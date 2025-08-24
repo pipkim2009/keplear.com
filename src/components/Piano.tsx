@@ -286,16 +286,8 @@ const Piano: React.FC = () => {
         0 4px 8px rgba(0, 0, 0, ${isDark ? '0.4' : '0.2'});
     }
 
-    .white-key:hover {
-      transform: translateY(2px);
-      box-shadow: 
-        inset 0 2px 4px rgba(255, 255, 255, 0.8),
-        inset 0 -2px 4px rgba(0, 0, 0, 0.1),
-        0 2px 4px rgba(0, 0, 0, 0.2);
-    }
 
     .white-key:active {
-      transform: translateY(4px);
       box-shadow: 
         inset 0 2px 4px rgba(255, 255, 255, 0.6),
         inset 0 -1px 2px rgba(0, 0, 0, 0.2),
@@ -305,7 +297,6 @@ const Piano: React.FC = () => {
     .white-key.selected {
       background: linear-gradient(145deg, #dbeafe, #bfdbfe);
       border-color: #3b82f6;
-      transform: translateY(3px);
     }
 
     .white-key.melody {
@@ -340,16 +331,8 @@ const Piano: React.FC = () => {
         0 4px 8px rgba(0, 0, 0, 0.5);
     }
 
-    .black-key:hover {
-      transform: translateY(1px);
-      box-shadow: 
-        inset 0 1px 2px rgba(255, 255, 255, 0.1),
-        inset 0 -1px 2px rgba(0, 0, 0, 0.3),
-        0 2px 4px rgba(0, 0, 0, 0.5);
-    }
 
     .black-key:active {
-      transform: translateY(3px);
       box-shadow: 
         inset 0 1px 2px rgba(255, 255, 255, 0.1),
         inset 0 -1px 1px rgba(0, 0, 0, 0.4),
@@ -358,7 +341,6 @@ const Piano: React.FC = () => {
 
     .black-key.selected {
       background: linear-gradient(145deg, #1e40af, #1d4ed8);
-      transform: translateY(2px);
     }
 
     .black-key.melody {
