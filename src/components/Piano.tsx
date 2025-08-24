@@ -47,7 +47,7 @@ const Piano: React.FC = () => {
   const [piano, setPiano] = useState<Tone.Sampler | null>(null)
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [bpm, setBpm] = useState(120)
-  const [numberOfNotes, setNumberOfNotes] = useState(8)
+  const [numberOfNotes, setNumberOfNotes] = useState(5)
   const [showNotes, setShowNotes] = useState(false)
 
   useEffect(() => {
@@ -90,9 +90,7 @@ const Piano: React.FC = () => {
 
     // Update selection logic
     if (selectedNotes.length < 2) {
-      if (!selectedNotes.find(n => n.name === note.name)) {
-        setSelectedNotes([...selectedNotes, note])
-      }
+      setSelectedNotes([...selectedNotes, note])
     } else {
       setSelectedNotes([note])
     }
@@ -103,6 +101,18 @@ const Piano: React.FC = () => {
     if (selectedNotes.length !== 2) return
 
     const [note1, note2] = selectedNotes.sort((a, b) => a.position - b.position)
+    
+    // If the same key is selected twice, use only that key
+    if (note1.name === note2.name) {
+      const melody: Note[] = []
+      for (let i = 0; i < numberOfNotes; i++) {
+        melody.push(note1)
+      }
+      setGeneratedMelody(melody)
+      return
+    }
+    
+    // Otherwise, use the range as before
     const startPos = note1.position
     const endPos = note2.position
     
@@ -152,11 +162,6 @@ const Piano: React.FC = () => {
     
     // Play the note using real piano samples
     piano.triggerAttackRelease(note.name, "0.5")
-    
-    // Return a promise that resolves when the note would finish
-    return new Promise(resolve => {
-      setTimeout(resolve, 500)
-    })
   }
 
 
@@ -672,8 +677,8 @@ const Piano: React.FC = () => {
             <label className="control-label">BPM</label>
             <input
               type="number"
-              min="60"
-              max="200"
+              min="1"
+              max="999"
               value={bpm}
               onChange={(e) => setBpm(Number(e.target.value))}
               className="piano-setting-input"
@@ -684,8 +689,8 @@ const Piano: React.FC = () => {
             <label className="control-label">Notes</label>
             <input
               type="number"
-              min="3"
-              max="16"
+              min="1"
+              max="25"
               value={numberOfNotes}
               onChange={(e) => setNumberOfNotes(Number(e.target.value))}
               className="piano-setting-input"
