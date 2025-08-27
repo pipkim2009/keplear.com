@@ -28,7 +28,7 @@ const Guitar: React.FC = () => {
           <div 
             key={index} 
             className="guitar-string" 
-            style={{ top: `${15 + index * 24}px` }}
+            style={{ top: `${15 + index * 28}px` }}
           ></div>
         ))}
       </div>

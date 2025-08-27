@@ -8,8 +8,8 @@
 
 .fretboard {
   position: relative;
-  width: 723px;
-  height: 150px;
+  width: 727px;
+  height: 175px;
   background: linear-gradient(145deg, #3e2723, #1e1e1e);
   border-radius: 0;
   box-shadow: 
@@ -42,7 +42,7 @@
   height: 12px;
   background: linear-gradient(145deg, #f5f5dc, #ddd);
   border-radius: 50%;
-  top: 50%;
+  top: 86.5px;
   left: 50%;
   transform: translate(-50%, -50%) translateX(-30px);
   box-shadow: 
@@ -52,11 +52,11 @@
 }
 
 .double-marker-1 {
-  transform: translate(-50%, -50%) translateX(-30px) translateY(-20px);
+  transform: translate(-50%, -50%) translateX(-30px) translateY(-21px);
 }
 
 .double-marker-2 {
-  transform: translate(-50%, -50%) translateX(-30px) translateY(20px);
+  transform: translate(-50%, -50%) translateX(-30px) translateY(19px);
 }
 
 .guitar-string {
@@ -67,7 +67,7 @@
   background: linear-gradient(90deg, #c0c0c0, #808080, #c0c0c0);
   border-radius: 1px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-  z-index: 5;
+  z-index: 15;
 }
 
 .guitar-string:nth-child(1) { 
