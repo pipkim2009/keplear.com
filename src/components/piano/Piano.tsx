@@ -1,5 +1,6 @@
 import React from 'react'
 import Keyboard from './Keyboard'
+import Guitar from '../guitar/Guitar'
 import PianoControls from './PianoControls'
 import type { Note } from '../../utils/notes'
 
@@ -12,6 +13,8 @@ interface PianoProps {
   setBpm: (bpm: number) => void
   numberOfNotes: number
   setNumberOfNotes: (count: number) => void
+  instrument: string
+  setInstrument: (instrument: string) => void
 }
 
 const Piano: React.FC<PianoProps> = ({
@@ -22,7 +25,9 @@ const Piano: React.FC<PianoProps> = ({
   bpm,
   setBpm,
   numberOfNotes,
-  setNumberOfNotes
+  setNumberOfNotes,
+  instrument,
+  setInstrument
 }) => {
   return (
     <div className="piano-container">
@@ -31,14 +36,20 @@ const Piano: React.FC<PianoProps> = ({
         setBpm={setBpm}
         numberOfNotes={numberOfNotes}
         setNumberOfNotes={setNumberOfNotes}
+        instrument={instrument}
+        setInstrument={setInstrument}
       />
       
-      <Keyboard
-        onNoteClick={onNoteClick}
-        isSelected={isSelected}
-        isInMelody={isInMelody}
-        showNotes={showNotes}
-      />
+      {instrument === 'piano' ? (
+        <Keyboard
+          onNoteClick={onNoteClick}
+          isSelected={isSelected}
+          isInMelody={isInMelody}
+          showNotes={showNotes}
+        />
+      ) : (
+        <Guitar />
+      )}
     </div>
   )
 }

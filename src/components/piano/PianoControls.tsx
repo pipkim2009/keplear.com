@@ -6,16 +6,32 @@ interface PianoControlsProps {
   setBpm: (bpm: number) => void
   numberOfNotes: number
   setNumberOfNotes: (count: number) => void
+  instrument: string
+  setInstrument: (instrument: string) => void
 }
 
 const PianoControls: React.FC<PianoControlsProps> = ({
   bpm,
   setBpm,
   numberOfNotes,
-  setNumberOfNotes
+  setNumberOfNotes,
+  instrument,
+  setInstrument
 }) => {
   return (
     <div className="piano-controls">
+      <div className="control-group">
+        <label className="control-label">Instrument</label>
+        <select
+          value={instrument}
+          onChange={(e) => setInstrument(e.target.value)}
+          className="control-input"
+        >
+          <option value="piano">Piano</option>
+          <option value="guitar">Guitar</option>
+        </select>
+      </div>
+
       <div className="control-group">
         <label className="control-label">BPM</label>
         <input

@@ -14,6 +14,7 @@ function App() {
   const [bpm, setBpm] = useState(120)
   const [numberOfNotes, setNumberOfNotes] = useState(5)
   const [showNotes, setShowNotes] = useState(false)
+  const [instrument, setInstrument] = useState('piano')
   
   const { isDarkMode, toggleTheme } = useTheme()
   const { playNote, playMelody, isPlaying } = useAudio()
@@ -60,6 +61,8 @@ function App() {
         setBpm={setBpm}
         numberOfNotes={numberOfNotes}
         setNumberOfNotes={setNumberOfNotes}
+        instrument={instrument}
+        setInstrument={setInstrument}
       />
 
       <MelodyControls
