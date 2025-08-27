@@ -8,7 +8,6 @@ interface PianoProps {
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
   showNotes: boolean
-  setShowNotes: (show: boolean) => void
   bpm: number
   setBpm: (bpm: number) => void
   numberOfNotes: number
@@ -20,7 +19,6 @@ const Piano: React.FC<PianoProps> = ({
   isSelected,
   isInMelody,
   showNotes,
-  setShowNotes,
   bpm,
   setBpm,
   numberOfNotes,
@@ -33,8 +31,6 @@ const Piano: React.FC<PianoProps> = ({
         setBpm={setBpm}
         numberOfNotes={numberOfNotes}
         setNumberOfNotes={setNumberOfNotes}
-        showNotes={showNotes}
-        setShowNotes={setShowNotes}
       />
       
       <Keyboard

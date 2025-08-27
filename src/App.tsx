@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import ThemeToggle from './components/common/ThemeToggle'
+import NotesToggle from './components/common/NotesToggle'
 import Piano from './components/piano/Piano'
 import MelodyControls from './components/MelodyControls'
 import MelodyDisplay from './components/MelodyDisplay'
@@ -41,6 +42,7 @@ function App() {
   return (
     <div className={`app-container ${isDarkMode ? 'dark' : 'light'}`}>
       <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
+      <NotesToggle showNotes={showNotes} onToggle={() => setShowNotes(!showNotes)} />
       
       <div className="app-header">
         <h1 className="app-title">Keplear</h1>
@@ -54,7 +56,6 @@ function App() {
         isSelected={isSelected}
         isInMelody={isInMelody}
         showNotes={showNotes}
-        setShowNotes={setShowNotes}
         bpm={bpm}
         setBpm={setBpm}
         numberOfNotes={numberOfNotes}
