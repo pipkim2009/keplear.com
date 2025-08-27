@@ -1,0 +1,77 @@
+.piano-controls {
+  position: absolute;
+  top: 10px;
+  left: 30px;
+  right: 30px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  z-index: 20;
+  height: 40px;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.control-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #d2d2f9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.control-input {
+  background: rgba(128, 0, 255, 0.1);
+  border: 2px solid #8000ff;
+  color: #d2d2f9;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  outline: none;
+  min-width: 70px;
+  text-align: center;
+  height: 28px;
+}
+
+.control-input:hover {
+  background: rgba(128, 0, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.control-input:focus {
+  box-shadow: 0 0 0 2px rgba(128, 0, 255, 0.3);
+}
+
+.notes-visibility-toggle {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  background: #8000ff;
+  color: #d2d2f9;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  font-size: 20px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notes-visibility-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}

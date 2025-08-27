@@ -1,0 +1,35 @@
+.melody-display {
+  background: #121212;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid #8000ff;
+  position: relative;
+}
+
+.melody-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #d2d2f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.melody-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.melody-note {
+  background: #ffffff;
+  color: #121212;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid #ffffff;
+}

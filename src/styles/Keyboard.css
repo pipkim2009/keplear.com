@@ -1,0 +1,114 @@
+.piano-container {
+  position: relative;
+  display: inline-block;
+  background: linear-gradient(145deg, #2d3748, #1a202c);
+  padding: 60px 30px 30px 30px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 4px solid #4a5568;
+}
+
+.keyboard {
+  position: relative;
+  display: flex;
+}
+
+.white-key {
+  width: 60px;
+  height: 280px;
+  background: linear-gradient(145deg, #ffffff, #f7fafc);
+  border: 2px solid #e2e8f0;
+  border-radius: 0 0 8px 8px;
+  margin-right: 2px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dark .white-key {
+  box-shadow: 
+    inset 0 2px 4px rgba(156, 163, 175, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.white-key:active {
+  box-shadow: 
+    inset 0 2px 4px rgba(255, 255, 255, 0.6),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.white-key.selected {
+  background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+  border-color: #3b82f6;
+}
+
+.white-key.melody {
+  background: linear-gradient(145deg, #dcfce7, #bbf7d0);
+  border-color: #10b981;
+}
+
+.white-key:last-child {
+  margin-right: 0;
+}
+
+.black-keys {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.black-key {
+  position: absolute;
+  width: 36px;
+  height: 180px;
+  background: linear-gradient(145deg, #374151, #111827);
+  border: 1px solid #4b5563;
+  border-radius: 0 0 6px 6px;
+  cursor: pointer;
+  pointer-events: all;
+  transition: all 0.1s ease;
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.black-key:active {
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.black-key.selected {
+  background: linear-gradient(145deg, #1e40af, #1d4ed8);
+}
+
+.black-key.melody {
+  background: linear-gradient(145deg, #047857, #065f46);
+}
+
+.key-label {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: 600;
+  user-select: none;
+  pointer-events: none;
+  color: #374151;
+}
+
+.black-key .key-label {
+  color: #ffffff;
+  font-size: 10px;
+  bottom: 12px;
+}

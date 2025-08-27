@@ -51,11 +51,6 @@ const Piano: React.FC = () => {
   const [showNotes, setShowNotes] = useState(false)
 
   useEffect(() => {
-    // Dispose existing sampler
-    if (piano) {
-      piano.dispose()
-    }
-
     // Initialize Tone.js piano sampler with high-quality samples
     const sampler = new Tone.Sampler({
       urls: {
@@ -89,11 +84,7 @@ const Piano: React.FC = () => {
     }
 
     // Update selection logic
-    if (selectedNotes.length < 2) {
-      setSelectedNotes([...selectedNotes, note])
-    } else {
-      setSelectedNotes([note])
-    }
+    setSelectedNotes(prev => prev.length < 2 ? [...prev, note] : [note])
     setGeneratedMelody([])
   }
 
@@ -104,11 +95,7 @@ const Piano: React.FC = () => {
     
     // If the same key is selected twice, use only that key
     if (note1.name === note2.name) {
-      const melody: Note[] = []
-      for (let i = 0; i < numberOfNotes; i++) {
-        melody.push(note1)
-      }
-      setGeneratedMelody(melody)
+      setGeneratedMelody(Array(numberOfNotes).fill(note1))
       return
     }
     
@@ -120,11 +107,9 @@ const Piano: React.FC = () => {
       note.position >= startPos && note.position <= endPos
     )
 
-    const melody: Note[] = []
-    for (let i = 0; i < numberOfNotes; i++) {
-      const randomNote = notesInRange[Math.floor(Math.random() * notesInRange.length)]
-      melody.push(randomNote)
-    }
+    const melody = Array(numberOfNotes).fill(null).map(() => 
+      notesInRange[Math.floor(Math.random() * notesInRange.length)]
+    )
 
     setGeneratedMelody(melody)
   }
@@ -167,8 +152,8 @@ const Piano: React.FC = () => {
 
   const currentNotes = notes
   
-  const isSelected = (note: Note) => selectedNotes.find(n => n.name === note.name) !== undefined
-  const isInMelody = (note: Note) => showNotes && generatedMelody.find(n => n.name === note.name) !== undefined
+  const isSelected = (note: Note) => selectedNotes.some(n => n.name === note.name)
+  const isInMelody = (note: Note) => showNotes && generatedMelody.some(n => n.name === note.name)
 
   const whiteKeys = notes.filter(note => !note.isBlack)
   const blackKeys = notes.filter(note => note.isBlack)

@@ -1,0 +1,45 @@
+.melody-controls {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.selected-notes {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #121212;
+}
+
+.dark .selected-notes {
+  color: #d2d2f9;
+}
+
+.buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #8000ff;
+  color: #d2d2f9;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button:not(:disabled):hover {
+  background: #6600cc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(128, 0, 255, 0.4);
+}
