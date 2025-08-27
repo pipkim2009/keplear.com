@@ -8,7 +8,7 @@
 
 .fretboard {
   position: relative;
-  width: 720px;
+  width: 723px;
   height: 150px;
   background: linear-gradient(145deg, #3e2723, #1e1e1e);
   border-radius: 0;
@@ -61,8 +61,8 @@
 
 .guitar-string {
   position: absolute;
-  left: -20px;
-  width: calc(100% + 40px);
+  left: 0;
+  width: 723px;
   height: 2px;
   background: linear-gradient(90deg, #c0c0c0, #808080, #c0c0c0);
   border-radius: 1px;
