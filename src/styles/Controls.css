@@ -60,3 +60,53 @@
   text-align: center;
 }
 
+/* Input with plus/minus buttons layout */
+.input-with-buttons {
+  position: relative;
+  display: inline-block;
+}
+
+.control-input.with-internal-buttons {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.control-button-internal {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  color: #d2d2f9;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  outline: none;
+  z-index: 10;
+}
+
+.control-button-internal:hover {
+  background: rgba(128, 0, 255, 0.1);
+}
+
+.control-button-internal:active {
+  background: rgba(128, 0, 255, 0.2);
+  transform: translateY(-50%) scale(0.95);
+}
+
+.control-button-internal.minus {
+  left: 3px;
+}
+
+.control-button-internal.plus {
+  right: 3px;
+}
+

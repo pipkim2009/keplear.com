@@ -24,7 +24,8 @@ function App() {
     selectNote, 
     generateMelody, 
     isSelected, 
-    isInMelody 
+    isInMelody,
+    clearSelection 
   } = useMelodyGenerator()
 
   const handleNoteClick = async (note: Note) => {
@@ -38,6 +39,11 @@ function App() {
 
   const handlePlayMelody = () => {
     playMelody(generatedMelody, bpm)
+  }
+
+  const handleInstrumentChange = (newInstrument: string) => {
+    setInstrument(newInstrument)
+    clearSelection() // Clear melody when instrument changes
   }
 
   return (
@@ -62,7 +68,7 @@ function App() {
         numberOfNotes={numberOfNotes}
         setNumberOfNotes={setNumberOfNotes}
         instrument={instrument}
-        setInstrument={setInstrument}
+        setInstrument={handleInstrumentChange}
       />
 
       <MelodyControls

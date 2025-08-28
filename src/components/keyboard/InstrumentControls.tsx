@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import '../../styles/Controls.css'
 
 interface InstrumentControlsProps {
@@ -24,6 +24,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   // Original default values
   const DEFAULT_BPM = 120
   const DEFAULT_NOTES = 5
+  
+  // Refs for hold-down functionality
+  const bpmIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const notesIntervalRef = useRef<NodeJS.Timeout | null>(null)
   
   // Update display values when props change
   useEffect(() => {
@@ -105,6 +109,110 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
       setNotesDisplay(numberOfNotes.toString())
     }
   }
+
+  // Plus/Minus button handlers with hold-down functionality
+  const handleBpmIncrement = () => {
+    const newBpm = Math.min(bpm + 1, 999)
+    setBpm(newBpm)
+    setBpmDisplay(newBpm.toString())
+  }
+
+  const handleBpmDecrement = () => {
+    const newBpm = Math.max(bpm - 1, 1)
+    setBpm(newBpm)
+    setBpmDisplay(newBpm.toString())
+  }
+
+  const handleNotesIncrement = () => {
+    const newNotes = Math.min(numberOfNotes + 1, 999)
+    setNumberOfNotes(newNotes)
+    setNotesDisplay(newNotes.toString())
+  }
+
+  const handleNotesDecrement = () => {
+    const newNotes = Math.max(numberOfNotes - 1, 1)
+    setNumberOfNotes(newNotes)
+    setNotesDisplay(newNotes.toString())
+  }
+
+  // Hold-down functionality
+  const startBpmIncrement = () => {
+    const increment = () => {
+      setBpm(prev => {
+        const newBpm = Math.min(prev + 1, 999)
+        setBpmDisplay(newBpm.toString())
+        return newBpm
+      })
+    }
+    
+    increment() // First increment immediately
+    if (bpmIntervalRef.current) clearInterval(bpmIntervalRef.current)
+    bpmIntervalRef.current = setInterval(increment, 225)
+  }
+
+  const startBpmDecrement = () => {
+    const decrement = () => {
+      setBpm(prev => {
+        const newBpm = Math.max(prev - 1, 1)
+        setBpmDisplay(newBpm.toString())
+        return newBpm
+      })
+    }
+    
+    decrement() // First decrement immediately
+    if (bpmIntervalRef.current) clearInterval(bpmIntervalRef.current)
+    bpmIntervalRef.current = setInterval(decrement, 225)
+  }
+
+  const startNotesIncrement = () => {
+    const increment = () => {
+      setNumberOfNotes(prev => {
+        const newNotes = Math.min(prev + 1, 999)
+        setNotesDisplay(newNotes.toString())
+        return newNotes
+      })
+    }
+    
+    increment() // First increment immediately
+    if (notesIntervalRef.current) clearInterval(notesIntervalRef.current)
+    notesIntervalRef.current = setInterval(increment, 225)
+  }
+
+  const startNotesDecrement = () => {
+    const decrement = () => {
+      setNumberOfNotes(prev => {
+        const newNotes = Math.max(prev - 1, 1)
+        setNotesDisplay(newNotes.toString())
+        return newNotes
+      })
+    }
+    
+    decrement() // First decrement immediately
+    if (notesIntervalRef.current) clearInterval(notesIntervalRef.current)
+    notesIntervalRef.current = setInterval(decrement, 225)
+  }
+
+  const stopBpmInterval = () => {
+    if (bpmIntervalRef.current) {
+      clearInterval(bpmIntervalRef.current)
+      bpmIntervalRef.current = null
+    }
+  }
+
+  const stopNotesInterval = () => {
+    if (notesIntervalRef.current) {
+      clearInterval(notesIntervalRef.current)
+      notesIntervalRef.current = null
+    }
+  }
+
+  // Cleanup intervals on unmount
+  useEffect(() => {
+    return () => {
+      stopBpmInterval()
+      stopNotesInterval()
+    }
+  }, [])
   return (
     <div className="instrument-controls">
       <div className="control-group">
@@ -121,26 +229,70 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
       <div className="control-group">
         <label className="control-label">BPM</label>
-        <input
-          type="text"
-          value={bpmDisplay}
-          onChange={(e) => handleBpmChange(e.target.value)}
-          onKeyPress={handleBpmKeyPress}
-          onBlur={handleBpmBlur}
-          className="control-input"
-        />
+        <div className="input-with-buttons">
+          <input
+            type="text"
+            value={bpmDisplay}
+            onChange={(e) => handleBpmChange(e.target.value)}
+            onKeyPress={handleBpmKeyPress}
+            onBlur={handleBpmBlur}
+            className="control-input with-internal-buttons"
+          />
+          <button
+            className="control-button-internal minus"
+            onMouseDown={startBpmDecrement}
+            onMouseUp={stopBpmInterval}
+            onMouseLeave={stopBpmInterval}
+            onTouchStart={startBpmDecrement}
+            onTouchEnd={stopBpmInterval}
+          >
+            −
+          </button>
+          <button
+            className="control-button-internal plus"
+            onMouseDown={startBpmIncrement}
+            onMouseUp={stopBpmInterval}
+            onMouseLeave={stopBpmInterval}
+            onTouchStart={startBpmIncrement}
+            onTouchEnd={stopBpmInterval}
+          >
+            +
+          </button>
+        </div>
       </div>
 
       <div className="control-group">
         <label className="control-label">Notes</label>
-        <input
-          type="text"
-          value={notesDisplay}
-          onChange={(e) => handleNotesChange(e.target.value)}
-          onKeyPress={handleNotesKeyPress}
-          onBlur={handleNotesBlur}
-          className="control-input"
-        />
+        <div className="input-with-buttons">
+          <input
+            type="text"
+            value={notesDisplay}
+            onChange={(e) => handleNotesChange(e.target.value)}
+            onKeyPress={handleNotesKeyPress}
+            onBlur={handleNotesBlur}
+            className="control-input with-internal-buttons"
+          />
+          <button
+            className="control-button-internal minus"
+            onMouseDown={startNotesDecrement}
+            onMouseUp={stopNotesInterval}
+            onMouseLeave={stopNotesInterval}
+            onTouchStart={startNotesDecrement}
+            onTouchEnd={stopNotesInterval}
+          >
+            −
+          </button>
+          <button
+            className="control-button-internal plus"
+            onMouseDown={startNotesIncrement}
+            onMouseUp={stopNotesInterval}
+            onMouseLeave={stopNotesInterval}
+            onTouchStart={startNotesIncrement}
+            onTouchEnd={stopNotesInterval}
+          >
+            +
+          </button>
+        </div>
       </div>
     </div>
   )
