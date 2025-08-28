@@ -48,7 +48,7 @@ function App() {
       <div className="app-header">
         <h1 className="app-title">Keplear</h1>
         <p className="app-description">
-          Interactive instrument for melody generation and practice
+          Interactive tools for musical ear training
         </p>
       </div>
 

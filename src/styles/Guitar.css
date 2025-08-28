@@ -86,6 +86,130 @@
 }
 
 
+/* Fret checkboxes styling */
+.fret-checkbox-container {
+  position: absolute;
+  bottom: -45px;
+  left: 50%;
+  transform: translateX(-40px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 20;
+}
+
+.fret-checkbox {
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  background: rgba(128, 0, 255, 0.1);
+  border: 2px solid #8000ff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.fret-checkbox:checked {
+  background: linear-gradient(145deg, #8000ff, #6b00cc);
+  border-color: #c77dff;
+}
+
+.fret-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.fret-checkbox:hover {
+  background: rgba(128, 0, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.fret-checkbox-label {
+  font-size: 10px;
+  color: #d2d2f9;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* Disabled state for fret checkboxes */
+.fret-checkbox.disabled {
+  opacity: 0.8;
+  background: rgba(128, 0, 255, 0.05);
+  border-color: rgba(128, 0, 255, 0.4);
+  cursor: not-allowed;
+}
+
+.fret-checkbox.disabled:hover {
+  background: rgba(128, 0, 255, 0.05);
+  transform: none;
+  border-color: rgba(128, 0, 255, 0.4);
+}
+
+.fret-checkbox-label.disabled {
+  opacity: 0.8;
+  color: rgba(210, 210, 249, 0.8);
+  cursor: not-allowed;
+}
+
+/* String checkboxes styling */
+.string-checkbox-container {
+  position: absolute;
+  left: -40px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 20;
+  flex-direction: row-reverse;
+}
+
+.string-checkbox {
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  background: rgba(128, 0, 255, 0.1);
+  border: 2px solid #8000ff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.string-checkbox:checked {
+  background: linear-gradient(145deg, #8000ff, #6b00cc);
+  border-color: #c77dff;
+}
+
+.string-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.string-checkbox:hover {
+  background: rgba(128, 0, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.string-checkbox-label {
+  font-size: 10px;
+  color: #d2d2f9;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 /* Dark mode adjustments */
 .dark .fretboard {
   background: linear-gradient(145deg, #2d1810, #0d0d0d);
