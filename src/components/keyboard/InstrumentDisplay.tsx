@@ -1,10 +1,10 @@
 import React from 'react'
 import Keyboard from './Keyboard'
 import Guitar from '../guitar/Guitar'
-import PianoControls from './PianoControls'
+import InstrumentControls from './InstrumentControls'
 import type { Note } from '../../utils/notes'
 
-interface PianoProps {
+interface InstrumentDisplayProps {
   onNoteClick: (note: Note) => void
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
@@ -17,7 +17,7 @@ interface PianoProps {
   setInstrument: (instrument: string) => void
 }
 
-const Piano: React.FC<PianoProps> = ({
+const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   onNoteClick,
   isSelected,
   isInMelody,
@@ -30,8 +30,8 @@ const Piano: React.FC<PianoProps> = ({
   setInstrument
 }) => {
   return (
-    <div className="piano-container">
-      <PianoControls
+    <div className="instrument-container">
+      <InstrumentControls
         bpm={bpm}
         setBpm={setBpm}
         numberOfNotes={numberOfNotes}
@@ -40,7 +40,7 @@ const Piano: React.FC<PianoProps> = ({
         setInstrument={setInstrument}
       />
       
-      {instrument === 'piano' ? (
+      {instrument === 'keyboard' ? (
         <Keyboard
           onNoteClick={onNoteClick}
           isSelected={isSelected}
@@ -54,4 +54,4 @@ const Piano: React.FC<PianoProps> = ({
   )
 }
 
-export default Piano
+export default InstrumentDisplay

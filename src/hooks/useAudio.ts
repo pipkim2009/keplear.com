@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import * as Tone from 'tone'
 
 export const useAudio = () => {
-  const [piano, setPiano] = useState<Tone.Sampler | null>(null)
+  const [keyboard, setKeyboard] = useState<Tone.Sampler | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(() => {
@@ -21,7 +21,7 @@ export const useAudio = () => {
       baseUrl: "https://tonejs.github.io/audio/salamander/",
     }).toDestination()
 
-    setPiano(sampler)
+    setKeyboard(sampler)
 
     return () => {
       sampler.dispose()
@@ -35,14 +35,14 @@ export const useAudio = () => {
   }
 
   const playNote = async (noteName: string, duration: string = "0.3") => {
-    if (!piano) return
+    if (!keyboard) return
     
     await ensureToneStarted()
-    piano.triggerAttackRelease(noteName, duration)
+    keyboard.triggerAttackRelease(noteName, duration)
   }
 
   const playMelody = async (melody: Array<{name: string}>, bpm: number) => {
-    if (melody.length === 0 || isPlaying || !piano) return
+    if (melody.length === 0 || isPlaying || !keyboard) return
     
     await ensureToneStarted()
     setIsPlaying(true)
@@ -50,7 +50,7 @@ export const useAudio = () => {
     const noteDuration = (60 / bpm) * 800 // 80% rhythm timing in milliseconds
     
     for (let i = 0; i < melody.length; i++) {
-      piano.triggerAttackRelease(melody[i].name, "0.5")
+      keyboard.triggerAttackRelease(melody[i].name, "0.5")
       if (i < melody.length - 1) {
         await new Promise(resolve => setTimeout(resolve, noteDuration))
       }

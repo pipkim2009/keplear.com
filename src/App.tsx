@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import ThemeToggle from './components/common/ThemeToggle'
 import NotesToggle from './components/common/NotesToggle'
-import Piano from './components/piano/Piano'
+import InstrumentDisplay from './components/keyboard/InstrumentDisplay'
 import MelodyControls from './components/MelodyControls'
 import MelodyDisplay from './components/MelodyDisplay'
 import { useAudio } from './hooks/useAudio'
@@ -14,7 +14,7 @@ function App() {
   const [bpm, setBpm] = useState(120)
   const [numberOfNotes, setNumberOfNotes] = useState(5)
   const [showNotes, setShowNotes] = useState(false)
-  const [instrument, setInstrument] = useState('piano')
+  const [instrument, setInstrument] = useState('keyboard')
   
   const { isDarkMode, toggleTheme } = useTheme()
   const { playNote, playMelody, isPlaying } = useAudio()
@@ -48,11 +48,11 @@ function App() {
       <div className="app-header">
         <h1 className="app-title">Keplear</h1>
         <p className="app-description">
-          Interactive piano for melody generation and practice
+          Interactive instrument for melody generation and practice
         </p>
       </div>
 
-      <Piano
+      <InstrumentDisplay
         onNoteClick={handleNoteClick}
         isSelected={isSelected}
         isInMelody={isInMelody}

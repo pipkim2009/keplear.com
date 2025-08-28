@@ -1,5 +1,5 @@
 import React from 'react'
-import PianoKey from './PianoKey'
+import KeyboardKey from './KeyboardKey'
 import { whiteKeys, blackKeys, getBlackKeyLeft, type Note } from '../../utils/notes'
 import '../../styles/Keyboard.css'
 
@@ -20,7 +20,7 @@ const Keyboard: React.FC<KeyboardProps> = ({
     <div className="keyboard">
       {/* White Keys */}
       {whiteKeys.map((note) => (
-        <PianoKey
+        <KeyboardKey
           key={note.name}
           note={note}
           isSelected={isSelected(note)}
@@ -32,7 +32,7 @@ const Keyboard: React.FC<KeyboardProps> = ({
       {/* Black Keys */}
       <div className="black-keys">
         {blackKeys.map((note) => (
-          <PianoKey
+          <KeyboardKey
             key={note.name}
             note={note}
             isSelected={isSelected(note)}

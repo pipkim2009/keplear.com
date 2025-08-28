@@ -1,7 +1,7 @@
 import React from 'react'
 import type { Note } from '../../utils/notes'
 
-interface PianoKeyProps {
+interface KeyboardKeyProps {
   note: Note
   isSelected: boolean
   isInMelody: boolean
@@ -10,7 +10,7 @@ interface PianoKeyProps {
   style?: React.CSSProperties
 }
 
-const PianoKey: React.FC<PianoKeyProps> = ({ 
+const KeyboardKey: React.FC<KeyboardKeyProps> = ({ 
   note, 
   isSelected, 
   isInMelody, 
@@ -33,4 +33,4 @@ const PianoKey: React.FC<PianoKeyProps> = ({
   )
 }
 
-export default PianoKey
+export default KeyboardKey
