@@ -5,6 +5,7 @@ import { guitarNotes } from '../../utils/guitarNotes'
 const Guitar: React.FC = () => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(12).fill(false))
+  const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set())
 
   // Check if at least one string is selected
   const hasStringSelected = stringCheckboxes.some(checked => checked)
@@ -38,6 +39,55 @@ const Guitar: React.FC = () => {
     
     const note = guitarNotes.find(note => note.string === guitarString && note.fret === fret)
     return note ? note.name : ''
+  }
+
+  // Handle clicking on individual fret positions
+  const handleNoteClick = (stringIndex: number, fretIndex: number) => {
+    const noteKey = `${stringIndex}-${fretIndex}`
+    const newSelectedNotes = new Set(selectedNotes)
+    
+    // Check current state without calling isNoteSelected to avoid circular dependency
+    const isIndividuallySelected = selectedNotes.has(noteKey)
+    const isNegativelySelected = selectedNotes.has(`-${noteKey}`)
+    const isCheckboxSelected = stringCheckboxes[stringIndex] && fretCheckboxes[fretIndex]
+    const currentlyVisible = (isIndividuallySelected || isCheckboxSelected) && !isNegativelySelected
+    
+    if (currentlyVisible) {
+      // Note is currently showing - we need to hide it
+      if (isIndividuallySelected) {
+        // It's individually selected, just remove it
+        newSelectedNotes.delete(noteKey)
+      } else {
+        // It's selected via checkboxes, add negative selection to override
+        newSelectedNotes.add(`-${noteKey}`)
+      }
+    } else {
+      // Note is not showing - we need to show it
+      if (isNegativelySelected) {
+        // It was negatively selected, remove the negative
+        newSelectedNotes.delete(`-${noteKey}`)
+      } else {
+        // Just add positive selection
+        newSelectedNotes.add(noteKey)
+      }
+    }
+    
+    setSelectedNotes(newSelectedNotes)
+  }
+
+  // Check if a specific note is selected
+  const isNoteSelected = (stringIndex: number, fretIndex: number): boolean => {
+    const noteKey = `${stringIndex}-${fretIndex}`
+    const negativeKey = `-${noteKey}`
+    
+    // If explicitly deselected, always return false
+    if (selectedNotes.has(negativeKey)) {
+      return false
+    }
+    
+    // Otherwise check if individually selected or selected via checkboxes
+    return selectedNotes.has(noteKey) || 
+           (stringCheckboxes[stringIndex] && fretCheckboxes[fretIndex])
   }
 
   return (
@@ -82,6 +132,23 @@ const Guitar: React.FC = () => {
           ></div>
         ))}
 
+        {/* Clickable fret positions */}
+        {[...Array(6)].map((_, stringIndex) => (
+          [...Array(12)].map((_, fretIndex) => (
+            <div
+              key={`fret-position-${stringIndex}-${fretIndex}`}
+              className="fret-position"
+              style={{
+                left: `${fretIndex * 60 + 3}px`, // Start just after the previous fret line
+                top: `${15 + stringIndex * 28 - 12}px`, // Expand height above and below string
+                width: `${60 - 6}px`, // Full width between fret lines minus small margins
+                height: `24px`, // Height of string spacing minus 4px to prevent overlap
+              }}
+              onClick={() => handleNoteClick(stringIndex, fretIndex)}
+            />
+          ))
+        ))}
+
         {/* String checkboxes beside each string */}
         {[...Array(6)].map((_, index) => (
           <div 
@@ -101,9 +168,9 @@ const Guitar: React.FC = () => {
         ))}
 
         {/* Note visualization circles */}
-        {stringCheckboxes.map((stringSelected, stringIndex) => 
-          stringSelected && fretCheckboxes.map((fretSelected, fretIndex) =>
-            fretSelected && (
+        {[...Array(6)].map((_, stringIndex) =>
+          [...Array(12)].map((_, fretIndex) =>
+            isNoteSelected(stringIndex, fretIndex) && (
               <div
                 key={`note-${stringIndex}-${fretIndex}`}
                 className="note-circle"

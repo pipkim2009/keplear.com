@@ -210,6 +210,21 @@
   cursor: pointer;
 }
 
+/* Clickable fret positions */
+.fret-position {
+  position: absolute;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 30;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.fret-position:hover {
+  background: rgba(255, 107, 107, 0.2);
+  transform: scaleY(1.1);
+}
+
 /* Note circle styling */
 .note-circle {
   position: absolute;
@@ -226,6 +241,7 @@
     0 2px 4px rgba(0, 0, 0, 0.3),
     inset 0 1px 2px rgba(255, 255, 255, 0.3);
   animation: noteAppear 0.3s ease-out;
+  pointer-events: none;
 }
 
 .note-name {
