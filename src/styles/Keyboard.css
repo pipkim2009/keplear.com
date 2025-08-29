@@ -1,12 +1,20 @@
 .instrument-container {
   position: relative;
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   background: linear-gradient(145deg, #2d3748, #1a202c);
   padding: 60px 30px 30px 30px;
   margin-top: 2rem;
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   border: 4px solid #4a5568;
+  width: 950px;
+  min-height: 350px;
+}
+
+.instrument-container > * {
+  position: relative;
 }
 
 .keyboard {
