@@ -50,7 +50,6 @@ export const useMelodyGenerator = () => {
         selectedNotes[Math.floor(Math.random() * selectedNotes.length)]
       )
 
-      console.log('Generated guitar melody:', melody)
       setGeneratedMelody(melody)
     }
   }

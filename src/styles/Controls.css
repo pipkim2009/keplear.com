@@ -37,10 +37,10 @@
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   outline: none;
-  min-width: 90px;
-  width: 90px;
+  min-width: 120px;
+  width: 120px;
   text-align: center;
-  height: 28px;
+  height: 32px;
 }
 
 .control-input:hover {
@@ -58,6 +58,13 @@
   background: #2d1b69;
   color: #d2d2f9;
   text-align: center;
+  text-align-last: center;
+  padding: 4px 8px;
+  direction: ltr;
+  border: 1px solid #000000;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Input with plus/minus buttons layout */
