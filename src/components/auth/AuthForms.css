@@ -22,9 +22,9 @@
 
 .dark .auth-modal-overlay {
   background: linear-gradient(135deg, 
-    rgba(10, 10, 10, 0.9) 0%, 
-    rgba(45, 27, 105, 0.8) 30%, 
-    rgba(26, 13, 46, 0.9) 70%, 
+    rgba(18, 18, 18, 0.9) 0%, 
+    rgba(30, 30, 30, 0.8) 30%, 
+    rgba(40, 40, 40, 0.9) 70%, 
     rgba(18, 18, 18, 0.9) 100%);
 }
 
@@ -50,49 +50,43 @@
 
 .dark .auth-modal {
   background: linear-gradient(145deg, 
-    rgba(45, 27, 105, 0.95) 0%, 
-    rgba(26, 13, 46, 0.98) 100%);
-  border: 2px solid rgba(210, 210, 249, 0.2);
+    rgba(40, 40, 40, 0.95) 0%, 
+    rgba(30, 30, 30, 0.98) 100%);
+  border: 2px solid rgba(80, 80, 80, 0.3);
   box-shadow: 
     0 20px 60px rgba(0, 0, 0, 0.5),
-    inset 0 1px 0 rgba(210, 210, 249, 0.1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .close-button {
   position: absolute;
   top: 20px;
   right: 20px;
-  background: rgba(45, 27, 105, 0.1);
-  border: 2px solid rgba(45, 27, 105, 0.2);
-  font-size: 20px;
+  background: none;
+  border: none;
+  font-size: 28px;
   cursor: pointer;
   color: #2d1b69;
   z-index: 10;
-  width: 36px;
-  height: 36px;
+  width: auto;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  transition: all 0.2s ease;
   font-weight: bold;
+  padding: 4px;
 }
 
 .close-button:hover {
-  background: rgba(45, 27, 105, 0.2);
-  border-color: rgba(45, 27, 105, 0.4);
-  transform: rotate(90deg) scale(1.1);
+  opacity: 0.7;
 }
 
 .dark .close-button {
-  background: rgba(210, 210, 249, 0.1);
-  border-color: rgba(210, 210, 249, 0.2);
-  color: #d2d2f9;
+  color: #f8f9fa;
 }
 
 .dark .close-button:hover {
-  background: rgba(210, 210, 249, 0.2);
-  border-color: rgba(210, 210, 249, 0.4);
+  opacity: 0.7;
 }
 
 /* Auth Form Styles */
@@ -110,7 +104,7 @@
 }
 
 .dark .auth-form h2 {
-  color: #d2d2f9;
+  color: #f8f9fa;
 }
 
 .form-description {
@@ -139,7 +133,7 @@
 }
 
 .dark .form-group label {
-  color: #d2d2f9;
+  color: #f8f9fa;
 }
 
 .form-group input {
@@ -157,9 +151,9 @@
 }
 
 .dark .form-group input {
-  background: rgba(45, 27, 105, 0.3);
-  border-color: rgba(210, 210, 249, 0.2);
-  color: #d2d2f9;
+  background: rgba(60, 60, 60, 0.8);
+  border-color: rgba(80, 80, 80, 0.4);
+  color: #f8f9fa;
 }
 
 .form-group input::placeholder {
@@ -168,7 +162,7 @@
 }
 
 .dark .form-group input::placeholder {
-  color: rgba(210, 210, 249, 0.6);
+  color: rgba(248, 249, 250, 0.6);
 }
 
 .form-group input:focus {
@@ -180,9 +174,9 @@
 }
 
 .dark .form-group input:focus {
-  border-color: #a5b4fc;
-  background: rgba(45, 27, 105, 0.5);
-  box-shadow: 0 0 0 4px rgba(165, 180, 252, 0.15);
+  border-color: #6366f1;
+  background: rgba(70, 70, 70, 0.9);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
 }
 
 .form-group input:disabled {
@@ -192,7 +186,7 @@
 }
 
 .dark .form-group input:disabled {
-  background: rgba(45, 27, 105, 0.1);
+  background: rgba(50, 50, 50, 0.5);
 }
 
 .auth-button {
@@ -234,6 +228,31 @@
   background: #3730a3;
   border-color: #3730a3;
   box-shadow: 0 6px 20px rgba(76, 29, 149, 0.4);
+}
+
+/* Special styling for Create Account button only */
+.auth-button.primary.create-account {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.dark .auth-button.primary.create-account {
+  background: #2563eb;
+  border-color: #2563eb;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.auth-button.primary.create-account:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+}
+
+.dark .auth-button.primary.create-account:hover:not(:disabled) {
+  background: #1e40af;
+  border-color: #1e40af;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
 }
 
 .auth-button:disabled {

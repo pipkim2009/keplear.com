@@ -74,7 +74,7 @@ const LoginForm = ({ onToggleForm, onClose }) => {
 
         <button 
           type="submit" 
-          className="auth-button primary"
+          className="auth-button primary create-account"
           disabled={loading}
         >
           {loading ? 'Signing in...' : 'Sign In'}

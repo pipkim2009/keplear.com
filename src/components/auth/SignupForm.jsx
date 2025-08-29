@@ -34,9 +34,6 @@ const SignupForm = ({ onToggleForm, onClose }) => {
     if (!formData.email) {
       return 'Email is required'
     }
-    if (formData.password.length < 6) {
-      return 'Password must be at least 6 characters'
-    }
     if (formData.password !== formData.confirmPassword) {
       return 'Passwords do not match'
     }
@@ -101,7 +98,7 @@ const SignupForm = ({ onToggleForm, onClose }) => {
             type="text"
             value={formData.username}
             onChange={handleChange}
-            placeholder="Enter your username (letters, numbers, _ only)"
+            placeholder="Username (a-z, 0-9, _ only)"
             disabled={loading}
             required
           />
@@ -129,7 +126,7 @@ const SignupForm = ({ onToggleForm, onClose }) => {
             type="password"
             value={formData.password}
             onChange={handleChange}
-            placeholder="Create a password (min 6 characters)"
+            placeholder="Create a password"
             disabled={loading}
             required
           />
@@ -151,7 +148,7 @@ const SignupForm = ({ onToggleForm, onClose }) => {
 
         <button 
           type="submit" 
-          className="auth-button primary"
+          className="auth-button primary create-account"
           disabled={loading}
         >
           {loading ? 'Creating account...' : 'Create Account'}
