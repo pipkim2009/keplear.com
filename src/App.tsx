@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import ThemeToggle from './components/common/ThemeToggle'
-import NotesToggle from './components/common/NotesToggle'
+import Header from './components/common/Header'
+import Footer from './components/common/Footer'
 import InstrumentDisplay from './components/keyboard/InstrumentDisplay'
 import MelodyControls from './components/MelodyControls'
 import MelodyDisplay from './components/MelodyDisplay'
@@ -57,16 +57,13 @@ function App() {
 
   return (
     <div className={`app-container ${isDarkMode ? 'dark' : 'light'}`}>
-      <ThemeToggle isDarkMode={isDarkMode} onToggle={toggleTheme} />
-      <NotesToggle showNotes={showNotes} onToggle={() => setShowNotes(!showNotes)} />
+      <Header 
+        isDarkMode={isDarkMode} 
+        onToggleTheme={toggleTheme}
+        showNotes={showNotes}
+        onToggleNotes={() => setShowNotes(!showNotes)}
+      />
       
-      <div className="app-header">
-        <h1 className="app-title">Keplear</h1>
-        <p className="app-description">
-          Interactive tools for musical ear training
-        </p>
-      </div>
-
       <InstrumentDisplay
         onNoteClick={handleNoteClick}
         isSelected={isSelected}
@@ -94,6 +91,8 @@ function App() {
         generatedMelody={generatedMelody}
         showNotes={showNotes}
       />
+      
+      <Footer />
     </div>
   )
 }

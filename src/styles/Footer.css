@@ -1,0 +1,144 @@
+.footer {
+  width: 100%;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.light .footer {
+  background: rgba(232, 228, 255, 0.8);
+  border-top: 1px solid rgba(18, 18, 18, 0.1);
+}
+
+.dark .footer {
+  background: rgba(18, 18, 18, 0.8);
+  border-top: 1px solid rgba(210, 210, 249, 0.1);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.footer-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #121212;
+  transition: color 0.3s ease;
+}
+
+.dark .footer-logo {
+  color: #d2d2f9;
+}
+
+.footer-slogan {
+  font-size: 0.875rem;
+  margin: 0;
+  color: #121212;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.dark .footer-slogan {
+  color: #d2d2f9;
+}
+
+.footer-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.footer-contact {
+  display: flex;
+  align-items: center;
+}
+
+.footer-email {
+  color: #8000ff;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.footer-email:hover {
+  background: rgba(128, 0, 255, 0.1);
+  text-decoration: underline;
+}
+
+.dark .footer-email {
+  color: #a855f7;
+}
+
+.dark .footer-email:hover {
+  background: rgba(168, 85, 247, 0.1);
+}
+
+.footer-copyright {
+  text-align: right;
+  font-size: 0.75rem;
+  color: #121212;
+  opacity: 0.6;
+  line-height: 1.4;
+}
+
+.dark .footer-copyright {
+  color: #d2d2f9;
+}
+
+.footer-copyright p {
+  margin: 0;
+}
+
+.footer-author {
+  font-weight: 600;
+  opacity: 0.8 !important;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    padding: 1.5rem 1rem;
+  }
+  
+  .footer-main {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  
+  .footer-brand {
+    align-items: center;
+  }
+  
+  .footer-info {
+    align-items: center;
+  }
+  
+  .footer-copyright {
+    text-align: center;
+  }
+  
+  .footer-logo {
+    font-size: 1.25rem;
+  }
+}
