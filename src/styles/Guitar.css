@@ -246,6 +246,16 @@
   transform: scaleY(1.1);
 }
 
+/* Open string area styling */
+.open-string-position {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.open-string-position:hover {
+  background: rgba(255, 107, 107, 0.2);
+  transform: scaleY(1.1);
+}
+
 /* Note circle styling */
 .note-circle {
   position: absolute;

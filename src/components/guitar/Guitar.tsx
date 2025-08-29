@@ -69,6 +69,39 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
     return note ? note.name : ''
   }
 
+  // Handle clicking on open strings (fret 0)
+  const handleOpenStringClick = async (stringIndex: number) => {
+    const noteKey = `${stringIndex}-open`
+    const newSelectedNotes = new Set(selectedNotes)
+    
+    // Play the note sound if onNoteClick is provided
+    if (onNoteClick) {
+      // Get open string note (fret 0)
+      const stringMapping = [6, 5, 4, 3, 2, 1] // Map visual index to guitar string number
+      const guitarString = stringMapping[stringIndex]
+      const openNote = guitarNotes.find(note => note.string === guitarString && note.fret === 0)
+      
+      if (openNote) {
+        const noteObj: Note = {
+          name: openNote.name,
+          frequency: openNote.frequency,
+          isBlack: openNote.name.includes('#'),
+          position: stringIndex * 100 - 1 // Unique position for open strings
+        }
+        await onNoteClick(noteObj)
+      }
+    }
+    
+    // Toggle open string selection
+    if (newSelectedNotes.has(noteKey)) {
+      newSelectedNotes.delete(noteKey)
+    } else {
+      newSelectedNotes.add(noteKey)
+    }
+    
+    setSelectedNotes(newSelectedNotes)
+  }
+
   // Handle clicking on individual fret positions
   const handleNoteClick = async (stringIndex: number, fretIndex: number) => {
     const noteKey = `${stringIndex}-${fretIndex}`
@@ -186,11 +219,35 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
     return false
   }
 
+  // Check if an open string is selected
+  const isOpenStringSelected = (stringIndex: number): boolean => {
+    const openKey = `${stringIndex}-open`
+    return selectedNotes.has(openKey) || stringCheckboxes[stringIndex]
+  }
+
   // Convert guitar notes to the Note format expected by the melody system
   const convertToMelodyNotes = (): Note[] => {
     const melodyNotes: Note[] = []
     
-    // Check all possible note positions
+    // Check open strings first
+    for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
+      if (isOpenStringSelected(stringIndex)) {
+        const stringMapping = [6, 5, 4, 3, 2, 1] // Map visual index to guitar string number
+        const guitarString = stringMapping[stringIndex]
+        const openNote = guitarNotes.find(note => note.string === guitarString && note.fret === 0)
+        
+        if (openNote) {
+          melodyNotes.push({
+            name: openNote.name,
+            frequency: openNote.frequency,
+            isBlack: openNote.name.includes('#'),
+            position: stringIndex * 100 - 1 // Position for open strings
+          })
+        }
+      }
+    }
+    
+    // Check all fretted note positions
     for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
       for (let fretIndex = 0; fretIndex < 12; fretIndex++) {
         if (isNoteSelected(stringIndex, fretIndex)) {
@@ -272,6 +329,21 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
           )
         })}
 
+        {/* Clickable open string positions (fret 0) */}
+        {[...Array(6)].map((_, stringIndex) => (
+          <div
+            key={`open-string-${stringIndex}`}
+            className="fret-position open-string-position"
+            style={{
+              left: `0px`, // At the very left edge
+              top: `${15 + stringIndex * 28 - 12}px`,
+              width: `15px`, // 25% of first fret zone (60px * 0.25)
+              height: `24px`,
+            }}
+            onClick={() => handleOpenStringClick(stringIndex)}
+          />
+        ))}
+
         {/* Clickable fret positions */}
         {[...Array(6)].map((_, stringIndex) => (
           [...Array(12)].map((_, fretIndex) => (
@@ -279,9 +351,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
               key={`fret-position-${stringIndex}-${fretIndex}`}
               className="fret-position"
               style={{
-                left: `${fretIndex * 60 + 3}px`, // Start just after the previous fret line
+                left: `${fretIndex === 0 ? 15 + 3 : fretIndex * 60 + 3}px`, // Start after open string area for first fret
                 top: `${15 + stringIndex * 28 - 12}px`, // Expand height above and below string
-                width: `${60 - 6}px`, // Full width between fret lines minus small margins
+                width: `${fretIndex === 0 ? 60 - 18 : 60 - 6}px`, // 75% width for first fret (42px)
                 height: `24px`, // Height of string spacing minus 4px to prevent overlap
               }}
               onClick={() => handleNoteClick(stringIndex, fretIndex)}
@@ -306,6 +378,41 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
             <label htmlFor={`string-${index}`} className="string-checkbox-label">{index + 1}</label>
           </div>
         ))}
+
+        {/* Open string note visualization circles */}
+        {[...Array(6)].map((_, stringIndex) => {
+          if (!isOpenStringSelected(stringIndex)) return null
+          
+          const stringMapping = [6, 5, 4, 3, 2, 1]
+          const guitarString = stringMapping[stringIndex]
+          const openNote = guitarNotes.find(note => note.string === guitarString && note.fret === 0)
+          
+          if (!openNote) return null
+          
+          const noteObj: Note = {
+            name: openNote.name,
+            frequency: openNote.frequency,
+            isBlack: openNote.name.includes('#'),
+            position: stringIndex * 100 - 1
+          }
+          
+          const isInGeneratedMelody = isInMelody(noteObj, showNotes)
+          
+          return (
+            <div
+              key={`open-note-${stringIndex}`}
+              className={`note-circle ${isInGeneratedMelody ? 'melody-note' : ''}`}
+              style={{
+                left: `25px`, // Positioned in the open string area
+                top: `${15 + stringIndex * 28 - 10}px`, // Center on string
+              }}
+            >
+              <span className="note-name">
+                {openNote.name}
+              </span>
+            </div>
+          )
+        })}
 
         {/* Note visualization circles */}
         {[...Array(6)].map((_, stringIndex) =>
