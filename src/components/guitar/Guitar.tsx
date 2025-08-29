@@ -330,6 +330,89 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
     return melodyNotes
   }
 
+  // Check if all notes on a string are individually selected
+  const checkStringCompletion = (stringIndex: number): boolean => {
+    // Check if open string is selected
+    const openKey = `${stringIndex}-open`
+    const hasOpenString = selectedNotes.has(openKey)
+    
+    // Check if all 12 fretted notes are selected
+    const allFrettedSelected = Array.from({length: 12}, (_, i) => i).every(fretIndex => {
+      const noteKey = `${stringIndex}-${fretIndex}`
+      return selectedNotes.has(noteKey)
+    })
+    
+    return hasOpenString && allFrettedSelected
+  }
+
+  // Check if all notes on a fret are individually selected
+  const checkFretCompletion = (fretIndex: number): boolean => {
+    if (fretIndex === 0) {
+      // Open fret: check all open strings
+      return Array.from({length: 6}, (_, i) => i).every(stringIndex => {
+        const openKey = `${stringIndex}-open`
+        return selectedNotes.has(openKey)
+      })
+    } else {
+      // Regular fret: check all strings on this fret
+      return Array.from({length: 6}, (_, i) => i).every(stringIndex => {
+        const noteKey = `${stringIndex}-${fretIndex - 1}` // Adjust for 0-based fret indexing
+        return selectedNotes.has(noteKey)
+      })
+    }
+  }
+
+  // Auto-apply checkboxes when all individual notes are selected
+  useEffect(() => {
+    const newStringCheckboxes = [...stringCheckboxes]
+    const newFretCheckboxes = [...fretCheckboxes]
+    let hasChanges = false
+
+    // Check each string for completion
+    for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
+      if (!stringCheckboxes[stringIndex] && checkStringCompletion(stringIndex)) {
+        newStringCheckboxes[stringIndex] = true
+        hasChanges = true
+        
+        // Remove individual selections for this string since checkbox now covers them
+        const updatedSelectedNotes = new Set(selectedNotes)
+        updatedSelectedNotes.delete(`${stringIndex}-open`)
+        for (let fretIndex = 0; fretIndex < 12; fretIndex++) {
+          updatedSelectedNotes.delete(`${stringIndex}-${fretIndex}`)
+        }
+        setSelectedNotes(updatedSelectedNotes)
+      }
+    }
+
+    // Check each fret for completion
+    for (let fretIndex = 0; fretIndex < 13; fretIndex++) {
+      if (!fretCheckboxes[fretIndex] && checkFretCompletion(fretIndex)) {
+        newFretCheckboxes[fretIndex] = true
+        hasChanges = true
+        
+        // Remove individual selections for this fret since checkbox now covers them
+        const updatedSelectedNotes = new Set(selectedNotes)
+        if (fretIndex === 0) {
+          // Open fret
+          for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
+            updatedSelectedNotes.delete(`${stringIndex}-open`)
+          }
+        } else {
+          // Regular fret
+          for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
+            updatedSelectedNotes.delete(`${stringIndex}-${fretIndex - 1}`)
+          }
+        }
+        setSelectedNotes(updatedSelectedNotes)
+      }
+    }
+
+    if (hasChanges) {
+      setStringCheckboxes(newStringCheckboxes)
+      setFretCheckboxes(newFretCheckboxes)
+    }
+  }, [selectedNotes, stringCheckboxes, fretCheckboxes])
+
   // Update melody system whenever selections change
   useEffect(() => {
     const melodyNotes = convertToMelodyNotes()
