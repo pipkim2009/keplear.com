@@ -4,6 +4,14 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
+  min-width: 727px;
+}
+
+@media (max-width: 768px) {
+  .guitar-container {
+    min-width: 767px;
+    margin: 0 20px 0 500px;
+  }
 }
 
 .fretboard {
@@ -16,6 +24,12 @@
     inset 0 2px 4px rgba(0, 0, 0, 0.5),
     0 4px 8px rgba(0, 0, 0, 0.3);
   border: 2px solid #2d2d2d;
+}
+
+@media (max-width: 768px) {
+  .fretboard {
+    width: 767px;
+  }
 }
 
 .fret {
