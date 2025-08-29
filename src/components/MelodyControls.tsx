@@ -8,6 +8,7 @@ interface MelodyControlsProps {
   onPlayMelody: () => void
   isPlaying: boolean
   generatedMelody: Note[]
+  instrument?: string
 }
 
 const MelodyControls: React.FC<MelodyControlsProps> = ({
@@ -15,8 +16,14 @@ const MelodyControls: React.FC<MelodyControlsProps> = ({
   onGenerateMelody,
   onPlayMelody,
   isPlaying,
-  generatedMelody
+  generatedMelody,
+  instrument = 'keyboard'
 }) => {
+  
+  // Different enable conditions based on instrument
+  const canGenerate = instrument === 'keyboard' 
+    ? selectedNotes.length === 2  // Keyboard needs exactly 2 notes
+    : selectedNotes.length > 0    // Guitar needs at least 1 note
   return (
     <div className="melody-controls">
       <div className="selected-notes">
@@ -26,7 +33,7 @@ const MelodyControls: React.FC<MelodyControlsProps> = ({
       <div className="buttons">
         <button
           onClick={onGenerateMelody}
-          disabled={selectedNotes.length !== 2}
+          disabled={!canGenerate}
           className="button"
         >
           Generate Melody

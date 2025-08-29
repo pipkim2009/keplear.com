@@ -15,6 +15,7 @@ interface InstrumentDisplayProps {
   setNumberOfNotes: (count: number) => void
   instrument: string
   setInstrument: (instrument: string) => void
+  setGuitarNotes: (notes: Note[]) => void
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -27,7 +28,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   numberOfNotes,
   setNumberOfNotes,
   instrument,
-  setInstrument
+  setInstrument,
+  setGuitarNotes
 }) => {
   return (
     <div className="instrument-container">
@@ -48,7 +50,13 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           showNotes={showNotes}
         />
       ) : (
-        <Guitar />
+        <Guitar 
+          setGuitarNotes={setGuitarNotes}
+          isSelected={isSelected}
+          isInMelody={isInMelody}
+          showNotes={showNotes}
+          onNoteClick={onNoteClick}
+        />
       )}
     </div>
   )

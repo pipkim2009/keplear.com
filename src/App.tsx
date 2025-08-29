@@ -23,6 +23,7 @@ function App() {
     generatedMelody, 
     selectNote, 
     generateMelody, 
+    setGuitarNotes,
     isSelected, 
     isInMelody,
     clearSelection 
@@ -34,7 +35,7 @@ function App() {
   }
 
   const handleGenerateMelody = () => {
-    generateMelody(notes, numberOfNotes)
+    generateMelody(notes, numberOfNotes, instrument)
   }
 
   const handlePlayMelody = () => {
@@ -69,6 +70,7 @@ function App() {
         setNumberOfNotes={setNumberOfNotes}
         instrument={instrument}
         setInstrument={handleInstrumentChange}
+        setGuitarNotes={setGuitarNotes}
       />
 
       <MelodyControls
@@ -77,6 +79,7 @@ function App() {
         onPlayMelody={handlePlayMelody}
         isPlaying={isPlaying}
         generatedMelody={generatedMelody}
+        instrument={instrument}
       />
 
       <MelodyDisplay

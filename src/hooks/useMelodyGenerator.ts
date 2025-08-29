@@ -16,30 +16,49 @@ export const useMelodyGenerator = () => {
     setGeneratedMelody([])
   }
 
-  const generateMelody = (notes: Note[], numberOfNotes: number) => {
-    if (selectedNotes.length !== 2) return
+  const generateMelody = (notes: Note[], numberOfNotes: number, instrument: string = 'keyboard') => {
+    if (instrument === 'keyboard') {
+      // Original keyboard logic - requires exactly 2 notes for range
+      if (selectedNotes.length !== 2) return
 
-    const [note1, note2] = selectedNotes.sort((a, b) => a.position - b.position)
-    
-    // If the same key is selected twice, use only that key
-    if (note1.name === note2.name) {
-      setGeneratedMelody(Array(numberOfNotes).fill(note1))
-      return
+      const [note1, note2] = selectedNotes.sort((a, b) => a.position - b.position)
+      
+      // If the same key is selected twice, use only that key
+      if (note1.name === note2.name) {
+        setGeneratedMelody(Array(numberOfNotes).fill(note1))
+        return
+      }
+      
+      // Otherwise, use the range
+      const startPos = note1.position
+      const endPos = note2.position
+      
+      const notesInRange = notes.filter(note => 
+        note.position >= startPos && note.position <= endPos
+      )
+
+      const melody = Array(numberOfNotes).fill(null).map(() => 
+        notesInRange[Math.floor(Math.random() * notesInRange.length)]
+      )
+
+      setGeneratedMelody(melody)
+    } else if (instrument === 'guitar') {
+      // Guitar logic - use ALL selected notes directly
+      if (selectedNotes.length === 0) return
+
+      const melody = Array(numberOfNotes).fill(null).map(() => 
+        selectedNotes[Math.floor(Math.random() * selectedNotes.length)]
+      )
+
+      console.log('Generated guitar melody:', melody)
+      setGeneratedMelody(melody)
     }
-    
-    // Otherwise, use the range
-    const startPos = note1.position
-    const endPos = note2.position
-    
-    const notesInRange = notes.filter(note => 
-      note.position >= startPos && note.position <= endPos
-    )
+  }
 
-    const melody = Array(numberOfNotes).fill(null).map(() => 
-      notesInRange[Math.floor(Math.random() * notesInRange.length)]
-    )
-
-    setGeneratedMelody(melody)
+  // Guitar-specific method to set all selected notes at once
+  const setGuitarNotes = (notes: Note[]) => {
+    setSelectedNotes(notes)
+    setGeneratedMelody([])
   }
 
   const isSelected = (note: Note) => selectedNotes.some(n => n.name === note.name)
@@ -56,6 +75,7 @@ export const useMelodyGenerator = () => {
     generatedMelody,
     selectNote,
     generateMelody,
+    setGuitarNotes,
     isSelected,
     isInMelody,
     clearSelection
