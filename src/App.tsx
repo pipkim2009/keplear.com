@@ -17,7 +17,7 @@ function App() {
   const [instrument, setInstrument] = useState('keyboard')
   
   const { isDarkMode, toggleTheme } = useTheme()
-  const { playNote, playMelody, isPlaying } = useAudio()
+  const { playNote, playGuitarNote, playMelody, playGuitarMelody, isPlaying } = useAudio()
   const { 
     selectedNotes, 
     generatedMelody, 
@@ -30,7 +30,11 @@ function App() {
   } = useMelodyGenerator()
 
   const handleNoteClick = async (note: Note) => {
-    await playNote(note.name)
+    if (instrument === 'guitar') {
+      await playGuitarNote(note.name)
+    } else {
+      await playNote(note.name)
+    }
     selectNote(note)
   }
 
@@ -39,7 +43,11 @@ function App() {
   }
 
   const handlePlayMelody = () => {
-    playMelody(generatedMelody, bpm)
+    if (instrument === 'guitar') {
+      playGuitarMelody(generatedMelody, bpm)
+    } else {
+      playMelody(generatedMelody, bpm)
+    }
   }
 
   const handleInstrumentChange = (newInstrument: string) => {
