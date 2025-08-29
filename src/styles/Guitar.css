@@ -256,7 +256,7 @@
 }
 
 .fret-position:hover {
-  background: rgba(255, 107, 107, 0.2);
+  background: rgba(59, 130, 246, 0.2);
   transform: scaleY(1.1);
 }
 
@@ -266,7 +266,7 @@
 }
 
 .open-string-position:hover {
-  background: rgba(255, 107, 107, 0.2);
+  background: rgba(59, 130, 246, 0.2);
   transform: scaleY(1.1);
 }
 
@@ -275,7 +275,7 @@
   position: absolute;
   width: 20px;
   height: 20px;
-  background: linear-gradient(145deg, #ff6b6b, #ff5252);
+  background: linear-gradient(145deg, #3b82f6, #1d4ed8);
   border: 1px solid #ffffff;
   border-radius: 50%;
   display: flex;

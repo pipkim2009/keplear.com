@@ -70,6 +70,74 @@
   gap: 1rem;
 }
 
+.auth-section {
+  display: flex;
+  align-items: center;
+}
+
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.auth-btn {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.login-btn {
+  background: rgba(255, 255, 255, 0.9);
+  color: #2d1b69;
+  border: 2px solid rgba(210, 210, 249, 0.4);
+  box-shadow: 0 4px 15px rgba(45, 27, 105, 0.1);
+}
+
+.dark .login-btn {
+  background: rgba(45, 27, 105, 0.8);
+  color: #d2d2f9;
+  border-color: rgba(210, 210, 249, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.login-btn:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(210, 210, 249, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(45, 27, 105, 0.2);
+}
+
+.dark .login-btn:hover {
+  background: rgba(45, 27, 105, 1);
+  border-color: rgba(210, 210, 249, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.signup-btn {
+  background: #3b82f6;
+  color: white;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.signup-btn:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+}
+
 @media (max-width: 768px) {
   .header-content {
     padding: 1rem 1rem;
@@ -85,5 +153,14 @@
   
   .header-right {
     gap: 0.5rem;
+  }
+  
+  .auth-buttons {
+    gap: 0.5rem;
+  }
+  
+  .auth-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
   }
 }

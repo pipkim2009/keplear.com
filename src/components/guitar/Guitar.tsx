@@ -29,6 +29,13 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
     // If unchecking, remove all individual selections for this string
     if (wasChecked) {
       const newSelectedNotes = new Set(selectedNotes)
+      
+      // Remove open string selection
+      const openKey = `${index}-open`
+      newSelectedNotes.delete(openKey)
+      newSelectedNotes.delete(`-${openKey}`)
+      
+      // Remove fretted note selections
       for (let fretIndex = 0; fretIndex < 12; fretIndex++) {
         const noteKey = `${index}-${fretIndex}`
         newSelectedNotes.delete(noteKey)
@@ -109,11 +116,11 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
     
     if (currentlyVisible) {
       // Note is currently showing - we need to hide it
-      if (isIndividuallySelected) {
-        // It's individually selected, just remove it
+      if (isIndividuallySelected && !isCheckboxSelected) {
+        // It's ONLY individually selected, just remove it
         newSelectedNotes.delete(noteKey)
       } else {
-        // It's selected via checkboxes - convert to individual selections
+        // It's selected via checkboxes (or both individual + checkbox) - convert to individual selections
         const newStringCheckboxes = [...stringCheckboxes]
         const newFretCheckboxes = [...fretCheckboxes]
         
@@ -121,11 +128,11 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
         if (isStringSelected) {
           newStringCheckboxes[stringIndex] = false
           // Add all other notes on this string as individual selections (except the clicked one)
-          newSelectedNotes.add(`${stringIndex}-open`) // Add open string back if it wasn't the clicked one
+          // Don't add open string since we're clicking on it to deselect
           for (let fret = 0; fret < 12; fret++) {
             newSelectedNotes.add(`${stringIndex}-${fret}`)
           }
-          // Remove the clicked one
+          // Explicitly ensure the clicked note is not individually selected
           newSelectedNotes.delete(noteKey)
         }
         
@@ -138,6 +145,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
               newSelectedNotes.add(`${str}-open`)
             }
           }
+          // Explicitly ensure the clicked note is not individually selected
+          newSelectedNotes.delete(noteKey)
         }
         
         setStringCheckboxes(newStringCheckboxes)
@@ -195,11 +204,11 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
     
     if (currentlyVisible) {
       // Note is currently showing - we need to hide it
-      if (isIndividuallySelected) {
-        // It's individually selected, just remove it
+      if (isIndividuallySelected && !isCheckboxSelected) {
+        // It's ONLY individually selected, just remove it
         newSelectedNotes.delete(noteKey)
       } else {
-        // It's selected via checkboxes - we need to:
+        // It's selected via checkboxes (or both individual + checkbox) - we need to:
         // 1. Convert checkbox selections to individual selections 
         // 2. Remove the clicked note
         // 3. Uncheck the relevant checkboxes

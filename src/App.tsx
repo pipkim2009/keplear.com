@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { AuthProvider } from './contexts/AuthContext'
 import Header from './components/common/Header'
 import Footer from './components/common/Footer'
 import InstrumentDisplay from './components/keyboard/InstrumentDisplay'
@@ -18,6 +19,11 @@ function App() {
   
   const { isDarkMode, toggleTheme } = useTheme()
   const { playNote, playGuitarNote, playMelody, playGuitarMelody, isPlaying } = useAudio()
+
+  // Apply theme class to document body for portaled modals
+  useEffect(() => {
+    document.body.className = isDarkMode ? 'dark' : 'light'
+  }, [isDarkMode])
   const { 
     selectedNotes, 
     generatedMelody, 
@@ -56,44 +62,46 @@ function App() {
   }
 
   return (
-    <div className={`app-container ${isDarkMode ? 'dark' : 'light'}`}>
-      <Header 
-        isDarkMode={isDarkMode} 
-        onToggleTheme={toggleTheme}
-      />
-      
-      <InstrumentDisplay
-        onNoteClick={handleNoteClick}
-        isSelected={isSelected}
-        isInMelody={isInMelody}
-        showNotes={showNotes}
-        bpm={bpm}
-        setBpm={setBpm}
-        numberOfNotes={numberOfNotes}
-        setNumberOfNotes={setNumberOfNotes}
-        instrument={instrument}
-        setInstrument={handleInstrumentChange}
-        setGuitarNotes={setGuitarNotes}
-      />
+    <AuthProvider>
+      <div className={`app-container ${isDarkMode ? 'dark' : 'light'}`}>
+        <Header 
+          isDarkMode={isDarkMode} 
+          onToggleTheme={toggleTheme}
+        />
+        
+        <InstrumentDisplay
+          onNoteClick={handleNoteClick}
+          isSelected={isSelected}
+          isInMelody={isInMelody}
+          showNotes={showNotes}
+          bpm={bpm}
+          setBpm={setBpm}
+          numberOfNotes={numberOfNotes}
+          setNumberOfNotes={setNumberOfNotes}
+          instrument={instrument}
+          setInstrument={handleInstrumentChange}
+          setGuitarNotes={setGuitarNotes}
+        />
 
-      <MelodyControls
-        selectedNotes={selectedNotes}
-        onGenerateMelody={handleGenerateMelody}
-        onPlayMelody={handlePlayMelody}
-        isPlaying={isPlaying}
-        generatedMelody={generatedMelody}
-        instrument={instrument}
-        showNotes={showNotes}
-        onToggleNotes={() => setShowNotes(!showNotes)}
-      />
+        <MelodyControls
+          selectedNotes={selectedNotes}
+          onGenerateMelody={handleGenerateMelody}
+          onPlayMelody={handlePlayMelody}
+          isPlaying={isPlaying}
+          generatedMelody={generatedMelody}
+          instrument={instrument}
+          showNotes={showNotes}
+          onToggleNotes={() => setShowNotes(!showNotes)}
+        />
 
-      <MelodyDisplay
-        generatedMelody={generatedMelody}
-        showNotes={showNotes}
-      />
-      
-      <Footer />
-    </div>
+        <MelodyDisplay
+          generatedMelody={generatedMelody}
+          showNotes={showNotes}
+        />
+        
+        <Footer />
+      </div>
+    </AuthProvider>
   )
 }
 
