@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import '../../styles/Guitar.css'
+import { guitarNotes } from '../../utils/guitarNotes'
 
 const Guitar: React.FC = () => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(new Array(6).fill(false))
@@ -26,6 +27,17 @@ const Guitar: React.FC = () => {
     const newCheckboxes = [...fretCheckboxes]
     newCheckboxes[index] = !newCheckboxes[index]
     setFretCheckboxes(newCheckboxes)
+  }
+
+  // Get note name for a specific string and fret
+  const getNoteForStringAndFret = (stringIndex: number, fretIndex: number): string => {
+    // Map visual string index to technical string number (E B G D A E -> 1 2 3 4 5 6)
+    const stringMapping = [1, 2, 3, 4, 5, 6] // High E to Low E in guitarNotes
+    const guitarString = stringMapping[5 - stringIndex] // Reverse the order since guitarNotes goes low to high
+    const fret = fretIndex + 1 // Convert to 1-indexed for fret (0 = open, but we're showing frets 1-12)
+    
+    const note = guitarNotes.find(note => note.string === guitarString && note.fret === fret)
+    return note ? note.name : ''
   }
 
   return (
@@ -84,9 +96,29 @@ const Guitar: React.FC = () => {
               checked={stringCheckboxes[index]}
               onChange={() => handleStringCheckboxChange(index)}
             />
-            <label htmlFor={`string-${index}`} className="string-checkbox-label">{6 - index}</label>
+            <label htmlFor={`string-${index}`} className="string-checkbox-label">{['E', 'B', 'G', 'D', 'A', 'E'][index]}</label>
           </div>
         ))}
+
+        {/* Note visualization circles */}
+        {stringCheckboxes.map((stringSelected, stringIndex) => 
+          stringSelected && fretCheckboxes.map((fretSelected, fretIndex) =>
+            fretSelected && (
+              <div
+                key={`note-${stringIndex}-${fretIndex}`}
+                className="note-circle"
+                style={{
+                  left: `${(fretIndex + 1) * 60 - 38}px`, // Align with fret checkboxes below
+                  top: `${15 + stringIndex * 28 - 10}px`, // Center on string
+                }}
+              >
+                <span className="note-name">
+                  {getNoteForStringAndFret(stringIndex, fretIndex)}
+                </span>
+              </div>
+            )
+          )
+        )}
       </div>
     </div>
   )
