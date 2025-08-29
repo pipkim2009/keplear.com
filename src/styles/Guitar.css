@@ -63,25 +63,46 @@
   position: absolute;
   left: 0;
   width: 723px;
-  height: 2px;
+  height: 2px; /* default height */
   background: linear-gradient(90deg, #c0c0c0, #808080, #c0c0c0);
   border-radius: 1px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
   z-index: 15;
 }
 
-.guitar-string:nth-child(1) { 
+/* String 1 - High E (thinnest) */
+.guitar-string:nth-of-type(1) { 
   height: 1px;
   background: linear-gradient(90deg, #e6e6e6, #999, #e6e6e6);
 }
 
-.guitar-string:nth-child(2) { 
+/* String 2 - B */
+.guitar-string:nth-of-type(2) { 
   height: 1.5px;
   background: linear-gradient(90deg, #d9d9d9, #999, #d9d9d9);
 }
 
-.guitar-string:nth-child(6) { 
-  height: 3px;
+/* String 3 - G */
+.guitar-string:nth-of-type(3) { 
+  height: 2px;
+  background: linear-gradient(90deg, #d0d0d0, #888, #d0d0d0);
+}
+
+/* String 4 - D */
+.guitar-string:nth-of-type(4) { 
+  height: 2.5px;
+  background: linear-gradient(90deg, #c8c8c8, #808080, #c8c8c8);
+}
+
+/* String 5 - A */
+.guitar-string:nth-of-type(5) { 
+  height: 3.5px;
+  background: linear-gradient(90deg, #b0b0b0, #707070, #b0b0b0);
+}
+
+/* String 6 - Low E (thickest) */
+.guitar-string:nth-of-type(6) { 
+  height: 4.5px;
   background: linear-gradient(90deg, #a0a0a0, #606060, #a0a0a0);
 }
 
@@ -273,9 +294,4 @@
   }
 }
 
-/* Dark mode adjustments */
-.dark .fretboard {
-  background: linear-gradient(145deg, #2d1810, #0d0d0d);
-  border-color: #1a1a1a;
-}
 

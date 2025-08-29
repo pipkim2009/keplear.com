@@ -258,13 +258,19 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
         ))}
         
         {/* Strings */}
-        {[...Array(6)].map((_, index) => (
-          <div 
-            key={index} 
-            className="guitar-string" 
-            style={{ top: `${15 + index * 28}px` }}
-          ></div>
-        ))}
+        {[...Array(6)].map((_, index) => {
+          const stringHeights = [1, 1.5, 2, 2.5, 3, 3.5] // Heights for strings 1-6
+          return (
+            <div 
+              key={index} 
+              className="guitar-string" 
+              style={{ 
+                top: `${15 + index * 28}px`,
+                height: `${stringHeights[index]}px`
+              }}
+            ></div>
+          )
+        })}
 
         {/* Clickable fret positions */}
         {[...Array(6)].map((_, stringIndex) => (
@@ -297,7 +303,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
               checked={stringCheckboxes[index]}
               onChange={() => handleStringCheckboxChange(index)}
             />
-            <label htmlFor={`string-${index}`} className="string-checkbox-label">{['E', 'B', 'G', 'D', 'A', 'E'][index]}</label>
+            <label htmlFor={`string-${index}`} className="string-checkbox-label">{index + 1}</label>
           </div>
         ))}
 
