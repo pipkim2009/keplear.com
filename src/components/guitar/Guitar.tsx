@@ -14,7 +14,7 @@ interface GuitarProps {
 
 const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody, showNotes, onNoteClick }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(new Array(6).fill(false))
-  const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(12).fill(false))
+  const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(13).fill(false)) // 13 total: open + 12 frets
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set())
 
   // Check if at least one string is selected
@@ -49,10 +49,17 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
     if (wasChecked) {
       const newSelectedNotes = new Set(selectedNotes)
       for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
-        const noteKey = `${stringIndex}-${index}`
-        newSelectedNotes.delete(noteKey)
-        // Also remove any negative selections for this fret
-        newSelectedNotes.delete(`-${noteKey}`)
+        if (index === 0) {
+          // Open fret - remove open string selections
+          const noteKey = `${stringIndex}-open`
+          newSelectedNotes.delete(noteKey)
+          newSelectedNotes.delete(`-${noteKey}`)
+        } else {
+          // Regular fret
+          const noteKey = `${stringIndex}-${index - 1}` // Adjust for open fret offset
+          newSelectedNotes.delete(noteKey)
+          newSelectedNotes.delete(`-${noteKey}`)
+        }
       }
       setSelectedNotes(newSelectedNotes)
     }
@@ -92,11 +99,59 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
       }
     }
     
-    // Toggle open string selection
-    if (newSelectedNotes.has(noteKey)) {
-      newSelectedNotes.delete(noteKey)
+    // Check current state
+    const isIndividuallySelected = selectedNotes.has(noteKey)
+    const isNegativelySelected = selectedNotes.has(`-${noteKey}`)
+    const isStringSelected = stringCheckboxes[stringIndex]
+    const isOpenFretSelected = fretCheckboxes[0]
+    const isCheckboxSelected = isStringSelected || isOpenFretSelected
+    const currentlyVisible = (isIndividuallySelected || isCheckboxSelected) && !isNegativelySelected
+    
+    if (currentlyVisible) {
+      // Note is currently showing - we need to hide it
+      if (isIndividuallySelected) {
+        // It's individually selected, just remove it
+        newSelectedNotes.delete(noteKey)
+      } else {
+        // It's selected via checkboxes - convert to individual selections
+        const newStringCheckboxes = [...stringCheckboxes]
+        const newFretCheckboxes = [...fretCheckboxes]
+        
+        // Convert string checkbox selections to individual selections
+        if (isStringSelected) {
+          newStringCheckboxes[stringIndex] = false
+          // Add all other notes on this string as individual selections (except the clicked one)
+          newSelectedNotes.add(`${stringIndex}-open`) // Add open string back if it wasn't the clicked one
+          for (let fret = 0; fret < 12; fret++) {
+            newSelectedNotes.add(`${stringIndex}-${fret}`)
+          }
+          // Remove the clicked one
+          newSelectedNotes.delete(noteKey)
+        }
+        
+        // Convert open fret checkbox selections to individual selections  
+        if (isOpenFretSelected) {
+          newFretCheckboxes[0] = false
+          // Add all other open strings as individual selections (except the clicked one)
+          for (let str = 0; str < 6; str++) {
+            if (str !== stringIndex) {
+              newSelectedNotes.add(`${str}-open`)
+            }
+          }
+        }
+        
+        setStringCheckboxes(newStringCheckboxes)
+        setFretCheckboxes(newFretCheckboxes)
+      }
     } else {
-      newSelectedNotes.add(noteKey)
+      // Note is not showing - we need to show it
+      if (isNegativelySelected) {
+        // It was negatively selected, remove the negative
+        newSelectedNotes.delete(`-${noteKey}`)
+      } else {
+        // Just add positive selection
+        newSelectedNotes.add(noteKey)
+      }
     }
     
     setSelectedNotes(newSelectedNotes)
@@ -134,7 +189,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
     const isIndividuallySelected = selectedNotes.has(noteKey)
     const isNegativelySelected = selectedNotes.has(`-${noteKey}`)
     const isStringSelected = stringCheckboxes[stringIndex]
-    const isFretSelected = fretCheckboxes[fretIndex]
+    const isFretSelected = fretCheckboxes[fretIndex + 1] // Adjust for open fret offset
     const isCheckboxSelected = isStringSelected || isFretSelected
     const currentlyVisible = (isIndividuallySelected || isCheckboxSelected) && !isNegativelySelected
     
@@ -165,7 +220,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
         
         // Convert fret checkbox selections to individual selections  
         if (isFretSelected) {
-          newFretCheckboxes[fretIndex] = false
+          newFretCheckboxes[fretIndex + 1] = false // Adjust for open fret offset
           // Add all other notes on this fret as individual selections (except the clicked one)
           for (let str = 0; str < 6; str++) {
             if (str !== stringIndex) {
@@ -212,7 +267,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
     }
     
     // Check if selected via fret checkbox (this fret on all strings)
-    if (fretCheckboxes[fretIndex]) {
+    if (fretCheckboxes[fretIndex + 1]) { // Adjust for open fret offset
       return true
     }
     
@@ -222,7 +277,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
   // Check if an open string is selected
   const isOpenStringSelected = (stringIndex: number): boolean => {
     const openKey = `${stringIndex}-open`
-    return selectedNotes.has(openKey) || stringCheckboxes[stringIndex]
+    return selectedNotes.has(openKey) || stringCheckboxes[stringIndex] || fretCheckboxes[0] // Include open fret checkbox
   }
 
   // Convert guitar notes to the Note format expected by the melody system
@@ -285,6 +340,18 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
   return (
     <div className="guitar-container">
       <div className="fretboard">
+        {/* Open fret checkbox */}
+        <div className="fret-checkbox-container" style={{ left: '5.5px', bottom: '-45px' }}>
+          <input
+            type="checkbox"
+            id="fret-open"
+            className="fret-checkbox"
+            checked={fretCheckboxes[0]}
+            onChange={() => handleFretCheckboxChange(0)}
+          />
+          <label htmlFor="fret-open" className="fret-checkbox-label">Open</label>
+        </div>
+
         {/* Frets */}
         {[...Array(12)].map((_, index) => (
           <div key={index} className="fret" style={{ left: `${(index + 1) * 60}px` }}>
@@ -304,12 +371,12 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
             <div className="fret-checkbox-container">
               <input
                 type="checkbox"
-                id={`fret-${index}`}
+                id={`fret-${index + 1}`}
                 className="fret-checkbox"
-                checked={fretCheckboxes[index]}
-                onChange={() => handleFretCheckboxChange(index)}
+                checked={fretCheckboxes[index + 1]}
+                onChange={() => handleFretCheckboxChange(index + 1)}
               />
-              <label htmlFor={`fret-${index}`} className="fret-checkbox-label">{index + 1}</label>
+              <label htmlFor={`fret-${index + 1}`} className="fret-checkbox-label">{index + 1}</label>
             </div>
           </div>
         ))}
@@ -403,7 +470,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
               key={`open-note-${stringIndex}`}
               className={`note-circle ${isInGeneratedMelody ? 'melody-note' : ''}`}
               style={{
-                left: `25px`, // Positioned in the open string area
+                left: `-2.5px`, // Center of the open string click field (15px width / 2 - 10px for note circle centering)
                 top: `${15 + stringIndex * 28 - 10}px`, // Center on string
               }}
             >
@@ -434,7 +501,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
                 key={`note-${stringIndex}-${fretIndex}`}
                 className={`note-circle ${isInGeneratedMelody ? 'melody-note' : ''}`}
                 style={{
-                  left: `${(fretIndex + 1) * 60 - 38}px`, // Align with fret checkboxes below
+                  left: `${fretIndex === 0 ? 30 : (fretIndex + 1) * 60 - 38}px`, // Center first fret in its area, others align with checkboxes
                   top: `${15 + stringIndex * 28 - 10}px`, // Center on string
                 }}
               >
