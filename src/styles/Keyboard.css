@@ -11,7 +11,6 @@
   border: 4px solid #4a5568;
   width: 950px;
   min-height: 350px;
-  overflow-x: auto;
   overflow-y: visible;
 }
 
@@ -35,12 +34,13 @@
   position: relative;
   display: flex;
   min-width: 950px;
+  justify-content: center;
 }
 
 @media (max-width: 768px) {
   .keyboard {
-    min-width: 950px;
-    margin: 0 20px 0 600px;
+    min-width: 880px;
+    margin: 0 20px 0 540px;
   }
 }
 
@@ -91,8 +91,14 @@
 .black-keys {
   position: absolute;
   top: 0;
-  left: 0;
+  left: 40px;
   pointer-events: none;
+}
+
+@media (max-width: 768px) {
+  .black-keys {
+    left: 5px;
+  }
 }
 
 .black-key {
