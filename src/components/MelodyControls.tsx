@@ -1,4 +1,5 @@
 import React from 'react'
+import NotesToggle from './common/NotesToggle'
 import type { Note } from '../utils/notes'
 import '../styles/MelodyControls.css'
 
@@ -9,6 +10,8 @@ interface MelodyControlsProps {
   isPlaying: boolean
   generatedMelody: Note[]
   instrument?: string
+  showNotes: boolean
+  onToggleNotes: () => void
 }
 
 const MelodyControls: React.FC<MelodyControlsProps> = ({
@@ -17,7 +20,9 @@ const MelodyControls: React.FC<MelodyControlsProps> = ({
   onPlayMelody,
   isPlaying,
   generatedMelody,
-  instrument = 'keyboard'
+  instrument = 'keyboard',
+  showNotes,
+  onToggleNotes
 }) => {
   
   // Different enable conditions based on instrument
@@ -26,6 +31,10 @@ const MelodyControls: React.FC<MelodyControlsProps> = ({
     : selectedNotes.length > 0    // Guitar needs at least 1 note
   return (
     <div className="melody-controls">
+      <div className="notes-toggle-container">
+        <NotesToggle showNotes={showNotes} onToggle={onToggleNotes} />
+      </div>
+      
       <div className="selected-notes">
         Selected Notes: {selectedNotes.map(n => n.name).join(', ') || 'None'}
       </div>

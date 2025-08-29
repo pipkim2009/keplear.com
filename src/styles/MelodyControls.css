@@ -3,6 +3,26 @@
   margin-top: 40px;
 }
 
+.notes-toggle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  padding: 12px 20px;
+  background: rgba(128, 0, 255, 0.1);
+  border: 1px solid rgba(128, 0, 255, 0.2);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  max-width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 20px;
+}
+
+.dark .notes-toggle-container {
+  background: rgba(128, 0, 255, 0.15);
+  border: 1px solid rgba(128, 0, 255, 0.3);
+}
+
 .selected-notes {
   font-size: 18px;
   font-weight: 600;

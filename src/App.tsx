@@ -60,8 +60,6 @@ function App() {
       <Header 
         isDarkMode={isDarkMode} 
         onToggleTheme={toggleTheme}
-        showNotes={showNotes}
-        onToggleNotes={() => setShowNotes(!showNotes)}
       />
       
       <InstrumentDisplay
@@ -85,6 +83,8 @@ function App() {
         isPlaying={isPlaying}
         generatedMelody={generatedMelody}
         instrument={instrument}
+        showNotes={showNotes}
+        onToggleNotes={() => setShowNotes(!showNotes)}
       />
 
       <MelodyDisplay

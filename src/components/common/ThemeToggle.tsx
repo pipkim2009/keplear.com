@@ -10,11 +10,19 @@ interface ThemeToggleProps {
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ isDarkMode, onToggle }) => {
   return (
     <button 
-      className="theme-toggle"
+      className="theme-toggle-nav"
       onClick={onToggle}
       title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      aria-label={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
     >
-      {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+      <div className="toggle-track">
+        <div className={`toggle-thumb ${isDarkMode ? 'dark' : 'light'}`}>
+          {isDarkMode ? <Moon size={12} /> : <Sun size={12} />}
+        </div>
+      </div>
+      <span className="toggle-label">
+        {isDarkMode ? 'Dark' : 'Light'}
+      </span>
     </button>
   )
 }

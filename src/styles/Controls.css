@@ -1,6 +1,6 @@
 .instrument-controls {
   position: absolute;
-  top: 10px;
+  top: 5px;
   left: 30px;
   right: 30px;
   display: flex;
@@ -20,7 +20,7 @@
 .control-label {
   font-size: 12px;
   font-weight: 600;
-  color: #d2d2f9;
+  color: #f8f9fa;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
