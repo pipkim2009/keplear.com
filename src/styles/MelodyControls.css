@@ -63,3 +63,24 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(128, 0, 255, 0.4);
 }
+
+@media (max-width: 768px) {
+  .notes-toggle-container {
+    max-width: 250px;
+    padding: 10px 15px;
+  }
+  
+  .selected-notes {
+    font-size: 16px;
+  }
+  
+  .buttons {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .button {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+}
