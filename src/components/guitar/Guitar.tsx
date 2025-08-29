@@ -211,11 +211,14 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
         if (isStringSelected) {
           newStringCheckboxes[stringIndex] = false
           // Add all other notes on this string as individual selections (except the clicked one)
+          newSelectedNotes.add(`${stringIndex}-open`) // Add open string (will be removed below if it's the clicked note)
           for (let fret = 0; fret < 12; fret++) {
             if (fret !== fretIndex) {
               newSelectedNotes.add(`${stringIndex}-${fret}`)
             }
           }
+          // Explicitly ensure the clicked note is not individually selected
+          newSelectedNotes.delete(noteKey)
         }
         
         // Convert fret checkbox selections to individual selections  
@@ -227,6 +230,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
               newSelectedNotes.add(`${str}-${fretIndex}`)
             }
           }
+          // Explicitly ensure the clicked note is not individually selected
+          newSelectedNotes.delete(noteKey)
         }
         
         setStringCheckboxes(newStringCheckboxes)
@@ -367,6 +372,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
     const newStringCheckboxes = [...stringCheckboxes]
     const newFretCheckboxes = [...fretCheckboxes]
     let hasChanges = false
+    let updatedSelectedNotes = new Set(selectedNotes)
 
     // Check each string for completion
     for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
@@ -375,12 +381,10 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
         hasChanges = true
         
         // Remove individual selections for this string since checkbox now covers them
-        const updatedSelectedNotes = new Set(selectedNotes)
         updatedSelectedNotes.delete(`${stringIndex}-open`)
         for (let fretIndex = 0; fretIndex < 12; fretIndex++) {
           updatedSelectedNotes.delete(`${stringIndex}-${fretIndex}`)
         }
-        setSelectedNotes(updatedSelectedNotes)
       }
     }
 
@@ -391,7 +395,6 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
         hasChanges = true
         
         // Remove individual selections for this fret since checkbox now covers them
-        const updatedSelectedNotes = new Set(selectedNotes)
         if (fretIndex === 0) {
           // Open fret
           for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
@@ -403,13 +406,13 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
             updatedSelectedNotes.delete(`${stringIndex}-${fretIndex - 1}`)
           }
         }
-        setSelectedNotes(updatedSelectedNotes)
       }
     }
 
     if (hasChanges) {
       setStringCheckboxes(newStringCheckboxes)
       setFretCheckboxes(newFretCheckboxes)
+      setSelectedNotes(updatedSelectedNotes)
     }
   }, [selectedNotes, stringCheckboxes, fretCheckboxes])
 
