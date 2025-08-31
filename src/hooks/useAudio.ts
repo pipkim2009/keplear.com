@@ -64,14 +64,14 @@ export const useAudio = () => {
       
       // Create samplers and wait for them to load
       const samplerPromises = Object.entries(INSTRUMENTS).map(([key, config]) => {
-        return new Promise((resolve) => {
+        return new Promise<void>((resolve) => {
           const sampler = new Tone.Sampler({
             urls: config.urls,
             release: config.release,
             baseUrl: config.baseUrl,
             onload: () => {
               newSamplers[key] = sampler.toDestination()
-              resolve(sampler)
+              resolve()
             }
           })
         })

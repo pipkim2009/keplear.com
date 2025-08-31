@@ -119,21 +119,6 @@ const UserMenu = () => {
           
           <div className="user-menu-actions">
             <button 
-              className="menu-item"
-              onClick={() => {
-                setIsOpen(false)
-              }}
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16">
-                <path 
-                  fill="currentColor" 
-                  d="M8 8a3 3 0 100-6 3 3 0 000 6zm2.735 2.015A4.001 4.001 0 0018 14v1H-2v-1a4.001 4.001 0 007.265-2.015z"
-                />
-              </svg>
-              Profile Settings
-            </button>
-            
-            <button 
               className="menu-item danger"
               onClick={handleSignOut}
             >
