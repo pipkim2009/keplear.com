@@ -14,7 +14,13 @@
   overflow-y: visible;
 }
 
-@media (max-width: 768px) {
+@media (min-width: 481px) and (max-width: 768px) {
+  .instrument-container {
+    margin-left: 40px;
+  }
+}
+
+@media (max-width: 480px) {
   .instrument-container {
     width: 100vw;
     max-width: 100vw;
@@ -37,7 +43,7 @@
   justify-content: center;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .keyboard {
     min-width: 880px;
     margin: 0 20px 0 540px;
@@ -95,7 +101,7 @@
   pointer-events: none;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .black-keys {
     left: 5px;
   }
