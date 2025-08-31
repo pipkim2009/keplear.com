@@ -1,4 +1,3 @@
-import React from 'react'
 import Keyboard from './Keyboard'
 import Guitar from '../guitar/Guitar'
 import InstrumentControls from './InstrumentControls'
@@ -52,7 +51,6 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
       ) : (
         <Guitar 
           setGuitarNotes={setGuitarNotes}
-          isSelected={isSelected}
           isInMelody={isInMelody}
           showNotes={showNotes}
           onNoteClick={onNoteClick}

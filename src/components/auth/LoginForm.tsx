@@ -1,15 +1,20 @@
-import React, { useState } from 'react'
-import { useAuth } from '../../contexts/AuthContext'
+import { useState } from 'react'
+import { useAuth } from '../../hooks/useAuth'
 import './AuthForms.css'
 
-const LoginForm = ({ onToggleForm, onClose }) => {
+interface LoginFormProps {
+  onToggleForm: (formType: 'login' | 'signup' | 'forgot') => void
+  onClose: () => void
+}
+
+const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { signIn } = useAuth()
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -23,12 +28,11 @@ const LoginForm = ({ onToggleForm, onClose }) => {
     try {
       const { error } = await signIn(email, password)
       if (error) {
-        setError(error.message)
+        setError(typeof error === 'object' && error && 'message' in error ? String((error as { message: string }).message) : 'An error occurred')
       } else {
-        // Success - close modal
         onClose()
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred')
     }
 

@@ -1,4 +1,3 @@
-import React from 'react'
 import NotesToggle from './common/NotesToggle'
 import type { Note } from '../utils/notes'
 import '../styles/MelodyControls.css'

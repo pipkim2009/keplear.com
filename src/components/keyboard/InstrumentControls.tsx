@@ -110,39 +110,13 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     }
   }
 
-  // Plus/Minus button handlers with hold-down functionality
-  const handleBpmIncrement = () => {
-    const newBpm = Math.min(bpm + 1, 999)
-    setBpm(newBpm)
-    setBpmDisplay(newBpm.toString())
-  }
-
-  const handleBpmDecrement = () => {
-    const newBpm = Math.max(bpm - 1, 1)
-    setBpm(newBpm)
-    setBpmDisplay(newBpm.toString())
-  }
-
-  const handleNotesIncrement = () => {
-    const newNotes = Math.min(numberOfNotes + 1, 999)
-    setNumberOfNotes(newNotes)
-    setNotesDisplay(newNotes.toString())
-  }
-
-  const handleNotesDecrement = () => {
-    const newNotes = Math.max(numberOfNotes - 1, 1)
-    setNumberOfNotes(newNotes)
-    setNotesDisplay(newNotes.toString())
-  }
 
   // Hold-down functionality
   const startBpmIncrement = () => {
     const increment = () => {
-      setBpm(prev => {
-        const newBpm = Math.min(prev + 1, 999)
-        setBpmDisplay(newBpm.toString())
-        return newBpm
-      })
+      const newBpm = Math.min(bpm + 1, 999)
+      setBpm(newBpm)
+      setBpmDisplay(newBpm.toString())
     }
     
     increment() // First increment immediately
@@ -152,11 +126,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
   const startBpmDecrement = () => {
     const decrement = () => {
-      setBpm(prev => {
-        const newBpm = Math.max(prev - 1, 1)
-        setBpmDisplay(newBpm.toString())
-        return newBpm
-      })
+      const newBpm = Math.max(bpm - 1, 1)
+      setBpm(newBpm)
+      setBpmDisplay(newBpm.toString())
     }
     
     decrement() // First decrement immediately
@@ -166,11 +138,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
   const startNotesIncrement = () => {
     const increment = () => {
-      setNumberOfNotes(prev => {
-        const newNotes = Math.min(prev + 1, 999)
-        setNotesDisplay(newNotes.toString())
-        return newNotes
-      })
+      const newNotes = Math.min(numberOfNotes + 1, 999)
+      setNumberOfNotes(newNotes)
+      setNotesDisplay(newNotes.toString())
     }
     
     increment() // First increment immediately
@@ -180,11 +150,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
   const startNotesDecrement = () => {
     const decrement = () => {
-      setNumberOfNotes(prev => {
-        const newNotes = Math.max(prev - 1, 1)
-        setNotesDisplay(newNotes.toString())
-        return newNotes
-      })
+      const newNotes = Math.max(numberOfNotes - 1, 1)
+      setNumberOfNotes(newNotes)
+      setNotesDisplay(newNotes.toString())
     }
     
     decrement() // First decrement immediately

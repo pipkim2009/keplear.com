@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
 import ForgotPasswordForm from './ForgotPasswordForm'
 import './AuthForms.css'
 
-const AuthModal = ({ isOpen, onClose, initialForm = 'login' }) => {
-  const [currentForm, setCurrentForm] = useState(initialForm)
+interface AuthModalProps {
+  isOpen: boolean
+  onClose: () => void
+  initialForm?: 'login' | 'signup' | 'forgot'
+}
 
-  // Update currentForm when initialForm changes
+const AuthModal = ({ isOpen, onClose, initialForm = 'login' }: AuthModalProps) => {
+  const [currentForm, setCurrentForm] = useState<'login' | 'signup' | 'forgot'>(initialForm)
+
   useEffect(() => {
     if (isOpen) {
       setCurrentForm(initialForm)
@@ -17,16 +22,16 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login' }) => {
 
   if (!isOpen) return null
 
-  const handleToggleForm = (formType) => {
+  const handleToggleForm = (formType: 'login' | 'signup' | 'forgot') => {
     setCurrentForm(formType)
   }
 
   const handleClose = () => {
-    setCurrentForm('login') // Reset to login form
+    setCurrentForm('login')
     onClose()
   }
 
-  const handleBackdropClick = (e) => {
+  const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       handleClose()
     }

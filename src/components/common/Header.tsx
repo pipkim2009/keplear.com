@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAuth } from '../../contexts/AuthContext'
+import { useAuth } from '../../hooks/useAuth'
 import ThemeToggle from './ThemeToggle'
 import AuthModal from '../auth/AuthModal'
 import UserMenu from '../auth/UserMenu'

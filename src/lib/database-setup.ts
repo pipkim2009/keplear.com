@@ -1,16 +1,18 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Use service role key for admin operations
-const supabaseUrl = 'https://mfcszvnhsjwfptcjgzyn.supabase.co'
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1mY3N6dm5oc2p3ZnB0Y2pnenluIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NjQ3NDk4NCwiZXhwIjoyMDcyMDUwOTg0fQ.xHuwOtyNzR_xx9Oce9nRuHUSr44RdFuNlb1NDL2B9nY'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseServiceKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  throw new Error('Missing Supabase environment variables for database setup')
+}
 
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
-export const setupDatabase = async () => {
+export const setupDatabase = async (): Promise<{ success: boolean; error?: unknown }> => {
   try {
     console.log('Setting up database tables and policies...')
 
-    // Create profiles table
     const { error: createTableError } = await supabaseAdmin.rpc('exec_sql', {
       sql: `
         -- Create profiles table
@@ -90,7 +92,6 @@ export const setupDatabase = async () => {
   }
 }
 
-// Run setup if called directly
 if (typeof window === 'undefined') {
   setupDatabase()
 }

@@ -1,4 +1,3 @@
-import React from 'react'
 import KeyboardKey from './KeyboardKey'
 import { whiteKeys, blackKeys, getBlackKeyLeft, type Note } from '../../utils/notes'
 import '../../styles/Keyboard.css'

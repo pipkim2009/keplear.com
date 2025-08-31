@@ -1,9 +1,21 @@
-import React, { useState } from 'react'
-import { useAuth } from '../../contexts/AuthContext'
+import { useState } from 'react'
+import { useAuth } from '../../hooks/useAuth'
 import './AuthForms.css'
 
-const SignupForm = ({ onToggleForm, onClose }) => {
-  const [formData, setFormData] = useState({
+interface SignupFormProps {
+  onToggleForm: (formType: 'login' | 'signup' | 'forgot') => void
+  onClose: () => void
+}
+
+interface FormData {
+  username: string
+  email: string
+  password: string
+  confirmPassword: string
+}
+
+const SignupForm = ({ onToggleForm }: SignupFormProps) => {
+  const [formData, setFormData] = useState<FormData>({
     username: '',
     email: '',
     password: '',
@@ -14,14 +26,14 @@ const SignupForm = ({ onToggleForm, onClose }) => {
   const [message, setMessage] = useState('')
   const { signUp } = useAuth()
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     })
   }
 
-  const validateForm = () => {
+  const validateForm = (): string | null => {
     if (!formData.username.trim()) {
       return 'Username is required'
     }
@@ -40,7 +52,7 @@ const SignupForm = ({ onToggleForm, onClose }) => {
     return null
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -61,12 +73,11 @@ const SignupForm = ({ onToggleForm, onClose }) => {
       )
       
       if (error) {
-        setError(error.message)
+        setError(typeof error === 'object' && error && 'message' in error ? String((error as { message: string }).message) : 'An error occurred')
       } else {
         setMessage('Check your email for a confirmation link!')
-        // Don't close the modal yet - let user see the message
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred')
     }
 

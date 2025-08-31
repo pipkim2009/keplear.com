@@ -1,15 +1,20 @@
-import React, { useState } from 'react'
-import { useAuth } from '../../contexts/AuthContext'
+import { useState } from 'react'
+import { useAuth } from '../../hooks/useAuth'
 import './AuthForms.css'
 
-const ForgotPasswordForm = ({ onToggleForm, onClose }) => {
+interface ForgotPasswordFormProps {
+  onToggleForm: (formType: 'login' | 'signup' | 'forgot') => void
+  onClose: () => void
+}
+
+const ForgotPasswordForm = ({ onToggleForm }: ForgotPasswordFormProps) => {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const { resetPassword } = useAuth()
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
@@ -24,11 +29,11 @@ const ForgotPasswordForm = ({ onToggleForm, onClose }) => {
     try {
       const { error } = await resetPassword(email)
       if (error) {
-        setError(error.message)
+        setError(typeof error === 'object' && error && 'message' in error ? String((error as { message: string }).message) : 'An error occurred')
       } else {
         setMessage('Check your email for a password reset link!')
       }
-    } catch (err) {
+    } catch {
       setError('An unexpected error occurred')
     }
 

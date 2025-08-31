@@ -1,17 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { useAuth } from '../../contexts/AuthContext'
+import { useState, useEffect, useRef } from 'react'
+import { useAuth } from '../../hooks/useAuth'
 import './UserMenu.css'
+
+interface UserProfile {
+  email: string
+  username: string
+  avatarUrl?: string
+}
 
 const UserMenu = () => {
   const { user, signOut } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
-  const [userProfile, setUserProfile] = useState(null)
-  const menuRef = useRef(null)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
-  // Close menu when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsOpen(false)
       }
     }
@@ -25,11 +30,10 @@ const UserMenu = () => {
     }
   }, [isOpen])
 
-  // Get user profile data
   useEffect(() => {
     if (user) {
       setUserProfile({
-        email: user.email,
+        email: user.email || '',
         username: user.user_metadata?.full_name || 'User',
         avatarUrl: user.user_metadata?.avatar_url
       })
@@ -49,8 +53,7 @@ const UserMenu = () => {
     return null
   }
 
-  // Generate initials for avatar
-  const getInitials = (name) => {
+  const getInitials = (name: string): string => {
     return name
       .split(' ')
       .map(word => word.charAt(0))
@@ -73,8 +76,10 @@ const UserMenu = () => {
               src={userProfile.avatarUrl} 
               alt="User avatar"
               onError={(e) => {
-                e.target.style.display = 'none'
-                e.target.nextSibling.style.display = 'flex'
+                const img = e.target as HTMLImageElement
+                img.style.display = 'none'
+                const initials = img.nextSibling as HTMLElement
+                if (initials) initials.style.display = 'flex'
               }}
             />
           ) : null}
@@ -116,7 +121,6 @@ const UserMenu = () => {
             <button 
               className="menu-item"
               onClick={() => {
-                // TODO: Navigate to profile page
                 setIsOpen(false)
               }}
             >

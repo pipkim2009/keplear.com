@@ -1,24 +1,19 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import '../../styles/Guitar.css'
 import { guitarNotes } from '../../utils/guitarNotes'
-import { getAvailableGuitarNotes } from '../../utils/guitarNotes'
 import type { Note } from '../../utils/notes'
 
 interface GuitarProps {
   setGuitarNotes: (notes: Note[]) => void
-  isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
   showNotes: boolean
   onNoteClick?: (note: Note) => void
 }
 
-const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody, showNotes, onNoteClick }) => {
+const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(new Array(6).fill(false))
-  const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(13).fill(false)) // 13 total: open + 12 frets
+  const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(13).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set())
-
-  // Check if at least one string is selected
-  const hasStringSelected = stringCheckboxes.some(checked => checked)
 
   const handleStringCheckboxChange = (index: number) => {
     const newCheckboxes = [...stringCheckboxes]
@@ -345,7 +340,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
   }
 
   // Check if all notes on a string are individually selected
-  const checkStringCompletion = (stringIndex: number): boolean => {
+  const checkStringCompletion = useCallback((stringIndex: number): boolean => {
     // Check if open string is selected
     const openKey = `${stringIndex}-open`
     const hasOpenString = selectedNotes.has(openKey)
@@ -357,10 +352,10 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
     })
     
     return hasOpenString && allFrettedSelected
-  }
+  }, [selectedNotes])
 
   // Check if all notes on a fret are individually selected
-  const checkFretCompletion = (fretIndex: number): boolean => {
+  const checkFretCompletion = useCallback((fretIndex: number): boolean => {
     if (fretIndex === 0) {
       // Open fret: check all open strings
       return Array.from({length: 6}, (_, i) => i).every(stringIndex => {
@@ -374,14 +369,14 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
         return selectedNotes.has(noteKey)
       })
     }
-  }
+  }, [selectedNotes])
 
   // Auto-apply checkboxes when all individual notes are selected
   useEffect(() => {
     const newStringCheckboxes = [...stringCheckboxes]
     const newFretCheckboxes = [...fretCheckboxes]
     let hasChanges = false
-    let updatedSelectedNotes = new Set(selectedNotes)
+    const updatedSelectedNotes = new Set(selectedNotes)
 
     // Check each string for completion
     for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
@@ -423,7 +418,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isSelected, isInMelody,
       setFretCheckboxes(newFretCheckboxes)
       setSelectedNotes(updatedSelectedNotes)
     }
-  }, [selectedNotes, stringCheckboxes, fretCheckboxes])
+  }, [selectedNotes, stringCheckboxes, fretCheckboxes, checkStringCompletion, checkFretCompletion])
 
   // Update melody system whenever selections change
   useEffect(() => {
