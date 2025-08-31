@@ -32,7 +32,8 @@ function App() {
     setGuitarNotes,
     isSelected, 
     isInMelody,
-    clearSelection 
+    clearSelection,
+    clearTrigger 
   } = useMelodyGenerator()
 
   const handleNoteClick = async (note: Note) => {
@@ -81,6 +82,8 @@ function App() {
           instrument={instrument}
           setInstrument={handleInstrumentChange}
           setGuitarNotes={setGuitarNotes}
+          clearSelection={clearSelection}
+          clearTrigger={clearTrigger}
         />
 
         <MelodyControls

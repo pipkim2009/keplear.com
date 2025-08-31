@@ -10,6 +10,7 @@ export type Note = {
 export const useMelodyGenerator = () => {
   const [selectedNotes, setSelectedNotes] = useState<Note[]>([])
   const [generatedMelody, setGeneratedMelody] = useState<Note[]>([])
+  const [clearTrigger, setClearTrigger] = useState<number>(0)
 
   const selectNote = (note: Note) => {
     setSelectedNotes(prev => prev.length < 2 ? [...prev, note] : [note])
@@ -67,6 +68,7 @@ export const useMelodyGenerator = () => {
   const clearSelection = () => {
     setSelectedNotes([])
     setGeneratedMelody([])
+    setClearTrigger(prev => prev + 1)
   }
 
   return {
@@ -77,6 +79,7 @@ export const useMelodyGenerator = () => {
     setGuitarNotes,
     isSelected,
     isInMelody,
-    clearSelection
+    clearSelection,
+    clearTrigger
   }
 }

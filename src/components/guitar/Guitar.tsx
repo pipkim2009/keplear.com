@@ -8,9 +8,10 @@ interface GuitarProps {
   isInMelody: (note: Note, showNotes: boolean) => boolean
   showNotes: boolean
   onNoteClick?: (note: Note) => void
+  clearTrigger?: number
 }
 
-const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick }) => {
+const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(13).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set())
@@ -426,6 +427,15 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     setGuitarNotes(melodyNotes)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stringCheckboxes, fretCheckboxes, selectedNotes])
+
+  // Clear all selections when clearTrigger changes
+  useEffect(() => {
+    if (clearTrigger !== undefined) {
+      setStringCheckboxes(new Array(6).fill(false))
+      setFretCheckboxes(new Array(13).fill(false))
+      setSelectedNotes(new Set())
+    }
+  }, [clearTrigger])
 
   return (
     <div className="guitar-container">

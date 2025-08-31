@@ -133,3 +133,43 @@
   right: 3px;
 }
 
+/* Delete selection button */
+.control-button.delete-selection {
+  background: rgba(220, 53, 69, 0.1);
+  border: 2px solid #dc3545;
+  color: #f5c2c7;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  outline: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  min-width: 120px;
+  margin-top: 19px;
+}
+
+.control-button.delete-selection:hover {
+  background: rgba(220, 53, 69, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.control-button.delete-selection:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .control-button.delete-selection {
+    min-width: 100px;
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+}
+
