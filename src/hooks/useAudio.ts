@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react'
-import * as Tone from 'tone'
 
 type Note = { name: string }
 
@@ -47,7 +46,7 @@ const INSTRUMENTS: Record<'keyboard' | 'guitar', InstrumentConfig> = {
 }
 
 export const useAudio = () => {
-  const [samplers, setSamplers] = useState<Record<string, Tone.Sampler>>({})
+  const [samplers, setSamplers] = useState<Record<string, any>>({})
   const [isPlaying, setIsPlaying] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
 
@@ -55,12 +54,13 @@ export const useAudio = () => {
     if (isInitialized) return
 
     try {
-      // Check if audio context is already running
-      if (Tone.getContext().state === 'suspended') {
-        await Tone.start()
-      }
+      // Dynamically import Tone.js only when needed
+      const Tone = await import('tone')
       
-      const newSamplers: Record<string, Tone.Sampler> = {}
+      // Start audio context (this will create it if needed)
+      await Tone.start()
+      
+      const newSamplers: Record<string, any> = {}
       
       Object.entries(INSTRUMENTS).forEach(([key, config]) => {
         newSamplers[key] = new Tone.Sampler({
