@@ -20,13 +20,14 @@
 @media (max-width: 480px) {
   .instrument-controls {
     position: fixed;
-    top: 125px;
+    top: 130px;
     flex-direction: row;
     flex-wrap: wrap;
     left: 20px;
     right: 20px;
     gap: 10px;
     height: auto;
+    z-index: 100;
   }
   
   .control-group {
