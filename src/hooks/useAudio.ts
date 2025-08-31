@@ -51,7 +51,7 @@ export const useAudio = () => {
   const [isInitialized, setIsInitialized] = useState(false)
 
   const initializeAudio = useCallback(async () => {
-    if (isInitialized) return
+    if (isInitialized) return samplers
 
     try {
       // Dynamically import Tone.js only when needed
@@ -62,25 +62,37 @@ export const useAudio = () => {
       
       const newSamplers: Record<string, any> = {}
       
-      Object.entries(INSTRUMENTS).forEach(([key, config]) => {
-        newSamplers[key] = new Tone.Sampler({
-          urls: config.urls,
-          release: config.release,
-          baseUrl: config.baseUrl,
-        }).toDestination()
+      // Create samplers and wait for them to load
+      const samplerPromises = Object.entries(INSTRUMENTS).map(([key, config]) => {
+        return new Promise((resolve) => {
+          const sampler = new Tone.Sampler({
+            urls: config.urls,
+            release: config.release,
+            baseUrl: config.baseUrl,
+            onload: () => {
+              newSamplers[key] = sampler.toDestination()
+              resolve(sampler)
+            }
+          })
+        })
       })
+
+      // Wait for all samplers to load
+      await Promise.all(samplerPromises)
 
       setSamplers(newSamplers)
       setIsInitialized(true)
+      return newSamplers
     } catch (error) {
       // Silently fail if audio initialization fails (expected before user interaction)
       if (error instanceof Error && error.message.includes('AudioContext')) {
         // Expected error before user interaction - don't log
-        return
+        return {}
       }
       console.warn('Audio initialization failed:', error)
+      return {}
     }
-  }, [isInitialized])
+  }, [isInitialized, samplers])
 
   useEffect(() => {
     return () => {
@@ -89,20 +101,20 @@ export const useAudio = () => {
   }, [samplers])
 
   const playNote = useCallback(async (noteName: string, duration?: string) => {
-    await initializeAudio()
-    const sampler = samplers.keyboard
+    const currentSamplers = await initializeAudio()
+    const sampler = currentSamplers.keyboard
     if (!sampler) return
     
     sampler.triggerAttackRelease(noteName, duration || INSTRUMENTS.keyboard.defaultDuration)
-  }, [initializeAudio, samplers.keyboard])
+  }, [initializeAudio])
 
   const playGuitarNote = useCallback(async (noteName: string, duration?: string) => {
-    await initializeAudio()
-    const sampler = samplers.guitar
+    const currentSamplers = await initializeAudio()
+    const sampler = currentSamplers.guitar
     if (!sampler) return
     
     sampler.triggerAttackRelease(noteName, duration || INSTRUMENTS.guitar.defaultDuration)
-  }, [initializeAudio, samplers.guitar])
+  }, [initializeAudio])
 
   const playMelodyGeneric = useCallback(async (
     melody: Note[], 
@@ -111,8 +123,8 @@ export const useAudio = () => {
   ) => {
     if (melody.length === 0 || isPlaying) return
     
-    await initializeAudio()
-    const sampler = samplers[instrument]
+    const currentSamplers = await initializeAudio()
+    const sampler = currentSamplers[instrument]
     if (!sampler) return
     
     setIsPlaying(true)
@@ -130,7 +142,7 @@ export const useAudio = () => {
     } finally {
       setIsPlaying(false)
     }
-  }, [initializeAudio, samplers, isPlaying])
+  }, [initializeAudio, isPlaying])
 
   const playMelody = useCallback((melody: Note[], bpm: number) => {
     return playMelodyGeneric(melody, bpm, 'keyboard')
