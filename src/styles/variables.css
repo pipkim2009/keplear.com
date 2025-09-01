@@ -1,0 +1,124 @@
+:root {
+  /* Color System */
+  
+  /* Primary Colors */
+  --primary-purple: #8000ff;
+  --primary-purple-dark: #6b00cc;
+  --primary-purple-darker: #6600cc;
+  --primary-purple-light: #c77dff;
+  
+  /* Theme Colors - Light */
+  --text-primary-light: #121212;
+  --text-secondary-light: #374151;
+  --text-tertiary-light: #1f2937;
+  --bg-primary-light: #ffffff;
+  --bg-secondary-light: #f8f9fa;
+  --bg-tertiary-light: #fafbfc;
+  
+  /* Theme Colors - Dark */
+  --text-primary-dark: #d2d2f9;
+  --text-secondary-dark: #ffffff;
+  --bg-primary-dark: #121212;
+  --bg-secondary-dark: #2d1b69;
+  --bg-tertiary-dark: #242d3a;
+  --bg-quaternary-dark: #242d3c;
+  
+  /* Accent Colors */
+  --blue-primary: #3b82f6;
+  --blue-dark: #1d4ed8;
+  --blue-light: #2563eb;
+  --green-primary: #10b981;
+  --green-dark: #388e3c;
+  --green-light: #22c55e;
+  --red-primary: #dc3545;
+  --red-light: #ef4444;
+  --yellow-primary: #fbbf24;
+  --indigo-primary: #6366f1;
+  
+  /* Neutral Colors */
+  --gray-100: #f8f9fa;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  
+  /* Surface Colors */
+  --surface-light: #e2e8f0;
+  --surface-dark: #4a5568;
+  --surface-guitar: #2a1f1c;
+  --surface-guitar-border: #2d2d2d;
+  
+  /* Guitar String Colors */
+  --string-1: #e6e6e6;
+  --string-2: #d9d9d9;
+  --string-3: #d0d0d0;
+  --string-4: #c8c8c8;
+  --string-5: #b0b0b0;
+  --string-6: #a0a0a0;
+  --string-center: #999;
+  --string-center-dark: #808080;
+  --string-center-darker: #707070;
+  --string-center-darkest: #606060;
+  
+  /* Fret Colors */
+  --fret-wire: #a0a0a0;
+  --fret-marker: #e6e6cc;
+  --fret-marker-border: #bbb;
+  
+  /* Spacing System */
+  --space-xs: 5px;
+  --space-sm: 10px;
+  --space-md: 15px;
+  --space-lg: 20px;
+  --space-xl: 25px;
+  --space-2xl: 30px;
+  
+  /* Component Spacing */
+  --gap-xs: 5px;
+  --gap-sm: 6px;
+  --gap-md: 10px;
+  --gap-lg: 15px;
+  --gap-xl: 20px;
+  
+  /* Border Radius */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 20px;
+  --radius-full: 50%;
+  
+  /* Font Sizes */
+  --text-xs: 9px;
+  --text-sm: 10px;
+  --text-base: 12px;
+  --text-lg: 14px;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.15);
+  --shadow-xl: 0 10px 20px rgba(0, 0, 0, 0.3);
+  --shadow-2xl: 0 20px 40px rgba(0, 0, 0, 0.3);
+  
+  /* Transitions */
+  --transition-fast: all 0.1s ease;
+  --transition-normal: all 0.15s ease;
+  --transition-slow: all 0.2s ease;
+  --transition-slower: all 0.3s ease;
+  
+  /* Z-index Scale */
+  --z-base: 1;
+  --z-frets: 10;
+  --z-strings: 15;
+  --z-checkboxes: 20;
+  --z-notes: 30;
+  --z-controls: 50;
+  --z-instrument-controls: 100;
+  --z-mobile-controls: 900;
+  --z-header: 1000;
+}
