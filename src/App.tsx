@@ -5,7 +5,6 @@ import Footer from './components/common/Footer'
 import InstrumentDisplay from './components/keyboard/InstrumentDisplay'
 import MelodyControls from './components/MelodyControls'
 import MelodyDisplay from './components/MelodyDisplay'
-import DeleteAccountConfirm from './components/auth/DeleteAccountConfirm'
 import { useAudio } from './hooks/useAudio'
 import { useMelodyGenerator } from './hooks/useMelodyGenerator'
 import { useTheme } from './hooks/useTheme'
@@ -17,7 +16,6 @@ function App() {
   const [numberOfNotes, setNumberOfNotes] = useState(5)
   const [showNotes, setShowNotes] = useState(false)
   const [instrument, setInstrument] = useState('keyboard')
-  const [deleteToken, setDeleteToken] = useState<string | null>(null)
   
   const { isDarkMode, toggleTheme } = useTheme()
   const { playNote, playGuitarNote, playMelody, playGuitarMelody, isPlaying } = useAudio()
@@ -27,16 +25,6 @@ function App() {
     document.body.className = isDarkMode ? 'dark' : 'light'
   }, [isDarkMode])
 
-  // Check for delete confirmation token in URL hash
-  useEffect(() => {
-    const hash = window.location.hash
-    const deleteMatch = hash.match(/#delete-confirm=(.+)/)
-    if (deleteMatch) {
-      setDeleteToken(deleteMatch[1])
-      // Clear the hash from URL
-      window.history.replaceState(null, '', window.location.pathname)
-    }
-  }, [])
   const { 
     selectedNotes, 
     generatedMelody, 
@@ -78,25 +66,6 @@ function App() {
   return (
     <AuthProvider>
       <div className={`app-container ${isDarkMode ? 'dark' : 'light'}`}>
-        {deleteToken ? (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 1000
-          }}>
-            <DeleteAccountConfirm 
-              token={deleteToken}
-              onClose={() => setDeleteToken(null)}
-            />
-          </div>
-        ) : null}
 
         <Header 
           isDarkMode={isDarkMode} 

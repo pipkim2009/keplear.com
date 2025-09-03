@@ -3,12 +3,12 @@ import { useAuth } from '../../hooks/useAuth'
 import './AuthForms.css'
 
 interface LoginFormProps {
-  onToggleForm: (formType: 'login' | 'signup' | 'forgot') => void
+  onToggleForm: (formType: 'login' | 'signup') => void
   onClose: () => void
 }
 
 const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -19,14 +19,14 @@ const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
     setLoading(true)
     setError('')
 
-    if (!email || !password) {
+    if (!username || !password) {
       setError('Please fill in all fields')
       setLoading(false)
       return
     }
 
     try {
-      const { error } = await signIn(email, password)
+      const { error } = await signIn(username, password)
       if (error) {
         setError(typeof error === 'object' && error && 'message' in error ? String((error as { message: string }).message) : 'An error occurred')
       } else {
@@ -49,16 +49,18 @@ const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} autoComplete="on">
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="username">Username</label>
           <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
+            id="username"
+            name="username"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            placeholder="Enter your username"
             disabled={loading}
+            autoComplete="username"
             required
           />
         </div>
@@ -67,11 +69,13 @@ const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
           <label htmlFor="password">Password</label>
           <input
             id="password"
+            name="current-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
             disabled={loading}
+            autoComplete="current-password"
             required
           />
         </div>
@@ -96,14 +100,6 @@ const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
             Sign up
           </button>
         </p>
-        
-        <button 
-          type="button"
-          className="link-button"
-          onClick={() => onToggleForm('forgot')}
-        >
-          Forgot your password?
-        </button>
       </div>
     </div>
   )

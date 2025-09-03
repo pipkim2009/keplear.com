@@ -6,13 +6,10 @@ import type { User } from '@supabase/supabase-js'
 interface AuthContextType {
   user: User | null
   loading: boolean
-  signUp: (email: string, password: string, metadata?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>
-  signIn: (email: string, password: string) => Promise<{ data: unknown; error: unknown }>
+  signUp: (username: string, password: string, metadata?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>
+  signIn: (username: string, password: string) => Promise<{ data: unknown; error: unknown }>
   signOut: () => Promise<{ error: unknown }>
-  resetPassword: (email: string) => Promise<{ error: unknown }>
   updatePassword: (newPassword: string) => Promise<{ error: unknown }>
-  sendDeleteConfirmation: () => Promise<{ error: unknown }>
-  confirmDeleteAccount: (token: string) => Promise<{ error: unknown }>
   deleteAccount: () => Promise<{ error: unknown }>
 }
 
@@ -46,13 +43,16 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signUp = async (email: string, password: string, metadata: Record<string, unknown> = {}) => {
+  const signUp = async (username: string, password: string, metadata: Record<string, unknown> = {}) => {
     try {
+      // Generate a fake email from username for Supabase (user never sees this)
+      const fakeEmail = `${username}@placeholder.com`
+      
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: fakeEmail,
         password,
         options: {
-          data: metadata
+          data: { ...metadata, username, display_name: username }
         }
       })
       return { data, error }
@@ -61,10 +61,13 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (username: string, password: string) => {
     try {
+      // Generate the same fake email format for sign in
+      const fakeEmail = `${username}@placeholder.com`
+      
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: fakeEmail,
         password
       })
       return { data, error }
@@ -82,16 +85,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }
 
-  const resetPassword = async (email: string) => {
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`
-      })
-      return { error }
-    } catch (error) {
-      return { error }
-    }
-  }
 
   const updatePassword = async (newPassword: string) => {
     try {
@@ -104,73 +97,6 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }
 
-  const sendDeleteConfirmation = async () => {
-    try {
-      // Generate a secure token for deletion confirmation
-      const token = crypto.randomUUID()
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
-      
-      // Store the deletion request in user metadata
-      const { error: updateError } = await supabase.auth.updateUser({
-        data: { 
-          delete_token: token,
-          delete_expires: expiresAt,
-          delete_requested: true
-        }
-      })
-      
-      if (updateError) {
-        return { error: updateError }
-      }
-      
-      // Try to use a custom Edge Function for proper email
-      try {
-        const { error: emailError } = await supabase.functions.invoke('send-delete-confirmation', {
-          body: {
-            email: user?.email,
-            token: token,
-            confirmationUrl: `${window.location.origin}/#delete-confirm=${token}`,
-            userName: user?.user_metadata?.full_name || 'User'
-          }
-        })
-        
-        // If Edge Function exists and works, return its result
-        return { error: emailError }
-      } catch (functionError) {
-        // If Edge Function doesn't exist, fall back to a different approach
-        console.log('Edge function not available, using alternative method')
-        
-        // For now, store the request and show instructions to user
-        // In production, you'd set up proper email service (SendGrid, etc.)
-        return { error: null }
-      }
-    } catch (error) {
-      return { error }
-    }
-  }
-
-  const confirmDeleteAccount = async (token: string) => {
-    try {
-      // Verify the token matches and hasn't expired
-      if (!user?.user_metadata?.delete_token || 
-          user.user_metadata.delete_token !== token ||
-          !user.user_metadata.delete_expires ||
-          new Date(user.user_metadata.delete_expires) < new Date()) {
-        return { error: 'Invalid or expired deletion token' }
-      }
-      
-      // Token is valid, proceed with deletion
-      const { error } = await supabase.rpc('delete_user')
-      if (!error) {
-        // Sign out the user and clear the session
-        await supabase.auth.signOut()
-        setUser(null)
-      }
-      return { error }
-    } catch (error) {
-      return { error }
-    }
-  }
 
   const deleteAccount = async () => {
     try {
@@ -192,10 +118,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     signUp,
     signIn,
     signOut,
-    resetPassword,
     updatePassword,
-    sendDeleteConfirmation,
-    confirmDeleteAccount,
     deleteAccount
   }
 

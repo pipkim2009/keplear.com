@@ -3,13 +3,12 @@ import { useAuth } from '../../hooks/useAuth'
 import './AuthForms.css'
 
 interface SignupFormProps {
-  onToggleForm: (formType: 'login' | 'signup' | 'forgot') => void
+  onToggleForm: (formType: 'login' | 'signup') => void
   onClose: () => void
 }
 
 interface FormData {
   username: string
-  email: string
   password: string
   confirmPassword: string
 }
@@ -17,7 +16,6 @@ interface FormData {
 const SignupForm = ({ onToggleForm }: SignupFormProps) => {
   const [formData, setFormData] = useState<FormData>({
     username: '',
-    email: '',
     password: '',
     confirmPassword: ''
   })
@@ -43,9 +41,6 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
     if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
       return 'Username can only contain letters, numbers, and underscores'
     }
-    if (!formData.email) {
-      return 'Email is required'
-    }
     if (formData.password !== formData.confirmPassword) {
       return 'Passwords do not match'
     }
@@ -67,7 +62,7 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
 
     try {
       const { error } = await signUp(
-        formData.email, 
+        formData.username, 
         formData.password,
         { full_name: formData.username }
       )
@@ -75,7 +70,7 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
       if (error) {
         setError(typeof error === 'object' && error && 'message' in error ? String((error as { message: string }).message) : 'An error occurred')
       } else {
-        setMessage('Check your email for a confirmation link!')
+        setMessage('Account created successfully! You can now sign in.')
       }
     } catch {
       setError('An unexpected error occurred')
@@ -100,7 +95,7 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} autoComplete="on">
         <div className="form-group">
           <label htmlFor="username">Username</label>
           <input
@@ -111,20 +106,7 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
             onChange={handleChange}
             placeholder="Username (a-z, 0-9, _ only)"
             disabled={loading}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Enter your email"
-            disabled={loading}
+            autoComplete="username"
             required
           />
         </div>
@@ -139,6 +121,8 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
             onChange={handleChange}
             placeholder="Create a password"
             disabled={loading}
+            autoComplete="new-password"
+            minLength={8}
             required
           />
         </div>
@@ -153,6 +137,8 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
             onChange={handleChange}
             placeholder="Confirm your password"
             disabled={loading}
+            autoComplete="new-password"
+            minLength={8}
             required
           />
         </div>

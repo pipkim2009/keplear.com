@@ -2,17 +2,16 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
-import ForgotPasswordForm from './ForgotPasswordForm'
 import './AuthForms.css'
 
 interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
-  initialForm?: 'login' | 'signup' | 'forgot'
+  initialForm?: 'login' | 'signup'
 }
 
 const AuthModal = ({ isOpen, onClose, initialForm = 'login' }: AuthModalProps) => {
-  const [currentForm, setCurrentForm] = useState<'login' | 'signup' | 'forgot'>(initialForm)
+  const [currentForm, setCurrentForm] = useState<'login' | 'signup'>(initialForm)
 
   useEffect(() => {
     if (isOpen) {
@@ -22,7 +21,7 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login' }: AuthModalProps) =
 
   if (!isOpen) return null
 
-  const handleToggleForm = (formType: 'login' | 'signup' | 'forgot') => {
+  const handleToggleForm = (formType: 'login' | 'signup') => {
     setCurrentForm(formType)
   }
 
@@ -41,8 +40,6 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login' }: AuthModalProps) =
     switch (currentForm) {
       case 'signup':
         return <SignupForm onToggleForm={handleToggleForm} onClose={handleClose} />
-      case 'forgot':
-        return <ForgotPasswordForm onToggleForm={handleToggleForm} onClose={handleClose} />
       default:
         return <LoginForm onToggleForm={handleToggleForm} onClose={handleClose} />
     }

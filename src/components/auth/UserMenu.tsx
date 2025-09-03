@@ -4,7 +4,6 @@ import { useTheme } from '../../hooks/useTheme'
 import './UserMenu.css'
 
 interface UserProfile {
-  email: string
   username: string
   avatarUrl?: string
 }
@@ -36,8 +35,7 @@ const UserMenu = () => {
   useEffect(() => {
     if (user) {
       setUserProfile({
-        email: user.email || '',
-        username: user.user_metadata?.full_name || 'User',
+        username: user.user_metadata?.username || user.user_metadata?.full_name || 'User',
         avatarUrl: user.user_metadata?.avatar_url
       })
     }
@@ -217,7 +215,6 @@ const UserMenu = () => {
           <div className="user-menu-header">
             <div className="user-info">
               <div className="user-name-large">{userProfile.username}</div>
-              <div className="user-email">{userProfile.email}</div>
             </div>
           </div>
           
