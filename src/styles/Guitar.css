@@ -7,10 +7,35 @@
   min-width: 727px;
 }
 
+@media (min-width: 481px) and (max-width: 768px) {
+  .guitar-container {
+    min-width: 850px;
+    margin: 0 0 0 75px;
+    padding: 50px;
+  }
+  
+  .fretboard {
+    width: 850px;
+  }
+  
+  .guitar-string {
+    width: 850px;
+  }
+}
+
 @media (max-width: 480px) {
   .guitar-container {
-    min-width: 767px;
-    margin: 0 20px 0 520px;
+    min-width: 850px;
+    margin: 0 20px 0 550px;
+    padding: 50px;
+  }
+  
+  .fretboard {
+    width: 850px;
+  }
+  
+  .guitar-string {
+    width: 850px;
   }
 }
 
@@ -26,11 +51,6 @@
   border: 2px solid #2d2d2d;
 }
 
-@media (max-width: 480px) {
-  .fretboard {
-    width: 767px;
-  }
-}
 
 .fret {
   position: absolute;
