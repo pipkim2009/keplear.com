@@ -17,6 +17,7 @@ interface InstrumentDisplayProps {
   setGuitarNotes: (notes: Note[]) => void
   clearSelection: () => void
   clearTrigger: number
+  selectedNotes: Note[]
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -32,7 +33,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   setInstrument,
   setGuitarNotes,
   clearSelection,
-  clearTrigger
+  clearTrigger,
+  selectedNotes
 }) => {
   return (
     <>
@@ -45,6 +47,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           instrument={instrument}
           setInstrument={setInstrument}
           clearSelection={clearSelection}
+          hasSelectedNotes={selectedNotes.length > 0}
         />
       </div>
       

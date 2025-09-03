@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../../hooks/useAuth'
+import { useTheme } from '../../hooks/useTheme'
 import './UserMenu.css'
 
 interface UserProfile {
@@ -9,9 +10,11 @@ interface UserProfile {
 }
 
 const UserMenu = () => {
-  const { user, signOut } = useAuth()
+  const { user, signOut, deleteAccount } = useAuth()
+  const { isDarkMode } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -49,6 +52,25 @@ const UserMenu = () => {
     }
   }
 
+  const handleDeleteAccount = () => {
+    setShowDeleteConfirm(true)
+    setIsOpen(false)
+  }
+
+  const confirmAccountDeletion = async () => {
+    try {
+      const { error } = await deleteAccount()
+      if (error) {
+        console.error('Error deleting account:', error)
+        alert('Failed to delete account. Please try again or contact support.')
+      }
+      setShowDeleteConfirm(false)
+    } catch (error) {
+      console.error('Error deleting account:', error)
+      alert('Failed to delete account. Please try again or contact support.')
+    }
+  }
+
   if (!user || !userProfile) {
     return null
   }
@@ -63,13 +85,97 @@ const UserMenu = () => {
   }
 
   return (
-    <div className="user-menu" ref={menuRef}>
-      <button 
-        className="user-menu-trigger"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-expanded={isOpen}
-        aria-haspopup="true"
-      >
+    <>
+      {showDeleteConfirm && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px',
+          boxSizing: 'border-box'
+        }}>
+          <div style={{
+            background: isDarkMode ? '#2d1b69' : 'white',
+            padding: '30px',
+            borderRadius: '12px',
+            maxWidth: '400px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            textAlign: 'center',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+            color: isDarkMode ? '#d2d2f9' : '#2d1b69',
+            position: 'relative',
+            margin: 'auto'
+          }}>
+            <h3 style={{ marginBottom: '20px', color: '#dc2626' }}>Delete Account</h3>
+            <p style={{ marginBottom: '20px', lineHeight: '1.5' }}>
+              Are you absolutely sure you want to delete your account?
+              <br /><br />
+              <strong>This action cannot be undone.</strong> All your data will be permanently deleted.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                style={{
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  border: `2px solid ${isDarkMode ? '#6366f1' : '#d1d5db'}`,
+                  background: isDarkMode ? 'transparent' : 'white',
+                  color: isDarkMode ? '#d2d2f9' : '#374151',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#f9fafb'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = isDarkMode ? 'transparent' : 'white'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmAccountDeletion}
+                style={{
+                  padding: '12px 24px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  background: '#dc2626',
+                  color: 'white',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = '#b91c1c'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = '#dc2626'
+                }}
+              >
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <div className="user-menu" ref={menuRef}>
+        <button 
+          className="user-menu-trigger"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-expanded={isOpen}
+          aria-haspopup="true"
+        >
         <div className="user-avatar">
           {userProfile.avatarUrl ? (
             <img 
@@ -130,10 +236,23 @@ const UserMenu = () => {
               </svg>
               Sign Out
             </button>
+            <button 
+              className="menu-item danger"
+              onClick={handleDeleteAccount}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16">
+                <path 
+                  fill="currentColor" 
+                  d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 1.152l.557 6.977A2.5 2.5 0 0 0 5.53 13h4.94a2.5 2.5 0 0 0 2.477-2.371l.557-6.977a.58.58 0 0 0-.01-1.152H11ZM4.682 3.5h6.636l-.54 6.771A1.5 1.5 0 0 1 9.29 12H6.71a1.5 1.5 0 0 1-1.487-1.729L4.682 3.5Z"
+                />
+              </svg>
+              Delete Account
+            </button>
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </>
   )
 }
 
