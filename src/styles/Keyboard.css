@@ -4,8 +4,8 @@
   justify-content: center;
   align-items: center;
   background: linear-gradient(145deg, #2d3748, #1a202c);
-  padding: 60px 30px 30px 30px;
-  margin-top: 2rem;
+  padding: 30px 30px 30px 30px;
+  margin-top: 1rem;
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   border: 4px solid #4a5568;
@@ -18,8 +18,8 @@
   .instrument-container {
     width: 100vw;
     max-width: 100vw;
-    margin: 2rem 0 0 0;
-    padding: 60px 0 30px 0;
+    margin: 0.5rem 0 0 0;
+    padding: 30px 0 30px 0;
     border-radius: 0;
     overflow-x: scroll;
     -webkit-overflow-scrolling: touch;
@@ -39,8 +39,8 @@
   .instrument-container {
     width: 100vw;
     max-width: 100vw;
-    margin: 2rem 0 0 0;
-    padding: 120px 0 30px 0;
+    margin: 0.5rem 0 0 0;
+    padding: 30px 0 30px 0;
     border-radius: 0;
     overflow-x: scroll;
     -webkit-overflow-scrolling: touch;
@@ -49,6 +49,40 @@
 
 .instrument-container > * {
   position: relative;
+}
+
+.instrument-controls-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(145deg, #2d3748, #1a202c);
+  padding: 20px 30px;
+  margin-top: 1rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 4px solid #4a5568;
+  width: 700px;
+  min-height: 80px;
+  overflow: visible;
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .instrument-controls-container {
+    width: 700px;
+    max-width: 90vw;
+    margin: 1rem auto 0 auto;
+    padding: 20px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .instrument-controls-container {
+    width: 700px;
+    max-width: 90vw;
+    margin: 1rem auto 0 auto;
+    padding: 20px 20px;
+  }
 }
 
 .keyboard {

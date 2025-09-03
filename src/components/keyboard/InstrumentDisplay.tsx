@@ -35,34 +35,38 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   clearTrigger
 }) => {
   return (
-    <div className="instrument-container">
-      <InstrumentControls
-        bpm={bpm}
-        setBpm={setBpm}
-        numberOfNotes={numberOfNotes}
-        setNumberOfNotes={setNumberOfNotes}
-        instrument={instrument}
-        setInstrument={setInstrument}
-        clearSelection={clearSelection}
-      />
+    <>
+      <div className="instrument-controls-container">
+        <InstrumentControls
+          bpm={bpm}
+          setBpm={setBpm}
+          numberOfNotes={numberOfNotes}
+          setNumberOfNotes={setNumberOfNotes}
+          instrument={instrument}
+          setInstrument={setInstrument}
+          clearSelection={clearSelection}
+        />
+      </div>
       
-      {instrument === 'keyboard' ? (
-        <Keyboard
-          onNoteClick={onNoteClick}
-          isSelected={isSelected}
-          isInMelody={isInMelody}
-          showNotes={showNotes}
-        />
-      ) : (
-        <Guitar 
-          setGuitarNotes={setGuitarNotes}
-          isInMelody={isInMelody}
-          showNotes={showNotes}
-          onNoteClick={onNoteClick}
-          clearTrigger={clearTrigger}
-        />
-      )}
-    </div>
+      <div className="instrument-container">
+        {instrument === 'keyboard' ? (
+          <Keyboard
+            onNoteClick={onNoteClick}
+            isSelected={isSelected}
+            isInMelody={isInMelody}
+            showNotes={showNotes}
+          />
+        ) : (
+          <Guitar 
+            setGuitarNotes={setGuitarNotes}
+            isInMelody={isInMelody}
+            showNotes={showNotes}
+            onNoteClick={onNoteClick}
+            clearTrigger={clearTrigger}
+          />
+        )}
+      </div>
+    </>
   )
 }
 
