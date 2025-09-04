@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import Header from './components/common/Header'
 import Footer from './components/common/Footer'
+import Home from './components/pages/Home'
 import InstrumentDisplay from './components/keyboard/InstrumentDisplay'
 import MelodyControls from './components/MelodyControls'
 import MelodyDisplay from './components/MelodyDisplay'
@@ -12,6 +13,7 @@ import { notes, type Note } from './utils/notes'
 import './styles/App.css'
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('home')
   const [bpm, setBpm] = useState(120)
   const [numberOfNotes, setNumberOfNotes] = useState(5)
   const [showNotes, setShowNotes] = useState(false)
@@ -67,6 +69,10 @@ function App() {
     clearSelection() // Clear melody when instrument changes
   }
 
+  const navigateToHome = () => setCurrentPage('home')
+  const navigateToSandbox = () => setCurrentPage('sandbox')
+  const navigateToPractice = () => setCurrentPage('practice')
+
   return (
     <AuthProvider>
       <div className={`app-container ${isDarkMode ? 'dark' : 'light'}`}>
@@ -74,40 +80,67 @@ function App() {
         <Header 
           isDarkMode={isDarkMode} 
           onToggleTheme={toggleTheme}
+          currentPage={currentPage}
+          onNavigateToHome={navigateToHome}
+          onNavigateToSandbox={navigateToSandbox}
+          onNavigateToPractice={navigateToPractice}
         />
         
-        <InstrumentDisplay
-          onNoteClick={handleNoteClick}
-          isSelected={isSelected}
-          isInMelody={isInMelody}
-          showNotes={showNotes}
-          bpm={bpm}
-          setBpm={setBpm}
-          numberOfNotes={numberOfNotes}
-          setNumberOfNotes={setNumberOfNotes}
-          instrument={instrument}
-          setInstrument={handleInstrumentChange}
-          setGuitarNotes={setGuitarNotes}
-          clearSelection={clearSelection}
-          clearTrigger={clearTrigger}
-          selectedNotes={selectedNotes}
-        />
+        {currentPage === 'home' && (
+          <Home 
+            onNavigateToSandbox={navigateToSandbox}
+            onNavigateToPractice={navigateToPractice}
+          />
+        )}
 
-        <MelodyControls
-          selectedNotes={selectedNotes}
-          onGenerateMelody={handleGenerateMelody}
-          onPlayMelody={handlePlayMelody}
-          isPlaying={isPlaying}
-          generatedMelody={generatedMelody}
-          instrument={instrument}
-          showNotes={showNotes}
-          onToggleNotes={() => setShowNotes(!showNotes)}
-        />
+        {currentPage === 'sandbox' && (
+          <>
+            <InstrumentDisplay
+              onNoteClick={handleNoteClick}
+              isSelected={isSelected}
+              isInMelody={isInMelody}
+              showNotes={showNotes}
+              bpm={bpm}
+              setBpm={setBpm}
+              numberOfNotes={numberOfNotes}
+              setNumberOfNotes={setNumberOfNotes}
+              instrument={instrument}
+              setInstrument={handleInstrumentChange}
+              setGuitarNotes={setGuitarNotes}
+              clearSelection={clearSelection}
+              clearTrigger={clearTrigger}
+              selectedNotes={selectedNotes}
+            />
 
-        <MelodyDisplay
-          generatedMelody={generatedMelody}
-          showNotes={showNotes}
-        />
+            <MelodyControls
+              selectedNotes={selectedNotes}
+              onGenerateMelody={handleGenerateMelody}
+              onPlayMelody={handlePlayMelody}
+              isPlaying={isPlaying}
+              generatedMelody={generatedMelody}
+              instrument={instrument}
+              showNotes={showNotes}
+              onToggleNotes={() => setShowNotes(!showNotes)}
+            />
+
+            <MelodyDisplay
+              generatedMelody={generatedMelody}
+              showNotes={showNotes}
+            />
+          </>
+        )}
+
+        {currentPage === 'practice' && (
+          <div className="practice-page">
+            <div className="coming-soon">
+              <h2>Practice Mode</h2>
+              <p>Coming soon! This will include structured exercises and progress tracking.</p>
+              <button className="button" onClick={navigateToSandbox}>
+                Try Sandbox Mode
+              </button>
+            </div>
+          </div>
+        )}
         
         <Footer />
       </div>

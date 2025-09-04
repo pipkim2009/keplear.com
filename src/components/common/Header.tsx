@@ -8,9 +8,20 @@ import '../../styles/Header.css'
 interface HeaderProps {
   isDarkMode: boolean
   onToggleTheme: () => void
+  currentPage: string
+  onNavigateToHome: () => void
+  onNavigateToSandbox: () => void
+  onNavigateToPractice: () => void
 }
 
-function Header({ isDarkMode, onToggleTheme }: HeaderProps) {
+function Header({ 
+  isDarkMode, 
+  onToggleTheme, 
+  currentPage, 
+  onNavigateToHome, 
+  onNavigateToSandbox, 
+  onNavigateToPractice 
+}: HeaderProps) {
   const { user, loading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authForm, setAuthForm] = useState<'login' | 'signup'>('login')
@@ -34,6 +45,27 @@ function Header({ isDarkMode, onToggleTheme }: HeaderProps) {
             <p className="header-slogan">Interactive tools for musical ear training</p>
           </div>
         </div>
+
+        <nav className="header-nav">
+          <button 
+            className={`nav-link ${currentPage === 'home' ? 'nav-link-active' : ''}`}
+            onClick={onNavigateToHome}
+          >
+            Home
+          </button>
+          <button 
+            className={`nav-link ${currentPage === 'sandbox' ? 'nav-link-active' : ''}`}
+            onClick={onNavigateToSandbox}
+          >
+            Sandbox
+          </button>
+          <button 
+            className={`nav-link ${currentPage === 'practice' ? 'nav-link-active' : ''}`}
+            onClick={onNavigateToPractice}
+          >
+            Practice
+          </button>
+        </nav>
         
         <div className="header-right">
           <ThemeToggle isDarkMode={isDarkMode} onToggle={onToggleTheme} />
