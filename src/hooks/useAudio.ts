@@ -131,6 +131,7 @@ export const useAudio = () => {
     
     setIsPlaying(true)
     setShouldStop(false)
+    setCurrentTimeoutId(null) // Reset any lingering timeout ID
     
     const noteDuration = (60 / bpm) * 800
     const playDuration = instrument === 'guitar' ? "0.6" : "0.5"
@@ -182,6 +183,11 @@ export const useAudio = () => {
     }
     // Immediately set playing to false when manually stopped
     setIsPlaying(false)
+    
+    // Reset shouldStop after a brief delay to ensure the playback loop sees it
+    setTimeout(() => {
+      setShouldStop(false)
+    }, 10)
   }, [currentTimeoutId])
 
   return {
