@@ -180,6 +180,8 @@ export const useAudio = () => {
       clearTimeout(currentTimeoutId)
       setCurrentTimeoutId(null)
     }
+    // Immediately set playing to false when manually stopped
+    setIsPlaying(false)
   }, [currentTimeoutId])
 
   return {
