@@ -64,6 +64,16 @@
   box-shadow: 0 4px 12px rgba(128, 0, 255, 0.4);
 }
 
+.button-stop {
+  background: #e53e3e !important;
+  color: white !important;
+}
+
+.button-stop:not(:disabled):hover {
+  background: #c53030 !important;
+  box-shadow: 0 4px 12px rgba(229, 62, 62, 0.4) !important;
+}
+
 @media (max-width: 768px) {
   .notes-toggle-container {
     max-width: 250px;

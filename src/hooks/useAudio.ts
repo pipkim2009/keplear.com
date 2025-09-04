@@ -49,6 +49,8 @@ export const useAudio = () => {
   const [samplers, setSamplers] = useState<Record<string, any>>({})
   const [isPlaying, setIsPlaying] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
+  const [shouldStop, setShouldStop] = useState(false)
+  const [currentTimeoutId, setCurrentTimeoutId] = useState<NodeJS.Timeout | null>(null)
 
   const initializeAudio = useCallback(async () => {
     if (isInitialized) return samplers
@@ -128,21 +130,41 @@ export const useAudio = () => {
     if (!sampler) return
     
     setIsPlaying(true)
+    setShouldStop(false)
     
     const noteDuration = (60 / bpm) * 800
     const playDuration = instrument === 'guitar' ? "0.6" : "0.5"
     
     try {
       for (let i = 0; i < melody.length; i++) {
+        if (shouldStop) {
+          break
+        }
         sampler.triggerAttackRelease(melody[i].name, playDuration)
         if (i < melody.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, noteDuration))
+          await new Promise(resolve => {
+            const timeoutId = setTimeout(resolve, noteDuration)
+            setCurrentTimeoutId(timeoutId)
+          })
+          if (shouldStop) {
+            break
+          }
         }
+      }
+      
+      // Add delay for the last note to finish playing (only if not stopped manually)
+      if (!shouldStop) {
+        await new Promise(resolve => {
+          const timeoutId = setTimeout(resolve, noteDuration)
+          setCurrentTimeoutId(timeoutId)
+        })
       }
     } finally {
       setIsPlaying(false)
+      setShouldStop(false)
+      setCurrentTimeoutId(null)
     }
-  }, [initializeAudio, isPlaying])
+  }, [initializeAudio, isPlaying, shouldStop])
 
   const playMelody = useCallback((melody: Note[], bpm: number) => {
     return playMelodyGeneric(melody, bpm, 'keyboard')
@@ -152,11 +174,20 @@ export const useAudio = () => {
     return playMelodyGeneric(melody, bpm, 'guitar')
   }, [playMelodyGeneric])
 
+  const stopMelody = useCallback(() => {
+    setShouldStop(true)
+    if (currentTimeoutId) {
+      clearTimeout(currentTimeoutId)
+      setCurrentTimeoutId(null)
+    }
+  }, [currentTimeoutId])
+
   return {
     playNote,
     playGuitarNote,
     playMelody,
     playGuitarMelody,
+    stopMelody,
     isPlaying
   }
 }

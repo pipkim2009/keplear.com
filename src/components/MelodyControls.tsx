@@ -49,10 +49,10 @@ const MelodyControls: React.FC<MelodyControlsProps> = ({
         
         <button
           onClick={onPlayMelody}
-          disabled={generatedMelody.length === 0 || isPlaying}
-          className="button"
+          disabled={generatedMelody.length === 0}
+          className={`button ${isPlaying ? 'button-stop' : ''}`}
         >
-          {isPlaying ? 'Playing...' : 'Play Melody'}
+          {isPlaying ? 'Stop' : 'Play Melody'}
         </button>
       </div>
     </div>

@@ -18,7 +18,7 @@ function App() {
   const [instrument, setInstrument] = useState('keyboard')
   
   const { isDarkMode, toggleTheme } = useTheme()
-  const { playNote, playGuitarNote, playMelody, playGuitarMelody, isPlaying } = useAudio()
+  const { playNote, playGuitarNote, playMelody, playGuitarMelody, stopMelody, isPlaying } = useAudio()
 
   // Apply theme class to document body for portaled modals
   useEffect(() => {
@@ -51,10 +51,14 @@ function App() {
   }
 
   const handlePlayMelody = () => {
-    if (instrument === 'guitar') {
-      playGuitarMelody(generatedMelody, bpm)
+    if (isPlaying) {
+      stopMelody()
     } else {
-      playMelody(generatedMelody, bpm)
+      if (instrument === 'guitar') {
+        playGuitarMelody(generatedMelody, bpm)
+      } else {
+        playMelody(generatedMelody, bpm)
+      }
     }
   }
 
