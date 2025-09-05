@@ -1,17 +1,32 @@
 import { useState, useEffect, useCallback } from 'react'
+import type { Note } from '../utils/notes'
+import { SERVICE_URLS, AUDIO_CONFIG } from '../constants'
 
-type Note = { name: string }
-
+/**
+ * Configuration for an instrument's audio samples
+ */
 interface InstrumentConfig {
-  urls: Record<string, string>
-  release: number
-  baseUrl: string
-  defaultDuration: string
+  /** Mapping of note names to sample file names */
+  readonly urls: Readonly<Record<string, string>>
+  /** Release time in seconds */
+  readonly release: number
+  /** Base URL for sample files */
+  readonly baseUrl: string
+  /** Default duration for note playback */
+  readonly defaultDuration: string
 }
 
-const INSTRUMENTS: Record<'keyboard' | 'guitar', InstrumentConfig> = {
+/**
+ * Supported instrument types
+ */
+type InstrumentType = 'keyboard' | 'guitar'
+
+/**
+ * Configuration for all supported instruments
+ */
+const INSTRUMENTS: Readonly<Record<InstrumentType, InstrumentConfig>> = Object.freeze({
   keyboard: {
-    urls: {
+    urls: Object.freeze({
       C4: "C4.mp3",
       "D#4": "Ds4.mp3",
       "F#4": "Fs4.mp3",
@@ -20,13 +35,13 @@ const INSTRUMENTS: Record<'keyboard' | 'guitar', InstrumentConfig> = {
       "D#5": "Ds5.mp3",
       "F#5": "Fs5.mp3",
       A5: "A5.mp3",
-    },
+    }),
     release: 1.5,
-    baseUrl: "https://tonejs.github.io/audio/salamander/",
-    defaultDuration: "0.3"
+    baseUrl: SERVICE_URLS.keyboardSamples,
+    defaultDuration: AUDIO_CONFIG.keyboardDuration
   },
   guitar: {
-    urls: {
+    urls: Object.freeze({
       A2: "A2.mp3",
       A3: "A3.mp3", 
       A4: "A4.mp3",
@@ -38,84 +53,122 @@ const INSTRUMENTS: Record<'keyboard' | 'guitar', InstrumentConfig> = {
       "F#3": "Fs3.mp3", 
       "F#4": "Fs4.mp3",
       G3: "G3.mp3",
-    },
+    }),
     release: 1.0,
-    baseUrl: "https://nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/",
-    defaultDuration: "0.5"
+    baseUrl: SERVICE_URLS.guitarSamples,
+    defaultDuration: AUDIO_CONFIG.guitarDuration
   }
+})
+
+/**
+ * Type for Tone.js Sampler instance
+ * Using unknown instead of any for better type safety
+ */
+type ToneSampler = unknown
+
+/**
+ * Audio hook return type
+ */
+interface UseAudioReturn {
+  playNote: (noteName: string, duration?: string) => Promise<void>
+  playGuitarNote: (noteName: string, duration?: string) => Promise<void>
+  playMelody: (melody: Note[], bpm: number) => Promise<void>
+  playGuitarMelody: (melody: Note[], bpm: number) => Promise<void>
+  stopMelody: () => void
+  readonly isPlaying: boolean
 }
 
-export const useAudio = () => {
-  const [samplers, setSamplers] = useState<Record<string, any>>({})
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [isInitialized, setIsInitialized] = useState(false)
-  const [shouldStop, setShouldStop] = useState(false)
+/**
+ * Custom hook for audio management and playback
+ * Handles initialization, playing notes, and melody playback for keyboard and guitar instruments
+ */
+export const useAudio = (): UseAudioReturn => {
+  const [samplers, setSamplers] = useState<Record<InstrumentType, ToneSampler | null>>({
+    keyboard: null,
+    guitar: null
+  })
+  const [isPlaying, setIsPlaying] = useState<boolean>(false)
+  const [isInitialized, setIsInitialized] = useState<boolean>(false)
+  const [shouldStop, setShouldStop] = useState<boolean>(false)
   const [currentTimeoutId, setCurrentTimeoutId] = useState<NodeJS.Timeout | null>(null)
 
-  const initializeAudio = useCallback(async () => {
+  /**
+   * Initializes the audio system by loading Tone.js and creating samplers
+   * @returns Promise that resolves to the initialized samplers
+   */
+  const initializeAudio = useCallback(async (): Promise<Record<InstrumentType, ToneSampler | null>> => {
     if (isInitialized) return samplers
 
     try {
-      // Dynamically import Tone.js only when needed
+      // Dynamically import Tone.js only when needed to reduce bundle size
       const Tone = await import('tone')
       
-      // Start audio context (this will create it if needed)
+      // Start audio context (required for Web Audio API)
       await Tone.start()
       
-      const newSamplers: Record<string, any> = {}
+      const newSamplers: Record<InstrumentType, ToneSampler | null> = {
+        keyboard: null,
+        guitar: null
+      }
       
-      // Create samplers and wait for them to load
-      const samplerPromises = Object.entries(INSTRUMENTS).map(([key, config]) => {
-        return new Promise<void>((resolve) => {
-          const sampler = new Tone.Sampler({
-            urls: config.urls,
-            release: config.release,
-            baseUrl: config.baseUrl,
-            onload: () => {
-              newSamplers[key] = sampler.toDestination()
-              resolve()
-            }
+      // Create samplers for each instrument and wait for them to load
+      const samplerPromises = (Object.entries(INSTRUMENTS) as Array<[InstrumentType, InstrumentConfig]>)
+        .map(([instrumentType, config]) => {
+          return new Promise<void>((resolve) => {
+            const sampler = new Tone.Sampler({
+              urls: config.urls,
+              release: config.release,
+              baseUrl: config.baseUrl,
+              onload: () => {
+                newSamplers[instrumentType] = (sampler as ToneSampler & { toDestination: () => ToneSampler }).toDestination()
+                resolve()
+              }
+            })
           })
         })
-      })
 
-      // Wait for all samplers to load
+      // Wait for all samplers to load before proceeding
       await Promise.all(samplerPromises)
 
       setSamplers(newSamplers)
       setIsInitialized(true)
       return newSamplers
     } catch (error) {
-      // Silently fail if audio initialization fails (expected before user interaction)
+      // Handle expected AudioContext errors (before user interaction)
       if (error instanceof Error && error.message.includes('AudioContext')) {
-        // Expected error before user interaction - don't log
-        return {}
+        return { keyboard: null, guitar: null }
       }
       console.warn('Audio initialization failed:', error)
-      return {}
+      return { keyboard: null, guitar: null }
     }
   }, [isInitialized, samplers])
 
   useEffect(() => {
     return () => {
-      Object.values(samplers).forEach(sampler => sampler.dispose())
+      Object.values(samplers).forEach(sampler => {
+        if (sampler && typeof sampler === 'object' && 'dispose' in sampler) {
+          (sampler as { dispose: () => void }).dispose()
+        }
+      })
     }
   }, [samplers])
 
-  const playNote = useCallback(async (noteName: string, duration?: string) => {
+  const playNote = useCallback(async (noteName: string, duration?: string): Promise<void> => {
     const currentSamplers = await initializeAudio()
     const sampler = currentSamplers.keyboard
-    if (!sampler) return
+    if (!sampler || typeof sampler !== 'object' || !('triggerAttackRelease' in sampler)) return
     
-    sampler.triggerAttackRelease(noteName, duration || INSTRUMENTS.keyboard.defaultDuration)
+    ;(sampler as { triggerAttackRelease: (note: string, duration: string) => void })
+      .triggerAttackRelease(noteName, duration || INSTRUMENTS.keyboard.defaultDuration)
   }, [initializeAudio])
 
-  const playGuitarNote = useCallback(async (noteName: string, duration?: string) => {
+  const playGuitarNote = useCallback(async (noteName: string, duration?: string): Promise<void> => {
     const currentSamplers = await initializeAudio()
     const sampler = currentSamplers.guitar
-    if (!sampler) return
+    if (!sampler || typeof sampler !== 'object' || !('triggerAttackRelease' in sampler)) return
     
-    sampler.triggerAttackRelease(noteName, duration || INSTRUMENTS.guitar.defaultDuration)
+    ;(sampler as { triggerAttackRelease: (note: string, duration: string) => void })
+      .triggerAttackRelease(noteName, duration || INSTRUMENTS.guitar.defaultDuration)
   }, [initializeAudio])
 
   const playMelodyGeneric = useCallback(async (
@@ -127,7 +180,7 @@ export const useAudio = () => {
     
     const currentSamplers = await initializeAudio()
     const sampler = currentSamplers[instrument]
-    if (!sampler) return
+    if (!sampler || typeof sampler !== 'object' || !('triggerAttackRelease' in sampler)) return
     
     setIsPlaying(true)
     setShouldStop(false)
@@ -136,12 +189,14 @@ export const useAudio = () => {
     const noteDuration = (60 / bpm) * 800
     const playDuration = instrument === 'guitar' ? "0.6" : "0.5"
     
+    const samplerWithMethod = sampler as { triggerAttackRelease: (note: string, duration: string) => void }
+    
     try {
       for (let i = 0; i < melody.length; i++) {
         if (shouldStop) {
           break
         }
-        sampler.triggerAttackRelease(melody[i].name, playDuration)
+        samplerWithMethod.triggerAttackRelease(melody[i].name, playDuration)
         if (i < melody.length - 1) {
           await new Promise(resolve => {
             const timeoutId = setTimeout(resolve, noteDuration)

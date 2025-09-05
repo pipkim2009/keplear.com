@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import Header from './components/common/Header'
 import Footer from './components/common/Footer'
@@ -9,20 +9,44 @@ import MelodyDisplay from './components/MelodyDisplay'
 import { useAudio } from './hooks/useAudio'
 import { useMelodyGenerator } from './hooks/useMelodyGenerator'
 import { useTheme } from './hooks/useTheme'
-import { notes, type Note } from './utils/notes'
+import { notes } from './utils/notes'
+import type { Note } from './utils/notes'
 import './styles/App.css'
 
+/**
+ * Supported page types in the application
+ */
+type PageType = 'home' | 'sandbox' | 'practice'
+
+/**
+ * Supported instrument types
+ */
+type InstrumentType = 'keyboard' | 'guitar'
+
+/**
+ * Default application settings
+ */
+const DEFAULT_SETTINGS = {
+  bpm: 120,
+  numberOfNotes: 5,
+  instrument: 'keyboard' as InstrumentType
+} as const
+
+/**
+ * Main application component
+ * Manages routing, audio playback, melody generation, and theme state
+ */
 function App() {
-  const [currentPage, setCurrentPage] = useState('home')
-  const [bpm, setBpm] = useState(120)
-  const [numberOfNotes, setNumberOfNotes] = useState(5)
-  const [showNotes, setShowNotes] = useState(false)
-  const [instrument, setInstrument] = useState('keyboard')
+  const [currentPage, setCurrentPage] = useState<PageType>('home')
+  const [bpm, setBpm] = useState<number>(DEFAULT_SETTINGS.bpm)
+  const [numberOfNotes, setNumberOfNotes] = useState<number>(DEFAULT_SETTINGS.numberOfNotes)
+  const [showNotes, setShowNotes] = useState<boolean>(false)
+  const [instrument, setInstrument] = useState<InstrumentType>(DEFAULT_SETTINGS.instrument)
   
   const { isDarkMode, toggleTheme } = useTheme()
   const { playNote, playGuitarNote, playMelody, playGuitarMelody, stopMelody, isPlaying } = useAudio()
 
-  // Apply theme class to document body for portaled modals
+  // Apply theme class to document body for portaled modals and global styles
   useEffect(() => {
     document.body.className = isDarkMode ? 'dark' : 'light'
   }, [isDarkMode])
@@ -39,39 +63,63 @@ function App() {
     clearTrigger 
   } = useMelodyGenerator()
 
-  const handleNoteClick = async (note: Note) => {
-    if (instrument === 'guitar') {
-      await playGuitarNote(note.name)
-    } else {
-      await playNote(note.name)
+  /**
+   * Handles note clicks by playing the note and selecting it
+   */
+  const handleNoteClick = useCallback(async (note: Note): Promise<void> => {
+    try {
+      if (instrument === 'guitar') {
+        await playGuitarNote(note.name)
+      } else {
+        await playNote(note.name)
+      }
+      selectNote(note)
+    } catch (error) {
+      console.warn('Failed to play note:', error)
     }
-    selectNote(note)
-  }
+  }, [instrument, playGuitarNote, playNote, selectNote])
 
-  const handleGenerateMelody = () => {
+  /**
+   * Generates a new melody based on current settings
+   */
+  const handleGenerateMelody = useCallback((): void => {
     generateMelody(notes, numberOfNotes, instrument)
-  }
+  }, [generateMelody, numberOfNotes, instrument])
 
-  const handlePlayMelody = () => {
+  /**
+   * Plays or stops the current melody
+   */
+  const handlePlayMelody = useCallback((): void => {
     if (isPlaying) {
       stopMelody()
     } else {
+      if (generatedMelody.length === 0) {
+        console.warn('No melody to play. Generate a melody first.')
+        return
+      }
+      
       if (instrument === 'guitar') {
-        playGuitarMelody(generatedMelody, bpm)
+        playGuitarMelody([...generatedMelody], bpm)
       } else {
-        playMelody(generatedMelody, bpm)
+        playMelody([...generatedMelody], bpm)
       }
     }
-  }
+  }, [isPlaying, stopMelody, generatedMelody, instrument, playGuitarMelody, playMelody, bpm])
 
-  const handleInstrumentChange = (newInstrument: string) => {
+  /**
+   * Handles instrument changes and clears selection
+   */
+  const handleInstrumentChange = useCallback((newInstrument: InstrumentType): void => {
     setInstrument(newInstrument)
     clearSelection() // Clear melody when instrument changes
-  }
+  }, [clearSelection])
 
-  const navigateToHome = () => setCurrentPage('home')
-  const navigateToSandbox = () => setCurrentPage('sandbox')
-  const navigateToPractice = () => setCurrentPage('practice')
+  // Navigation handlers - memoized to prevent unnecessary re-renders
+  const { navigateToHome, navigateToSandbox, navigateToPractice } = useMemo(() => ({
+    navigateToHome: () => setCurrentPage('home'),
+    navigateToSandbox: () => setCurrentPage('sandbox'),
+    navigateToPractice: () => setCurrentPage('practice')
+  }), [])
 
   return (
     <AuthProvider>
@@ -105,26 +153,26 @@ function App() {
               numberOfNotes={numberOfNotes}
               setNumberOfNotes={setNumberOfNotes}
               instrument={instrument}
-              setInstrument={handleInstrumentChange}
+              setInstrument={(inst: string) => handleInstrumentChange(inst as InstrumentType)}
               setGuitarNotes={setGuitarNotes}
               clearSelection={clearSelection}
               clearTrigger={clearTrigger}
-              selectedNotes={selectedNotes}
+              selectedNotes={[...selectedNotes]}
             />
 
             <MelodyControls
-              selectedNotes={selectedNotes}
+              selectedNotes={[...selectedNotes]}
               onGenerateMelody={handleGenerateMelody}
               onPlayMelody={handlePlayMelody}
               isPlaying={isPlaying}
-              generatedMelody={generatedMelody}
+              generatedMelody={[...generatedMelody]}
               instrument={instrument}
               showNotes={showNotes}
               onToggleNotes={() => setShowNotes(!showNotes)}
             />
 
             <MelodyDisplay
-              generatedMelody={generatedMelody}
+              generatedMelody={[...generatedMelody]}
               showNotes={showNotes}
             />
           </>

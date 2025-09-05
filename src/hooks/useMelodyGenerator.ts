@@ -1,36 +1,76 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import type { Note } from '../utils/notes'
 
-export type Note = {
-  name: string
-  frequency: number
-  isBlack: boolean
-  position: number
+/**
+ * Supported instrument types for melody generation
+ */
+type InstrumentType = 'keyboard' | 'guitar'
+
+/**
+ * Return type for the melody generator hook
+ */
+interface UseMelodyGeneratorReturn {
+  readonly selectedNotes: readonly Note[]
+  readonly generatedMelody: readonly Note[]
+  readonly clearTrigger: number
+  selectNote: (note: Note) => void
+  generateMelody: (notes: readonly Note[], numberOfNotes: number, instrument?: InstrumentType) => void
+  setGuitarNotes: (notes: Note[]) => void
+  isSelected: (note: Note) => boolean
+  isInMelody: (note: Note, showNotes: boolean) => boolean
+  clearSelection: () => void
 }
 
-export const useMelodyGenerator = () => {
-  const [selectedNotes, setSelectedNotes] = useState<Note[]>([])
-  const [generatedMelody, setGeneratedMelody] = useState<Note[]>([])
+/**
+ * Custom hook for managing note selection and melody generation
+ * Handles different logic for keyboard (range-based) and guitar (selection-based) instruments
+ */
+export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
+  const [selectedNotes, setSelectedNotes] = useState<readonly Note[]>([])
+  const [generatedMelody, setGeneratedMelody] = useState<readonly Note[]>([])
   const [clearTrigger, setClearTrigger] = useState<number>(0)
 
-  const selectNote = (note: Note) => {
+  /**
+   * Selects a note for keyboard instrument (max 2 notes for range selection)
+   * @param note - The note to select
+   */
+  const selectNote = useCallback((note: Note): void => {
     setSelectedNotes(prev => prev.length < 2 ? [...prev, note] : [note])
     setGeneratedMelody([])
-  }
+  }, [])
 
-  const generateMelody = (notes: Note[], numberOfNotes: number, instrument: string = 'keyboard') => {
+  /**
+   * Generates a melody based on selected notes and instrument type
+   * @param notes - All available notes
+   * @param numberOfNotes - Number of notes to generate in the melody
+   * @param instrument - The instrument type ('keyboard' or 'guitar')
+   */
+  const generateMelody = useCallback((
+    notes: readonly Note[], 
+    numberOfNotes: number, 
+    instrument: InstrumentType = 'keyboard'
+  ): void => {
+    if (numberOfNotes <= 0) {
+      console.warn('Number of notes must be positive')
+      return
+    }
+
     if (instrument === 'keyboard') {
-      // Original keyboard logic - requires exactly 2 notes for range
-      if (selectedNotes.length !== 2) return
+      // Keyboard logic: requires exactly 2 notes for range selection
+      if (selectedNotes.length !== 2) {
+        console.warn('Keyboard requires exactly 2 notes selected for range')
+        return
+      }
 
-      const [note1, note2] = selectedNotes.sort((a, b) => a.position - b.position)
+      const [note1, note2] = [...selectedNotes].sort((a, b) => a.position - b.position)
       
-      // If the same key is selected twice, use only that key
+      // If the same note is selected twice, create melody with just that note
       if (note1.name === note2.name) {
         setGeneratedMelody(Array(numberOfNotes).fill(note1))
         return
       }
       
-      // Otherwise, use the range
+      // Create melody from notes within the selected range
       const startPos = note1.position
       const endPos = note2.position
       
@@ -38,14 +78,22 @@ export const useMelodyGenerator = () => {
         note.position >= startPos && note.position <= endPos
       )
 
+      if (notesInRange.length === 0) {
+        console.warn('No notes found in selected range')
+        return
+      }
+
       const melody = Array(numberOfNotes).fill(null).map(() => 
         notesInRange[Math.floor(Math.random() * notesInRange.length)]
       )
 
       setGeneratedMelody(melody)
     } else if (instrument === 'guitar') {
-      // Guitar logic - use ALL selected notes directly
-      if (selectedNotes.length === 0) return
+      // Guitar logic: use all selected notes directly
+      if (selectedNotes.length === 0) {
+        console.warn('Guitar requires at least one note selected')
+        return
+      }
 
       const melody = Array(numberOfNotes).fill(null).map(() => 
         selectedNotes[Math.floor(Math.random() * selectedNotes.length)]
@@ -53,23 +101,42 @@ export const useMelodyGenerator = () => {
 
       setGeneratedMelody(melody)
     }
-  }
+  }, [selectedNotes])
 
-  // Guitar-specific method to set all selected notes at once
-  const setGuitarNotes = (notes: Note[]) => {
-    setSelectedNotes(notes)
+  /**
+   * Guitar-specific method to set all selected notes at once
+   * @param notes - Array of notes to select for guitar
+   */
+  const setGuitarNotes = useCallback((notes: Note[]): void => {
+    setSelectedNotes([...notes])
     setGeneratedMelody([])
-  }
+  }, [])
 
-  const isSelected = (note: Note) => selectedNotes.some(n => n.name === note.name)
-  const isInMelody = (note: Note, showNotes: boolean) => 
-    showNotes && generatedMelody.some(n => n.name === note.name)
+  /**
+   * Checks if a note is currently selected
+   * @param note - The note to check
+   * @returns True if the note is selected
+   */
+  const isSelected = useCallback((note: Note): boolean => 
+    selectedNotes.some(n => n.name === note.name), [selectedNotes])
 
-  const clearSelection = () => {
+  /**
+   * Checks if a note is part of the generated melody (when notes are shown)
+   * @param note - The note to check
+   * @param showNotes - Whether notes are currently being displayed
+   * @returns True if the note is in the melody and notes are shown
+   */
+  const isInMelody = useCallback((note: Note, showNotes: boolean): boolean => 
+    showNotes && generatedMelody.some(n => n.name === note.name), [generatedMelody])
+
+  /**
+   * Clears all selections and generated melody
+   */
+  const clearSelection = useCallback((): void => {
     setSelectedNotes([])
     setGeneratedMelody([])
     setClearTrigger(prev => prev + 1)
-  }
+  }, [])
 
   return {
     selectedNotes,

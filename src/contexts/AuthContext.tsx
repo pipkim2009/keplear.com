@@ -1,28 +1,89 @@
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useEffect, useState, useCallback } from 'react'
 import type { ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
-import type { User } from '@supabase/supabase-js'
+import type { User, AuthError } from '@supabase/supabase-js'
 
-interface AuthContextType {
-  user: User | null
-  loading: boolean
-  signUp: (username: string, password: string, metadata?: Record<string, unknown>) => Promise<{ data: unknown; error: unknown }>
-  signIn: (username: string, password: string) => Promise<{ data: unknown; error: unknown }>
-  signOut: () => Promise<{ error: unknown }>
-  updatePassword: (newPassword: string) => Promise<{ error: unknown }>
-  deleteAccount: () => Promise<{ error: unknown }>
+/**
+ * Authentication result type for operations that return data
+ */
+interface AuthResult<T = unknown> {
+  data: T | null
+  error: AuthError | Error | null
 }
 
+/**
+ * Authentication result type for operations that only return error status
+ */
+interface AuthErrorResult {
+  error: AuthError | Error | null
+}
+
+/**
+ * Context type for authentication state and methods
+ */
+interface AuthContextType {
+  /** Current authenticated user, null if not authenticated */
+  readonly user: User | null
+  /** Loading state for authentication operations */
+  readonly loading: boolean
+  /** Sign up a new user with username and password */
+  signUp: (username: string, password: string, metadata?: Record<string, unknown>) => Promise<AuthResult>
+  /** Sign in an existing user */
+  signIn: (username: string, password: string) => Promise<AuthResult>
+  /** Sign out the current user */
+  signOut: () => Promise<AuthErrorResult>
+  /** Update the current user's password */
+  updatePassword: (newPassword: string) => Promise<AuthErrorResult>
+  /** Delete the current user's account */
+  deleteAccount: () => Promise<AuthErrorResult>
+}
+
+/**
+ * Authentication context - provides auth state and methods to child components
+ */
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-
+/**
+ * Props for the AuthProvider component
+ */
 interface AuthProviderProps {
   children: ReactNode
 }
 
+/**
+ * Validates username format
+ * @param username - The username to validate
+ * @returns True if valid, false otherwise
+ */
+const isValidUsername = (username: string): boolean => {
+  return username.length >= 3 && /^[a-zA-Z0-9_]+$/.test(username)
+}
+
+/**
+ * Validates password strength
+ * @param password - The password to validate
+ * @returns True if valid, false otherwise
+ */
+const isValidPassword = (password: string): boolean => {
+  return password.length >= 6
+}
+
+/**
+ * Creates a placeholder email from username for Supabase compatibility
+ * @param username - The username
+ * @returns A placeholder email address
+ */
+const createPlaceholderEmail = (username: string): string => {
+  return `${username.toLowerCase()}@placeholder.com`
+}
+
+/**
+ * Authentication provider component
+ * Manages user authentication state and provides auth methods
+ */
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState<boolean>(true)
 
   useEffect(() => {
     const getSession = async () => {
@@ -43,62 +104,137 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => subscription.unsubscribe()
   }, [])
 
-  const signUp = async (username: string, password: string, metadata: Record<string, unknown> = {}) => {
+  /**
+   * Sign up a new user with username and password
+   * @param username - The desired username (3+ chars, alphanumeric + underscore)
+   * @param password - The password (6+ chars)
+   * @param metadata - Additional user metadata
+   * @returns Promise with auth result
+   */
+  const signUp = useCallback(async (
+    username: string, 
+    password: string, 
+    metadata: Record<string, unknown> = {}
+  ): Promise<AuthResult> => {
     try {
-      // Generate a fake email from username for Supabase (user never sees this)
-      const fakeEmail = `${username}@placeholder.com`
+      // Validate inputs
+      if (!isValidUsername(username)) {
+        return {
+          data: null,
+          error: new Error('Username must be at least 3 characters and contain only letters, numbers, and underscores')
+        }
+      }
+
+      if (!isValidPassword(password)) {
+        return {
+          data: null,
+          error: new Error('Password must be at least 6 characters long')
+        }
+      }
+
+      // Generate placeholder email for Supabase compatibility
+      const placeholderEmail = createPlaceholderEmail(username)
       
       const { data, error } = await supabase.auth.signUp({
-        email: fakeEmail,
+        email: placeholderEmail,
         password,
         options: {
           data: { ...metadata, username, display_name: username }
         }
       })
+      
       return { data, error }
     } catch (error) {
-      return { data: null, error }
+      return { 
+        data: null, 
+        error: error instanceof Error ? error : new Error('Unknown sign up error')
+      }
     }
-  }
+  }, [])
 
-  const signIn = async (username: string, password: string) => {
+  /**
+   * Sign in an existing user with username and password
+   * @param username - The username
+   * @param password - The password
+   * @returns Promise with auth result
+   */
+  const signIn = useCallback(async (username: string, password: string): Promise<AuthResult> => {
     try {
-      // Generate the same fake email format for sign in
-      const fakeEmail = `${username}@placeholder.com`
+      // Validate inputs
+      if (!isValidUsername(username)) {
+        return {
+          data: null,
+          error: new Error('Invalid username format')
+        }
+      }
+
+      if (!isValidPassword(password)) {
+        return {
+          data: null,
+          error: new Error('Invalid password format')
+        }
+      }
+
+      // Generate the same placeholder email format for sign in
+      const placeholderEmail = createPlaceholderEmail(username)
       
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: fakeEmail,
+        email: placeholderEmail,
         password
       })
       return { data, error }
     } catch (error) {
-      return { data: null, error }
+      return { 
+        data: null, 
+        error: error instanceof Error ? error : new Error('Unknown sign in error')
+      }
     }
-  }
+  }, [])
 
-  const signOut = async () => {
+  /**
+   * Sign out the current user
+   * @returns Promise with error result
+   */
+  const signOut = useCallback(async (): Promise<AuthErrorResult> => {
     try {
       const { error } = await supabase.auth.signOut()
       return { error }
     } catch (error) {
-      return { error }
+      return { 
+        error: error instanceof Error ? error : new Error('Unknown sign out error')
+      }
     }
-  }
+  }, [])
 
-
-  const updatePassword = async (newPassword: string) => {
+  /**
+   * Update the current user's password
+   * @param newPassword - The new password
+   * @returns Promise with error result
+   */
+  const updatePassword = useCallback(async (newPassword: string): Promise<AuthErrorResult> => {
     try {
+      if (!isValidPassword(newPassword)) {
+        return {
+          error: new Error('Password must be at least 6 characters long')
+        }
+      }
+
       const { error } = await supabase.auth.updateUser({
         password: newPassword
       })
       return { error }
     } catch (error) {
-      return { error }
+      return { 
+        error: error instanceof Error ? error : new Error('Unknown password update error')
+      }
     }
-  }
+  }, [])
 
-
-  const deleteAccount = async () => {
+  /**
+   * Delete the current user's account
+   * @returns Promise with error result
+   */
+  const deleteAccount = useCallback(async (): Promise<AuthErrorResult> => {
     try {
       const { error } = await supabase.rpc('delete_user')
       if (!error) {
@@ -108,9 +244,11 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       }
       return { error }
     } catch (error) {
-      return { error }
+      return { 
+        error: error instanceof Error ? error : new Error('Unknown account deletion error')
+      }
     }
-  }
+  }, [])
 
   const value: AuthContextType = {
     user,
