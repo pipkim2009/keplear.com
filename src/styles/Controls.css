@@ -224,6 +224,10 @@
   min-width: 120px;
 }
 
+.control-group:has(.octave-range-container) .control-label {
+  margin-top: -7px;
+}
+
 .octave-range-display {
   background: rgba(128, 0, 255, 0.1);
   border: 1px solid rgba(128, 0, 255, 0.3);

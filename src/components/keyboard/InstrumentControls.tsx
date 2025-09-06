@@ -344,9 +344,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           <div className="control-group">
             <label className="control-label">Octave Range</label>
             <div className="octave-range-container">
-              <div className="octave-range-display">
-                {octaveRange.min} - {octaveRange.max}
-              </div>
               <div className="dual-range-slider">
                 <input
                   type="range"
