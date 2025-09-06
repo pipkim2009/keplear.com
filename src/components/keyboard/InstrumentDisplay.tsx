@@ -1,7 +1,9 @@
 import Keyboard from './Keyboard'
 import Guitar from '../guitar/Guitar'
 import InstrumentControls from './InstrumentControls'
+import { useRef, useState } from 'react'
 import type { Note } from '../../utils/notes'
+import type { GuitarScale } from '../../utils/guitarScales'
 
 interface InstrumentDisplayProps {
   onNoteClick: (note: Note) => void
@@ -36,9 +38,27 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   clearTrigger,
   selectedNotes
 }) => {
+  const guitarRef = useRef<any>(null)
+  const [scaleHandlers, setScaleHandlers] = useState<{
+    handleScaleSelect: (rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => void;
+    handleClearScale: () => void;
+  } | null>(null)
+
+  const handleScaleSelect = (rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => {
+    if (scaleHandlers) {
+      scaleHandlers.handleScaleSelect(rootNote, scale, octaveRange)
+    }
+  }
+
+  const handleClearScale = () => {
+    if (scaleHandlers) {
+      scaleHandlers.handleClearScale()
+    }
+  }
+
   return (
     <>
-      <div className="instrument-controls-container">
+      <div className={`instrument-controls-container ${instrument === 'guitar' ? 'guitar-mode' : ''}`}>
         <InstrumentControls
           bpm={bpm}
           setBpm={setBpm}
@@ -48,6 +68,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           setInstrument={setInstrument}
           clearSelection={clearSelection}
           hasSelectedNotes={selectedNotes.length > 0}
+          onScaleSelect={handleScaleSelect}
+          onClearScale={handleClearScale}
         />
       </div>
       
@@ -61,11 +83,13 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           />
         ) : (
           <Guitar 
+            ref={guitarRef}
             setGuitarNotes={setGuitarNotes}
             isInMelody={isInMelody}
             showNotes={showNotes}
             onNoteClick={onNoteClick}
             clearTrigger={clearTrigger}
+            onScaleHandlersReady={setScaleHandlers}
           />
         )}
       </div>

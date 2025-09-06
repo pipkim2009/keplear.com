@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import '../../styles/Controls.css'
+import { GUITAR_SCALES, ROOT_NOTES, type GuitarScale } from '../../utils/guitarScales'
 
 interface InstrumentControlsProps {
   bpm: number
@@ -10,6 +11,8 @@ interface InstrumentControlsProps {
   setInstrument: (instrument: string) => void
   clearSelection: () => void
   hasSelectedNotes: boolean
+  onScaleSelect?: (rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => void
+  onClearScale?: () => void
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -20,10 +23,15 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   instrument,
   setInstrument,
   clearSelection,
-  hasSelectedNotes
+  hasSelectedNotes,
+  onScaleSelect,
+  onClearScale
 }) => {
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
+  const [selectedRoot, setSelectedRoot] = useState<string>('C')
+  const [selectedScale, setSelectedScale] = useState<GuitarScale>(GUITAR_SCALES[0])
+  const [octaveRange, setOctaveRange] = useState<{ min: number; max: number }>({ min: 2, max: 4 })
   
   // Original default values
   const DEFAULT_BPM = 120
@@ -178,6 +186,31 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     }
   }
 
+  // Scale control handlers
+  const handleRootChange = (rootNote: string) => {
+    setSelectedRoot(rootNote)
+  }
+
+  const handleScaleChange = (scale: GuitarScale) => {
+    setSelectedScale(scale)
+  }
+
+  const handleOctaveRangeChange = (newRange: { min: number; max: number }) => {
+    setOctaveRange(newRange)
+  }
+
+  const handleApplyScale = () => {
+    if (onScaleSelect) {
+      onScaleSelect(selectedRoot, selectedScale, octaveRange)
+    }
+  }
+
+  const handleClearScale = () => {
+    if (onClearScale) {
+      onClearScale()
+    }
+  }
+
   // Cleanup intervals on unmount
   useEffect(() => {
     return () => {
@@ -267,12 +300,109 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         </div>
       </div>
 
+      {instrument === 'guitar' && (
+        <>
+          <div className="control-group">
+            <label className="control-label">Root Note</label>
+            <select
+              value={selectedRoot}
+              onChange={(e) => handleRootChange(e.target.value)}
+              className="control-input"
+            >
+              {ROOT_NOTES.map(note => (
+                <option key={note} value={note}>{note}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="control-group">
+            <label className="control-label">Scale</label>
+            <select
+              value={selectedScale.name}
+              onChange={(e) => {
+                const scale = GUITAR_SCALES.find(s => s.name === e.target.value)
+                if (scale) handleScaleChange(scale)
+              }}
+              className="control-input"
+            >
+              {GUITAR_SCALES.map(scale => (
+                <option key={scale.name} value={scale.name}>{scale.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="control-group">
+            <label className="control-label">Octave Range</label>
+            <div className="octave-range-container">
+              <div className="octave-range-display">
+                {octaveRange.min} - {octaveRange.max}
+              </div>
+              <div className="dual-range-slider">
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={octaveRange.min}
+                  onChange={(e) => {
+                    const newMin = parseInt(e.target.value)
+                    const newMax = Math.max(newMin, octaveRange.max)
+                    handleOctaveRangeChange({ min: newMin, max: newMax })
+                  }}
+                  className="octave-slider range-min"
+                />
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={octaveRange.max}
+                  onChange={(e) => {
+                    const newMax = parseInt(e.target.value)
+                    const newMin = Math.min(octaveRange.min, newMax)
+                    handleOctaveRangeChange({ min: newMin, max: newMax })
+                  }}
+                  className="octave-slider range-max"
+                />
+                <div className="range-track">
+                  <div 
+                    className="range-fill"
+                    style={{
+                      left: `${((octaveRange.min - 1) / 4) * 100}%`,
+                      width: `${((octaveRange.max - octaveRange.min) / 4) * 100}%`
+                    }}
+                  />
+                </div>
+                <div className="range-labels">
+                  <span>1</span>
+                  <span>2</span>
+                  <span>3</span>
+                  <span>4</span>
+                  <span>5</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="control-group">
+            <button
+              onClick={handleApplyScale}
+              className="control-button apply-scale"
+              title="Apply scale to guitar"
+            >
+              Apply Scale
+            </button>
+          </div>
+        </>
+      )}
+
       {hasSelectedNotes && (
         <div className="control-group">
           <button
-            onClick={clearSelection}
+            onClick={() => {
+              clearSelection()
+              handleClearScale()
+            }}
             className="control-button delete-selection"
-            title="Clear selected notes"
+            title="Clear selected notes and scales"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
               <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>

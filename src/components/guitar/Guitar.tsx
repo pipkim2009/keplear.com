@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import '../../styles/Guitar.css'
 import { guitarNotes } from '../../utils/guitarNotes'
+import { applyScaleToGuitar, isNoteInScale, type GuitarScale } from '../../utils/guitarScales'
 import type { Note } from '../../utils/notes'
 
 interface GuitarProps {
@@ -9,12 +10,17 @@ interface GuitarProps {
   showNotes: boolean
   onNoteClick?: (note: Note) => void
   clearTrigger?: number
+  onScaleHandlersReady?: (handlers: {
+    handleScaleSelect: (rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => void;
+    handleClearScale: () => void;
+  }) => void
 }
 
-const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger }) => {
+const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(13).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set())
+  const [currentScale, setCurrentScale] = useState<{ root: string; scale: GuitarScale } | null>(null)
 
   const handleStringCheckboxChange = (index: number) => {
     const newCheckboxes = [...stringCheckboxes]
@@ -428,12 +434,83 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stringCheckboxes, fretCheckboxes, selectedNotes])
 
+  // Handle scale selection
+  const handleScaleSelect = (rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => {
+    setCurrentScale({ root: rootNote, scale })
+    
+    // Apply scale to guitar with octave filtering
+    const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes, octaveRange)
+    const newSelectedNotes = new Set<string>()
+    
+    // Clear existing selections
+    setStringCheckboxes(new Array(6).fill(false))
+    setFretCheckboxes(new Array(13).fill(false))
+    
+    // Add scale notes to selection
+    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+      if (fretIndex === 0) {
+        newSelectedNotes.add(`${stringIndex}-open`)
+      } else {
+        newSelectedNotes.add(`${stringIndex}-${fretIndex - 1}`) // Convert to 0-indexed fret for internal use
+      }
+    })
+    
+    setSelectedNotes(newSelectedNotes)
+  }
+
+  // Handle clearing scale
+  const handleClearScale = () => {
+    setCurrentScale(null)
+    setStringCheckboxes(new Array(6).fill(false))
+    setFretCheckboxes(new Array(13).fill(false))
+    setSelectedNotes(new Set())
+  }
+
+  // Check if a note is part of the current scale
+  const isNoteInCurrentScale = (stringIndex: number, fretIndex: number): boolean => {
+    if (!currentScale) return false
+    
+    const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
+    return isNoteInScale(noteName, currentScale.root, currentScale.scale)
+  }
+
+  // Check if an open string is part of the current scale
+  const isOpenStringInCurrentScale = (stringIndex: number): boolean => {
+    if (!currentScale) return false
+    
+    const stringMapping = [6, 5, 4, 3, 2, 1]
+    const guitarString = stringMapping[stringIndex]
+    const openNote = guitarNotes.find(note => note.string === guitarString && note.fret === 0)
+    
+    if (!openNote) return false
+    
+    return isNoteInScale(openNote.name, currentScale.root, currentScale.scale)
+  }
+
+  // Check if a note is the root note of the current scale
+  const isRootNote = (noteName: string): boolean => {
+    if (!currentScale) return false
+    const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
+    return noteNameWithoutOctave === currentScale.root
+  }
+
+  // Provide scale handlers to parent component
+  useEffect(() => {
+    if (onScaleHandlersReady) {
+      onScaleHandlersReady({
+        handleScaleSelect,
+        handleClearScale
+      })
+    }
+  }, [onScaleHandlersReady, handleScaleSelect, handleClearScale])
+
   // Clear all selections when clearTrigger changes
   useEffect(() => {
     if (clearTrigger !== undefined) {
       setStringCheckboxes(new Array(6).fill(false))
       setFretCheckboxes(new Array(13).fill(false))
       setSelectedNotes(new Set())
+      setCurrentScale(null)
     }
   }, [clearTrigger])
 
@@ -564,18 +641,29 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           }
           
           const isInGeneratedMelody = isInMelody(noteObj, showNotes)
+          const isInScale = isOpenStringInCurrentScale(stringIndex)
+          const isRoot = isRootNote(openNote.name)
+          
+          let noteClass = 'note-circle'
+          if (isInGeneratedMelody) {
+            noteClass += ' melody-note'
+          } else if (isRoot && isInScale) {
+            noteClass += ' scale-root-note'
+          } else if (isInScale) {
+            noteClass += ' scale-note'
+          }
           
           return (
             <div
               key={`open-note-${stringIndex}`}
-              className={`note-circle ${isInGeneratedMelody ? 'melody-note' : ''}`}
+              className={noteClass}
               style={{
                 left: `-2.5px`, // Center of the open string click field (15px width / 2 - 10px for note circle centering)
                 top: `${15 + stringIndex * 28 - 10}px`, // Center on string
               }}
             >
               <span className="note-name">
-                {openNote.name}
+                {openNote.name.replace(/\d+$/, '')}
               </span>
             </div>
           )
@@ -595,18 +683,29 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             }
             
             const isInGeneratedMelody = isInMelody(noteObj, showNotes)
+            const isInScale = isNoteInCurrentScale(stringIndex, fretIndex)
+            const isRoot = isRootNote(noteName)
+            
+            let noteClass = 'note-circle'
+            if (isInGeneratedMelody) {
+              noteClass += ' melody-note'
+            } else if (isRoot && isInScale) {
+              noteClass += ' scale-root-note'
+            } else if (isInScale) {
+              noteClass += ' scale-note'
+            }
             
             return (
               <div
                 key={`note-${stringIndex}-${fretIndex}`}
-                className={`note-circle ${isInGeneratedMelody ? 'melody-note' : ''}`}
+                className={noteClass}
                 style={{
                   left: `${fretIndex === 0 ? 30 : (fretIndex + 1) * 60 - 38}px`, // Center first fret in its area, others align with checkboxes
                   top: `${15 + stringIndex * 28 - 10}px`, // Center on string
                 }}
               >
                 <span className="note-name">
-                  {noteName}
+                  {noteName.replace(/\d+$/, '')}
                 </span>
               </div>
             )
