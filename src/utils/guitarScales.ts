@@ -141,9 +141,10 @@ export const applyScaleToGuitar = (
   
   scalePositions.forEach(position => {
     // Convert guitar string number (1-6) to visual string index (0-5)
-    // Guitar strings: 1=high E, 2=B, 3=G, 4=D, 5=A, 6=low E
+    // guitarNotes: 1=low E, 2=A, 3=D, 4=G, 5=B, 6=high E
     // Visual strings: 0=high E, 1=B, 2=G, 3=D, 4=A, 5=low E
-    const stringIndex = position.string - 1
+    // So we need to map: guitarNotes string 6→visual 0, 5→1, 4→2, 3→3, 2→4, 1→5
+    const stringIndex = 6 - position.string // Convert 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
     const fretIndex = position.fret
     
     selections.push({ stringIndex, fretIndex })

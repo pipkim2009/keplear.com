@@ -31,7 +31,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
   const [selectedRoot, setSelectedRoot] = useState<string>('C')
   const [selectedScale, setSelectedScale] = useState<GuitarScale>(GUITAR_SCALES[0])
-  const [octaveRange, setOctaveRange] = useState<{ min: number; max: number }>({ min: 2, max: 4 })
+  const [octaveRange, setOctaveRange] = useState<{ min: number; max: number }>({ min: 2, max: 5 })
+  const [hasActiveScale, setHasActiveScale] = useState<boolean>(false)
   
   // Original default values
   const DEFAULT_BPM = 120
@@ -202,14 +203,23 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const handleApplyScale = () => {
     if (onScaleSelect) {
       onScaleSelect(selectedRoot, selectedScale, octaveRange)
+      setHasActiveScale(true)
     }
   }
 
   const handleClearScale = () => {
     if (onClearScale) {
       onClearScale()
+      setHasActiveScale(false)
     }
   }
+
+  // Auto-reapply scale when parameters change
+  useEffect(() => {
+    if (hasActiveScale && onScaleSelect) {
+      onScaleSelect(selectedRoot, selectedScale, octaveRange)
+    }
+  }, [selectedRoot, selectedScale, octaveRange, hasActiveScale, onScaleSelect])
 
   // Cleanup intervals on unmount
   useEffect(() => {
@@ -340,7 +350,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               <div className="dual-range-slider">
                 <input
                   type="range"
-                  min="1"
+                  min="2"
                   max="5"
                   value={octaveRange.min}
                   onChange={(e) => {
@@ -352,7 +362,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                 />
                 <input
                   type="range"
-                  min="1"
+                  min="2"
                   max="5"
                   value={octaveRange.max}
                   onChange={(e) => {
@@ -366,13 +376,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                   <div 
                     className="range-fill"
                     style={{
-                      left: `${((octaveRange.min - 1) / 4) * 100}%`,
-                      width: `${((octaveRange.max - octaveRange.min) / 4) * 100}%`
+                      left: `${((octaveRange.min - 2) / 3) * 100}%`,
+                      width: `${((octaveRange.max - octaveRange.min) / 3) * 100}%`
                     }}
                   />
                 </div>
                 <div className="range-labels">
-                  <span>1</span>
                   <span>2</span>
                   <span>3</span>
                   <span>4</span>
