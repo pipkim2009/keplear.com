@@ -663,7 +663,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
               }}
             >
               <span className="note-name">
-                {openNote.name.replace(/\d+$/, '')}
+                {openNote.name}
               </span>
             </div>
           )
@@ -705,7 +705,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
                 }}
               >
                 <span className="note-name">
-                  {noteName.replace(/\d+$/, '')}
+                  {noteName}
                 </span>
               </div>
             )
