@@ -219,7 +219,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     if (hasActiveScale && onScaleSelect) {
       onScaleSelect(selectedRoot, selectedScale, octaveRange)
     }
-  }, [selectedRoot, selectedScale, octaveRange, hasActiveScale, onScaleSelect])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRoot, selectedScale, octaveRange, hasActiveScale])
 
   // Cleanup intervals on unmount
   useEffect(() => {

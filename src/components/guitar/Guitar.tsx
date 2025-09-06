@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import '../../styles/Guitar.css'
 import { guitarNotes } from '../../utils/guitarNotes'
 import { applyScaleToGuitar, isNoteInScale, type GuitarScale } from '../../utils/guitarScales'
@@ -346,86 +346,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     return melodyNotes
   }
 
-  // Check if all notes on a string are individually selected
-  const checkStringCompletion = useCallback((stringIndex: number): boolean => {
-    // Check if open string is selected
-    const openKey = `${stringIndex}-open`
-    const hasOpenString = selectedNotes.has(openKey)
-    
-    // Check if all 12 fretted notes are selected
-    const allFrettedSelected = Array.from({length: 12}, (_, i) => i).every(fretIndex => {
-      const noteKey = `${stringIndex}-${fretIndex}`
-      return selectedNotes.has(noteKey)
-    })
-    
-    return hasOpenString && allFrettedSelected
-  }, [selectedNotes])
-
-  // Check if all notes on a fret are individually selected
-  const checkFretCompletion = useCallback((fretIndex: number): boolean => {
-    if (fretIndex === 0) {
-      // Open fret: check all open strings
-      return Array.from({length: 6}, (_, i) => i).every(stringIndex => {
-        const openKey = `${stringIndex}-open`
-        return selectedNotes.has(openKey)
-      })
-    } else {
-      // Regular fret: check all strings on this fret
-      return Array.from({length: 6}, (_, i) => i).every(stringIndex => {
-        const noteKey = `${stringIndex}-${fretIndex - 1}` // Adjust for 0-based fret indexing
-        return selectedNotes.has(noteKey)
-      })
-    }
-  }, [selectedNotes])
 
   // Auto-apply checkboxes when all individual notes are selected
-  useEffect(() => {
-    const newStringCheckboxes = [...stringCheckboxes]
-    const newFretCheckboxes = [...fretCheckboxes]
-    let hasChanges = false
-    const updatedSelectedNotes = new Set(selectedNotes)
-
-    // Check each string for completion
-    for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
-      if (!stringCheckboxes[stringIndex] && checkStringCompletion(stringIndex)) {
-        newStringCheckboxes[stringIndex] = true
-        hasChanges = true
-        
-        // Remove individual selections for this string since checkbox now covers them
-        updatedSelectedNotes.delete(`${stringIndex}-open`)
-        for (let fretIndex = 0; fretIndex < 12; fretIndex++) {
-          updatedSelectedNotes.delete(`${stringIndex}-${fretIndex}`)
-        }
-      }
-    }
-
-    // Check each fret for completion
-    for (let fretIndex = 0; fretIndex < 13; fretIndex++) {
-      if (!fretCheckboxes[fretIndex] && checkFretCompletion(fretIndex)) {
-        newFretCheckboxes[fretIndex] = true
-        hasChanges = true
-        
-        // Remove individual selections for this fret since checkbox now covers them
-        if (fretIndex === 0) {
-          // Open fret
-          for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
-            updatedSelectedNotes.delete(`${stringIndex}-open`)
-          }
-        } else {
-          // Regular fret
-          for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
-            updatedSelectedNotes.delete(`${stringIndex}-${fretIndex - 1}`)
-          }
-        }
-      }
-    }
-
-    if (hasChanges) {
-      setStringCheckboxes(newStringCheckboxes)
-      setFretCheckboxes(newFretCheckboxes)
-      setSelectedNotes(updatedSelectedNotes)
-    }
-  }, [selectedNotes, stringCheckboxes, fretCheckboxes, checkStringCompletion, checkFretCompletion])
+  // DISABLED: This was causing infinite render loops and flickering with the scale system
 
   // Update melody system whenever selections change
   useEffect(() => {
@@ -435,16 +358,10 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   }, [stringCheckboxes, fretCheckboxes, selectedNotes])
 
   // Handle scale selection
-  const handleScaleSelect = (rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => {
-    setCurrentScale({ root: rootNote, scale })
-    
+  const handleScaleSelect = useCallback((rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => {
     // Apply scale to guitar with octave filtering
     const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes, octaveRange)
     const newSelectedNotes = new Set<string>()
-    
-    // Clear existing selections
-    setStringCheckboxes(new Array(6).fill(false))
-    setFretCheckboxes(new Array(13).fill(false))
     
     // Add scale notes to selection
     scaleSelections.forEach(({ stringIndex, fretIndex }) => {
@@ -455,16 +372,20 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       }
     })
     
+    // Update all state at once to minimize re-renders
+    setCurrentScale({ root: rootNote, scale })
+    setStringCheckboxes(new Array(6).fill(false))
+    setFretCheckboxes(new Array(13).fill(false))
     setSelectedNotes(newSelectedNotes)
-  }
+  }, [])
 
   // Handle clearing scale
-  const handleClearScale = () => {
+  const handleClearScale = useCallback(() => {
     setCurrentScale(null)
     setStringCheckboxes(new Array(6).fill(false))
     setFretCheckboxes(new Array(13).fill(false))
     setSelectedNotes(new Set())
-  }
+  }, [])
 
   // Check if a note is part of the current scale
   const isNoteInCurrentScale = (stringIndex: number, fretIndex: number): boolean => {
@@ -502,7 +423,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         handleClearScale
       })
     }
-  }, [onScaleHandlersReady, handleScaleSelect, handleClearScale])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleScaleSelect, handleClearScale])
 
   // Clear all selections when clearTrigger changes
   useEffect(() => {
