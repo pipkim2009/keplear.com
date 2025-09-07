@@ -3,7 +3,7 @@ import Guitar from '../guitar/Guitar'
 import InstrumentControls from './InstrumentControls'
 import { useRef, useState } from 'react'
 import type { Note } from '../../utils/notes'
-import type { GuitarScale } from '../../utils/guitarScales'
+import type { GuitarScale, ScaleBox } from '../../utils/guitarScales'
 
 interface InstrumentDisplayProps {
   onNoteClick: (note: Note) => void
@@ -41,12 +41,19 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   const guitarRef = useRef<any>(null)
   const [scaleHandlers, setScaleHandlers] = useState<{
     handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
+    handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
     handleClearScale: () => void;
   } | null>(null)
 
   const handleScaleSelect = (rootNote: string, scale: GuitarScale) => {
     if (scaleHandlers) {
       scaleHandlers.handleScaleSelect(rootNote, scale)
+    }
+  }
+
+  const handleScaleBoxSelect = (scaleBox: ScaleBox) => {
+    if (scaleHandlers) {
+      scaleHandlers.handleScaleBoxSelect(scaleBox)
     }
   }
 
@@ -69,6 +76,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           clearSelection={clearSelection}
           hasSelectedNotes={selectedNotes.length > 0}
           onScaleSelect={handleScaleSelect}
+          onScaleBoxSelect={handleScaleBoxSelect}
           onClearScale={handleClearScale}
         />
       </div>

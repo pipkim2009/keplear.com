@@ -11,6 +11,13 @@ export type ScalePosition = {
   isRoot: boolean // Is this the root note of the scale
 }
 
+export type ScaleBox = {
+  name: string // Box 1, Box 2, etc.
+  minFret: number // Starting fret position
+  maxFret: number // Ending fret position
+  positions: ScalePosition[] // All notes in this position
+}
+
 // Common guitar scales with their interval patterns
 export const GUITAR_SCALES: GuitarScale[] = [
   {
@@ -124,6 +131,42 @@ export const getScalePositions = (
   return positions
 }
 
+// Function to get scale boxes/positions for a given scale and root
+export const getScaleBoxes = (
+  rootNote: string,
+  scale: GuitarScale,
+  guitarNotes: any[]
+): ScaleBox[] => {
+  const allPositions = getScalePositions(rootNote, scale, guitarNotes)
+  const boxes: ScaleBox[] = []
+  
+  // Define box ranges based on common guitar patterns (0-12 frets)
+  const boxRanges = [
+    { name: 'Open Position', minFret: 0, maxFret: 4 },
+    { name: 'Box 2', minFret: 3, maxFret: 7 },
+    { name: 'Box 3', minFret: 5, maxFret: 9 },
+    { name: 'Box 4', minFret: 7, maxFret: 11 },
+    { name: 'Box 5', minFret: 8, maxFret: 12 }
+  ]
+  
+  boxRanges.forEach(range => {
+    const boxPositions = allPositions.filter(pos => 
+      pos.fret >= range.minFret && pos.fret <= range.maxFret
+    )
+    
+    if (boxPositions.length > 0) {
+      boxes.push({
+        name: range.name,
+        minFret: range.minFret,
+        maxFret: range.maxFret,
+        positions: boxPositions
+      })
+    }
+  })
+  
+  return boxes
+}
+
 // Function to apply scale to guitar note selection
 export const applyScaleToGuitar = (
   rootNote: string, 
@@ -139,6 +182,23 @@ export const applyScaleToGuitar = (
     // Visual strings: 0=high E, 1=B, 2=G, 3=D, 4=A, 5=low E
     // So we need to map: guitarNotes string 6→visual 0, 5→1, 4→2, 3→3, 2→4, 1→5
     const stringIndex = 6 - position.string // Convert 1→5, 2→4, 3→3, 4→2, 5→1, 6→0
+    const fretIndex = position.fret
+    
+    selections.push({ stringIndex, fretIndex })
+  })
+  
+  return selections
+}
+
+// Function to apply a specific scale box to guitar note selection
+export const applyScaleBoxToGuitar = (
+  scaleBox: ScaleBox
+): { stringIndex: number, fretIndex: number }[] => {
+  const selections: { stringIndex: number, fretIndex: number }[] = []
+  
+  scaleBox.positions.forEach(position => {
+    // Convert guitar string number (1-6) to visual string index (0-5)
+    const stringIndex = 6 - position.string
     const fretIndex = position.fret
     
     selections.push({ stringIndex, fretIndex })

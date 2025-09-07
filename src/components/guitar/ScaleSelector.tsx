@@ -1,32 +1,60 @@
-import React, { useState } from 'react'
-import { GUITAR_SCALES, ROOT_NOTES, type GuitarScale } from '../../utils/guitarScales'
+import React, { useState, useEffect } from 'react'
+import { GUITAR_SCALES, ROOT_NOTES, type GuitarScale, type ScaleBox, getScaleBoxes, applyScaleBoxToGuitar } from '../../utils/guitarScales'
+import { guitarNotes } from '../../utils/guitarNotes'
 
 interface ScaleSelectorProps {
   onScaleSelect: (rootNote: string, scale: GuitarScale) => void
+  onScaleBoxSelect: (scaleBox: ScaleBox) => void
   onClearScale: () => void
+  showPositions: boolean
 }
 
-const ScaleSelector: React.FC<ScaleSelectorProps> = ({ onScaleSelect, onClearScale }) => {
+const ScaleSelector: React.FC<ScaleSelectorProps> = ({ onScaleSelect, onScaleBoxSelect, onClearScale, showPositions }) => {
   const [selectedRoot, setSelectedRoot] = useState<string>('C')
   const [selectedScale, setSelectedScale] = useState<GuitarScale>(GUITAR_SCALES[0])
   const [isExpanded, setIsExpanded] = useState<boolean>(false)
+  const [availableBoxes, setAvailableBoxes] = useState<ScaleBox[]>([])
+  const [selectedBoxIndex, setSelectedBoxIndex] = useState<number>(0)
+
+  // Update available boxes when root or scale changes
+  useEffect(() => {
+    const boxes = getScaleBoxes(selectedRoot, selectedScale, guitarNotes)
+    setAvailableBoxes(boxes)
+    setSelectedBoxIndex(0)
+  }, [selectedRoot, selectedScale])
 
   const handleRootChange = (rootNote: string) => {
     setSelectedRoot(rootNote)
-    onScaleSelect(rootNote, selectedScale)
+    if (!showPositions) {
+      onScaleSelect(rootNote, selectedScale)
+    }
   }
 
   const handleScaleChange = (scale: GuitarScale) => {
     setSelectedScale(scale)
-    onScaleSelect(selectedRoot, scale)
+    if (!showPositions) {
+      onScaleSelect(selectedRoot, scale)
+    }
   }
 
   const handleApplyScale = () => {
-    onScaleSelect(selectedRoot, selectedScale)
+    if (showPositions && availableBoxes.length > 0) {
+      onScaleBoxSelect(availableBoxes[selectedBoxIndex])
+    } else {
+      onScaleSelect(selectedRoot, selectedScale)
+    }
   }
 
   const handleClearScale = () => {
     onClearScale()
+  }
+
+
+  const handleBoxChange = (boxIndex: number) => {
+    setSelectedBoxIndex(boxIndex)
+    if (availableBoxes[boxIndex]) {
+      onScaleBoxSelect(availableBoxes[boxIndex])
+    }
   }
 
   return (
@@ -73,6 +101,33 @@ const ScaleSelector: React.FC<ScaleSelectorProps> = ({ onScaleSelect, onClearSca
             </div>
           </div>
 
+
+          {showPositions && availableBoxes.length > 0 && (
+            <div className="position-selector">
+              <div className="scale-control-group">
+                <label htmlFor="position-select">Position:</label>
+                <select
+                  id="position-select"
+                  value={selectedBoxIndex}
+                  onChange={(e) => handleBoxChange(parseInt(e.target.value))}
+                >
+                  {availableBoxes.map((box, index) => (
+                    <option key={index} value={index}>
+                      {box.name} (Frets {box.minFret}-{box.maxFret})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {availableBoxes[selectedBoxIndex] && (
+                <div className="position-info">
+                  <p><strong>{availableBoxes[selectedBoxIndex].name}</strong></p>
+                  <p>Frets: {availableBoxes[selectedBoxIndex].minFret}-{availableBoxes[selectedBoxIndex].maxFret}</p>
+                  <p>Notes: {availableBoxes[selectedBoxIndex].positions.length} positions</p>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="scale-description">
             <p><strong>{selectedScale.name}</strong>: {selectedScale.description}</p>
             <p><strong>Pattern:</strong> {selectedScale.intervals.join(' - ')}</p>
@@ -80,7 +135,10 @@ const ScaleSelector: React.FC<ScaleSelectorProps> = ({ onScaleSelect, onClearSca
 
           <div className="scale-actions">
             <button className="apply-scale-button" onClick={handleApplyScale}>
-              Apply {selectedRoot} {selectedScale.name}
+              Apply {showPositions && availableBoxes.length > 0 
+                ? `${availableBoxes[selectedBoxIndex]?.name || 'Position'}`
+                : `${selectedRoot} ${selectedScale.name}`
+              }
             </button>
             <button className="clear-scale-button" onClick={handleClearScale}>
               Clear Scale

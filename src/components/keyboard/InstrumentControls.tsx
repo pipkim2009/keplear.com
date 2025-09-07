@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import '../../styles/Controls.css'
-import { GUITAR_SCALES, ROOT_NOTES, type GuitarScale } from '../../utils/guitarScales'
+import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
+import { guitarNotes } from '../../utils/guitarNotes'
 
 interface InstrumentControlsProps {
   bpm: number
@@ -12,6 +13,7 @@ interface InstrumentControlsProps {
   clearSelection: () => void
   hasSelectedNotes: boolean
   onScaleSelect?: (rootNote: string, scale: GuitarScale) => void
+  onScaleBoxSelect?: (scaleBox: ScaleBox) => void
   onClearScale?: () => void
 }
 
@@ -25,6 +27,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   clearSelection,
   hasSelectedNotes,
   onScaleSelect,
+  onScaleBoxSelect,
   onClearScale
 }) => {
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
@@ -32,6 +35,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const [selectedRoot, setSelectedRoot] = useState<string>('C')
   const [selectedScale, setSelectedScale] = useState<GuitarScale>(GUITAR_SCALES[0])
   const [hasActiveScale, setHasActiveScale] = useState<boolean>(false)
+  const [showPositions, setShowPositions] = useState<boolean>(false)
+  const [availableBoxes, setAvailableBoxes] = useState<ScaleBox[]>([])
+  const [selectedBoxIndex, setSelectedBoxIndex] = useState<number>(0)
   
   // Original default values
   const DEFAULT_BPM = 120
@@ -186,6 +192,13 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     }
   }
 
+  // Update available boxes when root or scale changes
+  useEffect(() => {
+    const boxes = getScaleBoxes(selectedRoot, selectedScale, guitarNotes)
+    setAvailableBoxes(boxes)
+    setSelectedBoxIndex(0)
+  }, [selectedRoot, selectedScale])
+
   // Scale control handlers
   const handleRootChange = (rootNote: string) => {
     setSelectedRoot(rootNote)
@@ -195,9 +208,16 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     setSelectedScale(scale)
   }
 
+  const handleBoxChange = (boxIndex: number) => {
+    setSelectedBoxIndex(boxIndex)
+  }
+
 
   const handleApplyScale = () => {
-    if (onScaleSelect) {
+    if (showPositions && availableBoxes.length > 0 && onScaleBoxSelect) {
+      onScaleBoxSelect(availableBoxes[selectedBoxIndex])
+      setHasActiveScale(true)
+    } else if (onScaleSelect) {
       onScaleSelect(selectedRoot, selectedScale)
       setHasActiveScale(true)
     }
@@ -212,11 +232,15 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
   // Auto-reapply scale when parameters change
   useEffect(() => {
-    if (hasActiveScale && onScaleSelect) {
-      onScaleSelect(selectedRoot, selectedScale)
+    if (hasActiveScale) {
+      if (showPositions && availableBoxes.length > 0 && onScaleBoxSelect) {
+        onScaleBoxSelect(availableBoxes[selectedBoxIndex])
+      } else if (onScaleSelect) {
+        onScaleSelect(selectedRoot, selectedScale)
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRoot, selectedScale, hasActiveScale])
+  }, [selectedRoot, selectedScale, selectedBoxIndex, showPositions, hasActiveScale])
 
   // Cleanup intervals on unmount
   useEffect(() => {
@@ -338,6 +362,34 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             </select>
           </div>
 
+          <div className="control-group">
+            <label className="control-label">
+              <input
+                type="checkbox"
+                checked={showPositions}
+                onChange={(e) => setShowPositions(e.target.checked)}
+                style={{ marginRight: '8px' }}
+              />
+              Use Positions/Boxes
+            </label>
+          </div>
+
+          {showPositions && availableBoxes.length > 0 && (
+            <div className="control-group">
+              <label className="control-label">Position</label>
+              <select
+                value={selectedBoxIndex}
+                onChange={(e) => handleBoxChange(parseInt(e.target.value))}
+                className="control-input"
+              >
+                {availableBoxes.map((box, index) => (
+                  <option key={index} value={index}>
+                    {box.name} (Frets {box.minFret}-{box.maxFret})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="control-group">
             <button
@@ -345,7 +397,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               className="control-button apply-scale"
               title="Apply scale to guitar"
             >
-              Apply Scale
+              Apply {showPositions && availableBoxes.length > 0 
+                ? `${availableBoxes[selectedBoxIndex]?.name || 'Position'}`
+                : 'Scale'
+              }
             </button>
           </div>
         </>

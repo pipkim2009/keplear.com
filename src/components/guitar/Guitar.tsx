@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import '../../styles/Guitar.css'
 import { guitarNotes } from '../../utils/guitarNotes'
-import { applyScaleToGuitar, isNoteInScale, type GuitarScale } from '../../utils/guitarScales'
+import { applyScaleToGuitar, applyScaleBoxToGuitar, isNoteInScale, GUITAR_SCALES, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
 import type { Note } from '../../utils/notes'
 
 interface GuitarProps {
@@ -12,6 +12,7 @@ interface GuitarProps {
   clearTrigger?: number
   onScaleHandlersReady?: (handlers: {
     handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
+    handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
     handleClearScale: () => void;
   }) => void
 }
@@ -379,6 +380,37 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     setSelectedNotes(newSelectedNotes)
   }, [])
 
+  // Handle scale box selection
+  const handleScaleBoxSelect = useCallback((scaleBox: ScaleBox) => {
+    // Apply scale box to guitar
+    const scaleSelections = applyScaleBoxToGuitar(scaleBox)
+    const newSelectedNotes = new Set<string>()
+    
+    // Add scale notes to selection
+    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+      if (fretIndex === 0) {
+        newSelectedNotes.add(`${stringIndex}-open`)
+      } else {
+        newSelectedNotes.add(`${stringIndex}-${fretIndex - 1}`) // Convert to 0-indexed fret for internal use
+      }
+    })
+    
+    // For box selection, we need to derive the scale info from the box
+    // We'll use the first position's root information
+    const rootPosition = scaleBox.positions.find(pos => pos.isRoot)
+    if (rootPosition) {
+      const rootNote = rootPosition.note.replace(/\d+$/, '') // Remove octave
+      // We need to find the scale that matches this box - for now, use the current scale
+      // In a more complete implementation, you'd store scale info with the box
+      setCurrentScale({ root: rootNote, scale: currentScale?.scale || GUITAR_SCALES[0] })
+    }
+    
+    // Update all state at once to minimize re-renders
+    setStringCheckboxes(new Array(6).fill(false))
+    setFretCheckboxes(new Array(13).fill(false))
+    setSelectedNotes(newSelectedNotes)
+  }, [currentScale])
+
   // Handle clearing scale
   const handleClearScale = useCallback(() => {
     setCurrentScale(null)
@@ -420,11 +452,12 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     if (onScaleHandlersReady) {
       onScaleHandlersReady({
         handleScaleSelect,
+        handleScaleBoxSelect,
         handleClearScale
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleScaleSelect, handleClearScale])
+  }, [handleScaleSelect, handleScaleBoxSelect, handleClearScale])
 
   // Clear all selections when clearTrigger changes
   useEffect(() => {
