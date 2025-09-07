@@ -22,6 +22,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(13).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set())
   const [currentScale, setCurrentScale] = useState<{ root: string; scale: GuitarScale } | null>(null)
+  const [scaleSelectedNotes, setScaleSelectedNotes] = useState<Set<string>>(new Set())
 
   const handleStringCheckboxChange = (index: number) => {
     const newCheckboxes = [...stringCheckboxes]
@@ -167,6 +168,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     }
     
     setSelectedNotes(newSelectedNotes)
+    // Clear scale tracking when making individual selections
+    setScaleSelectedNotes(new Set())
+    setCurrentScale(null)
   }
 
   // Handle clicking on individual fret positions
@@ -261,6 +265,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     }
     
     setSelectedNotes(newSelectedNotes)
+    // Clear scale tracking when making individual selections
+    setScaleSelectedNotes(new Set())
+    setCurrentScale(null)
   }
 
   // Check if a specific note is selected
@@ -363,14 +370,13 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     // Apply scale to guitar
     const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes)
     const newSelectedNotes = new Set<string>()
+    const newScaleSelectedNotes = new Set<string>()
     
     // Add scale notes to selection
     scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      if (fretIndex === 0) {
-        newSelectedNotes.add(`${stringIndex}-open`)
-      } else {
-        newSelectedNotes.add(`${stringIndex}-${fretIndex - 1}`) // Convert to 0-indexed fret for internal use
-      }
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      newSelectedNotes.add(noteKey)
+      newScaleSelectedNotes.add(noteKey)
     })
     
     // Update all state at once to minimize re-renders
@@ -378,6 +384,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     setStringCheckboxes(new Array(6).fill(false))
     setFretCheckboxes(new Array(13).fill(false))
     setSelectedNotes(newSelectedNotes)
+    setScaleSelectedNotes(newScaleSelectedNotes)
   }, [])
 
   // Handle scale box selection
@@ -385,14 +392,13 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     // Apply scale box to guitar
     const scaleSelections = applyScaleBoxToGuitar(scaleBox)
     const newSelectedNotes = new Set<string>()
+    const newScaleSelectedNotes = new Set<string>()
     
     // Add scale notes to selection
     scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      if (fretIndex === 0) {
-        newSelectedNotes.add(`${stringIndex}-open`)
-      } else {
-        newSelectedNotes.add(`${stringIndex}-${fretIndex - 1}`) // Convert to 0-indexed fret for internal use
-      }
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      newSelectedNotes.add(noteKey)
+      newScaleSelectedNotes.add(noteKey)
     })
     
     // For box selection, we need to derive the scale info from the box
@@ -409,6 +415,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     setStringCheckboxes(new Array(6).fill(false))
     setFretCheckboxes(new Array(13).fill(false))
     setSelectedNotes(newSelectedNotes)
+    setScaleSelectedNotes(newScaleSelectedNotes)
   }, [currentScale])
 
   // Handle clearing scale
@@ -417,27 +424,19 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     setStringCheckboxes(new Array(6).fill(false))
     setFretCheckboxes(new Array(13).fill(false))
     setSelectedNotes(new Set())
+    setScaleSelectedNotes(new Set())
   }, [])
 
-  // Check if a note is part of the current scale
+  // Check if a note was selected as part of the current scale application
   const isNoteInCurrentScale = (stringIndex: number, fretIndex: number): boolean => {
-    if (!currentScale) return false
-    
-    const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
-    return isNoteInScale(noteName, currentScale.root, currentScale.scale)
+    const noteKey = `${stringIndex}-${fretIndex}`
+    return scaleSelectedNotes.has(noteKey)
   }
 
-  // Check if an open string is part of the current scale
+  // Check if an open string was selected as part of the current scale application
   const isOpenStringInCurrentScale = (stringIndex: number): boolean => {
-    if (!currentScale) return false
-    
-    const stringMapping = [6, 5, 4, 3, 2, 1]
-    const guitarString = stringMapping[stringIndex]
-    const openNote = guitarNotes.find(note => note.string === guitarString && note.fret === 0)
-    
-    if (!openNote) return false
-    
-    return isNoteInScale(openNote.name, currentScale.root, currentScale.scale)
+    const noteKey = `${stringIndex}-open`
+    return scaleSelectedNotes.has(noteKey)
   }
 
   // Check if a note is the root note of the current scale
@@ -465,6 +464,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       setStringCheckboxes(new Array(6).fill(false))
       setFretCheckboxes(new Array(13).fill(false))
       setSelectedNotes(new Set())
+      setScaleSelectedNotes(new Set())
       setCurrentScale(null)
     }
   }, [clearTrigger])

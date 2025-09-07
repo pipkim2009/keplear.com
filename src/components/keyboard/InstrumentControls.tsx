@@ -230,17 +230,18 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     }
   }
 
-  // Auto-reapply scale when parameters change
+  // Auto-reapply scale when position or show positions mode changes (but not root/scale)
   useEffect(() => {
     if (hasActiveScale) {
       if (showPositions && availableBoxes.length > 0 && onScaleBoxSelect) {
         onScaleBoxSelect(availableBoxes[selectedBoxIndex])
-      } else if (onScaleSelect) {
+      } else if (!showPositions && onScaleSelect) {
+        // Only reapply when switching from positions back to full scale
         onScaleSelect(selectedRoot, selectedScale)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRoot, selectedScale, selectedBoxIndex, showPositions, hasActiveScale])
+  }, [selectedBoxIndex, showPositions, hasActiveScale])
 
   // Cleanup intervals on unmount
   useEffect(() => {
@@ -250,7 +251,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     }
   }, [])
   return (
-    <div className="instrument-controls">
+    <div className={`instrument-controls ${instrument === 'guitar' ? 'guitar-mode' : ''}`}>
       <div className="control-group">
         <label className="control-label">Instrument</label>
         <select
@@ -363,12 +364,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
 
           <div className="control-group">
-            <label className="control-label">
+            <label className="control-label checkbox-label">
               <input
                 type="checkbox"
                 checked={showPositions}
                 onChange={(e) => setShowPositions(e.target.checked)}
-                style={{ marginRight: '8px' }}
+                className="styled-checkbox"
               />
               Use Positions/Boxes
             </label>
@@ -397,10 +398,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               className="control-button apply-scale"
               title="Apply scale to guitar"
             >
-              Apply {showPositions && availableBoxes.length > 0 
-                ? `${availableBoxes[selectedBoxIndex]?.name || 'Position'}`
-                : 'Scale'
-              }
+              Apply
             </button>
           </div>
         </>

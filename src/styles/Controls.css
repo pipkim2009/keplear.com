@@ -2,13 +2,37 @@
   position: relative;
   display: flex;
   gap: 20px;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 20;
-  height: 40px;
+  min-height: 40px;
+  height: auto;
   width: 100%;
+  flex-wrap: wrap;
+  padding: 10px 0;
 }
 
+/* Tablet and larger screens */
+@media (min-width: 769px) {
+  .instrument-controls {
+    gap: 25px;
+  }
+}
+
+/* Small tablets */
+@media (max-width: 768px) and (min-width: 481px) {
+  .instrument-controls {
+    gap: 15px;
+    justify-content: center;
+  }
+  
+  .control-group {
+    flex: 0 0 auto;
+    min-width: 100px;
+  }
+}
+
+/* Mobile screens */
 @media (max-width: 480px) {
   .instrument-controls {
     flex-direction: row;
@@ -16,10 +40,12 @@
     gap: 10px;
     height: auto;
     justify-content: space-between;
+    padding: 15px 10px;
   }
   
   .control-group {
     flex: 0 0 calc(50% - 5px);
+    min-width: 120px;
   }
 }
 
@@ -28,6 +54,35 @@
   flex-direction: column;
   align-items: center;
   gap: 5px;
+  flex-shrink: 0;
+}
+
+/* Guitar mode specific styling */
+.instrument-controls.guitar-mode {
+  justify-content: flex-start;
+  align-items: flex-start;
+  min-height: 80px;
+  padding: 15px 10px;
+}
+
+@media (min-width: 769px) {
+  .instrument-controls.guitar-mode {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .instrument-controls.guitar-mode .control-group {
+    flex: 0 0 calc(33.333% - 10px);
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .instrument-controls.guitar-mode .control-group {
+    flex: 0 0 calc(50% - 5px);
+    min-width: 90px;
+  }
 }
 
 .control-label {
@@ -36,6 +91,47 @@
   color: #f8f9fa;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.control-label.checkbox-label {
+  text-transform: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.styled-checkbox {
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  background: rgba(128, 0, 255, 0.1);
+  border: 2px solid #8000ff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.styled-checkbox:checked {
+  background: linear-gradient(145deg, #8000ff, #6b00cc);
+  border-color: #c77dff;
+}
+
+.styled-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.styled-checkbox:hover {
+  background: rgba(128, 0, 255, 0.2);
+  transform: scale(1.1);
 }
 
 .control-input {
