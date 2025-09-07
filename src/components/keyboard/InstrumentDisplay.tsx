@@ -40,13 +40,13 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
 }) => {
   const guitarRef = useRef<any>(null)
   const [scaleHandlers, setScaleHandlers] = useState<{
-    handleScaleSelect: (rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => void;
+    handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
     handleClearScale: () => void;
   } | null>(null)
 
-  const handleScaleSelect = (rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => {
+  const handleScaleSelect = (rootNote: string, scale: GuitarScale) => {
     if (scaleHandlers) {
-      scaleHandlers.handleScaleSelect(rootNote, scale, octaveRange)
+      scaleHandlers.handleScaleSelect(rootNote, scale)
     }
   }
 

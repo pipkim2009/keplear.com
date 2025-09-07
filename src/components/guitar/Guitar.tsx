@@ -11,7 +11,7 @@ interface GuitarProps {
   onNoteClick?: (note: Note) => void
   clearTrigger?: number
   onScaleHandlersReady?: (handlers: {
-    handleScaleSelect: (rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => void;
+    handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
     handleClearScale: () => void;
   }) => void
 }
@@ -358,9 +358,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   }, [stringCheckboxes, fretCheckboxes, selectedNotes])
 
   // Handle scale selection
-  const handleScaleSelect = useCallback((rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => {
-    // Apply scale to guitar with octave filtering
-    const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes, octaveRange)
+  const handleScaleSelect = useCallback((rootNote: string, scale: GuitarScale) => {
+    // Apply scale to guitar
+    const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes)
     const newSelectedNotes = new Set<string>()
     
     // Add scale notes to selection

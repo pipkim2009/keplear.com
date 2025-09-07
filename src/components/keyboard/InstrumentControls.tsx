@@ -11,7 +11,7 @@ interface InstrumentControlsProps {
   setInstrument: (instrument: string) => void
   clearSelection: () => void
   hasSelectedNotes: boolean
-  onScaleSelect?: (rootNote: string, scale: GuitarScale, octaveRange?: { min: number; max: number }) => void
+  onScaleSelect?: (rootNote: string, scale: GuitarScale) => void
   onClearScale?: () => void
 }
 
@@ -31,7 +31,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
   const [selectedRoot, setSelectedRoot] = useState<string>('C')
   const [selectedScale, setSelectedScale] = useState<GuitarScale>(GUITAR_SCALES[0])
-  const [octaveRange, setOctaveRange] = useState<{ min: number; max: number }>({ min: 2, max: 5 })
   const [hasActiveScale, setHasActiveScale] = useState<boolean>(false)
   
   // Original default values
@@ -196,13 +195,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     setSelectedScale(scale)
   }
 
-  const handleOctaveRangeChange = (newRange: { min: number; max: number }) => {
-    setOctaveRange(newRange)
-  }
 
   const handleApplyScale = () => {
     if (onScaleSelect) {
-      onScaleSelect(selectedRoot, selectedScale, octaveRange)
+      onScaleSelect(selectedRoot, selectedScale)
       setHasActiveScale(true)
     }
   }
@@ -217,10 +213,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   // Auto-reapply scale when parameters change
   useEffect(() => {
     if (hasActiveScale && onScaleSelect) {
-      onScaleSelect(selectedRoot, selectedScale, octaveRange)
+      onScaleSelect(selectedRoot, selectedScale)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRoot, selectedScale, octaveRange, hasActiveScale])
+  }, [selectedRoot, selectedScale, hasActiveScale])
 
   // Cleanup intervals on unmount
   useEffect(() => {
@@ -342,52 +338,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             </select>
           </div>
 
-          <div className="control-group">
-            <label className="control-label">Octave Range</label>
-            <div className="octave-range-container">
-              <div className="dual-range-slider">
-                <input
-                  type="range"
-                  min="2"
-                  max="5"
-                  value={octaveRange.min}
-                  onChange={(e) => {
-                    const newMin = parseInt(e.target.value)
-                    const newMax = Math.max(newMin, octaveRange.max)
-                    handleOctaveRangeChange({ min: newMin, max: newMax })
-                  }}
-                  className="octave-slider range-min"
-                />
-                <input
-                  type="range"
-                  min="2"
-                  max="5"
-                  value={octaveRange.max}
-                  onChange={(e) => {
-                    const newMax = parseInt(e.target.value)
-                    const newMin = Math.min(octaveRange.min, newMax)
-                    handleOctaveRangeChange({ min: newMin, max: newMax })
-                  }}
-                  className="octave-slider range-max"
-                />
-                <div className="range-track">
-                  <div 
-                    className="range-fill"
-                    style={{
-                      left: `${((octaveRange.min - 2) / 3) * 100}%`,
-                      width: `${((octaveRange.max - octaveRange.min) / 3) * 100}%`
-                    }}
-                  />
-                </div>
-                <div className="range-labels">
-                  <span>2</span>
-                  <span>3</span>
-                  <span>4</span>
-                  <span>5</span>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <div className="control-group">
             <button

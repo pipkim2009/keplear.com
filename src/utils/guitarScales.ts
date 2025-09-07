@@ -95,12 +95,11 @@ export const isNoteInScale = (noteName: string, rootNote: string, scale: GuitarS
   return scaleNotes.includes(noteNameWithoutOctave)
 }
 
-// Function to get scale positions on the guitar fretboard with octave filtering
+// Function to get scale positions on the guitar fretboard
 export const getScalePositions = (
   rootNote: string, 
   scale: GuitarScale, 
-  guitarNotes: any[], 
-  octaveRange?: { min: number; max: number }
+  guitarNotes: any[]
 ): ScalePosition[] => {
   const scaleNotes = getScaleNotes(rootNote, scale)
   const positions: ScalePosition[] = []
@@ -112,10 +111,6 @@ export const getScalePositions = (
     
     // Check if note is in scale
     if (scaleNotes.includes(noteNameWithoutOctave)) {
-      // Apply octave filtering if provided
-      if (octaveRange && (octave < octaveRange.min || octave > octaveRange.max)) {
-        return // Skip this note if outside octave range
-      }
       
       positions.push({
         string: guitarNote.string,
@@ -129,14 +124,13 @@ export const getScalePositions = (
   return positions
 }
 
-// Function to apply scale to guitar note selection with octave filtering
+// Function to apply scale to guitar note selection
 export const applyScaleToGuitar = (
   rootNote: string, 
   scale: GuitarScale, 
-  guitarNotes: any[],
-  octaveRange?: { min: number; max: number }
+  guitarNotes: any[]
 ): { stringIndex: number, fretIndex: number }[] => {
-  const scalePositions = getScalePositions(rootNote, scale, guitarNotes, octaveRange)
+  const scalePositions = getScalePositions(rootNote, scale, guitarNotes)
   const selections: { stringIndex: number, fretIndex: number }[] = []
   
   scalePositions.forEach(position => {
