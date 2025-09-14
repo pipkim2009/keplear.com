@@ -39,6 +39,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   selectedNotes
 }) => {
   const guitarRef = useRef<any>(null)
+  const [lowerOctaves, setLowerOctaves] = useState<number>(0)
+  const [higherOctaves, setHigherOctaves] = useState<number>(0)
   const [scaleHandlers, setScaleHandlers] = useState<{
     handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
     handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
@@ -88,6 +90,12 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             isSelected={isSelected}
             isInMelody={isInMelody}
             showNotes={showNotes}
+            lowerOctaves={lowerOctaves}
+            higherOctaves={higherOctaves}
+            onAddLowerOctave={() => setLowerOctaves(Math.min(lowerOctaves + 1, 3))}
+            onRemoveLowerOctave={() => setLowerOctaves(Math.max(lowerOctaves - 1, 0))}
+            onAddHigherOctave={() => setHigherOctaves(Math.min(higherOctaves + 1, 3))}
+            onRemoveHigherOctave={() => setHigherOctaves(Math.max(higherOctaves - 1, 0))}
           />
         ) : (
           <Guitar 

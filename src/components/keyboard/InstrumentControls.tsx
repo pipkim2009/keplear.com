@@ -35,7 +35,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const [selectedRoot, setSelectedRoot] = useState<string>('C')
   const [selectedScale, setSelectedScale] = useState<GuitarScale>(GUITAR_SCALES[0])
   const [hasActiveScale, setHasActiveScale] = useState<boolean>(false)
-  const [showPositions, setShowPositions] = useState<boolean>(false)
+  const [showPositions, setShowPositions] = useState<boolean>(true)
   const [availableBoxes, setAvailableBoxes] = useState<ScaleBox[]>([])
   const [selectedBoxIndex, setSelectedBoxIndex] = useState<number>(0)
   
@@ -192,6 +192,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     }
   }
 
+
   // Update available boxes when root or scale changes
   useEffect(() => {
     const boxes = getScaleBoxes(selectedRoot, selectedScale, guitarNotes)
@@ -230,18 +231,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     }
   }
 
-  // Auto-reapply scale when position or show positions mode changes (but not root/scale)
-  useEffect(() => {
-    if (hasActiveScale) {
-      if (showPositions && availableBoxes.length > 0 && onScaleBoxSelect) {
-        onScaleBoxSelect(availableBoxes[selectedBoxIndex])
-      } else if (!showPositions && onScaleSelect) {
-        // Only reapply when switching from positions back to full scale
-        onScaleSelect(selectedRoot, selectedScale)
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedBoxIndex, showPositions, hasActiveScale])
+  // Remove auto-reapplication - user must click Apply button
 
   // Cleanup intervals on unmount
   useEffect(() => {
@@ -363,18 +353,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             </select>
           </div>
 
-          <div className="control-group">
-            <label className="control-label checkbox-label">
-              <input
-                type="checkbox"
-                checked={showPositions}
-                onChange={(e) => setShowPositions(e.target.checked)}
-                className="styled-checkbox"
-              />
-              Use Positions/Boxes
-            </label>
-          </div>
-
           {showPositions && availableBoxes.length > 0 && (
             <div className="control-group">
               <label className="control-label">Position</label>
@@ -391,6 +369,18 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               </select>
             </div>
           )}
+
+          <div className="control-group">
+            <label className="control-label checkbox-label">
+              <input
+                type="checkbox"
+                checked={!showPositions}
+                onChange={(e) => setShowPositions(!e.target.checked)}
+                className="styled-checkbox"
+              />
+              Use Full Scale
+            </label>
+          </div>
 
           <div className="control-group">
             <button

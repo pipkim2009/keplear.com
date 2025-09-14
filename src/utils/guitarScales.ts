@@ -143,10 +143,10 @@ export const getScaleBoxes = (
   // Define box ranges based on common guitar patterns (0-12 frets)
   const boxRanges = [
     { name: 'Open Position', minFret: 0, maxFret: 4 },
-    { name: 'Box 2', minFret: 3, maxFret: 7 },
-    { name: 'Box 3', minFret: 5, maxFret: 9 },
-    { name: 'Box 4', minFret: 7, maxFret: 11 },
-    { name: 'Box 5', minFret: 8, maxFret: 12 }
+    { name: 'Position 2', minFret: 3, maxFret: 7 },
+    { name: 'Position 3', minFret: 5, maxFret: 9 },
+    { name: 'Position 4', minFret: 7, maxFret: 11 },
+    { name: 'Position 5', minFret: 8, maxFret: 12 }
   ]
   
   boxRanges.forEach(range => {

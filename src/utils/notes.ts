@@ -56,6 +56,37 @@ export const generateNotes = (): readonly Note[] => {
 }
 
 /**
+ * Generates notes for an expanded keyboard range with octave offset
+ * @param octaveOffset - Number of additional octaves to add (positive = higher octaves, negative = lower octaves)
+ * @returns Array of Note objects
+ */
+export const generateNotesWithOffset = (octaveOffset: number = 0): readonly Note[] => {
+  const notes: Note[] = []
+  const { startOctave, endOctave } = MUSIC_CONFIG.keyboardRange
+  
+  // Calculate expanded range
+  const finalStartOctave = octaveOffset < 0 ? startOctave + octaveOffset : startOctave
+  const finalEndOctave = octaveOffset > 0 ? endOctave + octaveOffset : endOctave
+  
+  for (let octave = finalStartOctave; octave <= finalEndOctave; octave++) {
+    CHROMATIC_NOTES.forEach((noteName, index) => {
+      const relativeOctavePosition = (octave - finalStartOctave) * SEMITONES_PER_OCTAVE
+      const position = relativeOctavePosition + index
+      const frequency = C4_FREQUENCY * Math.pow(2, ((octave - 4) * SEMITONES_PER_OCTAVE + index) / SEMITONES_PER_OCTAVE)
+      
+      notes.push({
+        name: `${noteName}${octave}`,
+        frequency: Math.round(frequency * 100) / 100,
+        isBlack: noteName.includes('#'),
+        position
+      })
+    })
+  }
+  
+  return Object.freeze(notes)
+}
+
+/**
  * All musical notes in the keyboard range
  */
 export const notes = generateNotes()
@@ -69,6 +100,76 @@ export const whiteKeys = notes.filter(note => !note.isBlack)
  * Only the black keys (sharp/flat notes)
  */
 export const blackKeys = notes.filter(note => note.isBlack)
+
+/**
+ * Generate white keys with octave offset
+ * @param octaveOffset - Number to offset the base octave range
+ * @returns Array of white key Note objects
+ */
+export const generateWhiteKeysWithOffset = (octaveOffset: number = 0): readonly Note[] => {
+  return generateNotesWithOffset(octaveOffset).filter(note => !note.isBlack)
+}
+
+/**
+ * Generate black keys with octave offset
+ * @param octaveOffset - Number to offset the base octave range
+ * @returns Array of black key Note objects
+ */
+export const generateBlackKeysWithOffset = (octaveOffset: number = 0): readonly Note[] => {
+  return generateNotesWithOffset(octaveOffset).filter(note => note.isBlack)
+}
+
+/**
+ * Generates notes for a keyboard range with separate lower and higher octave additions
+ * @param lowerOctaves - Number of octaves to add below the base range
+ * @param higherOctaves - Number of octaves to add above the base range
+ * @returns Array of Note objects
+ */
+export const generateNotesWithSeparateOctaves = (lowerOctaves: number = 0, higherOctaves: number = 0): readonly Note[] => {
+  const notes: Note[] = []
+  const { startOctave, endOctave } = MUSIC_CONFIG.keyboardRange
+  
+  // Calculate expanded range
+  const finalStartOctave = startOctave - lowerOctaves
+  const finalEndOctave = endOctave + higherOctaves
+  
+  for (let octave = finalStartOctave; octave <= finalEndOctave; octave++) {
+    CHROMATIC_NOTES.forEach((noteName, index) => {
+      const relativeOctavePosition = (octave - finalStartOctave) * SEMITONES_PER_OCTAVE
+      const position = relativeOctavePosition + index
+      const frequency = C4_FREQUENCY * Math.pow(2, ((octave - 4) * SEMITONES_PER_OCTAVE + index) / SEMITONES_PER_OCTAVE)
+      
+      notes.push({
+        name: `${noteName}${octave}`,
+        frequency: Math.round(frequency * 100) / 100,
+        isBlack: noteName.includes('#'),
+        position
+      })
+    })
+  }
+  
+  return Object.freeze(notes)
+}
+
+/**
+ * Generate white keys with separate lower and higher octave additions
+ * @param lowerOctaves - Number of octaves to add below the base range
+ * @param higherOctaves - Number of octaves to add above the base range
+ * @returns Array of white key Note objects
+ */
+export const generateWhiteKeysWithSeparateOctaves = (lowerOctaves: number = 0, higherOctaves: number = 0): readonly Note[] => {
+  return generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves).filter(note => !note.isBlack)
+}
+
+/**
+ * Generate black keys with separate lower and higher octave additions
+ * @param lowerOctaves - Number of octaves to add below the base range
+ * @param higherOctaves - Number of octaves to add above the base range
+ * @returns Array of black key Note objects
+ */
+export const generateBlackKeysWithSeparateOctaves = (lowerOctaves: number = 0, higherOctaves: number = 0): readonly Note[] => {
+  return generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves).filter(note => note.isBlack)
+}
 
 /**
  * Keyboard layout constants
@@ -104,4 +205,46 @@ const BLACK_KEY_POSITIONS: Readonly<Record<number, number>> = Object.freeze({
  */
 export const getBlackKeyLeft = (position: number): number => {
   return BLACK_KEY_POSITIONS[position] ?? 0
+}
+
+/**
+ * Calculates the left position for a black key based on its note name and all white keys
+ * @param note - The black key note
+ * @param whiteKeys - Array of all white keys
+ * @returns The left offset in pixels
+ */
+export const getBlackKeyLeftDynamic = (note: Note, whiteKeys: readonly Note[]): number => {
+  if (!note.isBlack) return 0
+  
+  // Extract the note name without octave (e.g., "C#" from "C#4")
+  const noteName = note.name.slice(0, -1)
+  const blackOctave = parseInt(note.name.slice(-1))
+  
+  // Find the index of this black key in the sorted list of all notes
+  let whiteKeysBeforeThisBlack = 0
+  
+  for (const whiteKey of whiteKeys) {
+    const whiteOctave = parseInt(whiteKey.name.slice(-1))
+    const whiteNoteName = whiteKey.name.slice(0, -1)
+    
+    // Count white keys that come before this black key chronologically
+    if (whiteOctave < blackOctave) {
+      // All white keys from previous octaves
+      whiteKeysBeforeThisBlack++
+    } else if (whiteOctave === blackOctave) {
+      // White keys from same octave that come before this black key
+      const noteOrder = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+      const whiteNotePosition = noteOrder.indexOf(whiteNoteName)
+      const blackNotePosition = noteOrder.indexOf(noteName)
+      
+      if (whiteNotePosition < blackNotePosition) {
+        whiteKeysBeforeThisBlack++
+      }
+    }
+  }
+  
+  // Calculate position: (white keys before) * (white key width including margin) - half black key width
+  // whiteKeyWidth already includes the 2px margin (62px total)
+  // Subtract 40px to move black keys to the left when expanded
+  return (whiteKeysBeforeThisBlack * KEYBOARD_DIMENSIONS.whiteKeyWidth) - (KEYBOARD_DIMENSIONS.blackKeyWidth / 2) - 40
 }

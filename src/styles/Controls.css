@@ -274,6 +274,11 @@
   }
 }
 
+/* Use boxes checkbox positioning */
+.instrument-controls.guitar-mode .control-group:has(.styled-checkbox) {
+  margin-top: 25px;
+}
+
 /* Scale control buttons */
 .control-button.apply-scale {
   background: rgba(76, 175, 80, 0.1);
@@ -309,6 +314,14 @@
     font-size: 11px;
     padding: 6px 8px;
   }
+}
+
+/* Octave display specific styling */
+.control-input.octave-display {
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
+  font-weight: 700;
 }
 
 
