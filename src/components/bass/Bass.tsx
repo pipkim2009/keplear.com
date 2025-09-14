@@ -512,12 +512,15 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         {/* Strings */}
         {[...Array(4)].map((_, index) => {
           const stringHeights = [3.5, 4.5, 5.5, 6.5] // Heights for bass strings 1-4
+          // Align string center with open position marker center
+          const openMarkerCenter = 22 + index * 30
+          const stringTop = openMarkerCenter - (stringHeights[index] / 2)
           return (
             <div
               key={index}
               className="bass-string"
               style={{
-                top: `${20 + index * 24}px`,
+                top: `${stringTop}px`,
                 height: `${stringHeights[index]}px`
               }}
             ></div>
@@ -531,7 +534,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             className="bass-fret-position bass-open-string-position"
             style={{
               left: `0px`, // At the very left edge
-              top: `${20 + stringIndex * 24 - 12}px`,
+              top: `${22 + stringIndex * 30 - 12}px`,
               width: `15px`, // 25% of first fret zone (60px * 0.25)
               height: `24px`,
             }}
@@ -547,7 +550,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               className="bass-fret-position"
               style={{
                 left: `${fretIndex === 0 ? 15 + 3 : fretIndex * 60 + 3}px`, // Start after open string area for first fret
-                top: `${20 + stringIndex * 24 - 12}px`, // Expand height above and below string
+                top: `${22 + stringIndex * 30 - 12}px`, // Expand height above and below string
                 width: `${fretIndex === 0 ? 60 - 18 : 60 - 6}px`, // 75% width for first fret (42px)
                 height: `24px`, // Height of string spacing minus 4px to prevent overlap
               }}
@@ -561,7 +564,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
           <div
             key={`bass-string-checkbox-${index}`}
             className="bass-string-checkbox-container"
-            style={{ top: `${20 + index * 24}px` }}
+            style={{ top: `${22 + index * 30}px` }}
           >
             <input
               type="checkbox"
@@ -610,7 +613,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               className={noteClass}
               style={{
                 left: `-3px`, // Center of the open string click field (15px width / 2 - 11px for note circle centering)
-                top: `${20 + stringIndex * 24 - 11}px`, // Center on string
+                top: `${22 + stringIndex * 30 - 11}px`, // Center on string
               }}
             >
               <span className="bass-note-name">
@@ -652,7 +655,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                 className={noteClass}
                 style={{
                   left: `${fretIndex === 0 ? 30 : (fretIndex + 1) * 60 - 39}px`, // Center first fret in its area, others align with checkboxes
-                  top: `${20 + stringIndex * 24 - 11}px`, // Center on string
+                  top: `${22 + stringIndex * 30 - 11}px`, // Center on string
                 }}
               >
                 <span className="bass-note-name">

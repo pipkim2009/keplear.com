@@ -26,7 +26,9 @@ export const AUDIO_CONFIG = {
   /** Default note duration for keyboard */
   keyboardDuration: '0.3',
   /** Default note duration for guitar */
-  guitarDuration: '0.5'
+  guitarDuration: '0.5',
+  /** Default note duration for bass */
+  bassDuration: '0.7'
 } as const
 
 /**
@@ -66,7 +68,9 @@ export const SERVICE_URLS = {
   /** Salamander Grand Piano samples base URL */
   keyboardSamples: 'https://tonejs.github.io/audio/salamander/',
   /** Acoustic guitar samples base URL */
-  guitarSamples: 'https://nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/'
+  guitarSamples: 'https://nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/',
+  /** Bass samples base URL (using lower octave piano samples) */
+  bassSamples: 'https://tonejs.github.io/audio/salamander/'
 } as const
 
 /**
@@ -100,7 +104,8 @@ export const ROUTES = {
  */
 export const INSTRUMENTS = {
   keyboard: 'keyboard',
-  guitar: 'guitar'
+  guitar: 'guitar',
+  bass: 'bass'
 } as const
 
 /**

@@ -15,7 +15,8 @@
   min-height: 40px;
   transition: all 0.3s ease;
   background: transparent;
-  z-index: 100;
+  z-index: 200;
+  pointer-events: auto;
 }
 
 .scale-options-container.collapsed {
@@ -37,11 +38,28 @@
   max-height: 400px;
   overflow-y: auto;
   min-width: 320px;
-  z-index: 101;
+  z-index: 201;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 0 12px 12px 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.1);
+  pointer-events: auto;
+}
+
+/* Disable fretboard interactions and hover effects when scale options are expanded */
+.scale-options-container.expanded ~ .guitar-container .fret-position,
+.scale-options-container.expanded ~ .guitar-container .open-string-position,
+.scale-options-container.expanded ~ .bass-container .bass-fret-position,
+.scale-options-container.expanded ~ .bass-container .bass-open-string-position {
+  pointer-events: none !important;
+}
+
+.scale-options-container.expanded ~ .guitar-container .fret-position:hover,
+.scale-options-container.expanded ~ .guitar-container .open-string-position:hover,
+.scale-options-container.expanded ~ .bass-container .bass-fret-position:hover,
+.scale-options-container.expanded ~ .bass-container .bass-open-string-position:hover {
+  background: transparent !important;
+  transform: none !important;
 }
 
 .dark .scale-options-content {
@@ -66,8 +84,9 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 10;
+  z-index: 200;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
 }
 
 .scale-options-toggle:hover {

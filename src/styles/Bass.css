@@ -75,7 +75,7 @@
   height: 14px;
   background: linear-gradient(145deg, #f0f0dc, #ccc);
   border-radius: 50%;
-  top: 67.5px;
+  top: 67px;
   left: 50%;
   transform: translate(-50%, -50%) translateX(-30px);
   box-shadow:
@@ -85,11 +85,11 @@
 }
 
 .bass-double-marker-1 {
-  transform: translate(-50%, -50%) translateX(-30px) translateY(-18px);
+  transform: translate(-50%, -50%) translateX(-30px) translateY(-20px);
 }
 
 .bass-double-marker-2 {
-  transform: translate(-50%, -50%) translateX(-30px) translateY(16px);
+  transform: translate(-50%, -50%) translateX(-30px) translateY(18px);
 }
 
 .bass-string {
@@ -286,7 +286,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 35;
+  z-index: 10;
   box-shadow:
     0 3px 5px rgba(0, 0, 0, 0.4),
     inset 0 1px 3px rgba(255, 255, 255, 0.4);
@@ -329,6 +329,8 @@
   background: rgba(255, 140, 0, 0.05);
   border: 1px solid rgba(255, 140, 0, 0.2);
   border-radius: 8px;
+  z-index: 50;
+  position: relative;
 }
 
 .bass-scale-selector-header {
@@ -345,6 +347,8 @@
   font-size: 14px;
   font-weight: 600;
   transition: all 0.2s ease;
+  position: relative;
+  z-index: 51;
 }
 
 .bass-scale-toggle-button:hover {
@@ -356,6 +360,8 @@
   display: flex;
   flex-direction: column;
   gap: 15px;
+  position: relative;
+  z-index: 50;
 }
 
 .bass-scale-controls {

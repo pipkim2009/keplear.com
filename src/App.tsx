@@ -46,7 +46,7 @@ function App() {
   const [keyboardSelectionMode, setKeyboardSelectionMode] = useState<'range' | 'multi'>('range')
   
   const { isDarkMode, toggleTheme } = useTheme()
-  const { playNote, playGuitarNote, playMelody, playGuitarMelody, stopMelody, isPlaying } = useAudio()
+  const { playNote, playGuitarNote, playBassNote, playMelody, playGuitarMelody, playBassMelody, stopMelody, isPlaying } = useAudio()
 
   // Apply theme class to document body for portaled modals and global styles
   useEffect(() => {
@@ -70,8 +70,10 @@ function App() {
    */
   const handleNoteClick = useCallback(async (note: Note): Promise<void> => {
     try {
-      if (instrument === 'guitar' || instrument === 'bass') {
+      if (instrument === 'guitar') {
         await playGuitarNote(note.name)
+      } else if (instrument === 'bass') {
+        await playBassNote(note.name)
       } else {
         await playNote(note.name)
       }
@@ -79,7 +81,7 @@ function App() {
     } catch (error) {
       console.warn('Failed to play note:', error)
     }
-  }, [instrument, playGuitarNote, playNote, selectNote, keyboardSelectionMode])
+  }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, keyboardSelectionMode])
 
   /**
    * Generates a new melody based on current settings
@@ -105,13 +107,15 @@ function App() {
         return
       }
       
-      if (instrument === 'guitar' || instrument === 'bass') {
+      if (instrument === 'guitar') {
         playGuitarMelody([...generatedMelody], bpm)
+      } else if (instrument === 'bass') {
+        playBassMelody([...generatedMelody], bpm)
       } else {
         playMelody([...generatedMelody], bpm)
       }
     }
-  }, [isPlaying, stopMelody, generatedMelody, instrument, playGuitarMelody, playMelody, bpm])
+  }, [isPlaying, stopMelody, generatedMelody, instrument, playGuitarMelody, playBassMelody, playMelody, bpm])
 
   /**
    * Handles instrument changes and clears selection

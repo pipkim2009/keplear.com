@@ -19,7 +19,7 @@ interface InstrumentConfig {
 /**
  * Supported instrument types
  */
-type InstrumentType = 'keyboard' | 'guitar'
+type InstrumentType = 'keyboard' | 'guitar' | 'bass'
 
 /**
  * Configuration for all supported instruments
@@ -43,20 +43,35 @@ const INSTRUMENTS: Readonly<Record<InstrumentType, InstrumentConfig>> = Object.f
   guitar: {
     urls: Object.freeze({
       A2: "A2.mp3",
-      A3: "A3.mp3", 
+      A3: "A3.mp3",
       A4: "A4.mp3",
       C3: "C3.mp3",
       C4: "C4.mp3",
       C5: "C5.mp3",
       "D#4": "Ds4.mp3",
       "F#2": "Fs2.mp3",
-      "F#3": "Fs3.mp3", 
+      "F#3": "Fs3.mp3",
       "F#4": "Fs4.mp3",
       G3: "G3.mp3",
     }),
     release: 1.0,
     baseUrl: SERVICE_URLS.guitarSamples,
     defaultDuration: AUDIO_CONFIG.guitarDuration
+  },
+  bass: {
+    urls: Object.freeze({
+      C3: "C3.mp3",
+      "D#3": "Ds3.mp3",
+      "F#3": "Fs3.mp3",
+      A3: "A3.mp3",
+      C4: "C4.mp3",
+      "D#4": "Ds4.mp3",
+      "F#4": "Fs4.mp3",
+      A4: "A4.mp3"
+    }),
+    release: 1.5,
+    baseUrl: SERVICE_URLS.bassSamples,
+    defaultDuration: AUDIO_CONFIG.bassDuration
   }
 })
 
@@ -72,8 +87,10 @@ type ToneSampler = unknown
 interface UseAudioReturn {
   playNote: (noteName: string, duration?: string) => Promise<void>
   playGuitarNote: (noteName: string, duration?: string) => Promise<void>
+  playBassNote: (noteName: string, duration?: string) => Promise<void>
   playMelody: (melody: Note[], bpm: number) => Promise<void>
   playGuitarMelody: (melody: Note[], bpm: number) => Promise<void>
+  playBassMelody: (melody: Note[], bpm: number) => Promise<void>
   stopMelody: () => void
   readonly isPlaying: boolean
 }
@@ -85,7 +102,8 @@ interface UseAudioReturn {
 export const useAudio = (): UseAudioReturn => {
   const [samplers, setSamplers] = useState<Record<InstrumentType, ToneSampler | null>>({
     keyboard: null,
-    guitar: null
+    guitar: null,
+    bass: null
   })
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [isInitialized, setIsInitialized] = useState<boolean>(false)
@@ -108,7 +126,8 @@ export const useAudio = (): UseAudioReturn => {
       
       const newSamplers: Record<InstrumentType, ToneSampler | null> = {
         keyboard: null,
-        guitar: null
+        guitar: null,
+        bass: null
       }
       
       // Create samplers for each instrument and wait for them to load
@@ -136,10 +155,10 @@ export const useAudio = (): UseAudioReturn => {
     } catch (error) {
       // Handle expected AudioContext errors (before user interaction)
       if (error instanceof Error && error.message.includes('AudioContext')) {
-        return { keyboard: null, guitar: null }
+        return { keyboard: null, guitar: null, bass: null }
       }
       console.warn('Audio initialization failed:', error)
-      return { keyboard: null, guitar: null }
+      return { keyboard: null, guitar: null, bass: null }
     }
   }, [isInitialized, samplers])
 
@@ -166,15 +185,24 @@ export const useAudio = (): UseAudioReturn => {
     const currentSamplers = await initializeAudio()
     const sampler = currentSamplers.guitar
     if (!sampler || typeof sampler !== 'object' || !('triggerAttackRelease' in sampler)) return
-    
+
     ;(sampler as { triggerAttackRelease: (note: string, duration: string) => void })
       .triggerAttackRelease(noteName, duration || INSTRUMENTS.guitar.defaultDuration)
   }, [initializeAudio])
 
+  const playBassNote = useCallback(async (noteName: string, duration?: string): Promise<void> => {
+    const currentSamplers = await initializeAudio()
+    const sampler = currentSamplers.bass
+    if (!sampler || typeof sampler !== 'object' || !('triggerAttackRelease' in sampler)) return
+
+    ;(sampler as { triggerAttackRelease: (note: string, duration: string) => void })
+      .triggerAttackRelease(noteName, duration || INSTRUMENTS.bass.defaultDuration)
+  }, [initializeAudio])
+
   const playMelodyGeneric = useCallback(async (
-    melody: Note[], 
-    bpm: number, 
-    instrument: 'keyboard' | 'guitar'
+    melody: Note[],
+    bpm: number,
+    instrument: 'keyboard' | 'guitar' | 'bass'
   ) => {
     if (melody.length === 0 || isPlaying) return
     
@@ -187,7 +215,7 @@ export const useAudio = (): UseAudioReturn => {
     setCurrentTimeoutId(null) // Reset any lingering timeout ID
     
     const noteDuration = (60 / bpm) * 800
-    const playDuration = instrument === 'guitar' ? "0.6" : "0.5"
+    const playDuration = instrument === 'guitar' ? "0.6" : instrument === 'bass' ? "0.8" : "0.5"
     
     const samplerWithMethod = sampler as { triggerAttackRelease: (note: string, duration: string) => void }
     
@@ -230,6 +258,10 @@ export const useAudio = (): UseAudioReturn => {
     return playMelodyGeneric(melody, bpm, 'guitar')
   }, [playMelodyGeneric])
 
+  const playBassMelody = useCallback((melody: Note[], bpm: number) => {
+    return playMelodyGeneric(melody, bpm, 'bass')
+  }, [playMelodyGeneric])
+
   const stopMelody = useCallback(() => {
     setShouldStop(true)
     if (currentTimeoutId) {
@@ -248,8 +280,10 @@ export const useAudio = (): UseAudioReturn => {
   return {
     playNote,
     playGuitarNote,
+    playBassNote,
     playMelody,
     playGuitarMelody,
+    playBassMelody,
     stopMelody,
     isPlaying
   }
