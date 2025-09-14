@@ -19,7 +19,7 @@ interface GuitarProps {
 
 const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(new Array(6).fill(false))
-  const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(13).fill(false))
+  const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set())
   const [currentScale, setCurrentScale] = useState<{ root: string; scale: GuitarScale } | null>(null)
   const [scaleSelectedNotes, setScaleSelectedNotes] = useState<Set<string>>(new Set())
@@ -40,7 +40,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       newSelectedNotes.delete(`-${openKey}`)
       
       // Remove fretted note selections
-      for (let fretIndex = 0; fretIndex < 12; fretIndex++) {
+      for (let fretIndex = 0; fretIndex < 24; fretIndex++) {
         const noteKey = `${index}-${fretIndex}`
         newSelectedNotes.delete(noteKey)
         // Also remove any negative selections for this string
@@ -133,7 +133,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           newStringCheckboxes[stringIndex] = false
           // Add all other notes on this string as individual selections (except the clicked one)
           // Don't add open string since we're clicking on it to deselect
-          for (let fret = 0; fret < 12; fret++) {
+          for (let fret = 0; fret < 24; fret++) {
             newSelectedNotes.add(`${stringIndex}-${fret}`)
           }
           // Explicitly ensure the clicked note is not individually selected
@@ -228,7 +228,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           newStringCheckboxes[stringIndex] = false
           // Add all other notes on this string as individual selections (except the clicked one)
           newSelectedNotes.add(`${stringIndex}-open`) // Add open string (will be removed below if it's the clicked note)
-          for (let fret = 0; fret < 12; fret++) {
+          for (let fret = 0; fret < 24; fret++) {
             if (fret !== fretIndex) {
               newSelectedNotes.add(`${stringIndex}-${fret}`)
             }
@@ -328,7 +328,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     
     // Check all fretted note positions
     for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
-      for (let fretIndex = 0; fretIndex < 12; fretIndex++) {
+      for (let fretIndex = 0; fretIndex < 24; fretIndex++) {
         if (isNoteSelected(stringIndex, fretIndex)) {
           const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
           if (noteName) {
@@ -382,7 +382,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     // Update all state at once to minimize re-renders
     setCurrentScale({ root: rootNote, scale })
     setStringCheckboxes(new Array(6).fill(false))
-    setFretCheckboxes(new Array(13).fill(false))
+    setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(newSelectedNotes)
     setScaleSelectedNotes(newScaleSelectedNotes)
   }, [])
@@ -413,7 +413,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     
     // Update all state at once to minimize re-renders
     setStringCheckboxes(new Array(6).fill(false))
-    setFretCheckboxes(new Array(13).fill(false))
+    setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(newSelectedNotes)
     setScaleSelectedNotes(newScaleSelectedNotes)
   }, [currentScale])
@@ -422,7 +422,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   const handleClearScale = useCallback(() => {
     setCurrentScale(null)
     setStringCheckboxes(new Array(6).fill(false))
-    setFretCheckboxes(new Array(13).fill(false))
+    setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(new Set())
     setScaleSelectedNotes(new Set())
   }, [])
@@ -485,15 +485,15 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         </div>
 
         {/* Frets */}
-        {[...Array(12)].map((_, index) => (
+        {[...Array(24)].map((_, index) => (
           <div key={index} className="fret" style={{ left: `${(index + 1) * 60}px` }}>
             <div className="fret-wire"></div>
-            {/* Fret markers on 3rd, 5th, 7th, 9th frets */}
-            {[3, 5, 7, 9].includes(index + 1) && (
+            {/* Fret markers on 3rd, 5th, 7th, 9th, 15th, 17th, 19th, 21st frets */}
+            {[3, 5, 7, 9, 15, 17, 19, 21].includes(index + 1) && (
               <div className="fret-marker"></div>
             )}
-            {/* Double marker on 12th fret */}
-            {index + 1 === 12 && (
+            {/* Double markers on 12th and 24th frets */}
+            {(index + 1 === 12 || index + 1 === 24) && (
               <>
                 <div className="fret-marker double-marker-1"></div>
                 <div className="fret-marker double-marker-2"></div>
@@ -545,7 +545,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
 
         {/* Clickable fret positions */}
         {[...Array(6)].map((_, stringIndex) => (
-          [...Array(12)].map((_, fretIndex) => (
+          [...Array(24)].map((_, fretIndex) => (
             <div
               key={`fret-position-${stringIndex}-${fretIndex}`}
               className="fret-position"
@@ -626,7 +626,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
 
         {/* Note visualization circles */}
         {[...Array(6)].map((_, stringIndex) =>
-          [...Array(12)].map((_, fretIndex) => {
+          [...Array(24)].map((_, fretIndex) => {
             if (!isNoteSelected(stringIndex, fretIndex)) return null
             
             const noteName = getNoteForStringAndFret(stringIndex, fretIndex)

@@ -2,7 +2,7 @@ export type GuitarNote = {
   name: string
   frequency: number
   string: number // 1-6 (low E to high E)
-  fret: number   // 0-12 (open to 12th fret)
+  fret: number   // 0-24 (open to 24th fret)
   position: number // unique position for melody generation
 }
 
@@ -20,7 +20,7 @@ export const generateGuitarNotes = (): GuitarNote[] => {
   const guitarNotes: GuitarNote[] = []
   
   openStringNotes.forEach((openString, stringIndex) => {
-    for (let fret = 0; fret <= 12; fret++) {
+    for (let fret = 0; fret <= 24; fret++) {
       // Calculate semitone offset from the open string
       const semitoneOffset = fret
       const frequency = openString.frequency * Math.pow(2, semitoneOffset / 12)
