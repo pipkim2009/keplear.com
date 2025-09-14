@@ -339,26 +339,33 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           <label className="control-label">Octave Range</label>
           <div className="octave-range-slider">
             <div className="range-labels">
-              <span className="range-label">Low: {4 - lowerOctaves}</span>
-              <span className="range-label">High: {5 + higherOctaves}</span>
+              <span className="range-label">Low: {Math.max(1, 4 - lowerOctaves)}</span>
+              <span className="range-label">High: {Math.min(8, 5 + higherOctaves)}</span>
             </div>
             <div className="dual-range-container">
               <input
                 type="range"
                 min="1"
-                max="4"
-                value={4 - lowerOctaves}
+                max="8"
+                value={Math.max(1, 4 - lowerOctaves)}
                 onChange={(e) => {
                   const newLowOctave = parseInt(e.target.value)
+                  const currentHighOctave = Math.min(8, 5 + higherOctaves)
+
+                  // Prevent low octave from going higher than high octave
+                  if (newLowOctave > currentHighOctave) return
+
+                  const currentLowOctave = Math.max(1, 4 - lowerOctaves)
                   const targetLowerOctaves = 4 - newLowOctave
-                  if (onAddLowerOctave && onRemoveLowerOctave) {
+
+                  if (targetLowerOctaves !== lowerOctaves) {
                     if (targetLowerOctaves > lowerOctaves) {
                       for (let i = 0; i < targetLowerOctaves - lowerOctaves; i++) {
-                        onAddLowerOctave()
+                        onAddLowerOctave && onAddLowerOctave()
                       }
                     } else if (targetLowerOctaves < lowerOctaves) {
                       for (let i = 0; i < lowerOctaves - targetLowerOctaves; i++) {
-                        onRemoveLowerOctave()
+                        onRemoveLowerOctave && onRemoveLowerOctave()
                       }
                     }
                   }
@@ -368,11 +375,16 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               />
               <input
                 type="range"
-                min="5"
+                min="1"
                 max="8"
-                value={5 + higherOctaves}
+                value={Math.min(8, 5 + higherOctaves)}
                 onChange={(e) => {
                   const newHighOctave = parseInt(e.target.value)
+                  const currentLowOctave = Math.max(1, 4 - lowerOctaves)
+
+                  // Prevent high octave from going lower than low octave
+                  if (newHighOctave < currentLowOctave) return
+
                   const targetHigherOctaves = newHighOctave - 5
                   if (onAddHigherOctave && onRemoveHigherOctave) {
                     if (targetHigherOctaves > higherOctaves) {

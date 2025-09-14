@@ -82,10 +82,10 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           onClearScale={handleClearScale}
           lowerOctaves={lowerOctaves}
           higherOctaves={higherOctaves}
-          onAddLowerOctave={() => setLowerOctaves(Math.min(lowerOctaves + 1, 3))}
-          onRemoveLowerOctave={() => setLowerOctaves(Math.max(lowerOctaves - 1, 0))}
-          onAddHigherOctave={() => setHigherOctaves(Math.min(higherOctaves + 1, 3))}
-          onRemoveHigherOctave={() => setHigherOctaves(Math.max(higherOctaves - 1, -1))}
+          onAddLowerOctave={() => setLowerOctaves(Math.min(lowerOctaves + 1, 7))}
+          onRemoveLowerOctave={() => setLowerOctaves(Math.max(lowerOctaves - 1, -4))}
+          onAddHigherOctave={() => setHigherOctaves(Math.min(higherOctaves + 1, 7))}
+          onRemoveHigherOctave={() => setHigherOctaves(Math.max(higherOctaves - 1, -4))}
         />
       </div>
       
