@@ -5,6 +5,8 @@ import { useRef, useState, useEffect } from 'react'
 import type { Note } from '../../utils/notes'
 import type { GuitarScale, ScaleBox } from '../../utils/guitarScales'
 import type { KeyboardSelectionMode } from './InstrumentControls'
+import { applyScaleToKeyboard, isKeyboardNoteInScale, isKeyboardNoteRoot, type KeyboardScale } from '../../utils/keyboardScales'
+import { generateNotesWithSeparateOctaves } from '../../utils/notes'
 
 interface InstrumentDisplayProps {
   onNoteClick: (note: Note) => void
@@ -48,6 +50,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   const guitarRef = useRef<any>(null)
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
   const [higherOctaves, setHigherOctaves] = useState<number>(0)
+  const [currentKeyboardScale, setCurrentKeyboardScale] = useState<{ root: string; scale: KeyboardScale } | null>(null)
   const [scaleHandlers, setScaleHandlers] = useState<{
     handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
     handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
@@ -72,12 +75,63 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     }
   }
 
+  // Keyboard scale handlers
+  const handleKeyboardScaleApply = (rootNote: string, scale: KeyboardScale) => {
+    // Generate current keyboard notes based on octave range
+    const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
+      ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+      : generateNotesWithSeparateOctaves(0, 0) // Default range
+
+    // Apply scale to get scale notes
+    const scaleNotes = applyScaleToKeyboard(rootNote, scale, currentNotes)
+
+    // Set these notes as selected (this will trigger the melody system)
+    setGuitarNotes(scaleNotes)
+
+    // Store current scale info for visual highlighting
+    setCurrentKeyboardScale({ root: rootNote, scale })
+  }
+
+  const handleKeyboardScaleClear = () => {
+    // Clear all selected notes
+    clearSelection()
+    // Clear scale info
+    setCurrentKeyboardScale(null)
+  }
+
+  // Helper functions for keyboard scale highlighting
+  const isNoteInKeyboardScale = (note: Note): boolean => {
+    if (!currentKeyboardScale) return false
+    return isKeyboardNoteInScale(note, currentKeyboardScale.root, currentKeyboardScale.scale)
+  }
+
+  const isNoteKeyboardRoot = (note: Note): boolean => {
+    if (!currentKeyboardScale) return false
+    return isKeyboardNoteRoot(note, currentKeyboardScale.root)
+  }
+
   // Notify parent when octave range changes
   useEffect(() => {
     if (onOctaveRangeChange) {
       onOctaveRangeChange(lowerOctaves, higherOctaves)
     }
   }, [lowerOctaves, higherOctaves, onOctaveRangeChange])
+
+  // Auto-reapply keyboard scale when octave range changes (but not on initial scale application)
+  useEffect(() => {
+    if (currentKeyboardScale) {
+      // Generate current keyboard notes based on octave range
+      const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
+        ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+        : generateNotesWithSeparateOctaves(0, 0) // Default range
+
+      // Apply scale to get scale notes
+      const scaleNotes = applyScaleToKeyboard(currentKeyboardScale.root, currentKeyboardScale.scale, currentNotes)
+
+      // Set these notes as selected (this will trigger the melody system)
+      setGuitarNotes(scaleNotes)
+    }
+  }, [lowerOctaves, higherOctaves]) // Only depend on octave changes, not the scale state
 
   return (
     <>
@@ -102,6 +156,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           onRemoveHigherOctave={() => setHigherOctaves(Math.max(higherOctaves - 1, -4))}
           keyboardSelectionMode={keyboardSelectionMode}
           onKeyboardSelectionModeChange={onKeyboardSelectionModeChange}
+          onKeyboardScaleApply={handleKeyboardScaleApply}
+          onKeyboardScaleClear={handleKeyboardScaleClear}
         />
       </div>
       
@@ -115,6 +171,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             lowerOctaves={lowerOctaves}
             higherOctaves={higherOctaves}
             selectionMode={keyboardSelectionMode}
+            isNoteInScale={isNoteInKeyboardScale}
+            isNoteRoot={isNoteKeyboardRoot}
           />
         ) : (
           <Guitar 

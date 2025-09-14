@@ -225,6 +225,52 @@
   background: linear-gradient(145deg, #047857, #065f46);
 }
 
+/* Scale highlighting for keyboard keys */
+.white-key.scale-note {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  border-color: #d97706;
+}
+
+.black-key.scale-note {
+  background: linear-gradient(145deg, #d97706, #b45309);
+}
+
+.white-key.scale-root {
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+  border-color: #991b1b;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.black-key.scale-root {
+  background: linear-gradient(145deg, #b91c1c, #991b1b);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Ensure scale styling takes precedence over selected when both are active */
+.white-key.selected.scale-note {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+}
+
+.black-key.selected.scale-note {
+  background: linear-gradient(145deg, #d97706, #b45309);
+}
+
+.white-key.selected.scale-root {
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+}
+
+.black-key.selected.scale-root {
+  background: linear-gradient(145deg, #b91c1c, #991b1b);
+}
+
 .key-label {
   position: absolute;
   bottom: 15px;

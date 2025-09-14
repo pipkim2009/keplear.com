@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import '../../styles/Controls.css'
 import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
 import { guitarNotes } from '../../utils/guitarNotes'
+import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/keyboardScales'
 
 export type KeyboardSelectionMode = 'range' | 'multi'
 
@@ -25,6 +26,8 @@ interface InstrumentControlsProps {
   onRemoveHigherOctave?: () => void
   keyboardSelectionMode?: KeyboardSelectionMode
   onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
+  onKeyboardScaleApply?: (rootNote: string, scale: KeyboardScale) => void
+  onKeyboardScaleClear?: () => void
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -46,13 +49,18 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   onAddHigherOctave,
   onRemoveHigherOctave,
   keyboardSelectionMode = 'range',
-  onKeyboardSelectionModeChange
+  onKeyboardSelectionModeChange,
+  onKeyboardScaleApply,
+  onKeyboardScaleClear
 }) => {
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
   const [selectedRoot, setSelectedRoot] = useState<string>('C')
   const [selectedScale, setSelectedScale] = useState<GuitarScale>(GUITAR_SCALES[0])
   const [hasActiveScale, setHasActiveScale] = useState<boolean>(false)
+  const [keyboardSelectedRoot, setKeyboardSelectedRoot] = useState<string>('C')
+  const [keyboardSelectedScale, setKeyboardSelectedScale] = useState<KeyboardScale>(KEYBOARD_SCALES[0])
+  const [hasActiveKeyboardScale, setHasActiveKeyboardScale] = useState<boolean>(false)
   const [showPositions, setShowPositions] = useState<boolean>(true)
   const [availableBoxes, setAvailableBoxes] = useState<ScaleBox[]>([])
   const [selectedBoxIndex, setSelectedBoxIndex] = useState<number>(0)
@@ -246,6 +254,29 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     if (onClearScale) {
       onClearScale()
       setHasActiveScale(false)
+    }
+  }
+
+  // Keyboard scale handlers
+  const handleKeyboardRootChange = (rootNote: string) => {
+    setKeyboardSelectedRoot(rootNote)
+  }
+
+  const handleKeyboardScaleChange = (scale: KeyboardScale) => {
+    setKeyboardSelectedScale(scale)
+  }
+
+  const handleApplyKeyboardScale = () => {
+    if (onKeyboardScaleApply) {
+      onKeyboardScaleApply(keyboardSelectedRoot, keyboardSelectedScale)
+      setHasActiveKeyboardScale(true)
+    }
+  }
+
+  const handleClearKeyboardScale = () => {
+    if (onKeyboardScaleClear) {
+      onKeyboardScaleClear()
+      setHasActiveKeyboardScale(false)
     }
   }
 
@@ -452,6 +483,50 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             </div>
             </div>
           </div>
+
+          {/* Keyboard Scale Controls - only show in multi-select mode */}
+          {keyboardSelectionMode === 'multi' && (
+            <>
+              <div className="control-group">
+                <label className="control-label">Root Note</label>
+                <select
+                  value={keyboardSelectedRoot}
+                  onChange={(e) => handleKeyboardRootChange(e.target.value)}
+                  className="control-input"
+                >
+                  {ROOT_NOTES.map(note => (
+                    <option key={note} value={note}>{note}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="control-group">
+                <label className="control-label">Scale</label>
+                <select
+                  value={keyboardSelectedScale.name}
+                  onChange={(e) => {
+                    const scale = KEYBOARD_SCALES.find(s => s.name === e.target.value)
+                    if (scale) handleKeyboardScaleChange(scale)
+                  }}
+                  className="control-input"
+                >
+                  {KEYBOARD_SCALES.map(scale => (
+                    <option key={scale.name} value={scale.name}>{scale.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="control-group">
+                <button
+                  onClick={handleApplyKeyboardScale}
+                  className="control-button apply-scale"
+                  title="Apply scale to keyboard"
+                >
+                  Apply Scale
+                </button>
+              </div>
+            </>
+          )}
         </>
       )}
 
@@ -533,6 +608,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             onClick={() => {
               clearSelection()
               handleClearScale()
+              handleClearKeyboardScale()
             }}
             className="control-button delete-selection"
             title="Clear selected notes and scales"
