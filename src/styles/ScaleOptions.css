@@ -11,9 +11,7 @@
 }
 
 .scale-options-container {
-  position: absolute;
-  top: 0;
-  right: 0;
+  position: relative;
   min-height: 40px;
   transition: all 0.3s ease;
   background: transparent;
@@ -25,14 +23,26 @@
 }
 
 .scale-options-container.expanded {
-  width: 320px;
+  width: 40px;
+}
+
+.scale-options-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0;
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+  min-width: 320px;
+  z-index: 101;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
+  border-radius: 0 12px 12px 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.dark .scale-options-container.expanded {
+.dark .scale-options-content {
   background: rgba(30, 30, 30, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -40,7 +50,7 @@
 
 .scale-options-toggle {
   position: absolute;
-  top: 0;
+  top: 25px;
   left: 0;
   width: 40px;
   height: 40px;
@@ -78,18 +88,7 @@
 }
 
 .scale-options-container.expanded .toggle-text {
-  display: inline;
-  font-size: 14px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-
-.scale-options-content {
-  margin-top: 0;
-  padding: 20px;
-  max-height: 400px;
-  overflow-y: auto;
+  display: none;
 }
 
 .scale-options-header {
@@ -129,6 +128,7 @@
   background: rgba(128, 0, 255, 0.05);
   border-radius: 8px;
   border: 1px solid rgba(128, 0, 255, 0.2);
+  width: calc(100% - 22px);
 }
 
 .dark .scale-controls {
@@ -210,7 +210,7 @@
 
 .scale-reference {
   border-top: 1px solid rgba(0, 0, 0, 0.1);
-  padding-top: 16px;
+  padding-top: 11px;
 }
 
 .dark .scale-reference {
@@ -241,6 +241,7 @@
   border: 1px solid rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
   cursor: pointer;
+  width: calc(100% - 2px);
 }
 
 .dark .scale-item {
@@ -259,6 +260,14 @@
   border-color: rgba(128, 0, 255, 0.4);
 }
 
+.scale-info {
+  background: transparent;
+}
+
+.scale-description {
+  background: transparent;
+}
+
 .scale-name {
   font-size: 13px;
   font-weight: 600;
@@ -275,6 +284,8 @@
   font-size: 11px;
   color: #666;
   font-style: italic;
+  margin-top: -5px;
+  padding-top: 3px;
 }
 
 .dark .scale-description {
