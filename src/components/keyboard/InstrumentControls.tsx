@@ -237,6 +237,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
   const handleBoxChange = (boxIndex: number) => {
     setSelectedBoxIndex(boxIndex)
+    // If "Entire Fretboard" is selected (index equals availableBoxes.length), use full scale
+    if (boxIndex >= availableBoxes.length) {
+      setShowPositions(false)
+    } else {
+      setShowPositions(true)
+    }
   }
 
 
@@ -380,8 +386,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               onChange={(e) => onKeyboardSelectionModeChange && onKeyboardSelectionModeChange(e.target.value as KeyboardSelectionMode)}
               className="control-input"
             >
-              <option value="range">Range Select (2 notes)</option>
-              <option value="multi">Multi Select (inclusive)</option>
+              <option value="range">Range Select</option>
+              <option value="multi">Multi Select</option>
             </select>
           </div>
 
@@ -561,7 +567,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             </select>
           </div>
 
-          {showPositions && availableBoxes.length > 0 && (
+          {availableBoxes.length > 0 && (
             <div className="control-group">
               <label className="control-label">Position</label>
               <select
@@ -571,24 +577,16 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               >
                 {availableBoxes.map((box, index) => (
                   <option key={index} value={index}>
-                    {box.name} (Frets {box.minFret}-{box.maxFret})
+                    Frets {box.minFret}-{box.maxFret}
                   </option>
                 ))}
+                <option key="entire" value={availableBoxes.length}>
+                  Entire Fretboard
+                </option>
               </select>
             </div>
           )}
 
-          <div className="control-group">
-            <label className="control-label checkbox-label">
-              <input
-                type="checkbox"
-                checked={!showPositions}
-                onChange={(e) => setShowPositions(!e.target.checked)}
-                className="styled-checkbox"
-              />
-              Use Full Scale
-            </label>
-          </div>
 
           <div className="control-group">
             <button
