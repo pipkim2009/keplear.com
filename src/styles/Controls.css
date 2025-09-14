@@ -318,8 +318,8 @@
 
 /* Octave range control styling */
 .octave-range-control {
-  min-width: 520px !important;
-  width: 520px !important;
+  min-width: 576px !important;
+  width: 576px !important;
 }
 
 .octave-range-slider {
@@ -333,7 +333,7 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  max-width: 500px;
+  max-width: 576px;
   margin-bottom: 8px;
 }
 
@@ -350,8 +350,8 @@
 
 .dual-range-container {
   position: relative;
-  width: 500px !important;
-  max-width: 500px !important;
+  width: 576px !important;
+  max-width: 576px !important;
   height: 40px;
 }
 
@@ -435,17 +435,67 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
+/* Small octave visual indicator */
+.octave-visual {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+  margin-top: 12px;
+  font-size: 0;
+  line-height: 0;
+}
+
+.octave-mini {
+  width: 72px;
+  height: 54px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  outline: 0;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.octave-icon {
+  width: 100%;
+  height: 100%;
+  filter: brightness(1);
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: top;
+}
+
+.octave-mini.highlight .octave-icon {
+  filter: brightness(1) saturate(1);
+}
+
+.octave-mini.dim .octave-icon {
+  filter: brightness(0.4) saturate(0.5);
+}
+
 @media (max-width: 480px) {
   .octave-range-control {
     min-width: 300px;
   }
 
   .dual-range-container {
-    max-width: 300px;
+    max-width: 432px;
   }
 
-  .range-labels {
-    max-width: 300px;
+  .range-labels-center {
+    max-width: 432px;
+  }
+
+  .octave-mini {
+    width: 54px;
+    height: 40.5px;
+  }
+
+  .octave-icon {
+    width: 100%;
+    height: 100%;
   }
 }
 

@@ -410,6 +410,27 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                 title="Set highest octave"
               />
             </div>
+            <div className="octave-visual">
+              {Array.from({ length: 8 }, (_, i) => {
+                const octaveNumber = i + 1
+                const currentLowOctave = Math.max(1, 4 - lowerOctaves)
+                const currentHighOctave = Math.min(8, 5 + higherOctaves)
+                const isSelected = octaveNumber >= currentLowOctave && octaveNumber <= currentHighOctave
+
+                return (
+                  <div
+                    key={octaveNumber}
+                    className={`octave-mini ${isSelected ? 'highlight' : 'dim'}`}
+                  >
+                    <img
+                      src="https://openclipart.org/download/304838/1533631532.svg"
+                      alt={`Octave ${octaveNumber}`}
+                      className="octave-icon"
+                    />
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
       )}
