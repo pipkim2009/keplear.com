@@ -71,18 +71,11 @@
   }
 }
 
-@media (max-width: 768px) {
-  .instrument-controls.guitar-mode .control-group {
-    flex: 0 0 calc(33.333% - 10px);
-    min-width: 100px;
-  }
-}
+/* Remove guitar-mode specific control group sizing to match keyboard width */
 
-@media (max-width: 480px) {
-  .instrument-controls.guitar-mode .control-group {
-    flex: 0 0 calc(50% - 5px);
-    min-width: 90px;
-  }
+/* Bass mode specific styling - use same layout as default (keyboard) */
+.instrument-controls.bass-mode {
+  justify-content: center;
 }
 
 .control-label {

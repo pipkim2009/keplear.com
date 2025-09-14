@@ -72,7 +72,11 @@
 }
 
 .instrument-controls-container.guitar-mode {
-  width: 1150px;
+  width: 700px;
+}
+
+.instrument-controls-container.bass-mode {
+  width: 700px;
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
@@ -84,9 +88,13 @@
   }
   
   .instrument-controls-container.guitar-mode {
-    width: 1150px;
-    max-width: 95vw;
-    overflow-x: auto;
+    width: 700px;
+    max-width: 90vw;
+  }
+
+  .instrument-controls-container.bass-mode {
+    width: 700px;
+    max-width: 90vw;
   }
 }
 
@@ -99,10 +107,15 @@
   }
   
   .instrument-controls-container.guitar-mode {
-    width: 1150px;
-    max-width: 95vw;
-    padding: 20px 15px;
-    overflow-x: auto;
+    width: 700px;
+    max-width: 90vw;
+    padding: 20px 20px;
+  }
+
+  .instrument-controls-container.bass-mode {
+    width: 700px;
+    max-width: 90vw;
+    padding: 20px 20px;
   }
 }
 
