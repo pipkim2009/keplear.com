@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { ChevronRight, ChevronDown } from 'lucide-react'
 import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
 import { guitarNotes } from '../../utils/guitarNotes'
 import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/keyboardScales'
@@ -96,8 +95,8 @@ const ScaleOptions: React.FC<ScaleOptionsProps> = ({
         onClick={toggleExpanded}
         title={isExpanded ? 'Collapse Scale Options' : 'Expand Scale Options'}
       >
-        {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-        <span className="toggle-text">Scale Options</span>
+        {isExpanded ? '▼' : '▶'}
+        <span className="toggle-text">{isExpanded ? 'Scale Options' : '\u00A0\u00A0\u00A0Scale Options'}</span>
       </button>
 
       {isExpanded && (

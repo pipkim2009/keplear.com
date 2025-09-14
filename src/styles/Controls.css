@@ -88,13 +88,9 @@
 .control-label {
   font-size: 12px;
   font-weight: 600;
-  color: #f8f9fa;
+  color: #f8f9fa !important;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-
-.light .control-label {
-  color: #f8f9fa;
 }
 
 .control-label.checkbox-label {
@@ -350,6 +346,10 @@
   border-radius: 6px;
   padding: 4px 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.light .range-label-center {
+  color: #ffffff;
 }
 
 .dual-range-container {
