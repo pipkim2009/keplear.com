@@ -296,7 +296,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     }
   }, [])
   return (
-    <div className={`instrument-controls ${instrument === 'guitar' ? 'guitar-mode' : ''}`}>
+    <div className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
       <div className="control-group">
         <label className="control-label">Instrument</label>
         <select
@@ -306,6 +306,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         >
           <option value="keyboard">Keyboard</option>
           <option value="guitar">Guitar</option>
+          <option value="bass">Bass</option>
         </select>
       </div>
 

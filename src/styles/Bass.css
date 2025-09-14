@@ -1,0 +1,543 @@
+.bass-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50px;
+  min-width: 1447px;
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .bass-container {
+    min-width: 1450px;
+    margin: 0 0 0 75px;
+    padding: 50px;
+  }
+
+  .bass-fretboard {
+    width: 1450px;
+  }
+
+  .bass-string {
+    width: 1450px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bass-container {
+    min-width: 1450px;
+    margin: 0 20px 0 550px;
+    padding: 50px;
+  }
+
+  .bass-fretboard {
+    width: 1450px;
+  }
+
+  .bass-string {
+    width: 1450px;
+  }
+}
+
+.bass-fretboard {
+  position: relative;
+  width: 1447px;
+  height: 135px; /* Shorter than guitar since only 4 strings */
+  background: linear-gradient(145deg, #2a1a14, #1a1a1a);
+  border-radius: 0;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.4);
+  border: 2px solid #1f1f1f;
+}
+
+.bass-fret {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 4px; /* Slightly thicker fret wire for bass */
+  z-index: 10;
+}
+
+.bass-fret-wire {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #d5d5d5, #999);
+  border-radius: 1.5px;
+  box-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.6),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+.bass-fret-marker {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(145deg, #f0f0dc, #ccc);
+  border-radius: 50%;
+  top: 67.5px;
+  left: 50%;
+  transform: translate(-50%, -50%) translateX(-30px);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.6),
+    0 2px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid #aaa;
+}
+
+.bass-double-marker-1 {
+  transform: translate(-50%, -50%) translateX(-30px) translateY(-18px);
+}
+
+.bass-double-marker-2 {
+  transform: translate(-50%, -50%) translateX(-30px) translateY(16px);
+}
+
+.bass-string {
+  position: absolute;
+  left: 0;
+  width: 1443px;
+  background: linear-gradient(90deg, #b8b8b8, #707070, #b8b8b8);
+  border-radius: 2px;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4);
+  z-index: 15;
+}
+
+/* String 1 - G (highest, thinnest bass string) */
+.bass-string:nth-of-type(1) {
+  height: 3.5px;
+  background: linear-gradient(90deg, #c8c8c8, #808080, #c8c8c8);
+}
+
+/* String 2 - D */
+.bass-string:nth-of-type(2) {
+  height: 4.5px;
+  background: linear-gradient(90deg, #b8b8b8, #707070, #b8b8b8);
+}
+
+/* String 3 - A */
+.bass-string:nth-of-type(3) {
+  height: 5.5px;
+  background: linear-gradient(90deg, #a8a8a8, #606060, #a8a8a8);
+}
+
+/* String 4 - E (lowest, thickest bass string) */
+.bass-string:nth-of-type(4) {
+  height: 6.5px;
+  background: linear-gradient(90deg, #989898, #505050, #989898);
+}
+
+/* Bass fret checkboxes styling */
+.bass-fret-checkbox-container {
+  position: absolute;
+  bottom: -45px;
+  left: 50%;
+  transform: translateX(-38px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 20;
+}
+
+.bass-fret-checkbox {
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  background: rgba(255, 140, 0, 0.1);
+  border: 2px solid #ff8c00;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.bass-fret-checkbox:checked {
+  background: linear-gradient(145deg, #ff8c00, #cc7000);
+  border-color: #ffb347;
+}
+
+.bass-fret-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.bass-fret-checkbox:hover {
+  background: rgba(255, 140, 0, 0.2);
+  transform: scale(1.1);
+}
+
+.bass-fret-checkbox-label {
+  font-size: 10px;
+  color: #ffcc80;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* Disabled state for bass fret checkboxes */
+.bass-fret-checkbox.disabled {
+  opacity: 0.8;
+  background: rgba(255, 140, 0, 0.05);
+  border-color: rgba(255, 140, 0, 0.4);
+  cursor: not-allowed;
+}
+
+.bass-fret-checkbox.disabled:hover {
+  background: rgba(255, 140, 0, 0.05);
+  transform: none;
+  border-color: rgba(255, 140, 0, 0.4);
+}
+
+.bass-fret-checkbox-label.disabled {
+  opacity: 0.8;
+  color: rgba(255, 204, 128, 0.8);
+  cursor: not-allowed;
+}
+
+/* Bass string checkboxes styling */
+.bass-string-checkbox-container {
+  position: absolute;
+  left: -40px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 20;
+  flex-direction: row-reverse;
+}
+
+.bass-string-checkbox {
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  background: rgba(255, 140, 0, 0.1);
+  border: 2px solid #ff8c00;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.bass-string-checkbox:checked {
+  background: linear-gradient(145deg, #ff8c00, #cc7000);
+  border-color: #ffb347;
+}
+
+.bass-string-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.bass-string-checkbox:hover {
+  background: rgba(255, 140, 0, 0.2);
+  transform: scale(1.1);
+}
+
+.bass-string-checkbox-label {
+  font-size: 10px;
+  color: #ffcc80;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Clickable bass fret positions */
+.bass-fret-position {
+  position: absolute;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 30;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.bass-fret-position:hover {
+  background: rgba(255, 140, 0, 0.2);
+  transform: scaleY(1.1);
+}
+
+/* Open string area styling for bass */
+.bass-open-string-position {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.bass-open-string-position:hover {
+  background: rgba(255, 140, 0, 0.2);
+  transform: scaleY(1.1);
+}
+
+/* Bass note circle styling */
+.bass-note-circle {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  background: linear-gradient(145deg, #ff8c00, #cc7000);
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 35;
+  box-shadow:
+    0 3px 5px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.4);
+  animation: bassNoteAppear 0.3s ease-out;
+  pointer-events: none;
+}
+
+/* Green styling for bass melody notes */
+.bass-note-circle.melody-note {
+  background: linear-gradient(145deg, #4caf50, #2e7d32) !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+}
+
+.bass-note-name {
+  font-size: 9px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  user-select: none;
+}
+
+@keyframes bassNoteAppear {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Bass Scale Selector Styling */
+.bass-scale-selector {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(255, 140, 0, 0.05);
+  border: 1px solid rgba(255, 140, 0, 0.2);
+  border-radius: 8px;
+}
+
+.bass-scale-selector-header {
+  margin-bottom: 10px;
+}
+
+.bass-scale-toggle-button {
+  background: rgba(255, 140, 0, 0.1);
+  border: 1px solid #ff8c00;
+  color: #ffcc80;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.bass-scale-toggle-button:hover {
+  background: rgba(255, 140, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.bass-scale-selector-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.bass-scale-controls {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.bass-scale-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 120px;
+}
+
+.bass-scale-control-group label {
+  font-size: 12px;
+  color: #ffcc80;
+  font-weight: 600;
+}
+
+.bass-scale-control-group select {
+  background: rgba(255, 140, 0, 0.1);
+  border: 1px solid #ff8c00;
+  color: #ffcc80;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.bass-scale-control-group select:hover,
+.bass-scale-control-group select:focus {
+  background: rgba(255, 140, 0, 0.2);
+  outline: none;
+}
+
+.bass-scale-description {
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border-left: 3px solid #ff8c00;
+}
+
+.bass-scale-description p {
+  margin: 5px 0;
+  font-size: 12px;
+  color: #ffcc80;
+}
+
+.bass-scale-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.bass-apply-scale-button,
+.bass-clear-scale-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.bass-apply-scale-button {
+  background: linear-gradient(145deg, #4caf50, #2e7d32);
+  color: white;
+}
+
+.bass-apply-scale-button:hover {
+  background: linear-gradient(145deg, #66bb6a, #4caf50);
+  transform: translateY(-1px);
+}
+
+.bass-clear-scale-button {
+  background: rgba(244, 67, 54, 0.8);
+  color: white;
+}
+
+.bass-clear-scale-button:hover {
+  background: rgba(244, 67, 54, 1);
+  transform: translateY(-1px);
+}
+
+/* Bass scale note highlighting */
+.bass-note-circle.scale-note {
+  background: linear-gradient(145deg, #ff9800, #f57400) !important;
+  border-color: #ffcc02;
+}
+
+.bass-note-circle.scale-root-note {
+  background: linear-gradient(145deg, #f44336, #d32f2f) !important;
+  border-color: #ffcdd2;
+  box-shadow:
+    0 0 10px rgba(244, 67, 54, 0.7),
+    0 3px 5px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+  .bass-scale-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .bass-scale-actions {
+    flex-direction: column;
+  }
+
+  .bass-apply-scale-button,
+  .bass-clear-scale-button {
+    width: 100%;
+  }
+}
+
+/* Bass position toggle styling */
+.bass-position-toggle {
+  margin: 10px 0;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.bass-position-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #ffcc80;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bass-position-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  background: rgba(255, 140, 0, 0.1);
+  border: 2px solid #ff8c00;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.bass-position-toggle input[type="checkbox"]:checked {
+  background: linear-gradient(145deg, #ff8c00, #cc7000);
+  border-color: #ffb347;
+}
+
+.bass-position-toggle input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Bass position selector styling */
+.bass-position-selector {
+  margin: 10px 0;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  border-left: 3px solid #ff8c00;
+}
+
+.bass-position-info {
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(255, 140, 0, 0.1);
+  border-radius: 4px;
+}
+
+.bass-position-info p {
+  margin: 3px 0;
+  font-size: 11px;
+  color: #ffcc80;
+}

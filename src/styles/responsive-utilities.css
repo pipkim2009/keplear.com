@@ -1,0 +1,108 @@
+/*
+  ===========================================
+  RESPONSIVE UTILITIES
+  ===========================================
+
+  Common responsive patterns and utilities
+  to ensure consistency across components.
+*/
+
+/* Container utilities */
+.container {
+  max-width: var(--breakpoint-xl);
+  margin: 0 auto;
+  padding: 0 var(--space-lg);
+}
+
+.container-fluid {
+  width: 100%;
+  padding: 0 var(--space-lg);
+}
+
+/* Responsive spacing utilities */
+.section-padding {
+  padding: var(--space-2xl) 0;
+}
+
+@media (min-width: 48rem) {
+  .section-padding {
+    padding: var(--space-4xl) 0;
+  }
+}
+
+/* Common responsive text sizes */
+.responsive-title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+}
+
+@media (min-width: 30rem) {
+  .responsive-title {
+    font-size: var(--text-3xl);
+  }
+}
+
+@media (min-width: 48rem) {
+  .responsive-title {
+    font-size: 2rem;
+  }
+}
+
+/* Common responsive gaps */
+.responsive-gap {
+  gap: var(--gap-md);
+}
+
+@media (min-width: 30rem) {
+  .responsive-gap {
+    gap: var(--gap-lg);
+  }
+}
+
+@media (min-width: 48rem) {
+  .responsive-gap {
+    gap: var(--gap-xl);
+  }
+}
+
+/* Hide on mobile utility */
+.hide-mobile {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .hide-mobile {
+    display: initial;
+  }
+}
+
+/* Hide on desktop utility */
+.hide-desktop {
+  display: initial;
+}
+
+@media (min-width: 48rem) {
+  .hide-desktop {
+    display: none;
+  }
+}
+
+/* Common button responsive sizing */
+.responsive-button {
+  padding: var(--space-xs) var(--space-base);
+  font-size: var(--text-sm);
+}
+
+@media (min-width: 30rem) {
+  .responsive-button {
+    padding: var(--space-sm) var(--space-lg);
+    font-size: var(--text-lg);
+  }
+}
+
+@media (min-width: 48rem) {
+  .responsive-button {
+    padding: var(--space-base) var(--space-xl);
+    font-size: var(--text-xl);
+  }
+}

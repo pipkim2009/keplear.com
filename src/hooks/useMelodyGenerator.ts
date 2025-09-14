@@ -4,7 +4,7 @@ import type { Note } from '../utils/notes'
 /**
  * Supported instrument types for melody generation
  */
-type InstrumentType = 'keyboard' | 'guitar'
+type InstrumentType = 'keyboard' | 'guitar' | 'bass'
 
 /**
  * Return type for the melody generator hook

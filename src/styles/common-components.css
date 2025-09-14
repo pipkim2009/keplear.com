@@ -1,0 +1,198 @@
+/*
+  ===========================================
+  COMMON COMPONENTS
+  ===========================================
+
+  Shared component styles to reduce duplication
+  and ensure consistency across the application.
+*/
+
+/* Common button styles */
+.btn-base {
+  padding: var(--space-sm) var(--space-lg);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-normal);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-lg);
+}
+
+.btn-primary {
+  background: var(--primary-purple);
+  color: white;
+  border: 2px solid var(--primary-purple);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:hover {
+  background: var(--primary-purple-dark);
+  border-color: var(--primary-purple-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+  background: rgba(128, 0, 255, 0.1);
+  color: var(--primary-purple);
+  border: 2px solid var(--primary-purple);
+}
+
+.dark .btn-secondary {
+  background: rgba(168, 85, 247, 0.1);
+  color: var(--primary-purple-light);
+  border-color: var(--primary-purple-light);
+}
+
+.btn-secondary:hover {
+  background: var(--primary-purple);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.dark .btn-secondary:hover {
+  background: var(--primary-purple-light);
+}
+
+/* Common form input styles */
+.form-input-base {
+  width: 100%;
+  padding: var(--space-lg) var(--space-xl);
+  border: 2px solid rgba(210, 210, 249, 0.4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  transition: var(--transition-normal);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  box-sizing: border-box;
+  color: var(--text-primary-light);
+}
+
+.dark .form-input-base {
+  background: rgba(60, 60, 60, 0.8);
+  border-color: rgba(80, 80, 80, 0.4);
+  color: var(--text-primary-dark);
+}
+
+.form-input-base:focus {
+  outline: none;
+  border-color: var(--blue-primary);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  transform: translateY(-2px);
+}
+
+.dark .form-input-base:focus {
+  border-color: var(--blue-primary);
+  background: rgba(70, 70, 70, 0.9);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+}
+
+/* Common card styles */
+.card-base {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(210, 210, 249, 0.4);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition-normal);
+}
+
+.dark .card-base {
+  background: rgba(60, 60, 60, 0.8);
+  border-color: rgba(80, 80, 80, 0.4);
+  box-shadow: var(--shadow-xl);
+}
+
+.card-base:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-xl);
+}
+
+.dark .card-base:hover {
+  box-shadow: var(--shadow-2xl);
+}
+
+/* Common checkbox styles */
+.checkbox-base {
+  width: 1rem;
+  height: 1rem;
+  appearance: none;
+  background: rgba(128, 0, 255, 0.1);
+  border: 2px solid var(--primary-purple);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-slow);
+  position: relative;
+}
+
+.checkbox-base:checked {
+  background: linear-gradient(145deg, var(--primary-purple), var(--primary-purple-dark));
+  border-color: var(--primary-purple-light);
+}
+
+.checkbox-base:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  color: white;
+  font-size: var(--text-base);
+  font-weight: bold;
+}
+
+.checkbox-base:hover {
+  background: rgba(128, 0, 255, 0.2);
+  transform: scale(1.1);
+}
+
+/* Common gradient backgrounds */
+.gradient-bg-light {
+  background: linear-gradient(135deg,
+    #e8e4ff 0%,
+    #d2d2f9 25%,
+    #f0f0ff 50%,
+    #e1d8ff 75%,
+    #d2d2f9 100%);
+}
+
+.gradient-bg-dark {
+  background: linear-gradient(135deg,
+    #0a0a0a 0%,
+    #121212 25%,
+    #1a0d2e 50%,
+    #2d1b69 75%,
+    #121212 100%);
+}
+
+/* Common text styles */
+.text-primary {
+  color: var(--text-primary-light);
+}
+
+.dark .text-primary {
+  color: var(--text-primary-dark);
+}
+
+.text-secondary {
+  color: var(--text-secondary-light);
+}
+
+.dark .text-secondary {
+  color: var(--text-secondary-dark);
+}
+
+.text-accent {
+  color: var(--primary-purple);
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}

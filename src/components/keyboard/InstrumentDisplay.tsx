@@ -1,10 +1,12 @@
 import Keyboard from './Keyboard'
 import Guitar from '../guitar/Guitar'
+import Bass from '../bass/Bass'
 import InstrumentControls from './InstrumentControls'
 import ScaleOptions from '../common/ScaleOptions'
 import { useRef, useState, useEffect } from 'react'
 import type { Note } from '../../utils/notes'
 import type { GuitarScale, ScaleBox } from '../../utils/guitarScales'
+import type { BassScale, BassScaleBox } from '../../utils/bassScales'
 import type { KeyboardSelectionMode } from './InstrumentControls'
 import { applyScaleToKeyboard, isKeyboardNoteInScale, isKeyboardNoteRoot, type KeyboardScale } from '../../utils/keyboardScales'
 import { generateNotesWithSeparateOctaves } from '../../utils/notes'
@@ -21,6 +23,7 @@ interface InstrumentDisplayProps {
   instrument: string
   setInstrument: (instrument: string) => void
   setGuitarNotes: (notes: Note[]) => void
+  setBassNotes?: (notes: Note[]) => void
   clearSelection: () => void
   clearTrigger: number
   selectedNotes: Note[]
@@ -41,6 +44,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   instrument,
   setInstrument,
   setGuitarNotes,
+  setBassNotes,
   clearSelection,
   clearTrigger,
   selectedNotes,
@@ -49,6 +53,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   onKeyboardSelectionModeChange
 }) => {
   const guitarRef = useRef<any>(null)
+  const bassRef = useRef<any>(null)
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
   const [higherOctaves, setHigherOctaves] = useState<number>(0)
   const [currentKeyboardScale, setCurrentKeyboardScale] = useState<{ root: string; scale: KeyboardScale } | null>(null)
@@ -58,22 +63,33 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
     handleClearScale: () => void;
   } | null>(null)
+  const [bassScaleHandlers, setBassScaleHandlers] = useState<{
+    handleScaleSelect: (rootNote: string, scale: BassScale) => void;
+    handleScaleBoxSelect: (scaleBox: BassScaleBox) => void;
+    handleClearScale: () => void;
+  } | null>(null)
 
   const handleScaleSelect = (rootNote: string, scale: GuitarScale) => {
-    if (scaleHandlers) {
+    if (instrument === 'guitar' && scaleHandlers) {
       scaleHandlers.handleScaleSelect(rootNote, scale)
+    } else if (instrument === 'bass' && bassScaleHandlers) {
+      bassScaleHandlers.handleScaleSelect(rootNote, scale as any)
     }
   }
 
   const handleScaleBoxSelect = (scaleBox: ScaleBox) => {
-    if (scaleHandlers) {
+    if (instrument === 'guitar' && scaleHandlers) {
       scaleHandlers.handleScaleBoxSelect(scaleBox)
+    } else if (instrument === 'bass' && bassScaleHandlers) {
+      bassScaleHandlers.handleScaleBoxSelect(scaleBox as any)
     }
   }
 
   const handleClearScale = () => {
-    if (scaleHandlers) {
+    if (instrument === 'guitar' && scaleHandlers) {
       scaleHandlers.handleClearScale()
+    } else if (instrument === 'bass' && bassScaleHandlers) {
+      bassScaleHandlers.handleClearScale()
     }
   }
 
@@ -144,7 +160,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   return (
     <>
       <div className="instrument-display-layout">
-        <div className={`instrument-controls-container ${instrument === 'guitar' ? 'guitar-mode' : ''}`}>
+        <div className={`instrument-controls-container ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
           <InstrumentControls
             bpm={bpm}
             setBpm={setBpm}
@@ -193,15 +209,23 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             isNoteInScale={isNoteInKeyboardScale}
             isNoteRoot={isNoteKeyboardRoot}
           />
-        ) : (
+        ) : instrument === 'guitar' ? (
           <Guitar
-            ref={guitarRef}
             setGuitarNotes={setGuitarNotes}
             isInMelody={isInMelody}
             showNotes={showNotes}
             onNoteClick={onNoteClick}
             clearTrigger={clearTrigger}
             onScaleHandlersReady={setScaleHandlers}
+          />
+        ) : (
+          <Bass
+            setBassNotes={setBassNotes || setGuitarNotes}
+            isInMelody={isInMelody}
+            showNotes={showNotes}
+            onNoteClick={onNoteClick}
+            clearTrigger={clearTrigger}
+            onScaleHandlersReady={setBassScaleHandlers}
           />
         )}
       </div>

@@ -21,7 +21,7 @@ type PageType = 'home' | 'sandbox' | 'practice'
 /**
  * Supported instrument types
  */
-type InstrumentType = 'keyboard' | 'guitar'
+type InstrumentType = 'keyboard' | 'guitar' | 'bass'
 
 /**
  * Default application settings
@@ -70,7 +70,7 @@ function App() {
    */
   const handleNoteClick = useCallback(async (note: Note): Promise<void> => {
     try {
-      if (instrument === 'guitar') {
+      if (instrument === 'guitar' || instrument === 'bass') {
         await playGuitarNote(note.name)
       } else {
         await playNote(note.name)
@@ -105,7 +105,7 @@ function App() {
         return
       }
       
-      if (instrument === 'guitar') {
+      if (instrument === 'guitar' || instrument === 'bass') {
         playGuitarMelody([...generatedMelody], bpm)
       } else {
         playMelody([...generatedMelody], bpm)
