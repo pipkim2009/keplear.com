@@ -11,6 +11,7 @@ interface MelodyControlsProps {
   instrument?: string
   showNotes: boolean
   onToggleNotes: () => void
+  keyboardSelectionMode?: 'range' | 'multi'
 }
 
 const MelodyControls: React.FC<MelodyControlsProps> = ({
@@ -21,13 +22,16 @@ const MelodyControls: React.FC<MelodyControlsProps> = ({
   generatedMelody,
   instrument = 'keyboard',
   showNotes,
-  onToggleNotes
+  onToggleNotes,
+  keyboardSelectionMode = 'range'
 }) => {
   
-  // Different enable conditions based on instrument
-  const canGenerate = instrument === 'keyboard' 
-    ? selectedNotes.length === 2  // Keyboard needs exactly 2 notes
-    : selectedNotes.length > 0    // Guitar needs at least 1 note
+  // Different enable conditions based on instrument and selection mode
+  const canGenerate = instrument === 'keyboard'
+    ? (keyboardSelectionMode === 'range'
+        ? selectedNotes.length === 2  // Range mode needs exactly 2 notes
+        : selectedNotes.length > 0)   // Multi mode needs at least 1 note
+    : selectedNotes.length > 0        // Guitar needs at least 1 note
   return (
     <div className="melody-controls">
       <div className="notes-toggle-container">

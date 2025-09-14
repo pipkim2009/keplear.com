@@ -4,6 +4,7 @@ import InstrumentControls from './InstrumentControls'
 import { useRef, useState, useEffect } from 'react'
 import type { Note } from '../../utils/notes'
 import type { GuitarScale, ScaleBox } from '../../utils/guitarScales'
+import type { KeyboardSelectionMode } from './InstrumentControls'
 
 interface InstrumentDisplayProps {
   onNoteClick: (note: Note) => void
@@ -21,6 +22,8 @@ interface InstrumentDisplayProps {
   clearTrigger: number
   selectedNotes: Note[]
   onOctaveRangeChange?: (lowerOctaves: number, higherOctaves: number) => void
+  keyboardSelectionMode?: KeyboardSelectionMode
+  onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -38,7 +41,9 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   clearSelection,
   clearTrigger,
   selectedNotes,
-  onOctaveRangeChange
+  onOctaveRangeChange,
+  keyboardSelectionMode = 'range',
+  onKeyboardSelectionModeChange
 }) => {
   const guitarRef = useRef<any>(null)
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
@@ -95,6 +100,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           onRemoveLowerOctave={() => setLowerOctaves(Math.max(lowerOctaves - 1, -4))}
           onAddHigherOctave={() => setHigherOctaves(Math.min(higherOctaves + 1, 7))}
           onRemoveHigherOctave={() => setHigherOctaves(Math.max(higherOctaves - 1, -4))}
+          keyboardSelectionMode={keyboardSelectionMode}
+          onKeyboardSelectionModeChange={onKeyboardSelectionModeChange}
         />
       </div>
       
@@ -107,6 +114,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             showNotes={showNotes}
             lowerOctaves={lowerOctaves}
             higherOctaves={higherOctaves}
+            selectionMode={keyboardSelectionMode}
           />
         ) : (
           <Guitar 

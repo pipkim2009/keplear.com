@@ -3,6 +3,8 @@ import '../../styles/Controls.css'
 import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
 import { guitarNotes } from '../../utils/guitarNotes'
 
+export type KeyboardSelectionMode = 'range' | 'multi'
+
 interface InstrumentControlsProps {
   bpm: number
   setBpm: (bpm: number) => void
@@ -21,6 +23,8 @@ interface InstrumentControlsProps {
   onRemoveLowerOctave?: () => void
   onAddHigherOctave?: () => void
   onRemoveHigherOctave?: () => void
+  keyboardSelectionMode?: KeyboardSelectionMode
+  onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -40,7 +44,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   onAddLowerOctave,
   onRemoveLowerOctave,
   onAddHigherOctave,
-  onRemoveHigherOctave
+  onRemoveHigherOctave,
+  keyboardSelectionMode = 'range',
+  onKeyboardSelectionModeChange
 }) => {
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
@@ -335,9 +341,22 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
       </div>
 
       {instrument === 'keyboard' && (
-        <div className="control-group octave-range-control">
-          <label className="control-label">Octave Range</label>
-          <div className="octave-range-slider">
+        <>
+          <div className="control-group">
+            <label className="control-label">Selection Mode</label>
+            <select
+              value={keyboardSelectionMode}
+              onChange={(e) => onKeyboardSelectionModeChange && onKeyboardSelectionModeChange(e.target.value as KeyboardSelectionMode)}
+              className="control-input"
+            >
+              <option value="range">Range Select (2 notes)</option>
+              <option value="multi">Multi Select (inclusive)</option>
+            </select>
+          </div>
+
+          <div className="control-group octave-range-control">
+            <label className="control-label">Octave Range</label>
+            <div className="octave-range-slider">
             <div className="range-labels-center">
               <span className="range-label-center">
                 {Math.max(1, 4 - lowerOctaves)} - {Math.min(8, 5 + higherOctaves)}
@@ -431,8 +450,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                 )
               })}
             </div>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {instrument === 'guitar' && (

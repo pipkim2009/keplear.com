@@ -1,5 +1,6 @@
 import KeyboardKey from './KeyboardKey'
 import { whiteKeys, blackKeys, getBlackKeyLeft, getBlackKeyLeftDynamic, generateWhiteKeysWithSeparateOctaves, generateBlackKeysWithSeparateOctaves, type Note } from '../../utils/notes'
+import type { KeyboardSelectionMode } from './InstrumentControls'
 import '../../styles/Keyboard.css'
 
 interface KeyboardProps {
@@ -9,6 +10,7 @@ interface KeyboardProps {
   showNotes: boolean
   lowerOctaves?: number
   higherOctaves?: number
+  selectionMode?: KeyboardSelectionMode
 }
 
 const Keyboard: React.FC<KeyboardProps> = ({
@@ -17,7 +19,8 @@ const Keyboard: React.FC<KeyboardProps> = ({
   isInMelody,
   showNotes,
   lowerOctaves = 0,
-  higherOctaves = 0
+  higherOctaves = 0,
+  selectionMode = 'range'
 }) => {
   const hasExtendedRange = lowerOctaves !== 0 || higherOctaves !== 0
   const currentWhiteKeys = hasExtendedRange ? generateWhiteKeysWithSeparateOctaves(lowerOctaves, higherOctaves) : whiteKeys

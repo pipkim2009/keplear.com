@@ -13,8 +13,8 @@ interface UseMelodyGeneratorReturn {
   readonly selectedNotes: readonly Note[]
   readonly generatedMelody: readonly Note[]
   readonly clearTrigger: number
-  selectNote: (note: Note) => void
-  generateMelody: (notes: readonly Note[], numberOfNotes: number, instrument?: InstrumentType) => void
+  selectNote: (note: Note, selectionMode?: 'range' | 'multi') => void
+  generateMelody: (notes: readonly Note[], numberOfNotes: number, instrument?: InstrumentType, selectionMode?: 'range' | 'multi') => void
   setGuitarNotes: (notes: Note[]) => void
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
@@ -31,11 +31,27 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
   const [clearTrigger, setClearTrigger] = useState<number>(0)
 
   /**
-   * Selects a note for keyboard instrument (max 2 notes for range selection)
+   * Selects a note for keyboard instrument
    * @param note - The note to select
+   * @param selectionMode - The keyboard selection mode
    */
-  const selectNote = useCallback((note: Note): void => {
-    setSelectedNotes(prev => prev.length < 2 ? [...prev, note] : [note])
+  const selectNote = useCallback((note: Note, selectionMode: 'range' | 'multi' = 'range'): void => {
+    if (selectionMode === 'range') {
+      // Range mode: max 2 notes for range selection
+      setSelectedNotes(prev => prev.length < 2 ? [...prev, note] : [note])
+    } else {
+      // Multi mode: toggle individual note selection
+      setSelectedNotes(prev => {
+        const isAlreadySelected = prev.some(n => n.name === note.name)
+        if (isAlreadySelected) {
+          // Remove the note if already selected
+          return prev.filter(n => n.name !== note.name)
+        } else {
+          // Add the note
+          return [...prev, note]
+        }
+      })
+    }
     setGeneratedMelody([])
   }, [])
 
@@ -44,11 +60,13 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
    * @param notes - All available notes
    * @param numberOfNotes - Number of notes to generate in the melody
    * @param instrument - The instrument type ('keyboard' or 'guitar')
+   * @param selectionMode - The keyboard selection mode
    */
   const generateMelody = useCallback((
-    notes: readonly Note[], 
-    numberOfNotes: number, 
-    instrument: InstrumentType = 'keyboard'
+    notes: readonly Note[],
+    numberOfNotes: number,
+    instrument: InstrumentType = 'keyboard',
+    selectionMode: 'range' | 'multi' = 'range'
   ): void => {
     if (numberOfNotes <= 0) {
       console.warn('Number of notes must be positive')
@@ -56,38 +74,52 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     }
 
     if (instrument === 'keyboard') {
-      // Keyboard logic: requires exactly 2 notes for range selection
-      if (selectedNotes.length !== 2) {
-        console.warn('Keyboard requires exactly 2 notes selected for range')
-        return
+      if (selectionMode === 'range') {
+        // Range mode: requires exactly 2 notes for range selection
+        if (selectedNotes.length !== 2) {
+          console.warn('Range mode requires exactly 2 notes selected')
+          return
+        }
+
+        const [note1, note2] = [...selectedNotes].sort((a, b) => a.position - b.position)
+
+        // If the same note is selected twice, create melody with just that note
+        if (note1.name === note2.name) {
+          setGeneratedMelody(Array(numberOfNotes).fill(note1))
+          return
+        }
+
+        // Create melody from notes within the selected range
+        const startPos = note1.position
+        const endPos = note2.position
+
+        const notesInRange = notes.filter(note =>
+          note.position >= startPos && note.position <= endPos
+        )
+
+        if (notesInRange.length === 0) {
+          console.warn('No notes found in selected range')
+          return
+        }
+
+        const melody = Array(numberOfNotes).fill(null).map(() =>
+          notesInRange[Math.floor(Math.random() * notesInRange.length)]
+        )
+
+        setGeneratedMelody(melody)
+      } else {
+        // Multi mode: use selected notes directly (like guitar)
+        if (selectedNotes.length === 0) {
+          console.warn('Multi-select mode requires at least one note selected')
+          return
+        }
+
+        const melody = Array(numberOfNotes).fill(null).map(() =>
+          selectedNotes[Math.floor(Math.random() * selectedNotes.length)]
+        )
+
+        setGeneratedMelody(melody)
       }
-
-      const [note1, note2] = [...selectedNotes].sort((a, b) => a.position - b.position)
-      
-      // If the same note is selected twice, create melody with just that note
-      if (note1.name === note2.name) {
-        setGeneratedMelody(Array(numberOfNotes).fill(note1))
-        return
-      }
-      
-      // Create melody from notes within the selected range
-      const startPos = note1.position
-      const endPos = note2.position
-      
-      const notesInRange = notes.filter(note => 
-        note.position >= startPos && note.position <= endPos
-      )
-
-      if (notesInRange.length === 0) {
-        console.warn('No notes found in selected range')
-        return
-      }
-
-      const melody = Array(numberOfNotes).fill(null).map(() => 
-        notesInRange[Math.floor(Math.random() * notesInRange.length)]
-      )
-
-      setGeneratedMelody(melody)
     } else if (instrument === 'guitar') {
       // Guitar logic: use all selected notes directly
       if (selectedNotes.length === 0) {
@@ -95,7 +127,7 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
         return
       }
 
-      const melody = Array(numberOfNotes).fill(null).map(() => 
+      const melody = Array(numberOfNotes).fill(null).map(() =>
         selectedNotes[Math.floor(Math.random() * selectedNotes.length)]
       )
 

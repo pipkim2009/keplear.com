@@ -43,6 +43,7 @@ function App() {
   const [showNotes, setShowNotes] = useState<boolean>(false)
   const [instrument, setInstrument] = useState<InstrumentType>(DEFAULT_SETTINGS.instrument)
   const [keyboardOctaves, setKeyboardOctaves] = useState<{ lower: number; higher: number }>({ lower: 0, higher: 0 })
+  const [keyboardSelectionMode, setKeyboardSelectionMode] = useState<'range' | 'multi'>('range')
   
   const { isDarkMode, toggleTheme } = useTheme()
   const { playNote, playGuitarNote, playMelody, playGuitarMelody, stopMelody, isPlaying } = useAudio()
@@ -74,11 +75,11 @@ function App() {
       } else {
         await playNote(note.name)
       }
-      selectNote(note)
+      selectNote(note, keyboardSelectionMode)
     } catch (error) {
       console.warn('Failed to play note:', error)
     }
-  }, [instrument, playGuitarNote, playNote, selectNote])
+  }, [instrument, playGuitarNote, playNote, selectNote, keyboardSelectionMode])
 
   /**
    * Generates a new melody based on current settings
@@ -89,8 +90,8 @@ function App() {
       ? generateNotesWithSeparateOctaves(keyboardOctaves.lower, keyboardOctaves.higher)
       : notes
 
-    generateMelody(melodyNotes, numberOfNotes, instrument)
-  }, [generateMelody, numberOfNotes, instrument, keyboardOctaves])
+    generateMelody(melodyNotes, numberOfNotes, instrument, keyboardSelectionMode)
+  }, [generateMelody, numberOfNotes, instrument, keyboardOctaves, keyboardSelectionMode])
 
   /**
    * Plays or stops the current melody
@@ -126,6 +127,15 @@ function App() {
   const handleOctaveRangeChange = useCallback((lowerOctaves: number, higherOctaves: number): void => {
     setKeyboardOctaves({ lower: lowerOctaves, higher: higherOctaves })
   }, [])
+
+  /**
+   * Handles keyboard selection mode changes
+   */
+  const handleKeyboardSelectionModeChange = useCallback((mode: 'range' | 'multi'): void => {
+    setKeyboardSelectionMode(mode)
+    // Clear current selections when switching modes
+    clearSelection()
+  }, [clearSelection])
 
   // Navigation handlers - memoized to prevent unnecessary re-renders
   const { navigateToHome, navigateToSandbox, navigateToPractice } = useMemo(() => ({
@@ -172,6 +182,8 @@ function App() {
               clearTrigger={clearTrigger}
               selectedNotes={[...selectedNotes]}
               onOctaveRangeChange={handleOctaveRangeChange}
+              keyboardSelectionMode={keyboardSelectionMode}
+              onKeyboardSelectionModeChange={handleKeyboardSelectionModeChange}
             />
 
             <MelodyControls
@@ -183,6 +195,7 @@ function App() {
               instrument={instrument}
               showNotes={showNotes}
               onToggleNotes={() => setShowNotes(!showNotes)}
+              keyboardSelectionMode={keyboardSelectionMode}
             />
 
             <MelodyDisplay
