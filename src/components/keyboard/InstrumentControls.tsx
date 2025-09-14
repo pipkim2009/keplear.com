@@ -15,6 +15,12 @@ interface InstrumentControlsProps {
   onScaleSelect?: (rootNote: string, scale: GuitarScale) => void
   onScaleBoxSelect?: (scaleBox: ScaleBox) => void
   onClearScale?: () => void
+  lowerOctaves?: number
+  higherOctaves?: number
+  onAddLowerOctave?: () => void
+  onRemoveLowerOctave?: () => void
+  onAddHigherOctave?: () => void
+  onRemoveHigherOctave?: () => void
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -28,7 +34,13 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   hasSelectedNotes,
   onScaleSelect,
   onScaleBoxSelect,
-  onClearScale
+  onClearScale,
+  lowerOctaves = 0,
+  higherOctaves = 0,
+  onAddLowerOctave,
+  onRemoveLowerOctave,
+  onAddHigherOctave,
+  onRemoveHigherOctave
 }) => {
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
@@ -321,6 +333,66 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </button>
         </div>
       </div>
+
+      {instrument === 'keyboard' && (
+        <div className="control-group octave-range-control">
+          <label className="control-label">Octave Range</label>
+          <div className="octave-range-slider">
+            <div className="range-labels">
+              <span className="range-label">Low: {4 - lowerOctaves}</span>
+              <span className="range-label">High: {5 + higherOctaves}</span>
+            </div>
+            <div className="dual-range-container">
+              <input
+                type="range"
+                min="1"
+                max="4"
+                value={4 - lowerOctaves}
+                onChange={(e) => {
+                  const newLowOctave = parseInt(e.target.value)
+                  const targetLowerOctaves = 4 - newLowOctave
+                  if (onAddLowerOctave && onRemoveLowerOctave) {
+                    if (targetLowerOctaves > lowerOctaves) {
+                      for (let i = 0; i < targetLowerOctaves - lowerOctaves; i++) {
+                        onAddLowerOctave()
+                      }
+                    } else if (targetLowerOctaves < lowerOctaves) {
+                      for (let i = 0; i < lowerOctaves - targetLowerOctaves; i++) {
+                        onRemoveLowerOctave()
+                      }
+                    }
+                  }
+                }}
+                className="range-slider range-low"
+                title="Set lowest octave"
+              />
+              <input
+                type="range"
+                min="5"
+                max="8"
+                value={5 + higherOctaves}
+                onChange={(e) => {
+                  const newHighOctave = parseInt(e.target.value)
+                  const targetHigherOctaves = newHighOctave - 5
+                  if (onAddHigherOctave && onRemoveHigherOctave) {
+                    if (targetHigherOctaves > higherOctaves) {
+                      for (let i = 0; i < targetHigherOctaves - higherOctaves; i++) {
+                        onAddHigherOctave()
+                      }
+                    } else if (targetHigherOctaves < higherOctaves) {
+                      for (let i = 0; i < higherOctaves - targetHigherOctaves; i++) {
+                        onRemoveHigherOctave()
+                      }
+                    }
+                  }
+                }}
+                className="range-slider range-high"
+                title="Set highest octave"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {instrument === 'guitar' && (
         <>

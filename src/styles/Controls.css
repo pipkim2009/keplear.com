@@ -316,12 +316,105 @@
   }
 }
 
-/* Octave display specific styling */
-.control-input.octave-display {
-  cursor: default;
-  pointer-events: none;
-  user-select: none;
-  font-weight: 700;
+/* Octave range control styling */
+.octave-range-control {
+  min-width: 520px !important;
+  width: 520px !important;
+}
+
+.octave-range-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 500px;
+}
+
+.range-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #d2d2f9;
+  background: rgba(128, 0, 255, 0.1);
+  border: 1px solid #8000ff;
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.dual-range-container {
+  position: relative;
+  width: 500px !important;
+  max-width: 500px !important;
+  height: 40px;
+}
+
+.range-slider {
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(128, 0, 255, 0.2);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.range-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #8000ff, #6b00cc);
+  border: 2px solid #c77dff;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.range-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #8000ff, #6b00cc);
+  border: 2px solid #c77dff;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.range-slider.range-low {
+  z-index: 1;
+}
+
+.range-slider.range-high {
+  z-index: 2;
+}
+
+.range-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.range-slider:hover::-moz-range-thumb {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 480px) {
+  .octave-range-control {
+    min-width: 300px;
+  }
+
+  .dual-range-container {
+    max-width: 300px;
+  }
+
+  .range-labels {
+    max-width: 300px;
+  }
 }
 
 

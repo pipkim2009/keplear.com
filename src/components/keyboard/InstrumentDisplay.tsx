@@ -80,6 +80,12 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           onScaleSelect={handleScaleSelect}
           onScaleBoxSelect={handleScaleBoxSelect}
           onClearScale={handleClearScale}
+          lowerOctaves={lowerOctaves}
+          higherOctaves={higherOctaves}
+          onAddLowerOctave={() => setLowerOctaves(Math.min(lowerOctaves + 1, 3))}
+          onRemoveLowerOctave={() => setLowerOctaves(Math.max(lowerOctaves - 1, 0))}
+          onAddHigherOctave={() => setHigherOctaves(Math.min(higherOctaves + 1, 3))}
+          onRemoveHigherOctave={() => setHigherOctaves(Math.max(higherOctaves - 1, -1))}
         />
       </div>
       
@@ -92,10 +98,6 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             showNotes={showNotes}
             lowerOctaves={lowerOctaves}
             higherOctaves={higherOctaves}
-            onAddLowerOctave={() => setLowerOctaves(Math.min(lowerOctaves + 1, 3))}
-            onRemoveLowerOctave={() => setLowerOctaves(Math.max(lowerOctaves - 1, 0))}
-            onAddHigherOctave={() => setHigherOctaves(Math.min(higherOctaves + 1, 3))}
-            onRemoveHigherOctave={() => setHigherOctaves(Math.max(higherOctaves - 1, 0))}
           />
         ) : (
           <Guitar 
