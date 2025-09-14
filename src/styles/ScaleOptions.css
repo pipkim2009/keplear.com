@@ -1,0 +1,343 @@
+/* Scale Options expandable column */
+.instrument-display-layout {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+  min-height: 40px;
+  z-index: 20;
+  position: relative;
+}
+
+.scale-options-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  min-height: 40px;
+  transition: all 0.3s ease;
+  background: transparent;
+  z-index: 100;
+}
+
+.scale-options-container.collapsed {
+  width: 40px;
+}
+
+.scale-options-container.expanded {
+  width: 320px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .scale-options-container.expanded {
+  background: rgba(30, 30, 30, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.scale-options-toggle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(128, 0, 255, 0.9);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.scale-options-toggle:hover {
+  background: rgba(128, 0, 255, 1);
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.scale-options-container.expanded .scale-options-toggle {
+  position: relative;
+  width: 100%;
+  justify-content: flex-start;
+  padding-left: 12px;
+  gap: 8px;
+  border-radius: 12px 12px 0 0;
+  background: rgba(128, 0, 255, 0.9);
+}
+
+.scale-options-container.collapsed .toggle-text {
+  display: none;
+}
+
+.scale-options-container.expanded .toggle-text {
+  display: inline;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+
+.scale-options-content {
+  margin-top: 0;
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.scale-options-header {
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 12px;
+}
+
+.dark .scale-options-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scale-options-header h3 {
+  margin: 0 0 4px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #121212;
+}
+
+.dark .scale-options-header h3 {
+  color: #d2d2f9;
+}
+
+.scale-options-header p {
+  margin: 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.dark .scale-options-header p {
+  color: #999;
+}
+
+.scale-controls {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(128, 0, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(128, 0, 255, 0.2);
+}
+
+.dark .scale-controls {
+  background: rgba(128, 0, 255, 0.1);
+  border-color: rgba(128, 0, 255, 0.3);
+}
+
+.control-section {
+  margin-bottom: 12px;
+}
+
+.control-section:last-child {
+  margin-bottom: 0;
+}
+
+.control-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #121212;
+  margin-bottom: 6px;
+}
+
+.dark .control-label {
+  color: #d2d2f9;
+}
+
+.control-select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  background: #ffffff;
+  color: #121212;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dark .control-select {
+  background: rgba(30, 30, 30, 0.9);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #d2d2f9;
+}
+
+.control-select:hover {
+  border-color: rgba(128, 0, 255, 0.5);
+}
+
+.control-select:focus {
+  outline: none;
+  border-color: rgba(128, 0, 255, 0.8);
+  box-shadow: 0 0 0 2px rgba(128, 0, 255, 0.2);
+}
+
+.apply-button {
+  width: 100%;
+  padding: 10px 16px;
+  background: rgba(128, 0, 255, 0.9);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.apply-button:hover {
+  background: rgba(128, 0, 255, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(128, 0, 255, 0.3);
+}
+
+.apply-button:active {
+  transform: translateY(0);
+}
+
+.scale-reference {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 16px;
+}
+
+.dark .scale-reference {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.scale-reference h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #121212;
+}
+
+.dark .scale-reference h4 {
+  color: #d2d2f9;
+}
+
+.scale-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.scale-item {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.dark .scale-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.scale-item:hover {
+  background: rgba(128, 0, 255, 0.1);
+  border-color: rgba(128, 0, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.dark .scale-item:hover {
+  background: rgba(128, 0, 255, 0.15);
+  border-color: rgba(128, 0, 255, 0.4);
+}
+
+.scale-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #121212;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.dark .scale-name {
+  color: #d2d2f9;
+}
+
+.scale-description {
+  font-size: 11px;
+  color: #666;
+  font-style: italic;
+}
+
+.dark .scale-description {
+  color: #999;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .instrument-display-layout {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .scale-options-container.expanded {
+    width: 280px;
+  }
+
+  .scale-options-content {
+    max-height: 300px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .instrument-display-layout {
+    gap: 8px;
+  }
+
+  .scale-options-container.expanded {
+    width: 260px;
+  }
+
+  .scale-options-content {
+    max-height: 250px;
+    padding: 12px;
+  }
+
+  .scale-options-toggle {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Scrollbar styling for scale list */
+.scale-options-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scale-options-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.dark .scale-options-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.scale-options-content::-webkit-scrollbar-thumb {
+  background: rgba(128, 0, 255, 0.3);
+  border-radius: 3px;
+}
+
+.scale-options-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 0, 255, 0.5);
+}

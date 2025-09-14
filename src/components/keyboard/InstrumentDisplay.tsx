@@ -1,6 +1,7 @@
 import Keyboard from './Keyboard'
 import Guitar from '../guitar/Guitar'
 import InstrumentControls from './InstrumentControls'
+import ScaleOptions from '../common/ScaleOptions'
 import { useRef, useState, useEffect } from 'react'
 import type { Note } from '../../utils/notes'
 import type { GuitarScale, ScaleBox } from '../../utils/guitarScales'
@@ -51,6 +52,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
   const [higherOctaves, setHigherOctaves] = useState<number>(0)
   const [currentKeyboardScale, setCurrentKeyboardScale] = useState<{ root: string; scale: KeyboardScale } | null>(null)
+  const [selectedRoot, setSelectedRoot] = useState<string>('C')
   const [scaleHandlers, setScaleHandlers] = useState<{
     handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
     handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
@@ -99,6 +101,12 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     setCurrentKeyboardScale(null)
   }
 
+  const handleRootChange = (rootNote: string) => {
+    setSelectedRoot(rootNote)
+    // Update scale handlers if they exist (for guitar)
+    // The selected root will be used when applying scales
+  }
+
   // Helper functions for keyboard scale highlighting
   const isNoteInKeyboardScale = (note: Note): boolean => {
     if (!currentKeyboardScale) return false
@@ -135,32 +143,43 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
 
   return (
     <>
-      <div className={`instrument-controls-container ${instrument === 'guitar' ? 'guitar-mode' : ''}`}>
-        <InstrumentControls
-          bpm={bpm}
-          setBpm={setBpm}
-          numberOfNotes={numberOfNotes}
-          setNumberOfNotes={setNumberOfNotes}
+      <div className="instrument-display-layout">
+        <div className={`instrument-controls-container ${instrument === 'guitar' ? 'guitar-mode' : ''}`}>
+          <InstrumentControls
+            bpm={bpm}
+            setBpm={setBpm}
+            numberOfNotes={numberOfNotes}
+            setNumberOfNotes={setNumberOfNotes}
+            instrument={instrument}
+            setInstrument={setInstrument}
+            clearSelection={clearSelection}
+            hasSelectedNotes={selectedNotes.length > 0}
+            onScaleSelect={handleScaleSelect}
+            onScaleBoxSelect={handleScaleBoxSelect}
+            onClearScale={handleClearScale}
+            lowerOctaves={lowerOctaves}
+            higherOctaves={higherOctaves}
+            onAddLowerOctave={() => setLowerOctaves(Math.min(lowerOctaves + 1, 7))}
+            onRemoveLowerOctave={() => setLowerOctaves(Math.max(lowerOctaves - 1, -4))}
+            onAddHigherOctave={() => setHigherOctaves(Math.min(higherOctaves + 1, 7))}
+            onRemoveHigherOctave={() => setHigherOctaves(Math.max(higherOctaves - 1, -4))}
+            keyboardSelectionMode={keyboardSelectionMode}
+            onKeyboardSelectionModeChange={onKeyboardSelectionModeChange}
+            onKeyboardScaleApply={handleKeyboardScaleApply}
+            onKeyboardScaleClear={handleKeyboardScaleClear}
+          />
+        </div>
+
+        <ScaleOptions
           instrument={instrument}
-          setInstrument={setInstrument}
-          clearSelection={clearSelection}
-          hasSelectedNotes={selectedNotes.length > 0}
+          selectedRoot={selectedRoot}
+          onRootChange={handleRootChange}
           onScaleSelect={handleScaleSelect}
           onScaleBoxSelect={handleScaleBoxSelect}
-          onClearScale={handleClearScale}
-          lowerOctaves={lowerOctaves}
-          higherOctaves={higherOctaves}
-          onAddLowerOctave={() => setLowerOctaves(Math.min(lowerOctaves + 1, 7))}
-          onRemoveLowerOctave={() => setLowerOctaves(Math.max(lowerOctaves - 1, -4))}
-          onAddHigherOctave={() => setHigherOctaves(Math.min(higherOctaves + 1, 7))}
-          onRemoveHigherOctave={() => setHigherOctaves(Math.max(higherOctaves - 1, -4))}
-          keyboardSelectionMode={keyboardSelectionMode}
-          onKeyboardSelectionModeChange={onKeyboardSelectionModeChange}
           onKeyboardScaleApply={handleKeyboardScaleApply}
-          onKeyboardScaleClear={handleKeyboardScaleClear}
         />
       </div>
-      
+
       <div className="instrument-container">
         {instrument === 'keyboard' ? (
           <Keyboard
@@ -175,7 +194,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             isNoteRoot={isNoteKeyboardRoot}
           />
         ) : (
-          <Guitar 
+          <Guitar
             ref={guitarRef}
             setGuitarNotes={setGuitarNotes}
             isInMelody={isInMelody}
