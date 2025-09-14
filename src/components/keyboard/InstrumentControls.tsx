@@ -338,11 +338,19 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         <div className="control-group octave-range-control">
           <label className="control-label">Octave Range</label>
           <div className="octave-range-slider">
-            <div className="range-labels">
-              <span className="range-label">Low: {Math.max(1, 4 - lowerOctaves)}</span>
-              <span className="range-label">High: {Math.min(8, 5 + higherOctaves)}</span>
+            <div className="range-labels-center">
+              <span className="range-label-center">
+                {Math.max(1, 4 - lowerOctaves)} - {Math.min(8, 5 + higherOctaves)}
+              </span>
             </div>
             <div className="dual-range-container">
+              <div
+                className="range-fill"
+                style={{
+                  left: `${((Math.max(1, 4 - lowerOctaves) - 1) / 7) * 100}%`,
+                  right: `${(1 - (Math.min(8, 5 + higherOctaves) - 1) / 7) * 100}%`
+                }}
+              />
               <input
                 type="range"
                 min="1"
