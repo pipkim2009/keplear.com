@@ -155,20 +155,19 @@
   margin-bottom: 0;
 }
 
-.control-label {
+.scale-options-content .control-label {
   display: block;
   font-size: 13px;
   font-weight: 600;
-  color: #121212;
   margin-bottom: 6px;
 }
 
-.light .control-label {
-  color: #333333;
+.light .scale-options-content .control-label {
+  color: #333333 !important;
 }
 
-.dark .control-label {
-  color: #d2d2f9;
+.dark .scale-options-content .control-label {
+  color: #d2d2f9 !important;
 }
 
 .control-select {

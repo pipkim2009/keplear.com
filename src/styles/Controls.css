@@ -447,6 +447,8 @@
   margin-top: -29px;
   font-size: 0;
   line-height: 0;
+  letter-spacing: 0;
+  word-spacing: 0;
 }
 
 .octave-mini {
@@ -458,6 +460,8 @@
   outline: 0;
   transition: all 0.3s ease;
   flex-shrink: 0;
+  display: block;
+  vertical-align: top;
 }
 
 .octave-icon {
