@@ -93,6 +93,10 @@
   letter-spacing: 0.5px;
 }
 
+.light .control-label {
+  color: #f8f9fa;
+}
+
 .control-label.checkbox-label {
   text-transform: none;
   display: flex;
