@@ -9,7 +9,7 @@ import MelodyDisplay from './components/MelodyDisplay'
 import { useAudio } from './hooks/useAudio'
 import { useMelodyGenerator } from './hooks/useMelodyGenerator'
 import { useTheme } from './hooks/useTheme'
-import { notes } from './utils/notes'
+import { notes, generateNotesWithSeparateOctaves } from './utils/notes'
 import type { Note } from './utils/notes'
 import './styles/App.css'
 
@@ -42,6 +42,7 @@ function App() {
   const [numberOfNotes, setNumberOfNotes] = useState<number>(DEFAULT_SETTINGS.numberOfNotes)
   const [showNotes, setShowNotes] = useState<boolean>(false)
   const [instrument, setInstrument] = useState<InstrumentType>(DEFAULT_SETTINGS.instrument)
+  const [keyboardOctaves, setKeyboardOctaves] = useState<{ lower: number; higher: number }>({ lower: 0, higher: 0 })
   
   const { isDarkMode, toggleTheme } = useTheme()
   const { playNote, playGuitarNote, playMelody, playGuitarMelody, stopMelody, isPlaying } = useAudio()
@@ -83,8 +84,13 @@ function App() {
    * Generates a new melody based on current settings
    */
   const handleGenerateMelody = useCallback((): void => {
-    generateMelody(notes, numberOfNotes, instrument)
-  }, [generateMelody, numberOfNotes, instrument])
+    // For keyboard, use expanded octave range if specified, otherwise use default notes
+    const melodyNotes = instrument === 'keyboard' && (keyboardOctaves.lower !== 0 || keyboardOctaves.higher !== 0)
+      ? generateNotesWithSeparateOctaves(keyboardOctaves.lower, keyboardOctaves.higher)
+      : notes
+
+    generateMelody(melodyNotes, numberOfNotes, instrument)
+  }, [generateMelody, numberOfNotes, instrument, keyboardOctaves])
 
   /**
    * Plays or stops the current melody
@@ -113,6 +119,13 @@ function App() {
     setInstrument(newInstrument)
     clearSelection() // Clear melody when instrument changes
   }, [clearSelection])
+
+  /**
+   * Handles octave range changes from the keyboard
+   */
+  const handleOctaveRangeChange = useCallback((lowerOctaves: number, higherOctaves: number): void => {
+    setKeyboardOctaves({ lower: lowerOctaves, higher: higherOctaves })
+  }, [])
 
   // Navigation handlers - memoized to prevent unnecessary re-renders
   const { navigateToHome, navigateToSandbox, navigateToPractice } = useMemo(() => ({
@@ -158,6 +171,7 @@ function App() {
               clearSelection={clearSelection}
               clearTrigger={clearTrigger}
               selectedNotes={[...selectedNotes]}
+              onOctaveRangeChange={handleOctaveRangeChange}
             />
 
             <MelodyControls

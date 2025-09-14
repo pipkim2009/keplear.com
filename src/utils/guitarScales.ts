@@ -6,7 +6,7 @@ export type GuitarScale = {
 
 export type ScalePosition = {
   string: number // 1-6
-  fret: number   // 0-12
+  fret: number   // 0-24
   note: string   // Note name
   isRoot: boolean // Is this the root note of the scale
 }
@@ -140,13 +140,19 @@ export const getScaleBoxes = (
   const allPositions = getScalePositions(rootNote, scale, guitarNotes)
   const boxes: ScaleBox[] = []
   
-  // Define box ranges based on common guitar patterns (0-12 frets)
+  // Define box ranges based on common guitar patterns (0-24 frets)
   const boxRanges = [
     { name: 'Open Position', minFret: 0, maxFret: 4 },
     { name: 'Position 2', minFret: 3, maxFret: 7 },
     { name: 'Position 3', minFret: 5, maxFret: 9 },
     { name: 'Position 4', minFret: 7, maxFret: 11 },
-    { name: 'Position 5', minFret: 8, maxFret: 12 }
+    { name: 'Position 5', minFret: 8, maxFret: 12 },
+    { name: 'Position 6', minFret: 10, maxFret: 14 },
+    { name: 'Position 7', minFret: 12, maxFret: 16 },
+    { name: 'Position 8', minFret: 14, maxFret: 18 },
+    { name: 'Position 9', minFret: 16, maxFret: 20 },
+    { name: 'Position 10', minFret: 18, maxFret: 22 },
+    { name: 'Position 11', minFret: 20, maxFret: 24 }
   ]
   
   boxRanges.forEach(range => {

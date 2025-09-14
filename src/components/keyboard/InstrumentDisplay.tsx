@@ -1,7 +1,7 @@
 import Keyboard from './Keyboard'
 import Guitar from '../guitar/Guitar'
 import InstrumentControls from './InstrumentControls'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import type { Note } from '../../utils/notes'
 import type { GuitarScale, ScaleBox } from '../../utils/guitarScales'
 
@@ -20,6 +20,7 @@ interface InstrumentDisplayProps {
   clearSelection: () => void
   clearTrigger: number
   selectedNotes: Note[]
+  onOctaveRangeChange?: (lowerOctaves: number, higherOctaves: number) => void
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -36,7 +37,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   setGuitarNotes,
   clearSelection,
   clearTrigger,
-  selectedNotes
+  selectedNotes,
+  onOctaveRangeChange
 }) => {
   const guitarRef = useRef<any>(null)
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
@@ -64,6 +66,13 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
       scaleHandlers.handleClearScale()
     }
   }
+
+  // Notify parent when octave range changes
+  useEffect(() => {
+    if (onOctaveRangeChange) {
+      onOctaveRangeChange(lowerOctaves, higherOctaves)
+    }
+  }, [lowerOctaves, higherOctaves, onOctaveRangeChange])
 
   return (
     <>
