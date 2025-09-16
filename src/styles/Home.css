@@ -489,6 +489,7 @@
   }
 }
 
+
 @media (max-width: 1023px) {
   .hero-section {
     flex-direction: column;
@@ -496,24 +497,18 @@
     gap: 2rem;
     padding: 3rem 2rem;
   }
-  
+
   .hero-title {
-    font-size: 3rem;
+    font-size: 2.5rem;
   }
-  
+
   .visual-element {
     width: 250px;
     height: 250px;
   }
-  
+
   .modes-grid {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .hero-title {
-    font-size: 2.5rem;
   }
   
   .hero-description {

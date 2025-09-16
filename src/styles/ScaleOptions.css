@@ -105,6 +105,7 @@
   background: rgba(128, 0, 255, 0.9);
 }
 
+
 .scale-options-container.collapsed .toggle-text {
   display: inline;
   font-size: 12px;
@@ -366,8 +367,10 @@
   }
 
   .scale-options-toggle {
-    width: 36px;
-    height: 36px;
+    width: 100%;
+    height: 40px;
+    position: relative;
+    top: 0px;
   }
 }
 
