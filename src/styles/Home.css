@@ -461,7 +461,7 @@
 }
 
 /* Responsive Design */
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
   .hero-section {
     display: flex;
     align-items: center;
@@ -473,14 +473,14 @@
     flex-direction: row;
     text-align: left;
   }
-  
+
   .features-grid {
     grid-template-columns: repeat(3, minmax(220px, 1fr));
     gap: 2rem;
     max-width: 1200px;
     margin: 0 auto;
   }
-  
+
   .modes-grid {
     grid-template-columns: repeat(2, minmax(400px, 1fr));
     gap: 2rem;
@@ -489,7 +489,7 @@
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1023px) {
   .hero-section {
     flex-direction: column;
     text-align: center;
