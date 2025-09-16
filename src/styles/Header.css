@@ -234,13 +234,13 @@
   .header-right {
     gap: 0.5rem;
     order: 2;
-    justify-content: space-between;
+    justify-content: flex-end;
     width: 100%;
     flex: 1;
   }
-  
+
   .auth-section {
-    margin-left: auto;
+    margin-left: 0.5rem;
   }
   
   .auth-buttons {
