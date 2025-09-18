@@ -28,6 +28,7 @@ interface InstrumentControlsProps {
   onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
   onKeyboardScaleApply?: (rootNote: string, scale: KeyboardScale) => void
   onKeyboardScaleClear?: () => void
+  scaleOptionsComponent?: React.ReactNode
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -51,7 +52,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   keyboardSelectionMode = 'range',
   onKeyboardSelectionModeChange,
   onKeyboardScaleApply,
-  onKeyboardScaleClear
+  onKeyboardScaleClear,
+  scaleOptionsComponent
 }) => {
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
@@ -494,6 +496,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         </>
       )}
 
+      {/* Scale Options Component - integrated as part of controls */}
+      {scaleOptionsComponent && (
+        <div className="control-group scale-options-integrated">
+          {scaleOptionsComponent}
+        </div>
+      )}
 
       {hasSelectedNotes && (
         <div className="control-group">

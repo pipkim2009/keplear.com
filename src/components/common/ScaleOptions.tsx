@@ -90,22 +90,6 @@ const ScaleOptions: React.FC<ScaleOptionsProps> = ({
     }
   }
 
-  // Common scale types that could be used for both instruments
-  const scaleTypes = [
-    'Major',
-    'Minor',
-    'Dorian',
-    'Phrygian',
-    'Lydian',
-    'Mixolydian',
-    'Aeolian',
-    'Locrian',
-    'Blues',
-    'Pentatonic Major',
-    'Pentatonic Minor',
-    'Harmonic Minor',
-    'Melodic Minor'
-  ]
 
   return (
     <div className={`scale-options-container ${isExpanded ? 'expanded' : 'collapsed'}`}>
@@ -120,11 +104,6 @@ const ScaleOptions: React.FC<ScaleOptionsProps> = ({
 
       {isExpanded && (
         <div className="scale-options-content">
-          <div className="scale-options-header">
-            <h3>Scale Options</h3>
-            <p>Root note and scale reference for {instrument}</p>
-          </div>
-
           <div className="scale-controls">
             <div className="control-section">
               <label className="control-label">Root Note</label>
@@ -212,32 +191,6 @@ const ScaleOptions: React.FC<ScaleOptionsProps> = ({
                 Apply Scale
               </button>
             </div>
-          </div>
-
-          <div className="scale-reference">
-            <h4>Scale Reference</h4>
-            {scaleTypes.map((scale, index) => (
-              <div key={index} className="scale-item">
-                <span className="scale-name">{scale}</span>
-                <div className="scale-info">
-                  <span className="scale-description">
-                    {scale === 'Major' && 'Happy, bright sound'}
-                    {scale === 'Minor' && 'Sad, melancholic sound'}
-                    {scale === 'Blues' && 'Soulful, expressive sound'}
-                    {scale === 'Pentatonic Major' && 'Simple, versatile scale'}
-                    {scale === 'Pentatonic Minor' && 'Rock, blues foundation'}
-                    {scale === 'Dorian' && 'Minor with raised 6th'}
-                    {scale === 'Phrygian' && 'Spanish, exotic sound'}
-                    {scale === 'Lydian' && 'Dreamy, floating sound'}
-                    {scale === 'Mixolydian' && 'Dominant, bluesy sound'}
-                    {scale === 'Aeolian' && 'Natural minor scale'}
-                    {scale === 'Locrian' && 'Rare, diminished sound'}
-                    {scale === 'Harmonic Minor' && 'Classical, dramatic'}
-                    {scale === 'Melodic Minor' && 'Jazz, ascending melody'}
-                  </span>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       )}

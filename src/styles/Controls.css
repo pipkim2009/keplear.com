@@ -364,6 +364,29 @@
   }
 }
 
+/* Scale options integrated styling adjustments */
+.control-group.scale-options-integrated {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 100%;
+  min-width: 280px;
+  margin: 0 auto;
+}
+
+@media (max-width: 480px) {
+  .control-group.scale-options-integrated {
+    min-width: 240px;
+  }
+}
+
+@media (max-width: 360px) {
+  .control-group.scale-options-integrated {
+    min-width: 200px;
+  }
+}
+
 /* Octave range control styling */
 .octave-range-control {
   min-width: 576px !important;

@@ -183,17 +183,18 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             onKeyboardSelectionModeChange={onKeyboardSelectionModeChange}
             onKeyboardScaleApply={handleKeyboardScaleApply}
             onKeyboardScaleClear={handleKeyboardScaleClear}
+            scaleOptionsComponent={
+              <ScaleOptions
+                instrument={instrument}
+                selectedRoot={selectedRoot}
+                onRootChange={handleRootChange}
+                onScaleSelect={handleScaleSelect}
+                onScaleBoxSelect={handleScaleBoxSelect}
+                onKeyboardScaleApply={handleKeyboardScaleApply}
+              />
+            }
           />
         </div>
-
-        <ScaleOptions
-          instrument={instrument}
-          selectedRoot={selectedRoot}
-          onRootChange={handleRootChange}
-          onScaleSelect={handleScaleSelect}
-          onScaleBoxSelect={handleScaleBoxSelect}
-          onKeyboardScaleApply={handleKeyboardScaleApply}
-        />
       </div>
 
       <div className="instrument-container">
