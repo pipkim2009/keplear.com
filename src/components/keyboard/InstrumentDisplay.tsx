@@ -159,7 +159,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
 
   return (
     <>
-      <div className="controls-layout">
+      <div className="instrument-display-layout">
         <div className={`instrument-controls-container ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
           <InstrumentControls
             bpm={bpm}
