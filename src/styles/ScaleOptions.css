@@ -60,7 +60,7 @@
 
 .scale-options-content {
   position: absolute;
-  top: 54px;
+  top: 44px;
   left: 0;
   margin-top: 0;
   padding: 16px !important;
@@ -115,7 +115,6 @@
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
   z-index: 200;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   pointer-events: auto;
@@ -123,8 +122,6 @@
 
 .scale-options-toggle:hover {
   background: rgba(128, 0, 255, 1);
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .scale-options-container.expanded .scale-options-toggle {
@@ -379,7 +376,7 @@
 /* Tablet specific adjustments - use consistent higher positioning */
 @media (min-width: 481px) and (max-width: 1039px) {
   .scale-options-content {
-    top: 54px !important;
+    top: 44px !important;
   }
 
   .scale-options-toggle {
