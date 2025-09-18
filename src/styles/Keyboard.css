@@ -69,6 +69,9 @@
   min-height: 80px;
   overflow: visible;
   transition: width 0.3s ease;
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .instrument-controls-container.guitar-mode {
