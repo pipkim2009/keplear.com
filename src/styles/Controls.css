@@ -1,7 +1,7 @@
 .instrument-controls {
   position: relative;
   display: flex;
-  gap: 20px;
+  gap: 10px;
   align-items: flex-start;
   justify-content: center;
   z-index: 20;
@@ -15,14 +15,14 @@
 /* Tablet and larger screens */
 @media (min-width: 769px) {
   .instrument-controls {
-    gap: 25px;
+    gap: 10px;
   }
 }
 
 /* Small tablets */
 @media (max-width: 768px) and (min-width: 481px) {
   .instrument-controls {
-    gap: 15px;
+    gap: 10px;
     justify-content: center;
   }
   
@@ -56,7 +56,7 @@
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 15px;
+    gap: 10px;
     padding: 15px 0 !important;
     margin: 0 auto !important;
     width: 100% !important;
@@ -366,31 +366,21 @@
 
 /* Scale options integrated styling adjustments */
 .control-group.scale-options-integrated {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  width: 100%;
-  min-width: 280px;
-  margin: 0 auto;
-}
-
-@media (max-width: 480px) {
-  .control-group.scale-options-integrated {
-    min-width: 240px;
-  }
-}
-
-@media (max-width: 360px) {
-  .control-group.scale-options-integrated {
-    min-width: 200px;
-  }
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  width: 100% !important;
+  min-width: 200px !important;
+  margin: 0 auto !important;
+  flex: 1 1 auto !important;
 }
 
 /* Octave range control styling */
 .octave-range-control {
-  min-width: 576px !important;
-  width: 576px !important;
+  min-width: 280px !important;
+  width: 100% !important;
+  max-width: 500px !important;
 }
 
 .octave-range-slider {
@@ -554,49 +544,27 @@
   filter: brightness(0.4) saturate(0.5);
 }
 
-@media (max-width: 480px) {
-  .octave-range-control {
-    min-width: 300px;
-  }
-
-  .dual-range-container {
-    max-width: 432px;
-  }
-
-  .range-labels-center {
-    max-width: 432px;
-  }
-
-  .octave-mini {
-    width: 54px;
-    height: 40.5px;
-  }
-
-  .octave-icon {
-    width: 100%;
-    height: 100%;
-  }
+/* Mobile octave range styling applied to all screen sizes */
+.dual-range-container {
+  width: 100% !important;
+  min-width: 280px !important;
+  max-width: 500px !important;
 }
 
-@media (max-width: 360px) {
-  .octave-range-control {
-    min-width: 280px !important;
-    width: 280px !important;
-  }
+.range-labels-center {
+  width: 100%;
+  min-width: 280px;
+  max-width: 500px;
+}
 
-  .dual-range-container {
-    width: 280px !important;
-    max-width: 280px !important;
-  }
+.octave-mini {
+  width: 54px;
+  height: 40.5px;
+}
 
-  .range-labels-center {
-    max-width: 280px;
-  }
-
-  .octave-mini {
-    width: 35px;
-    height: 26.25px;
-  }
+.octave-icon {
+  width: 100%;
+  height: 100%;
 }
 
 
