@@ -1,13 +1,87 @@
-/* Scale Options expandable column */
-.instrument-display-layout {
+/* Controls layout for responsive design */
+.controls-layout {
   display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 20px;
-  width: 100%;
-  min-height: 40px;
-  z-index: 20;
-  position: relative;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Side-by-side layout when screen can fit both expanded scale options and controls */
+@media (min-width: 1040px) {
+  .controls-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+  }
+}
+
+/* For screens that need to fit side-by-side but ensure scale options menu stays on screen */
+@media (min-width: 1040px) and (max-width: 1439px) {
+  .controls-layout {
+    justify-content: flex-start;
+    width: 100vw;
+    max-width: 100vw;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+
+  /* Ensure scale options expanded content doesn't overflow viewport */
+  .scale-options-content {
+    left: auto;
+    right: 0;
+    transform: translateX(0);
+    width: 264px !important;
+    min-width: 264px !important;
+    max-width: 264px !important;
+    padding: 16px !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
+}
+
+/* Centered layout when there's enough space for comfortable centering */
+@media (min-width: 1440px) {
+  .controls-layout {
+    position: relative;
+    width: 100vw;
+    display: block;
+  }
+
+  /* Position instrument controls in the center */
+  .instrument-controls-container {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    z-index: 1;
+  }
+
+  /* Position scale options to the left of the centered controls */
+  .scale-options-container {
+    position: absolute;
+    left: calc(50% - 380px - 20px - 130px); /* Center minus half control width minus gap minus scale width */
+    top: 0;
+    z-index: 2;
+    width: 130px !important;
+    max-width: 130px !important;
+    min-width: 130px !important;
+  }
+
+  /* Fix scale options toggle positioning for absolute layout */
+  .scale-options-toggle {
+    top: 0;
+    position: relative;
+  }
+
+  /* Reset scale options positioning for wide screen layout */
+  .scale-options-content {
+    left: 0;
+    right: auto;
+    width: 264px !important;
+    min-width: 264px !important;
+    max-width: 264px !important;
+    padding: 16px !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  }
 }
 
 .scale-options-container {
@@ -31,18 +105,21 @@
 
 .scale-options-content {
   position: absolute;
-  top: calc(100% + 25px);
+  top: 65px;
   left: 0;
   margin-top: 0;
-  padding: 20px;
+  padding: 16px !important;
   max-height: 400px;
   overflow-y: auto;
-  min-width: 320px;
+  width: 264px !important;
+  min-width: 264px !important;
+  max-width: 264px !important;
+  box-sizing: border-box !important;
   z-index: 201;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 0 12px 12px 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
   pointer-events: auto;
 }
 
@@ -335,35 +412,42 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-  .instrument-display-layout {
+@media (max-width: 1039px) {
+  .controls-layout {
     flex-direction: column;
-    gap: 10px;
+    gap: 1rem;
     align-items: center;
   }
 
-  .scale-options-container.expanded {
-    width: 280px;
-  }
+}
 
+/* Phone specific adjustments - align scale options to the left */
+@media (max-width: 480px) {
+  .controls-layout {
+    align-items: flex-start;
+    padding-left: 20px;
+  }
+}
+
+@media (max-width: 768px) {
   .scale-options-content {
     max-height: 300px;
-    padding: 16px;
+    width: 264px !important;
+    min-width: 264px !important;
+    max-width: 264px !important;
+    padding: 16px !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
   }
 }
 
 @media (max-width: 480px) {
-  .instrument-display-layout {
-    gap: 8px;
-  }
-
-  .scale-options-container.expanded {
-    width: 260px;
-  }
-
   .scale-options-content {
     max-height: 250px;
-    padding: 12px;
+    width: 264px !important;
+    min-width: 264px !important;
+    max-width: 264px !important;
+    padding: 16px !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
   }
 
   .scale-options-toggle {
