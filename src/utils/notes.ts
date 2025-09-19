@@ -245,6 +245,6 @@ export const getBlackKeyLeftDynamic = (note: Note, whiteKeys: readonly Note[]): 
   
   // Calculate position: (white keys before) * (white key width including margin) - half black key width
   // whiteKeyWidth already includes the 2px margin (62px total)
-  // Subtract 40px to move black keys to the left when expanded
+  // Base offset for expanded keyboard - will be adjusted by CSS for mobile
   return (whiteKeysBeforeThisBlack * KEYBOARD_DIMENSIONS.whiteKeyWidth) - (KEYBOARD_DIMENSIONS.blackKeyWidth / 2) - 40
 }
