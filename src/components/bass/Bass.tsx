@@ -470,7 +470,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   useEffect(() => {
     if (clearTrigger !== undefined) {
       setStringCheckboxes(new Array(4).fill(false))
-      setFretCheckboxes(new Array(13).fill(false))
+      setFretCheckboxes(new Array(25).fill(false))
       setSelectedNotes(new Set())
       setScaleSelectedNotes(new Set())
       setCurrentScale(null)
@@ -486,7 +486,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             type="checkbox"
             id="bass-fret-open"
             className="bass-fret-checkbox"
-            checked={fretCheckboxes[0]}
+            checked={fretCheckboxes[0] || false}
             onChange={() => handleFretCheckboxChange(0)}
             onMouseEnter={() => setHoveredFret(0)}
             onMouseLeave={() => setHoveredFret(null)}
@@ -515,7 +515,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                 type="checkbox"
                 id={`bass-fret-${index + 1}`}
                 className="bass-fret-checkbox"
-                checked={fretCheckboxes[index + 1]}
+                checked={fretCheckboxes[index + 1] || false}
                 onChange={() => handleFretCheckboxChange(index + 1)}
                 onMouseEnter={() => setHoveredFret(index + 1)}
                 onMouseLeave={() => setHoveredFret(null)}
@@ -586,7 +586,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               type="checkbox"
               id={`bass-string-${index}`}
               className="bass-string-checkbox"
-              checked={stringCheckboxes[index]}
+              checked={stringCheckboxes[index] || false}
               onChange={() => handleStringCheckboxChange(index)}
               onMouseEnter={() => setHoveredString(index)}
               onMouseLeave={() => setHoveredString(null)}

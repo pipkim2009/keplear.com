@@ -474,7 +474,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   useEffect(() => {
     if (clearTrigger !== undefined) {
       setStringCheckboxes(new Array(6).fill(false))
-      setFretCheckboxes(new Array(13).fill(false))
+      setFretCheckboxes(new Array(25).fill(false))
       setSelectedNotes(new Set())
       setScaleSelectedNotes(new Set())
       setCurrentScale(null)
@@ -490,7 +490,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             type="checkbox"
             id="fret-open"
             className="fret-checkbox"
-            checked={fretCheckboxes[0]}
+            checked={fretCheckboxes[0] || false}
             onChange={() => handleFretCheckboxChange(0)}
             onMouseEnter={() => setHoveredFret(0)}
             onMouseLeave={() => setHoveredFret(null)}
@@ -519,7 +519,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
                 type="checkbox"
                 id={`fret-${index + 1}`}
                 className="fret-checkbox"
-                checked={fretCheckboxes[index + 1]}
+                checked={fretCheckboxes[index + 1] || false}
                 onChange={() => handleFretCheckboxChange(index + 1)}
                 onMouseEnter={() => setHoveredFret(index + 1)}
                 onMouseLeave={() => setHoveredFret(null)}
@@ -587,7 +587,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
               type="checkbox"
               id={`string-${index}`}
               className="string-checkbox"
-              checked={stringCheckboxes[index]}
+              checked={stringCheckboxes[index] || false}
               onChange={() => handleStringCheckboxChange(index)}
               onMouseEnter={() => setHoveredString(index)}
               onMouseLeave={() => setHoveredString(null)}
