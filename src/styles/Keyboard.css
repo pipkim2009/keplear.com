@@ -436,29 +436,29 @@
 }
 
 .instrument-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(145deg, #4a5568, #2d3748);
+  background: linear-gradient(145deg, #3b82f6, #1d4ed8);
   border-radius: 6px;
-  border: 1px solid #718096;
+  border: 1px solid #60a5fa;
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.3),
     inset 0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
 .instrument-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(145deg, #5a6578, #3d4758);
+  background: linear-gradient(145deg, #2563eb, #1e40af);
   box-shadow:
     0 3px 6px rgba(0, 0, 0, 0.4),
     inset 0 1px 2px rgba(255, 255, 255, 0.15);
 }
 
 .instrument-container::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(145deg, #3a4558, #2a3648);
+  background: linear-gradient(145deg, #1e40af, #1e3a8a);
 }
 
 /* Firefox scrollbar */
 .instrument-container {
   scrollbar-width: thin;
-  scrollbar-color: #4a5568 #1a202c;
+  scrollbar-color: #3b82f6 #1a202c;
 }
 
 /* Remove padding and reduce height when instrument container contains guitar or bass */

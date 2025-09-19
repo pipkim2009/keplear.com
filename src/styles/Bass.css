@@ -307,7 +307,7 @@
   position: absolute;
   width: 22px;
   height: 22px;
-  background: linear-gradient(145deg, #ff8c00, #cc7000);
+  background: linear-gradient(145deg, #3b82f6, #1d4ed8);
   border: 1px solid #ffffff;
   border-radius: 50%;
   display: flex;
@@ -323,9 +323,23 @@
 
 /* Preview bass note circle styling (for hover effects) */
 .bass-note-circle.preview {
-  background: linear-gradient(145deg, rgba(255, 140, 0, 0.4), rgba(204, 112, 0, 0.4));
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.4), rgba(29, 78, 216, 0.4));
   border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow:
+    0 3px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2);
+}
+
+.bass-note-circle.preview.scale-note {
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.4), rgba(234, 88, 12, 0.4)) !important;
+  border: 1px solid rgba(251, 146, 60, 0.6);
+}
+
+.bass-note-circle.preview.scale-root-note {
+  background: linear-gradient(145deg, rgba(220, 38, 38, 0.4), rgba(185, 28, 28, 0.4)) !important;
+  border: 1px solid rgba(248, 113, 113, 0.6);
+  box-shadow:
+    0 0 6px rgba(220, 38, 38, 0.4),
     0 3px 5px rgba(0, 0, 0, 0.2),
     inset 0 1px 3px rgba(255, 255, 255, 0.2);
 }
@@ -488,15 +502,15 @@
 
 /* Bass scale note highlighting */
 .bass-note-circle.scale-note {
-  background: linear-gradient(145deg, #ff9800, #f57400) !important;
-  border-color: #ffcc02;
+  background: linear-gradient(145deg, #f97316, #ea580c) !important;
+  border-color: #fb923c;
 }
 
 .bass-note-circle.scale-root-note {
-  background: linear-gradient(145deg, #f44336, #d32f2f) !important;
-  border-color: #ffcdd2;
+  background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
+  border-color: #f87171;
   box-shadow:
-    0 0 10px rgba(244, 67, 54, 0.7),
+    0 0 10px rgba(220, 38, 38, 0.7),
     0 3px 5px rgba(0, 0, 0, 0.4),
     inset 0 1px 3px rgba(255, 255, 255, 0.4);
 }

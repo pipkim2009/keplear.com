@@ -707,6 +707,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
                 style={{
                   left: fretIndex === 0
                     ? `-2.5px` // Open string position
+                    : fretIndex === 1
+                    ? `${fretIndex * 60 - 38 + 9}px` // First fret moved right by 9px
                     : `${fretIndex * 60 - 38}px`, // Regular fret position
                   top: `${15 + stringIndex * 28 - 10}px`, // Center on string
                 }}

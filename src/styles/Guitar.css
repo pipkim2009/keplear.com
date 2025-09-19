@@ -382,6 +382,20 @@
     inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 
+.note-circle.preview.scale-note {
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.4), rgba(234, 88, 12, 0.4)) !important;
+  border: 1px solid rgba(251, 146, 60, 0.6);
+}
+
+.note-circle.preview.scale-root-note {
+  background: linear-gradient(145deg, rgba(220, 38, 38, 0.4), rgba(185, 28, 28, 0.4)) !important;
+  border: 1px solid rgba(248, 113, 113, 0.6);
+  box-shadow:
+    0 0 6px rgba(220, 38, 38, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
 /* Green styling for melody notes */
 .note-circle.melody-note {
   background: linear-gradient(145deg, #4caf50, #2e7d32) !important;
@@ -534,15 +548,15 @@
 
 /* Scale note highlighting */
 .note-circle.scale-note {
-  background: linear-gradient(145deg, #ff9800, #f57400) !important;
-  border-color: #ffcc02;
+  background: linear-gradient(145deg, #f97316, #ea580c) !important;
+  border-color: #fb923c;
 }
 
 .note-circle.scale-root-note {
-  background: linear-gradient(145deg, #f44336, #d32f2f) !important;
-  border-color: #ffcdd2;
-  box-shadow: 
-    0 0 8px rgba(244, 67, 54, 0.6),
+  background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
+  border-color: #f87171;
+  box-shadow:
+    0 0 8px rgba(220, 38, 38, 0.6),
     0 2px 4px rgba(0, 0, 0, 0.3),
     inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }

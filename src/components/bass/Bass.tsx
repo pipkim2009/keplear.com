@@ -706,6 +706,8 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                 style={{
                   left: fretIndex === 0
                     ? `-2.5px` // Open string position
+                    : fretIndex === 1
+                    ? `${fretIndex * 60 - 39 + 9}px` // First fret moved right by 9px
                     : `${fretIndex * 60 - 39}px`, // Regular fret position
                   top: `${22 + stringIndex * 30 - 11}px`, // Center on string
                 }}
