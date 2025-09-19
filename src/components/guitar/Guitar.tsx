@@ -485,7 +485,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     <div className="guitar-container">
       <div className="fretboard">
         {/* Open fret checkbox */}
-        <div className="fret-checkbox-container" style={{ left: '5.5px', bottom: '-45px' }}>
+        <div className="fret-checkbox-container" style={{ left: '4.5px', bottom: '-40px' }}>
           <input
             type="checkbox"
             id="fret-open"

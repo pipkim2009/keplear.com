@@ -304,7 +304,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         <select
           value={instrument}
           onChange={(e) => setInstrument(e.target.value)}
-          className="control-input"
+          className={`control-input instrument-select-${instrument}`}
         >
           <option value="keyboard">Keyboard</option>
           <option value="guitar">Guitar</option>

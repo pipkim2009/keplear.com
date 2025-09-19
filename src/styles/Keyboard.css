@@ -460,3 +460,26 @@
   scrollbar-width: thin;
   scrollbar-color: #4a5568 #1a202c;
 }
+
+/* Remove padding and reduce height when instrument container contains guitar or bass */
+.instrument-container:has(.guitar-container),
+.instrument-container:has(.bass-container) {
+  padding: 0 !important;
+  min-height: 250px !important;
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .instrument-container:has(.guitar-container),
+  .instrument-container:has(.bass-container) {
+    padding: 0 !important;
+    min-height: 250px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .instrument-container:has(.guitar-container),
+  .instrument-container:has(.bass-container) {
+    padding: 0 !important;
+    min-height: 250px !important;
+  }
+}

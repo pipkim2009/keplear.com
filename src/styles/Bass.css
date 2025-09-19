@@ -3,7 +3,7 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 50px 20px 50px 45px;
+  padding: 0px 20px 50px 45px;
   min-width: auto;
   overflow-x: auto;
   overflow-y: visible;
@@ -14,7 +14,7 @@
   .bass-container {
     min-width: auto !important;
     margin: 0 20px 0 0 !important;
-    padding: 50px 20px 50px 45px !important;
+    padding: 0px 20px 50px 45px !important;
     justify-content: flex-start !important;
     overflow-x: scroll !important;
     -webkit-overflow-scrolling: touch !important;
@@ -38,7 +38,7 @@
   .bass-container {
     min-width: auto !important;
     margin: 0 20px 0 0 !important;
-    padding: 50px 20px 50px 45px !important;
+    padding: 0px 20px 50px 45px !important;
     justify-content: flex-start !important;
     overflow-x: scroll !important;
     -webkit-overflow-scrolling: touch !important;
@@ -149,7 +149,7 @@
 /* Bass fret checkboxes styling */
 .bass-fret-checkbox-container {
   position: absolute;
-  bottom: -45px;
+  bottom: -40px;
   left: 50%;
   transform: translateX(-44px);
   display: flex;
@@ -164,7 +164,7 @@
   height: 28px;
   appearance: none;
   background: transparent;
-  border: 2px solid #ff8c00;
+  border: 2px solid #ef4444;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -175,12 +175,12 @@
 }
 
 .bass-fret-checkbox:checked {
-  background: linear-gradient(145deg, #ff8c00, #cc7000);
-  border-color: #ffb347;
+  background: linear-gradient(145deg, #ef4444, #dc2626);
+  border-color: #f87171;
 }
 
 .bass-fret-checkbox:hover {
-  background: rgba(255, 140, 0, 0.6);
+  background: rgba(239, 68, 68, 0.6);
   transform: scale(1.05);
 }
 
@@ -193,7 +193,7 @@
   font-weight: 700;
   cursor: pointer;
   text-align: center;
-  color: #ffcc80;
+  color: #fca5a5;
   pointer-events: none;
   user-select: none;
 }
@@ -206,19 +206,19 @@
 .bass-fret-checkbox.disabled {
   opacity: 0.5;
   background: transparent;
-  border-color: rgba(255, 140, 0, 0.3);
+  border-color: rgba(239, 68, 68, 0.3);
   cursor: not-allowed;
 }
 
 .bass-fret-checkbox.disabled:hover {
   background: transparent;
   transform: none;
-  border-color: rgba(255, 140, 0, 0.3);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .bass-fret-checkbox-label.disabled {
   opacity: 0.5;
-  color: rgba(255, 204, 128, 0.5);
+  color: rgba(252, 165, 165, 0.5);
   cursor: not-allowed;
 }
 
@@ -239,7 +239,7 @@
   height: 28px;
   appearance: none;
   background: transparent;
-  border: 2px solid #ff8c00;
+  border: 2px solid #ef4444;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -250,12 +250,12 @@
 }
 
 .bass-string-checkbox:checked {
-  background: linear-gradient(145deg, #ff8c00, #cc7000);
-  border-color: #ffb347;
+  background: linear-gradient(145deg, #ef4444, #dc2626);
+  border-color: #f87171;
 }
 
 .bass-string-checkbox:hover {
-  background: rgba(255, 140, 0, 0.6);
+  background: rgba(239, 68, 68, 0.6);
   transform: scale(1.05);
 }
 
@@ -268,7 +268,7 @@
   font-weight: 700;
   cursor: pointer;
   text-align: center;
-  color: #ffcc80;
+  color: #fca5a5;
   pointer-events: none;
   user-select: none;
 }
@@ -596,27 +596,27 @@
 }
 
 .bass-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(145deg, #ff8c00, #cc7000);
+  background: linear-gradient(145deg, #ef4444, #dc2626);
   border-radius: 6px;
-  border: 1px solid #ffb347;
+  border: 1px solid #f87171;
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.3),
     inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 
 .bass-container::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(145deg, #ff9c10, #dd8010);
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
   box-shadow:
     0 3px 6px rgba(0, 0, 0, 0.4),
     inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .bass-container::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(145deg, #ee7c00, #bb6000);
+  background: linear-gradient(145deg, #b91c1c, #991b1b);
 }
 
 /* Firefox scrollbar */
 .bass-container {
   scrollbar-width: thin;
-  scrollbar-color: #ff8c00 #2a1a14;
+  scrollbar-color: #ef4444 #2a1a14;
 }
