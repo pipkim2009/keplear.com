@@ -1,17 +1,18 @@
 .guitar-container {
   position: relative;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  padding: 50px;
-  min-width: 1447px;
+  padding: 50px 20px 50px 10px;
+  min-width: auto;
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
   .guitar-container {
-    min-width: 1450px;
-    margin: 0 0 0 75px;
-    padding: 50px;
+    min-width: auto !important;
+    margin: 0 20px 0 0 !important;
+    padding: 50px 20px 50px 10px !important;
+    justify-content: flex-start !important;
   }
 
   .fretboard {
@@ -25,9 +26,10 @@
 
 @media (max-width: 480px) {
   .guitar-container {
-    min-width: 1450px;
-    margin: 0 20px 0 550px;
-    padding: 50px;
+    min-width: auto !important;
+    margin: 0 20px 0 0 !important;
+    padding: 50px 20px 50px 10px !important;
+    justify-content: flex-start !important;
   }
 
   .fretboard {
