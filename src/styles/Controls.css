@@ -564,12 +564,31 @@
 }
 
 @media (max-width: 360px) {
-  .octave-mini {
-    height: 36px;
+  .octave-range-control .octave-mini {
+    height: 32px !important;
+    width: 12.5% !important;
   }
 
-  .octave-range-control {
-    min-width: 250px !important;
+  .octave-range-control .dual-range-container {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    height: 36px !important;
+  }
+
+  .octave-range-control .range-label-center {
+    font-size: 11px !important;
+    padding: 3px 10px !important;
+  }
+
+  .octave-range-control .octave-range-slider {
+    width: 240px !important;
+    max-width: 240px !important;
+  }
+
+  .octave-range-control .octave-visual {
+    width: 240px !important;
+    max-width: 240px !important;
   }
 }
 
