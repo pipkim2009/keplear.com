@@ -23,6 +23,8 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set())
   const [currentScale, setCurrentScale] = useState<{ root: string; scale: BassScale } | null>(null)
   const [scaleSelectedNotes, setScaleSelectedNotes] = useState<Set<string>>(new Set())
+  const [hoveredString, setHoveredString] = useState<number | null>(null)
+  const [hoveredFret, setHoveredFret] = useState<number | null>(null)
 
   const handleStringCheckboxChange = (index: number) => {
     const newCheckboxes = [...stringCheckboxes]
@@ -442,6 +444,16 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     return noteNameWithoutOctave === currentScale.root
   }
 
+  // Check if a note should show preview on string hover
+  const shouldShowStringPreview = (stringIndex: number): boolean => {
+    return hoveredString === stringIndex && !stringCheckboxes[stringIndex]
+  }
+
+  // Check if a note should show preview on fret hover
+  const shouldShowFretPreview = (fretIndex: number): boolean => {
+    return hoveredFret === fretIndex && !fretCheckboxes[fretIndex]
+  }
+
   // Provide scale handlers to parent component
   useEffect(() => {
     if (onScaleHandlersReady) {
@@ -476,8 +488,10 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             className="bass-fret-checkbox"
             checked={fretCheckboxes[0]}
             onChange={() => handleFretCheckboxChange(0)}
+            onMouseEnter={() => setHoveredFret(0)}
+            onMouseLeave={() => setHoveredFret(null)}
           />
-          <label htmlFor="bass-fret-open" className="bass-fret-checkbox-label">Open</label>
+          <label htmlFor="bass-fret-open" className="bass-fret-checkbox-label">0</label>
         </div>
 
         {/* Frets */}
@@ -503,6 +517,8 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                 className="bass-fret-checkbox"
                 checked={fretCheckboxes[index + 1]}
                 onChange={() => handleFretCheckboxChange(index + 1)}
+                onMouseEnter={() => setHoveredFret(index + 1)}
+                onMouseLeave={() => setHoveredFret(null)}
               />
               <label htmlFor={`bass-fret-${index + 1}`} className="bass-fret-checkbox-label">{index + 1}</label>
             </div>
@@ -572,6 +588,8 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               className="bass-string-checkbox"
               checked={stringCheckboxes[index]}
               onChange={() => handleStringCheckboxChange(index)}
+              onMouseEnter={() => setHoveredString(index)}
+              onMouseLeave={() => setHoveredString(null)}
             />
             <label htmlFor={`bass-string-${index}`} className="bass-string-checkbox-label">{index + 1}</label>
           </div>
@@ -655,6 +673,40 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                 className={noteClass}
                 style={{
                   left: `${fretIndex === 0 ? 30 : (fretIndex + 1) * 60 - 39}px`, // Center first fret in its area, others align with checkboxes
+                  top: `${22 + stringIndex * 30 - 11}px`, // Center on string
+                }}
+              >
+                <span className="bass-note-name">
+                  {noteName}
+                </span>
+              </div>
+            )
+          })
+        )}
+
+        {/* Preview bass note visualization circles for hover effects */}
+        {[...Array(4)].map((_, stringIndex) =>
+          [...Array(25)].map((_, fretIndex) => {
+            const adjustedFretIndex = fretIndex === 0 ? 0 : fretIndex - 1 // Adjust for open string
+            const shouldShowPreview = (
+              shouldShowStringPreview(stringIndex) ||
+              shouldShowFretPreview(fretIndex)
+            ) && !isNoteSelected(stringIndex, adjustedFretIndex)
+
+            if (!shouldShowPreview) return null
+
+            const noteName = fretIndex === 0
+              ? getNoteForStringAndFret(stringIndex, 0) // Open string
+              : getNoteForStringAndFret(stringIndex, fretIndex - 1) // Regular fret
+
+            return (
+              <div
+                key={`bass-preview-note-${stringIndex}-${fretIndex}`}
+                className="bass-note-circle preview"
+                style={{
+                  left: fretIndex === 0
+                    ? `-2.5px` // Open string position
+                    : `${fretIndex * 60 - 39}px`, // Regular fret position
                   top: `${22 + stringIndex * 30 - 11}px`, // Center on string
                 }}
               >

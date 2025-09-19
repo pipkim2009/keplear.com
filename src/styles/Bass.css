@@ -142,15 +142,18 @@
 }
 
 .bass-fret-checkbox {
-  width: 16px;
-  height: 16px;
+  width: 28px;
+  height: 28px;
   appearance: none;
-  background: rgba(255, 140, 0, 0.1);
+  background: transparent;
   border: 2px solid #ff8c00;
-  border-radius: 4px;
+  border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bass-fret-checkbox:checked {
@@ -158,46 +161,46 @@
   border-color: #ffb347;
 }
 
-.bass-fret-checkbox:checked::after {
-  content: '✓';
-  position: absolute;
-  top: -2px;
-  left: 2px;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-}
-
 .bass-fret-checkbox:hover {
-  background: rgba(255, 140, 0, 0.2);
-  transform: scale(1.1);
+  background: rgba(255, 140, 0, 0.6);
+  transform: scale(1.05);
 }
 
 .bass-fret-checkbox-label {
-  font-size: 10px;
-  color: #ffcc80;
-  font-weight: 600;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 700;
   cursor: pointer;
   text-align: center;
+  color: #ffcc80;
+  pointer-events: none;
+  user-select: none;
+}
+
+.bass-fret-checkbox:checked + .bass-fret-checkbox-label {
+  color: white;
 }
 
 /* Disabled state for bass fret checkboxes */
 .bass-fret-checkbox.disabled {
-  opacity: 0.8;
-  background: rgba(255, 140, 0, 0.05);
-  border-color: rgba(255, 140, 0, 0.4);
+  opacity: 0.5;
+  background: transparent;
+  border-color: rgba(255, 140, 0, 0.3);
   cursor: not-allowed;
 }
 
 .bass-fret-checkbox.disabled:hover {
-  background: rgba(255, 140, 0, 0.05);
+  background: transparent;
   transform: none;
-  border-color: rgba(255, 140, 0, 0.4);
+  border-color: rgba(255, 140, 0, 0.3);
 }
 
 .bass-fret-checkbox-label.disabled {
-  opacity: 0.8;
-  color: rgba(255, 204, 128, 0.8);
+  opacity: 0.5;
+  color: rgba(255, 204, 128, 0.5);
   cursor: not-allowed;
 }
 
@@ -214,15 +217,18 @@
 }
 
 .bass-string-checkbox {
-  width: 16px;
-  height: 16px;
+  width: 28px;
+  height: 28px;
   appearance: none;
-  background: rgba(255, 140, 0, 0.1);
+  background: transparent;
   border: 2px solid #ff8c00;
-  border-radius: 4px;
+  border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bass-string-checkbox:checked {
@@ -230,26 +236,27 @@
   border-color: #ffb347;
 }
 
-.bass-string-checkbox:checked::after {
-  content: '✓';
-  position: absolute;
-  top: -2px;
-  left: 2px;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-}
-
 .bass-string-checkbox:hover {
-  background: rgba(255, 140, 0, 0.2);
-  transform: scale(1.1);
+  background: rgba(255, 140, 0, 0.6);
+  transform: scale(1.05);
 }
 
 .bass-string-checkbox-label {
-  font-size: 10px;
-  color: #ffcc80;
-  font-weight: 600;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 700;
   cursor: pointer;
+  text-align: center;
+  color: #ffcc80;
+  pointer-events: none;
+  user-select: none;
+}
+
+.bass-string-checkbox:checked + .bass-string-checkbox-label {
+  color: white;
 }
 
 /* Clickable bass fret positions */
@@ -294,6 +301,15 @@
     inset 0 1px 3px rgba(255, 255, 255, 0.4);
   animation: bassNoteAppear 0.3s ease-out;
   pointer-events: none;
+}
+
+/* Preview bass note circle styling (for hover effects) */
+.bass-note-circle.preview {
+  background: linear-gradient(145deg, rgba(255, 140, 0, 0.4), rgba(204, 112, 0, 0.4));
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 3px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2);
 }
 
 /* Green styling for bass melody notes */
