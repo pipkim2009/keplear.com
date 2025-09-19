@@ -423,3 +423,40 @@
     font-size: 20px;
   }
 }
+
+/* Custom scrollbar for instrument container (keyboard) */
+.instrument-container::-webkit-scrollbar {
+  height: 12px;
+}
+
+.instrument-container::-webkit-scrollbar-track {
+  background: linear-gradient(145deg, #1a202c, #2d3748);
+  border-radius: 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.instrument-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(145deg, #4a5568, #2d3748);
+  border-radius: 6px;
+  border: 1px solid #718096;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.instrument-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(145deg, #5a6578, #3d4758);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15);
+}
+
+.instrument-container::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(145deg, #3a4558, #2a3648);
+}
+
+/* Firefox scrollbar */
+.instrument-container {
+  scrollbar-width: thin;
+  scrollbar-color: #4a5568 #1a202c;
+}
