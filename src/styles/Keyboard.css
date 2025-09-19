@@ -174,11 +174,11 @@
   position: relative;
   display: flex;
   width: auto;
-  min-width: 880px;
+  min-width: fit-content;
 }
 
 .keyboard.default-mode {
-  margin-left: 50px;
+  margin-left: 0;
 }
 
 @media (max-width: 480px) {
