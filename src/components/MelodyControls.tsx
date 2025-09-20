@@ -34,9 +34,14 @@ const MelodyControls: React.FC<MelodyControlsProps> = ({
     : selectedNotes.length > 0        // Guitar needs at least 1 note
   return (
     <div className="melody-controls">
-      <div className="notes-toggle-container">
-        <NotesToggle showNotes={showNotes} onToggle={onToggleNotes} />
-      </div>
+      <button
+        className="notes-toggle-container"
+        onClick={onToggleNotes}
+        title={showNotes ? 'Hide notes' : 'Reveal notes'}
+        aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
+      >
+        <NotesToggle showNotes={showNotes} onToggle={() => {}} />
+      </button>
       
       <div className="selected-notes">
         Selected Notes: {selectedNotes.map(n => n.name).join(', ') || 'None'}

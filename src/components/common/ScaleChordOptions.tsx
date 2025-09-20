@@ -188,7 +188,6 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         <div className="scale-options-content">
           {/* Mode Toggle Slider */}
           <div className="control-section">
-            <label className="control-label">Mode</label>
             <div className="mode-toggle">
               <label className="toggle-switch">
                 <input

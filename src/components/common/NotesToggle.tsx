@@ -6,23 +6,14 @@ interface NotesToggleProps {
   onToggle: () => void
 }
 
-const NotesToggle: React.FC<NotesToggleProps> = ({ showNotes, onToggle }) => {
+const NotesToggle: React.FC<NotesToggleProps> = ({ showNotes }) => {
   return (
-    <button 
-      className="notes-toggle-switch"
-      onClick={onToggle}
-      title={showNotes ? 'Hide notes' : 'Show notes'}
-      aria-label={showNotes ? 'Hide notes' : 'Show notes'}
-    >
-      <div className={`toggle-track ${showNotes ? 'show' : ''}`}>
-        <div className={`toggle-thumb ${showNotes ? 'visible' : 'hidden'}`}>
-          {showNotes ? <Eye size={12} /> : <EyeOff size={12} />}
-        </div>
-      </div>
+    <div className="notes-toggle-content">
+      {showNotes ? <EyeOff size={16} /> : <Eye size={16} />}
       <span className="toggle-label">
-        {showNotes ? 'Show' : 'Hide'}
+        {showNotes ? 'Hide' : 'Reveal'}
       </span>
-    </button>
+    </div>
   )
 }
 
