@@ -1,0 +1,200 @@
+/* Custom Dropdown Component - Following W3Schools Guide */
+/* Adapted for keplear.com with blue selected items and rounded borders */
+
+.custom-dropdown {
+  position: relative;
+  display: inline-block;
+  width: 120px;
+  min-width: 120px;
+}
+
+.custom-dropbtn {
+  background: rgba(128, 0, 255, 0.1);
+  border: 2px solid #8000ff;
+  color: #d2d2f9;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  outline: none;
+  min-width: 120px;
+  width: 120px;
+  text-align: center;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.custom-dropbtn:hover {
+  background: rgba(128, 0, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.custom-dropbtn:focus {
+  box-shadow: 0 0 0 2px rgba(128, 0, 255, 0.3);
+}
+
+/* Dropdown arrow */
+.custom-dropbtn::after {
+  content: '▼';
+  font-size: 10px;
+  position: absolute;
+  right: 8px;
+  transition: transform 0.2s ease;
+}
+
+.custom-dropdown.open .custom-dropbtn::after {
+  transform: rotate(180deg);
+}
+
+/* Dropdown content */
+.custom-dropdown-content {
+  display: none;
+  position: absolute;
+  background: #000000;
+  min-width: 100%;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  border-radius: 8px;
+  border: 2px solid #333333;
+  margin-top: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.custom-dropdown-content.show {
+  display: block;
+}
+
+/* Dropdown items */
+.custom-dropdown-item {
+  background: #000000;
+  color: #ffffff;
+  padding: 8px 0;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 4px;
+  margin: 2px;
+  transition: all 0.2s ease;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.custom-dropdown-item:hover {
+  background: #333333;
+}
+
+.custom-dropdown-item.selected {
+  background: #3b82f6 !important;
+  color: #000000 !important;
+  font-weight: 700;
+}
+
+/* Scale options specific styling */
+.scale-dropdown .custom-dropbtn {
+  background: rgba(255, 152, 0, 0.1);
+  border: 2px solid #ffcc02;
+  color: #ffcc02;
+  width: 100%;
+  min-width: auto;
+}
+
+.scale-dropdown .custom-dropbtn:hover {
+  background: rgba(255, 204, 2, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.scale-dropdown .custom-dropbtn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 204, 2, 0.4);
+}
+
+/* Guitar mode styling */
+.guitar-mode .custom-dropdown .custom-dropbtn {
+  background: rgba(34, 197, 94, 0.1);
+  border: 2px solid #22c55e;
+  color: #4ade80;
+}
+
+.guitar-mode .custom-dropdown .custom-dropbtn:hover {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.guitar-mode .custom-dropdown .custom-dropbtn:focus {
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+}
+
+/* Bass mode styling */
+.bass-mode .custom-dropdown .custom-dropbtn {
+  background: rgba(239, 68, 68, 0.1);
+  border: 2px solid #ef4444;
+  color: #f87171;
+}
+
+.bass-mode .custom-dropdown .custom-dropbtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+}
+
+.bass-mode .custom-dropdown .custom-dropbtn:focus {
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .custom-dropdown {
+    min-width: 100px;
+    width: 100px;
+  }
+
+  .custom-dropbtn {
+    font-size: 11px;
+  }
+
+  .custom-dropdown-item {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .custom-dropdown {
+    min-width: 120px;
+    width: 120px;
+  }
+
+  .custom-dropbtn {
+    font-size: 12px;
+  }
+
+  .custom-dropdown-item {
+    font-size: 12px;
+  }
+}
+
+/* Dark mode support */
+.dark .custom-dropdown-content {
+  background: #000000;
+  border-color: #333333;
+}
+
+.dark .custom-dropdown-item {
+  background: #000000;
+  color: #ffffff;
+}
+
+.dark .custom-dropdown-item:hover {
+  background: #333333;
+}
+
+.dark .custom-dropdown-item.selected {
+  background: #3b82f6 !important;
+  color: #000000 !important;
+}

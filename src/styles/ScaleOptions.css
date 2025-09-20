@@ -179,18 +179,27 @@
   box-shadow: 0 0 0 2px rgba(255, 204, 2, 0.4);
 }
 
-/* Dark background for dropdown options */
+/* Custom dropdown options styling */
 .control-select option {
-  background: #2d1b69;
-  color: #ffcc02;
+  background: #000000;
+  color: #ffffff;
   text-align: center;
   text-align-last: center;
-  padding: 4px 8px;
+  padding: 8px 0;
   direction: ltr;
-  border: 1px solid #000000;
+  border: 1px solid #333333;
   display: block;
   width: 100%;
   box-sizing: border-box;
+  border-radius: 4px;
+  margin: 1px 0;
+}
+
+.control-select option:checked,
+.control-select option:selected {
+  background: #3b82f6 !important;
+  color: #000000 !important;
+  font-weight: 600;
 }
 
 .apply-button {

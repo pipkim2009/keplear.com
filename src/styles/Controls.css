@@ -198,18 +198,27 @@
   box-shadow: 0 0 0 2px rgba(128, 0, 255, 0.3);
 }
 
-/* Dark background for dropdown options */
+/* Custom dropdown options styling */
 .control-input option {
-  background: #2d1b69;
-  color: #d2d2f9;
+  background: #000000;
+  color: #ffffff;
   text-align: center;
   text-align-last: center;
-  padding: 4px 8px;
+  padding: 8px 0;
   direction: ltr;
-  border: 1px solid #000000;
+  border: 1px solid #333333;
   display: block;
   width: 100%;
   box-sizing: border-box;
+  border-radius: 4px;
+  margin: 1px 0;
+}
+
+.control-input option:checked,
+.control-input option:selected {
+  background: #3b82f6 !important;
+  color: #000000 !important;
+  font-weight: 600;
 }
 
 /* Input with plus/minus buttons layout */
