@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import '../../styles/Guitar.css'
 import { guitarNotes } from '../../utils/guitarNotes'
 import { applyScaleToGuitar, applyScaleBoxToGuitar, isNoteInScale, GUITAR_SCALES, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
+import { applyChordToGuitar, applyChordShapeToGuitar, isNoteInChord, GUITAR_CHORDS, type GuitarChord, type ChordShape } from '../../utils/guitarChords'
 import type { Note } from '../../utils/notes'
 
 interface GuitarProps {
@@ -15,14 +16,21 @@ interface GuitarProps {
     handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
     handleClearScale: () => void;
   }) => void
+  onChordHandlersReady?: (handlers: {
+    handleChordSelect: (rootNote: string, chord: GuitarChord) => void;
+    handleChordShapeSelect: (chordShape: ChordShape) => void;
+    handleClearChord: () => void;
+  }) => void
 }
 
-const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady }) => {
+const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set())
   const [currentScale, setCurrentScale] = useState<{ root: string; scale: GuitarScale } | null>(null)
   const [scaleSelectedNotes, setScaleSelectedNotes] = useState<Set<string>>(new Set())
+  const [currentChord, setCurrentChord] = useState<{ root: string; chord: GuitarChord } | null>(null)
+  const [chordSelectedNotes, setChordSelectedNotes] = useState<Set<string>>(new Set())
   const [hoveredString, setHoveredString] = useState<number | null>(null)
   const [hoveredFret, setHoveredFret] = useState<number | null>(null)
 
@@ -427,6 +435,67 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(new Set())
     setScaleSelectedNotes(new Set())
+    // Clear chord state when clearing scale
+    setCurrentChord(null)
+    setChordSelectedNotes(new Set())
+  }, [])
+
+  // Handle chord selection
+  const handleChordSelect = useCallback((rootNote: string, chord: GuitarChord) => {
+    // Apply chord to guitar
+    const chordSelections = applyChordToGuitar(rootNote, chord, guitarNotes)
+    const newSelectedNotes = new Set<string>()
+    const newChordSelectedNotes = new Set<string>()
+
+    // Add chord notes to selection
+    chordSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      newSelectedNotes.add(noteKey)
+      newChordSelectedNotes.add(noteKey)
+    })
+
+    // Update all state at once to minimize re-renders
+    setCurrentChord({ root: rootNote, chord })
+    setStringCheckboxes(new Array(6).fill(false))
+    setFretCheckboxes(new Array(25).fill(false))
+    setSelectedNotes(newSelectedNotes)
+    setChordSelectedNotes(newChordSelectedNotes)
+    // Clear scale state when chord is applied
+    setCurrentScale(null)
+    setScaleSelectedNotes(new Set())
+  }, [])
+
+  // Handle chord shape selection
+  const handleChordShapeSelect = useCallback((chordShape: ChordShape) => {
+    // Apply chord shape to guitar
+    const chordSelections = applyChordShapeToGuitar(chordShape)
+    const newSelectedNotes = new Set<string>()
+    const newChordSelectedNotes = new Set<string>()
+
+    // Add chord notes to selection
+    chordSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      newSelectedNotes.add(noteKey)
+      newChordSelectedNotes.add(noteKey)
+    })
+
+    // Update state
+    setStringCheckboxes(new Array(6).fill(false))
+    setFretCheckboxes(new Array(25).fill(false))
+    setSelectedNotes(newSelectedNotes)
+    setChordSelectedNotes(newChordSelectedNotes)
+    // Clear scale state when chord shape is applied
+    setCurrentScale(null)
+    setScaleSelectedNotes(new Set())
+  }, [currentChord])
+
+  // Handle clearing chord
+  const handleClearChord = useCallback(() => {
+    setCurrentChord(null)
+    setStringCheckboxes(new Array(6).fill(false))
+    setFretCheckboxes(new Array(25).fill(false))
+    setSelectedNotes(new Set())
+    setChordSelectedNotes(new Set())
   }, [])
 
   // Check if a note was selected as part of the current scale application
@@ -441,11 +510,29 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     return scaleSelectedNotes.has(noteKey)
   }
 
-  // Check if a note is the root note of the current scale
+  // Check if a note is the root note of the current scale or chord
   const isRootNote = (noteName: string): boolean => {
-    if (!currentScale) return false
-    const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
-    return noteNameWithoutOctave === currentScale.root
+    if (currentScale) {
+      const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
+      return noteNameWithoutOctave === currentScale.root
+    }
+    if (currentChord) {
+      const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
+      return noteNameWithoutOctave === currentChord.root
+    }
+    return false
+  }
+
+  // Check if a note was selected as part of the current chord application
+  const isNoteInCurrentChord = (stringIndex: number, fretIndex: number): boolean => {
+    const noteKey = `${stringIndex}-${fretIndex}`
+    return chordSelectedNotes.has(noteKey)
+  }
+
+  // Check if an open string was selected as part of the current chord application
+  const isOpenStringInCurrentChord = (stringIndex: number): boolean => {
+    const noteKey = `${stringIndex}-open`
+    return chordSelectedNotes.has(noteKey)
   }
 
   // Check if a note should show preview on string hover
@@ -470,6 +557,18 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleScaleSelect, handleScaleBoxSelect, handleClearScale])
 
+  // Provide chord handlers to parent component
+  useEffect(() => {
+    if (onChordHandlersReady) {
+      onChordHandlersReady({
+        handleChordSelect,
+        handleChordShapeSelect,
+        handleClearChord
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleChordSelect, handleChordShapeSelect, handleClearChord])
+
   // Clear all selections when clearTrigger changes
   useEffect(() => {
     if (clearTrigger !== undefined) {
@@ -478,6 +577,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       setSelectedNotes(new Set())
       setScaleSelectedNotes(new Set())
       setCurrentScale(null)
+      setChordSelectedNotes(new Set())
+      setCurrentChord(null)
     }
   }, [clearTrigger])
 

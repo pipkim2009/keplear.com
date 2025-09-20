@@ -255,6 +255,120 @@
   height: 28px;
 }
 
+/* Mode Toggle Slider */
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 120px;
+  height: 32px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 152, 0, 0.2);
+  border: 2px solid #ffcc02;
+  transition: all 0.3s ease;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+}
+
+.toggle-text {
+  font-size: 11px;
+  font-weight: 600;
+  z-index: 2;
+  position: relative;
+  transition: all 0.3s ease;
+  color: #ffcc02;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.toggle-text.left {
+  margin-left: 2px;
+}
+
+.toggle-text.right {
+  margin-right: 2px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 56px;
+  left: 2px;
+  top: 2px;
+  background-color: rgba(255, 204, 2, 0.8);
+  transition: all 0.3s ease;
+  border-radius: 14px;
+  z-index: 1;
+}
+
+/* Scales mode (default) */
+.toggle-slider .toggle-text.left {
+  color: #2d1b69;
+  opacity: 1;
+  font-weight: 700;
+  text-shadow: none;
+}
+
+.toggle-slider .toggle-text.right {
+  color: #ffcc02;
+  opacity: 0.7;
+}
+
+/* Chords mode (checked) */
+input:checked + .toggle-slider {
+  background-color: rgba(76, 175, 80, 0.2);
+  border-color: #4caf50;
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(56px);
+  background-color: rgba(76, 175, 80, 0.8);
+}
+
+input:checked + .toggle-slider .toggle-text.left {
+  color: #4caf50;
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+input:checked + .toggle-slider .toggle-text.right {
+  color: #2d1b69;
+  opacity: 1;
+  font-weight: 700;
+  text-shadow: none;
+}
+
+.toggle-slider:hover {
+  background-color: rgba(255, 204, 2, 0.3);
+}
+
+input:checked + .toggle-slider:hover {
+  background-color: rgba(76, 175, 80, 0.3);
+}
+
 /* Very small devices - make scale options thinner */
 @media (max-width: 480px) {
   .scale-options-content {
@@ -269,6 +383,28 @@
   .scale-options-container {
     width: calc(100% - 20px) !important;
     margin: 0 auto !important;
+  }
+
+  .toggle-switch {
+    width: 100px;
+    height: 28px;
+  }
+
+  .toggle-slider {
+    padding: 0 6px;
+  }
+
+  .toggle-text {
+    font-size: 10px;
+  }
+
+  .toggle-slider:before {
+    height: 22px;
+    width: 46px;
+  }
+
+  input:checked + .toggle-slider:before {
+    transform: translateX(46px);
   }
 }
 

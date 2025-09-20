@@ -2,14 +2,17 @@ import Keyboard from './Keyboard'
 import Guitar from '../guitar/Guitar'
 import Bass from '../bass/Bass'
 import InstrumentControls from './InstrumentControls'
-import ScaleOptions from '../common/ScaleOptions'
+import ScaleChordOptions from '../common/ScaleChordOptions'
 import { useRef, useState, useEffect } from 'react'
 import type { Note } from '../../utils/notes'
 import type { GuitarScale, ScaleBox } from '../../utils/guitarScales'
 import type { BassScale, BassScaleBox } from '../../utils/bassScales'
 import type { KeyboardSelectionMode } from './InstrumentControls'
 import { applyScaleToKeyboard, isKeyboardNoteInScale, isKeyboardNoteRoot, type KeyboardScale } from '../../utils/keyboardScales'
+import { applyChordToKeyboard, isKeyboardNoteInChord, isKeyboardNoteChordRoot, type KeyboardChord } from '../../utils/keyboardChords'
 import { generateNotesWithSeparateOctaves } from '../../utils/notes'
+import type { GuitarChord, ChordShape } from '../../utils/guitarChords'
+import type { BassChord, BassChordShape } from '../../utils/bassChords'
 
 interface InstrumentDisplayProps {
   onNoteClick: (note: Note) => void
@@ -57,7 +60,9 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
   const [higherOctaves, setHigherOctaves] = useState<number>(0)
   const [currentKeyboardScale, setCurrentKeyboardScale] = useState<{ root: string; scale: KeyboardScale } | null>(null)
+  const [currentKeyboardChord, setCurrentKeyboardChord] = useState<{ root: string; chord: KeyboardChord } | null>(null)
   const [selectedRoot, setSelectedRoot] = useState<string>('C')
+  const [selectedChordRoot, setSelectedChordRoot] = useState<string>('C')
   const [scaleHandlers, setScaleHandlers] = useState<{
     handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
     handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
@@ -67,6 +72,16 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     handleScaleSelect: (rootNote: string, scale: BassScale) => void;
     handleScaleBoxSelect: (scaleBox: BassScaleBox) => void;
     handleClearScale: () => void;
+  } | null>(null)
+  const [chordHandlers, setChordHandlers] = useState<{
+    handleChordSelect: (rootNote: string, chord: GuitarChord) => void;
+    handleChordShapeSelect: (chordShape: ChordShape) => void;
+    handleClearChord: () => void;
+  } | null>(null)
+  const [bassChordHandlers, setBassChordHandlers] = useState<{
+    handleChordSelect: (rootNote: string, chord: BassChord) => void;
+    handleChordShapeSelect: (chordShape: BassChordShape) => void;
+    handleClearChord: () => void;
   } | null>(null)
 
   const handleScaleSelect = (rootNote: string, scale: GuitarScale) => {
@@ -93,8 +108,38 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     }
   }
 
+  // Chord handlers
+  const handleChordSelect = (rootNote: string, chord: GuitarChord) => {
+    if (instrument === 'guitar' && chordHandlers) {
+      chordHandlers.handleChordSelect(rootNote, chord)
+    } else if (instrument === 'bass' && bassChordHandlers) {
+      bassChordHandlers.handleChordSelect(rootNote, chord as any)
+    }
+  }
+
+  const handleChordShapeSelect = (chordShape: ChordShape) => {
+    if (instrument === 'guitar' && chordHandlers) {
+      chordHandlers.handleChordShapeSelect(chordShape)
+    } else if (instrument === 'bass' && bassChordHandlers) {
+      bassChordHandlers.handleChordShapeSelect(chordShape as any)
+    }
+  }
+
+  const handleClearChord = () => {
+    if (instrument === 'guitar' && chordHandlers) {
+      chordHandlers.handleClearChord()
+    } else if (instrument === 'bass' && bassChordHandlers) {
+      bassChordHandlers.handleClearChord()
+    }
+  }
+
   // Keyboard scale handlers
   const handleKeyboardScaleApply = (rootNote: string, scale: KeyboardScale) => {
+    // Switch to multi-select mode automatically
+    if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
+      onKeyboardSelectionModeChange('multi')
+    }
+
     // Generate current keyboard notes based on octave range
     const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
       ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
@@ -117,21 +162,67 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     setCurrentKeyboardScale(null)
   }
 
+  // Keyboard chord handlers
+  const handleKeyboardChordApply = (rootNote: string, chord: KeyboardChord) => {
+    // Switch to multi-select mode automatically
+    if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
+      onKeyboardSelectionModeChange('multi')
+    }
+
+    // Generate current keyboard notes based on octave range
+    const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
+      ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+      : generateNotesWithSeparateOctaves(0, 0) // Default range
+
+    // Apply chord to get chord notes
+    const chordNotes = applyChordToKeyboard(rootNote, chord, currentNotes)
+
+    // Set these notes as selected (this will trigger the melody system)
+    setGuitarNotes(chordNotes)
+
+    // Store current chord info for visual highlighting
+    setCurrentKeyboardChord({ root: rootNote, chord })
+    // Clear scale highlighting when chord is applied
+    setCurrentKeyboardScale(null)
+  }
+
+  const handleKeyboardChordClear = () => {
+    // Clear all selected notes
+    clearSelection()
+    // Clear chord info
+    setCurrentKeyboardChord(null)
+  }
+
   const handleRootChange = (rootNote: string) => {
     setSelectedRoot(rootNote)
     // Update scale handlers if they exist (for guitar)
     // The selected root will be used when applying scales
   }
 
-  // Helper functions for keyboard scale highlighting
+  const handleChordRootChange = (rootNote: string) => {
+    setSelectedChordRoot(rootNote)
+    // The selected root will be used when applying chords
+  }
+
+  // Helper functions for keyboard scale and chord highlighting
   const isNoteInKeyboardScale = (note: Note): boolean => {
-    if (!currentKeyboardScale) return false
-    return isKeyboardNoteInScale(note, currentKeyboardScale.root, currentKeyboardScale.scale)
+    if (currentKeyboardScale) {
+      return isKeyboardNoteInScale(note, currentKeyboardScale.root, currentKeyboardScale.scale)
+    }
+    if (currentKeyboardChord) {
+      return isKeyboardNoteInChord(note, currentKeyboardChord.root, currentKeyboardChord.chord)
+    }
+    return false
   }
 
   const isNoteKeyboardRoot = (note: Note): boolean => {
-    if (!currentKeyboardScale) return false
-    return isKeyboardNoteRoot(note, currentKeyboardScale.root)
+    if (currentKeyboardScale) {
+      return isKeyboardNoteRoot(note, currentKeyboardScale.root)
+    }
+    if (currentKeyboardChord) {
+      return isKeyboardNoteChordRoot(note, currentKeyboardChord.root)
+    }
+    return false
   }
 
   // Notify parent when octave range changes
@@ -141,7 +232,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     }
   }, [lowerOctaves, higherOctaves, onOctaveRangeChange])
 
-  // Auto-reapply keyboard scale when octave range changes (but not on initial scale application)
+  // Auto-reapply keyboard scale/chord when octave range changes (but not on initial application)
   useEffect(() => {
     if (currentKeyboardScale) {
       // Generate current keyboard notes based on octave range
@@ -154,8 +245,19 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
 
       // Set these notes as selected (this will trigger the melody system)
       setGuitarNotes(scaleNotes)
+    } else if (currentKeyboardChord) {
+      // Generate current keyboard notes based on octave range
+      const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
+        ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+        : generateNotesWithSeparateOctaves(0, 0) // Default range
+
+      // Apply chord to get chord notes
+      const chordNotes = applyChordToKeyboard(currentKeyboardChord.root, currentKeyboardChord.chord, currentNotes)
+
+      // Set these notes as selected (this will trigger the melody system)
+      setGuitarNotes(chordNotes)
     }
-  }, [lowerOctaves, higherOctaves]) // Only depend on octave changes, not the scale state
+  }, [lowerOctaves, higherOctaves]) // Only depend on octave changes, not the scale/chord state
 
   return (
     <>
@@ -183,13 +285,18 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             onKeyboardScaleApply={handleKeyboardScaleApply}
             onKeyboardScaleClear={handleKeyboardScaleClear}
             scaleOptionsComponent={
-              <ScaleOptions
+              <ScaleChordOptions
                 instrument={instrument}
                 selectedRoot={selectedRoot}
+                selectedChordRoot={selectedChordRoot}
                 onRootChange={handleRootChange}
+                onChordRootChange={handleChordRootChange}
                 onScaleSelect={handleScaleSelect}
                 onScaleBoxSelect={handleScaleBoxSelect}
                 onKeyboardScaleApply={handleKeyboardScaleApply}
+                onChordSelect={handleChordSelect}
+                onChordShapeSelect={handleChordShapeSelect}
+                onKeyboardChordApply={handleKeyboardChordApply}
               />
             }
           />
@@ -216,6 +323,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             onNoteClick={onNoteClick}
             clearTrigger={clearTrigger}
             onScaleHandlersReady={setScaleHandlers}
+            onChordHandlersReady={setChordHandlers}
           />
         ) : (
           <Bass
@@ -225,6 +333,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             onNoteClick={onNoteClick}
             clearTrigger={clearTrigger}
             onScaleHandlersReady={setBassScaleHandlers}
+            onChordHandlersReady={setBassChordHandlers}
           />
         )}
       </div>
