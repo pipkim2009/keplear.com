@@ -167,14 +167,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
   // Hold-down functionality
   const startBpmIncrement = () => {
-    console.log('Starting BPM increment')
     isHoldingBpm.current = true
     setInputActive('bpm', true) // Set to green immediately
 
     const increment = () => {
       setBpm(prevBpm => {
         const newBpm = Math.min(prevBpm + 1, 999)
-        console.log('BPM increment tick:', prevBpm, '->', newBpm)
         setBpmDisplay(newBpm.toString())
         return newBpm
       })
@@ -183,18 +181,15 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     increment() // First increment immediately
     if (bpmIntervalRef.current) clearInterval(bpmIntervalRef.current)
     bpmIntervalRef.current = setInterval(increment, 200)
-    console.log('BPM interval started, ID:', bpmIntervalRef.current)
   }
 
   const startBpmDecrement = () => {
-    console.log('Starting BPM decrement')
     isHoldingBpm.current = true
     setInputActive('bpm', true) // Set to green immediately
 
     const decrement = () => {
       setBpm(prevBpm => {
         const newBpm = Math.max(prevBpm - 1, 1)
-        console.log('BPM decrement tick:', prevBpm, '->', newBpm)
         setBpmDisplay(newBpm.toString())
         return newBpm
       })
@@ -206,14 +201,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   }
 
   const startNotesIncrement = () => {
-    console.log('Starting Notes increment')
     isHoldingNotes.current = true
     setInputActive('notes', true) // Set to green immediately
 
     const increment = () => {
       setNumberOfNotes(prevNotes => {
         const newNotes = Math.min(prevNotes + 1, 999)
-        console.log('Notes increment tick:', prevNotes, '->', newNotes)
         setNotesDisplay(newNotes.toString())
         return newNotes
       })
@@ -225,14 +218,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   }
 
   const startNotesDecrement = () => {
-    console.log('Starting Notes decrement')
     isHoldingNotes.current = true
     setInputActive('notes', true) // Set to green immediately
 
     const decrement = () => {
       setNumberOfNotes(prevNotes => {
         const newNotes = Math.max(prevNotes - 1, 1)
-        console.log('Notes decrement tick:', prevNotes, '->', newNotes)
         setNotesDisplay(newNotes.toString())
         return newNotes
       })
@@ -244,7 +235,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   }
 
   const stopBpmInterval = () => {
-    console.log('Stopping BPM interval')
     isHoldingBpm.current = false
     if (bpmIntervalRef.current) {
       clearInterval(bpmIntervalRef.current)
@@ -255,7 +245,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   }
 
   const stopNotesInterval = () => {
-    console.log('Stopping Notes interval')
     isHoldingNotes.current = false
     if (notesIntervalRef.current) {
       clearInterval(notesIntervalRef.current)
