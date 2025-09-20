@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import Header from './components/common/Header'
 import Footer from './components/common/Footer'
@@ -44,7 +44,22 @@ function App() {
   const [instrument, setInstrument] = useState<InstrumentType>(DEFAULT_SETTINGS.instrument)
   const [keyboardOctaves, setKeyboardOctaves] = useState<{ lower: number; higher: number }>({ lower: 0, higher: 0 })
   const [keyboardSelectionMode, setKeyboardSelectionMode] = useState<'range' | 'multi'>('range')
-  
+  const [flashingInputs, setFlashingInputs] = useState<{ bpm: boolean; notes: boolean; mode: boolean }>({
+    bpm: false,
+    notes: false,
+    mode: false
+  })
+  const [activeInputs, setActiveInputs] = useState<{ bpm: boolean; notes: boolean; mode: boolean }>({
+    bpm: false,
+    notes: false,
+    mode: false
+  })
+
+  // Refs to track initial render
+  const isInitialBpm = useRef(true)
+  const isInitialNotes = useRef(true)
+  const isInitialMode = useRef(true)
+
   const { isDarkMode, toggleTheme } = useTheme()
   const { playNote, playGuitarNote, playBassNote, playMelody, playGuitarMelody, playBassMelody, stopMelody, isPlaying } = useAudio()
 
@@ -52,6 +67,49 @@ function App() {
   useEffect(() => {
     document.body.className = isDarkMode ? 'dark' : 'light'
   }, [isDarkMode])
+
+  // Function to trigger green border flash for specific input
+  const triggerInputFlash = useCallback((inputType: 'bpm' | 'notes' | 'mode') => {
+    setFlashingInputs(prev => ({ ...prev, [inputType]: true }))
+    setTimeout(() => {
+      setFlashingInputs(prev => ({ ...prev, [inputType]: false }))
+    }, 1000)
+  }, [])
+
+  // Function to set input as actively changing (stays green)
+  const setInputActive = useCallback((inputType: 'bpm' | 'notes' | 'mode', active: boolean) => {
+    setActiveInputs(prev => ({ ...prev, [inputType]: active }))
+  }, [])
+
+  // Trigger flash when BPM changes (skip initial render and when actively changing)
+  useEffect(() => {
+    if (isInitialBpm.current) {
+      isInitialBpm.current = false
+    } else if (!activeInputs.bpm) {
+      // Only trigger if not currently in active state (being held down)
+      triggerInputFlash('bpm')
+    }
+  }, [bpm, triggerInputFlash, activeInputs.bpm])
+
+  // Trigger flash when number of notes changes (skip initial render and when actively changing)
+  useEffect(() => {
+    if (isInitialNotes.current) {
+      isInitialNotes.current = false
+    } else if (!activeInputs.notes) {
+      // Only trigger if not currently in active state (being held down)
+      triggerInputFlash('notes')
+    }
+  }, [numberOfNotes, triggerInputFlash, activeInputs.notes])
+
+  // Trigger flash when selection mode changes (skip initial render and when actively changing)
+  useEffect(() => {
+    if (isInitialMode.current) {
+      isInitialMode.current = false
+    } else if (!activeInputs.mode) {
+      // Only trigger if not currently in active state
+      triggerInputFlash('mode')
+    }
+  }, [keyboardSelectionMode, triggerInputFlash, activeInputs.mode])
 
   const { 
     selectedNotes, 
@@ -188,6 +246,13 @@ function App() {
               onOctaveRangeChange={handleOctaveRangeChange}
               keyboardSelectionMode={keyboardSelectionMode}
               onKeyboardSelectionModeChange={handleKeyboardSelectionModeChange}
+              flashingInputs={{
+                bpm: flashingInputs.bpm || activeInputs.bpm,
+                notes: flashingInputs.notes || activeInputs.notes,
+                mode: flashingInputs.mode || activeInputs.mode
+              }}
+              triggerInputFlash={triggerInputFlash}
+              setInputActive={setInputActive}
             />
 
             <MelodyControls

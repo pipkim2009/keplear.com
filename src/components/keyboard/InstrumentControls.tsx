@@ -29,6 +29,9 @@ interface InstrumentControlsProps {
   onKeyboardScaleApply?: (rootNote: string, scale: KeyboardScale) => void
   onKeyboardScaleClear?: () => void
   scaleOptionsComponent?: React.ReactNode
+  flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
+  triggerInputFlash: (inputType: 'bpm' | 'notes' | 'mode') => void
+  setInputActive: (inputType: 'bpm' | 'notes' | 'mode', active: boolean) => void
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -53,7 +56,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   onKeyboardSelectionModeChange,
   onKeyboardScaleApply,
   onKeyboardScaleClear,
-  scaleOptionsComponent
+  scaleOptionsComponent,
+  flashingInputs,
+  triggerInputFlash,
+  setInputActive
 }) => {
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
@@ -74,6 +80,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   // Refs for hold-down functionality
   const bpmIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const notesIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const isHoldingBpm = useRef<boolean>(false)
+  const isHoldingNotes = useRef<boolean>(false)
   
   // Update display values when props change
   useEffect(() => {
@@ -159,65 +167,102 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
   // Hold-down functionality
   const startBpmIncrement = () => {
+    console.log('Starting BPM increment')
+    isHoldingBpm.current = true
+    setInputActive('bpm', true) // Set to green immediately
+
     const increment = () => {
-      const newBpm = Math.min(bpm + 1, 999)
-      setBpm(newBpm)
-      setBpmDisplay(newBpm.toString())
+      setBpm(prevBpm => {
+        const newBpm = Math.min(prevBpm + 1, 999)
+        console.log('BPM increment tick:', prevBpm, '->', newBpm)
+        setBpmDisplay(newBpm.toString())
+        return newBpm
+      })
     }
-    
+
     increment() // First increment immediately
     if (bpmIntervalRef.current) clearInterval(bpmIntervalRef.current)
-    bpmIntervalRef.current = setInterval(increment, 225)
+    bpmIntervalRef.current = setInterval(increment, 200)
+    console.log('BPM interval started, ID:', bpmIntervalRef.current)
   }
 
   const startBpmDecrement = () => {
+    console.log('Starting BPM decrement')
+    isHoldingBpm.current = true
+    setInputActive('bpm', true) // Set to green immediately
+
     const decrement = () => {
-      const newBpm = Math.max(bpm - 1, 1)
-      setBpm(newBpm)
-      setBpmDisplay(newBpm.toString())
+      setBpm(prevBpm => {
+        const newBpm = Math.max(prevBpm - 1, 1)
+        console.log('BPM decrement tick:', prevBpm, '->', newBpm)
+        setBpmDisplay(newBpm.toString())
+        return newBpm
+      })
     }
-    
+
     decrement() // First decrement immediately
     if (bpmIntervalRef.current) clearInterval(bpmIntervalRef.current)
-    bpmIntervalRef.current = setInterval(decrement, 225)
+    bpmIntervalRef.current = setInterval(decrement, 200)
   }
 
   const startNotesIncrement = () => {
+    console.log('Starting Notes increment')
+    isHoldingNotes.current = true
+    setInputActive('notes', true) // Set to green immediately
+
     const increment = () => {
-      const newNotes = Math.min(numberOfNotes + 1, 999)
-      setNumberOfNotes(newNotes)
-      setNotesDisplay(newNotes.toString())
+      setNumberOfNotes(prevNotes => {
+        const newNotes = Math.min(prevNotes + 1, 999)
+        console.log('Notes increment tick:', prevNotes, '->', newNotes)
+        setNotesDisplay(newNotes.toString())
+        return newNotes
+      })
     }
-    
+
     increment() // First increment immediately
     if (notesIntervalRef.current) clearInterval(notesIntervalRef.current)
-    notesIntervalRef.current = setInterval(increment, 225)
+    notesIntervalRef.current = setInterval(increment, 200)
   }
 
   const startNotesDecrement = () => {
+    console.log('Starting Notes decrement')
+    isHoldingNotes.current = true
+    setInputActive('notes', true) // Set to green immediately
+
     const decrement = () => {
-      const newNotes = Math.max(numberOfNotes - 1, 1)
-      setNumberOfNotes(newNotes)
-      setNotesDisplay(newNotes.toString())
+      setNumberOfNotes(prevNotes => {
+        const newNotes = Math.max(prevNotes - 1, 1)
+        console.log('Notes decrement tick:', prevNotes, '->', newNotes)
+        setNotesDisplay(newNotes.toString())
+        return newNotes
+      })
     }
-    
+
     decrement() // First decrement immediately
     if (notesIntervalRef.current) clearInterval(notesIntervalRef.current)
-    notesIntervalRef.current = setInterval(decrement, 225)
+    notesIntervalRef.current = setInterval(decrement, 200)
   }
 
   const stopBpmInterval = () => {
+    console.log('Stopping BPM interval')
+    isHoldingBpm.current = false
     if (bpmIntervalRef.current) {
       clearInterval(bpmIntervalRef.current)
       bpmIntervalRef.current = null
     }
+    // Turn off green immediately
+    setInputActive('bpm', false)
   }
 
   const stopNotesInterval = () => {
+    console.log('Stopping Notes interval')
+    isHoldingNotes.current = false
     if (notesIntervalRef.current) {
       clearInterval(notesIntervalRef.current)
       notesIntervalRef.current = null
     }
+    // Turn off green immediately
+    setInputActive('notes', false)
   }
 
 
@@ -321,25 +366,49 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             onChange={(e) => handleBpmChange(e.target.value)}
             onKeyPress={handleBpmKeyPress}
             onBlur={handleBpmBlur}
-            className="control-input with-internal-buttons"
+            className={`control-input with-internal-buttons ${flashingInputs.bpm ? 'flashing' : ''}`}
           />
           <button
             className="control-button-internal minus"
-            onMouseDown={startBpmDecrement}
-            onMouseUp={stopBpmInterval}
-            onMouseLeave={stopBpmInterval}
-            onTouchStart={startBpmDecrement}
-            onTouchEnd={stopBpmInterval}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              startBpmDecrement();
+            }}
+            onMouseUp={(e) => {
+              e.preventDefault();
+              stopBpmInterval();
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              startBpmDecrement();
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              stopBpmInterval();
+            }}
+            style={{ userSelect: 'none', touchAction: 'none' }}
           >
             −
           </button>
           <button
             className="control-button-internal plus"
-            onMouseDown={startBpmIncrement}
-            onMouseUp={stopBpmInterval}
-            onMouseLeave={stopBpmInterval}
-            onTouchStart={startBpmIncrement}
-            onTouchEnd={stopBpmInterval}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              startBpmIncrement();
+            }}
+            onMouseUp={(e) => {
+              e.preventDefault();
+              stopBpmInterval();
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              startBpmIncrement();
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              stopBpmInterval();
+            }}
+            style={{ userSelect: 'none', touchAction: 'none' }}
           >
             +
           </button>
@@ -355,25 +424,49 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             onChange={(e) => handleNotesChange(e.target.value)}
             onKeyPress={handleNotesKeyPress}
             onBlur={handleNotesBlur}
-            className="control-input with-internal-buttons"
+            className={`control-input with-internal-buttons ${flashingInputs.notes ? 'flashing' : ''}`}
           />
           <button
             className="control-button-internal minus"
-            onMouseDown={startNotesDecrement}
-            onMouseUp={stopNotesInterval}
-            onMouseLeave={stopNotesInterval}
-            onTouchStart={startNotesDecrement}
-            onTouchEnd={stopNotesInterval}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              startNotesDecrement();
+            }}
+            onMouseUp={(e) => {
+              e.preventDefault();
+              stopNotesInterval();
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              startNotesDecrement();
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              stopNotesInterval();
+            }}
+            style={{ userSelect: 'none', touchAction: 'none' }}
           >
             −
           </button>
           <button
             className="control-button-internal plus"
-            onMouseDown={startNotesIncrement}
-            onMouseUp={stopNotesInterval}
-            onMouseLeave={stopNotesInterval}
-            onTouchStart={startNotesIncrement}
-            onTouchEnd={stopNotesInterval}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              startNotesIncrement();
+            }}
+            onMouseUp={(e) => {
+              e.preventDefault();
+              stopNotesInterval();
+            }}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              startNotesIncrement();
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              stopNotesInterval();
+            }}
+            style={{ userSelect: 'none', touchAction: 'none' }}
           >
             +
           </button>
@@ -387,7 +480,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             <select
               value={keyboardSelectionMode}
               onChange={(e) => onKeyboardSelectionModeChange && onKeyboardSelectionModeChange(e.target.value as KeyboardSelectionMode)}
-              className="control-input"
+              className={`control-input ${flashingInputs.mode ? 'flashing' : ''}`}
             >
               <option value="range">Range Select</option>
               <option value="multi">Multi Select</option>

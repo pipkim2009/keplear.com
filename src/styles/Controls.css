@@ -641,3 +641,9 @@
   box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3) !important;
 }
 
+/* Green border for input changes */
+.control-input.flashing {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4) !important;
+}
+

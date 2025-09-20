@@ -33,6 +33,9 @@ interface InstrumentDisplayProps {
   onOctaveRangeChange?: (lowerOctaves: number, higherOctaves: number) => void
   keyboardSelectionMode?: KeyboardSelectionMode
   onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
+  flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
+  triggerInputFlash: (inputType: 'bpm' | 'notes' | 'mode') => void
+  setInputActive: (inputType: 'bpm' | 'notes' | 'mode', active: boolean) => void
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -53,7 +56,10 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   selectedNotes,
   onOctaveRangeChange,
   keyboardSelectionMode = 'range',
-  onKeyboardSelectionModeChange
+  onKeyboardSelectionModeChange,
+  flashingInputs,
+  triggerInputFlash,
+  setInputActive
 }) => {
   const guitarRef = useRef<any>(null)
   const bassRef = useRef<any>(null)
@@ -284,6 +290,9 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             onKeyboardSelectionModeChange={onKeyboardSelectionModeChange}
             onKeyboardScaleApply={handleKeyboardScaleApply}
             onKeyboardScaleClear={handleKeyboardScaleClear}
+            flashingInputs={flashingInputs}
+            triggerInputFlash={triggerInputFlash}
+            setInputActive={setInputActive}
             scaleOptionsComponent={
               <ScaleChordOptions
                 instrument={instrument}
