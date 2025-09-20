@@ -288,8 +288,7 @@
 }
 
 .bass-fret-position:hover {
-  background: rgba(255, 140, 0, 0.2);
-  transform: scaleY(1.1);
+  background: transparent;
 }
 
 /* Open string area styling for bass */
@@ -298,8 +297,7 @@
 }
 
 .bass-open-string-position:hover {
-  background: rgba(255, 140, 0, 0.2);
-  transform: scaleY(1.1);
+  background: transparent;
 }
 
 /* Bass note circle styling */
@@ -336,6 +334,20 @@
 }
 
 .bass-note-circle.preview.scale-root-note {
+  background: linear-gradient(145deg, rgba(220, 38, 38, 0.4), rgba(185, 28, 28, 0.4)) !important;
+  border: 1px solid rgba(248, 113, 113, 0.6);
+  box-shadow:
+    0 0 6px rgba(220, 38, 38, 0.4),
+    0 3px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2);
+}
+
+.bass-note-circle.preview.chord-note {
+  background: linear-gradient(145deg, rgba(139, 92, 246, 0.4), rgba(124, 58, 237, 0.4)) !important;
+  border: 1px solid rgba(167, 139, 250, 0.6);
+}
+
+.bass-note-circle.preview.chord-root-note {
   background: linear-gradient(145deg, rgba(220, 38, 38, 0.4), rgba(185, 28, 28, 0.4)) !important;
   border: 1px solid rgba(248, 113, 113, 0.6);
   box-shadow:
@@ -507,6 +519,21 @@
 }
 
 .bass-note-circle.scale-root-note {
+  background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
+  border-color: #f87171;
+  box-shadow:
+    0 0 10px rgba(220, 38, 38, 0.7),
+    0 3px 5px rgba(0, 0, 0, 0.4),
+    inset 0 1px 3px rgba(255, 255, 255, 0.4);
+}
+
+/* Bass chord note highlighting */
+.bass-note-circle.chord-note {
+  background: linear-gradient(145deg, #8b5cf6, #7c3aed) !important;
+  border-color: #a78bfa;
+}
+
+.bass-note-circle.chord-root-note {
   background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
   border-color: #f87171;
   box-shadow:

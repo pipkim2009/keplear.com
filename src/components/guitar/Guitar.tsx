@@ -33,6 +33,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   const [chordSelectedNotes, setChordSelectedNotes] = useState<Set<string>>(new Set())
   const [hoveredString, setHoveredString] = useState<number | null>(null)
   const [hoveredFret, setHoveredFret] = useState<number | null>(null)
+  const [hoveredNote, setHoveredNote] = useState<{ string: number; fret: number } | null>(null)
 
   const handleStringCheckboxChange = (index: number) => {
     const newCheckboxes = [...stringCheckboxes]
@@ -545,6 +546,11 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     return hoveredFret === fretIndex && !fretCheckboxes[fretIndex]
   }
 
+  // Check if a specific note should show preview on individual note hover
+  const shouldShowNotePreview = (stringIndex: number, fretIndex: number): boolean => {
+    return hoveredNote?.string === stringIndex && hoveredNote?.fret === fretIndex
+  }
+
   // Provide scale handlers to parent component
   useEffect(() => {
     if (onScaleHandlersReady) {
@@ -657,6 +663,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
               height: `24px`,
             }}
             onClick={() => handleOpenStringClick(stringIndex)}
+            onMouseEnter={() => setHoveredNote({ string: stringIndex, fret: 0 })}
+            onMouseLeave={() => setHoveredNote(null)}
           />
         ))}
 
@@ -673,6 +681,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
                 height: `24px`, // Height of string spacing minus 4px to prevent overlap
               }}
               onClick={() => handleNoteClick(stringIndex, fretIndex)}
+              onMouseEnter={() => setHoveredNote({ string: stringIndex, fret: fretIndex + 1 })}
+              onMouseLeave={() => setHoveredNote(null)}
             />
           ))
         ))}
@@ -792,13 +802,14 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             const adjustedFretIndex = fretIndex === 0 ? 0 : fretIndex - 1 // Adjust for open string
             const shouldShowPreview = (
               shouldShowStringPreview(stringIndex) ||
-              shouldShowFretPreview(fretIndex)
+              shouldShowFretPreview(fretIndex) ||
+              shouldShowNotePreview(stringIndex, fretIndex)
             ) && !isNoteSelected(stringIndex, adjustedFretIndex)
 
             if (!shouldShowPreview) return null
 
             const noteName = fretIndex === 0
-              ? getNoteForStringAndFret(stringIndex, 0) // Open string
+              ? getNoteForStringAndFret(stringIndex, -1) // Open string (1 semitone lower)
               : getNoteForStringAndFret(stringIndex, fretIndex - 1) // Regular fret
 
             return (

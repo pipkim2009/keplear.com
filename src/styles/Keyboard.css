@@ -372,6 +372,52 @@
   background: linear-gradient(145deg, #b91c1c, #991b1b);
 }
 
+/* Chord highlighting for keyboard keys */
+.white-key.chord-note {
+  background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+  border-color: #a78bfa;
+}
+
+.black-key.chord-note {
+  background: linear-gradient(145deg, #7c3aed, #6d28d9);
+}
+
+.white-key.chord-root {
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+  border-color: #991b1b;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.black-key.chord-root {
+  background: linear-gradient(145deg, #b91c1c, #991b1b);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Ensure chord styling takes precedence when both chord and selected are active */
+.white-key.selected.chord-note {
+  background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+}
+
+.black-key.selected.chord-note {
+  background: linear-gradient(145deg, #7c3aed, #6d28d9);
+}
+
+.white-key.selected.chord-root {
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+}
+
+.black-key.selected.chord-root {
+  background: linear-gradient(145deg, #b91c1c, #991b1b);
+}
+
 .key-label {
   position: absolute;
   bottom: 15px;
