@@ -147,12 +147,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
   const handleShapeChange = (shapeIndex: number) => {
     setSelectedShapeIndex(shapeIndex)
-    const currentShapes = instrument === 'bass' ? availableBassShapes : availableShapes
-    if (shapeIndex >= currentShapes.length) {
-      setShowShapes(false)
-    } else {
-      setShowShapes(true)
-    }
+    setShowShapes(true)
   }
 
   const handleApplyChord = () => {
@@ -341,12 +336,9 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     >
                       {availableShapes.map((shape, index) => (
                         <option key={index} value={index}>
-                          {shape.name} ({shape.difficulty})
+                          {shape.name}
                         </option>
                       ))}
-                      <option key="all" value={availableShapes.length}>
-                        All Fretboard
-                      </option>
                     </select>
                   </div>
                 )}
@@ -361,12 +353,9 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     >
                       {availableBassShapes.map((shape, index) => (
                         <option key={index} value={index}>
-                          {shape.name} ({shape.difficulty})
+                          {shape.name}
                         </option>
                       ))}
-                      <option key="all" value={availableBassShapes.length}>
-                        All Fretboard
-                      </option>
                     </select>
                   </div>
                 )}

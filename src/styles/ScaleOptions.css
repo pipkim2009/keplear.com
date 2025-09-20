@@ -314,10 +314,10 @@
 .toggle-slider:before {
   position: absolute;
   content: "";
-  height: 26px;
+  height: 28px;
   width: 56px;
   left: 2px;
-  top: 2px;
+  top: 0px;
   background-color: rgba(255, 204, 2, 0.8);
   transition: all 0.3s ease;
   border-radius: 14px;
@@ -326,7 +326,7 @@
 
 /* Scales mode (default) */
 .toggle-slider .toggle-text.left {
-  color: #2d1b69;
+  color: #000000;
   opacity: 1;
   font-weight: 700;
   text-shadow: none;
@@ -339,23 +339,23 @@
 
 /* Chords mode (checked) */
 input:checked + .toggle-slider {
-  background-color: rgba(76, 175, 80, 0.2);
-  border-color: #4caf50;
+  background-color: rgba(255, 152, 0, 0.2);
+  border-color: #ffcc02;
 }
 
 input:checked + .toggle-slider:before {
   transform: translateX(56px);
-  background-color: rgba(76, 175, 80, 0.8);
+  background-color: rgba(255, 204, 2, 0.8);
 }
 
 input:checked + .toggle-slider .toggle-text.left {
-  color: #4caf50;
+  color: #ffcc02;
   opacity: 0.7;
   font-weight: 600;
 }
 
 input:checked + .toggle-slider .toggle-text.right {
-  color: #2d1b69;
+  color: #000000;
   opacity: 1;
   font-weight: 700;
   text-shadow: none;
@@ -366,7 +366,7 @@ input:checked + .toggle-slider .toggle-text.right {
 }
 
 input:checked + .toggle-slider:hover {
-  background-color: rgba(76, 175, 80, 0.3);
+  background-color: rgba(255, 204, 2, 0.3);
 }
 
 /* Very small devices - make scale options thinner */
@@ -399,8 +399,9 @@ input:checked + .toggle-slider:hover {
   }
 
   .toggle-slider:before {
-    height: 22px;
+    height: 24px;
     width: 46px;
+    top: 0px;
   }
 
   input:checked + .toggle-slider:before {
