@@ -629,8 +629,8 @@
   background: linear-gradient(145deg, #b91c1c, #991b1b);
 }
 
-/* Firefox scrollbar */
+/* Firefox scrollbar - only show when needed */
 .bass-container {
-  scrollbar-width: thin;
+  scrollbar-width: auto;
   scrollbar-color: #ef4444 #2a1a14;
 }

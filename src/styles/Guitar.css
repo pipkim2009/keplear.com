@@ -191,9 +191,9 @@
   background: linear-gradient(145deg, #15803d, #166534);
 }
 
-/* Firefox scrollbar */
+/* Firefox scrollbar - only show when needed */
 .guitar-container {
-  scrollbar-width: thin;
+  scrollbar-width: auto;
   scrollbar-color: #22c55e #2d2d2d;
 }
 

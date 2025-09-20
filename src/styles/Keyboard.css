@@ -461,7 +461,11 @@
   }
 }
 
-/* Custom scrollbar for instrument container (keyboard) */
+/* Custom scrollbar for instrument container (keyboard) - only show when needed */
+.instrument-container {
+  overflow-x: auto;
+}
+
 .instrument-container::-webkit-scrollbar {
   height: 12px;
 }
@@ -493,9 +497,9 @@
   background: linear-gradient(145deg, #1e40af, #1e3a8a);
 }
 
-/* Firefox scrollbar */
+/* Firefox scrollbar - only show when needed */
 .instrument-container {
-  scrollbar-width: thin;
+  scrollbar-width: auto;
   scrollbar-color: #3b82f6 #1a202c;
 }
 
