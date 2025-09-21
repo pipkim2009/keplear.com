@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
 import { guitarNotes } from '../../utils/guitarNotes'
 import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, type BassScale, type BassScaleBox } from '../../utils/bassScales'
@@ -38,6 +38,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isScaleMode, setIsScaleMode] = useState(true) // true for scales, false for chords
+  const containerRef = useRef<HTMLDivElement>(null)
 
   // Scale states
   const [selectedScale, setSelectedScale] = useState<GuitarScale>(GUITAR_SCALES[0])
@@ -60,6 +61,23 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded)
   }
+
+  // Close popup when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsExpanded(false)
+      }
+    }
+
+    if (isExpanded) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isExpanded])
 
   // Update available boxes when root or scale changes (Scale mode)
   useEffect(() => {
@@ -174,18 +192,18 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
     : (instrument === 'bass' ? BASS_CHORD_ROOT_NOTES : CHORD_ROOT_NOTES)
 
   return (
-    <div className={`scale-options-container ${isExpanded ? 'expanded' : 'collapsed'}`}>
+    <div ref={containerRef} className={`scale-options-container ${isExpanded ? 'expanded' : 'collapsed'}`}>
       <button
         className="scale-options-toggle"
         onClick={toggleExpanded}
-        title={isExpanded ? 'Collapse Scales/Chords' : 'Expand Scales/Chords'}
+        title={isExpanded ? 'Close Scales/Chords' : 'Open Scales/Chords'}
       >
         {isExpanded ? '▼' : '▶'}
-        <span className="toggle-text">{isExpanded ? 'Scales/Chords' : '\u00A0\u00A0\u00A0Scales/Chords'}</span>
+        <span className="toggle-text">Scales/Chords</span>
       </button>
 
       {isExpanded && (
-        <div className="scale-options-content">
+        <div className="scale-options-popup">
           {/* Mode Toggle Slider */}
           <div className="control-section">
             <div className="mode-toggle">
