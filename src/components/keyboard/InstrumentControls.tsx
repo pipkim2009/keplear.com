@@ -556,38 +556,34 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
       {/* Play, Generate Melody, BPM, Notes - Combined row */}
       <div className="control-group bpm-notes-melody-row">
-        <div className="control-subgroup">
-          <button
-            onClick={onPlayMelody}
-            disabled={!hasGeneratedMelody}
-            className={`control-button play-melody ${isPlaying ? 'playing' : ''} ${!hasGeneratedMelody ? 'disabled' : ''}`}
-            title={!hasGeneratedMelody ? 'Generate a melody first' : (isPlaying ? 'Stop playing melody' : 'Play generated melody')}
-          >
-            <div className="play-icon">
-              {isPlaying ? (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="4" width="4" height="16" rx="2"/>
-                  <rect x="14" y="4" width="4" height="16" rx="2"/>
-                </svg>
-              ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-              )}
-            </div>
-          </button>
-        </div>
+        <button
+          onClick={onPlayMelody}
+          disabled={!hasGeneratedMelody}
+          className={`control-subgroup control-button play-melody ${isPlaying ? 'playing' : ''} ${!hasGeneratedMelody ? 'disabled' : ''}`}
+          title={!hasGeneratedMelody ? 'Generate a melody first' : (isPlaying ? 'Stop playing melody' : 'Play generated melody')}
+        >
+          <div className="play-icon">
+            {isPlaying ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="6" y="4" width="4" height="16" rx="2"/>
+                <rect x="14" y="4" width="4" height="16" rx="2"/>
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            )}
+          </div>
+        </button>
 
-        <div className="control-subgroup">
-          <button
-            onClick={onGenerateMelody}
-            disabled={!canGenerateMelody}
-            className="control-button generate-melody"
-            title="Generate a melody from selected notes"
-          >
-            Generate Melody
-          </button>
-        </div>
+        <button
+          onClick={onGenerateMelody}
+          disabled={!canGenerateMelody}
+          className="control-subgroup control-button generate-melody"
+          title="Generate a melody from selected notes"
+        >
+          Generate Melody
+        </button>
 
         <div className="control-subgroup">
           <label className="control-label">BPM</label>
