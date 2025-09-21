@@ -745,11 +745,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                 </div>
                 <div className="progress-time-info">
                   <span className="progress-current">
-                    {Math.floor(playbackProgress / 1000)}s
+                    {(playbackProgress / 1000).toFixed(2)}s
                   </span>
-                  <span className="progress-divider">/</span>
                   <span className="progress-total">
-                    {Math.floor(melodyDuration / 1000)}s
+                    {(melodyDuration / 1000).toFixed(2)}s
                   </span>
                 </div>
               </div>

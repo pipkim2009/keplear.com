@@ -34,7 +34,11 @@
 }
 
 .light .notes-toggle-content {
-  color: #2d1b69;
+  color: #d2d2f9;
+}
+
+.light .notes-toggle-content .toggle-label {
+  color: #d2d2f9;
 }
 
 .notes-toggle-content .toggle-label {
