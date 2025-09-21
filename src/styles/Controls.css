@@ -196,6 +196,8 @@
     min-width: 100px;
     width: 100px;
     font-size: 11px;
+    padding: 8px 10px;
+    height: 36px;
   }
 }
 
@@ -205,6 +207,8 @@
     width: 120px;
     font-size: 12px;
     margin: 0 auto;
+    padding: 8px 10px;
+    height: 36px;
   }
 }
 
@@ -282,6 +286,14 @@
   user-select: none;
   outline: none;
   z-index: 10;
+}
+
+@media (max-width: 480px) {
+  .control-button-internal {
+    width: 20px;
+    height: 24px;
+    font-size: 14px;
+  }
 }
 
 .input-with-buttons .control-button-internal {
@@ -674,18 +686,30 @@
 
 @media (max-width: 480px) {
   .control-button.generate-melody {
-    width: 20px;
-    font-size: 11px;
-    padding: 6px 8px;
+    width: 120px !important;
+    font-size: 12px;
+    padding: 6px 12px;
+    height: 32px !important;
+    line-height: 1;
+    max-height: 32px;
+    min-height: 32px;
+    flex-shrink: 0;
+    box-sizing: border-box;
   }
 }
 
 @media (max-width: 360px) {
   .control-button.generate-melody {
-    width: 20px;
+    width: 120px !important;
     font-size: 12px;
     padding: 6px 12px;
+    height: 32px !important;
+    line-height: 1;
     margin: 0 auto;
+    max-height: 32px;
+    min-height: 32px;
+    flex-shrink: 0;
+    box-sizing: border-box;
   }
 }
 
@@ -1179,6 +1203,76 @@
   .control-group.deselect-generate-row {
     gap: 8px;
   }
+
+  /* Reset transforms for mobile - use normal flex layout with custom order */
+  .control-group.bpm-notes-melody-row .melody-controls-top {
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
+    transform: none;
+  }
+
+  /* Mobile order: BPM, Notes, Generate Melody, Play */
+  /* Play button (1st child in DOM) becomes 4th on mobile */
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
+    order: 4;
+  }
+
+  /* Generate Melody button (2nd child in DOM) becomes 3rd on mobile */
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
+    order: 3;
+    gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
+  }
+
+  /* BPM (3rd child in DOM) becomes 1st on mobile */
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
+    order: 1;
+  }
+
+  /* Notes (4th child in DOM) becomes 2nd on mobile */
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
+    order: 2;
+  }
+
+  /* Also reset for guitar and bass modes */
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4),
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
+    transform: none;
+  }
+
+  /* Apply mobile order to guitar and bass modes too */
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
+    order: 4;
+  }
+
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
+    order: 3;
+    gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
+  }
+
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
+    order: 1;
+  }
+
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4),
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
+    order: 2;
+  }
 }
 
 @media (max-width: 360px) {
@@ -1199,6 +1293,60 @@
 
   .control-subgroup {
     width: 100%;
+  }
+
+  /* Further ensure no transforms on very small screens and maintain mobile order */
+  .control-group.bpm-notes-melody-row .melody-controls-top {
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+  }
+
+  /* Mobile order: BPM, Notes, Generate Melody, Play (same as 480px) */
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
+    order: 4;
+  }
+
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
+    order: 3;
+    gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
+  }
+
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
+    order: 1;
+  }
+
+  .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
+    order: 2;
+  }
+
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top,
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top {
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+  }
+
+  /* Apply mobile order to guitar and bass modes too */
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
+    order: 4;
+  }
+
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
+    order: 3;
+    gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
+  }
+
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
+    order: 1;
+  }
+
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4),
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
+    order: 2;
   }
 }
 

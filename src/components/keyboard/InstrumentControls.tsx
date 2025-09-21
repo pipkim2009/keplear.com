@@ -640,6 +640,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                 }}
                 onTouchStart={(e) => {
                   e.preventDefault();
+                  stopNotesInterval();
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
                   startNotesDecrement();
                 }}
                 onTouchEnd={(e) => {
