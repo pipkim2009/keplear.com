@@ -402,6 +402,16 @@
   color: #ffffff;
 }
 
+.control-button.play-melody.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.control-button.play-melody.disabled:hover {
+  transform: none;
+  color: #ffffff;
+}
+
 .play-icon {
   display: flex;
   align-items: center;
@@ -420,26 +430,31 @@
   transform: scale(0.9);
 }
 
-/* Combined Play Button and Progress Bar Styling */
-.control-group.play-progress-row {
+/* Melody Controls (Generate + Play) - Top Row */
+.control-group.melody-controls-row {
   width: 100%;
   margin-top: 8px;
 }
 
-.play-progress-container {
+.melody-controls-container {
   width: 100%;
-  position: relative;
-  padding-top: 43px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
 }
 
-.play-progress-container .control-button.play-melody {
-  position: absolute;
-  top: -5px;
-  left: 0;
-  z-index: 3;
+.melody-controls-container .control-button {
+  flex-shrink: 0;
 }
 
-.play-progress-container .progress-bar-container {
+/* Progress Bar - Bottom Row */
+.control-group.progress-bar-row {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.progress-bar-container {
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -492,6 +507,19 @@
 .progress-bar-head:active {
   cursor: grabbing;
   transform: translate(-50%, -50%) scale(1.1);
+}
+
+.progress-bar-container.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.progress-bar-container.disabled .progress-bar-background {
+  cursor: not-allowed;
+}
+
+.progress-bar-container.disabled .progress-bar-head {
+  cursor: not-allowed;
 }
 
 .progress-time-info {
@@ -549,8 +577,8 @@
     font-size: 14px;
   }
 
-  .play-progress-container {
-    padding-top: 43px;
+  .melody-controls-container {
+    gap: 8px;
   }
 
   .progress-bar-head {

@@ -688,74 +688,76 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         </div>
       </div>
 
-      {/* Generate Melody button - separate row */}
-      <div className="control-group generate-melody-row">
-        <button
-          onClick={onGenerateMelody}
-          disabled={!canGenerateMelody}
-          className="control-button generate-melody"
-          title="Generate a melody from selected notes"
-        >
-          Generate Melody
-        </button>
+      {/* Play Button and Generate Melody - Top row */}
+      <div className="control-group melody-controls-row">
+        <div className="melody-controls-container">
+          <button
+            onClick={onPlayMelody}
+            disabled={!hasGeneratedMelody}
+            className={`control-button play-melody ${isPlaying ? 'playing' : ''} ${!hasGeneratedMelody ? 'disabled' : ''}`}
+            title={!hasGeneratedMelody ? 'Generate a melody first' : (isPlaying ? 'Stop playing melody' : 'Play generated melody')}
+          >
+            <div className="play-icon">
+              {isPlaying ? (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16" rx="2"/>
+                  <rect x="14" y="4" width="4" height="16" rx="2"/>
+                </svg>
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              )}
+            </div>
+          </button>
+
+          <button
+            onClick={onGenerateMelody}
+            disabled={!canGenerateMelody}
+            className="control-button generate-melody"
+            title="Generate a melody from selected notes"
+          >
+            Generate Melody
+          </button>
+        </div>
       </div>
 
-      {/* Combined Play Button and Progress Bar */}
-      {hasGeneratedMelody && (
-        <div className="control-group play-progress-row">
-          <div className="play-progress-container">
-            <button
-              onClick={onPlayMelody}
-              className={`control-button play-melody ${isPlaying ? 'playing' : ''}`}
-              title={isPlaying ? 'Stop playing melody' : 'Play generated melody'}
-            >
-              <div className="play-icon">
-                {isPlaying ? (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <rect x="6" y="4" width="4" height="16" rx="2"/>
-                    <rect x="14" y="4" width="4" height="16" rx="2"/>
-                  </svg>
-                ) : (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                )}
-              </div>
-            </button>
-
-            {melodyDuration > 0 && (
-              <div className="progress-bar-container">
-                <div
-                  className="progress-bar-background"
-                  onClick={handleProgressBarClick}
-                  onMouseDown={handleProgressBarMouseDown}
-                >
-                  <div
-                    className="progress-bar-fill"
-                    style={{
-                      width: `${Math.min((playbackProgress / melodyDuration) * 100, 100)}%`
-                    }}
-                  />
-                  <div
-                    className="progress-bar-head"
-                    style={{
-                      left: `${Math.min((playbackProgress / melodyDuration) * 100, 100)}%`
-                    }}
-                  />
-                </div>
-                <div className="progress-time-info">
-                  <span className="progress-current">
-                    {(playbackProgress / 1000).toFixed(2)}s
-                  </span>
-                  <span className="progress-total">
-                    {(melodyDuration / 1000).toFixed(2)}s
-                  </span>
-                </div>
-              </div>
-            )}
+      {/* Progress Bar - Bottom row */}
+      <div className="control-group progress-bar-row">
+        <div className={`progress-bar-container ${!hasGeneratedMelody ? 'disabled' : ''}`}>
+          <div
+            className="progress-bar-background"
+            onClick={hasGeneratedMelody ? handleProgressBarClick : undefined}
+            onMouseDown={hasGeneratedMelody ? handleProgressBarMouseDown : undefined}
+            style={{ cursor: hasGeneratedMelody ? 'pointer' : 'not-allowed' }}
+          >
+            <div
+              className="progress-bar-fill"
+              style={{
+                width: hasGeneratedMelody && melodyDuration > 0
+                  ? `${Math.min((playbackProgress / melodyDuration) * 100, 100)}%`
+                  : '0%'
+              }}
+            />
+            <div
+              className="progress-bar-head"
+              style={{
+                left: hasGeneratedMelody && melodyDuration > 0
+                  ? `${Math.min((playbackProgress / melodyDuration) * 100, 100)}%`
+                  : '0%'
+              }}
+            />
+          </div>
+          <div className="progress-time-info">
+            <span className="progress-current">
+              {hasGeneratedMelody ? (playbackProgress / 1000).toFixed(2) : '0.00'}s
+            </span>
+            <span className="progress-total">
+              {hasGeneratedMelody ? (melodyDuration / 1000).toFixed(2) : '0.00'}s
+            </span>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Notes Toggle - Separate row at bottom */}
       <div className="control-group notes-toggle-row">
