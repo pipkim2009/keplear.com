@@ -364,7 +364,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
 
             {/* Deselect All button */}
             {selectedNotes.length > 0 && (
-              <div className="control-group deselect-row">
+              <div className="control-group">
                 <button
                   onClick={() => {
                     clearSelection()
@@ -381,7 +381,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             )}
 
             {hasGeneratedMelody && (
-              <div className="control-group notes-toggle-row">
+              <div className="control-group">
                 <button
                   className="notes-toggle-container control-input"
                   onClick={onToggleNotes}

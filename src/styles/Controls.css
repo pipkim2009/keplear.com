@@ -348,18 +348,17 @@
   gap: 6px;
   height: 32px;
   min-width: 120px;
-  transform: translateY(40px) !important;
-  margin-top: 40px !important;
+  margin-top: 19px;
 }
 
 .control-button.delete-selection:hover {
   background: rgba(220, 53, 69, 0.2);
-  transform: translateY(39px);
+  transform: translateY(-1px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .control-button.delete-selection:active {
-  transform: translateY(40px);
+  transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -1035,6 +1034,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  margin-top: 19px;
 }
 
 .notes-toggle-container .toggle-text {
