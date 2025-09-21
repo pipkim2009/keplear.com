@@ -196,8 +196,6 @@
     min-width: 100px;
     width: 100px;
     font-size: 11px;
-    padding: 8px 10px;
-    height: 36px;
   }
 }
 
@@ -207,8 +205,6 @@
     width: 120px;
     font-size: 12px;
     margin: 0 auto;
-    padding: 8px 10px;
-    height: 36px;
   }
 }
 
@@ -649,10 +645,22 @@
 
   .progress-bar-background {
     height: 4px;
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+  }
+
+  .progress-bar-container {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
   }
 
   .progress-time-info {
-    font-size: 14px;
+    font-size: 12px;
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
   }
 
   .melody-controls-container {
@@ -681,6 +689,26 @@
   .play-icon svg {
     width: 20px;
     height: 20px;
+  }
+
+  .progress-bar-background {
+    height: 4px;
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+  }
+
+  .progress-bar-container {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+  }
+
+  .progress-time-info {
+    font-size: 12px;
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
   }
 }
 
@@ -1197,7 +1225,11 @@
   }
 
   .control-group.bpm-notes-melody-row {
-    gap: 8px;
+    gap: 6px;
+    padding: 10px;
+    width: auto;
+    min-width: 260px;
+    margin: 0 auto;
   }
 
   .control-group.deselect-generate-row {
@@ -1207,7 +1239,7 @@
   /* Reset transforms for mobile - use normal flex layout with custom order */
   .control-group.bpm-notes-melody-row .melody-controls-top {
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
   }
 
@@ -1284,6 +1316,7 @@
   .control-group.bpm-notes-melody-row {
     flex-direction: column;
     gap: 5px;
+    margin: 0 auto;
   }
 
   .control-group.deselect-generate-row {
@@ -1318,6 +1351,15 @@
 
   .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
     order: 2;
+  }
+
+  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row,
+  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row {
+    gap: 6px;
+    padding: 10px;
+    width: auto;
+    min-width: 260px;
+    margin: 0 auto;
   }
 
   .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top,
