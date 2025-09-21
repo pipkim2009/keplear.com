@@ -537,154 +537,154 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
       {/* Play, Generate Melody, BPM, Notes - Combined row */}
       <div className="control-group bpm-notes-melody-row">
-        <button
-          onClick={onPlayMelody}
-          disabled={!hasGeneratedMelody}
-          className={`control-subgroup control-button play-melody ${isPlaying ? 'playing' : ''} ${!hasGeneratedMelody ? 'disabled' : ''}`}
-          title={!hasGeneratedMelody ? 'Generate a melody first' : (isPlaying ? 'Stop playing melody' : 'Play generated melody')}
-        >
-          <div className="play-icon">
-            {isPlaying ? (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <rect x="6" y="4" width="4" height="16" rx="2"/>
-                <rect x="14" y="4" width="4" height="16" rx="2"/>
-              </svg>
-            ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            )}
+        <div className="melody-controls-top">
+          <button
+            onClick={onPlayMelody}
+            disabled={!hasGeneratedMelody}
+            className={`control-subgroup control-button play-melody ${isPlaying ? 'playing' : ''} ${!hasGeneratedMelody ? 'disabled' : ''}`}
+            title={!hasGeneratedMelody ? 'Generate a melody first' : (isPlaying ? 'Stop playing melody' : 'Play generated melody')}
+          >
+            <div className="play-icon">
+              {isPlaying ? (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16" rx="2"/>
+                  <rect x="14" y="4" width="4" height="16" rx="2"/>
+                </svg>
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              )}
+            </div>
+          </button>
+
+          <button
+            onClick={onGenerateMelody}
+            disabled={!canGenerateMelody}
+            className="control-subgroup control-button generate-melody"
+            title="Generate a melody from selected notes"
+          >
+            Generate Melody
+          </button>
+
+          <div className="control-subgroup">
+            <label className="control-label">BPM</label>
+            <div className="input-with-buttons">
+              <input
+                type="text"
+                value={bpmDisplay}
+                onChange={(e) => handleBpmChange(e.target.value)}
+                onKeyPress={handleBpmKeyPress}
+                onBlur={handleBpmBlur}
+                className={`control-input with-internal-buttons ${flashingInputs.bpm ? 'flashing' : ''}`}
+              />
+              <button
+                className="control-button-internal minus"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  startBpmDecrement();
+                }}
+                onMouseUp={(e) => {
+                  e.preventDefault();
+                  stopBpmInterval();
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  startBpmDecrement();
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  stopBpmInterval();
+                }}
+                style={{ userSelect: 'none', touchAction: 'none' }}
+              >
+                −
+              </button>
+              <button
+                className="control-button-internal plus"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  startBpmIncrement();
+                }}
+                onMouseUp={(e) => {
+                  e.preventDefault();
+                  stopBpmInterval();
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  startBpmIncrement();
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  stopBpmInterval();
+                }}
+                style={{ userSelect: 'none', touchAction: 'none' }}
+              >
+                +
+              </button>
+            </div>
           </div>
-        </button>
 
-        <button
-          onClick={onGenerateMelody}
-          disabled={!canGenerateMelody}
-          className="control-subgroup control-button generate-melody"
-          title="Generate a melody from selected notes"
-        >
-          Generate Melody
-        </button>
-
-        <div className="control-subgroup">
-          <label className="control-label">BPM</label>
-          <div className="input-with-buttons">
-            <input
-              type="text"
-              value={bpmDisplay}
-              onChange={(e) => handleBpmChange(e.target.value)}
-              onKeyPress={handleBpmKeyPress}
-              onBlur={handleBpmBlur}
-              className={`control-input with-internal-buttons ${flashingInputs.bpm ? 'flashing' : ''}`}
-            />
-            <button
-              className="control-button-internal minus"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                startBpmDecrement();
-              }}
-              onMouseUp={(e) => {
-                e.preventDefault();
-                stopBpmInterval();
-              }}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                startBpmDecrement();
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                stopBpmInterval();
-              }}
-              style={{ userSelect: 'none', touchAction: 'none' }}
-            >
-              −
-            </button>
-            <button
-              className="control-button-internal plus"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                startBpmIncrement();
-              }}
-              onMouseUp={(e) => {
-                e.preventDefault();
-                stopBpmInterval();
-              }}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                startBpmIncrement();
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                stopBpmInterval();
-              }}
-              style={{ userSelect: 'none', touchAction: 'none' }}
-            >
-              +
-            </button>
+          <div className="control-subgroup">
+            <label className="control-label">Notes</label>
+            <div className="input-with-buttons">
+              <input
+                type="text"
+                value={notesDisplay}
+                onChange={(e) => handleNotesChange(e.target.value)}
+                onKeyPress={handleNotesKeyPress}
+                onBlur={handleNotesBlur}
+                className={`control-input with-internal-buttons ${flashingInputs.notes ? 'flashing' : ''}`}
+              />
+              <button
+                className="control-button-internal minus"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  startNotesDecrement();
+                }}
+                onMouseUp={(e) => {
+                  e.preventDefault();
+                  stopNotesInterval();
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  startNotesDecrement();
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  stopNotesInterval();
+                }}
+                style={{ userSelect: 'none', touchAction: 'none' }}
+              >
+                −
+              </button>
+              <button
+                className="control-button-internal plus"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  startNotesIncrement();
+                }}
+                onMouseUp={(e) => {
+                  e.preventDefault();
+                  stopNotesInterval();
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  startNotesIncrement();
+                }}
+                onTouchEnd={(e) => {
+                  e.preventDefault();
+                  stopNotesInterval();
+                }}
+                style={{ userSelect: 'none', touchAction: 'none' }}
+              >
+                +
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="control-subgroup">
-          <label className="control-label">Notes</label>
-          <div className="input-with-buttons">
-            <input
-              type="text"
-              value={notesDisplay}
-              onChange={(e) => handleNotesChange(e.target.value)}
-              onKeyPress={handleNotesKeyPress}
-              onBlur={handleNotesBlur}
-              className={`control-input with-internal-buttons ${flashingInputs.notes ? 'flashing' : ''}`}
-            />
-            <button
-              className="control-button-internal minus"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                startNotesDecrement();
-              }}
-              onMouseUp={(e) => {
-                e.preventDefault();
-                stopNotesInterval();
-              }}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                startNotesDecrement();
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                stopNotesInterval();
-              }}
-              style={{ userSelect: 'none', touchAction: 'none' }}
-            >
-              −
-            </button>
-            <button
-              className="control-button-internal plus"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                startNotesIncrement();
-              }}
-              onMouseUp={(e) => {
-                e.preventDefault();
-                stopNotesInterval();
-              }}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                startNotesIncrement();
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                stopNotesInterval();
-              }}
-              style={{ userSelect: 'none', touchAction: 'none' }}
-            >
-              +
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Progress Bar - Bottom row */}
-      <div className="control-group progress-bar-row">
+        {/* Progress Bar */}
         <div className={`progress-bar-container ${!hasGeneratedMelody ? 'disabled' : ''}`}>
           <div
             className="progress-bar-background"

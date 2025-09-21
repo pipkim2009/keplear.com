@@ -374,16 +374,18 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
               </div>
             )}
 
-            <div className="control-group notes-toggle-row">
-              <button
-                className="notes-toggle-container control-input"
-                onClick={onToggleNotes}
-                title={showNotes ? 'Hide notes' : 'Reveal notes'}
-                aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
-              >
-                <NotesToggle showNotes={showNotes} onToggle={() => {}} />
-              </button>
-            </div>
+            {hasGeneratedMelody && (
+              <div className="control-group notes-toggle-row">
+                <button
+                  className="notes-toggle-container control-input"
+                  onClick={onToggleNotes}
+                  title={showNotes ? 'Hide notes' : 'Reveal notes'}
+                  aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
+                >
+                  <NotesToggle showNotes={showNotes} onToggle={() => {}} />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 

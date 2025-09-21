@@ -284,7 +284,32 @@
   z-index: 10;
 }
 
-.control-input.with-internal-buttons .control-button-internal {
+.input-with-buttons .control-button-internal {
+  color: #ffffff !important;
+}
+
+.input-with-buttons .control-button-internal:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.input-with-buttons .control-button-internal:active {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.input-with-buttons .control-button-internal.minus,
+.input-with-buttons .control-button-internal.plus {
+  color: #ffffff !important;
+}
+
+.input-with-buttons .control-button-internal.minus:hover,
+.input-with-buttons .control-button-internal.plus:hover {
+  color: #ffffff !important;
+}
+
+.input-with-buttons .control-button-internal.minus:active,
+.input-with-buttons .control-button-internal.plus:active {
   color: #ffffff !important;
 }
 
@@ -1051,27 +1076,60 @@
 
 .control-group.bpm-notes-melody-row {
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #666666;
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.control-group.bpm-notes-melody-row .melody-controls-top {
+  display: flex;
   flex-direction: row;
   gap: 0;
-  width: 100%;
   align-items: flex-start;
   justify-content: center;
 }
 
-.control-group.bpm-notes-melody-row .control-subgroup:first-child {
-  transform: translateY(10px) translateX(-127px);
+.control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
+  transform: translateY(10px) translateX(-112px);
 }
 
-.control-group.bpm-notes-melody-row .control-subgroup:nth-child(2) {
-  transform: translateY(19px) translateX(-117px);
+.control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
+  transform: translateY(19px) translateX(-102px);
 }
 
-.control-group.bpm-notes-melody-row .control-subgroup:nth-child(3) {
-  transform: translateX(-107px);
+.control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
+  transform: translateX(-92px);
 }
 
-.control-group.bpm-notes-melody-row .control-subgroup:nth-child(4) {
-  transform: translateX(-87px);
+.control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
+  transform: translateX(-72px);
+}
+
+/* Match guitar and bass controls exactly to keyboard positioning */
+.instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
+.instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
+  transform: translateY(10px) translateX(-112px);
+}
+
+.instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
+.instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
+  transform: translateY(19px) translateX(-102px);
+}
+
+.instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
+.instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
+  transform: translateX(-92px);
+}
+
+.instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4),
+.instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
+  transform: translateX(-72px);
 }
 
 .control-subgroup {
