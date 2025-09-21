@@ -35,17 +35,25 @@
 /* Mobile screens */
 @media (max-width: 480px) {
   .instrument-controls {
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-direction: column;
+    flex-wrap: nowrap;
     gap: 10px;
     height: auto;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
     padding: 15px 10px;
+    width: 100%;
   }
 
   .control-group {
-    flex: 0 0 calc(50% - 5px);
+    flex: 0 0 auto;
     min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    margin: 0 auto;
   }
 }
 
@@ -375,6 +383,12 @@
     min-width: 100px;
     font-size: 11px;
     padding: 6px 8px;
+  }
+}
+
+@media (max-width: 480px) and (min-width: 361px) {
+  .control-button.delete-selection {
+    margin: 0 auto !important;
   }
 }
 
@@ -1077,7 +1091,6 @@
 .control-group.notes-toggle-row {
   width: 100%;
   flex: 1 1 100%;
-  margin-top: 10px;
 }
 
 .notes-toggle-container {
@@ -1085,7 +1098,6 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 19px;
 }
 
 .notes-toggle-container .toggle-text {
@@ -1108,7 +1120,26 @@
 
 @media (max-width: 480px) {
   .control-group.notes-toggle-row {
-    margin-top: 8px;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+    flex: 0 0 auto !important;
+    position: static !important;
+  }
+
+  .notes-toggle-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
+    position: static !important;
   }
 
   .notes-toggle-container .toggle-text {
@@ -1118,8 +1149,22 @@
 
 @media (max-width: 360px) {
   .control-group.notes-toggle-row {
-    width: 100%;
-    margin: 8px auto 0;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: auto !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+    flex: 0 0 auto !important;
+  }
+
+  .notes-toggle-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 0 auto !important;
+    text-align: center !important;
   }
 }
 
@@ -1254,22 +1299,38 @@
   /* Play button (1st child in DOM) becomes 4th on mobile */
   .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
     order: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   /* Generate Melody button (2nd child in DOM) becomes 3rd on mobile */
   .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
     order: 3;
     gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   /* BPM (3rd child in DOM) becomes 1st on mobile */
   .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
     order: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   /* Notes (4th child in DOM) becomes 2nd on mobile */
   .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
     order: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   /* Also reset for guitar and bass modes */
@@ -1288,22 +1349,38 @@
   .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
   .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
     order: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
   .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
     order: 3;
     gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
   .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
     order: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4),
   .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
     order: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 }
 
@@ -1338,19 +1415,35 @@
   /* Mobile order: BPM, Notes, Generate Melody, Play (same as 480px) */
   .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
     order: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
     order: 3;
     gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
     order: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
     order: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row,
@@ -1373,22 +1466,38 @@
   .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
   .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
     order: 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
   .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
     order: 3;
     gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
   .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
     order: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 
   .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4),
   .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
     order: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
   }
 }
 
