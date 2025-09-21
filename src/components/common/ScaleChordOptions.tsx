@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
 import { guitarNotes } from '../../utils/guitarNotes'
 import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, type BassScale, type BassScaleBox } from '../../utils/bassScales'
@@ -39,6 +40,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   const [isExpanded, setIsExpanded] = useState(false)
   const [isScaleMode, setIsScaleMode] = useState(true) // true for scales, false for chords
   const containerRef = useRef<HTMLDivElement>(null)
+  const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 })
 
   // Scale states
   const [selectedScale, setSelectedScale] = useState<GuitarScale>(GUITAR_SCALES[0])
@@ -59,13 +61,26 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   const [showShapes, setShowShapes] = useState<boolean>(true)
 
   const toggleExpanded = () => {
+    if (!isExpanded && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect()
+      setPopupPosition({
+        top: rect.bottom + 4,
+        left: rect.left
+      })
+    }
     setIsExpanded(!isExpanded)
   }
 
   // Close popup when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      const target = event.target as Node
+      const popup = document.querySelector('.scale-options-popup')
+
+      if (containerRef.current &&
+          !containerRef.current.contains(target) &&
+          popup &&
+          !popup.contains(target)) {
         setIsExpanded(false)
       }
     }
@@ -148,6 +163,9 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
     } else if (instrument === 'keyboard' && onKeyboardScaleApply) {
       onKeyboardScaleApply(selectedRoot, keyboardSelectedScale)
     }
+
+    // Auto-close the popup
+    setIsExpanded(false)
   }
 
   // Chord handlers
@@ -184,6 +202,9 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
     } else if (instrument === 'keyboard' && onKeyboardChordApply) {
       onKeyboardChordApply(selectedChordRoot, keyboardSelectedChord)
     }
+
+    // Auto-close the popup
+    setIsExpanded(false)
   }
 
   const currentRoot = isScaleMode ? selectedRoot : selectedChordRoot
@@ -202,8 +223,14 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         <span className="toggle-text">Scales/Chords</span>
       </button>
 
-      {isExpanded && (
-        <div className="scale-options-popup">
+      {isExpanded && createPortal(
+        <div
+          className="scale-options-popup"
+          style={{
+            top: `${popupPosition.top}px`,
+            left: `${popupPosition.left}px`
+          }}
+        >
           {/* Mode Toggle Slider */}
           <div className="control-section">
             <div className="mode-toggle">
@@ -389,7 +416,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
               </>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )

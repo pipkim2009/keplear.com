@@ -27,20 +27,26 @@
 }
 
 .scale-options-popup {
-  position: absolute;
-  top: 100%;
-  left: 0;
+  position: fixed;
+  top: auto;
+  left: auto;
   margin-top: 4px;
   padding: 16px;
   min-width: 300px;
   box-sizing: border-box;
-  z-index: 1000;
+  z-index: 2147483647 !important;
   background: rgba(0, 0, 0, 0.95);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   border: 2px solid #ffcc02;
-  pointer-events: auto;
+  pointer-events: auto !important;
   backdrop-filter: blur(8px);
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+.scale-options-popup * {
+  pointer-events: auto !important;
 }
 
 .dark .scale-options-popup {
