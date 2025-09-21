@@ -320,21 +320,6 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             playbackProgress={playbackProgress}
             melodyDuration={melodyDuration}
             onProgressChange={onProgressChange}
-            scaleOptionsComponent={
-              <ScaleChordOptions
-                instrument={instrument}
-                selectedRoot={selectedRoot}
-                selectedChordRoot={selectedChordRoot}
-                onRootChange={handleRootChange}
-                onChordRootChange={handleChordRootChange}
-                onScaleSelect={handleScaleSelect}
-                onScaleBoxSelect={handleScaleBoxSelect}
-                onKeyboardScaleApply={handleKeyboardScaleApply}
-                onChordSelect={handleChordSelect}
-                onChordShapeSelect={handleChordShapeSelect}
-                onKeyboardChordApply={handleKeyboardChordApply}
-              />
-            }
           />
       </div>
 
@@ -355,6 +340,27 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
                 </select>
               </div>
             )}
+
+            {/* Scale/Chord Options */}
+            <div className="control-group scale-chord-options">
+              <ScaleChordOptions
+                instrument={instrument}
+                onScaleSelect={handleScaleSelect}
+                onScaleBoxSelect={handleScaleBoxSelect}
+                onClearScale={handleClearScale}
+                onChordSelect={handleChordSelect}
+                onChordShapeSelect={handleChordShapeSelect}
+                onClearChord={handleClearChord}
+                onRootChange={handleRootChange}
+                onChordRootChange={handleChordRootChange}
+                selectedRoot={selectedRoot}
+                selectedChordRoot={selectedChordRoot}
+                onKeyboardScaleApply={handleKeyboardScaleApply}
+                onKeyboardScaleClear={handleKeyboardScaleClear}
+                onKeyboardChordApply={handleKeyboardChordApply}
+                onKeyboardChordClear={handleKeyboardChordClear}
+              />
+            </div>
 
             {/* Deselect All button */}
             {selectedNotes.length > 0 && (

@@ -348,17 +348,18 @@
   gap: 6px;
   height: 32px;
   min-width: 120px;
-  transform: translateY(10px);
+  transform: translateY(40px) !important;
+  margin-top: 40px !important;
 }
 
 .control-button.delete-selection:hover {
   background: rgba(220, 53, 69, 0.2);
-  transform: translateY(9px);
+  transform: translateY(39px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .control-button.delete-selection:active {
-  transform: translateY(10px);
+  transform: translateY(40px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
@@ -741,16 +742,23 @@
   }
 }
 
-/* Scale options integrated styling adjustments */
-.control-group.scale-options-integrated {
+/* Scale/Chord options in instrument header */
+.control-group.scale-chord-options {
   display: flex !important;
   align-items: center !important;
-  justify-content: center !important;
+  justify-content: flex-start !important;
   gap: 0 !important;
-  width: 100% !important;
-  min-width: 200px !important;
-  margin: 0 auto !important;
-  flex: 1 1 auto !important;
+  flex: 0 0 auto !important;
+  margin-left: 20px !important;
+}
+
+/* Make header controls layout horizontal */
+.header-controls-left {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start !important;
+  gap: 20px !important;
+  flex-wrap: wrap !important;
 }
 
 /* Octave range control styling */

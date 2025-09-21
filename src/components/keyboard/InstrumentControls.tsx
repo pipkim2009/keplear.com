@@ -29,7 +29,6 @@ interface InstrumentControlsProps {
   onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
   onKeyboardScaleApply?: (rootNote: string, scale: KeyboardScale) => void
   onKeyboardScaleClear?: () => void
-  scaleOptionsComponent?: React.ReactNode
   flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
   triggerInputFlash: (inputType: 'bpm' | 'notes' | 'mode') => void
   setInputActive: (inputType: 'bpm' | 'notes' | 'mode', active: boolean) => void
@@ -67,7 +66,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   onKeyboardSelectionModeChange,
   onKeyboardScaleApply,
   onKeyboardScaleClear,
-  scaleOptionsComponent,
   flashingInputs,
   triggerInputFlash,
   setInputActive,
@@ -527,12 +525,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         </div>
       )}
 
-      {/* Scale Options Component - integrated as part of controls */}
-      {scaleOptionsComponent && (
-        <div className="control-group scale-options-integrated">
-          {scaleOptionsComponent}
-        </div>
-      )}
 
 
       {/* Play, Generate Melody, BPM, Notes - Combined row */}
