@@ -145,9 +145,13 @@ function App() {
   // Calculate melody duration in milliseconds
   const calculateMelodyDuration = useCallback((melodyLength: number, bpm: number) => {
     if (melodyLength === 0) return 0
-    // Each note plays for one beat at the given BPM
-    // Duration = (number of notes * 60 * 1000) / BPM
-    return (melodyLength * 60 * 1000) / bpm
+    // Match the exact timing from useAudio.ts:
+    // - Each note has a delay of (60 / bpm) * 800 milliseconds
+    // - There are (numberOfNotes - 1) delays between notes
+    // - Plus one final delay after the last note
+    // Total: numberOfNotes * (60 / bpm) * 800
+    const noteDuration = (60 / bpm) * 800
+    return melodyLength * noteDuration
   }, [])
 
   /**
@@ -244,6 +248,13 @@ function App() {
     clearSelection()
   }, [clearSelection])
 
+  /**
+   * Handles progress bar changes for scrubbing
+   */
+  const handleProgressChange = useCallback((newProgress: number): void => {
+    setPlaybackProgress(newProgress)
+  }, [])
+
   // Navigation handlers - memoized to prevent unnecessary re-renders
   const { navigateToHome, navigateToSandbox, navigateToPractice } = useMemo(() => ({
     navigateToHome: () => setCurrentPage('home'),
@@ -305,6 +316,7 @@ function App() {
               onToggleNotes={() => setShowNotes(!showNotes)}
               playbackProgress={playbackProgress}
               melodyDuration={melodyDuration}
+              onProgressChange={handleProgressChange}
             />
 
 

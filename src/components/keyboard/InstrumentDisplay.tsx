@@ -43,6 +43,7 @@ interface InstrumentDisplayProps {
   onToggleNotes?: () => void
   playbackProgress?: number
   melodyDuration?: number
+  onProgressChange?: (progress: number) => void
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -73,7 +74,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   hasGeneratedMelody,
   onToggleNotes,
   playbackProgress,
-  melodyDuration
+  melodyDuration,
+  onProgressChange
 }) => {
   const guitarRef = useRef<any>(null)
   const bassRef = useRef<any>(null)
@@ -316,6 +318,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             onToggleNotes={onToggleNotes}
             playbackProgress={playbackProgress}
             melodyDuration={melodyDuration}
+            onProgressChange={onProgressChange}
             scaleOptionsComponent={
               <ScaleChordOptions
                 instrument={instrument}

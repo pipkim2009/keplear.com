@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import '../../styles/Controls.css'
 import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
 import { guitarNotes } from '../../utils/guitarNotes'
@@ -42,6 +42,7 @@ interface InstrumentControlsProps {
   onToggleNotes?: () => void
   playbackProgress?: number
   melodyDuration?: number
+  onProgressChange?: (progress: number) => void
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -78,7 +79,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   showNotes = false,
   onToggleNotes,
   playbackProgress = 0,
-  melodyDuration = 0
+  melodyDuration = 0,
+  onProgressChange
 }) => {
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
@@ -91,7 +93,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const [showPositions, setShowPositions] = useState<boolean>(true)
   const [availableBoxes, setAvailableBoxes] = useState<ScaleBox[]>([])
   const [selectedBoxIndex, setSelectedBoxIndex] = useState<number>(0)
-  
+  const [isDragging, setIsDragging] = useState<boolean>(false)
+
   // Original default values
   const DEFAULT_BPM = 120
   const DEFAULT_NOTES = 5
@@ -342,6 +345,55 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   }
 
   // Remove auto-reapplication - user must click Apply button
+
+  // Progress bar drag handling
+  const handleProgressBarClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!onProgressChange || melodyDuration === 0) return
+
+    const rect = e.currentTarget.getBoundingClientRect()
+    const clickX = e.clientX - rect.left
+    const percentage = Math.max(0, Math.min(1, clickX / rect.width))
+    const newProgress = percentage * melodyDuration
+
+    onProgressChange(newProgress)
+  }, [onProgressChange, melodyDuration])
+
+  const handleProgressBarMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!onProgressChange || melodyDuration === 0) return
+
+    setIsDragging(true)
+    handleProgressBarClick(e)
+  }, [onProgressChange, melodyDuration, handleProgressBarClick])
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !onProgressChange || melodyDuration === 0) return
+
+      const progressBar = document.querySelector('.progress-bar-background') as HTMLElement
+      if (!progressBar) return
+
+      const rect = progressBar.getBoundingClientRect()
+      const mouseX = e.clientX - rect.left
+      const percentage = Math.max(0, Math.min(1, mouseX / rect.width))
+      const newProgress = percentage * melodyDuration
+
+      onProgressChange(newProgress)
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove)
+      document.addEventListener('mouseup', handleMouseUp)
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging, onProgressChange, melodyDuration])
 
   // Cleanup intervals on unmount
   useEffect(() => {
@@ -673,11 +725,21 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
             {melodyDuration > 0 && (
               <div className="progress-bar-container">
-                <div className="progress-bar-background">
+                <div
+                  className="progress-bar-background"
+                  onClick={handleProgressBarClick}
+                  onMouseDown={handleProgressBarMouseDown}
+                >
                   <div
                     className="progress-bar-fill"
                     style={{
                       width: `${Math.min((playbackProgress / melodyDuration) * 100, 100)}%`
+                    }}
+                  />
+                  <div
+                    className="progress-bar-head"
+                    style={{
+                      left: `${Math.min((playbackProgress / melodyDuration) * 100, 100)}%`
                     }}
                   />
                 </div>
