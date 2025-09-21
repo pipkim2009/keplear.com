@@ -411,6 +411,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     : selectedNotesCount > 0        // Guitar/Bass needs at least 1 note
   return (
     <div className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
+      {/* Top row: Instrument selector */}
       <div className="control-group">
         <label className="control-label">Instrument</label>
         <select
@@ -424,11 +425,11 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         </select>
       </div>
 
+      {/* Second row: Octave range (keyboard only) */}
       {instrument === 'keyboard' && (
-        <>
-          <div className="control-group octave-range-control">
-            <label className="control-label">Octave Range</label>
-            <div className="octave-range-slider">
+        <div className="control-group octave-range-control">
+          <label className="control-label">Octave Range</label>
+          <div className="octave-range-slider">
             <div className="range-labels-center">
               <span className="range-label-center">
                 {Math.max(1, 4 - lowerOctaves)} - {Math.min(8, 5 + higherOctaves)}
@@ -522,10 +523,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                 )
               })}
             </div>
-            </div>
           </div>
-
-        </>
+        </div>
       )}
 
       {/* Scale Options Component - integrated as part of controls */}
@@ -555,8 +554,41 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         </div>
       )}
 
-      {/* BPM and Notes inputs on one row */}
-      <div className="control-group bpm-notes-row">
+      {/* Play, Generate Melody, BPM, Notes - Combined row */}
+      <div className="control-group bpm-notes-melody-row">
+        <div className="control-subgroup">
+          <button
+            onClick={onPlayMelody}
+            disabled={!hasGeneratedMelody}
+            className={`control-button play-melody ${isPlaying ? 'playing' : ''} ${!hasGeneratedMelody ? 'disabled' : ''}`}
+            title={!hasGeneratedMelody ? 'Generate a melody first' : (isPlaying ? 'Stop playing melody' : 'Play generated melody')}
+          >
+            <div className="play-icon">
+              {isPlaying ? (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16" rx="2"/>
+                  <rect x="14" y="4" width="4" height="16" rx="2"/>
+                </svg>
+              ) : (
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              )}
+            </div>
+          </button>
+        </div>
+
+        <div className="control-subgroup">
+          <button
+            onClick={onGenerateMelody}
+            disabled={!canGenerateMelody}
+            className="control-button generate-melody"
+            title="Generate a melody from selected notes"
+          >
+            Generate Melody
+          </button>
+        </div>
+
         <div className="control-subgroup">
           <label className="control-label">BPM</label>
           <div className="input-with-buttons">
@@ -671,40 +703,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               +
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* Play Button and Generate Melody - Top row */}
-      <div className="control-group melody-controls-row">
-        <div className="melody-controls-container">
-          <button
-            onClick={onPlayMelody}
-            disabled={!hasGeneratedMelody}
-            className={`control-button play-melody ${isPlaying ? 'playing' : ''} ${!hasGeneratedMelody ? 'disabled' : ''}`}
-            title={!hasGeneratedMelody ? 'Generate a melody first' : (isPlaying ? 'Stop playing melody' : 'Play generated melody')}
-          >
-            <div className="play-icon">
-              {isPlaying ? (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="4" width="4" height="16" rx="2"/>
-                  <rect x="14" y="4" width="4" height="16" rx="2"/>
-                </svg>
-              ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-              )}
-            </div>
-          </button>
-
-          <button
-            onClick={onGenerateMelody}
-            disabled={!canGenerateMelody}
-            className="control-button generate-melody"
-            title="Generate a melody from selected notes"
-          >
-            Generate Melody
-          </button>
         </div>
       </div>
 

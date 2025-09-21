@@ -83,6 +83,18 @@
   flex-shrink: 0;
 }
 
+/* Force instrument selector to take full width (separate row) */
+.control-group:has(.instrument-select-keyboard),
+.control-group:has(.instrument-select-guitar),
+.control-group:has(.instrument-select-bass) {
+  flex: 1 0 100%;
+}
+
+/* Force octave range to take full width (separate row) */
+.control-group.octave-range-control {
+  flex: 1 0 100%;
+}
+
 /* Guitar mode specific styling */
 .instrument-controls.guitar-mode {
   justify-content: flex-start;
@@ -1009,6 +1021,23 @@
   justify-content: center;
 }
 
+.control-group.bpm-notes-melody-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  width: 100%;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.control-group.bpm-notes-melody-row .control-subgroup:first-child .play-melody {
+  transform: translateY(10px);
+}
+
+.control-group.bpm-notes-melody-row .control-subgroup:nth-child(2) .generate-melody {
+  transform: translateY(19px);
+}
+
 .control-subgroup {
   display: flex;
   flex-direction: column;
@@ -1038,6 +1067,10 @@
     gap: 8px;
   }
 
+  .control-group.bpm-notes-melody-row {
+    gap: 8px;
+  }
+
   .control-group.deselect-generate-row {
     gap: 8px;
   }
@@ -1045,6 +1078,11 @@
 
 @media (max-width: 360px) {
   .control-group.bpm-notes-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .control-group.bpm-notes-melody-row {
     flex-direction: column;
     gap: 5px;
   }
