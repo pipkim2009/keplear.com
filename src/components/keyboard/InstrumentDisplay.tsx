@@ -36,6 +36,13 @@ interface InstrumentDisplayProps {
   flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
   triggerInputFlash: (inputType: 'bpm' | 'notes' | 'mode') => void
   setInputActive: (inputType: 'bpm' | 'notes' | 'mode', active: boolean) => void
+  onGenerateMelody?: () => void
+  onPlayMelody?: () => void
+  isPlaying?: boolean
+  hasGeneratedMelody?: boolean
+  onToggleNotes?: () => void
+  playbackProgress?: number
+  melodyDuration?: number
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -59,7 +66,14 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   onKeyboardSelectionModeChange,
   flashingInputs,
   triggerInputFlash,
-  setInputActive
+  setInputActive,
+  onGenerateMelody,
+  onPlayMelody,
+  isPlaying,
+  hasGeneratedMelody,
+  onToggleNotes,
+  playbackProgress,
+  melodyDuration
 }) => {
   const guitarRef = useRef<any>(null)
   const bassRef = useRef<any>(null)
@@ -293,6 +307,15 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             flashingInputs={flashingInputs}
             triggerInputFlash={triggerInputFlash}
             setInputActive={setInputActive}
+            selectedNotesCount={selectedNotes.length}
+            onGenerateMelody={onGenerateMelody}
+            onPlayMelody={onPlayMelody}
+            isPlaying={isPlaying}
+            hasGeneratedMelody={hasGeneratedMelody}
+            showNotes={showNotes}
+            onToggleNotes={onToggleNotes}
+            playbackProgress={playbackProgress}
+            melodyDuration={melodyDuration}
             scaleOptionsComponent={
               <ScaleChordOptions
                 instrument={instrument}

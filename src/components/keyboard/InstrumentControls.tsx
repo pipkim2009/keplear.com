@@ -3,6 +3,7 @@ import '../../styles/Controls.css'
 import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
 import { guitarNotes } from '../../utils/guitarNotes'
 import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/keyboardScales'
+import NotesToggle from '../common/NotesToggle'
 
 export type KeyboardSelectionMode = 'range' | 'multi'
 
@@ -32,6 +33,15 @@ interface InstrumentControlsProps {
   flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
   triggerInputFlash: (inputType: 'bpm' | 'notes' | 'mode') => void
   setInputActive: (inputType: 'bpm' | 'notes' | 'mode', active: boolean) => void
+  selectedNotesCount?: number
+  onGenerateMelody?: () => void
+  onPlayMelody?: () => void
+  isPlaying?: boolean
+  hasGeneratedMelody?: boolean
+  showNotes?: boolean
+  onToggleNotes?: () => void
+  playbackProgress?: number
+  melodyDuration?: number
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -59,7 +69,16 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   scaleOptionsComponent,
   flashingInputs,
   triggerInputFlash,
-  setInputActive
+  setInputActive,
+  selectedNotesCount = 0,
+  onGenerateMelody,
+  onPlayMelody,
+  isPlaying = false,
+  hasGeneratedMelody = false,
+  showNotes = false,
+  onToggleNotes,
+  playbackProgress = 0,
+  melodyDuration = 0
 }) => {
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
@@ -331,6 +350,13 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
       stopNotesInterval()
     }
   }, [])
+
+  // Determine if melody can be generated based on instrument and selection mode
+  const canGenerateMelody = instrument === 'keyboard'
+    ? (keyboardSelectionMode === 'range'
+        ? selectedNotesCount === 2  // Range mode needs exactly 2 notes
+        : selectedNotesCount > 0)   // Multi mode needs at least 1 note
+    : selectedNotesCount > 0        // Guitar/Bass needs at least 1 note
   return (
     <div className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
       <div className="control-group">
@@ -346,121 +372,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         </select>
       </div>
 
-      <div className="control-group">
-        <label className="control-label">BPM</label>
-        <div className="input-with-buttons">
-          <input
-            type="text"
-            value={bpmDisplay}
-            onChange={(e) => handleBpmChange(e.target.value)}
-            onKeyPress={handleBpmKeyPress}
-            onBlur={handleBpmBlur}
-            className={`control-input with-internal-buttons ${flashingInputs.bpm ? 'flashing' : ''}`}
-          />
-          <button
-            className="control-button-internal minus"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              startBpmDecrement();
-            }}
-            onMouseUp={(e) => {
-              e.preventDefault();
-              stopBpmInterval();
-            }}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              startBpmDecrement();
-            }}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              stopBpmInterval();
-            }}
-            style={{ userSelect: 'none', touchAction: 'none' }}
-          >
-            −
-          </button>
-          <button
-            className="control-button-internal plus"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              startBpmIncrement();
-            }}
-            onMouseUp={(e) => {
-              e.preventDefault();
-              stopBpmInterval();
-            }}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              startBpmIncrement();
-            }}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              stopBpmInterval();
-            }}
-            style={{ userSelect: 'none', touchAction: 'none' }}
-          >
-            +
-          </button>
-        </div>
-      </div>
 
-      <div className="control-group">
-        <label className="control-label">Notes</label>
-        <div className="input-with-buttons">
-          <input
-            type="text"
-            value={notesDisplay}
-            onChange={(e) => handleNotesChange(e.target.value)}
-            onKeyPress={handleNotesKeyPress}
-            onBlur={handleNotesBlur}
-            className={`control-input with-internal-buttons ${flashingInputs.notes ? 'flashing' : ''}`}
-          />
-          <button
-            className="control-button-internal minus"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              startNotesDecrement();
-            }}
-            onMouseUp={(e) => {
-              e.preventDefault();
-              stopNotesInterval();
-            }}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              startNotesDecrement();
-            }}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              stopNotesInterval();
-            }}
-            style={{ userSelect: 'none', touchAction: 'none' }}
-          >
-            −
-          </button>
-          <button
-            className="control-button-internal plus"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              startNotesIncrement();
-            }}
-            onMouseUp={(e) => {
-              e.preventDefault();
-              stopNotesInterval();
-            }}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              startNotesIncrement();
-            }}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              stopNotesInterval();
-            }}
-            style={{ userSelect: 'none', touchAction: 'none' }}
-          >
-            +
-          </button>
-        </div>
-      </div>
 
       {instrument === 'keyboard' && (
         <>
@@ -585,8 +497,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         </div>
       )}
 
+      {/* Deselect All button - separate row */}
       {hasSelectedNotes && (
-        <div className="control-group">
+        <div className="control-group deselect-row">
           <button
             onClick={() => {
               clearSelection()
@@ -603,6 +516,197 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </button>
         </div>
       )}
+
+      {/* BPM and Notes inputs on one row */}
+      <div className="control-group bpm-notes-row">
+        <div className="control-subgroup">
+          <label className="control-label">BPM</label>
+          <div className="input-with-buttons">
+            <input
+              type="text"
+              value={bpmDisplay}
+              onChange={(e) => handleBpmChange(e.target.value)}
+              onKeyPress={handleBpmKeyPress}
+              onBlur={handleBpmBlur}
+              className={`control-input with-internal-buttons ${flashingInputs.bpm ? 'flashing' : ''}`}
+            />
+            <button
+              className="control-button-internal minus"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                startBpmDecrement();
+              }}
+              onMouseUp={(e) => {
+                e.preventDefault();
+                stopBpmInterval();
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                startBpmDecrement();
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                stopBpmInterval();
+              }}
+              style={{ userSelect: 'none', touchAction: 'none' }}
+            >
+              −
+            </button>
+            <button
+              className="control-button-internal plus"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                startBpmIncrement();
+              }}
+              onMouseUp={(e) => {
+                e.preventDefault();
+                stopBpmInterval();
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                startBpmIncrement();
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                stopBpmInterval();
+              }}
+              style={{ userSelect: 'none', touchAction: 'none' }}
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <div className="control-subgroup">
+          <label className="control-label">Notes</label>
+          <div className="input-with-buttons">
+            <input
+              type="text"
+              value={notesDisplay}
+              onChange={(e) => handleNotesChange(e.target.value)}
+              onKeyPress={handleNotesKeyPress}
+              onBlur={handleNotesBlur}
+              className={`control-input with-internal-buttons ${flashingInputs.notes ? 'flashing' : ''}`}
+            />
+            <button
+              className="control-button-internal minus"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                startNotesDecrement();
+              }}
+              onMouseUp={(e) => {
+                e.preventDefault();
+                stopNotesInterval();
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                startNotesDecrement();
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                stopNotesInterval();
+              }}
+              style={{ userSelect: 'none', touchAction: 'none' }}
+            >
+              −
+            </button>
+            <button
+              className="control-button-internal plus"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                startNotesIncrement();
+              }}
+              onMouseUp={(e) => {
+                e.preventDefault();
+                stopNotesInterval();
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                startNotesIncrement();
+              }}
+              onTouchEnd={(e) => {
+                e.preventDefault();
+                stopNotesInterval();
+              }}
+              style={{ userSelect: 'none', touchAction: 'none' }}
+            >
+              +
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Generate Melody button - separate row */}
+      <div className="control-group generate-melody-row">
+        <button
+          onClick={onGenerateMelody}
+          disabled={!canGenerateMelody}
+          className="control-button generate-melody"
+          title="Generate a melody from selected notes"
+        >
+          Generate Melody
+        </button>
+      </div>
+
+      {/* Combined Play Button and Progress Bar */}
+      {hasGeneratedMelody && (
+        <div className="control-group play-progress-row">
+          <div className="play-progress-container">
+            <button
+              onClick={onPlayMelody}
+              className={`control-button play-melody ${isPlaying ? 'playing' : ''}`}
+              title={isPlaying ? 'Stop playing melody' : 'Play generated melody'}
+            >
+              <div className="play-icon">
+                {isPlaying ? (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <rect x="6" y="4" width="4" height="16" rx="2"/>
+                    <rect x="14" y="4" width="4" height="16" rx="2"/>
+                  </svg>
+                ) : (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                )}
+              </div>
+            </button>
+
+            {melodyDuration > 0 && (
+              <div className="progress-bar-container">
+                <div className="progress-bar-background">
+                  <div
+                    className="progress-bar-fill"
+                    style={{
+                      width: `${Math.min((playbackProgress / melodyDuration) * 100, 100)}%`
+                    }}
+                  />
+                </div>
+                <div className="progress-time-info">
+                  <span className="progress-current">
+                    {Math.floor(playbackProgress / 1000)}s
+                  </span>
+                  <span className="progress-divider">/</span>
+                  <span className="progress-total">
+                    {Math.floor(melodyDuration / 1000)}s
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Notes Toggle - Separate row at bottom */}
+      <div className="control-group notes-toggle-row">
+        <button
+          className="notes-toggle-container control-input"
+          onClick={onToggleNotes}
+          title={showNotes ? 'Hide notes' : 'Reveal notes'}
+          aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
+        >
+          <NotesToggle showNotes={showNotes} onToggle={() => {}} />
+        </button>
+      </div>
     </div>
   )
 }

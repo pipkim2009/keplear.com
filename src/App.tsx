@@ -4,7 +4,6 @@ import Header from './components/common/Header'
 import Footer from './components/common/Footer'
 import Home from './components/pages/Home'
 import InstrumentDisplay from './components/keyboard/InstrumentDisplay'
-import MelodyControls from './components/MelodyControls'
 import MelodyDisplay from './components/MelodyDisplay'
 import { useAudio } from './hooks/useAudio'
 import { useMelodyGenerator } from './hooks/useMelodyGenerator'
@@ -54,6 +53,8 @@ function App() {
     notes: false,
     mode: false
   })
+  const [playbackProgress, setPlaybackProgress] = useState(0)
+  const [melodyDuration, setMelodyDuration] = useState(0)
 
   // Refs to track initial render
   const isInitialBpm = useRef(true)
@@ -141,6 +142,14 @@ function App() {
     }
   }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, keyboardSelectionMode])
 
+  // Calculate melody duration in milliseconds
+  const calculateMelodyDuration = useCallback((melodyLength: number, bpm: number) => {
+    if (melodyLength === 0) return 0
+    // Each note plays for one beat at the given BPM
+    // Duration = (number of notes * 60 * 1000) / BPM
+    return (melodyLength * 60 * 1000) / bpm
+  }, [])
+
   /**
    * Generates a new melody based on current settings
    */
@@ -151,20 +160,56 @@ function App() {
       : notes
 
     generateMelody(melodyNotes, numberOfNotes, instrument, keyboardSelectionMode)
-  }, [generateMelody, numberOfNotes, instrument, keyboardOctaves, keyboardSelectionMode])
+
+    // Calculate and set duration for the new melody
+    const duration = calculateMelodyDuration(numberOfNotes, bpm)
+    setMelodyDuration(duration)
+    // Reset progress when new melody is generated
+    setPlaybackProgress(0)
+  }, [generateMelody, numberOfNotes, instrument, keyboardOctaves, keyboardSelectionMode, calculateMelodyDuration, bpm])
 
   /**
    * Plays or stops the current melody
    */
+  // Progress tracking effect
+  useEffect(() => {
+    let progressInterval: NodeJS.Timeout | null = null
+
+    if (isPlaying && melodyDuration > 0) {
+      const startTime = Date.now()
+      progressInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime
+        if (elapsed >= melodyDuration) {
+          setPlaybackProgress(melodyDuration)
+          clearInterval(progressInterval!)
+        } else {
+          setPlaybackProgress(elapsed)
+        }
+      }, 50) // Update every 50ms for smooth progress
+    } else if (!isPlaying) {
+      setPlaybackProgress(0)
+    }
+
+    return () => {
+      if (progressInterval) {
+        clearInterval(progressInterval)
+      }
+    }
+  }, [isPlaying, melodyDuration])
+
   const handlePlayMelody = useCallback((): void => {
     if (isPlaying) {
       stopMelody()
+      setPlaybackProgress(0)
     } else {
       if (generatedMelody.length === 0) {
         console.warn('No melody to play. Generate a melody first.')
         return
       }
-      
+
+      // Reset progress when starting playback
+      setPlaybackProgress(0)
+
       if (instrument === 'guitar') {
         playGuitarMelody([...generatedMelody], bpm)
       } else if (instrument === 'bass') {
@@ -253,19 +298,15 @@ function App() {
               }}
               triggerInputFlash={triggerInputFlash}
               setInputActive={setInputActive}
-            />
-
-            <MelodyControls
-              selectedNotes={[...selectedNotes]}
               onGenerateMelody={handleGenerateMelody}
               onPlayMelody={handlePlayMelody}
               isPlaying={isPlaying}
-              generatedMelody={[...generatedMelody]}
-              instrument={instrument}
-              showNotes={showNotes}
+              hasGeneratedMelody={generatedMelody.length > 0}
               onToggleNotes={() => setShowNotes(!showNotes)}
-              keyboardSelectionMode={keyboardSelectionMode}
+              playbackProgress={playbackProgress}
+              melodyDuration={melodyDuration}
             />
+
 
             <MelodyDisplay
               generatedMelody={[...generatedMelody]}
