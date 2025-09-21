@@ -3,6 +3,7 @@ import Guitar from '../guitar/Guitar'
 import Bass from '../bass/Bass'
 import InstrumentControls from './InstrumentControls'
 import ScaleChordOptions from '../common/ScaleChordOptions'
+import NotesToggle from '../common/NotesToggle'
 import { useRef, useState, useEffect } from 'react'
 import type { Note } from '../../utils/notes'
 import type { GuitarScale, ScaleBox } from '../../utils/guitarScales'
@@ -338,39 +339,71 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
       </div>
 
       <div className="instrument-container">
-        {instrument === 'keyboard' ? (
-          <Keyboard
-            onNoteClick={onNoteClick}
-            isSelected={isSelected}
-            isInMelody={isInMelody}
-            showNotes={showNotes}
-            lowerOctaves={lowerOctaves}
-            higherOctaves={higherOctaves}
-            selectionMode={keyboardSelectionMode}
-            isNoteInScale={isNoteInKeyboardScale}
-            isNoteRoot={isNoteKeyboardRoot}
-          />
-        ) : instrument === 'guitar' ? (
-          <Guitar
-            setGuitarNotes={setGuitarNotes}
-            isInMelody={isInMelody}
-            showNotes={showNotes}
-            onNoteClick={onNoteClick}
-            clearTrigger={clearTrigger}
-            onScaleHandlersReady={setScaleHandlers}
-            onChordHandlersReady={setChordHandlers}
-          />
-        ) : (
-          <Bass
-            setBassNotes={setBassNotes || setGuitarNotes}
-            isInMelody={isInMelody}
-            showNotes={showNotes}
-            onNoteClick={onNoteClick}
-            clearTrigger={clearTrigger}
-            onScaleHandlersReady={setBassScaleHandlers}
-            onChordHandlersReady={setBassChordHandlers}
-          />
-        )}
+        {/* Instrument-specific controls above the instrument */}
+        <div className="instrument-header-controls">
+          <div className="header-controls-left">
+            {instrument === 'keyboard' && (
+              <div className="control-group">
+                <label className="control-label">Selection Mode</label>
+                <select
+                  value={keyboardSelectionMode}
+                  onChange={(e) => onKeyboardSelectionModeChange && onKeyboardSelectionModeChange(e.target.value as KeyboardSelectionMode)}
+                  className={`control-input ${flashingInputs.mode ? 'flashing' : ''}`}
+                >
+                  <option value="range">Range Select</option>
+                  <option value="multi">Multi Select</option>
+                </select>
+              </div>
+            )}
+
+            <div className="control-group notes-toggle-row">
+              <button
+                className="notes-toggle-container control-input"
+                onClick={onToggleNotes}
+                title={showNotes ? 'Hide notes' : 'Reveal notes'}
+                aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
+              >
+                <NotesToggle showNotes={showNotes} onToggle={() => {}} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="instrument-wrapper">
+          {instrument === 'keyboard' ? (
+            <Keyboard
+              onNoteClick={onNoteClick}
+              isSelected={isSelected}
+              isInMelody={isInMelody}
+              showNotes={showNotes}
+              lowerOctaves={lowerOctaves}
+              higherOctaves={higherOctaves}
+              selectionMode={keyboardSelectionMode}
+              isNoteInScale={isNoteInKeyboardScale}
+              isNoteRoot={isNoteKeyboardRoot}
+            />
+          ) : instrument === 'guitar' ? (
+            <Guitar
+              setGuitarNotes={setGuitarNotes}
+              isInMelody={isInMelody}
+              showNotes={showNotes}
+              onNoteClick={onNoteClick}
+              clearTrigger={clearTrigger}
+              onScaleHandlersReady={setScaleHandlers}
+              onChordHandlersReady={setChordHandlers}
+            />
+          ) : (
+            <Bass
+              setBassNotes={setBassNotes || setGuitarNotes}
+              isInMelody={isInMelody}
+              showNotes={showNotes}
+              onNoteClick={onNoteClick}
+              clearTrigger={clearTrigger}
+              onScaleHandlersReady={setBassScaleHandlers}
+              onChordHandlersReady={setBassChordHandlers}
+            />
+          )}
+        </div>
       </div>
     </>
   )

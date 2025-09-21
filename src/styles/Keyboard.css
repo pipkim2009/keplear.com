@@ -1,8 +1,7 @@
 .instrument-container {
   position: relative;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
   background: linear-gradient(145deg, #2d3748, #1a202c);
   padding: 0;
   margin-top: 1rem;
@@ -13,6 +12,34 @@
   max-width: 95vw;
   min-width: auto;
   min-height: 350px;
+  overflow-y: visible;
+}
+
+.instrument-header-controls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 2px solid #4a5568;
+  background: linear-gradient(145deg, #374151, #1f2937);
+  border-radius: 16px 16px 0 0;
+}
+
+.header-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-controls-left .notes-toggle-row {
+  transform: translateY(5px);
+}
+
+.instrument-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
   overflow-x: scroll;
   overflow-y: visible;
 }
@@ -22,8 +49,15 @@
     width: 100vw;
     max-width: 100vw;
     margin: 0.5rem 0 0 0;
-    padding: 0;
     border-radius: 0;
+  }
+
+  .instrument-header-controls {
+    border-radius: 0;
+    padding: 0.75rem;
+  }
+
+  .instrument-wrapper {
     overflow-x: scroll;
     -webkit-overflow-scrolling: touch;
   }
@@ -83,8 +117,16 @@
     width: 100vw;
     max-width: 100vw;
     margin: 0.5rem 0 0 0;
-    padding: 0;
     border-radius: 0;
+  }
+
+  .instrument-header-controls {
+    border-radius: 0;
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .instrument-wrapper {
     overflow-x: scroll;
     -webkit-overflow-scrolling: touch;
   }
@@ -96,7 +138,7 @@
 
 /* Desktop/Laptop scrolling improvements */
 @media (min-width: 769px) {
-  .instrument-container {
+  .instrument-wrapper {
     overflow-x: scroll;
     scroll-behavior: smooth;
     justify-content: flex-start;
@@ -507,23 +549,22 @@
   }
 }
 
-/* Custom scrollbar for instrument container (keyboard) - only show when needed */
-.instrument-container {
+/* Custom scrollbar for instrument wrapper (keyboard) - only show when needed */
+.instrument-wrapper {
   overflow-x: auto;
 }
 
-.instrument-container::-webkit-scrollbar {
+.instrument-wrapper::-webkit-scrollbar {
   height: 12px;
 }
 
-
-.instrument-container::-webkit-scrollbar-track {
+.instrument-wrapper::-webkit-scrollbar-track {
   background: linear-gradient(145deg, #1a202c, #2d3748);
   border-radius: 6px;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.instrument-container::-webkit-scrollbar-thumb {
+.instrument-wrapper::-webkit-scrollbar-thumb {
   background: linear-gradient(145deg, #3b82f6, #1d4ed8);
   border-radius: 6px;
   border: 1px solid #60a5fa;
@@ -532,19 +573,19 @@
     inset 0 1px 2px rgba(255, 255, 255, 0.1);
 }
 
-.instrument-container::-webkit-scrollbar-thumb:hover {
+.instrument-wrapper::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(145deg, #2563eb, #1e40af);
   box-shadow:
     0 3px 6px rgba(0, 0, 0, 0.4),
     inset 0 1px 2px rgba(255, 255, 255, 0.15);
 }
 
-.instrument-container::-webkit-scrollbar-thumb:active {
+.instrument-wrapper::-webkit-scrollbar-thumb:active {
   background: linear-gradient(145deg, #1e40af, #1e3a8a);
 }
 
 /* Firefox scrollbar - only show when needed */
-.instrument-container {
+.instrument-wrapper {
   scrollbar-width: auto;
   scrollbar-color: #3b82f6 #1a202c;
 }

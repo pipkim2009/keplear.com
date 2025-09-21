@@ -424,22 +424,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         </select>
       </div>
 
-
-
       {instrument === 'keyboard' && (
         <>
-          <div className="control-group">
-            <label className="control-label">Selection Mode</label>
-            <select
-              value={keyboardSelectionMode}
-              onChange={(e) => onKeyboardSelectionModeChange && onKeyboardSelectionModeChange(e.target.value as KeyboardSelectionMode)}
-              className={`control-input ${flashingInputs.mode ? 'flashing' : ''}`}
-            >
-              <option value="range">Range Select</option>
-              <option value="multi">Multi Select</option>
-            </select>
-          </div>
-
           <div className="control-group octave-range-control">
             <label className="control-label">Octave Range</label>
             <div className="octave-range-slider">
@@ -759,17 +745,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         </div>
       </div>
 
-      {/* Notes Toggle - Separate row at bottom */}
-      <div className="control-group notes-toggle-row">
-        <button
-          className="notes-toggle-container control-input"
-          onClick={onToggleNotes}
-          title={showNotes ? 'Hide notes' : 'Reveal notes'}
-          aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
-        >
-          <NotesToggle showNotes={showNotes} onToggle={() => {}} />
-        </button>
-      </div>
     </div>
   )
 }
