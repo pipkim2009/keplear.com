@@ -1031,11 +1031,19 @@
 }
 
 .control-group.bpm-notes-melody-row .control-subgroup:first-child .play-melody {
-  transform: translateY(10px);
+  transform: translateY(10px) translateX(-67px);
 }
 
 .control-group.bpm-notes-melody-row .control-subgroup:nth-child(2) .generate-melody {
-  transform: translateY(19px);
+  transform: translateY(19px) translateX(-67px);
+}
+
+.control-group.bpm-notes-melody-row .control-subgroup:nth-child(3) {
+  transform: translateX(-67px);
+}
+
+.control-group.bpm-notes-melody-row .control-subgroup:nth-child(4) {
+  transform: translateX(-67px);
 }
 
 .control-subgroup {
