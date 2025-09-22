@@ -57,6 +57,7 @@ function App() {
   const [melodyDuration, setMelodyDuration] = useState(0)
   const [hasRecordedAudio, setHasRecordedAudio] = useState(false)
   const [recordedAudioBlob, setRecordedAudioBlob] = useState<Blob | null>(null)
+  const [isAutoRecording, setIsAutoRecording] = useState(false)
 
   // Refs to track initial render
   const isInitialBpm = useRef(true)
@@ -191,27 +192,42 @@ function App() {
     // Clear recorded audio when generating new melody
     setHasRecordedAudio(false)
     setRecordedAudioBlob(null)
+    setIsAutoRecording(false)
   }, [generateMelody, numberOfNotes, instrument, keyboardOctaves, keyboardSelectionMode, calculateMelodyDuration, bpm])
 
   // Auto-record melody when it changes
   useEffect(() => {
-    if (generatedMelody.length > 0) {
+    if (generatedMelody.length > 0 && !isPlaying && !isRecording && !isAutoRecording && !hasRecordedAudio) {
       const autoRecord = async () => {
         try {
+          console.log('Starting auto-recording...')
+          setIsAutoRecording(true)
+
+          // Ensure any previous playback is stopped
+          stopMelody()
+
+          // Wait a bit for stop to take effect
+          await new Promise(resolve => setTimeout(resolve, 100))
+
           const result = await handleRecordMelody()
           if (result) {
+            console.log('Auto-recording completed successfully')
             setHasRecordedAudio(true)
             setRecordedAudioBlob(result)
+          } else {
+            console.log('Auto-recording returned null')
           }
         } catch (error) {
           console.warn('Auto-recording failed:', error)
+        } finally {
+          setIsAutoRecording(false)
         }
       }
 
       // Small delay to ensure melody is fully processed
-      setTimeout(autoRecord, 100)
+      setTimeout(autoRecord, 500)
     }
-  }, [generatedMelody, handleRecordMelody])
+  }, [generatedMelody.length, isPlaying, isRecording, isAutoRecording, hasRecordedAudio])
 
   /**
    * Plays or stops the current melody

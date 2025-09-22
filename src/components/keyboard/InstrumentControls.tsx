@@ -588,28 +588,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
 
 
-      {/* Play, Generate Melody, BPM, Notes - Combined row */}
+      {/* Generate Melody, BPM, Notes - Combined row */}
       <div className="control-group bpm-notes-melody-row">
         <div className="melody-controls-top">
-          <button
-            onClick={onPlayMelody}
-            disabled={!hasGeneratedMelody}
-            className={`control-subgroup control-button play-melody ${isPlaying ? 'playing' : ''} ${!hasGeneratedMelody ? 'disabled' : ''}`}
-            title={!hasGeneratedMelody ? 'Generate a melody first' : (isPlaying ? 'Stop melody' : 'Play generated melody')}
-          >
-            <div className="play-icon">
-              {isPlaying ? (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <rect x="6" y="4" width="4" height="16" rx="2"/>
-                  <rect x="14" y="4" width="4" height="16" rx="2"/>
-                </svg>
-              ) : (
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-              )}
-            </div>
-          </button>
 
           <button
             onClick={() => {
@@ -750,44 +731,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className={`progress-bar-container ${!hasGeneratedMelody ? 'disabled' : ''}`}>
-          <div
-            className="progress-bar-background"
-            onClick={hasGeneratedMelody ? handleProgressBarClick : undefined}
-            onMouseDown={hasGeneratedMelody ? handleProgressBarMouseDown : undefined}
-            style={{ cursor: hasGeneratedMelody ? 'pointer' : 'not-allowed' }}
-          >
-            <div
-              className="progress-bar-fill"
-              style={{
-                width: hasGeneratedMelody && melodyDuration > 0
-                  ? `${Math.min((playbackProgress / melodyDuration) * 100, 100)}%`
-                  : '0%'
-              }}
-            />
-            <div
-              className="progress-bar-head"
-              style={{
-                left: hasGeneratedMelody && melodyDuration > 0
-                  ? `${Math.min((playbackProgress / melodyDuration) * 100, 100)}%`
-                  : '0%'
-              }}
-            />
-          </div>
-          <div className="progress-time-info">
-            <span className="progress-current">
-              {hasGeneratedMelody
-                ? (playbackProgress / 1000).toFixed(2)
-                : '0.00'}s
-            </span>
-            <span className="progress-total">
-              {hasGeneratedMelody
-                ? (melodyDuration / 1000).toFixed(2)
-                : '0.00'}s
-            </span>
-          </div>
-        </div>
       </div>
 
       {/* Recording Controls - Only show when there's recorded audio */}
@@ -799,7 +742,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               className="control-button download-button"
               title="Download recorded audio file"
             >
-              Download Audio
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+              </svg>
             </button>
           </div>
 
