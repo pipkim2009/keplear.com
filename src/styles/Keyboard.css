@@ -73,17 +73,7 @@
     padding: 20px 20px;
   }
 
-  .instrument-controls-container.guitar-mode {
-    width: 700px;
-    max-width: 90vw;
-    padding: 20px 20px;
-  }
-
-  .instrument-controls-container.bass-mode {
-    width: 700px;
-    max-width: 90vw;
-    padding: 20px 20px;
-  }
+  /* Removed guitar-mode and bass-mode container styling - use default keyboard layout */
 
   .keyboard-container {
     justify-content: flex-start !important;
@@ -196,17 +186,7 @@
     padding: 20px 20px;
   }
 
-  .instrument-controls-container.guitar-mode {
-    width: 700px;
-    max-width: 90vw;
-    padding: 20px 20px;
-  }
-
-  .instrument-controls-container.bass-mode {
-    width: 700px;
-    max-width: 90vw;
-    padding: 20px 20px;
-  }
+  /* Removed guitar-mode and bass-mode container styling - use default keyboard layout */
 }
 
 @media (max-width: 360px) {

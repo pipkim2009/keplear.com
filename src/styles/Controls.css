@@ -103,26 +103,11 @@
   flex: 1 0 100%;
 }
 
-/* Guitar mode specific styling */
-.instrument-controls.guitar-mode {
-  justify-content: flex-start;
-  align-items: flex-start;
-  min-height: 80px;
-  padding: 15px 10px;
-}
-
-@media (min-width: 769px) {
-  .instrument-controls.guitar-mode {
-    justify-content: center;
-  }
-}
+/* Removed guitar mode specific styling - use default keyboard layout */
 
 /* Remove guitar-mode specific control group sizing to match keyboard width */
 
-/* Bass mode specific styling - use same layout as default (keyboard) */
-.instrument-controls.bass-mode {
-  justify-content: center;
-}
+/* Removed bass mode specific styling - use default keyboard layout */
 
 .control-label {
   font-size: 12px;
@@ -755,10 +740,7 @@
   }
 }
 
-/* Use boxes checkbox positioning */
-.instrument-controls.guitar-mode .control-group:has(.styled-checkbox) {
-  margin-top: 25px;
-}
+/* Removed guitar-mode checkbox positioning - use default keyboard layout */
 
 /* Scale control buttons */
 .control-button.apply-scale {
@@ -1216,26 +1198,7 @@
   transform: translateX(-72px);
 }
 
-/* Match guitar and bass controls exactly to keyboard positioning */
-.instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
-.instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
-  transform: translateY(10px) translateX(-112px);
-}
-
-.instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
-.instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
-  transform: translateY(19px) translateX(-102px);
-}
-
-.instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
-.instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
-  transform: translateX(-92px);
-}
-
-.instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4),
-.instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
-  transform: translateX(-72px);
-}
+/* Removed instrument-specific overrides - use keyboard styles for all instruments */
 
 .control-subgroup {
   display: flex;
@@ -1335,20 +1298,20 @@
   }
 
   /* Also reset for guitar and bass modes */
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4),
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child,
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child,
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2),
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2),
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3),
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3),
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4),
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4) {
     transform: none;
   }
 
   /* Apply mobile order to guitar and bass modes too */
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child,
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child {
     order: 4;
     display: flex;
     align-items: center;
@@ -1356,8 +1319,8 @@
     width: 100%;
   }
 
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2),
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2) {
     order: 3;
     gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
     display: flex;
@@ -1366,8 +1329,8 @@
     width: 100%;
   }
 
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3),
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3) {
     order: 1;
     display: flex;
     align-items: center;
@@ -1375,8 +1338,8 @@
     width: 100%;
   }
 
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4),
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4),
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4) {
     order: 2;
     display: flex;
     align-items: center;
@@ -1447,8 +1410,8 @@
     width: 100%;
   }
 
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row,
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row {
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */,
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ {
     gap: 6px;
     padding: 10px;
     width: auto;
@@ -1456,16 +1419,16 @@
     margin: 0 auto;
   }
 
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top,
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top {
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top,
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top {
     flex-direction: column;
     gap: 6px;
     align-items: center;
   }
 
   /* Apply mobile order to guitar and bass modes too */
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child,
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child,
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child {
     order: 4;
     display: flex;
     align-items: center;
@@ -1473,8 +1436,8 @@
     width: 100%;
   }
 
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2),
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(2) {
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2),
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2) {
     order: 3;
     gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
     display: flex;
@@ -1483,8 +1446,8 @@
     width: 100%;
   }
 
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3),
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(3) {
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3),
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3) {
     order: 1;
     display: flex;
     align-items: center;
@@ -1492,8 +1455,8 @@
     width: 100%;
   }
 
-  .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4),
-  .instrument-controls.bass-mode .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:nth-child(4) {
+  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4),
+  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4) {
     order: 2;
     display: flex;
     align-items: center;
