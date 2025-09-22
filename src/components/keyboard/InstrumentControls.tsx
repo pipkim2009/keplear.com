@@ -4,6 +4,7 @@ import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleB
 import { guitarNotes } from '../../utils/guitarNotes'
 import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/keyboardScales'
 import NotesToggle from '../common/NotesToggle'
+import { downloadAudioFile, generateMelodyFilename } from '../../utils/audioExport'
 
 export type KeyboardSelectionMode = 'range' | 'multi'
 
@@ -35,13 +36,17 @@ interface InstrumentControlsProps {
   selectedNotesCount?: number
   onGenerateMelody?: () => void
   onPlayMelody?: () => void
+  onRecordMelody?: () => Promise<Blob | null>
   isPlaying?: boolean
+  isRecording?: boolean
   hasGeneratedMelody?: boolean
   showNotes?: boolean
   onToggleNotes?: () => void
   playbackProgress?: number
   melodyDuration?: number
   onProgressChange?: (progress: number) => void
+  onClearRecordedAudio?: () => void
+  recordedAudioBlob?: Blob | null
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -72,13 +77,17 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   selectedNotesCount = 0,
   onGenerateMelody,
   onPlayMelody,
+  onRecordMelody,
   isPlaying = false,
+  isRecording = false,
   hasGeneratedMelody = false,
   showNotes = false,
   onToggleNotes,
   playbackProgress = 0,
   melodyDuration = 0,
-  onProgressChange
+  onProgressChange,
+  onClearRecordedAudio,
+  recordedAudioBlob
 }) => {
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
@@ -92,6 +101,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const [availableBoxes, setAvailableBoxes] = useState<ScaleBox[]>([])
   const [selectedBoxIndex, setSelectedBoxIndex] = useState<number>(0)
   const [isDragging, setIsDragging] = useState<boolean>(false)
+  const [audioFileBlob, setAudioFileBlob] = useState<Blob | null>(null)
+  const [audioFileUrl, setAudioFileUrl] = useState<string | null>(null)
 
   // Original default values
   const DEFAULT_BPM = 120
@@ -365,7 +376,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging || !onProgressChange || melodyDuration === 0) return
+      if (!isDragging) return
 
       const progressBar = document.querySelector('.progress-bar-background') as HTMLElement
       if (!progressBar) return
@@ -373,9 +384,11 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
       const rect = progressBar.getBoundingClientRect()
       const mouseX = e.clientX - rect.left
       const percentage = Math.max(0, Math.min(1, mouseX / rect.width))
-      const newProgress = percentage * melodyDuration
 
-      onProgressChange(newProgress)
+      if (onProgressChange && melodyDuration > 0) {
+        const newProgress = percentage * melodyDuration
+        onProgressChange(newProgress)
+      }
     }
 
     const handleMouseUp = () => {
@@ -400,6 +413,54 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
       stopNotesInterval()
     }
   }, [])
+
+  // Recording handlers
+  const handleRecordForPlayback = async () => {
+    if (!onRecordMelody) return
+
+    try {
+      const audioBlob = await onRecordMelody()
+      if (audioBlob) {
+        // Create URL for HTML audio element (no download)
+        const url = URL.createObjectURL(audioBlob)
+        setAudioFileBlob(audioBlob)
+        setAudioFileUrl(url)
+      }
+    } catch (error) {
+      console.error('Failed to record melody:', error)
+    }
+  }
+
+  const handleDownloadRecording = () => {
+    if (audioFileBlob) {
+      const filename = generateMelodyFilename(instrument)
+      downloadAudioFile(audioFileBlob, filename)
+    }
+  }
+
+  // Handle auto-recorded audio from parent
+  React.useEffect(() => {
+    if (recordedAudioBlob) {
+      // Clean up previous URL
+      if (audioFileUrl) {
+        URL.revokeObjectURL(audioFileUrl)
+      }
+
+      // Create new URL for the recorded audio
+      const url = URL.createObjectURL(recordedAudioBlob)
+      setAudioFileBlob(recordedAudioBlob)
+      setAudioFileUrl(url)
+    }
+  }, [recordedAudioBlob])
+
+  // Cleanup audio URL when component unmounts or audio changes
+  React.useEffect(() => {
+    return () => {
+      if (audioFileUrl) {
+        URL.revokeObjectURL(audioFileUrl)
+      }
+    }
+  }, [audioFileUrl])
 
   // Determine if melody can be generated based on instrument and selection mode
   const canGenerateMelody = instrument === 'keyboard'
@@ -534,7 +595,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             onClick={onPlayMelody}
             disabled={!hasGeneratedMelody}
             className={`control-subgroup control-button play-melody ${isPlaying ? 'playing' : ''} ${!hasGeneratedMelody ? 'disabled' : ''}`}
-            title={!hasGeneratedMelody ? 'Generate a melody first' : (isPlaying ? 'Stop playing melody' : 'Play generated melody')}
+            title={!hasGeneratedMelody ? 'Generate a melody first' : (isPlaying ? 'Stop melody' : 'Play generated melody')}
           >
             <div className="play-icon">
               {isPlaying ? (
@@ -551,7 +612,20 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </button>
 
           <button
-            onClick={onGenerateMelody}
+            onClick={() => {
+              // Clear recorded audio when generating new melody
+              if (audioFileUrl) {
+                URL.revokeObjectURL(audioFileUrl)
+                setAudioFileUrl(null)
+              }
+              setAudioFileBlob(null)
+              if (onClearRecordedAudio) {
+                onClearRecordedAudio()
+              }
+              if (onGenerateMelody) {
+                onGenerateMelody()
+              }
+            }}
             disabled={!canGenerateMelody}
             className="control-subgroup control-button generate-melody"
             title="Generate a melody from selected notes"
@@ -703,14 +777,50 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
           <div className="progress-time-info">
             <span className="progress-current">
-              {hasGeneratedMelody ? (playbackProgress / 1000).toFixed(2) : '0.00'}s
+              {hasGeneratedMelody
+                ? (playbackProgress / 1000).toFixed(2)
+                : '0.00'}s
             </span>
             <span className="progress-total">
-              {hasGeneratedMelody ? (melodyDuration / 1000).toFixed(2) : '0.00'}s
+              {hasGeneratedMelody
+                ? (melodyDuration / 1000).toFixed(2)
+                : '0.00'}s
             </span>
           </div>
         </div>
       </div>
+
+      {/* Recording Controls - Only show when there's recorded audio */}
+      {audioFileBlob && (
+        <div className="control-group recording-controls">
+          <div className="recording-buttons">
+            <button
+              onClick={handleDownloadRecording}
+              className="control-button download-button"
+              title="Download recorded audio file"
+            >
+              Download Audio
+            </button>
+          </div>
+
+          {/* Native HTML Audio Player for WAV playback */}
+          {audioFileUrl && (
+            <div className="wav-player-container">
+              <label className="control-label">Auto-Recorded Audio:</label>
+              <audio
+                controls
+                src={audioFileUrl}
+                className="wav-audio-player"
+                preload="metadata"
+              >
+                Your browser does not support the audio element.
+              </audio>
+            </div>
+          )}
+
+        </div>
+      )}
+
 
     </div>
   )

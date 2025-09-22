@@ -1465,3 +1465,135 @@
   }
 }
 
+
+/* Recording Controls */
+.control-group.recording-controls {
+  margin-top: 12px;
+  border-top: 1px solid var(--border-color, #e0e0e0);
+  padding-top: 12px;
+}
+
+.recording-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.control-button.record-button {
+  min-width: 120px;
+  background: var(--accent-color, #28a745);
+  color: white;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.control-button.record-button:hover:not(:disabled) {
+  background: var(--accent-hover-color, #218838);
+  transform: translateY(-1px);
+}
+
+.control-button.record-button:disabled {
+  background: var(--disabled-color, #6c757d);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.control-button.download-button {
+  min-width: 120px;
+  background: var(--secondary-color, #6c757d);
+  color: white;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.control-button.download-button:hover:not(:disabled) {
+  background: var(--secondary-hover-color, #5a6268);
+  transform: translateY(-1px);
+}
+
+/* Dark mode support for recording controls */
+@media (prefers-color-scheme: dark) {
+  .control-group.recording-controls {
+    border-top-color: var(--border-color-dark, #404040);
+  }
+
+  .control-button.record-button {
+    --accent-color: #20c997;
+    --accent-hover-color: #1a9977;
+  }
+
+  .control-button.download-button {
+    --secondary-color: #6c757d;
+    --secondary-hover-color: #5a6268;
+  }
+}
+
+/* WAV Audio Player Styling */
+.wav-player-container {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--input-background, #f8f9fa);
+  border: 1px solid var(--border-color, #e0e0e0);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.wav-player-container .control-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-color, #333);
+  margin: 0;
+}
+
+.wav-audio-player {
+  width: 100%;
+  max-width: 400px;
+  height: 40px;
+  border-radius: 6px;
+  outline: none;
+}
+
+.wav-audio-player::-webkit-media-controls-panel {
+  background-color: var(--control-background, #fff);
+  border-radius: 6px;
+}
+
+.wav-audio-player::-webkit-media-controls-play-button,
+.wav-audio-player::-webkit-media-controls-pause-button {
+  background-color: var(--accent-color, #007bff);
+  border-radius: 50%;
+  color: white;
+}
+
+/* Dark mode support for WAV player */
+@media (prefers-color-scheme: dark) {
+  .wav-player-container {
+    background: var(--input-background-dark, #2d3338);
+    border-color: var(--border-color-dark, #404040);
+  }
+
+  .wav-player-container .control-label {
+    color: var(--text-color-dark, #e9ecef);
+  }
+
+  .wav-audio-player::-webkit-media-controls-panel {
+    background-color: var(--control-background-dark, #343a40);
+  }
+}
+
+/* Mobile responsive design for recording controls */
+@media (max-width: 480px) {
+  .recording-buttons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .control-button.record-button {
+    width: 100%;
+    min-width: auto;
+  }
+}

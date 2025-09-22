@@ -55,6 +55,8 @@ function App() {
   })
   const [playbackProgress, setPlaybackProgress] = useState(0)
   const [melodyDuration, setMelodyDuration] = useState(0)
+  const [hasRecordedAudio, setHasRecordedAudio] = useState(false)
+  const [recordedAudioBlob, setRecordedAudioBlob] = useState<Blob | null>(null)
 
   // Refs to track initial render
   const isInitialBpm = useRef(true)
@@ -62,7 +64,7 @@ function App() {
   const isInitialMode = useRef(true)
 
   const { isDarkMode, toggleTheme } = useTheme()
-  const { playNote, playGuitarNote, playBassNote, playMelody, playGuitarMelody, playBassMelody, stopMelody, isPlaying } = useAudio()
+  const { playNote, playGuitarNote, playBassNote, playMelody, playGuitarMelody, playBassMelody, stopMelody, recordMelody, isPlaying, isRecording } = useAudio()
 
   // Apply theme class to document body for portaled modals and global styles
   useEffect(() => {
@@ -155,6 +157,22 @@ function App() {
   }, [])
 
   /**
+   * Records the current melody based on instrument type
+   */
+  const handleRecordMelody = useCallback(async (): Promise<Blob | null> => {
+    if (generatedMelody.length === 0) {
+      console.warn('No melody to record. Generate a melody first.')
+      return null
+    }
+
+    const result = await recordMelody([...generatedMelody], bpm, instrument)
+    if (result) {
+      setHasRecordedAudio(true)
+    }
+    return result
+  }, [recordMelody, generatedMelody, bpm, instrument])
+
+  /**
    * Generates a new melody based on current settings
    */
   const handleGenerateMelody = useCallback((): void => {
@@ -170,12 +188,35 @@ function App() {
     setMelodyDuration(duration)
     // Reset progress when new melody is generated
     setPlaybackProgress(0)
+    // Clear recorded audio when generating new melody
+    setHasRecordedAudio(false)
+    setRecordedAudioBlob(null)
   }, [generateMelody, numberOfNotes, instrument, keyboardOctaves, keyboardSelectionMode, calculateMelodyDuration, bpm])
+
+  // Auto-record melody when it changes
+  useEffect(() => {
+    if (generatedMelody.length > 0) {
+      const autoRecord = async () => {
+        try {
+          const result = await handleRecordMelody()
+          if (result) {
+            setHasRecordedAudio(true)
+            setRecordedAudioBlob(result)
+          }
+        } catch (error) {
+          console.warn('Auto-recording failed:', error)
+        }
+      }
+
+      // Small delay to ensure melody is fully processed
+      setTimeout(autoRecord, 100)
+    }
+  }, [generatedMelody, handleRecordMelody])
 
   /**
    * Plays or stops the current melody
    */
-  // Progress tracking effect
+  // Progress tracking effect - only for ToneJS playback
   useEffect(() => {
     let progressInterval: NodeJS.Timeout | null = null
 
@@ -190,7 +231,8 @@ function App() {
           setPlaybackProgress(elapsed)
         }
       }, 50) // Update every 50ms for smooth progress
-    } else if (!isPlaying) {
+    } else if (!isPlaying && !hasRecordedAudio) {
+      // Only reset progress if we don't have recorded audio loaded
       setPlaybackProgress(0)
     }
 
@@ -199,7 +241,7 @@ function App() {
         clearInterval(progressInterval)
       }
     }
-  }, [isPlaying, melodyDuration])
+  }, [isPlaying, hasRecordedAudio, melodyDuration])
 
   const handlePlayMelody = useCallback((): void => {
     if (isPlaying) {
@@ -225,11 +267,21 @@ function App() {
   }, [isPlaying, stopMelody, generatedMelody, instrument, playGuitarMelody, playBassMelody, playMelody, bpm])
 
   /**
+   * Clears recorded audio state
+   */
+  const handleClearRecordedAudio = useCallback((): void => {
+    setHasRecordedAudio(false)
+    setRecordedAudioBlob(null)
+  }, [])
+
+  /**
    * Handles instrument changes and clears selection
    */
   const handleInstrumentChange = useCallback((newInstrument: InstrumentType): void => {
     setInstrument(newInstrument)
     clearSelection() // Clear melody when instrument changes
+    setHasRecordedAudio(false) // Clear recorded audio when changing instruments
+    setRecordedAudioBlob(null)
   }, [clearSelection])
 
   /**
@@ -311,12 +363,16 @@ function App() {
               setInputActive={setInputActive}
               onGenerateMelody={handleGenerateMelody}
               onPlayMelody={handlePlayMelody}
+              onRecordMelody={handleRecordMelody}
               isPlaying={isPlaying}
+              isRecording={isRecording}
               hasGeneratedMelody={generatedMelody.length > 0}
               onToggleNotes={() => setShowNotes(!showNotes)}
               playbackProgress={playbackProgress}
               melodyDuration={melodyDuration}
               onProgressChange={handleProgressChange}
+              onClearRecordedAudio={handleClearRecordedAudio}
+              recordedAudioBlob={recordedAudioBlob}
             />
 
 

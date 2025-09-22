@@ -39,12 +39,16 @@ interface InstrumentDisplayProps {
   setInputActive: (inputType: 'bpm' | 'notes' | 'mode', active: boolean) => void
   onGenerateMelody?: () => void
   onPlayMelody?: () => void
+  onRecordMelody?: () => Promise<Blob | null>
   isPlaying?: boolean
+  isRecording?: boolean
   hasGeneratedMelody?: boolean
   onToggleNotes?: () => void
   playbackProgress?: number
   melodyDuration?: number
   onProgressChange?: (progress: number) => void
+  onClearRecordedAudio?: () => void
+  recordedAudioBlob?: Blob | null
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -71,12 +75,16 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   setInputActive,
   onGenerateMelody,
   onPlayMelody,
+  onRecordMelody,
   isPlaying,
+  isRecording,
   hasGeneratedMelody,
   onToggleNotes,
   playbackProgress,
   melodyDuration,
-  onProgressChange
+  onProgressChange,
+  onClearRecordedAudio,
+  recordedAudioBlob
 }) => {
   const guitarRef = useRef<any>(null)
   const bassRef = useRef<any>(null)
@@ -313,13 +321,17 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             selectedNotesCount={selectedNotes.length}
             onGenerateMelody={onGenerateMelody}
             onPlayMelody={onPlayMelody}
+            onRecordMelody={onRecordMelody}
             isPlaying={isPlaying}
+            isRecording={isRecording}
             hasGeneratedMelody={hasGeneratedMelody}
             showNotes={showNotes}
             onToggleNotes={onToggleNotes}
             playbackProgress={playbackProgress}
             melodyDuration={melodyDuration}
             onProgressChange={onProgressChange}
+            onClearRecordedAudio={onClearRecordedAudio}
+            recordedAudioBlob={recordedAudioBlob}
           />
       </div>
 

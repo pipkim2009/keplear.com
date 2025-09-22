@@ -92,7 +92,9 @@ interface UseAudioReturn {
   playGuitarMelody: (melody: Note[], bpm: number) => Promise<void>
   playBassMelody: (melody: Note[], bpm: number) => Promise<void>
   stopMelody: () => void
+  recordMelody: (melody: Note[], bpm: number, instrument?: 'keyboard' | 'guitar' | 'bass') => Promise<Blob | null>
   readonly isPlaying: boolean
+  readonly isRecording: boolean
 }
 
 /**
@@ -106,6 +108,7 @@ export const useAudio = (): UseAudioReturn => {
     bass: null
   })
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
+  const [isRecording, setIsRecording] = useState<boolean>(false)
   const [isInitialized, setIsInitialized] = useState<boolean>(false)
   const [shouldStop, setShouldStop] = useState<boolean>(false)
   const [currentTimeoutId, setCurrentTimeoutId] = useState<NodeJS.Timeout | null>(null)
@@ -270,12 +273,79 @@ export const useAudio = (): UseAudioReturn => {
     }
     // Immediately set playing to false when manually stopped
     setIsPlaying(false)
-    
+
     // Reset shouldStop after a brief delay to ensure the playback loop sees it
     setTimeout(() => {
       setShouldStop(false)
     }, 10)
   }, [currentTimeoutId])
+
+  const recordMelody = useCallback(async (
+    melody: Note[],
+    bpm: number,
+    instrument: 'keyboard' | 'guitar' | 'bass' = 'keyboard'
+  ): Promise<Blob | null> => {
+    if (melody.length === 0 || isPlaying || isRecording) return null
+
+    try {
+      const Tone = await import('tone')
+      const currentSamplers = await initializeAudio()
+      const sampler = currentSamplers[instrument]
+
+      if (!sampler || typeof sampler !== 'object' || !('triggerAttackRelease' in sampler)) {
+        return null
+      }
+      setIsRecording(true)
+
+      // Create recorder (let browser choose supported format)
+      const recorder = new Tone.Recorder()
+
+      // Create a gain node to control volume during recording
+      const gainNode = new Tone.Gain(0) // 0 = silent, 1 = normal volume
+      const destination = Tone.getDestination()
+
+      // Connect: sampler -> gainNode -> destination (speakers)
+      // Connect: sampler -> recorder (for recording)
+      const samplerNode = sampler as any
+      samplerNode.disconnect() // Disconnect from speakers
+      samplerNode.connect(gainNode) // Connect to gain control
+      samplerNode.connect(recorder) // Connect to recorder
+      gainNode.connect(destination) // Gain to speakers (muted)
+
+      // Start recording
+      recorder.start()
+
+      const noteDuration = (60 / bpm) * 800
+      const playDuration = instrument === 'guitar' ? "0.6" : instrument === 'bass' ? "0.8" : "0.5"
+      const samplerWithMethod = sampler as { triggerAttackRelease: (note: string, duration: string) => void }
+
+      // Play melody while recording
+      for (let i = 0; i < melody.length; i++) {
+        samplerWithMethod.triggerAttackRelease(melody[i].name, playDuration)
+        if (i < melody.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, noteDuration))
+        }
+      }
+
+      // Wait for the last note to finish
+      await new Promise(resolve => setTimeout(resolve, noteDuration))
+
+      // Stop recording and get the audio blob
+      const recording = await recorder.stop()
+
+      // Restore normal audio routing
+      samplerNode.disconnect()
+      samplerNode.connect(destination)
+
+      setIsRecording(false)
+      return recording
+
+    } catch (error) {
+      console.error('Recording failed:', error)
+      setIsRecording(false)
+      return null
+    }
+  }, [initializeAudio, isPlaying, isRecording])
 
   return {
     playNote,
@@ -285,6 +355,8 @@ export const useAudio = (): UseAudioReturn => {
     playGuitarMelody,
     playBassMelody,
     stopMelody,
-    isPlaying
+    recordMelody,
+    isPlaying,
+    isRecording
   }
 }
