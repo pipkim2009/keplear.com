@@ -1098,6 +1098,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
+  margin-top: 19px;
 }
 
 .notes-toggle-container .toggle-text {

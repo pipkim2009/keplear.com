@@ -52,13 +52,13 @@
 
 @media (max-width: 768px) {
   .notes-toggle-content {
-    flex-direction: column;
-    gap: 0.25rem;
+    flex-direction: row;
+    gap: 0.5rem;
   }
 
   .notes-toggle-content .toggle-label {
     font-size: 11px;
-    order: -1;
+    display: block !important;
   }
 }
 

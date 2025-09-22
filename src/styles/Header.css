@@ -196,7 +196,19 @@
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
 }
 
-@media (max-width: 768px) {
+@media (min-width: 1024px) {
+  .header-content {
+    flex-wrap: nowrap;
+  }
+
+  .header-nav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 1023px) {
   .header-content {
     padding: 1rem 1rem;
     flex-wrap: wrap;
