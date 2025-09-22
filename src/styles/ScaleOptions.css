@@ -14,7 +14,7 @@
   width: auto;
   min-height: 40px;
   background: transparent;
-  z-index: 1;
+  z-index: 10000;
   pointer-events: auto;
 }
 
@@ -27,24 +27,23 @@
 }
 
 .scale-options-popup {
-  position: fixed;
-  top: auto;
-  left: auto;
-  margin-top: 4px;
+  position: absolute !important;
+  top: calc(100% + 4px) !important;
+  left: 0 !important;
+  margin: 0 !important;
   padding: 16px;
   width: 200px !important;
   max-width: 200px !important;
   min-width: 200px !important;
   box-sizing: border-box;
-  z-index: 2147483647 !important;
+  z-index: 999999 !important;
   background: rgba(0, 0, 0, 0.95);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   border: 2px solid #ffcc02;
   pointer-events: auto !important;
   backdrop-filter: blur(8px);
-  isolation: isolate;
-  transform: translateZ(0);
+  transform: none !important;
 }
 
 .scale-options-popup * {

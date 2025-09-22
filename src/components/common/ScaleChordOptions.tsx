@@ -223,13 +223,9 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         <span className="toggle-text">Scales/Chords</span>
       </button>
 
-      {isExpanded && createPortal(
+      {isExpanded && (
         <div
           className="scale-options-popup"
-          style={{
-            top: `${popupPosition.top}px`,
-            left: `${popupPosition.left}px`
-          }}
         >
           {/* Mode Toggle Slider */}
           <div className="control-section">
@@ -416,8 +412,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
               </>
             )}
           </div>
-        </div>,
-        document.body
+        </div>
       )}
     </div>
   )
