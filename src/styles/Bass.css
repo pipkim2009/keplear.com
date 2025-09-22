@@ -515,12 +515,15 @@
 /* Bass scale note highlighting */
 .bass-note-circle.scale-note {
   background: linear-gradient(145deg, #f97316, #ea580c) !important;
-  border-color: #fb923c;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 3px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2);
 }
 
 .bass-note-circle.scale-root-note {
   background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
-  border-color: #f87171;
+  border: 1px solid #ffffff;
   box-shadow:
     0 0 10px rgba(220, 38, 38, 0.7),
     0 3px 5px rgba(0, 0, 0, 0.4),
@@ -530,12 +533,15 @@
 /* Bass chord note highlighting */
 .bass-note-circle.chord-note {
   background: linear-gradient(145deg, #8b5cf6, #7c3aed) !important;
-  border-color: #a78bfa;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 3px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2);
 }
 
 .bass-note-circle.chord-root-note {
   background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
-  border-color: #f87171;
+  border: 1px solid #ffffff;
   box-shadow:
     0 0 10px rgba(220, 38, 38, 0.7),
     0 3px 5px rgba(0, 0, 0, 0.4),
@@ -628,6 +634,23 @@
 /* Custom scrollbar for bass container */
 .bass-container::-webkit-scrollbar {
   height: 12px;
+}
+
+.bass-container::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.bass-container::-webkit-scrollbar-button:start:decrement,
+.bass-container::-webkit-scrollbar-button:end:increment {
+  display: none;
+}
+
+.bass-container::-webkit-scrollbar-button:horizontal:start:decrement,
+.bass-container::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none;
+  width: 0 !important;
 }
 
 .bass-container::-webkit-scrollbar-track {

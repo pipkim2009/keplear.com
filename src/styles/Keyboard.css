@@ -538,6 +538,29 @@
   height: 12px;
 }
 
+.instrument-wrapper::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.instrument-wrapper::-webkit-scrollbar-button:start:decrement,
+.instrument-wrapper::-webkit-scrollbar-button:end:increment {
+  display: none;
+}
+
+.instrument-wrapper::-webkit-scrollbar-button:horizontal:start:decrement,
+.instrument-wrapper::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none;
+  width: 0 !important;
+}
+
+.keyboard-container::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
 .instrument-wrapper::-webkit-scrollbar-track {
   background: linear-gradient(145deg, #1a202c, #2d3748);
   border-radius: 6px;
