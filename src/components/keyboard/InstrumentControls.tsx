@@ -4,7 +4,6 @@ import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleB
 import { guitarNotes } from '../../utils/guitarNotes'
 import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/keyboardScales'
 import NotesToggle from '../common/NotesToggle'
-import { downloadAudioFile, generateMelodyFilename } from '../../utils/audioExport'
 
 export type KeyboardSelectionMode = 'range' | 'multi'
 
@@ -431,12 +430,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     }
   }
 
-  const handleDownloadRecording = () => {
-    if (audioFileBlob) {
-      const filename = generateMelodyFilename(instrument)
-      downloadAudioFile(audioFileBlob, filename)
-    }
-  }
 
   // Handle auto-recorded audio from parent
   React.useEffect(() => {
@@ -588,10 +581,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
 
 
-      {/* Generate Melody, BPM, Notes - Combined row */}
-      <div className="control-group bpm-notes-melody-row">
-        <div className="melody-controls-top">
-
+      {/* Generate Melody, BPM, Notes - Modern styled row */}
+      <div className="control-group modern-controls-row">
+        <div className="controls-container">
           <button
             onClick={() => {
               // Clear recorded audio when generating new melody
@@ -608,13 +600,13 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               }
             }}
             disabled={!canGenerateMelody}
-            className="control-subgroup control-button generate-melody"
+            className="modern-generate-button"
             title="Generate a melody from selected notes"
           >
             Generate Melody
           </button>
 
-          <div className="control-subgroup">
+          <div className="modern-control-item">
             <label className="control-label">BPM</label>
             <div className="input-with-buttons">
               <input
@@ -672,7 +664,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             </div>
           </div>
 
-          <div className="control-subgroup">
+          <div className="modern-control-item">
             <label className="control-label">Notes</label>
             <div className="input-with-buttons">
               <input
@@ -731,40 +723,25 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
         </div>
 
-      </div>
-
-      {/* Recording Controls - Only show when there's recorded audio */}
-      {audioFileBlob && (
-        <div className="control-group recording-controls">
-          <div className="recording-buttons">
-            <button
-              onClick={handleDownloadRecording}
-              className="control-button download-button"
-              title="Download recorded audio file"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-              </svg>
-            </button>
-          </div>
-
-          {/* Native HTML Audio Player for WAV playback */}
-          {audioFileUrl && (
-            <div className="wav-player-container">
-              <label className="control-label">Auto-Recorded Audio:</label>
-              <audio
-                controls
-                src={audioFileUrl}
-                className="wav-audio-player"
-                preload="metadata"
-              >
-                Your browser does not support the audio element.
-              </audio>
+        {/* Second row - Auto-recorded audio player */}
+        {audioFileBlob && (
+          <div className="controls-container second-row">
+            <div className="modern-control-item audio-player-section centered">
+              <label className="control-label">Auto-Recorded Audio</label>
+              {audioFileUrl && (
+                <audio
+                  controls
+                  src={audioFileUrl}
+                  preload="metadata"
+                >
+                  Your browser does not support the audio element.
+                </audio>
+              )}
             </div>
-          )}
+          </div>
+        )}
 
-        </div>
-      )}
+      </div>
 
 
     </div>
