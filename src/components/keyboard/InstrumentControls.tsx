@@ -730,6 +730,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               {audioFileUrl && (
                 <audio
                   controls
+                  controlsList="noplaybackrate"
                   src={audioFileUrl}
                   preload="metadata"
                 >
