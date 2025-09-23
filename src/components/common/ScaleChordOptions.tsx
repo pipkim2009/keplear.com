@@ -215,7 +215,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   return (
     <div ref={containerRef} className={`scale-options-container ${isExpanded ? 'expanded' : 'collapsed'}`}>
       <button
-        className="scale-options-toggle"
+        className={`scale-options-toggle instrument-${instrument}`}
         onClick={toggleExpanded}
         title={isExpanded ? 'Close Scales/Chords' : 'Open Scales/Chords'}
       >

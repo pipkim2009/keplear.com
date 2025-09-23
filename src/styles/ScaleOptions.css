@@ -81,6 +81,11 @@
   padding: 0 12px;
 }
 
+.scale-options-toggle.instrument-guitar,
+.scale-options-toggle.instrument-bass {
+  margin-top: 0;
+}
+
 .scale-options-toggle:hover {
   background: rgba(255, 204, 2, 0.3);
 }
