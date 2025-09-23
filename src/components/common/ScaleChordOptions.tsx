@@ -10,6 +10,15 @@ import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, type BassChord,
 import { KEYBOARD_CHORDS, type KeyboardChord } from '../../utils/keyboardChords'
 import '../../styles/ScaleOptions.css'
 
+export interface AppliedChord {
+  id: string
+  root: string
+  chord: GuitarChord | BassChord | KeyboardChord
+  displayName: string
+  noteKeys?: string[] // For guitar/bass: note keys like "0-open", "1-2" etc.
+  notes?: any[] // For keyboard: actual Note objects
+}
+
 interface ScaleChordOptionsProps {
   instrument: string
   selectedRoot?: string
@@ -22,6 +31,8 @@ interface ScaleChordOptionsProps {
   onChordSelect?: (rootNote: string, chord: GuitarChord) => void
   onChordShapeSelect?: (chordShape: ChordShape) => void
   onKeyboardChordApply?: (rootNote: string, chord: KeyboardChord) => void
+  appliedChords?: AppliedChord[]
+  onChordDelete?: (chordId: string) => void
 }
 
 const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
@@ -35,7 +46,9 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   onKeyboardScaleApply,
   onChordSelect,
   onChordShapeSelect,
-  onKeyboardChordApply
+  onKeyboardChordApply,
+  appliedChords = [],
+  onChordDelete
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isScaleMode, setIsScaleMode] = useState(true) // true for scales, false for chords
@@ -203,8 +216,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
       onKeyboardChordApply(selectedChordRoot, keyboardSelectedChord)
     }
 
-    // Auto-close the popup
-    setIsExpanded(false)
+    // Don't auto-close the popup to allow adding multiple chords
+    // setIsExpanded(false)
   }
 
   const currentRoot = isScaleMode ? selectedRoot : selectedChordRoot
@@ -409,6 +422,27 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     Apply Chord
                   </button>
                 </div>
+
+                {/* Applied Chords List */}
+                {appliedChords.length > 0 && (
+                  <div className="control-section">
+                    <label className="control-label">Applied Chords</label>
+                    <div className="applied-chords-list">
+                      {appliedChords.map((appliedChord) => (
+                        <div key={appliedChord.id} className="applied-chord-item">
+                          <span className="chord-name">{appliedChord.displayName}</span>
+                          <button
+                            onClick={() => onChordDelete?.(appliedChord.id)}
+                            className="delete-chord-button"
+                            title={`Remove ${appliedChord.displayName}`}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>

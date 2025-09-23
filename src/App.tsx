@@ -367,6 +367,7 @@ function App() {
               clearSelection={clearSelection}
               clearTrigger={clearTrigger}
               selectedNotes={[...selectedNotes]}
+              selectNote={selectNote}
               onOctaveRangeChange={handleOctaveRangeChange}
               keyboardSelectionMode={keyboardSelectionMode}
               onKeyboardSelectionModeChange={handleKeyboardSelectionModeChange}

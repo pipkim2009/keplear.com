@@ -13,6 +13,8 @@ interface KeyboardProps {
   selectionMode?: KeyboardSelectionMode
   isNoteInScale?: (note: Note) => boolean
   isNoteRoot?: (note: Note) => boolean
+  isNoteInChord?: (note: Note) => boolean
+  isNoteChordRoot?: (note: Note) => boolean
 }
 
 const Keyboard: React.FC<KeyboardProps> = ({
@@ -24,7 +26,9 @@ const Keyboard: React.FC<KeyboardProps> = ({
   higherOctaves = 0,
   selectionMode = 'range',
   isNoteInScale,
-  isNoteRoot
+  isNoteRoot,
+  isNoteInChord,
+  isNoteChordRoot
 }) => {
   const hasExtendedRange = lowerOctaves !== 0 || higherOctaves !== 0
   const currentWhiteKeys = hasExtendedRange ? generateWhiteKeysWithSeparateOctaves(lowerOctaves, higherOctaves) : whiteKeys
@@ -43,6 +47,8 @@ const Keyboard: React.FC<KeyboardProps> = ({
             onClick={onNoteClick}
             isInScale={isNoteInScale ? isNoteInScale(note) : false}
             isRoot={isNoteRoot ? isNoteRoot(note) : false}
+            isInChord={isNoteInChord ? isNoteInChord(note) : false}
+            isChordRoot={isNoteChordRoot ? isNoteChordRoot(note) : false}
           />
         ))}
         
@@ -62,6 +68,8 @@ const Keyboard: React.FC<KeyboardProps> = ({
                 style={{ left: `${leftPosition}px` }}
                 isInScale={isNoteInScale ? isNoteInScale(note) : false}
                 isRoot={isNoteRoot ? isNoteRoot(note) : false}
+                isInChord={isNoteInChord ? isNoteInChord(note) : false}
+                isChordRoot={isNoteChordRoot ? isNoteChordRoot(note) : false}
               />
             )
           })}

@@ -9,6 +9,8 @@ interface KeyboardKeyProps {
   style?: React.CSSProperties
   isInScale?: boolean
   isRoot?: boolean
+  isInChord?: boolean
+  isChordRoot?: boolean
 }
 
 const KeyboardKey: React.FC<KeyboardKeyProps> = ({
@@ -19,17 +21,31 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = ({
   className = '',
   style,
   isInScale = false,
-  isRoot = false
+  isRoot = false,
+  isInChord = false,
+  isChordRoot = false
 }) => {
   const baseClass = note.isBlack ? 'black-key' : 'white-key'
   const selectedClass = isSelected ? 'selected' : ''
   const melodyClass = isInMelody ? 'melody' : ''
-  const scaleClass = isInScale ? 'scale-note' : ''
-  const rootClass = isRoot ? 'scale-root' : ''
+
+  // Prioritize chord styling over scale styling
+  let noteTypeClass = ''
+  let rootTypeClass = ''
+
+  if (isChordRoot) {
+    rootTypeClass = 'chord-root'
+  } else if (isRoot) {
+    rootTypeClass = 'scale-root'
+  } else if (isInChord) {
+    noteTypeClass = 'chord-note'
+  } else if (isInScale) {
+    noteTypeClass = 'scale-note'
+  }
 
   return (
     <button
-      className={`${baseClass} ${selectedClass} ${melodyClass} ${scaleClass} ${rootClass} ${className}`.trim()}
+      className={`${baseClass} ${selectedClass} ${melodyClass} ${noteTypeClass} ${rootTypeClass} ${className}`.trim()}
       onClick={() => onClick(note)}
       style={style}
     >
