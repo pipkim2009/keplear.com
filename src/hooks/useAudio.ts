@@ -327,8 +327,10 @@ export const useAudio = (): UseAudioReturn => {
         }
       }
 
-      // Wait for the last note to finish
-      await new Promise(resolve => setTimeout(resolve, noteDuration))
+      // Wait for the last note to finish playing completely
+      // Wait one beat duration (60/bpm seconds) to capture the full note
+      const beatDuration = (60 / bpm) * 1000 // Convert to milliseconds
+      await new Promise(resolve => setTimeout(resolve, noteDuration + beatDuration))
 
       // Stop recording and get the audio blob
       const recording = await recorder.stop()
