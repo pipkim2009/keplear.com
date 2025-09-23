@@ -264,8 +264,6 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
       setGuitarNotes(uniqueNotes)
     }
 
-    // Store current chord info for visual highlighting
-    setCurrentKeyboardChord({ root: rootNote, chord })
     // Clear scale highlighting when chord is applied
     setCurrentKeyboardScale(null)
 
@@ -284,7 +282,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   const handleKeyboardChordClear = () => {
     // Clear all selected notes
     clearSelection()
-    // Clear chord info
+    // Clear chord info (not needed for highlighting anymore, but kept for compatibility)
     setCurrentKeyboardChord(null)
     // Clear applied chords list
     setAppliedChords([])
@@ -332,8 +330,15 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   }
 
   const isNoteInKeyboardChord = (note: Note): boolean => {
-    if (currentKeyboardChord) {
-      return isKeyboardNoteInChord(note, currentKeyboardChord.root, currentKeyboardChord.chord)
+    // Check against all applied keyboard chords, not just the current one
+    if (instrument === 'keyboard' && appliedChords.length > 0) {
+      return appliedChords.some(appliedChord => {
+        if (appliedChord.notes) {
+          // Check if this note matches any of the applied chord's notes
+          return appliedChord.notes.some(chordNote => chordNote.name === note.name)
+        }
+        return false
+      })
     }
     return false
   }
@@ -346,8 +351,16 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   }
 
   const isNoteKeyboardChordRoot = (note: Note): boolean => {
-    if (currentKeyboardChord) {
-      return isKeyboardNoteChordRoot(note, currentKeyboardChord.root)
+    // Check if this note is a root of any applied keyboard chord
+    if (instrument === 'keyboard' && appliedChords.length > 0) {
+      return appliedChords.some(appliedChord => {
+        if (appliedChord.notes) {
+          // Check if this note is the root of any applied chord
+          const noteNameWithoutOctave = note.name.replace(/\d+$/, '')
+          return appliedChord.root === noteNameWithoutOctave
+        }
+        return false
+      })
     }
     return false
   }
@@ -359,7 +372,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     }
   }, [lowerOctaves, higherOctaves, onOctaveRangeChange])
 
-  // Auto-reapply keyboard scale/chord when octave range changes (but not on initial application)
+  // Auto-reapply keyboard scale/chords when octave range changes (but not on initial application)
   useEffect(() => {
     if (currentKeyboardScale) {
       // Generate current keyboard notes based on octave range
@@ -372,17 +385,27 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
 
       // Set these notes as selected (this will trigger the melody system)
       setGuitarNotes(scaleNotes)
-    } else if (currentKeyboardChord) {
+    } else if (appliedChords.length > 0 && instrument === 'keyboard') {
       // Generate current keyboard notes based on octave range
       const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
         ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
         : generateNotesWithSeparateOctaves(0, 0) // Default range
 
-      // Apply chord to get chord notes
-      const chordNotes = applyChordToKeyboard(currentKeyboardChord.root, currentKeyboardChord.chord, currentNotes)
+      // Reapply all keyboard chords to the new octave range
+      let allChordNotes: any[] = []
+      appliedChords.forEach(appliedChord => {
+        if (appliedChord.notes) {
+          // Re-generate chord notes for the new octave range
+          const chordNotes = applyChordToKeyboard(appliedChord.root, appliedChord.chord as KeyboardChord, currentNotes)
+          allChordNotes.push(...chordNotes)
+        }
+      })
 
-      // Set these notes as selected (this will trigger the melody system)
-      setGuitarNotes(chordNotes)
+      // Remove duplicates and set as selected
+      const uniqueNotes = Array.from(
+        new Map(allChordNotes.map(note => [note.position, note])).values()
+      )
+      setGuitarNotes(uniqueNotes)
     }
   }, [lowerOctaves, higherOctaves]) // Only depend on octave changes, not the scale/chord state
 
@@ -473,14 +496,22 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             </div>
 
             {/* Deselect All button */}
-            {selectedNotes.length > 0 && (
+            {(selectedNotes.length > 0 || appliedChords.length > 0) && (
               <div className="control-group">
                 <button
                   onClick={() => {
+                    // Clear all selections
                     clearSelection()
+                    // Clear chord and scale state for keyboard
+                    if (instrument === 'keyboard') {
+                      setCurrentKeyboardChord(null)
+                      setCurrentKeyboardScale(null)
+                    }
+                    // Clear applied chords list
+                    setAppliedChords([])
                   }}
                   className="control-button delete-selection"
-                  title="Clear selected notes and scales"
+                  title="Clear selected notes, chords, and scales"
                 >
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
