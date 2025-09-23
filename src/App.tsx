@@ -43,6 +43,7 @@ function App() {
   const [instrument, setInstrument] = useState<InstrumentType>(DEFAULT_SETTINGS.instrument)
   const [keyboardOctaves, setKeyboardOctaves] = useState<{ lower: number; higher: number }>({ lower: 0, higher: 0 })
   const [keyboardSelectionMode, setKeyboardSelectionMode] = useState<'range' | 'multi'>('range')
+  const [clearChordsAndScalesTrigger, setClearChordsAndScalesTrigger] = useState<number>(0)
   const [flashingInputs, setFlashingInputs] = useState<{ bpm: boolean; notes: boolean; mode: boolean }>({
     bpm: false,
     notes: false,
@@ -298,6 +299,7 @@ function App() {
     clearSelection() // Clear melody when instrument changes
     setHasRecordedAudio(false) // Clear recorded audio when changing instruments
     setRecordedAudioBlob(null)
+    setClearChordsAndScalesTrigger(prev => prev + 1) // Clear all chords and scales when switching instruments
   }, [clearSelection])
 
   /**
@@ -378,6 +380,7 @@ function App() {
               }}
               triggerInputFlash={triggerInputFlash}
               setInputActive={setInputActive}
+              clearChordsAndScales={clearChordsAndScalesTrigger}
               onGenerateMelody={handleGenerateMelody}
               onPlayMelody={handlePlayMelody}
               onRecordMelody={handleRecordMelody}

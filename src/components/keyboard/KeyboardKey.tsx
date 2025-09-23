@@ -29,14 +29,19 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = ({
   const selectedClass = isSelected ? 'selected' : ''
   const melodyClass = isInMelody ? 'melody' : ''
 
-  // Prioritize chord styling over scale styling
+  // Handle mixed chord/scale styling and prioritization
   let noteTypeClass = ''
   let rootTypeClass = ''
 
+  // Handle roots first (chord roots take priority)
   if (isChordRoot) {
     rootTypeClass = 'chord-root'
   } else if (isRoot) {
     rootTypeClass = 'scale-root'
+  }
+  // Handle regular notes - check for mixed chord/scale
+  else if (isInChord && isInScale) {
+    noteTypeClass = 'chord-scale-note'
   } else if (isInChord) {
     noteTypeClass = 'chord-note'
   } else if (isInScale) {

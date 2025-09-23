@@ -366,12 +366,9 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     return melodyNotes
   }
 
-  // Update melody system whenever selections change
-  useEffect(() => {
-    const melodyNotes = convertToMelodyNotes()
-    setBassNotes(melodyNotes)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stringCheckboxes, fretCheckboxes, selectedNotes])
+  // Note: Removed useEffect that was causing infinite loop
+  // The Bass component manages its own state internally
+  // setBassNotes is only called when applying scales/chords explicitly
 
   // Handle scale selection
   const handleScaleSelect = useCallback((rootNote: string, scale: BassScale) => {
@@ -393,6 +390,29 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(newSelectedNotes)
     setScaleSelectedNotes(newScaleSelectedNotes)
+
+    // Convert scale selections to melody notes and update melody system
+    const melodyNotes: Note[] = []
+    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
+      if (noteName) {
+        const stringMapping = [4, 3, 2, 1] // Bass string mapping
+        const bassString = stringMapping[stringIndex]
+        const bassNote = bassNotes.find(note =>
+          note.string === bassString && note.fret === fretIndex + 1
+        )
+
+        if (bassNote) {
+          melodyNotes.push({
+            name: noteName,
+            frequency: bassNote.frequency,
+            isBlack: noteName.includes('#'),
+            position: stringIndex * 100 + fretIndex
+          })
+        }
+      }
+    })
+    setBassNotes(melodyNotes)
   }, [])
 
   // Handle scale box selection
@@ -409,6 +429,28 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       newScaleSelectedNotes.add(noteKey)
     })
 
+    // Convert scale selections to melody notes and update melody system
+    const melodyNotes: Note[] = []
+    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
+      if (noteName) {
+        const stringMapping = [4, 3, 2, 1] // Bass string mapping
+        const bassString = stringMapping[stringIndex]
+        const bassNote = bassNotes.find(note =>
+          note.string === bassString && note.fret === fretIndex + 1
+        )
+        if (bassNote) {
+          melodyNotes.push({
+            name: noteName,
+            frequency: bassNote.frequency,
+            isBlack: noteName.includes('#'),
+            position: stringIndex * 100 + fretIndex
+          })
+        }
+      }
+    })
+    setBassNotes(melodyNotes)
+
     // For box selection, we need to derive the scale info from the box
     // We'll use the first position's root information
     const rootPosition = scaleBox.positions.find(pos => pos.isRoot)
@@ -424,7 +466,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(newSelectedNotes)
     setScaleSelectedNotes(newScaleSelectedNotes)
-  }, [currentScale])
+  }, [currentScale, setBassNotes])
 
   // Handle clearing scale
   const handleClearScale = useCallback(() => {
@@ -442,46 +484,56 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const handleChordSelect = useCallback((rootNote: string, chord: BassChord) => {
     // Apply chord to bass
     const chordSelections = applyChordToBass(rootNote, chord, bassNotes)
-    const newSelectedNotes = new Set(selectedNotes) // Start with existing selections
-    const newChordSelectedNotes = new Set(chordSelectedNotes) // Start with existing chord selections
 
-    // Add chord notes to existing selection
-    chordSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      newSelectedNotes.add(noteKey)
-      newChordSelectedNotes.add(noteKey)
+    // Use functional updates to avoid dependencies on current state
+    setSelectedNotes(prev => {
+      const newSelectedNotes = new Set(prev)
+      chordSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newSelectedNotes.add(noteKey)
+      })
+      return newSelectedNotes
     })
 
-    // Update state - keep checkboxes and don't clear existing selections
+    setChordSelectedNotes(prev => {
+      const newChordSelectedNotes = new Set(prev)
+      chordSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newChordSelectedNotes.add(noteKey)
+      })
+      return newChordSelectedNotes
+    })
+
+    // Update chord state
     setCurrentChord({ root: rootNote, chord })
-    setSelectedNotes(newSelectedNotes)
-    setChordSelectedNotes(newChordSelectedNotes)
-    // Clear scale state when chord is applied
-    setCurrentScale(null)
-    setScaleSelectedNotes(new Set())
-  }, [selectedNotes, chordSelectedNotes])
+    // Keep scale state when chord is applied - allow coexistence
+  }, [])
 
   // Handle chord shape selection
   const handleChordShapeSelect = useCallback((chordShape: BassChordShape) => {
     // Apply chord shape to bass
     const chordSelections = applyBassChordShapeToBass(chordShape)
-    const newSelectedNotes = new Set(selectedNotes) // Start with existing selections
-    const newChordSelectedNotes = new Set(chordSelectedNotes) // Start with existing chord selections
 
-    // Add chord notes to existing selection
-    chordSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      newSelectedNotes.add(noteKey)
-      newChordSelectedNotes.add(noteKey)
+    // Use functional updates to avoid dependencies on current state
+    setSelectedNotes(prev => {
+      const newSelectedNotes = new Set(prev)
+      chordSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newSelectedNotes.add(noteKey)
+      })
+      return newSelectedNotes
     })
 
-    // Update state - keep existing selections
-    setSelectedNotes(newSelectedNotes)
-    setChordSelectedNotes(newChordSelectedNotes)
-    // Clear scale state when chord shape is applied
-    setCurrentScale(null)
-    setScaleSelectedNotes(new Set())
-  }, [selectedNotes, chordSelectedNotes])
+    setChordSelectedNotes(prev => {
+      const newChordSelectedNotes = new Set(prev)
+      chordSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newChordSelectedNotes.add(noteKey)
+      })
+      return newChordSelectedNotes
+    })
+    // Keep scale state when chord shape is applied - allow coexistence
+  }, [])
 
   // Handle clearing chord
   const handleClearChord = useCallback(() => {
@@ -585,7 +637,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
   // Clear all selections when clearTrigger changes
   useEffect(() => {
-    if (clearTrigger !== undefined) {
+    if (clearTrigger !== undefined && clearTrigger > 0) {
       setStringCheckboxes(new Array(4).fill(false))
       setFretCheckboxes(new Array(25).fill(false))
       setSelectedNotes(new Set())
@@ -749,6 +801,8 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             } else {
               noteClass += ' scale-root-note'
             }
+          } else if (isInChord && isInScale) {
+            noteClass += ' chord-scale-note'
           } else if (isInChord) {
             noteClass += ' chord-note'
           } else if (isInScale) {
@@ -798,6 +852,8 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               } else {
                 noteClass += ' scale-root-note'
               }
+            } else if (isInChord && isInScale) {
+              noteClass += ' chord-scale-note'
             } else if (isInChord) {
               noteClass += ' chord-note'
             } else if (isInScale) {

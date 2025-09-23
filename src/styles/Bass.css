@@ -347,6 +347,11 @@
   border: 1px solid rgba(167, 139, 250, 0.6);
 }
 
+.bass-note-circle.preview.chord-scale-note {
+  background: linear-gradient(145deg, rgba(192, 132, 252, 0.4), rgba(249, 115, 22, 0.4)) !important;
+  border: 1px solid rgba(217, 119, 6, 0.6);
+}
+
 .bass-note-circle.preview.chord-root-note {
   background: linear-gradient(145deg, rgba(220, 38, 38, 0.4), rgba(185, 28, 28, 0.4)) !important;
   border: 1px solid rgba(248, 113, 113, 0.6);
@@ -533,6 +538,15 @@
 /* Bass chord note highlighting */
 .bass-note-circle.chord-note {
   background: linear-gradient(145deg, #8b5cf6, #7c3aed) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 3px 5px rgba(0, 0, 0, 0.2),
+    inset 0 1px 3px rgba(255, 255, 255, 0.2);
+}
+
+/* Mixed chord/scale note highlighting - blend of purple (chord) and orange (scale) */
+.bass-note-circle.chord-scale-note {
+  background: linear-gradient(145deg, #c084fc, #f97316) !important;
   border: 1px solid #ffffff;
   box-shadow:
     0 3px 5px rgba(0, 0, 0, 0.2),

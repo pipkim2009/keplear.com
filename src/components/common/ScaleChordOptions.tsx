@@ -19,6 +19,15 @@ export interface AppliedChord {
   notes?: any[] // For keyboard: actual Note objects
 }
 
+export interface AppliedScale {
+  id: string
+  root: string
+  scale: GuitarScale | BassScale | KeyboardScale
+  displayName: string
+  noteKeys?: string[] // For guitar/bass: note keys like "0-open", "1-2" etc.
+  notes?: any[] // For keyboard: actual Note objects
+}
+
 interface ScaleChordOptionsProps {
   instrument: string
   selectedRoot?: string
@@ -33,6 +42,8 @@ interface ScaleChordOptionsProps {
   onKeyboardChordApply?: (rootNote: string, chord: KeyboardChord) => void
   appliedChords?: AppliedChord[]
   onChordDelete?: (chordId: string) => void
+  appliedScales?: AppliedScale[]
+  onScaleDelete?: (scaleId: string) => void
 }
 
 const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
@@ -48,7 +59,9 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   onChordShapeSelect,
   onKeyboardChordApply,
   appliedChords = [],
-  onChordDelete
+  onChordDelete,
+  appliedScales = [],
+  onScaleDelete
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isScaleMode, setIsScaleMode] = useState(true) // true for scales, false for chords
@@ -177,8 +190,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
       onKeyboardScaleApply(selectedRoot, keyboardSelectedScale)
     }
 
-    // Auto-close the popup
-    setIsExpanded(false)
+    // Keep popup open for multiple scale application
+    // setIsExpanded(false)
   }
 
   // Chord handlers
@@ -352,6 +365,27 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     Apply Scale
                   </button>
                 </div>
+
+                {/* Applied Scales List */}
+                {appliedScales.length > 0 && (
+                  <div className="control-section">
+                    <label className="control-label">Applied Scales</label>
+                    <div className="applied-chords-list">
+                      {appliedScales.map((appliedScale) => (
+                        <div key={appliedScale.id} className="applied-chord-item">
+                          <span className="chord-name">{appliedScale.displayName}</span>
+                          <button
+                            onClick={() => onScaleDelete?.(appliedScale.id)}
+                            className="delete-chord-button"
+                            title={`Remove ${appliedScale.displayName}`}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <>

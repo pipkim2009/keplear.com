@@ -2,7 +2,7 @@ import Keyboard from './Keyboard'
 import Guitar from '../guitar/Guitar'
 import Bass from '../bass/Bass'
 import InstrumentControls from './InstrumentControls'
-import ScaleChordOptions, { type AppliedChord } from '../common/ScaleChordOptions'
+import ScaleChordOptions, { type AppliedChord, type AppliedScale } from '../common/ScaleChordOptions'
 import NotesToggle from '../common/NotesToggle'
 import { useRef, useState, useEffect } from 'react'
 import type { Note } from '../../utils/notes'
@@ -38,6 +38,7 @@ interface InstrumentDisplayProps {
   flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
   triggerInputFlash: (inputType: 'bpm' | 'notes' | 'mode') => void
   setInputActive: (inputType: 'bpm' | 'notes' | 'mode', active: boolean) => void
+  clearChordsAndScales?: number
   onGenerateMelody?: () => void
   onPlayMelody?: () => void
   onRecordMelody?: () => Promise<Blob | null>
@@ -75,6 +76,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   flashingInputs,
   triggerInputFlash,
   setInputActive,
+  clearChordsAndScales,
   onGenerateMelody,
   onPlayMelody,
   onRecordMelody,
@@ -97,6 +99,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   const [selectedRoot, setSelectedRoot] = useState<string>('C')
   const [selectedChordRoot, setSelectedChordRoot] = useState<string>('C')
   const [appliedChords, setAppliedChords] = useState<AppliedChord[]>([])
+  const [appliedScales, setAppliedScales] = useState<AppliedScale[]>([])
   const [scaleHandlers, setScaleHandlers] = useState<{
     handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
     handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
@@ -119,6 +122,33 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     handleClearChord: () => void;
     handleRemoveChordNotes: (noteKeys: string[]) => void;
   } | null>(null)
+
+  // Clear all chords and scales when instrument changes
+  useEffect(() => {
+    if (clearChordsAndScales && clearChordsAndScales > 0) {
+      // Clear keyboard scales and chords
+      setCurrentKeyboardScale(null)
+      setCurrentKeyboardChord(null)
+      setAppliedChords([])
+      setAppliedScales([])
+
+      // Clear guitar scales and chords
+      if (scaleHandlers?.handleClearScale) {
+        scaleHandlers.handleClearScale()
+      }
+      if (chordHandlers?.handleClearChord) {
+        chordHandlers.handleClearChord()
+      }
+
+      // Clear bass scales and chords
+      if (bassScaleHandlers?.handleClearScale) {
+        bassScaleHandlers.handleClearScale()
+      }
+      if (bassChordHandlers?.handleClearChord) {
+        bassChordHandlers.handleClearChord()
+      }
+    }
+  }, [clearChordsAndScales, scaleHandlers, chordHandlers, bassScaleHandlers, bassChordHandlers])
 
   const handleScaleSelect = (rootNote: string, scale: GuitarScale) => {
     if (instrument === 'guitar' && scaleHandlers) {
@@ -146,6 +176,12 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
 
   // Chord handlers
   const handleChordSelect = (rootNote: string, chord: GuitarChord) => {
+    // Check if this chord is already applied
+    if (isChordAlreadyApplied(rootNote, chord.name)) {
+      console.log(`Chord ${rootNote}${chord.name} is already applied, skipping...`)
+      return
+    }
+
     // Apply the chord first
     if (instrument === 'guitar' && chordHandlers) {
       chordHandlers.handleChordSelect(rootNote, chord)
@@ -153,7 +189,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
       bassChordHandlers.handleChordSelect(rootNote, chord as any)
     }
 
-    // For now, just track the chord without note keys - we'll implement removal differently
+    // Track the chord
     const chordId = `${instrument}-${rootNote}-${chord.name}-${Date.now()}`
     const newAppliedChord: AppliedChord = {
       id: chordId,
@@ -165,6 +201,12 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   }
 
   const handleChordShapeSelect = (chordShape: ChordShape) => {
+    // Check if this chord shape is already applied
+    if (isChordAlreadyApplied(chordShape.root, chordShape.name)) {
+      console.log(`Chord shape ${chordShape.name} is already applied, skipping...`)
+      return
+    }
+
     // Apply the chord shape first
     if (instrument === 'guitar' && chordHandlers) {
       chordHandlers.handleChordShapeSelect(chordShape)
@@ -195,6 +237,15 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
 
   // Keyboard scale handlers
   const handleKeyboardScaleApply = (rootNote: string, scale: KeyboardScale) => {
+    // Check if this exact scale is already applied
+    const isScaleAlreadyApplied = appliedScales.some(appliedScale =>
+      appliedScale.root === rootNote && appliedScale.scale.name === scale.name
+    )
+
+    if (isScaleAlreadyApplied) {
+      return // Don't add duplicate scales
+    }
+
     // Switch to multi-select mode automatically
     if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
       onKeyboardSelectionModeChange('multi')
@@ -221,6 +272,17 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
       setGuitarNotes(scaleNotes)
     }
 
+    // Add scale to applied scales list
+    const newAppliedScale: AppliedScale = {
+      id: `${rootNote}-${scale.name}-${Date.now()}`,
+      root: rootNote,
+      scale: scale,
+      displayName: `${rootNote} ${scale.name}`,
+      notes: scaleNotes
+    }
+
+    setAppliedScales(prev => [...prev, newAppliedScale])
+
     // Store current scale info for visual highlighting
     setCurrentKeyboardScale({ root: rootNote, scale })
   }
@@ -230,10 +292,22 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     clearSelection()
     // Clear scale info
     setCurrentKeyboardScale(null)
+    // Clear applied scales
+    setAppliedScales([])
+  }
+
+  const handleScaleDelete = (scaleId: string) => {
+    setAppliedScales(prev => prev.filter(scale => scale.id !== scaleId))
   }
 
   // Keyboard chord handlers
   const handleKeyboardChordApply = (rootNote: string, chord: KeyboardChord) => {
+    // Check if this chord is already applied
+    if (isChordAlreadyApplied(rootNote, chord.name)) {
+      console.log(`Keyboard chord ${rootNote}${chord.name} is already applied, skipping...`)
+      return
+    }
+
     // Switch to multi-select mode automatically
     if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
       onKeyboardSelectionModeChange('multi')
@@ -264,8 +338,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
       setGuitarNotes(uniqueNotes)
     }
 
-    // Clear scale highlighting when chord is applied
-    setCurrentKeyboardScale(null)
+    // Don't clear scale highlighting - let chords and scales coexist
+    // Chord styling will take priority over scale styling in the KeyboardKey component
 
     // Add keyboard chord to applied chords list with the actual notes
     const chordId = `keyboard-${rootNote}-${chord.name}-${Date.now()}`
@@ -310,6 +384,13 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     setAppliedChords([])
   }, [instrument])
 
+  // Helper function to check if a chord already exists
+  const isChordAlreadyApplied = (root: string, chordName: string): boolean => {
+    return appliedChords.some(appliedChord =>
+      appliedChord.root === root && appliedChord.chord.name === chordName
+    )
+  }
+
   const handleRootChange = (rootNote: string) => {
     setSelectedRoot(rootNote)
     // Update scale handlers if they exist (for guitar)
@@ -323,6 +404,13 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
 
   // Helper functions for keyboard scale and chord highlighting
   const isNoteInKeyboardScale = (note: Note): boolean => {
+    // Check against all applied keyboard scales, not just the current one
+    if (instrument === 'keyboard' && appliedScales.length > 0) {
+      return appliedScales.some(appliedScale => {
+        return isKeyboardNoteInScale(note, appliedScale.root, appliedScale.scale)
+      })
+    }
+    // Fallback to current scale for backward compatibility
     if (currentKeyboardScale) {
       return isKeyboardNoteInScale(note, currentKeyboardScale.root, currentKeyboardScale.scale)
     }
@@ -344,6 +432,13 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   }
 
   const isNoteKeyboardRoot = (note: Note): boolean => {
+    // Check against all applied keyboard scales, not just the current one
+    if (instrument === 'keyboard' && appliedScales.length > 0) {
+      return appliedScales.some(appliedScale => {
+        return isKeyboardNoteRoot(note, appliedScale.root)
+      })
+    }
+    // Fallback to current scale for backward compatibility
     if (currentKeyboardScale) {
       return isKeyboardNoteRoot(note, currentKeyboardScale.root)
     }
@@ -492,11 +587,13 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
                 onKeyboardChordClear={handleKeyboardChordClear}
                 appliedChords={appliedChords}
                 onChordDelete={handleChordDelete}
+                appliedScales={appliedScales}
+                onScaleDelete={handleScaleDelete}
               />
             </div>
 
             {/* Deselect All button */}
-            {(selectedNotes.length > 0 || appliedChords.length > 0) && (
+            {(selectedNotes.length > 0 || appliedChords.length > 0 || appliedScales.length > 0) && (
               <div className="control-group">
                 <button
                   onClick={() => {
@@ -507,8 +604,9 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
                       setCurrentKeyboardChord(null)
                       setCurrentKeyboardScale(null)
                     }
-                    // Clear applied chords list
+                    // Clear applied chords and scales lists
                     setAppliedChords([])
+                    setAppliedScales([])
                   }}
                   className="control-button delete-selection"
                   title="Clear selected notes, chords, and scales"
