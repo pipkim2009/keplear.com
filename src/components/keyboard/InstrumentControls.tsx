@@ -584,28 +584,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
       {/* Generate Melody, BPM, Notes - Modern styled row */}
       <div className="control-group modern-controls-row">
         <div className="controls-container">
-          <button
-            onClick={() => {
-              // Clear recorded audio when generating new melody
-              if (audioFileUrl) {
-                URL.revokeObjectURL(audioFileUrl)
-                setAudioFileUrl(null)
-              }
-              setAudioFileBlob(null)
-              if (onClearRecordedAudio) {
-                onClearRecordedAudio()
-              }
-              if (onGenerateMelody) {
-                onGenerateMelody()
-              }
-            }}
-            disabled={!canGenerateMelody}
-            className="modern-generate-button"
-            title="Generate a melody from selected notes"
-          >
-            Generate Melody
-          </button>
-
           <div className="modern-control-item">
             <label className="control-label">BPM</label>
             <div className="input-with-buttons">
@@ -721,13 +699,34 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               </button>
             </div>
           </div>
+
+          <button
+            onClick={() => {
+              // Clear recorded audio when generating new melody
+              if (audioFileUrl) {
+                URL.revokeObjectURL(audioFileUrl)
+                setAudioFileUrl(null)
+              }
+              setAudioFileBlob(null)
+              if (onClearRecordedAudio) {
+                onClearRecordedAudio()
+              }
+              if (onGenerateMelody) {
+                onGenerateMelody()
+              }
+            }}
+            disabled={!canGenerateMelody}
+            className="modern-generate-button"
+            title="Generate a melody from selected notes"
+          >
+            Generate Melody
+          </button>
         </div>
 
         {/* Second row - Auto-recorded audio player */}
         {audioFileBlob && (
           <div className="controls-container second-row">
             <div className="modern-control-item audio-player-section centered">
-              <label className="control-label">Auto-Recorded Audio</label>
               {audioFileUrl && (
                 <audio
                   controls
