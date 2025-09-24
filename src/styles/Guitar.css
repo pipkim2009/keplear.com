@@ -417,7 +417,7 @@
 }
 
 .note-circle.preview.chord-scale-note {
-  background: linear-gradient(145deg, rgba(192, 132, 252, 0.4), rgba(249, 115, 22, 0.4)) !important;
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.4), rgba(139, 92, 246, 0.4)) !important;
   border: 1px solid rgba(217, 119, 6, 0.6);
 }
 
@@ -609,11 +609,50 @@
 
 /* Mixed chord/scale note highlighting - blend of purple (chord) and orange (scale) */
 .note-circle.chord-scale-note {
-  background: linear-gradient(145deg, #c084fc, #f97316) !important;
+  background: linear-gradient(145deg, #f97316, #8b5cf6) !important;
   border: 1px solid #ffffff;
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.2),
     inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Mixed chord note + scale root - blend of purple (chord) and red (scale root) */
+.note-circle.chord-note-scale-root {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Mixed chord root + scale note - blend of red (chord root) and orange (scale) */
+.note-circle.chord-root-scale-note {
+  background: linear-gradient(145deg, #dc2626, #f97316) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Both roots (chord root + scale root) - stays red since both are roots */
+.note-circle.chord-root-scale-root {
+  background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Chord root + chord note - blend of red (chord root) and purple (chord note) */
+.note-circle.chord-root-chord-note {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 0 8px rgba(220, 38, 38, 0.4),
+    0 0 6px rgba(139, 92, 246, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 /* Chord root notes should always be red */

@@ -29,6 +29,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set())
   const [currentScale, setCurrentScale] = useState<{ root: string; scale: GuitarScale } | null>(null)
+  const [appliedScales, setAppliedScales] = useState<{ root: string; scale: GuitarScale; notes: Set<string> }[]>([])
   const [scaleSelectedNotes, setScaleSelectedNotes] = useState<Set<string>>(new Set())
   const [currentChord, setCurrentChord] = useState<{ root: string; chord: GuitarChord } | null>(null)
   const [chordSelectedNotes, setChordSelectedNotes] = useState<Set<string>>(new Set())
@@ -374,26 +375,31 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   // The Guitar component manages its own state internally
   // setGuitarNotes is only called when applying scales/chords explicitly
 
-  // Handle scale selection
+  // Handle scale selection - SIMPLE VERSION THAT WORKS
   const handleScaleSelect = useCallback((rootNote: string, scale: GuitarScale) => {
     // Apply scale to guitar
     const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes)
     const newSelectedNotes = new Set<string>()
     const newScaleSelectedNotes = new Set<string>()
-    
+
     // Add scale notes to selection
     scaleSelections.forEach(({ stringIndex, fretIndex }) => {
       const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
       newSelectedNotes.add(noteKey)
       newScaleSelectedNotes.add(noteKey)
     })
-    
+
+    // For multiple scales: add to existing instead of replacing
+    const existingSelected = selectedNotes.size > 0 ? selectedNotes : new Set<string>()
+    const combinedNotes = new Set([...existingSelected, ...newSelectedNotes])
+    const combinedScaleNotes = new Set([...scaleSelectedNotes, ...newScaleSelectedNotes])
+
     // Update all state at once to minimize re-renders
     setCurrentScale({ root: rootNote, scale })
     setStringCheckboxes(new Array(6).fill(false))
     setFretCheckboxes(new Array(25).fill(false))
-    setSelectedNotes(newSelectedNotes)
-    setScaleSelectedNotes(newScaleSelectedNotes)
+    setSelectedNotes(combinedNotes)
+    setScaleSelectedNotes(combinedScaleNotes)
 
     // Convert scale selections to melody notes and update melody system
     const melodyNotes: Note[] = []
@@ -476,6 +482,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   // Handle clearing scale
   const handleClearScale = useCallback(() => {
     setCurrentScale(null)
+    setAppliedScales([])
     setStringCheckboxes(new Array(6).fill(false))
     setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(new Set())
@@ -583,12 +590,20 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     return scaleSelectedNotes.has(noteKey)
   }
 
-  // Check if a note is the root note of the current scale
+  // Check if a note is the root note of any applied scale
   const isScaleRootNote = (noteName: string): boolean => {
+    const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
+
+    // Check against all applied scales first
+    if (appliedScales.length > 0) {
+      return appliedScales.some(appliedScale => noteNameWithoutOctave === appliedScale.root)
+    }
+
+    // Fallback to current scale for backward compatibility
     if (currentScale) {
-      const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
       return noteNameWithoutOctave === currentScale.root
     }
+
     return false
   }
 
@@ -815,16 +830,36 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           let noteClass = 'note-circle'
           if (isInGeneratedMelody) {
             noteClass += ' melody-note'
-          } else if (isChordRootNote(openNote.name) && isInChord) {
-            noteClass += ' chord-root-note'
-          } else if (isScaleRootNote(openNote.name) && isInScale) {
-            noteClass += ' scale-root-note'
-          } else if (isInChord && isInScale) {
-            noteClass += ' chord-scale-note'
-          } else if (isInChord) {
-            noteClass += ' chord-note'
-          } else if (isInScale) {
-            noteClass += ' scale-note'
+          } else {
+            // Check all possible combinations of chord/scale and root states
+            const isChordRoot = isChordRootNote(openNote.name) && isInChord
+            const isScaleRoot = isScaleRootNote(openNote.name) && isInScale
+
+            if (isChordRoot && isScaleRoot) {
+              // Both roots - stays red
+              noteClass += ' chord-root-scale-root'
+            } else if (isChordRoot && isInScale) {
+              // Chord root + scale note - red + orange mix
+              noteClass += ' chord-root-scale-note'
+            } else if (isInChord && isScaleRoot) {
+              // Chord note + scale root - purple + red mix
+              noteClass += ' chord-note-scale-root'
+            } else if (isChordRoot) {
+              // Just chord root
+              noteClass += ' chord-root-note'
+            } else if (isScaleRoot) {
+              // Just scale root
+              noteClass += ' scale-root-note'
+            } else if (isInChord && isInScale) {
+              // Regular chord note + scale note - purple + orange mix
+              noteClass += ' chord-scale-note'
+            } else if (isInChord) {
+              // Just chord note
+              noteClass += ' chord-note'
+            } else if (isInScale) {
+              // Just scale note
+              noteClass += ' scale-note'
+            }
           }
           
           return (
@@ -864,16 +899,36 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             let noteClass = 'note-circle'
             if (isInGeneratedMelody) {
               noteClass += ' melody-note'
-            } else if (isChordRootNote(noteName) && isInChord) {
-              noteClass += ' chord-root-note'
-            } else if (isScaleRootNote(noteName) && isInScale) {
-              noteClass += ' scale-root-note'
-            } else if (isInChord && isInScale) {
-              noteClass += ' chord-scale-note'
-            } else if (isInChord) {
-              noteClass += ' chord-note'
-            } else if (isInScale) {
-              noteClass += ' scale-note'
+            } else {
+              // Check all possible combinations of chord/scale and root states
+              const isChordRoot = isChordRootNote(noteName) && isInChord
+              const isScaleRoot = isScaleRootNote(noteName) && isInScale
+
+              if (isChordRoot && isScaleRoot) {
+                // Both roots - stays red
+                noteClass += ' chord-root-scale-root'
+              } else if (isChordRoot && isInScale) {
+                // Chord root + scale note - red + orange mix
+                noteClass += ' chord-root-scale-note'
+              } else if (isInChord && isScaleRoot) {
+                // Chord note + scale root - purple + red mix
+                noteClass += ' chord-note-scale-root'
+              } else if (isChordRoot) {
+                // Just chord root
+                noteClass += ' chord-root-note'
+              } else if (isScaleRoot) {
+                // Just scale root
+                noteClass += ' scale-root-note'
+              } else if (isInChord && isInScale) {
+                // Regular chord note + scale note - purple + orange mix
+                noteClass += ' chord-scale-note'
+              } else if (isInChord) {
+                // Just chord note
+                noteClass += ' chord-note'
+              } else if (isInScale) {
+                // Just scale note
+                noteClass += ' scale-note'
+              }
             }
             
             return (
