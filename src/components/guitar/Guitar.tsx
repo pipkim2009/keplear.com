@@ -18,7 +18,7 @@ interface GuitarProps {
   }) => void
   onChordHandlersReady?: (handlers: {
     handleChordSelect: (rootNote: string, chord: GuitarChord) => void;
-    handleChordShapeSelect: (chordShape: ChordShape) => void;
+    handleChordShapeSelect: (chordShape: ChordShape & { root?: string }) => void;
     handleClearChord: () => void;
     handleRemoveChordNotes: (noteKeys: string[]) => void;
   }) => void
@@ -515,7 +515,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   }, [])
 
   // Handle chord shape selection
-  const handleChordShapeSelect = useCallback((chordShape: ChordShape) => {
+  const handleChordShapeSelect = useCallback((chordShape: ChordShape & { root?: string }) => {
     // Apply chord shape to guitar
     const chordSelections = applyChordShapeToGuitar(chordShape)
 
@@ -537,6 +537,14 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       })
       return newChordSelectedNotes
     })
+
+    // Set current chord information for root note detection
+    if (chordShape.root) {
+      // Create a basic chord object for root detection
+      const basicChord = { name: chordShape.name, intervals: [] }
+      setCurrentChord({ root: chordShape.root, chord: basicChord as any })
+    }
+
     // Don't clear scale state - let chords and scales coexist
   }, [])
 
@@ -575,17 +583,27 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     return scaleSelectedNotes.has(noteKey)
   }
 
-  // Check if a note is the root note of the current scale or chord
-  const isRootNote = (noteName: string): boolean => {
+  // Check if a note is the root note of the current scale
+  const isScaleRootNote = (noteName: string): boolean => {
     if (currentScale) {
       const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
       return noteNameWithoutOctave === currentScale.root
     }
+    return false
+  }
+
+  // Check if a note is the root note of the current chord
+  const isChordRootNote = (noteName: string): boolean => {
     if (currentChord) {
       const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
       return noteNameWithoutOctave === currentChord.root
     }
     return false
+  }
+
+  // Check if a note is the root note of the current scale or chord
+  const isRootNote = (noteName: string): boolean => {
+    return isScaleRootNote(noteName) || isChordRootNote(noteName)
   }
 
   // Check if a note was selected as part of the current chord application
@@ -797,12 +815,10 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           let noteClass = 'note-circle'
           if (isInGeneratedMelody) {
             noteClass += ' melody-note'
-          } else if (isRoot && (isInScale || isInChord)) {
-            if (isInChord) {
-              noteClass += ' chord-root-note'
-            } else {
-              noteClass += ' scale-root-note'
-            }
+          } else if (isChordRootNote(openNote.name) && isInChord) {
+            noteClass += ' chord-root-note'
+          } else if (isScaleRootNote(openNote.name) && isInScale) {
+            noteClass += ' scale-root-note'
           } else if (isInChord && isInScale) {
             noteClass += ' chord-scale-note'
           } else if (isInChord) {
@@ -848,12 +864,10 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             let noteClass = 'note-circle'
             if (isInGeneratedMelody) {
               noteClass += ' melody-note'
-            } else if (isRoot && (isInScale || isInChord)) {
-              if (isInChord) {
-                noteClass += ' chord-root-note'
-              } else {
-                noteClass += ' scale-root-note'
-              }
+            } else if (isChordRootNote(noteName) && isInChord) {
+              noteClass += ' chord-root-note'
+            } else if (isScaleRootNote(noteName) && isInScale) {
+              noteClass += ' scale-root-note'
             } else if (isInChord && isInScale) {
               noteClass += ' chord-scale-note'
             } else if (isInChord) {

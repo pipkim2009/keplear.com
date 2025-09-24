@@ -101,6 +101,34 @@ export const BASS_CHORD_FINGERINGS: { [key: string]: { [chordType: string]: Bass
     'Dominant 7th': [
       { name: 'Root + 7th', frets: [3, 'x', 'x', 1], baseFret: 0, difficulty: 'Easy', description: 'C7 (root + seventh)' },
       { name: 'Full Chord', frets: [3, 3, 2, 1], baseFret: 0, difficulty: 'Hard', description: 'C7 full chord' }
+    ],
+    'Major 7th': [
+      { name: 'Root + Maj7', frets: [3, 'x', 'x', 0], baseFret: 0, difficulty: 'Easy', description: 'Cmaj7 (root + major seventh)' },
+      { name: 'Full Chord', frets: [3, 3, 2, 0], baseFret: 0, difficulty: 'Hard', description: 'Cmaj7 full chord' }
+    ],
+    'Minor 7th': [
+      { name: 'Root + 7th', frets: [3, 'x', 'x', 1], baseFret: 0, difficulty: 'Easy', description: 'Cm7 (root + seventh, same as major)' },
+      { name: 'Full Chord', frets: [3, 1, 1, 1], baseFret: 0, difficulty: 'Hard', description: 'Cm7 full chord' }
+    ],
+    'Sus2': [
+      { name: 'Root + 2nd', frets: [3, 'x', 0, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Csus2 (root + second)' },
+      { name: 'Full Chord', frets: [3, 0, 0, 'x'], baseFret: 0, difficulty: 'Medium', description: 'Csus2 partial chord' }
+    ],
+    'Sus4': [
+      { name: 'Root + 4th', frets: [3, 'x', 3, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Csus4 (root + fourth)' },
+      { name: 'Full Chord', frets: [3, 3, 3, 'x'], baseFret: 0, difficulty: 'Medium', description: 'Csus4 partial chord' }
+    ],
+    'Diminished': [
+      { name: 'Root + b3 + b5', frets: [3, 'x', 1, 'x'], baseFret: 0, difficulty: 'Medium', description: 'Cdim (root + minor third + diminished fifth)' },
+      { name: 'Full Chord', frets: [3, 1, 1, 'x'], baseFret: 0, difficulty: 'Hard', description: 'Cdim partial chord' }
+    ],
+    'Augmented': [
+      { name: 'Root + #5', frets: [3, 'x', 3, 'x'], baseFret: 0, difficulty: 'Medium', description: 'Caug (root + augmented fifth)' },
+      { name: 'Partial Aug', frets: [3, 3, 3, 2], baseFret: 0, difficulty: 'Hard', description: 'Caug partial chord' }
+    ],
+    'Add9': [
+      { name: 'Root + 9th', frets: [3, 'x', 'x', 'x'], baseFret: 0, difficulty: 'Easy', description: 'Cadd9 root note (add ninth elsewhere)' },
+      { name: 'Partial Add9', frets: [3, 0, 2, 0], baseFret: 0, difficulty: 'Hard', description: 'Cadd9 partial chord' }
     ]
   },
   'D': {
@@ -117,6 +145,22 @@ export const BASS_CHORD_FINGERINGS: { [key: string]: { [chordType: string]: Bass
     'Dominant 7th': [
       { name: 'Root + 7th', frets: [5, 'x', 'x', 3], baseFret: 0, difficulty: 'Easy', description: 'D7 (root + seventh)' },
       { name: 'Open D7', frets: ['x', 0, 0, 'x'], baseFret: 0, difficulty: 'Easy', description: 'D7 open position' }
+    ],
+    'Major 7th': [
+      { name: 'Root + Maj7', frets: [5, 'x', 'x', 2], baseFret: 0, difficulty: 'Easy', description: 'Dmaj7 (root + major seventh)' },
+      { name: 'Open Dmaj7', frets: ['x', 0, 0, 2], baseFret: 0, difficulty: 'Easy', description: 'Dmaj7 open position' }
+    ],
+    'Minor 7th': [
+      { name: 'Root + 7th', frets: [5, 'x', 'x', 3], baseFret: 0, difficulty: 'Easy', description: 'Dm7 (root + seventh)' },
+      { name: 'Open Dm7', frets: ['x', 0, 0, 1], baseFret: 0, difficulty: 'Easy', description: 'Dm7 open position' }
+    ],
+    'Sus2': [
+      { name: 'Root + 2nd', frets: [5, 'x', 2, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Dsus2 (root + second)' },
+      { name: 'Open Dsus2', frets: ['x', 0, 2, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Dsus2 open position' }
+    ],
+    'Sus4': [
+      { name: 'Root + 4th', frets: [5, 'x', 5, 'x'], baseFret: 0, difficulty: 'Medium', description: 'Dsus4 (root + fourth)' },
+      { name: 'Open Dsus4', frets: ['x', 0, 0, 3], baseFret: 0, difficulty: 'Easy', description: 'Dsus4 open position' }
     ]
   },
   'E': {
@@ -133,6 +177,22 @@ export const BASS_CHORD_FINGERINGS: { [key: string]: { [chordType: string]: Bass
     'Dominant 7th': [
       { name: 'Root + 7th', frets: [0, 'x', 'x', 3], baseFret: 0, difficulty: 'Easy', description: 'E7 (root + seventh)' },
       { name: 'Full Chord', frets: [0, 2, 0, 1], baseFret: 0, difficulty: 'Medium', description: 'E7 full chord' }
+    ],
+    'Major 7th': [
+      { name: 'Root + Maj7', frets: [0, 'x', 'x', 2], baseFret: 0, difficulty: 'Easy', description: 'Emaj7 (root + major seventh)' },
+      { name: 'Full Chord', frets: [0, 2, 1, 1], baseFret: 0, difficulty: 'Medium', description: 'Emaj7 full chord' }
+    ],
+    'Minor 7th': [
+      { name: 'Root + 7th', frets: [0, 'x', 'x', 3], baseFret: 0, difficulty: 'Easy', description: 'Em7 (root + seventh)' },
+      { name: 'Full Chord', frets: [0, 2, 0, 0], baseFret: 0, difficulty: 'Medium', description: 'Em7 full chord' }
+    ],
+    'Sus2': [
+      { name: 'Root + 2nd', frets: [0, 'x', 2, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Esus2 (root + second)' },
+      { name: 'Full Sus2', frets: [0, 2, 2, 'x'], baseFret: 0, difficulty: 'Medium', description: 'Esus2 partial chord' }
+    ],
+    'Sus4': [
+      { name: 'Root + 4th', frets: [0, 'x', 0, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Esus4 (root + fourth)' },
+      { name: 'Full Sus4', frets: [0, 2, 2, 2], baseFret: 0, difficulty: 'Hard', description: 'Esus4 full chord' }
     ]
   },
   'F': {
@@ -165,6 +225,22 @@ export const BASS_CHORD_FINGERINGS: { [key: string]: { [chordType: string]: Bass
     'Dominant 7th': [
       { name: 'Root + 7th', frets: [3, 'x', 'x', 1], baseFret: 0, difficulty: 'Easy', description: 'G7 (root + seventh)' },
       { name: 'Open G7', frets: [3, 'x', 0, 1], baseFret: 0, difficulty: 'Easy', description: 'G7 open position' }
+    ],
+    'Major 7th': [
+      { name: 'Root + Maj7', frets: [3, 'x', 'x', 0], baseFret: 0, difficulty: 'Easy', description: 'Gmaj7 (root + major seventh)' },
+      { name: 'Open Gmaj7', frets: [3, 'x', 0, 0], baseFret: 0, difficulty: 'Easy', description: 'Gmaj7 open position' }
+    ],
+    'Minor 7th': [
+      { name: 'Root + 7th', frets: [3, 'x', 'x', 1], baseFret: 0, difficulty: 'Easy', description: 'Gm7 (root + seventh)' },
+      { name: 'Barre Gm7', frets: [3, 3, 3, 1], baseFret: 3, difficulty: 'Hard', description: 'Gm7 barre position' }
+    ],
+    'Sus2': [
+      { name: 'Root + 2nd', frets: [3, 'x', 0, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Gsus2 (root + second)' },
+      { name: 'Open Gsus2', frets: [3, 0, 0, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Gsus2 open position' }
+    ],
+    'Sus4': [
+      { name: 'Root + 4th', frets: [3, 'x', 1, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Gsus4 (root + fourth)' },
+      { name: 'Open Gsus4', frets: [3, 'x', 0, 1], baseFret: 0, difficulty: 'Easy', description: 'Gsus4 open position' }
     ]
   },
   'A': {
@@ -181,6 +257,22 @@ export const BASS_CHORD_FINGERINGS: { [key: string]: { [chordType: string]: Bass
     'Dominant 7th': [
       { name: 'Root + 7th', frets: ['x', 0, 'x', 3], baseFret: 0, difficulty: 'Easy', description: 'A7 (root + seventh)' },
       { name: 'Open A7', frets: ['x', 0, 2, 0], baseFret: 0, difficulty: 'Easy', description: 'A7 open position' }
+    ],
+    'Major 7th': [
+      { name: 'Root + Maj7', frets: ['x', 0, 'x', 2], baseFret: 0, difficulty: 'Easy', description: 'Amaj7 (root + major seventh)' },
+      { name: 'Open Amaj7', frets: ['x', 0, 2, 1], baseFret: 0, difficulty: 'Medium', description: 'Amaj7 open position' }
+    ],
+    'Minor 7th': [
+      { name: 'Root + 7th', frets: ['x', 0, 'x', 3], baseFret: 0, difficulty: 'Easy', description: 'Am7 (root + seventh)' },
+      { name: 'Open Am7', frets: ['x', 0, 2, 0], baseFret: 0, difficulty: 'Easy', description: 'Am7 open position' }
+    ],
+    'Sus2': [
+      { name: 'Root + 2nd', frets: ['x', 0, 'x', 0], baseFret: 0, difficulty: 'Easy', description: 'Asus2 (root + second)' },
+      { name: 'Open Asus2', frets: ['x', 0, 2, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Asus2 open position' }
+    ],
+    'Sus4': [
+      { name: 'Root + 4th', frets: ['x', 0, 'x', 3], baseFret: 0, difficulty: 'Easy', description: 'Asus4 (root + fourth)' },
+      { name: 'Open Asus4', frets: ['x', 0, 2, 3], baseFret: 0, difficulty: 'Medium', description: 'Asus4 open position' }
     ]
   },
   'B': {

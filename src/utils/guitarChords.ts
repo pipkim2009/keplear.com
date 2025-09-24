@@ -111,6 +111,42 @@ export const CHORD_FINGERINGS: { [key: string]: { [chordType: string]: ChordFing
     'Dominant 7th': [
       { name: 'Open C7', frets: ['x', 3, 2, 3, 1, 0], baseFret: 0, difficulty: 'Medium', description: 'Open C7 chord' },
       { name: 'Barre 3rd', frets: [3, 3, 5, 3, 5, 3], baseFret: 3, difficulty: 'Medium', description: 'C7 barre chord 3rd fret' }
+    ],
+    'Major 7th': [
+      { name: 'Open Cmaj7', frets: ['x', 3, 2, 0, 0, 0], baseFret: 0, difficulty: 'Easy', description: 'Open C major 7th chord' },
+      { name: 'Barre 3rd', frets: [3, 3, 5, 4, 5, 3], baseFret: 3, difficulty: 'Hard', description: 'Cmaj7 barre chord 3rd fret' }
+    ],
+    'Minor 7th': [
+      { name: 'Partial Cm7', frets: ['x', 3, 1, 3, 1, 3], baseFret: 0, difficulty: 'Medium', description: 'C minor 7th partial chord' },
+      { name: 'Barre 3rd', frets: [3, 3, 5, 3, 4, 3], baseFret: 3, difficulty: 'Hard', description: 'Cm7 barre chord 3rd fret' }
+    ],
+    'Sus2': [
+      { name: 'Open Csus2', frets: ['x', 3, 0, 0, 1, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Open C sus2 chord' },
+      { name: 'Barre 3rd', frets: [3, 3, 5, 5, 3, 3], baseFret: 3, difficulty: 'Medium', description: 'Csus2 barre chord 3rd fret' }
+    ],
+    'Sus4': [
+      { name: 'Open Csus4', frets: ['x', 3, 3, 0, 1, 1], baseFret: 0, difficulty: 'Medium', description: 'Open C sus4 chord' },
+      { name: 'Barre 3rd', frets: [3, 3, 6, 6, 6, 3], baseFret: 3, difficulty: 'Hard', description: 'Csus4 barre chord 3rd fret' }
+    ],
+    'Diminished': [
+      { name: 'Cdim', frets: ['x', 3, 4, 2, 4, 2], baseFret: 0, difficulty: 'Hard', description: 'C diminished chord' },
+      { name: 'Barre 3rd', frets: [3, 4, 2, 4, 2, 'x'], baseFret: 3, difficulty: 'Hard', description: 'Cdim barre shape' }
+    ],
+    'Augmented': [
+      { name: 'Caug', frets: ['x', 3, 2, 1, 1, 0], baseFret: 0, difficulty: 'Hard', description: 'C augmented chord' },
+      { name: 'Barre 4th', frets: [4, 3, 2, 1, 1, 0], baseFret: 4, difficulty: 'Hard', description: 'Caug alternative shape' }
+    ],
+    'Add9': [
+      { name: 'Open Cadd9', frets: ['x', 3, 2, 0, 3, 0], baseFret: 0, difficulty: 'Medium', description: 'Open C add9 chord' },
+      { name: 'Partial Cadd9', frets: ['x', 3, 2, 0, 3, 3], baseFret: 0, difficulty: 'Medium', description: 'C add9 partial chord' }
+    ],
+    'Minor 9th': [
+      { name: 'Cm9', frets: ['x', 3, 1, 3, 3, 3], baseFret: 0, difficulty: 'Hard', description: 'C minor 9th chord' },
+      { name: 'Barre Cm9', frets: [3, 3, 5, 3, 4, 6], baseFret: 3, difficulty: 'Hard', description: 'Cm9 barre chord' }
+    ],
+    'Major 9th': [
+      { name: 'Cmaj9', frets: ['x', 3, 2, 4, 3, 0], baseFret: 0, difficulty: 'Hard', description: 'C major 9th chord' },
+      { name: 'Barre Cmaj9', frets: [3, 3, 5, 4, 5, 5], baseFret: 3, difficulty: 'Hard', description: 'Cmaj9 barre chord' }
     ]
   },
   'D': {
@@ -127,6 +163,22 @@ export const CHORD_FINGERINGS: { [key: string]: { [chordType: string]: ChordFing
     'Dominant 7th': [
       { name: 'Open D7', frets: ['x', 'x', 0, 2, 1, 2], baseFret: 0, difficulty: 'Easy', description: 'Open D7 chord' },
       { name: 'Barre 5th', frets: [5, 5, 7, 5, 7, 5], baseFret: 5, difficulty: 'Medium', description: 'D7 barre chord 5th fret' }
+    ],
+    'Major 7th': [
+      { name: 'Open Dmaj7', frets: ['x', 'x', 0, 2, 2, 2], baseFret: 0, difficulty: 'Easy', description: 'Open D major 7th chord' },
+      { name: 'Barre 5th', frets: [5, 5, 7, 6, 7, 5], baseFret: 5, difficulty: 'Hard', description: 'Dmaj7 barre chord 5th fret' }
+    ],
+    'Minor 7th': [
+      { name: 'Open Dm7', frets: ['x', 'x', 0, 2, 1, 1], baseFret: 0, difficulty: 'Easy', description: 'Open D minor 7th chord' },
+      { name: 'Barre 5th', frets: [5, 5, 7, 5, 6, 5], baseFret: 5, difficulty: 'Hard', description: 'Dm7 barre chord 5th fret' }
+    ],
+    'Sus2': [
+      { name: 'Open Dsus2', frets: ['x', 'x', 0, 2, 3, 0], baseFret: 0, difficulty: 'Easy', description: 'Open D sus2 chord' },
+      { name: 'Barre 5th', frets: [5, 5, 7, 7, 5, 5], baseFret: 5, difficulty: 'Medium', description: 'Dsus2 barre chord 5th fret' }
+    ],
+    'Sus4': [
+      { name: 'Open Dsus4', frets: ['x', 'x', 0, 2, 3, 3], baseFret: 0, difficulty: 'Easy', description: 'Open D sus4 chord' },
+      { name: 'Barre 5th', frets: [5, 5, 8, 8, 8, 5], baseFret: 5, difficulty: 'Hard', description: 'Dsus4 barre chord 5th fret' }
     ]
   },
   'E': {
@@ -143,6 +195,14 @@ export const CHORD_FINGERINGS: { [key: string]: { [chordType: string]: ChordFing
     'Dominant 7th': [
       { name: 'Open E7', frets: [0, 2, 0, 1, 0, 0], baseFret: 0, difficulty: 'Easy', description: 'Open E7 chord' },
       { name: 'Barre 7th', frets: [7, 7, 9, 7, 9, 7], baseFret: 7, difficulty: 'Medium', description: 'E7 barre chord 7th fret' }
+    ],
+    'Major 7th': [
+      { name: 'Open Emaj7', frets: [0, 2, 1, 1, 0, 0], baseFret: 0, difficulty: 'Easy', description: 'Open E major 7th chord' },
+      { name: 'Barre 7th', frets: [7, 7, 9, 8, 9, 7], baseFret: 7, difficulty: 'Hard', description: 'Emaj7 barre chord 7th fret' }
+    ],
+    'Minor 7th': [
+      { name: 'Open Em7', frets: [0, 2, 0, 0, 0, 0], baseFret: 0, difficulty: 'Easy', description: 'Open E minor 7th chord' },
+      { name: 'Barre 7th', frets: [7, 7, 9, 7, 8, 7], baseFret: 7, difficulty: 'Hard', description: 'Em7 barre chord 7th fret' }
     ]
   },
   'F': {
@@ -173,6 +233,22 @@ export const CHORD_FINGERINGS: { [key: string]: { [chordType: string]: ChordFing
     'Dominant 7th': [
       { name: 'Open G7', frets: [3, 2, 0, 0, 0, 1], baseFret: 0, difficulty: 'Easy', description: 'Open G7 chord' },
       { name: 'Barre 3rd', frets: [3, 3, 5, 3, 5, 3], baseFret: 3, difficulty: 'Medium', description: 'G7 barre chord 3rd fret' }
+    ],
+    'Major 7th': [
+      { name: 'Open Gmaj7', frets: [3, 2, 0, 0, 0, 2], baseFret: 0, difficulty: 'Easy', description: 'Open G major 7th chord' },
+      { name: 'Barre 3rd', frets: [3, 3, 5, 4, 5, 3], baseFret: 3, difficulty: 'Hard', description: 'Gmaj7 barre chord 3rd fret' }
+    ],
+    'Minor 7th': [
+      { name: 'Open Gm7', frets: [3, 5, 3, 3, 3, 3], baseFret: 0, difficulty: 'Medium', description: 'Open G minor 7th chord' },
+      { name: 'Barre 3rd', frets: [3, 3, 5, 3, 4, 3], baseFret: 3, difficulty: 'Hard', description: 'Gm7 barre chord 3rd fret' }
+    ],
+    'Sus2': [
+      { name: 'Open Gsus2', frets: [3, 0, 0, 0, 3, 3], baseFret: 0, difficulty: 'Easy', description: 'Open G sus2 chord' },
+      { name: 'Barre 3rd', frets: [3, 3, 5, 5, 3, 3], baseFret: 3, difficulty: 'Medium', description: 'Gsus2 barre chord 3rd fret' }
+    ],
+    'Sus4': [
+      { name: 'Open Gsus4', frets: [3, 3, 0, 0, 1, 3], baseFret: 0, difficulty: 'Medium', description: 'Open G sus4 chord' },
+      { name: 'Barre 3rd', frets: [3, 3, 6, 6, 6, 3], baseFret: 3, difficulty: 'Hard', description: 'Gsus4 barre chord 3rd fret' }
     ]
   },
   'A': {
@@ -187,6 +263,14 @@ export const CHORD_FINGERINGS: { [key: string]: { [chordType: string]: ChordFing
     'Dominant 7th': [
       { name: 'Open A7', frets: ['x', 0, 2, 0, 2, 0], baseFret: 0, difficulty: 'Easy', description: 'Open A7 chord' },
       { name: 'Barre 5th', frets: [5, 5, 7, 5, 7, 5], baseFret: 5, difficulty: 'Medium', description: 'A7 barre chord 5th fret' }
+    ],
+    'Major 7th': [
+      { name: 'Open Amaj7', frets: ['x', 0, 2, 1, 2, 0], baseFret: 0, difficulty: 'Medium', description: 'Open A major 7th chord' },
+      { name: 'Barre 5th', frets: [5, 5, 7, 6, 7, 5], baseFret: 5, difficulty: 'Hard', description: 'Amaj7 barre chord 5th fret' }
+    ],
+    'Minor 7th': [
+      { name: 'Open Am7', frets: ['x', 0, 2, 0, 1, 0], baseFret: 0, difficulty: 'Easy', description: 'Open A minor 7th chord' },
+      { name: 'Barre 5th', frets: [5, 5, 7, 5, 6, 5], baseFret: 5, difficulty: 'Hard', description: 'Am7 barre chord 5th fret' }
     ]
   },
   'B': {

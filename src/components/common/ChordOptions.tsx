@@ -75,13 +75,17 @@ const ChordOptions: React.FC<ChordOptionsProps> = ({
   const handleApplyChord = () => {
     if (instrument === 'guitar') {
       if (showShapes && availableShapes.length > 0 && onChordShapeSelect) {
-        onChordShapeSelect(availableShapes[selectedShapeIndex])
+        // Add root note context to chord shape
+        const chordShapeWithRoot = { ...availableShapes[selectedShapeIndex], root: selectedRoot }
+        onChordShapeSelect(chordShapeWithRoot as any)
       } else if (onChordSelect) {
         onChordSelect(selectedRoot, selectedChord)
       }
     } else if (instrument === 'bass') {
       if (showShapes && availableBassShapes.length > 0 && onChordShapeSelect) {
-        onChordShapeSelect(availableBassShapes[selectedShapeIndex] as any)
+        // Add root note context to bass chord shape
+        const bassChordShapeWithRoot = { ...availableBassShapes[selectedShapeIndex], root: selectedRoot }
+        onChordShapeSelect(bassChordShapeWithRoot as any)
       } else if (onChordSelect) {
         onChordSelect(selectedRoot, selectedBassChord as any)
       }

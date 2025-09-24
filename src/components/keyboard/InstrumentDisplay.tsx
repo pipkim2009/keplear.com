@@ -202,9 +202,13 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     setAppliedChords(prev => [...prev, newAppliedChord])
   }
 
-  const handleChordShapeSelect = (chordShape: ChordShape) => {
-    // Check if this chord shape is already applied
-    if (isChordAlreadyApplied(chordShape.root, chordShape.name)) {
+  const handleChordShapeSelect = (chordShape: ChordShape & { root?: string }) => {
+    // For chord shapes, we need to track them differently since they don't have root context
+    // We'll just use a generic identifier
+    const chordShapeId = `chord-shape-${chordShape.name}`
+
+    // Check if this chord shape is already applied (simplified check)
+    if (appliedChords.some(chord => chord.displayName === chordShape.name)) {
       console.log(`Chord shape ${chordShape.name} is already applied, skipping...`)
       return
     }
@@ -216,11 +220,11 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
       bassChordHandlers.handleChordShapeSelect(chordShape as any)
     }
 
-    // Track the chord shape
+    // Track the chord shape (without root since shapes don't have root context)
     const chordId = `${instrument}-shape-${chordShape.name}-${Date.now()}`
     const newAppliedChord: AppliedChord = {
       id: chordId,
-      root: chordShape.root,
+      root: chordShape.root || 'Unknown', // Use provided root or fallback
       chord: { name: chordShape.name, intervals: [] } as any, // Simplified for shapes
       displayName: chordShape.name
     }
