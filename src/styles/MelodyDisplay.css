@@ -1,35 +1,49 @@
 .melody-display {
-  background: #121212;
-  padding: 20px;
-  border-radius: 12px;
-  border: 2px solid #8000ff;
-  position: relative;
+  width: 100%;
+  background: rgba(59, 130, 246, 0.1);
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  padding: 12px;
 }
 
 .melody-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 15px;
-  color: #d2d2f9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  color: #3b82f6;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
 }
 
 .melody-notes {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
+  gap: 6px;
 }
 
 .melody-note {
-  background: #ffffff;
-  color: #121212;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1px solid #ffffff;
+  background: #3b82f6 !important;
+  color: white !important;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .melody-display {
+    background: rgba(32, 201, 151, 0.1);
+    border-color: #20c997;
+  }
+
+  .melody-title {
+    color: #20c997;
+  }
+
+  .melody-note {
+    background: #20c997 !important;
+    color: #212529 !important;
+  }
 }

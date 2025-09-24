@@ -51,6 +51,7 @@ interface InstrumentDisplayProps {
   onProgressChange?: (progress: number) => void
   onClearRecordedAudio?: () => void
   recordedAudioBlob?: Blob | null
+  generatedMelody?: Note[]
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -88,7 +89,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   melodyDuration,
   onProgressChange,
   onClearRecordedAudio,
-  recordedAudioBlob
+  recordedAudioBlob,
+  generatedMelody
 }) => {
   const guitarRef = useRef<any>(null)
   const bassRef = useRef<any>(null)
@@ -546,6 +548,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
             onProgressChange={onProgressChange}
             onClearRecordedAudio={onClearRecordedAudio}
             recordedAudioBlob={recordedAudioBlob}
+            generatedMelody={generatedMelody}
           />
       </div>
 

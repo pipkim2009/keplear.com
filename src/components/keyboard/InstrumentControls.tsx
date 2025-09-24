@@ -4,6 +4,8 @@ import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleB
 import { guitarNotes } from '../../utils/guitarNotes'
 import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/keyboardScales'
 import NotesToggle from '../common/NotesToggle'
+import type { Note } from '../../utils/notes'
+import MelodyDisplay from '../MelodyDisplay'
 
 export type KeyboardSelectionMode = 'range' | 'multi'
 
@@ -46,6 +48,7 @@ interface InstrumentControlsProps {
   onProgressChange?: (progress: number) => void
   onClearRecordedAudio?: () => void
   recordedAudioBlob?: Blob | null
+  generatedMelody?: Note[]
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -86,8 +89,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   melodyDuration = 0,
   onProgressChange,
   onClearRecordedAudio,
-  recordedAudioBlob
+  recordedAudioBlob,
+  generatedMelody
 }) => {
+
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
   const [selectedRoot, setSelectedRoot] = useState<string>('C')
@@ -721,6 +726,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           >
             Generate Melody
           </button>
+
         </div>
 
         {/* Second row - Auto-recorded audio player */}
@@ -738,6 +744,16 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                 </audio>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Generated Melody Display Row */}
+        {generatedMelody && generatedMelody.length > 0 && showNotes && (
+          <div className="control-group melody-notes-row">
+            <MelodyDisplay
+              generatedMelody={generatedMelody}
+              showNotes={showNotes}
+            />
           </div>
         )}
 

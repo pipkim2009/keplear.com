@@ -4,7 +4,6 @@ import Header from './components/common/Header'
 import Footer from './components/common/Footer'
 import Home from './components/pages/Home'
 import InstrumentDisplay from './components/keyboard/InstrumentDisplay'
-import MelodyDisplay from './components/MelodyDisplay'
 import { useAudio } from './hooks/useAudio'
 import { useMelodyGenerator } from './hooks/useMelodyGenerator'
 import { useTheme } from './hooks/useTheme'
@@ -201,7 +200,6 @@ function App() {
     if (generatedMelody.length > 0 && !isPlaying && !isRecording && !isAutoRecording && !hasRecordedAudio) {
       const autoRecord = async () => {
         try {
-          console.log('Starting auto-recording...')
           setIsAutoRecording(true)
 
           // Ensure any previous playback is stopped
@@ -212,11 +210,8 @@ function App() {
 
           const result = await handleRecordMelody()
           if (result) {
-            console.log('Auto-recording completed successfully')
             setHasRecordedAudio(true)
             setRecordedAudioBlob(result)
-          } else {
-            console.log('Auto-recording returned null')
           }
         } catch (error) {
           console.warn('Auto-recording failed:', error)
@@ -393,12 +388,7 @@ function App() {
               onProgressChange={handleProgressChange}
               onClearRecordedAudio={handleClearRecordedAudio}
               recordedAudioBlob={recordedAudioBlob}
-            />
-
-
-            <MelodyDisplay
               generatedMelody={[...generatedMelody]}
-              showNotes={showNotes}
             />
           </>
         )}
