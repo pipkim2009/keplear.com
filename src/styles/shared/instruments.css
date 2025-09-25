@@ -1,0 +1,189 @@
+/* Shared instrument styles */
+
+/* Container styles */
+.instrument-container-base {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0px 20px 50px 45px;
+  min-width: auto;
+  overflow-x: auto;
+  overflow-y: visible;
+  max-width: 95vw;
+}
+
+/* Note circle styles - shared between guitar and bass */
+.note-circle-base {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  z-index: 20;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.note-circle-base:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Note state colors - unified across all instruments */
+.note-state-default {
+  background: linear-gradient(145deg, #4a90e2, #357abd);
+}
+
+.note-state-selected {
+  background: linear-gradient(145deg, #5cb85c, #449d44);
+}
+
+.note-state-melody {
+  background: linear-gradient(145deg, #ffd700, #ffed4e);
+  color: #333;
+}
+
+.note-state-scale {
+  background: linear-gradient(145deg, #ff8c00, #ff7700);
+}
+
+.note-state-scale-root {
+  background: linear-gradient(145deg, #dc3545, #c82333);
+}
+
+.note-state-chord {
+  background: linear-gradient(145deg, #9b59b6, #8e44ad);
+}
+
+.note-state-chord-root {
+  background: linear-gradient(145deg, #dc3545, #c82333);
+}
+
+.note-state-chord-scale {
+  background: linear-gradient(145deg, #ff8c00, #9b59b6);
+}
+
+.note-state-chord-root-scale {
+  background: linear-gradient(145deg, #dc3545, #ff8c00);
+}
+
+.note-state-chord-root-scale-root {
+  background: linear-gradient(145deg, #dc3545, #c82333);
+}
+
+.note-state-chord-root-scale-note {
+  background: linear-gradient(145deg, #dc3545, #ff8c00);
+}
+
+.note-state-chord-note-scale-root {
+  background: linear-gradient(145deg, #9b59b6, #dc3545);
+}
+
+/* Preview note styles */
+.note-preview {
+  opacity: 0.4;
+  background: linear-gradient(145deg, #888, #666);
+}
+
+.note-preview:hover {
+  opacity: 0.6;
+}
+
+/* Fret markers - shared */
+.fret-marker-base {
+  position: absolute;
+  background: linear-gradient(145deg, #f0f0dc, #ccc);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Checkbox styles - shared */
+.instrument-checkbox {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.instrument-checkbox:hover {
+  opacity: 1;
+}
+
+.instrument-checkbox-label {
+  font-size: 11px;
+  color: #ddd;
+  margin-top: 2px;
+  user-select: none;
+  cursor: pointer;
+}
+
+/* Responsive styles - shared */
+@media (min-width: 481px) and (max-width: 768px) {
+  .instrument-container-base {
+    min-width: auto !important;
+    margin: 0 !important;
+    padding: 0px 20px 50px 45px !important;
+    justify-content: flex-start !important;
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .instrument-container-base {
+    min-width: auto !important;
+    margin: 0 !important;
+    padding: 0px 20px 50px 45px !important;
+    justify-content: flex-start !important;
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+  }
+}
+
+/* String styles - shared */
+.instrument-string {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #999 0%, #ccc 50%, #999 100%);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Fret wire styles - shared */
+.fret-wire-base {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #d5d5d5, #999);
+  box-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.6),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+/* Interactive position styles */
+.fret-position-base {
+  position: absolute;
+  cursor: pointer;
+  z-index: 15;
+  transition: background-color 0.1s ease;
+}
+
+.fret-position-base:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}

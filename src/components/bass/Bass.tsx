@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react'
 import '../../styles/Bass.css'
 import { bassNotes } from '../../utils/bassNotes'
 import { applyScaleToBass, applyScaleBoxToBass, BASS_SCALES, type BassScale, type BassScaleBox } from '../../utils/bassScales'
-import { applyChordToBass, applyBassChordShapeToBass, BASS_CHORDS, type BassChord, type BassChordShape } from '../../utils/bassChords'
+import { applyChordToBass, applyBassChordShapeToBass, type BassChord, type BassChordShape } from '../../utils/bassChords'
 import type { Note } from '../../utils/notes'
 
 interface BassProps {
@@ -835,7 +835,6 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
           const isInGeneratedMelody = isInMelody(noteObj, showNotes)
           const isInScale = isOpenStringInCurrentScale(stringIndex)
           const isInChord = isOpenStringInCurrentChord(stringIndex)
-          const isRoot = isRootNote(openNote.name)
 
           let noteClass = 'bass-note-circle'
           if (isInGeneratedMelody) {
@@ -904,7 +903,6 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             const isInGeneratedMelody = isInMelody(noteObj, showNotes)
             const isInScale = isNoteInCurrentScale(stringIndex, fretIndex)
             const isInChord = isNoteInCurrentChord(stringIndex, fretIndex)
-            const isRoot = isRootNote(noteName)
 
             let noteClass = 'bass-note-circle'
             if (isInGeneratedMelody) {

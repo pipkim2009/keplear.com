@@ -1,3 +1,4 @@
+import React, { memo, useCallback, useMemo } from 'react'
 import type { Note } from '../../utils/notes'
 
 interface KeyboardKeyProps {
@@ -13,7 +14,7 @@ interface KeyboardKeyProps {
   isChordRoot?: boolean
 }
 
-const KeyboardKey: React.FC<KeyboardKeyProps> = ({
+const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
   note,
   isSelected,
   isInMelody,
@@ -25,52 +26,47 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = ({
   isInChord = false,
   isChordRoot = false
 }) => {
-  const baseClass = note.isBlack ? 'black-key' : 'white-key'
+  const baseClass = useMemo(() => note.isBlack ? 'black-key' : 'white-key', [note.isBlack])
   const selectedClass = isSelected ? 'selected' : ''
   const melodyClass = isInMelody ? 'melody' : ''
 
-  // Handle all possible combinations of chord/scale and root states
-  let noteTypeClass = ''
+  // Memoize the note type class calculation
+  const noteTypeClass = useMemo(() => {
+    const isChordRootNote = isChordRoot && isInChord
+    const isScaleRootNote = isRoot && isInScale
 
-  // Check all possible combinations using the same logic as Guitar/Bass
-  const isChordRootNote = isChordRoot && isInChord
-  const isScaleRootNote = isRoot && isInScale
+    if (isChordRootNote && isScaleRootNote) return 'chord-root-scale-root'
+    if (isChordRootNote && isInScale) return 'chord-root-scale-note'
+    if (isInChord && isScaleRootNote) return 'chord-note-scale-root'
+    if (isChordRootNote) return 'chord-root'
+    if (isScaleRootNote) return 'scale-root'
+    if (isInChord && isInScale) return 'chord-scale-note'
+    if (isInChord) return 'chord-note'
+    if (isInScale) return 'scale-note'
+    return ''
+  }, [isChordRoot, isInChord, isRoot, isInScale])
 
-  if (isChordRootNote && isScaleRootNote) {
-    // Both roots - stays red
-    noteTypeClass = 'chord-root-scale-root'
-  } else if (isChordRootNote && isInScale) {
-    // Chord root + scale note - red + orange mix
-    noteTypeClass = 'chord-root-scale-note'
-  } else if (isInChord && isScaleRootNote) {
-    // Chord note + scale root - red + purple mix
-    noteTypeClass = 'chord-note-scale-root'
-  } else if (isChordRootNote) {
-    // Just chord root
-    noteTypeClass = 'chord-root'
-  } else if (isScaleRootNote) {
-    // Just scale root
-    noteTypeClass = 'scale-root'
-  } else if (isInChord && isInScale) {
-    // Regular chord note + scale note - orange + purple mix
-    noteTypeClass = 'chord-scale-note'
-  } else if (isInChord) {
-    // Just chord note
-    noteTypeClass = 'chord-note'
-  } else if (isInScale) {
-    // Just scale note
-    noteTypeClass = 'scale-note'
-  }
+  const handleClick = useCallback(() => {
+    onClick(note)
+  }, [onClick, note])
+
+  const classNames = useMemo(() => {
+    return `${baseClass} ${selectedClass} ${melodyClass} ${noteTypeClass} ${className}`.trim()
+  }, [baseClass, selectedClass, melodyClass, noteTypeClass, className])
 
   return (
     <button
-      className={`${baseClass} ${selectedClass} ${melodyClass} ${noteTypeClass} ${className}`.trim()}
-      onClick={() => onClick(note)}
+      className={classNames}
+      onClick={handleClick}
       style={style}
+      aria-label={`${note.name} key`}
+      aria-pressed={isSelected}
     >
       <span className="key-label">{note.name}</span>
     </button>
   )
-}
+})
+
+KeyboardKey.displayName = 'KeyboardKey'
 
 export default KeyboardKey
