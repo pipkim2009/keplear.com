@@ -109,6 +109,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const [isDragging, setIsDragging] = useState<boolean>(false)
   const [audioFileBlob, setAudioFileBlob] = useState<Blob | null>(null)
   const [audioFileUrl, setAudioFileUrl] = useState<string | null>(null)
+  const [isInstrumentDropdownOpen, setIsInstrumentDropdownOpen] = useState<boolean>(false)
 
   // Original default values
   const DEFAULT_BPM = 120
@@ -472,10 +473,22 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     <div className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
       {/* Top row: Instrument selector */}
       <div className="control-group instrument-selector-group">
-        <div className="instrument-selector">
+        {/* Desktop/Tablet view - Cards */}
+        <div className="instrument-selector desktop-selector">
           <div
             className={`instrument-card ${instrument === 'keyboard' ? 'active' : ''}`}
-            onClick={() => setInstrument('keyboard')}
+            onClick={() => {
+              // Clear recorded audio when switching instruments
+              if (audioFileUrl) {
+                URL.revokeObjectURL(audioFileUrl)
+                setAudioFileUrl(null)
+              }
+              setAudioFileBlob(null)
+              if (onClearRecordedAudio) {
+                onClearRecordedAudio()
+              }
+              setInstrument('keyboard')
+            }}
           >
             <div className="instrument-icon">🎹</div>
             <div className="instrument-name">Keyboard</div>
@@ -483,7 +496,18 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
           <div
             className={`instrument-card ${instrument === 'guitar' ? 'active' : ''}`}
-            onClick={() => setInstrument('guitar')}
+            onClick={() => {
+              // Clear recorded audio when switching instruments
+              if (audioFileUrl) {
+                URL.revokeObjectURL(audioFileUrl)
+                setAudioFileUrl(null)
+              }
+              setAudioFileBlob(null)
+              if (onClearRecordedAudio) {
+                onClearRecordedAudio()
+              }
+              setInstrument('guitar')
+            }}
           >
             <div className="instrument-icon">🎸</div>
             <div className="instrument-name">Guitar</div>
@@ -491,11 +515,114 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
           <div
             className={`instrument-card ${instrument === 'bass' ? 'active' : ''}`}
-            onClick={() => setInstrument('bass')}
+            onClick={() => {
+              // Clear recorded audio when switching instruments
+              if (audioFileUrl) {
+                URL.revokeObjectURL(audioFileUrl)
+                setAudioFileUrl(null)
+              }
+              setAudioFileBlob(null)
+              if (onClearRecordedAudio) {
+                onClearRecordedAudio()
+              }
+              setInstrument('bass')
+            }}
           >
             <div className="instrument-icon">🎸</div>
             <div className="instrument-name">Bass</div>
             <div className="instrument-glow"></div>
+          </div>
+        </div>
+
+        {/* Mobile view - Dropdown */}
+        <div className="instrument-selector mobile-selector">
+          <div
+            className={`instrument-dropdown ${isInstrumentDropdownOpen ? 'open' : ''} ${instrument}-active`}
+            onClick={() => setIsInstrumentDropdownOpen(!isInstrumentDropdownOpen)}
+          >
+            <div className="current-instrument">
+              <div className="instrument-icon">
+                {instrument === 'keyboard' && '🎹'}
+                {instrument === 'guitar' && '🎸'}
+                {instrument === 'bass' && '🎸'}
+              </div>
+              <div className="instrument-name">
+                {instrument === 'keyboard' && 'Keyboard'}
+                {instrument === 'guitar' && 'Guitar'}
+                {instrument === 'bass' && 'Bass'}
+              </div>
+              <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}>▼</div>
+            </div>
+            {isInstrumentDropdownOpen && (
+              <div className="dropdown-options">
+                {instrument !== 'keyboard' && (
+                  <div
+                    className="dropdown-option keyboard-option"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Clear recorded audio when switching instruments
+                      if (audioFileUrl) {
+                        URL.revokeObjectURL(audioFileUrl)
+                        setAudioFileUrl(null)
+                      }
+                      setAudioFileBlob(null)
+                      if (onClearRecordedAudio) {
+                        onClearRecordedAudio()
+                      }
+                      setInstrument('keyboard');
+                      setIsInstrumentDropdownOpen(false);
+                    }}
+                  >
+                    <div className="instrument-icon">🎹</div>
+                    <div className="instrument-name">Keyboard</div>
+                  </div>
+                )}
+                {instrument !== 'guitar' && (
+                  <div
+                    className="dropdown-option guitar-option"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Clear recorded audio when switching instruments
+                      if (audioFileUrl) {
+                        URL.revokeObjectURL(audioFileUrl)
+                        setAudioFileUrl(null)
+                      }
+                      setAudioFileBlob(null)
+                      if (onClearRecordedAudio) {
+                        onClearRecordedAudio()
+                      }
+                      setInstrument('guitar');
+                      setIsInstrumentDropdownOpen(false);
+                    }}
+                  >
+                    <div className="instrument-icon">🎸</div>
+                    <div className="instrument-name">Guitar</div>
+                  </div>
+                )}
+                {instrument !== 'bass' && (
+                  <div
+                    className="dropdown-option bass-option"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // Clear recorded audio when switching instruments
+                      if (audioFileUrl) {
+                        URL.revokeObjectURL(audioFileUrl)
+                        setAudioFileUrl(null)
+                      }
+                      setAudioFileBlob(null)
+                      if (onClearRecordedAudio) {
+                        onClearRecordedAudio()
+                      }
+                      setInstrument('bass');
+                      setIsInstrumentDropdownOpen(false);
+                    }}
+                  >
+                    <div className="instrument-icon">🎸</div>
+                    <div className="instrument-name">Bass</div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
