@@ -6,6 +6,8 @@ import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/keyboardScales'
 import NotesToggle from '../common/NotesToggle'
 import type { Note } from '../../utils/notes'
 import MelodyDisplay from '../MelodyDisplay'
+import CustomAudioPlayer from '../common/CustomAudioPlayer'
+import '../../styles/CustomAudioPlayer.css'
 
 export type KeyboardSelectionMode = 'range' | 'multi'
 
@@ -734,14 +736,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           <div className="controls-container second-row">
             <div className="modern-control-item audio-player-section centered">
               {audioFileUrl && (
-                <audio
-                  controls
-                  controlsList="noplaybackrate"
+                <CustomAudioPlayer
                   src={audioFileUrl}
                   preload="metadata"
-                >
-                  Your browser does not support the audio element.
-                </audio>
+                />
               )}
             </div>
           </div>
