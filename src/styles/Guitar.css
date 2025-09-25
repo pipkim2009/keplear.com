@@ -61,7 +61,7 @@
 .fretboard {
   position: relative;
   width: auto;
-  min-width: 1447px;
+  min-width: 1305px;
   height: 175px;
   background: linear-gradient(145deg, #3e2723, #1e1e1e);
   border-radius: 0;
@@ -116,7 +116,7 @@
 .guitar-string {
   position: absolute;
   left: 0;
-  width: 100%;
+  width: 1299px;
   height: 2px; /* default height */
   background: linear-gradient(90deg, #c0c0c0, #808080, #c0c0c0);
   border-radius: 1px;

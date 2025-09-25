@@ -706,7 +706,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
 
         {/* Frets */}
         {[...Array(24)].map((_, index) => (
-          <div key={index} className="fret" style={{ left: `${(index + 1) * 60}px` }}>
+          <div key={index} className="fret" style={{ left: `${(index + 1) * 54}px` }}>
             <div className="fret-wire"></div>
             {/* Fret markers on 3rd, 5th, 7th, 9th, 15th, 17th, 19th, 21st frets */}
             {[3, 5, 7, 9, 15, 17, 19, 21].includes(index + 1) && (
@@ -758,7 +758,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             style={{
               left: `0px`, // At the very left edge
               top: `${15 + stringIndex * 28 - 12}px`,
-              width: `15px`, // 25% of first fret zone (60px * 0.25)
+              width: `14px`, // 25% of first fret zone (54px * 0.25)
               height: `24px`,
             }}
             onClick={() => handleOpenStringClick(stringIndex)}
@@ -774,9 +774,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
               key={`fret-position-${stringIndex}-${fretIndex}`}
               className="fret-position"
               style={{
-                left: `${fretIndex === 0 ? 15 + 3 : fretIndex * 60 + 3}px`, // Start after open string area for first fret
+                left: `${fretIndex === 0 ? 15 + 3 : fretIndex * 54 + 3}px`, // Start after open string area for first fret
                 top: `${15 + stringIndex * 28 - 12}px`, // Expand height above and below string
-                width: `${fretIndex === 0 ? 60 - 18 : 60 - 6}px`, // 75% width for first fret (42px)
+                width: `${fretIndex === 0 ? 54 - 18 : 54 - 6}px`, // 75% width for first fret (36px)
                 height: `24px`, // Height of string spacing minus 4px to prevent overlap
               }}
               onClick={() => handleNoteClick(stringIndex, fretIndex)}
@@ -935,7 +935,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
                 key={`note-${stringIndex}-${fretIndex}`}
                 className={noteClass}
                 style={{
-                  left: `${fretIndex === 0 ? 30 : (fretIndex + 1) * 60 - 38}px`, // Center first fret in its area, others align with checkboxes
+                  left: `${fretIndex === 0 ? 27 : (fretIndex + 1) * 54 - 34}px`, // Center first fret in its area, others align with checkboxes
                   top: `${15 + stringIndex * 28 - 10}px`, // Center on string
                 }}
               >
@@ -971,8 +971,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
                   left: fretIndex === 0
                     ? `-2.5px` // Open string position
                     : fretIndex === 1
-                    ? `${fretIndex * 60 - 38 + 9}px` // First fret moved right by 9px
-                    : `${fretIndex * 60 - 38}px`, // Regular fret position
+                    ? `${fretIndex * 54 - 34 + 9}px` // First fret moved right by 9px
+                    : `${fretIndex * 54 - 34}px`, // Regular fret position
                   top: `${15 + stringIndex * 28 - 10}px`, // Center on string
                 }}
               >
