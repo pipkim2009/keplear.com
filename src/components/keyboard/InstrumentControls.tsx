@@ -471,17 +471,33 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   return (
     <div className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
       {/* Top row: Instrument selector */}
-      <div className="control-group">
-        <label className="control-label">Instrument</label>
-        <select
-          value={instrument}
-          onChange={(e) => setInstrument(e.target.value)}
-          className={`control-input instrument-select-${instrument}`}
-        >
-          <option value="keyboard">Keyboard</option>
-          <option value="guitar">Guitar</option>
-          <option value="bass">Bass</option>
-        </select>
+      <div className="control-group instrument-selector-group">
+        <div className="instrument-selector">
+          <div
+            className={`instrument-card ${instrument === 'keyboard' ? 'active' : ''}`}
+            onClick={() => setInstrument('keyboard')}
+          >
+            <div className="instrument-icon">🎹</div>
+            <div className="instrument-name">Keyboard</div>
+            <div className="instrument-glow"></div>
+          </div>
+          <div
+            className={`instrument-card ${instrument === 'guitar' ? 'active' : ''}`}
+            onClick={() => setInstrument('guitar')}
+          >
+            <div className="instrument-icon">🎸</div>
+            <div className="instrument-name">Guitar</div>
+            <div className="instrument-glow"></div>
+          </div>
+          <div
+            className={`instrument-card ${instrument === 'bass' ? 'active' : ''}`}
+            onClick={() => setInstrument('bass')}
+          >
+            <div className="instrument-icon">🎸</div>
+            <div className="instrument-name">Bass</div>
+            <div className="instrument-glow"></div>
+          </div>
+        </div>
       </div>
 
       {/* Second row: Octave range (keyboard only) */}
