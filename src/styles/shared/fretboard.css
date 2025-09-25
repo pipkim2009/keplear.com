@@ -1,0 +1,301 @@
+/* Unified fretboard styles for Guitar and Bass */
+
+/* Main instrument containers */
+.guitar-instrument,
+.bass-instrument {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0px 20px 50px 45px;
+  min-width: auto;
+  overflow-x: auto;
+  overflow-y: visible;
+  max-width: 95vw;
+}
+
+/* Fretboard */
+.fretboard {
+  position: relative;
+  width: auto;
+  min-width: 1447px;
+  background: linear-gradient(145deg, #3e2723, #1e1e1e);
+  border-radius: 0;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid #2d2d2d;
+}
+
+.fretboard[data-instrument="guitar"] {
+  height: 175px;
+}
+
+.fretboard[data-instrument="bass"] {
+  height: 135px;
+  background: linear-gradient(145deg, #2a1a14, #1a1a1a);
+}
+
+/* Fret structure */
+.fret {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  z-index: 10;
+}
+
+.fret-wire {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #c9c9c9, #888);
+  border-radius: 1px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+/* Fret markers */
+.fret-marker {
+  position: absolute;
+  background: linear-gradient(145deg, #f5f5dc, #ddd);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.fret-marker.single {
+  width: 12px;
+  height: 12px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateX(-30px);
+}
+
+.fret-marker.double::before,
+.fret-marker.double::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: inherit;
+  border-radius: 50%;
+  box-shadow: inherit;
+}
+
+.fret-marker.double::before {
+  top: 35%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateX(-30px);
+}
+
+.fret-marker.double::after {
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%) translateX(-30px);
+}
+
+/* String lines */
+.string-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #999 0%, #ccc 50%, #999 100%);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Interactive note positions */
+.note-position {
+  position: absolute;
+  cursor: pointer;
+  z-index: 15;
+  background: transparent;
+  border: none;
+  padding: 0;
+  transition: background-color 0.1s ease;
+}
+
+.note-position:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.note-position:focus-visible {
+  outline: 2px solid #4a90e2;
+  outline-offset: -2px;
+}
+
+.note-position.open-string {
+  z-index: 16;
+}
+
+/* Fret and String selectors */
+.fret-selector,
+.string-selector {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  z-index: 25;
+  cursor: pointer;
+}
+
+.fret-selector {
+  bottom: -40px;
+}
+
+.string-selector {
+  left: -35px;
+}
+
+.fret-selector__checkbox,
+.string-selector__checkbox {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.fret-selector__checkbox:hover,
+.string-selector__checkbox:hover {
+  opacity: 1;
+}
+
+.fret-selector__label,
+.string-selector__label {
+  font-size: 11px;
+  color: #ddd;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Note markers */
+.note-marker {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  z-index: 20;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+.note-marker:not(.preview):hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.note-marker__label {
+  font-size: 9px;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Note marker states */
+.note-marker {
+  background: linear-gradient(145deg, #4a90e2, #357abd);
+}
+
+.note-marker.melody {
+  background: linear-gradient(145deg, #ffd700, #ffed4e);
+  color: #333;
+}
+
+.note-marker.scale {
+  background: linear-gradient(145deg, #ff8c00, #ff7700);
+}
+
+.note-marker.scale-root {
+  background: linear-gradient(145deg, #dc3545, #c82333);
+}
+
+.note-marker.chord {
+  background: linear-gradient(145deg, #9b59b6, #8e44ad);
+}
+
+.note-marker.chord-root {
+  background: linear-gradient(145deg, #dc3545, #c82333);
+}
+
+.note-marker.chord-scale {
+  background: linear-gradient(145deg, #ff8c00, #9b59b6);
+}
+
+.note-marker.chord-root-scale-root {
+  background: linear-gradient(145deg, #dc3545, #c82333);
+}
+
+.note-marker.chord-root-scale-note {
+  background: linear-gradient(145deg, #dc3545, #ff8c00);
+}
+
+.note-marker.chord-note-scale-root {
+  background: linear-gradient(145deg, #9b59b6, #dc3545);
+}
+
+.note-marker.preview {
+  opacity: 0.4;
+  background: linear-gradient(145deg, #888, #666);
+  pointer-events: none;
+}
+
+.note-marker.preview:hover {
+  opacity: 0.6;
+  transform: none;
+}
+
+/* Responsive styles */
+@media (min-width: 481px) and (max-width: 768px) {
+  .guitar-instrument,
+  .bass-instrument {
+    min-width: auto !important;
+    margin: 0 !important;
+    padding: 0px 20px 50px 45px !important;
+    justify-content: flex-start !important;
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+  }
+
+  .fretboard {
+    min-width: 800px;
+    max-width: 1200px;
+    width: 95vw;
+    margin: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .guitar-instrument,
+  .bass-instrument {
+    min-width: auto !important;
+    margin: 0 !important;
+    padding: 0px 20px 50px 45px !important;
+    justify-content: flex-start !important;
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+  }
+
+  .fretboard {
+    min-width: 320px;
+    max-width: 800px;
+    width: 95vw;
+    margin: 0;
+  }
+}
