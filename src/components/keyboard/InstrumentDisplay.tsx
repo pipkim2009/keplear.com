@@ -102,15 +102,18 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   const [selectedChordRoot, setSelectedChordRoot] = useState<string>('C')
   const [appliedChords, setAppliedChords] = useState<AppliedChord[]>([])
   const [appliedScales, setAppliedScales] = useState<AppliedScale[]>([])
+
   const [scaleHandlers, setScaleHandlers] = useState<{
     handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
     handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
     handleClearScale: () => void;
+    handleScaleDelete: (rootNote: string, scale: GuitarScale) => void;
   } | null>(null)
   const [bassScaleHandlers, setBassScaleHandlers] = useState<{
     handleScaleSelect: (rootNote: string, scale: BassScale) => void;
     handleScaleBoxSelect: (scaleBox: BassScaleBox) => void;
     handleClearScale: () => void;
+    handleScaleDelete: (rootNote: string, scale: BassScale) => void;
   } | null>(null)
   const [chordHandlers, setChordHandlers] = useState<{
     handleChordSelect: (rootNote: string, chord: GuitarChord) => void;
@@ -153,18 +156,123 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   }, [clearChordsAndScales, scaleHandlers, chordHandlers, bassScaleHandlers, bassChordHandlers])
 
   const handleScaleSelect = (rootNote: string, scale: GuitarScale) => {
+
+    // Check if this exact scale is already applied
+    const isScaleAlreadyApplied = appliedScales.some(appliedScale =>
+      appliedScale.root === rootNote && appliedScale.scale.name === scale.name
+    )
+
+    if (isScaleAlreadyApplied) {
+      console.log('🚫 Scale already applied, skipping')
+      return // Don't add duplicate scales
+    }
+
     if (instrument === 'guitar' && scaleHandlers) {
+      console.log('🎸 Applying scale to guitar')
       scaleHandlers.handleScaleSelect(rootNote, scale)
+      // Add to applied scales list for guitar (like keyboard does)
+      const newAppliedScale: AppliedScale = {
+        id: `guitar-${rootNote}-${scale.name}-${Date.now()}`,
+        root: rootNote,
+        scale: scale,
+        displayName: `${rootNote} ${scale.name}`,
+        notes: [] // Guitar uses internal note tracking
+      }
+      console.log('🎸 Adding to applied scales:', newAppliedScale)
+      setAppliedScales(prev => {
+        const newList = [...prev, newAppliedScale]
+        console.log('🎸 New applied scales length:', newList.length)
+        return newList
+      })
     } else if (instrument === 'bass' && bassScaleHandlers) {
+      console.log('🎻 Applying scale to bass')
       bassScaleHandlers.handleScaleSelect(rootNote, scale as any)
+      // Add to applied scales list for bass (like keyboard does)
+      const newAppliedScale: AppliedScale = {
+        id: `bass-${rootNote}-${scale.name}-${Date.now()}`,
+        root: rootNote,
+        scale: scale,
+        displayName: `${rootNote} ${scale.name}`,
+        notes: [] // Bass uses internal note tracking
+      }
+      console.log('🎻 Adding to applied scales:', newAppliedScale)
+      setAppliedScales(prev => {
+        const newList = [...prev, newAppliedScale]
+        console.log('🎻 New applied scales length:', newList.length)
+        return newList
+      })
+    } else {
+      console.log('❌ No handlers or wrong condition:', {
+        instrument,
+        hasScaleHandlers: !!scaleHandlers,
+        hasBassScaleHandlers: !!bassScaleHandlers
+      })
     }
   }
 
   const handleScaleBoxSelect = (scaleBox: ScaleBox) => {
     if (instrument === 'guitar' && scaleHandlers) {
       scaleHandlers.handleScaleBoxSelect(scaleBox)
+
+      // Also add to applied scales list like handleScaleSelect does
+      const rootPosition = scaleBox.positions.find(pos => pos.isRoot)
+      if (rootPosition) {
+        const rootNote = rootPosition.note.replace(/\d+$/, '') // Remove octave
+        // Create a scale object from the box info
+        const scaleFromBox = {
+          name: `${scaleBox.scaleName} (Frets ${scaleBox.minFret}-${scaleBox.maxFret})`,
+          intervals: [], // Box selections don't need intervals
+          modes: []
+        }
+
+        const newAppliedScale: AppliedScale = {
+          id: `${rootNote}-${scaleFromBox.name}-${Date.now()}`,
+          root: rootNote,
+          scale: scaleFromBox,
+          displayName: `${rootNote} ${scaleFromBox.name}`,
+          noteKeys: [] // Will be populated by the guitar component
+        }
+
+        // Check for duplicates
+        const isDuplicate = appliedScales.some(scale =>
+          scale.root === rootNote && scale.scale.name === scaleFromBox.name
+        )
+
+        if (!isDuplicate) {
+          setAppliedScales(prev => [...prev, newAppliedScale])
+        }
+      }
     } else if (instrument === 'bass' && bassScaleHandlers) {
       bassScaleHandlers.handleScaleBoxSelect(scaleBox as any)
+
+      // Also add to applied scales list like handleScaleSelect does
+      const rootPosition = scaleBox.positions.find(pos => pos.isRoot)
+      if (rootPosition) {
+        const rootNote = rootPosition.note.replace(/\d+$/, '') // Remove octave
+        // Create a scale object from the box info
+        const scaleFromBox = {
+          name: `${scaleBox.scaleName} (Frets ${scaleBox.minFret}-${scaleBox.maxFret})`,
+          intervals: [], // Box selections don't need intervals
+          modes: []
+        }
+
+        const newAppliedScale: AppliedScale = {
+          id: `${rootNote}-${scaleFromBox.name}-${Date.now()}`,
+          root: rootNote,
+          scale: scaleFromBox,
+          displayName: `${rootNote} ${scaleFromBox.name}`,
+          noteKeys: [] // Will be populated by the bass component
+        }
+
+        // Check for duplicates
+        const isDuplicate = appliedScales.some(scale =>
+          scale.root === rootNote && scale.scale.name === scaleFromBox.name
+        )
+
+        if (!isDuplicate) {
+          setAppliedScales(prev => [...prev, newAppliedScale])
+        }
+      }
     }
   }
 
@@ -303,6 +411,19 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   }
 
   const handleScaleDelete = (scaleId: string) => {
+    // Find the scale to delete
+    const scaleToDelete = appliedScales.find(scale => scale.id === scaleId)
+
+    if (scaleToDelete) {
+      // Call the appropriate deletion handler
+      if (instrument === 'guitar' && scaleHandlers?.handleScaleDelete) {
+        scaleHandlers.handleScaleDelete(scaleToDelete.root, scaleToDelete.scale as GuitarScale)
+      } else if (instrument === 'bass' && bassScaleHandlers?.handleScaleDelete) {
+        bassScaleHandlers.handleScaleDelete(scaleToDelete.root, scaleToDelete.scale as BassScale)
+      }
+    }
+
+    // Remove from applied scales list
     setAppliedScales(prev => prev.filter(scale => scale.id !== scaleId))
   }
 

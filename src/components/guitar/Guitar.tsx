@@ -15,6 +15,7 @@ interface GuitarProps {
     handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
     handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
     handleClearScale: () => void;
+    handleScaleDelete: (rootNote: string, scale: GuitarScale) => void;
   }) => void
   onChordHandlersReady?: (handlers: {
     handleChordSelect: (rootNote: string, chord: GuitarChord) => void;
@@ -375,68 +376,81 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   // The Guitar component manages its own state internally
   // setGuitarNotes is only called when applying scales/chords explicitly
 
-  // Handle scale selection - SIMPLE VERSION THAT WORKS
+  // Handle scale selection - COPY THE CHORD PATTERN EXACTLY
   const handleScaleSelect = useCallback((rootNote: string, scale: GuitarScale) => {
     // Apply scale to guitar
     const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes)
-    const newSelectedNotes = new Set<string>()
-    const newScaleSelectedNotes = new Set<string>()
 
-    // Add scale notes to selection
-    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      newSelectedNotes.add(noteKey)
-      newScaleSelectedNotes.add(noteKey)
+    // Use functional updates to avoid dependencies on current state (SAME AS CHORDS)
+    setSelectedNotes(prev => {
+      const newSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newSelectedNotes.add(noteKey)
+      })
+      return newSelectedNotes
     })
 
-    // For multiple scales: add to existing instead of replacing
-    const existingSelected = selectedNotes.size > 0 ? selectedNotes : new Set<string>()
-    const combinedNotes = new Set([...existingSelected, ...newSelectedNotes])
-    const combinedScaleNotes = new Set([...scaleSelectedNotes, ...newScaleSelectedNotes])
+    setScaleSelectedNotes(prev => {
+      const newScaleSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newScaleSelectedNotes.add(noteKey)
+      })
+      return newScaleSelectedNotes
+    })
 
-    // Update all state at once to minimize re-renders
+      // Update scale state
     setCurrentScale({ root: rootNote, scale })
-    setStringCheckboxes(new Array(6).fill(false))
-    setFretCheckboxes(new Array(25).fill(false))
-    setSelectedNotes(combinedNotes)
-    setScaleSelectedNotes(combinedScaleNotes)
+    // Keep scale state when scale is applied - allow coexistence
+  }, [guitarNotes])
 
-    // Convert scale selections to melody notes and update melody system
-    const melodyNotes: Note[] = []
-    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
-      if (noteName) {
-        const stringMapping = [6, 5, 4, 3, 2, 1]
-        const guitarString = stringMapping[stringIndex]
-        const guitarNote = guitarNotes.find(note =>
-          note.string === guitarString && note.fret === fretIndex + 1
-        )
+  // Handle scale deletion
+  const handleScaleDelete = useCallback((rootNote: string, scale: GuitarScale) => {
+    // Remove scale notes from selection by reapplying the scale and removing those notes
+    const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes)
 
-        if (guitarNote) {
-          melodyNotes.push({
-            name: noteName,
-            frequency: guitarNote.frequency,
-            isBlack: noteName.includes('#'),
-            position: stringIndex * 100 + fretIndex
-          })
-        }
-      }
+    setSelectedNotes(prev => {
+      const newSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newSelectedNotes.delete(noteKey)
+      })
+      return newSelectedNotes
     })
-    setGuitarNotes(melodyNotes)
-  }, [])
+
+    setScaleSelectedNotes(prev => {
+      const newScaleSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newScaleSelectedNotes.delete(noteKey)
+      })
+      return newScaleSelectedNotes
+    })
+  }, [guitarNotes])
 
   // Handle scale box selection
   const handleScaleBoxSelect = useCallback((scaleBox: ScaleBox) => {
     // Apply scale box to guitar
     const scaleSelections = applyScaleBoxToGuitar(scaleBox)
-    const newSelectedNotes = new Set<string>()
-    const newScaleSelectedNotes = new Set<string>()
-    
-    // Add scale notes to selection
-    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      newSelectedNotes.add(noteKey)
-      newScaleSelectedNotes.add(noteKey)
+
+    // Use functional updates to accumulate scales (SAME AS handleScaleSelect)
+    setSelectedNotes(prev => {
+      const newSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newSelectedNotes.add(noteKey)
+      })
+      return newSelectedNotes
+    })
+
+    setScaleSelectedNotes(prev => {
+      const newScaleSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newScaleSelectedNotes.add(noteKey)
+      })
+      return newScaleSelectedNotes
     })
     
     // For box selection, we need to derive the scale info from the box
@@ -449,11 +463,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       setCurrentScale({ root: rootNote, scale: GUITAR_SCALES[0] })
     }
     
-    // Update all state at once to minimize re-renders
+    // Update checkboxes to reflect no individual selections
     setStringCheckboxes(new Array(6).fill(false))
     setFretCheckboxes(new Array(25).fill(false))
-    setSelectedNotes(newSelectedNotes)
-    setScaleSelectedNotes(newScaleSelectedNotes)
 
     // Convert scale selections to melody notes and update melody system
     const melodyNotes: Note[] = []
@@ -654,7 +666,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       onScaleHandlersReady({
         handleScaleSelect,
         handleScaleBoxSelect,
-        handleClearScale
+        handleClearScale,
+        handleScaleDelete
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

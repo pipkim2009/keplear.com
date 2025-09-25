@@ -15,6 +15,7 @@ interface BassProps {
     handleScaleSelect: (rootNote: string, scale: BassScale) => void;
     handleScaleBoxSelect: (scaleBox: BassScaleBox) => void;
     handleClearScale: () => void;
+    handleScaleDelete: (rootNote: string, scale: BassScale) => void;
   }) => void
   onChordHandlersReady?: (handlers: {
     handleChordSelect: (rootNote: string, chord: BassChord) => void;
@@ -371,68 +372,80 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   // The Bass component manages its own state internally
   // setBassNotes is only called when applying scales/chords explicitly
 
-  // Handle scale selection - SIMPLE VERSION THAT WORKS
+  // Handle scale selection - MULTIPLE SCALES VERSION
   const handleScaleSelect = useCallback((rootNote: string, scale: BassScale) => {
     // Apply scale to bass
     const scaleSelections = applyScaleToBass(rootNote, scale, bassNotes)
-    const newSelectedNotes = new Set<string>()
-    const newScaleSelectedNotes = new Set<string>()
 
-    // Add scale notes to selection
-    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      newSelectedNotes.add(noteKey)
-      newScaleSelectedNotes.add(noteKey)
+    // Use functional updates to avoid dependencies on current state (SAME AS CHORDS)
+    setSelectedNotes(prev => {
+      const newSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newSelectedNotes.add(noteKey)
+      })
+      return newSelectedNotes
     })
 
-    // For multiple scales: add to existing instead of replacing
-    const existingSelected = selectedNotes.size > 0 ? selectedNotes : new Set<string>()
-    const combinedNotes = new Set([...existingSelected, ...newSelectedNotes])
-    const combinedScaleNotes = new Set([...scaleSelectedNotes, ...newScaleSelectedNotes])
+    setScaleSelectedNotes(prev => {
+      const newScaleSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newScaleSelectedNotes.add(noteKey)
+      })
+      return newScaleSelectedNotes
+    })
 
-    // Update all state at once to minimize re-renders
+    // Update scale state
     setCurrentScale({ root: rootNote, scale })
-    setStringCheckboxes(new Array(4).fill(false))
-    setFretCheckboxes(new Array(25).fill(false))
-    setSelectedNotes(combinedNotes)
-    setScaleSelectedNotes(combinedScaleNotes)
+    // Keep scale state when scale is applied - allow coexistence
+  }, [bassNotes])
 
-    // Convert scale selections to melody notes and update melody system
-    const melodyNotes: Note[] = []
-    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
-      if (noteName) {
-        const stringMapping = [4, 3, 2, 1] // Bass string mapping
-        const bassString = stringMapping[stringIndex]
-        const bassNote = bassNotes.find(note =>
-          note.string === bassString && note.fret === fretIndex + 1
-        )
+  // Handle scale deletion
+  const handleScaleDelete = useCallback((rootNote: string, scale: BassScale) => {
+    // Remove scale notes from selection by reapplying the scale and removing those notes
+    const scaleSelections = applyScaleToBass(rootNote, scale, bassNotes)
 
-        if (bassNote) {
-          melodyNotes.push({
-            name: noteName,
-            frequency: bassNote.frequency,
-            isBlack: noteName.includes('#'),
-            position: stringIndex * 100 + fretIndex
-          })
-        }
-      }
+    setSelectedNotes(prev => {
+      const newSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newSelectedNotes.delete(noteKey)
+      })
+      return newSelectedNotes
     })
-    setBassNotes(melodyNotes)
-  }, [])
+
+    setScaleSelectedNotes(prev => {
+      const newScaleSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newScaleSelectedNotes.delete(noteKey)
+      })
+      return newScaleSelectedNotes
+    })
+  }, [bassNotes])
 
   // Handle scale box selection
   const handleScaleBoxSelect = useCallback((scaleBox: BassScaleBox) => {
     // Apply scale box to bass
     const scaleSelections = applyScaleBoxToBass(scaleBox)
-    const newSelectedNotes = new Set<string>()
-    const newScaleSelectedNotes = new Set<string>()
+    // Use functional updates to accumulate scales (SAME AS handleScaleSelect)
+    setSelectedNotes(prev => {
+      const newSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newSelectedNotes.add(noteKey)
+      })
+      return newSelectedNotes
+    })
 
-    // Add scale notes to selection
-    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      newSelectedNotes.add(noteKey)
-      newScaleSelectedNotes.add(noteKey)
+    setScaleSelectedNotes(prev => {
+      const newScaleSelectedNotes = new Set(prev)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        newScaleSelectedNotes.add(noteKey)
+      })
+      return newScaleSelectedNotes
     })
 
     // Convert scale selections to melody notes and update melody system
@@ -467,11 +480,9 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       setCurrentScale({ root: rootNote, scale: currentScale?.scale || BASS_SCALES[0] })
     }
 
-    // Update all state at once to minimize re-renders
+    // Update checkboxes to reflect no individual selections
     setStringCheckboxes(new Array(4).fill(false))
     setFretCheckboxes(new Array(25).fill(false))
-    setSelectedNotes(newSelectedNotes)
-    setScaleSelectedNotes(newScaleSelectedNotes)
   }, [currentScale, setBassNotes])
 
   // Handle clearing scale
@@ -649,7 +660,8 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       onScaleHandlersReady({
         handleScaleSelect,
         handleScaleBoxSelect,
-        handleClearScale
+        handleClearScale,
+        handleScaleDelete
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

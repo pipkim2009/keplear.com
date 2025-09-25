@@ -36,10 +36,14 @@ interface ScaleChordOptionsProps {
   onChordRootChange?: (rootNote: string) => void
   onScaleSelect?: (rootNote: string, scale: GuitarScale) => void
   onScaleBoxSelect?: (scaleBox: ScaleBox) => void
+  onClearScale?: () => void
   onKeyboardScaleApply?: (rootNote: string, scale: KeyboardScale) => void
+  onKeyboardScaleClear?: () => void
   onChordSelect?: (rootNote: string, chord: GuitarChord) => void
   onChordShapeSelect?: (chordShape: ChordShape) => void
+  onClearChord?: () => void
   onKeyboardChordApply?: (rootNote: string, chord: KeyboardChord) => void
+  onKeyboardChordClear?: () => void
   appliedChords?: AppliedChord[]
   onChordDelete?: (chordId: string) => void
   appliedScales?: AppliedScale[]
@@ -54,10 +58,14 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   onChordRootChange,
   onScaleSelect,
   onScaleBoxSelect,
+  onClearScale,
   onKeyboardScaleApply,
+  onKeyboardScaleClear,
   onChordSelect,
   onChordShapeSelect,
+  onClearChord,
   onKeyboardChordApply,
+  onKeyboardChordClear,
   appliedChords = [],
   onChordDelete,
   appliedScales = [],
@@ -174,14 +182,15 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   }
 
   const handleApplyScale = () => {
+
     if (instrument === 'guitar') {
-      if (showPositions && availableBoxes.length > 0 && onScaleBoxSelect) {
+      if (showPositions && availableBoxes.length > 0 && selectedBoxIndex < availableBoxes.length && onScaleBoxSelect) {
         onScaleBoxSelect(availableBoxes[selectedBoxIndex])
       } else if (onScaleSelect) {
         onScaleSelect(selectedRoot, selectedScale)
       }
     } else if (instrument === 'bass') {
-      if (showPositions && availableBassBoxes.length > 0 && onScaleBoxSelect) {
+      if (showPositions && availableBassBoxes.length > 0 && selectedBoxIndex < availableBassBoxes.length && onScaleBoxSelect) {
         onScaleBoxSelect(availableBassBoxes[selectedBoxIndex] as any)
       } else if (onScaleSelect) {
         onScaleSelect(selectedRoot, selectedBassScale as any)
