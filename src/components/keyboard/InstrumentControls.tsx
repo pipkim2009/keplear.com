@@ -891,15 +891,15 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         {/* Third row - Expandable Reveal/Hide Notes Button */}
         {audioFileBlob && (
           <div className="controls-container third-row">
-            <button
-              className={`modern-notes-toggle-button ${showNotes ? 'expanded' : ''}`}
-              onClick={onToggleNotes}
-              title={showNotes ? 'Hide notes' : 'Reveal notes'}
-              aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
-            >
-              <div className="toggle-content">
+            <div className={`modern-notes-toggle-button ${showNotes ? 'expanded' : ''}`}>
+              <button
+                className="toggle-content"
+                onClick={onToggleNotes}
+                title={showNotes ? 'Hide notes' : 'Reveal notes'}
+                aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
+              >
                 <NotesToggle showNotes={showNotes} onToggle={() => {}} />
-              </div>
+              </button>
 
               {/* Expanded melody content */}
               {showNotes && generatedMelody && generatedMelody.length > 0 && (
@@ -914,7 +914,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                   </div>
                 </div>
               )}
-            </button>
+            </div>
           </div>
         )}
 
