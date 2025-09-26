@@ -809,7 +809,7 @@
   gap: 6px;
   height: 32px;
   min-width: 120px;
-  margin-top: 19px;
+  margin-top: 0;
 }
 
 .control-button.delete-selection:hover {
@@ -823,34 +823,9 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Remove top margin on non-phone devices by default */
-@media (min-width: 481px) {
-  .control-button.delete-selection {
-    margin-top: 0;
-  }
+/* OLD CONFLICTING RULES REMOVED */
 
-  /* Comprehensive rules for keyboard mode clear button - maximum specificity */
-  div.instrument-controls-container:not(.guitar-mode) div.control-group button.control-button.delete-selection {
-    margin-top: 19px !important;
-  }
-
-  div.instrument-controls-container:not(.guitar-mode) button[title="Clear selected notes, chords, and scales"] {
-    margin-top: 19px !important;
-  }
-
-  .instrument-controls-container:not(.guitar-mode) .control-group > button.control-button.delete-selection {
-    margin-top: 19px !important;
-  }
-
-  .instrument-controls-container:not(.guitar-mode) .control-button.delete-selection {
-    margin-top: 19px !important;
-  }
-
-  /* Fallback with even higher specificity */
-  body div.instrument-controls-container:not(.guitar-mode) div.control-group button.control-button.delete-selection[title="Clear selected notes, chords, and scales"] {
-    margin-top: 19px !important;
-  }
-}
+/* MORE OLD CONFLICTING RULES REMOVED */
 
 @media (max-width: 480px) {
   .control-button.delete-selection {
@@ -1966,6 +1941,19 @@
   }
 }
 
+/* Ensure third-row (reveal/hide button) stays centered on very small screens */
+@media (max-width: 360px) {
+  .controls-container.third-row {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    margin-top: 15px !important;
+  }
+}
+
 
 /* Recording Controls */
 .control-group.recording-controls {
@@ -2212,6 +2200,10 @@
 .controls-container.third-row {
   margin-top: 15px;
   justify-content: center;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 /* Audio player section styling */
@@ -2288,12 +2280,22 @@ body.dark .modern-control-item.audio-player-section audio {
   .modern-control-item {
     width: 100%;
   }
+
+  /* Ensure third-row (reveal/hide button) stays centered on tablet */
+  .controls-container.third-row {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 16px !important;
+    flex-wrap: wrap !important;
+  }
 }
 
 
 /* Tablet and Mobile layout - BPM and Notes on same row */
 @media (max-width: 768px) {
-  .controls-container:not(.second-row) {
+  .controls-container:not(.second-row):not(.third-row) {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
@@ -2346,6 +2348,16 @@ body.dark .modern-control-item.audio-player-section audio {
   .control-group.modern-controls-row .modern-control-item .control-input {
     width: 110px !important;
     min-width: 110px !important;
+  }
+
+  /* Ensure third-row (reveal/hide button) stays centered on mobile */
+  .controls-container.third-row {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
   }
 }
 
@@ -2418,4 +2430,29 @@ body.dark .modern-control-item.audio-player-section audio {
     min-width: auto;
   }
 }
+
+/* FINAL OVERRIDE: Ensure keyboard mode delete button has correct margin */
+
+/* Final working solution - red border for all instruments */
+.control-button.delete-selection {
+  margin-top: 0;
+  border-color: #dc3545; /* Original red border color */
+}
+
+/* Keyboard mode: 19px margin on tablets/desktop */
+body:has([data-instrument="keyboard"]) .control-button.delete-selection {
+  margin-top: 19px !important;
+}
+
+/* Guitar mode: 0px margin on tablets/desktop */
+body:has([data-instrument="guitar"]) .control-button.delete-selection {
+  margin-top: 0 !important;
+}
+
+/* Bass mode: 0px margin on tablets/desktop */
+body:has([data-instrument="bass"]) .control-button.delete-selection {
+  margin-top: 0 !important;
+}
+
+
 
