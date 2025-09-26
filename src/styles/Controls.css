@@ -2223,13 +2223,8 @@ body.dark .modern-control-item.audio-player-section audio {
 }
 
 
-/* Phone layout - BPM and Notes on same row */
-@media (max-width: 480px) {
-  .controls-container {
-    flex-direction: column;
-    gap: 12px;
-  }
-
+/* Tablet and Mobile layout - BPM and Notes on same row */
+@media (max-width: 768px) {
   .controls-container:not(.second-row) {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2252,6 +2247,14 @@ body.dark .modern-control-item.audio-player-section audio {
     grid-area: generate;
     min-width: auto;
     width: 100%;
+  }
+}
+
+/* Phone layout - additional styling */
+@media (max-width: 480px) {
+  .controls-container {
+    flex-direction: column;
+    gap: 12px;
   }
 
   /* Use very small screen styles for modern-controls-row on all phones */
