@@ -889,7 +889,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         )}
 
         {/* Third row - Reveal/Hide Notes Button */}
-        {hasGeneratedMelody && (
+        {audioFileBlob && (
           <div className="controls-container third-row">
             <button
               className="modern-notes-toggle-button"
@@ -903,7 +903,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         )}
 
         {/* Generated Melody Display Row */}
-        {generatedMelody && generatedMelody.length > 0 && showNotes && (
+        {generatedMelody && generatedMelody.length > 0 && showNotes && audioFileBlob && (
           <div className="control-group melody-notes-row">
             <MelodyDisplay
               generatedMelody={generatedMelody}

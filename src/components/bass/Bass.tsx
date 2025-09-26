@@ -325,7 +325,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   }
 
   // Convert bass notes to the Note format expected by the melody system
-  const convertToMelodyNotes = (): Note[] => {
+  const convertToMelodyNotes = useCallback((): Note[] => {
     const melodyNotes: Note[] = []
 
     // Check open strings first
@@ -372,11 +372,17 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     }
 
     return melodyNotes
-  }
+  }, [isOpenStringSelected, isNoteSelected, getNoteForStringAndFret, bassNotes])
+
+  // Sync bass selections with parent component for deselect all button visibility
+  useEffect(() => {
+    const melodyNotes = convertToMelodyNotes()
+    setBassNotes(melodyNotes)
+  }, [selectedNotes, stringCheckboxes, fretCheckboxes, setBassNotes, convertToMelodyNotes])
 
   // Note: Removed useEffect that was causing infinite loop
   // The Bass component manages its own state internally
-  // setBassNotes is only called when applying scales/chords explicitly
+  // setBassNotes is called when selections change to keep parent in sync
 
   // Handle scale selection - MULTIPLE SCALES VERSION
   const handleScaleSelect = useCallback((rootNote: string, scale: BassScale) => {

@@ -52,7 +52,6 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
         }
       })
     }
-    setGeneratedMelody([])
   }, [])
 
   /**
@@ -153,7 +152,6 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
    */
   const setGuitarNotes = useCallback((notes: Note[]): void => {
     setSelectedNotes([...notes])
-    setGeneratedMelody([])
   }, [])
 
   /**

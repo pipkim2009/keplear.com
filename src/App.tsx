@@ -38,7 +38,10 @@ function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('home')
   const [bpm, setBpm] = useState<number>(DEFAULT_SETTINGS.bpm)
   const [numberOfNotes, setNumberOfNotes] = useState<number>(DEFAULT_SETTINGS.numberOfNotes)
-  const [showNotes, setShowNotes] = useState<boolean>(false)
+  const [showNotes, setShowNotes] = useState<boolean>(() => {
+    const saved = localStorage.getItem('keplear-showNotes')
+    return saved ? JSON.parse(saved) : false
+  })
   const [instrument, setInstrument] = useState<InstrumentType>(DEFAULT_SETTINGS.instrument)
   const [keyboardOctaves, setKeyboardOctaves] = useState<{ lower: number; higher: number }>({ lower: 0, higher: 0 })
   const [keyboardSelectionMode, setKeyboardSelectionMode] = useState<'range' | 'multi'>('range')
@@ -71,6 +74,11 @@ function App() {
   useEffect(() => {
     document.body.className = isDarkMode ? 'dark' : 'light'
   }, [isDarkMode])
+
+  // Save showNotes state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('keplear-showNotes', JSON.stringify(showNotes))
+  }, [showNotes])
 
   // Function to trigger green border flash for specific input
   const triggerInputFlash = useCallback((inputType: 'bpm' | 'notes' | 'mode') => {
@@ -193,6 +201,8 @@ function App() {
     setHasRecordedAudio(false)
     setRecordedAudioBlob(null)
     setIsAutoRecording(false)
+    // Hide melody by default when new one is generated
+    setShowNotes(false)
   }, [generateMelody, numberOfNotes, instrument, keyboardOctaves, keyboardSelectionMode, calculateMelodyDuration, bpm])
 
   // Auto-record melody when it changes

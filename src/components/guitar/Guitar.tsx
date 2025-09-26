@@ -313,7 +313,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   }, [selectedNotes, stringCheckboxes, fretCheckboxes])
 
   // Convert guitar notes to the Note format expected by the melody system
-  const convertToMelodyNotes = (): Note[] => {
+  const convertToMelodyNotes = useCallback((): Note[] => {
     const melodyNotes: Note[] = []
     
     // Check open strings first
@@ -358,17 +358,23 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         }
       }
     }
-    
+
     return melodyNotes
-  }
+  }, [isOpenStringSelected, isNoteSelected, getNoteForStringAndFret, guitarNotes])
 
 
   // Auto-apply checkboxes when all individual notes are selected
   // DISABLED: This was causing infinite render loops and flickering with the scale system
 
+  // Sync guitar selections with parent component for deselect all button visibility
+  useEffect(() => {
+    const melodyNotes = convertToMelodyNotes()
+    setGuitarNotes(melodyNotes)
+  }, [selectedNotes, stringCheckboxes, fretCheckboxes, setGuitarNotes, convertToMelodyNotes])
+
   // Note: Removed useEffect that was causing infinite loop
   // The Guitar component manages its own state internally
-  // setGuitarNotes is only called when applying scales/chords explicitly
+  // setGuitarNotes is called when selections change to keep parent in sync
 
   // Handle scale selection - COPY THE CHORD PATTERN EXACTLY
   const handleScaleSelect = useCallback((rootNote: string, scale: GuitarScale) => {
