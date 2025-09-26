@@ -888,6 +888,20 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
         )}
 
+        {/* Third row - Reveal/Hide Notes Button */}
+        {hasGeneratedMelody && (
+          <div className="controls-container third-row">
+            <button
+              className="modern-notes-toggle-button"
+              onClick={onToggleNotes}
+              title={showNotes ? 'Hide notes' : 'Reveal notes'}
+              aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
+            >
+              <NotesToggle showNotes={showNotes} onToggle={() => {}} />
+            </button>
+          </div>
+        )}
+
         {/* Generated Melody Display Row */}
         {generatedMelody && generatedMelody.length > 0 && showNotes && (
           <div className="control-group melody-notes-row">

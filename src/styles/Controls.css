@@ -829,9 +829,26 @@
     margin-top: 0;
   }
 
-  /* Add back top margin only for keyboard */
+  /* Comprehensive rules for keyboard mode clear button - maximum specificity */
+  div.instrument-controls-container:not(.guitar-mode) div.control-group button.control-button.delete-selection {
+    margin-top: 19px !important;
+  }
+
+  div.instrument-controls-container:not(.guitar-mode) button[title="Clear selected notes, chords, and scales"] {
+    margin-top: 19px !important;
+  }
+
+  .instrument-controls-container:not(.guitar-mode) .control-group > button.control-button.delete-selection {
+    margin-top: 19px !important;
+  }
+
   .instrument-controls-container:not(.guitar-mode) .control-button.delete-selection {
-    margin-top: 19px;
+    margin-top: 19px !important;
+  }
+
+  /* Fallback with even higher specificity */
+  body div.instrument-controls-container:not(.guitar-mode) div.control-group button.control-button.delete-selection[title="Clear selected notes, chords, and scales"] {
+    margin-top: 19px !important;
   }
 }
 
@@ -1555,6 +1572,18 @@
   margin-top: 19px;
 }
 
+/* Remove top margin for guitar and bass modes */
+.instrument-controls.guitar-mode .notes-toggle-container {
+  margin-top: 0;
+}
+
+/* Ensure keyboard mode has top margin on desktop */
+@media (min-width: 481px) {
+  .instrument-controls:not(.guitar-mode) .notes-toggle-container {
+    margin-top: 19px;
+  }
+}
+
 .notes-toggle-container .toggle-text {
   font-size: 12px;
   font-weight: 600;
@@ -2064,6 +2093,35 @@
   transform: translateY(10px);
 }
 
+/* Modern Notes Toggle Button - Same green as melody container border */
+.modern-notes-toggle-button {
+  background: #20c997;
+  color: black !important;
+  border: 1px solid #20c997;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.modern-notes-toggle-button:hover {
+  background: #1ba085;
+  border-color: #1ba085;
+  color: black !important;
+}
+
+/* Ensure all child elements also have black text */
+.modern-notes-toggle-button * {
+  color: black !important;
+}
+
 .modern-control-item {
   display: flex;
   flex-direction: column;
@@ -2150,6 +2208,12 @@
   justify-content: center;
 }
 
+/* Third row styling - for reveal/hide button */
+.controls-container.third-row {
+  margin-top: 15px;
+  justify-content: center;
+}
+
 /* Audio player section styling */
 .modern-control-item.audio-player-section {
   flex: 1;
@@ -2217,6 +2281,10 @@ body.dark .modern-control-item.audio-player-section audio {
     min-width: 200px;
   }
 
+  .modern-notes-toggle-button {
+    min-width: 200px;
+  }
+
   .modern-control-item {
     width: 100%;
   }
@@ -2245,6 +2313,11 @@ body.dark .modern-control-item.audio-player-section audio {
 
   .modern-generate-button {
     grid-area: generate;
+    min-width: auto;
+    width: 100%;
+  }
+
+  .modern-notes-toggle-button {
     min-width: auto;
     width: 100%;
   }
