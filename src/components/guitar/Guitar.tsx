@@ -958,11 +958,14 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         {[...Array(6)].map((_, stringIndex) =>
           [...Array(25)].map((_, fretIndex) => {
             const adjustedFretIndex = fretIndex === 0 ? 0 : fretIndex - 1 // Adjust for open string
+            const isCurrentNoteSelected = fretIndex === 0
+              ? isOpenStringSelected(stringIndex)
+              : isNoteSelected(stringIndex, adjustedFretIndex)
             const shouldShowPreview = (
               shouldShowStringPreview(stringIndex) ||
               shouldShowFretPreview(fretIndex) ||
               shouldShowNotePreview(stringIndex, fretIndex)
-            ) && !isNoteSelected(stringIndex, adjustedFretIndex)
+            ) && !isCurrentNoteSelected
 
             if (!shouldShowPreview) return null
 
