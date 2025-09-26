@@ -888,27 +888,33 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
         )}
 
-        {/* Third row - Reveal/Hide Notes Button */}
+        {/* Third row - Expandable Reveal/Hide Notes Button */}
         {audioFileBlob && (
           <div className="controls-container third-row">
             <button
-              className="modern-notes-toggle-button"
+              className={`modern-notes-toggle-button ${showNotes ? 'expanded' : ''}`}
               onClick={onToggleNotes}
               title={showNotes ? 'Hide notes' : 'Reveal notes'}
               aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
             >
-              <NotesToggle showNotes={showNotes} onToggle={() => {}} />
-            </button>
-          </div>
-        )}
+              <div className="toggle-content">
+                <NotesToggle showNotes={showNotes} onToggle={() => {}} />
+              </div>
 
-        {/* Generated Melody Display Row */}
-        {generatedMelody && generatedMelody.length > 0 && showNotes && audioFileBlob && (
-          <div className="control-group melody-notes-row">
-            <MelodyDisplay
-              generatedMelody={generatedMelody}
-              showNotes={showNotes}
-            />
+              {/* Expanded melody content */}
+              {showNotes && generatedMelody && generatedMelody.length > 0 && (
+                <div className="expanded-melody-content">
+                  <div className="melody-title">Generated Melody:</div>
+                  <div className="melody-notes">
+                    {generatedMelody.map((note, index) => (
+                      <span key={`${note.name}-${index}`} className="melody-note">
+                        {note.name}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </button>
           </div>
         )}
 

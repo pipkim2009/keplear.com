@@ -2090,13 +2090,15 @@
   padding: 10px 20px;
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   cursor: pointer;
   min-width: 140px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 8px;
+  overflow: hidden;
 }
 
 .modern-notes-toggle-button:hover {
@@ -2105,9 +2107,85 @@
   color: black !important;
 }
 
+.modern-notes-toggle-button.expanded {
+  min-width: 300px;
+  max-width: 600px;
+  width: auto;
+  padding: 15px 20px;
+  background: rgba(32, 201, 151, 0.1);
+  border: 2px solid #20c997;
+}
+
+.modern-notes-toggle-button .toggle-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.modern-notes-toggle-button .expanded-melody-content {
+  width: 100%;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(32, 201, 151, 0.3);
+  animation: expandIn 0.3s ease-out;
+}
+
+.modern-notes-toggle-button .expanded-melody-content .melody-title {
+  color: #20c997;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.modern-notes-toggle-button .expanded-melody-content .melody-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.modern-notes-toggle-button .expanded-melody-content .melody-note {
+  background: #20c997 !important;
+  color: #212529 !important;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Ensure all child elements also have black text */
 .modern-notes-toggle-button * {
   color: black !important;
+}
+
+/* When expanded, make toggle text green */
+.modern-notes-toggle-button.expanded .toggle-content * {
+  color: #20c997 !important;
+}
+
+/* Override text color for melody content */
+.modern-notes-toggle-button .expanded-melody-content .melody-title {
+  color: #20c997 !important;
+}
+
+.modern-notes-toggle-button .expanded-melody-content .melody-note {
+  color: #212529 !important;
 }
 
 .modern-control-item {
@@ -2358,6 +2436,22 @@ body.dark .modern-control-item.audio-player-section audio {
     align-items: center !important;
     gap: 12px !important;
     flex-wrap: wrap !important;
+  }
+
+  /* Mobile styling for expandable notes button */
+  .modern-notes-toggle-button.expanded {
+    min-width: 280px;
+    max-width: 320px;
+    padding: 12px 15px;
+  }
+
+  .modern-notes-toggle-button .expanded-melody-content .melody-notes {
+    gap: 4px;
+  }
+
+  .modern-notes-toggle-button .expanded-melody-content .melody-note {
+    font-size: 11px;
+    padding: 3px 6px;
   }
 }
 
