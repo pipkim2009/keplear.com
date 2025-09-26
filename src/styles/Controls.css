@@ -2454,5 +2454,12 @@ body:has([data-instrument="bass"]) .control-button.delete-selection {
   margin-top: 0 !important;
 }
 
+/* Mobile override: keyboard mode gets 0px margin on phones only */
+@media (max-width: 480px) {
+  body:has([data-instrument="keyboard"]) .control-button.delete-selection {
+    margin-top: 0 !important;
+  }
+}
+
 
 
