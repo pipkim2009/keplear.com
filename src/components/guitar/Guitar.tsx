@@ -750,22 +750,29 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           )
         })}
 
-        {/* Clickable open string positions (fret 0) */}
-        {[...Array(6)].map((_, stringIndex) => (
-          <div
-            key={`open-string-${stringIndex}`}
-            className="fret-position open-string-position"
-            style={{
-              left: `0px`, // At the very left edge
-              top: `${15 + stringIndex * 28 - 12}px`,
-              width: `14px`, // 25% of first fret zone (54px * 0.25)
-              height: `24px`,
-            }}
-            onClick={() => handleOpenStringClick(stringIndex)}
-            onMouseEnter={() => setHoveredNote({ string: stringIndex, fret: 0 })}
-            onMouseLeave={() => setHoveredNote(null)}
-          />
-        ))}
+        {/* Clickable open string positions (fret 0) - hidden when note is selected */}
+        {[...Array(6)].map((_, stringIndex) => {
+          // Hide the position marker if a note is selected on this open string
+          if (isOpenStringSelected(stringIndex)) {
+            return null
+          }
+
+          return (
+            <div
+              key={`open-string-${stringIndex}`}
+              className="fret-position open-string-position"
+              style={{
+                left: `0px`, // At the very left edge
+                top: `${15 + stringIndex * 28 - 12}px`,
+                width: `14px`, // 25% of first fret zone (54px * 0.25)
+                height: `24px`,
+              }}
+              onClick={() => handleOpenStringClick(stringIndex)}
+              onMouseEnter={() => setHoveredNote({ string: stringIndex, fret: 0 })}
+              onMouseLeave={() => setHoveredNote(null)}
+            />
+          )
+        })}
 
         {/* Clickable fret positions */}
         {[...Array(6)].map((_, stringIndex) => (
