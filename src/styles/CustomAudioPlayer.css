@@ -235,8 +235,10 @@
 }
 
 .volume-slider input[type="range"] {
-  writing-mode: bt-lr; /* IE */
-  -webkit-appearance: slider-vertical; /* WebKit */
+  writing-mode: vertical-lr;
+  direction: rtl;
+  -webkit-appearance: none;
+  appearance: none;
   width: 4px;
   height: 80px;
   background: #444;
