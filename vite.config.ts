@@ -11,6 +11,7 @@ export default defineConfig(({ mode }) => ({
       (() => {
         // Dynamic import for bundle analyzer to avoid dependency issues
         try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
           const { analyzer } = require('vite-bundle-analyzer')
           return analyzer({ analyzerMode: 'server', openAnalyzer: true })
         } catch {

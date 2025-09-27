@@ -18,12 +18,16 @@ const ParameterControls: React.FC = () => {
   } = useInstrument()
 
   const handleBpmChange = (newBpm: number) => {
-    setBpm(newBpm)
+    // Validate input to prevent NaN
+    const validBpm = isNaN(newBpm) ? bpm : newBpm
+    setBpm(validBpm)
     triggerInputFlash('bpm')
   }
 
   const handleNotesChange = (newNotes: number) => {
-    setNumberOfNotes(newNotes)
+    // Validate input to prevent NaN
+    const validNotes = isNaN(newNotes) ? numberOfNotes : newNotes
+    setNumberOfNotes(validNotes)
     triggerInputFlash('notes')
   }
 
@@ -40,7 +44,10 @@ const ParameterControls: React.FC = () => {
             min="60"
             max="200"
             value={bpm}
-            onChange={(e) => handleBpmChange(Number(e.target.value))}
+            onChange={(e) => {
+              const value = Number(e.target.value)
+              handleBpmChange(value)
+            }}
             onFocus={() => setInputActive('bpm', true)}
             onBlur={() => setInputActive('bpm', false)}
             className={`slider ${flashingInputs.bpm || activeInputs.bpm ? 'flashing' : ''}`}
@@ -58,7 +65,10 @@ const ParameterControls: React.FC = () => {
             min="4"
             max="16"
             value={numberOfNotes}
-            onChange={(e) => handleNotesChange(Number(e.target.value))}
+            onChange={(e) => {
+              const value = Number(e.target.value)
+              handleNotesChange(value)
+            }}
             onFocus={() => setInputActive('notes', true)}
             onBlur={() => setInputActive('notes', false)}
             className={`slider ${flashingInputs.notes || activeInputs.notes ? 'flashing' : ''}`}

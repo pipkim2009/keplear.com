@@ -55,15 +55,19 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
       }
 
     case 'SET_BPM':
+      // Ensure we never store NaN values
+      const bpmValue = isNaN(action.payload) ? state.bpm : action.payload
       return {
         ...state,
-        bpm: Math.max(60, Math.min(200, action.payload))
+        bpm: Math.max(60, Math.min(200, bpmValue))
       }
 
     case 'SET_NUMBER_OF_NOTES':
+      // Ensure we never store NaN values
+      const notesValue = isNaN(action.payload) ? state.numberOfNotes : action.payload
       return {
         ...state,
-        numberOfNotes: Math.max(1, Math.min(16, action.payload))
+        numberOfNotes: Math.max(1, Math.min(16, notesValue))
       }
 
     case 'TRIGGER_INPUT_FLASH':

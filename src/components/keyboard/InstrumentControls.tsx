@@ -210,7 +210,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
     const increment = () => {
       setBpm(prevBpm => {
-        const newBpm = Math.min(prevBpm + 1, 999)
+        // Ensure prevBpm is a valid number
+        const safePrevBpm = isNaN(prevBpm) ? 120 : prevBpm
+        const newBpm = Math.min(safePrevBpm + 1, 200)
         setBpmDisplay(newBpm.toString())
         return newBpm
       })
@@ -227,7 +229,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
     const decrement = () => {
       setBpm(prevBpm => {
-        const newBpm = Math.max(prevBpm - 1, 1)
+        // Ensure prevBpm is a valid number
+        const safePrevBpm = isNaN(prevBpm) ? 120 : prevBpm
+        const newBpm = Math.max(safePrevBpm - 1, 60)
         setBpmDisplay(newBpm.toString())
         return newBpm
       })
@@ -244,7 +248,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
     const increment = () => {
       setNumberOfNotes(prevNotes => {
-        const newNotes = Math.min(prevNotes + 1, 999)
+        // Ensure prevNotes is a valid number
+        const safePrevNotes = isNaN(prevNotes) ? 5 : prevNotes
+        const newNotes = Math.min(safePrevNotes + 1, 16)
         setNotesDisplay(newNotes.toString())
         return newNotes
       })
@@ -261,7 +267,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
     const decrement = () => {
       setNumberOfNotes(prevNotes => {
-        const newNotes = Math.max(prevNotes - 1, 1)
+        // Ensure prevNotes is a valid number
+        const safePrevNotes = isNaN(prevNotes) ? 5 : prevNotes
+        const newNotes = Math.max(safePrevNotes - 1, 4)
         setNotesDisplay(newNotes.toString())
         return newNotes
       })
@@ -747,21 +755,19 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               />
               <button
                 className="control-button-internal minus"
-                onMouseDown={(e) => {
+                onClick={(e) => {
+                  console.log('BPM - button clicked')
                   e.preventDefault();
-                  startBpmDecrement();
-                }}
-                onMouseUp={(e) => {
-                  e.preventDefault();
-                  stopBpmInterval();
-                }}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  startBpmDecrement();
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  stopBpmInterval();
+                  e.stopPropagation();
+                  // Single click decrement
+                  setBpm(prevBpm => {
+                    console.log('BPM - decrementing from:', prevBpm)
+                    const safePrevBpm = isNaN(prevBpm) ? 120 : prevBpm
+                    const newBpm = Math.max(safePrevBpm - 1, 60)
+                    console.log('BPM - new value:', newBpm)
+                    setBpmDisplay(newBpm.toString())
+                    return newBpm
+                  })
                 }}
                 style={{ userSelect: 'none', touchAction: 'none' }}
               >
@@ -769,21 +775,19 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               </button>
               <button
                 className="control-button-internal plus"
-                onMouseDown={(e) => {
+                onClick={(e) => {
+                  console.log('BPM + button clicked')
                   e.preventDefault();
-                  startBpmIncrement();
-                }}
-                onMouseUp={(e) => {
-                  e.preventDefault();
-                  stopBpmInterval();
-                }}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  startBpmIncrement();
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  stopBpmInterval();
+                  e.stopPropagation();
+                  // Single click increment
+                  setBpm(prevBpm => {
+                    console.log('BPM + incrementing from:', prevBpm)
+                    const safePrevBpm = isNaN(prevBpm) ? 120 : prevBpm
+                    const newBpm = Math.min(safePrevBpm + 1, 200)
+                    console.log('BPM + new value:', newBpm)
+                    setBpmDisplay(newBpm.toString())
+                    return newBpm
+                  })
                 }}
                 style={{ userSelect: 'none', touchAction: 'none' }}
               >
@@ -805,21 +809,19 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               />
               <button
                 className="control-button-internal minus"
-                onMouseDown={(e) => {
+                onClick={(e) => {
+                  console.log('Notes - button clicked')
                   e.preventDefault();
-                  startNotesDecrement();
-                }}
-                onMouseUp={(e) => {
-                  e.preventDefault();
-                  stopNotesInterval();
-                }}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  startNotesDecrement();
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  stopNotesInterval();
+                  e.stopPropagation();
+                  // Single click decrement
+                  setNumberOfNotes(prevNotes => {
+                    console.log('Notes - decrementing from:', prevNotes)
+                    const safePrevNotes = isNaN(prevNotes) ? 5 : prevNotes
+                    const newNotes = Math.max(safePrevNotes - 1, 4)
+                    console.log('Notes - new value:', newNotes)
+                    setNotesDisplay(newNotes.toString())
+                    return newNotes
+                  })
                 }}
                 style={{ userSelect: 'none', touchAction: 'none' }}
               >
@@ -827,21 +829,19 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               </button>
               <button
                 className="control-button-internal plus"
-                onMouseDown={(e) => {
+                onClick={(e) => {
+                  console.log('Notes + button clicked')
                   e.preventDefault();
-                  startNotesIncrement();
-                }}
-                onMouseUp={(e) => {
-                  e.preventDefault();
-                  stopNotesInterval();
-                }}
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  startNotesIncrement();
-                }}
-                onTouchEnd={(e) => {
-                  e.preventDefault();
-                  stopNotesInterval();
+                  e.stopPropagation();
+                  // Single click increment
+                  setNumberOfNotes(prevNotes => {
+                    console.log('Notes + incrementing from:', prevNotes)
+                    const safePrevNotes = isNaN(prevNotes) ? 5 : prevNotes
+                    const newNotes = Math.min(safePrevNotes + 1, 16)
+                    console.log('Notes + new value:', newNotes)
+                    setNotesDisplay(newNotes.toString())
+                    return newNotes
+                  })
                 }}
                 style={{ userSelect: 'none', touchAction: 'none' }}
               >

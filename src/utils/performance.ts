@@ -3,6 +3,17 @@
  * Provides comprehensive performance tracking for React components and user interactions
  */
 
+// Type definitions for Web APIs
+interface PerformanceEventTiming extends PerformanceEntry {
+  processingStart: number
+  hadRecentInput?: boolean
+}
+
+interface LayoutShift extends PerformanceEntry {
+  value: number
+  hadRecentInput: boolean
+}
+
 export interface PerformanceMetrics {
   /** First Contentful Paint timing */
   fcp?: number
@@ -75,7 +86,7 @@ export class PerformanceMonitor {
 
     try {
       observer.observe({ entryTypes: ['paint'] })
-    } catch (e) {
+    } catch {
       // Browser doesn't support this API
     }
 
@@ -88,20 +99,21 @@ export class PerformanceMonitor {
 
     try {
       lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] })
-    } catch (e) {
+    } catch {
       // Browser doesn't support this API
     }
 
     // First Input Delay
     const fidObserver = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        this.metrics.fid = (entry as any).processingStart - entry.startTime
+        const performanceEntry = entry as PerformanceEventTiming
+        this.metrics.fid = performanceEntry.processingStart - entry.startTime
       }
     })
 
     try {
       fidObserver.observe({ entryTypes: ['first-input'] })
-    } catch (e) {
+    } catch {
       // Browser doesn't support this API
     }
 
@@ -109,8 +121,9 @@ export class PerformanceMonitor {
     let clsValue = 0
     const clsObserver = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        if (!(entry as any).hadRecentInput) {
-          clsValue += (entry as any).value
+        const layoutShiftEntry = entry as LayoutShift
+        if (!layoutShiftEntry.hadRecentInput) {
+          clsValue += layoutShiftEntry.value
           this.metrics.cls = clsValue
         }
       }
@@ -118,7 +131,7 @@ export class PerformanceMonitor {
 
     try {
       clsObserver.observe({ entryTypes: ['layout-shift'] })
-    } catch (e) {
+    } catch {
       // Browser doesn't support this API
     }
   }
@@ -151,7 +164,7 @@ export class PerformanceMonitor {
     if (typeof window === 'undefined' || !('memory' in performance)) return
 
     const checkMemory = () => {
-      const memory = (performance as any).memory
+      const memory = (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory
       if (memory) {
         const usedMB = memory.usedJSHeapSize / 1024 / 1024
         this.memoryUsageHistory.push(usedMB)
@@ -271,7 +284,7 @@ export class PerformanceMonitor {
    */
   private getCurrentMemoryUsage(): number {
     if (typeof window === 'undefined' || !('memory' in performance)) return 0
-    const memory = (performance as any).memory
+    const memory = (performance as Performance & { memory?: { usedJSHeapSize: number } }).memory
     return memory ? memory.usedJSHeapSize / 1024 / 1024 : 0
   }
 
@@ -376,10 +389,10 @@ export function withPerformanceTracking<P extends object>(
 /**
  * Performance measurement decorator for class methods
  */
-export function measurePerformance(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
-  const originalMethod = descriptor.value
+export function measurePerformance(target: object, propertyKey: string, descriptor: PropertyDescriptor) {
+  const originalMethod = descriptor.value as (...args: unknown[]) => Promise<unknown>
 
-  descriptor.value = async function (...args: any[]) {
+  descriptor.value = async function (...args: unknown[]) {
     const startTime = performance.now()
     const monitor = PerformanceMonitor.getInstance()
 

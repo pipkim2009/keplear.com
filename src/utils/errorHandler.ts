@@ -280,7 +280,7 @@ export const errorRecoveryStrategies = {
     }
   },
 
-  networkTimeout: async (operation: () => Promise<any>, timeoutMs = 10000) => {
+  networkTimeout: async <T>(operation: () => Promise<T>, timeoutMs = 10000): Promise<T> => {
     return Promise.race([
       operation(),
       new Promise((_, reject) =>
