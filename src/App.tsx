@@ -2,8 +2,7 @@ import { useEffect, useCallback } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import Header from './components/common/Header'
 import Footer from './components/common/Footer'
-import Home from './components/pages/Home'
-import InstrumentDisplay from './components/keyboard/InstrumentDisplay'
+import Router from './components/Router'
 import { useAudio } from './hooks/useAudio'
 import { useMelodyGenerator } from './hooks/useMelodyGenerator'
 import { useTheme } from './hooks/useTheme'
@@ -195,70 +194,50 @@ function App() {
           onNavigateToPractice={navigateToPractice}
         />
         
-        {currentPage === 'home' && (
-          <Home 
-            onNavigateToSandbox={navigateToSandbox}
-            onNavigateToPractice={navigateToPractice}
-          />
-        )}
-
-        {currentPage === 'sandbox' && (
-          <>
-            <InstrumentDisplay
-              onNoteClick={handleNoteClick}
-              isSelected={isSelected}
-              isInMelody={isInMelody}
-              showNotes={showNotes}
-              bpm={bpm}
-              setBpm={setBpm}
-              numberOfNotes={numberOfNotes}
-              setNumberOfNotes={setNumberOfNotes}
-              instrument={instrument}
-              setInstrument={handleInstrumentChange}
-              setGuitarNotes={setGuitarNotes}
-              clearSelection={clearSelection}
-              clearTrigger={clearTrigger}
-              selectedNotes={[...selectedNotes]}
-              selectNote={selectNote}
-              onOctaveRangeChange={handleOctaveRangeChange}
-              keyboardSelectionMode={keyboardSelectionMode}
-              onKeyboardSelectionModeChange={handleKeyboardSelectionModeChange}
-              flashingInputs={{
-                bpm: flashingInputs.bpm || activeInputs.bpm,
-                notes: flashingInputs.notes || activeInputs.notes,
-                mode: flashingInputs.mode || activeInputs.mode
-              }}
-              triggerInputFlash={triggerInputFlash}
-              setInputActive={setInputActive}
-              clearChordsAndScales={clearChordsAndScalesTrigger}
-              onGenerateMelody={handleGenerateMelody}
-              onPlayMelody={handlePlayMelody}
-              onRecordMelody={handleRecordMelody}
-              isPlaying={isPlaying}
-              isRecording={isRecording}
-              hasGeneratedMelody={generatedMelody.length > 0}
-              onToggleNotes={toggleShowNotes}
-              playbackProgress={playbackProgress}
-              melodyDuration={melodyDuration}
-              onProgressChange={setPlaybackProgress}
-              onClearRecordedAudio={handleClearRecordedAudio}
-              recordedAudioBlob={recordedAudioBlob}
-              generatedMelody={[...generatedMelody]}
-            />
-          </>
-        )}
-
-        {currentPage === 'practice' && (
-          <div className="practice-page">
-            <div className="coming-soon">
-              <h2>Practice Mode</h2>
-              <p>Coming soon! This will include structured exercises and progress tracking.</p>
-              <button className="button" onClick={navigateToSandbox}>
-                Try Sandbox Mode
-              </button>
-            </div>
-          </div>
-        )}
+        <Router
+          currentPage={currentPage}
+          onNavigateToSandbox={navigateToSandbox}
+          onNavigateToPractice={navigateToPractice}
+          onNoteClick={handleNoteClick}
+          isSelected={isSelected}
+          isInMelody={isInMelody}
+          showNotes={showNotes}
+          bpm={bpm}
+          setBpm={setBpm}
+          numberOfNotes={numberOfNotes}
+          setNumberOfNotes={setNumberOfNotes}
+          instrument={instrument}
+          setInstrument={handleInstrumentChange}
+          setGuitarNotes={setGuitarNotes}
+          clearSelection={clearSelection}
+          clearTrigger={clearTrigger}
+          selectedNotes={[...selectedNotes]}
+          selectNote={selectNote}
+          onOctaveRangeChange={handleOctaveRangeChange}
+          keyboardSelectionMode={keyboardSelectionMode}
+          onKeyboardSelectionModeChange={handleKeyboardSelectionModeChange}
+          flashingInputs={{
+            bpm: flashingInputs.bpm || activeInputs.bpm,
+            notes: flashingInputs.notes || activeInputs.notes,
+            mode: flashingInputs.mode || activeInputs.mode
+          }}
+          triggerInputFlash={triggerInputFlash}
+          setInputActive={setInputActive}
+          clearChordsAndScales={clearChordsAndScalesTrigger}
+          onGenerateMelody={handleGenerateMelody}
+          onPlayMelody={handlePlayMelody}
+          onRecordMelody={handleRecordMelody}
+          isPlaying={isPlaying}
+          isRecording={isRecording}
+          hasGeneratedMelody={generatedMelody.length > 0}
+          onToggleNotes={toggleShowNotes}
+          playbackProgress={playbackProgress}
+          melodyDuration={melodyDuration}
+          onProgressChange={setPlaybackProgress}
+          onClearRecordedAudio={handleClearRecordedAudio}
+          recordedAudioBlob={recordedAudioBlob}
+          generatedMelody={[...generatedMelody]}
+        />
         
         <Footer />
       </div>
