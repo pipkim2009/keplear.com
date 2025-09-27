@@ -1,25 +1,40 @@
 import { Sun, Moon } from 'lucide-react'
+import { memo, useMemo } from 'react'
 import '../../styles/ThemeToggle.css'
 
 interface ThemeToggleProps {
-  isDarkMode: boolean
-  onToggle: () => void
+  readonly isDarkMode: boolean
+  readonly onToggle: () => void
 }
 
-const ThemeToggle: React.FC<ThemeToggleProps> = ({ isDarkMode, onToggle }) => {
+const ThemeToggle = memo(function ThemeToggle({ isDarkMode, onToggle }: ThemeToggleProps) {
+  const ariaLabel = useMemo(() =>
+    isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+    [isDarkMode]
+  )
+
+  const icon = useMemo(() =>
+    isDarkMode ? <Moon size={20} /> : <Sun size={20} />,
+    [isDarkMode]
+  )
+
+  const label = useMemo(() =>
+    isDarkMode ? 'Dark' : 'Light',
+    [isDarkMode]
+  )
   return (
     <button
       className="theme-toggle-simple"
       onClick={onToggle}
-      title={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-      aria-label={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      title={ariaLabel}
+      aria-label={ariaLabel}
     >
-      {isDarkMode ? <Moon size={20} /> : <Sun size={20} />}
+      {icon}
       <span className="toggle-label">
-        {isDarkMode ? 'Dark' : 'Light'}
+        {label}
       </span>
     </button>
   )
-}
+})
 
 export default ThemeToggle

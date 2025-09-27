@@ -1,0 +1,266 @@
+.header {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.light .header {
+  background: rgba(232, 228, 255, 0.8);
+  border-bottom: 1px solid rgba(18, 18, 18, 0.1);
+}
+
+.dark .header {
+  background: rgba(18, 18, 18, 0.8);
+  border-bottom: 1px solid rgba(210, 210, 249, 0.1);
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  position: relative;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+}
+
+.headerBrand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.headerTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #121212;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.dark .headerTitle {
+  color: #d2d2f9;
+}
+
+.headerSlogan {
+  font-size: 0.75rem;
+  font-weight: 400;
+  margin: 0;
+  color: #121212;
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.dark .headerSlogan {
+  color: #d2d2f9;
+}
+
+.headerNav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.navLink {
+  background: none;
+  border: none;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #121212;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+  padding: 0.5rem 0;
+  position: relative;
+  cursor: pointer;
+}
+
+.dark .navLink {
+  color: #d2d2f9;
+}
+
+.navLink:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.navLinkActive {
+  opacity: 1;
+  font-weight: 600;
+  color: #8000ff;
+}
+
+.dark .navLinkActive {
+  color: #a855f7;
+}
+
+.navLinkActive::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #8000ff;
+  border-radius: 1px;
+}
+
+.dark .navLinkActive::after {
+  background: #a855f7;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.authSection {
+  display: flex;
+  align-items: center;
+}
+
+.authButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.authBtn {
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+}
+
+.loginBtn {
+  background: rgba(255, 255, 255, 0.9);
+  color: #2d1b69;
+  border: 2px solid rgba(210, 210, 249, 0.4);
+  box-shadow: 0 4px 15px rgba(45, 27, 105, 0.1);
+}
+
+.dark .loginBtn {
+  background: rgba(45, 27, 105, 0.8);
+  color: #d2d2f9;
+  border-color: rgba(210, 210, 249, 0.3);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.loginBtn:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(210, 210, 249, 0.6);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(45, 27, 105, 0.2);
+}
+
+.dark .loginBtn:hover {
+  background: rgba(45, 27, 105, 1);
+  border-color: rgba(210, 210, 249, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.signupBtn {
+  background: #3b82f6;
+  color: white;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+}
+
+.signupBtn:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+}
+
+@media (min-width: 1024px) {
+  .headerContent {
+    flex-wrap: nowrap;
+  }
+
+  .headerNav {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 1023px) {
+  .headerContent {
+    padding: 1rem 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .headerTitle {
+    font-size: 1.25rem;
+  }
+  
+  .headerSlogan {
+    font-size: 0.6875rem;
+  }
+  
+  .headerNav {
+    gap: 1.5rem;
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    position: static;
+    transform: none;
+    left: auto;
+  }
+  
+  .dark .headerNav {
+    border-top: 1px solid rgba(210, 210, 249, 0.1);
+  }
+  
+  .navLink {
+    font-size: 0.8125rem;
+  }
+  
+  .headerRight {
+    gap: 0.5rem;
+    order: 2;
+    justify-content: flex-end;
+    width: 100%;
+    flex: 1;
+  }
+
+  .authSection {
+    margin-left: 0.5rem;
+  }
+  
+  .authButtons {
+    gap: 0.5rem;
+  }
+  
+  .authBtn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+}

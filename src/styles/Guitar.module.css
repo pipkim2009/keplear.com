@@ -1,0 +1,751 @@
+.guitarContainer {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0px 20px 50px 45px;
+  min-width: auto;
+  overflow-x: auto;
+  overflow-y: visible;
+  max-width: 95vw;
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .guitarContainer {
+    min-width: auto !important;
+    margin: 0 !important;
+    padding: 0px 20px 50px 45px !important;
+    justify-content: flex-start !important;
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+  }
+
+  .fretboard {
+    min-width: 800px;
+    max-width: 1200px;
+    width: 95vw;
+    margin: 0;
+  }
+
+  .guitarString {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .guitarContainer {
+    min-width: auto !important;
+    margin: 0 !important;
+    padding: 0px 20px 50px 45px !important;
+    justify-content: flex-start !important;
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+  }
+
+  .fretboard {
+    min-width: 320px;
+    max-width: 800px;
+    width: 95vw;
+    margin: 0;
+  }
+
+  .guitarString {
+    width: 100%;
+  }
+}
+
+.fretboard {
+  position: relative;
+  width: auto;
+  min-width: 1305px;
+  height: 175px;
+  background: linear-gradient(145deg, #3e2723, #1e1e1e);
+  border-radius: 0;
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.5),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+  border: 2px solid #2d2d2d;
+}
+
+
+.fret {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  z-index: 10;
+}
+
+.fretWire {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #c9c9c9, #888);
+  border-radius: 1px;
+  box-shadow: 
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+}
+
+.fretMarker {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(145deg, #f5f5dc, #ddd);
+  border-radius: 50%;
+  top: 86.5px;
+  left: 50%;
+  transform: translate(-50%, -50%) translateX(-30px);
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+  border: 1px solid #bbb;
+}
+
+.doubleMarker1 {
+  transform: translate(-50%, -50%) translateX(-30px) translateY(-21px);
+}
+
+.doubleMarker2 {
+  transform: translate(-50%, -50%) translateX(-30px) translateY(19px);
+}
+
+.guitarString {
+  position: absolute;
+  left: 0;
+  width: 1299px;
+  height: 2px; /* default height */
+  background: linear-gradient(90deg, #c0c0c0, #808080, #c0c0c0);
+  border-radius: 1px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  z-index: 15;
+}
+
+/* String 1 - High E (thinnest) */
+.guitarString:nth-of-type(1) { 
+  height: 1px;
+  background: linear-gradient(90deg, #e6e6e6, #999, #e6e6e6);
+}
+
+/* String 2 - B */
+.guitarString:nth-of-type(2) { 
+  height: 1.5px;
+  background: linear-gradient(90deg, #d9d9d9, #999, #d9d9d9);
+}
+
+/* String 3 - G */
+.guitarString:nth-of-type(3) { 
+  height: 2px;
+  background: linear-gradient(90deg, #d0d0d0, #888, #d0d0d0);
+}
+
+/* String 4 - D */
+.guitarString:nth-of-type(4) { 
+  height: 2.5px;
+  background: linear-gradient(90deg, #c8c8c8, #808080, #c8c8c8);
+}
+
+/* String 5 - A */
+.guitarString:nth-of-type(5) { 
+  height: 3.5px;
+  background: linear-gradient(90deg, #b0b0b0, #707070, #b0b0b0);
+}
+
+/* String 6 - Low E (thickest) */
+.guitarString:nth-of-type(6) {
+  height: 4.5px;
+  background: linear-gradient(90deg, #a0a0a0, #606060, #a0a0a0);
+}
+
+/* Custom scrollbar for guitar container */
+.guitarContainer::-webkit-scrollbar {
+  height: 12px;
+}
+
+.guitarContainer::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.guitarContainer::-webkit-scrollbar-button:start:decrement,
+.guitarContainer::-webkit-scrollbar-button:end:increment {
+  display: none;
+}
+
+.guitarContainer::-webkit-scrollbar-button:horizontal:start:decrement,
+.guitarContainer::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none;
+  width: 0 !important;
+}
+
+.guitarContainer::-webkit-scrollbar-track {
+  background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
+  border-radius: 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.guitarContainer::-webkit-scrollbar-thumb {
+  background: linear-gradient(145deg, #22c55e, #16a34a);
+  border-radius: 6px;
+  border: 1px solid #4ade80;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.guitarContainer::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(145deg, #16a34a, #15803d);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+.guitarContainer::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(145deg, #15803d, #166534);
+}
+
+/* Firefox scrollbar - only show when needed */
+.guitarContainer {
+  scrollbar-width: auto;
+  scrollbar-color: #22c55e #2d2d2d;
+}
+
+
+/* Fret checkboxes styling */
+.fretCheckboxContainer {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-44px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  z-index: 20;
+}
+
+.fretCheckbox {
+  width: 28px;
+  height: 28px;
+  appearance: none;
+  background: transparent;
+  border: 2px solid #22c55e;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fretCheckbox:checked {
+  background: linear-gradient(145deg, #22c55e, #16a34a);
+  border-color: #4ade80;
+}
+
+.fretCheckbox:hover {
+  background: rgba(34, 197, 94, 0.6);
+  transform: scale(1.05);
+}
+
+.fretCheckboxLabel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  color: #86efac;
+  pointer-events: none;
+  user-select: none;
+}
+
+.fretCheckbox:checked + .fretCheckboxLabel {
+  color: white;
+}
+
+/* Disabled state for fret checkboxes */
+.fretCheckbox.disabled {
+  opacity: 0.5;
+  background: transparent;
+  border-color: rgba(34, 197, 94, 0.3);
+  cursor: not-allowed;
+}
+
+.fretCheckbox.disabled:hover {
+  background: transparent;
+  transform: none;
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.fretCheckboxLabel.disabled {
+  opacity: 0.5;
+  color: rgba(134, 239, 172, 0.5);
+  cursor: not-allowed;
+}
+
+/* String checkboxes styling */
+.stringCheckboxContainer {
+  position: absolute;
+  left: -40px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 20;
+  flex-direction: row-reverse;
+}
+
+.stringCheckbox {
+  width: 28px;
+  height: 28px;
+  appearance: none;
+  background: transparent;
+  border: 2px solid #22c55e;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stringCheckbox:checked {
+  background: linear-gradient(145deg, #22c55e, #16a34a);
+  border-color: #4ade80;
+}
+
+.stringCheckbox:hover {
+  background: rgba(34, 197, 94, 0.6);
+  transform: scale(1.05);
+}
+
+.stringCheckbox-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  color: #86efac;
+  pointer-events: none;
+  user-select: none;
+}
+
+.stringCheckbox:checked + .stringCheckbox-label {
+  color: white;
+}
+
+/* Clickable fret positions */
+.fretPosition {
+  position: absolute;
+  border-radius: 8px;
+  cursor: pointer;
+  z-index: 30;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.fretPosition:hover {
+  background: transparent;
+}
+
+/* Open string area styling */
+.openStringPosition {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.openStringPosition:hover {
+  background: transparent;
+}
+
+/* Note circle styling */
+.noteCircle {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+  border: 1px solid #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  animation: noteAppear 0.3s ease-out;
+  pointer-events: none;
+}
+
+/* Preview note circle styling (for hover effects) */
+.noteCircle.preview {
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.4), rgba(29, 78, 216, 0.4));
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.noteCircle.preview.scaleNote {
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.4), rgba(234, 88, 12, 0.4)) !important;
+  border: 1px solid rgba(251, 146, 60, 0.6);
+}
+
+.noteCircle.preview.scaleRootNote {
+  background: linear-gradient(145deg, rgba(220, 38, 38, 0.4), rgba(185, 28, 28, 0.4)) !important;
+  border: 1px solid rgba(248, 113, 113, 0.6);
+  box-shadow:
+    0 0 6px rgba(220, 38, 38, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.noteCircle.preview.chordNote {
+  background: linear-gradient(145deg, rgba(139, 92, 246, 0.4), rgba(124, 58, 237, 0.4)) !important;
+  border: 1px solid rgba(167, 139, 250, 0.6);
+}
+
+.noteCircle.preview.chordScaleNote {
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.4), rgba(139, 92, 246, 0.4)) !important;
+  border: 1px solid rgba(217, 119, 6, 0.6);
+}
+
+.noteCircle.preview.chordRootNote {
+  background: linear-gradient(145deg, rgba(220, 38, 38, 0.4), rgba(185, 28, 28, 0.4)) !important;
+  border: 1px solid rgba(248, 113, 113, 0.6);
+  box-shadow:
+    0 0 6px rgba(220, 38, 38, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Green styling for melody notes */
+.noteCircle.melodyNote {
+  background: linear-gradient(145deg, #4caf50, #2e7d32) !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  padding: 0 !important;
+}
+
+.noteName {
+  font-size: 9px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  user-select: none;
+}
+
+@keyframes noteAppear {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Scale Selector Styling */
+.scale-selector {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(128, 0, 255, 0.05);
+  border: 1px solid rgba(128, 0, 255, 0.2);
+  border-radius: 8px;
+}
+
+.scale-selector-header {
+  margin-bottom: 10px;
+}
+
+.scale-toggle-button {
+  background: rgba(128, 0, 255, 0.1);
+  border: 1px solid #8000ff;
+  color: #d2d2f9;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.scale-toggle-button:hover {
+  background: rgba(128, 0, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.scale-selector-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.scale-controls {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.scale-control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 120px;
+}
+
+.scale-control-group label {
+  font-size: 12px;
+  color: #d2d2f9;
+  font-weight: 600;
+}
+
+.scale-control-group select {
+  background: rgba(128, 0, 255, 0.1);
+  border: 1px solid #8000ff;
+  color: #d2d2f9;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.scale-control-group select:hover,
+.scale-control-group select:focus {
+  background: rgba(128, 0, 255, 0.2);
+  outline: none;
+}
+
+.scale-description {
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border-left: 3px solid #8000ff;
+}
+
+.scale-description p {
+  margin: 5px 0;
+  font-size: 12px;
+  color: #d2d2f9;
+}
+
+.scale-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.apply-scale-button,
+.clear-scale-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.apply-scale-button {
+  background: linear-gradient(145deg, #4caf50, #2e7d32);
+  color: white;
+}
+
+.apply-scale-button:hover {
+  background: linear-gradient(145deg, #66bb6a, #4caf50);
+  transform: translateY(-1px);
+}
+
+.clear-scale-button {
+  background: rgba(244, 67, 54, 0.8);
+  color: white;
+}
+
+.clear-scale-button:hover {
+  background: rgba(244, 67, 54, 1);
+  transform: translateY(-1px);
+}
+
+/* Scale note highlighting */
+.noteCircle.scaleNote {
+  background: linear-gradient(145deg, #f97316, #ea580c) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.noteCircle.scaleRootNote {
+  background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Chord note highlighting */
+.noteCircle.chordNote {
+  background: linear-gradient(145deg, #8b5cf6, #7c3aed) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Mixed chord/scale note highlighting - blend of purple (chord) and orange (scale) */
+.noteCircle.chordScaleNote {
+  background: linear-gradient(145deg, #f97316, #8b5cf6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Mixed chord note + scale root - blend of purple (chord) and red (scale root) */
+.noteCircle.chordNoteScaleRoot {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Mixed chord root + scale note - blend of red (chord root) and orange (scale) */
+.noteCircle.chordRootScaleNote {
+  background: linear-gradient(145deg, #dc2626, #f97316) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Both roots (chord root + scale root) - stays red since both are roots */
+.noteCircle.chordRootScaleRoot {
+  background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Chord root + chord note - blend of red (chord root) and purple (chord note) */
+.noteCircle.chordRootChordNote {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 0 8px rgba(220, 38, 38, 0.4),
+    0 0 6px rgba(139, 92, 246, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Chord root notes should always be red */
+.noteCircle.chordRootNote,
+.noteCircle.chordNote.chordRootNote {
+  background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+  .scale-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .scale-actions {
+    flex-direction: column;
+  }
+  
+  .apply-scale-button,
+  .clear-scale-button {
+    width: 100%;
+  }
+}
+
+/* Position toggle styling */
+.position-toggle {
+  margin: 10px 0;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+.position-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #d2d2f9;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.position-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  appearance: none;
+  background: rgba(128, 0, 255, 0.1);
+  border: 2px solid #8000ff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.position-toggle input[type="checkbox"]:checked {
+  background: linear-gradient(145deg, #8000ff, #6b00cc);
+  border-color: #c77dff;
+}
+
+.position-toggle input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -2px;
+  left: 2px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* Position selector styling */
+.position-selector {
+  margin: 10px 0;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  border-left: 3px solid #ff9800;
+}
+
+.position-info {
+  margin-top: 8px;
+  padding: 8px;
+  background: rgba(255, 152, 0, 0.1);
+  border-radius: 4px;
+}
+
+.position-info p {
+  margin: 3px 0;
+  font-size: 11px;
+  color: #d2d2f9;
+}
+

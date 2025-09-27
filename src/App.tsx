@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useCallback, memo } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { InstrumentProvider } from './contexts/InstrumentContext'
 import Header from './components/common/Header'
@@ -11,8 +11,9 @@ import styles from './styles/App.module.css'
 /**
  * Main application component
  * Now simplified with context-based state management
+ * Optimized with React.memo and useCallback for performance
  */
-function App() {
+const App = memo(function App() {
   // Only theme management remains at app level
   const { isDarkMode, toggleTheme } = useTheme()
 
@@ -21,6 +22,11 @@ function App() {
     document.body.className = isDarkMode ? 'dark' : 'light'
   }, [isDarkMode])
 
+  // Memoize the toggle function to prevent unnecessary re-renders
+  const memoizedToggleTheme = useCallback(() => {
+    toggleTheme()
+  }, [toggleTheme])
+
   return (
     <ErrorBoundary>
       <AuthProvider>
@@ -28,7 +34,7 @@ function App() {
           <div className={`${styles.appContainer} ${isDarkMode ? styles.dark : styles.light}`}>
             <Header
               isDarkMode={isDarkMode}
-              onToggleTheme={toggleTheme}
+              onToggleTheme={memoizedToggleTheme}
             />
 
             <ErrorBoundary fallback={
@@ -46,6 +52,6 @@ function App() {
       </AuthProvider>
     </ErrorBoundary>
   )
-}
+})
 
 export default App

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { Note } from '../utils/notes'
 import { SERVICE_URLS, AUDIO_CONFIG } from '../constants'
+import { withRetry, AudioError, CircuitBreaker, errorRecoveryStrategies } from '../utils/errorHandler'
 
 /**
  * Configuration for an instrument's audio samples
@@ -112,6 +113,7 @@ export const useAudio = (): UseAudioReturn => {
   const [isInitialized, setIsInitialized] = useState<boolean>(false)
   const [shouldStop, setShouldStop] = useState<boolean>(false)
   const [currentTimeoutId, setCurrentTimeoutId] = useState<NodeJS.Timeout | null>(null)
+  const [circuitBreaker] = useState(() => new CircuitBreaker(3, 30000, 15000))
 
   /**
    * Initializes the audio system by loading Tone.js and creating samplers
@@ -120,50 +122,67 @@ export const useAudio = (): UseAudioReturn => {
   const initializeAudio = useCallback(async (): Promise<Record<InstrumentType, ToneSampler | null>> => {
     if (isInitialized) return samplers
 
-    try {
-      // Dynamically import Tone.js only when needed to reduce bundle size
-      const Tone = await import('tone')
-      
-      // Start audio context (required for Web Audio API)
-      await Tone.start()
-      
-      const newSamplers: Record<InstrumentType, ToneSampler | null> = {
-        keyboard: null,
-        guitar: null,
-        bass: null
-      }
-      
-      // Create samplers for each instrument and wait for them to load
-      const samplerPromises = (Object.entries(INSTRUMENTS) as Array<[InstrumentType, InstrumentConfig]>)
-        .map(([instrumentType, config]) => {
-          return new Promise<void>((resolve) => {
-            const sampler = new Tone.Sampler({
-              urls: config.urls,
-              release: config.release,
-              baseUrl: config.baseUrl,
-              onload: () => {
-                newSamplers[instrumentType] = (sampler as ToneSampler & { toDestination: () => ToneSampler }).toDestination()
-                resolve()
-              }
+    return withRetry(async () => {
+      return circuitBreaker.execute(async () => {
+        try {
+          // Dynamically import Tone.js only when needed to reduce bundle size
+          const Tone = await import('tone')
+
+          // Check and resume audio context if suspended
+          if (Tone.context.state === 'suspended') {
+            await errorRecoveryStrategies.audioContextSuspended()
+          }
+
+          // Start audio context (required for Web Audio API)
+          await Tone.start()
+
+          const newSamplers: Record<InstrumentType, ToneSampler | null> = {
+            keyboard: null,
+            guitar: null,
+            bass: null
+          }
+
+          // Create samplers for each instrument and wait for them to load
+          const samplerPromises = (Object.entries(INSTRUMENTS) as Array<[InstrumentType, InstrumentConfig]>)
+            .map(([instrumentType, config]) => {
+              return new Promise<void>((resolve, reject) => {
+                const timeoutId = setTimeout(() => {
+                  reject(new AudioError(`Sampler loading timeout for ${instrumentType}`))
+                }, 10000) // 10 second timeout
+
+                const sampler = new Tone.Sampler({
+                  urls: config.urls,
+                  release: config.release,
+                  baseUrl: config.baseUrl,
+                  onload: () => {
+                    clearTimeout(timeoutId)
+                    newSamplers[instrumentType] = (sampler as ToneSampler & { toDestination: () => ToneSampler }).toDestination()
+                    resolve()
+                  },
+                  onerror: (error) => {
+                    clearTimeout(timeoutId)
+                    reject(new AudioError(`Failed to load sampler for ${instrumentType}: ${error}`))
+                  }
+                })
+              })
             })
-          })
-        })
 
-      // Wait for all samplers to load before proceeding
-      await Promise.all(samplerPromises)
+          // Wait for all samplers to load before proceeding
+          await Promise.all(samplerPromises)
 
-      setSamplers(newSamplers)
-      setIsInitialized(true)
-      return newSamplers
-    } catch (error) {
-      // Handle expected AudioContext errors (before user interaction)
-      if (error instanceof Error && error.message.includes('AudioContext')) {
-        return { keyboard: null, guitar: null, bass: null }
-      }
-      console.warn('Audio initialization failed:', error)
-      return { keyboard: null, guitar: null, bass: null }
-    }
-  }, [isInitialized, samplers])
+          setSamplers(newSamplers)
+          setIsInitialized(true)
+          return newSamplers
+        } catch (error) {
+          // Handle expected AudioContext errors (before user interaction)
+          if (error instanceof Error && error.message.includes('AudioContext')) {
+            throw new AudioError('AudioContext not available - user interaction required')
+          }
+          throw new AudioError(`Audio initialization failed: ${error instanceof Error ? error.message : String(error)}`)
+        }
+      })
+    }, {}, 'audio')
+  }, [isInitialized, samplers, circuitBreaker])
 
   useEffect(() => {
     return () => {

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, memo } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import ThemeToggle from './ThemeToggle'
@@ -7,11 +7,11 @@ import UserMenu from '../auth/UserMenu'
 import '../../styles/Header.css'
 
 interface HeaderProps {
-  isDarkMode: boolean
-  onToggleTheme: () => void
+  readonly isDarkMode: boolean
+  readonly onToggleTheme: () => void
 }
 
-function Header({
+const Header = memo(function Header({
   isDarkMode,
   onToggleTheme
 }: HeaderProps) {
@@ -25,15 +25,19 @@ function Header({
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authForm, setAuthForm] = useState<'login' | 'signup'>('login')
 
-  const handleShowLogin = () => {
+  const handleShowLogin = useCallback(() => {
     setAuthForm('login')
     setShowAuthModal(true)
-  }
+  }, [])
 
-  const handleShowSignup = () => {
+  const handleShowSignup = useCallback(() => {
     setAuthForm('signup')
     setShowAuthModal(true)
-  }
+  }, [])
+
+  const handleCloseModal = useCallback(() => {
+    setShowAuthModal(false)
+  }, [])
 
   return (
     <header className="header">
@@ -96,11 +100,11 @@ function Header({
       
       <AuthModal
         isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
+        onClose={handleCloseModal}
         initialForm={authForm}
       />
     </header>
   )
-}
+})
 
 export default Header

@@ -1,12 +1,13 @@
+import { memo } from 'react'
 import NotesToggle from './NotesToggle'
 import '../../styles/ControlsPanel.css'
 
 interface ControlsPanelProps {
-  showNotes: boolean
-  onToggleNotes: () => void
+  readonly showNotes: boolean
+  readonly onToggleNotes: () => void
 }
 
-function ControlsPanel({ showNotes, onToggleNotes }: ControlsPanelProps) {
+const ControlsPanel = memo(function ControlsPanel({ showNotes, onToggleNotes }: ControlsPanelProps) {
   return (
     <div className="controls-panel">
       <div className="controls-content">
@@ -17,6 +18,6 @@ function ControlsPanel({ showNotes, onToggleNotes }: ControlsPanelProps) {
       </div>
     </div>
   )
-}
+})
 
 export default ControlsPanel
