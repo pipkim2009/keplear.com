@@ -1,0 +1,73 @@
+import React from 'react'
+import { useInstrument } from '../../contexts/InstrumentContext'
+
+/**
+ * Component for controlling melody parameters (BPM, number of notes, etc.)
+ * Extracted from InstrumentControls for better organization
+ */
+const ParameterControls: React.FC = () => {
+  const {
+    bpm,
+    setBpm,
+    numberOfNotes,
+    setNumberOfNotes,
+    flashingInputs,
+    activeInputs,
+    triggerInputFlash,
+    setInputActive
+  } = useInstrument()
+
+  const handleBpmChange = (newBpm: number) => {
+    setBpm(newBpm)
+    triggerInputFlash('bpm')
+  }
+
+  const handleNotesChange = (newNotes: number) => {
+    setNumberOfNotes(newNotes)
+    triggerInputFlash('notes')
+  }
+
+  return (
+    <div className="parameter-controls">
+      <h3>⚙️ Melody Settings</h3>
+
+      <div className="control-group">
+        <label htmlFor="bpm-control">🎵 BPM (Beats Per Minute)</label>
+        <div className="input-container">
+          <input
+            id="bpm-control"
+            type="range"
+            min="60"
+            max="200"
+            value={bpm}
+            onChange={(e) => handleBpmChange(Number(e.target.value))}
+            onFocus={() => setInputActive('bpm', true)}
+            onBlur={() => setInputActive('bpm', false)}
+            className={`slider ${flashingInputs.bpm || activeInputs.bpm ? 'flashing' : ''}`}
+          />
+          <span className="value-display">{bpm}</span>
+        </div>
+      </div>
+
+      <div className="control-group">
+        <label htmlFor="notes-control">🎼 Number of Notes</label>
+        <div className="input-container">
+          <input
+            id="notes-control"
+            type="range"
+            min="4"
+            max="16"
+            value={numberOfNotes}
+            onChange={(e) => handleNotesChange(Number(e.target.value))}
+            onFocus={() => setInputActive('notes', true)}
+            onBlur={() => setInputActive('notes', false)}
+            className={`slider ${flashingInputs.notes || activeInputs.notes ? 'flashing' : ''}`}
+          />
+          <span className="value-display">{numberOfNotes}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default ParameterControls

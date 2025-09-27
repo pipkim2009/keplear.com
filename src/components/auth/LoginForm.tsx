@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import './AuthForms.css'
+import styles from './AuthForms.module.css'
 
 interface LoginFormProps {
   onToggleForm: (formType: 'login' | 'signup') => void
@@ -40,17 +40,17 @@ const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
   }
 
   return (
-    <div className="auth-form">
+    <div className={styles.authForm}>
       <h2>Sign In</h2>
       
       {error && (
-        <div className="error-message">
+        <div className={styles.errorMessage}>
           {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit} autoComplete="on">
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="username">Username</label>
           <input
             id="username"
@@ -65,7 +65,7 @@ const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
           />
         </div>
 
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="password">Password</label>
           <input
             id="password"
@@ -82,7 +82,7 @@ const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
 
         <button 
           type="submit" 
-          className="auth-button primary create-account"
+          className={`${styles.authButton} primary create-account`}
           disabled={loading}
         >
           {loading ? 'Signing in...' : 'Sign In'}

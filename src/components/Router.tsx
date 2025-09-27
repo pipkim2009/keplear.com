@@ -1,112 +1,103 @@
 import Home from './pages/Home'
 import InstrumentDisplay from './keyboard/InstrumentDisplay'
-import type { Note } from '../utils/notes'
-import type { KeyboardSelectionMode } from './keyboard/InstrumentControls'
-
-interface RouterProps {
-  currentPage: string
-  onNavigateToSandbox: () => void
-  onNavigateToPractice: () => void
-
-  // Sandbox page props
-  onNoteClick: (note: Note) => Promise<void>
-  isSelected: (note: Note) => boolean
-  isInMelody: (note: Note, showNotes: boolean) => boolean
-  showNotes: boolean
-  bpm: number
-  setBpm: (bpm: number) => void
-  numberOfNotes: number
-  setNumberOfNotes: (notes: number) => void
-  instrument: string
-  setInstrument: (instrument: string) => void
-  setGuitarNotes: (notes: Note[]) => void
-  clearSelection: () => void
-  clearTrigger: number
-  selectedNotes: Note[]
-  selectNote: (note: Note, selectionMode?: 'range' | 'multi') => void
-  onOctaveRangeChange: (lower: number, higher: number) => void
-  keyboardSelectionMode: KeyboardSelectionMode
-  onKeyboardSelectionModeChange: (mode: KeyboardSelectionMode) => void
-  flashingInputs: {
-    bpm: boolean
-    notes: boolean
-    mode: boolean
-  }
-  triggerInputFlash: (inputType: 'bpm' | 'notes' | 'mode') => void
-  setInputActive: (inputType: 'bpm' | 'notes' | 'mode', active: boolean) => void
-  clearChordsAndScales: number
-  onGenerateMelody: () => void
-  onPlayMelody: () => void
-  onRecordMelody: () => Promise<Blob | null>
-  isPlaying: boolean
-  isRecording: boolean
-  hasGeneratedMelody: boolean
-  onToggleNotes: () => void
-  playbackProgress: number
-  melodyDuration: number
-  onProgressChange: (progress: number) => void
-  onClearRecordedAudio: () => void
-  recordedAudioBlob: Blob | null
-  generatedMelody: Note[]
-}
+import { useInstrument } from '../contexts/InstrumentContext'
 
 /**
  * Router component that handles page navigation and renders appropriate content
- * Extracted from App.tsx to reduce complexity and improve separation of concerns
+ * Now uses InstrumentContext to eliminate prop drilling
  */
-function Router({
-  currentPage,
-  onNavigateToSandbox,
-  onNavigateToPractice,
-  ...sandboxProps
-}: RouterProps) {
+function Router() {
+  const {
+    currentPage,
+    navigateToSandbox,
+    navigateToPractice,
+    handleNoteClick,
+    isSelected,
+    isInMelody,
+    showNotes,
+    bpm,
+    setBpm,
+    numberOfNotes,
+    setNumberOfNotes,
+    instrument,
+    handleInstrumentChange,
+    setGuitarNotes,
+    clearSelection,
+    clearTrigger,
+    selectedNotes,
+    selectNote,
+    handleOctaveRangeChange,
+    keyboardSelectionMode,
+    handleKeyboardSelectionModeChange,
+    flashingInputs,
+    activeInputs,
+    triggerInputFlash,
+    setInputActive,
+    clearChordsAndScalesTrigger,
+    handleGenerateMelody,
+    handlePlayMelody,
+    handleRecordMelody,
+    isPlaying,
+    isRecording,
+    generatedMelody,
+    toggleShowNotes,
+    playbackProgress,
+    melodyDuration,
+    setPlaybackProgress,
+    handleClearRecordedAudio,
+    recordedAudioBlob
+  } = useInstrument()
   switch (currentPage) {
     case 'home':
       return (
         <Home
-          onNavigateToSandbox={onNavigateToSandbox}
-          onNavigateToPractice={onNavigateToPractice}
+          onNavigateToSandbox={navigateToSandbox}
+          onNavigateToPractice={navigateToPractice}
         />
       )
 
     case 'sandbox':
       return (
         <InstrumentDisplay
-          onNoteClick={(note: Note) => sandboxProps.onNoteClick(note)}
-          isSelected={sandboxProps.isSelected}
-          isInMelody={sandboxProps.isInMelody}
-          showNotes={sandboxProps.showNotes}
-          bpm={sandboxProps.bpm}
-          setBpm={sandboxProps.setBpm}
-          numberOfNotes={sandboxProps.numberOfNotes}
-          setNumberOfNotes={sandboxProps.setNumberOfNotes}
-          instrument={sandboxProps.instrument}
-          setInstrument={sandboxProps.setInstrument}
-          setGuitarNotes={sandboxProps.setGuitarNotes}
-          clearSelection={sandboxProps.clearSelection}
-          clearTrigger={sandboxProps.clearTrigger}
-          selectedNotes={sandboxProps.selectedNotes}
-          selectNote={sandboxProps.selectNote}
-          onOctaveRangeChange={sandboxProps.onOctaveRangeChange}
-          keyboardSelectionMode={sandboxProps.keyboardSelectionMode}
-          onKeyboardSelectionModeChange={sandboxProps.onKeyboardSelectionModeChange}
-          flashingInputs={sandboxProps.flashingInputs}
-          triggerInputFlash={sandboxProps.triggerInputFlash}
-          setInputActive={sandboxProps.setInputActive}
-          clearChordsAndScales={sandboxProps.clearChordsAndScales}
-          onGenerateMelody={sandboxProps.onGenerateMelody}
-          onPlayMelody={sandboxProps.onPlayMelody}
-          onRecordMelody={sandboxProps.onRecordMelody}
-          isPlaying={sandboxProps.isPlaying}
-          isRecording={sandboxProps.isRecording}
-          hasGeneratedMelody={sandboxProps.hasGeneratedMelody}
-          onToggleNotes={sandboxProps.onToggleNotes}
-          playbackProgress={sandboxProps.playbackProgress}
-          melodyDuration={sandboxProps.melodyDuration}
-          onProgressChange={sandboxProps.onProgressChange}
-          onClearRecordedAudio={sandboxProps.onClearRecordedAudio}
-          recordedAudioBlob={sandboxProps.recordedAudioBlob}
-          generatedMelody={sandboxProps.generatedMelody}
+          onNoteClick={handleNoteClick}
+          isSelected={isSelected}
+          isInMelody={isInMelody}
+          showNotes={showNotes}
+          bpm={bpm}
+          setBpm={setBpm}
+          numberOfNotes={numberOfNotes}
+          setNumberOfNotes={setNumberOfNotes}
+          instrument={instrument}
+          setInstrument={handleInstrumentChange}
+          setGuitarNotes={setGuitarNotes}
+          clearSelection={clearSelection}
+          clearTrigger={clearTrigger}
+          selectedNotes={[...selectedNotes]}
+          selectNote={selectNote}
+          onOctaveRangeChange={handleOctaveRangeChange}
+          keyboardSelectionMode={keyboardSelectionMode}
+          onKeyboardSelectionModeChange={handleKeyboardSelectionModeChange}
+          flashingInputs={{
+            bpm: flashingInputs.bpm || activeInputs.bpm,
+            notes: flashingInputs.notes || activeInputs.notes,
+            mode: flashingInputs.mode || activeInputs.mode
+          }}
+          triggerInputFlash={triggerInputFlash}
+          setInputActive={setInputActive}
+          clearChordsAndScales={clearChordsAndScalesTrigger}
+          onGenerateMelody={handleGenerateMelody}
+          onPlayMelody={handlePlayMelody}
+          onRecordMelody={handleRecordMelody}
+          isPlaying={isPlaying}
+          isRecording={isRecording}
+          hasGeneratedMelody={generatedMelody.length > 0}
+          onToggleNotes={toggleShowNotes}
+          playbackProgress={playbackProgress}
+          melodyDuration={melodyDuration}
+          onProgressChange={setPlaybackProgress}
+          onClearRecordedAudio={handleClearRecordedAudio}
+          recordedAudioBlob={recordedAudioBlob}
+          generatedMelody={[...generatedMelody]}
         />
       )
 
@@ -116,7 +107,7 @@ function Router({
           <div className="coming-soon">
             <h2>Practice Mode</h2>
             <p>Coming soon! This will include structured exercises and progress tracking.</p>
-            <button className="button" onClick={onNavigateToSandbox}>
+            <button className="button" onClick={navigateToSandbox}>
               Try Sandbox Mode
             </button>
           </div>
@@ -126,8 +117,8 @@ function Router({
     default:
       return (
         <Home
-          onNavigateToSandbox={onNavigateToSandbox}
-          onNavigateToPractice={onNavigateToPractice}
+          onNavigateToSandbox={navigateToSandbox}
+          onNavigateToPractice={navigateToPractice}
         />
       )
   }

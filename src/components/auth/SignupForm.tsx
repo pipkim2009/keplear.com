@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import './AuthForms.css'
+import styles from './AuthForms.module.css'
 
 interface SignupFormProps {
   onToggleForm: (formType: 'login' | 'signup') => void
@@ -80,11 +80,11 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
   }
 
   return (
-    <div className="auth-form">
+    <div className={styles.authForm}>
       <h2>Sign Up</h2>
       
       {error && (
-        <div className="error-message">
+        <div className={styles.errorMessage}>
           {error}
         </div>
       )}
@@ -96,7 +96,7 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
       )}
 
       <form onSubmit={handleSubmit} autoComplete="on">
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="username">Username</label>
           <input
             id="username"
@@ -111,7 +111,7 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
           />
         </div>
 
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="password">Password</label>
           <input
             id="password"
@@ -127,7 +127,7 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
           />
         </div>
 
-        <div className="form-group">
+        <div className={styles.formGroup}>
           <label htmlFor="confirmPassword">Confirm Password</label>
           <input
             id="confirmPassword"
@@ -145,7 +145,7 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
 
         <button 
           type="submit" 
-          className="auth-button primary create-account"
+          className={`${styles.authButton} primary create-account`}
           disabled={loading}
         >
           {loading ? 'Creating account...' : 'Create Account'}

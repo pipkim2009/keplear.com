@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
+import { useInstrument } from '../../contexts/InstrumentContext'
 import ThemeToggle from './ThemeToggle'
 import AuthModal from '../auth/AuthModal'
 import UserMenu from '../auth/UserMenu'
@@ -8,20 +9,18 @@ import '../../styles/Header.css'
 interface HeaderProps {
   isDarkMode: boolean
   onToggleTheme: () => void
-  currentPage: string
-  onNavigateToHome: () => void
-  onNavigateToSandbox: () => void
-  onNavigateToPractice: () => void
 }
 
-function Header({ 
-  isDarkMode, 
-  onToggleTheme, 
-  currentPage, 
-  onNavigateToHome, 
-  onNavigateToSandbox, 
-  onNavigateToPractice 
+function Header({
+  isDarkMode,
+  onToggleTheme
 }: HeaderProps) {
+  const {
+    currentPage,
+    navigateToHome,
+    navigateToSandbox,
+    navigateToPractice
+  } = useInstrument()
   const { user, loading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authForm, setAuthForm] = useState<'login' | 'signup'>('login')
@@ -49,19 +48,19 @@ function Header({
         <nav className="header-nav">
           <button 
             className={`nav-link ${currentPage === 'home' ? 'nav-link-active' : ''}`}
-            onClick={onNavigateToHome}
+            onClick={navigateToHome}
           >
             Home
           </button>
           <button 
             className={`nav-link ${currentPage === 'sandbox' ? 'nav-link-active' : ''}`}
-            onClick={onNavigateToSandbox}
+            onClick={navigateToSandbox}
           >
             Sandbox
           </button>
           <button 
             className={`nav-link ${currentPage === 'practice' ? 'nav-link-active' : ''}`}
-            onClick={onNavigateToPractice}
+            onClick={navigateToPractice}
           >
             Practice
           </button>

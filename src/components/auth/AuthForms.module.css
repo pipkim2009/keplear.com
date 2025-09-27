@@ -1,5 +1,5 @@
 /* Auth Modal Styles */
-.auth-modal-overlay {
+.authModalOverlay {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
@@ -20,7 +20,7 @@
   overflow-y: auto;
 }
 
-.dark .auth-modal-overlay {
+.dark .authModalOverlay {
   background: linear-gradient(135deg, 
     rgba(18, 18, 18, 0.9) 0%, 
     rgba(30, 30, 30, 0.8) 30%, 
@@ -28,7 +28,7 @@
     rgba(18, 18, 18, 0.9) 100%);
 }
 
-.auth-modal {
+.authModal {
   background: linear-gradient(145deg, 
     rgba(255, 255, 255, 0.95) 0%, 
     rgba(240, 240, 255, 0.98) 100%);
@@ -48,7 +48,7 @@
   margin: auto;
 }
 
-.dark .auth-modal {
+.dark .authModal {
   background: linear-gradient(145deg, 
     rgba(40, 40, 40, 0.95) 0%, 
     rgba(30, 30, 30, 0.98) 100%);
@@ -90,7 +90,7 @@
 }
 
 /* Auth Form Styles */
-.auth-form {
+.authForm {
   padding: 40px;
   padding-top: 60px;
 }
@@ -120,7 +120,7 @@
   color: #a5b4fc;
 }
 
-.form-group {
+.formGroup {
   margin-bottom: 20px;
 }
 
@@ -189,7 +189,7 @@
   background: rgba(50, 50, 50, 0.5);
 }
 
-.auth-button {
+.authButton {
   width: 100%;
   padding: 16px 24px;
   border: none;
@@ -299,7 +299,7 @@
 }
 
 /* Message Styles */
-.error-message {
+.errorMessage {
   background: #fee2e2;
   color: #dc2626;
   padding: 12px 16px;
@@ -309,7 +309,7 @@
   border: 1px solid #fecaca;
 }
 
-.dark .error-message {
+.dark .errorMessage {
   background: rgba(239, 68, 68, 0.1);
   color: #fca5a5;
   border-color: rgba(239, 68, 68, 0.3);
@@ -354,20 +354,20 @@
 
 /* Responsive */
 @media (max-width: 480px) {
-  .auth-modal-overlay {
+  .authModalOverlay {
     padding: 10px;
     align-items: flex-start;
     padding-top: 60px;
   }
   
-  .auth-modal {
+  .authModal {
     width: 100%;
     max-width: 100%;
     margin: 0;
     max-height: calc(100vh - 80px);
   }
   
-  .auth-form {
+  .authForm {
     padding: 24px 20px;
     padding-top: 40px;
   }
@@ -378,12 +378,12 @@
 }
 
 @media (max-height: 600px) {
-  .auth-modal-overlay {
+  .authModalOverlay {
     align-items: flex-start;
     padding-top: 20px;
   }
   
-  .auth-modal {
+  .authModal {
     max-height: calc(100vh - 40px);
   }
 }

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
-import './AuthForms.css'
+import styles from './AuthForms.module.css'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -46,8 +46,8 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login' }: AuthModalProps) =
   }
 
   const modalContent = (
-    <div className="auth-modal-overlay" onClick={handleBackdropClick}>
-      <div className="auth-modal">
+    <div className={styles.authModalOverlay} onClick={handleBackdropClick}>
+      <div className={styles.authModal}>
         <button 
           className="close-button" 
           onClick={handleClose}
