@@ -1,0 +1,247 @@
+/**
+ * DesignTokens.css
+ * Comprehensive Design Token System for Keplear Music Application
+ *
+ * This file consolidates all design tokens into a unified system that provides:
+ * - Consistent color palettes and semantic color system
+ * - Standardized spacing, sizing, and layout constraints
+ * - Typography scale with proper font stacks and text effects
+ * - Visual effects including shadows, transitions, and animations
+ * - Component-specific token collections for better maintainability
+ *
+ * Benefits of this token system:
+ * ✅ Centralized design decisions
+ * ✅ Consistent visual language across components
+ * ✅ Easy theme switching and customization
+ * ✅ Reduced CSS duplication and maintenance overhead
+ * ✅ Scalable design system for future development
+ * ✅ Better collaboration between design and development
+ */
+
+/*
+  ===========================================
+  DESIGN TOKEN IMPORTS
+  ===========================================
+  Import order is important - colors first, then spacing,
+  typography, and effects that may reference other tokens
+*/
+
+@import './tokens/colors.css';
+@import './tokens/spacing.css';
+@import './tokens/typography.css';
+@import './tokens/effects.css';
+
+/*
+  ===========================================
+  SEMANTIC TOKEN MAPPINGS
+  ===========================================
+  Map generic tokens to semantic usage patterns
+  for better component integration
+*/
+
+:root {
+  /*
+    ===========================================
+    THEME SEMANTIC MAPPINGS
+    ===========================================
+  */
+
+  /* Text Colors */
+  --text-primary: var(--dark-text-primary);
+  --text-secondary: var(--dark-text-secondary);
+  --text-muted: var(--gray-400);
+  --text-disabled: var(--gray-500);
+
+  /* Background Colors */
+  --bg-primary: var(--dark-bg-primary);
+  --bg-secondary: var(--dark-bg-secondary);
+  --bg-tertiary: var(--dark-bg-tertiary);
+  --bg-elevated: var(--dark-bg-quaternary);
+
+  /* Border Colors */
+  --border-primary: var(--dark-border);
+  --border-secondary: var(--gray-600);
+  --border-muted: var(--gray-700);
+
+  /* Interactive Colors */
+  --interactive-primary: var(--blue-500);
+  --interactive-primary-hover: var(--blue-600);
+  --interactive-primary-active: var(--blue-700);
+
+  --interactive-secondary: var(--purple-500);
+  --interactive-secondary-hover: var(--purple-600);
+  --interactive-secondary-active: var(--purple-700);
+
+  /* Status Colors */
+  --status-success: var(--green-500);
+  --status-warning: var(--yellow-400);
+  --status-error: var(--red-500);
+  --status-info: var(--blue-500);
+
+  /*
+    ===========================================
+    COMPONENT SEMANTIC MAPPINGS
+    ===========================================
+  */
+
+  /* Button System */
+  --button-primary-bg: var(--interactive-primary);
+  --button-primary-hover: var(--interactive-primary-hover);
+  --button-primary-active: var(--interactive-primary-active);
+  --button-primary-text: var(--white);
+
+  --button-secondary-bg: var(--interactive-secondary);
+  --button-secondary-hover: var(--interactive-secondary-hover);
+  --button-secondary-active: var(--interactive-secondary-active);
+  --button-secondary-text: var(--white);
+
+  --button-danger-bg: var(--status-error);
+  --button-danger-hover: var(--red-600);
+  --button-danger-active: var(--red-700);
+  --button-danger-text: var(--white);
+
+  /* Input System */
+  --input-bg: var(--primary-purple-alpha-15);
+  --input-border: var(--purple-600);
+  --input-border-hover: var(--purple-500);
+  --input-border-focus: var(--purple-400);
+  --input-text: var(--text-primary);
+  --input-placeholder: var(--text-muted);
+
+  /* Surface System */
+  --surface-elevated: var(--bg-elevated);
+  --surface-secondary: var(--bg-secondary);
+  --surface-primary: var(--bg-primary);
+
+  /*
+    ===========================================
+    INSTRUMENT SEMANTIC MAPPINGS
+    ===========================================
+  */
+
+  /* Keyboard Colors */
+  --keyboard-bg: var(--dark-bg-tertiary);
+  --keyboard-border: var(--dark-border);
+
+  --key-white-bg: var(--keyboard-white-key);
+  --key-white-bg-secondary: var(--keyboard-white-key-secondary);
+  --key-white-border: var(--keyboard-white-key-border);
+  --key-white-text: var(--gray-700);
+
+  --key-black-bg: var(--keyboard-black-key);
+  --key-black-bg-secondary: var(--keyboard-black-key-secondary);
+  --key-black-border: var(--keyboard-black-key-border);
+  --key-black-text: var(--white);
+
+  /* Key States */
+  --key-selected-bg: var(--blue-200);
+  --key-selected-border: var(--blue-500);
+  --key-melody-bg: var(--green-200);
+  --key-melody-border: var(--green-border);
+
+  /* Scale/Chord Highlighting */
+  --scale-note-bg: var(--orange-scale);
+  --scale-note-bg-alt: var(--orange-scale-dark);
+  --scale-root-bg: var(--red-600);
+  --scale-root-border: var(--red-800);
+
+  --chord-note-bg: var(--purple-chord);
+  --chord-note-bg-alt: var(--purple-chord-dark);
+  --chord-root-bg: var(--red-600);
+  --chord-root-border: var(--red-800);
+
+  /*
+    ===========================================
+    ANIMATION SEMANTIC MAPPINGS
+    ===========================================
+  */
+
+  /* Common Durations */
+  --duration-instant: var(--duration-75);
+  --duration-fast: var(--duration-150);
+  --duration-normal: var(--duration-200);
+  --duration-slow: var(--duration-300);
+
+  /* Common Easings */
+  --ease-ui: var(--ease-out);
+  --ease-motion: var(--ease-in-out);
+  --ease-bounce: var(--ease-back);
+
+  /*
+    ===========================================
+    RESPONSIVE BREAKPOINT TOKENS
+    ===========================================
+  */
+
+  --mobile-max: 480px;
+  --tablet-min: 481px;
+  --tablet-max: 768px;
+  --desktop-min: 769px;
+  --desktop-max: 1024px;
+  --large-min: 1025px;
+}
+
+/*
+  ===========================================
+  LIGHT THEME OVERRIDES
+  ===========================================
+  When light mode is active, override semantic tokens
+*/
+
+.light {
+  /* Text Colors */
+  --text-primary: var(--light-text-primary);
+  --text-secondary: var(--light-text-secondary);
+
+  /* Background Colors */
+  --bg-primary: var(--light-bg-primary);
+  --bg-secondary: var(--light-bg-secondary);
+  --bg-tertiary: var(--light-bg-tertiary);
+
+  /* Border Colors */
+  --border-primary: var(--light-border);
+  --border-secondary: var(--gray-300);
+  --border-muted: var(--gray-200);
+
+  /* Keyboard in Light Mode */
+  --keyboard-bg: var(--light-bg-secondary);
+  --keyboard-border: var(--light-border);
+}
+
+/**
+ * ===========================================
+ * DESIGN TOKEN SYSTEM SUMMARY
+ * ===========================================
+ *
+ * Total Design Tokens: ~400+ tokens organized into:
+ *
+ * 1. Colors.css - 120+ color tokens including:
+ *    - Complete color scales (blue, green, red, orange, purple, gray)
+ *    - Alpha transparency variants
+ *    - Instrument-specific colors
+ *    - Theme-aware color mappings
+ *
+ * 2. Spacing.css - 80+ spacing tokens including:
+ *    - Scalable spacing scale (rem + px)
+ *    - Component dimensions
+ *    - Layout constraints
+ *    - Z-index scale
+ *
+ * 3. Typography.css - 70+ typography tokens including:
+ *    - Font scales and weights
+ *    - Component-specific typography
+ *    - Text effects and transforms
+ *
+ * 4. Effects.css - 130+ effect tokens including:
+ *    - Comprehensive shadow system
+ *    - Transition and animation presets
+ *    - Transform utilities
+ *    - Filter effects
+ *
+ * This system provides:
+ * ✅ Complete design consistency
+ * ✅ Theme switching capability
+ * ✅ Component-specific token collections
+ * ✅ Semantic token mapping
+ * ✅ Scalable architecture for future features
+ */

@@ -1,0 +1,337 @@
+/**
+ * CSSModules.css
+ * CSS Modules System for Dynamic Component Styling
+ *
+ * This file provides a comprehensive CSS modules system that enables:
+ * - Dynamic theme switching and component theming
+ * - Instrument-specific styling with state management
+ * - Reusable control component patterns
+ * - Type-safe CSS class composition
+ * - Runtime style switching capabilities
+ *
+ * Benefits of CSS Modules:
+ * ✅ Scoped CSS classes prevent naming conflicts
+ * ✅ Dynamic styling capabilities for interactive components
+ * ✅ Type-safe integration with TypeScript/JavaScript
+ * ✅ Better tree-shaking and performance optimization
+ * ✅ Maintainable component-specific styling
+ * ✅ Runtime theme and state switching
+ */
+
+/*
+  ===========================================
+  CSS MODULE IMPORTS
+  ===========================================
+  Each module provides focused utility classes
+  for specific component types and use cases
+*/
+
+@import './modules/ThemeModule.css';
+@import './modules/InstrumentModule.css';
+@import './modules/ControlModule.css';
+
+/*
+  ===========================================
+  UTILITY CLASS COMPOSITIONS
+  ===========================================
+  Global utility classes that compose module classes
+  for common patterns and cross-component usage
+*/
+
+.elevated {
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-secondary);
+  background: var(--bg-elevated);
+}
+
+.interactive {
+  cursor: pointer;
+  transition: var(--transition-fast);
+  user-select: var(--user-select-none);
+}
+
+.interactive:hover {
+  transform: var(--translate-y-1);
+  box-shadow: var(--shadow-md);
+}
+
+.interactive:active {
+  transform: var(--translate-y-0);
+  box-shadow: var(--shadow-sm);
+}
+
+.disabled {
+  opacity: var(--opacity-50);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.hidden {
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+.flex {
+  display: flex;
+}
+
+.flexCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexRow {
+  display: flex;
+  flex-direction: row;
+}
+
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.spaceBetween {
+  display: flex;
+  justify-content: space-between;
+}
+
+.spaceAround {
+  display: flex;
+  justify-content: space-around;
+}
+
+.alignCenter {
+  align-items: center;
+}
+
+.justifyCenter {
+  justify-content: center;
+}
+
+.textCenter {
+  text-align: var(--text-center);
+}
+
+.textLeft {
+  text-align: var(--text-left);
+}
+
+.textRight {
+  text-align: var(--text-right);
+}
+
+.fullWidth {
+  width: var(--width-full);
+}
+
+.fullHeight {
+  height: 100%;
+}
+
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.fixed {
+  position: fixed;
+}
+
+.sticky {
+  position: sticky;
+}
+
+/*
+  ===========================================
+  RESPONSIVE UTILITY CLASSES
+  ===========================================
+  Mobile-first responsive utilities
+*/
+
+.mobile\:hidden {
+  @media (max-width: 480px) {
+    display: none;
+  }
+}
+
+.mobile\:visible {
+  @media (max-width: 480px) {
+    display: block;
+  }
+}
+
+.tablet\:hidden {
+  @media (min-width: 481px) and (max-width: 768px) {
+    display: none;
+  }
+}
+
+.tablet\:visible {
+  @media (min-width: 481px) and (max-width: 768px) {
+    display: block;
+  }
+}
+
+.desktop\:hidden {
+  @media (min-width: 769px) {
+    display: none;
+  }
+}
+
+.desktop\:visible {
+  @media (min-width: 769px) {
+    display: block;
+  }
+}
+
+/*
+  ===========================================
+  SPACING UTILITY CLASSES
+  ===========================================
+  Consistent spacing utilities
+*/
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: var(--space-1); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+
+.ml-0 { margin-left: 0; }
+.ml-1 { margin-left: var(--space-1); }
+.ml-2 { margin-left: var(--space-2); }
+.ml-3 { margin-left: var(--space-3); }
+.ml-4 { margin-left: var(--space-4); }
+
+.mr-0 { margin-right: 0; }
+.mr-1 { margin-right: var(--space-1); }
+.mr-2 { margin-right: var(--space-2); }
+.mr-3 { margin-right: var(--space-3); }
+.mr-4 { margin-right: var(--space-4); }
+
+.pt-0 { padding-top: 0; }
+.pt-1 { padding-top: var(--space-1); }
+.pt-2 { padding-top: var(--space-2); }
+.pt-3 { padding-top: var(--space-3); }
+.pt-4 { padding-top: var(--space-4); }
+
+.pb-0 { padding-bottom: 0; }
+.pb-1 { padding-bottom: var(--space-1); }
+.pb-2 { padding-bottom: var(--space-2); }
+.pb-3 { padding-bottom: var(--space-3); }
+.pb-4 { padding-bottom: var(--space-4); }
+
+.pl-0 { padding-left: 0; }
+.pl-1 { padding-left: var(--space-1); }
+.pl-2 { padding-left: var(--space-2); }
+.pl-3 { padding-left: var(--space-3); }
+.pl-4 { padding-left: var(--space-4); }
+
+.pr-0 { padding-right: 0; }
+.pr-1 { padding-right: var(--space-1); }
+.pr-2 { padding-right: var(--space-2); }
+.pr-3 { padding-right: var(--space-3); }
+.pr-4 { padding-right: var(--space-4); }
+
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+
+/*
+  ===========================================
+  COLOR UTILITY CLASSES
+  ===========================================
+  Direct access to design token colors
+*/
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-blue { color: var(--blue-500); }
+.text-green { color: var(--green-500); }
+.text-red { color: var(--red-500); }
+.text-purple { color: var(--purple-500); }
+
+.bg-primary { background: var(--bg-primary); }
+.bg-secondary { background: var(--bg-secondary); }
+.bg-tertiary { background: var(--bg-tertiary); }
+.bg-blue { background: var(--blue-500); }
+.bg-green { background: var(--green-500); }
+.bg-red { background: var(--red-500); }
+.bg-purple { background: var(--purple-500); }
+
+.border-primary { border-color: var(--border-primary); }
+.border-secondary { border-color: var(--border-secondary); }
+.border-blue { border-color: var(--blue-500); }
+.border-green { border-color: var(--green-500); }
+.border-red { border-color: var(--red-500); }
+.border-purple { border-color: var(--purple-500); }
+
+/**
+ * ===========================================
+ * CSS MODULES SYSTEM SUMMARY
+ * ===========================================
+ *
+ * The CSS Modules system provides:
+ *
+ * 1. ThemeModule.css - 100+ theme-aware utility classes
+ *    - Light/dark theme variants for all components
+ *    - Semantic color mappings
+ *    - Theme transition animations
+ *
+ * 2. InstrumentModule.css - 80+ instrument-specific classes
+ *    - Dynamic instrument container variants
+ *    - Key state management classes
+ *    - Scale/chord highlighting utilities
+ *    - Instrument selection components
+ *
+ * 3. ControlModule.css - 120+ control component classes
+ *    - Button variants (size, style, state)
+ *    - Input and form control utilities
+ *    - Progress bars and sliders
+ *    - Animation and interaction states
+ *
+ * 4. CSSModules.css - 60+ global utility classes
+ *    - Layout and positioning utilities
+ *    - Responsive display utilities
+ *    - Spacing and color utilities
+ *    - Cross-component compositions
+ *
+ * Total: 360+ modular CSS classes for dynamic styling
+ *
+ * Usage in Components:
+ * ```tsx
+ * import styles from './CSSModules.css'
+ *
+ * const MyComponent = ({ theme, instrument, size }) => (
+ *   <div className={clsx(
+ *     styles.instrumentContainer,
+ *     styles[`${instrument}Container`],
+ *     styles[`${theme}Theme`],
+ *     styles.interactive
+ *   )}>
+ *     <button className={clsx(
+ *       styles.button,
+ *       styles[`button${size}`],
+ *       styles.buttonPrimary
+ *     )}>
+ *       Click me
+ *     </button>
+ *   </div>
+ * )
+ * ```
+ */

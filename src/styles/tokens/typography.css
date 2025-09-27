@@ -1,0 +1,173 @@
+/**
+ * typography.css
+ * Typography design tokens for consistent text styling
+ * Includes font sizes, weights, line heights, and text effects
+ */
+
+:root {
+  /*
+    ===========================================
+    FONT FAMILY STACK
+    ===========================================
+  */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+
+  /*
+    ===========================================
+    FONT SIZE SCALE
+    ===========================================
+  */
+  --text-xs: 0.75rem;    /* 12px */
+  --text-sm: 0.875rem;   /* 14px */
+  --text-base: 1rem;     /* 16px */
+  --text-lg: 1.125rem;   /* 18px */
+  --text-xl: 1.25rem;    /* 20px */
+  --text-2xl: 1.5rem;    /* 24px */
+  --text-3xl: 1.875rem;  /* 30px */
+  --text-4xl: 2.25rem;   /* 36px */
+
+  /* Legacy pixel-based sizes for precision */
+  --text-tiny: 9px;
+  --text-mini: 10px;
+  --text-small: 11px;
+  --text-normal: 12px;
+  --text-medium: 14px;
+  --text-large: 16px;
+
+  /*
+    ===========================================
+    FONT WEIGHT SCALE
+    ===========================================
+  */
+  --font-thin: 100;
+  --font-light: 300;
+  --font-normal: 400;
+  --font-medium: 500;
+  --font-semibold: 600;
+  --font-bold: 700;
+  --font-extrabold: 800;
+  --font-black: 900;
+
+  /*
+    ===========================================
+    LINE HEIGHT SCALE
+    ===========================================
+  */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+
+  /*
+    ===========================================
+    LETTER SPACING SCALE
+    ===========================================
+  */
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.025em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-widest: 0.1em;
+
+  /* Legacy pixel values */
+  --letter-spacing-sm: 0.5px;
+  --letter-spacing-md: 1px;
+
+  /*
+    ===========================================
+    TEXT TRANSFORM
+    ===========================================
+  */
+  --text-transform-none: none;
+  --text-transform-uppercase: uppercase;
+  --text-transform-lowercase: lowercase;
+  --text-transform-capitalize: capitalize;
+
+  /*
+    ===========================================
+    COMPONENT-SPECIFIC TYPOGRAPHY
+    ===========================================
+  */
+
+  /* Button Typography */
+  --button-font-size: var(--text-normal);
+  --button-font-weight: var(--font-semibold);
+  --button-letter-spacing: var(--letter-spacing-sm);
+  --button-text-transform: var(--text-transform-none);
+
+  /* Control Typography */
+  --control-font-size: var(--text-normal);
+  --control-font-weight: var(--font-semibold);
+  --control-letter-spacing: var(--letter-spacing-sm);
+
+  /* Label Typography */
+  --label-font-size: var(--text-normal);
+  --label-font-weight: var(--font-semibold);
+  --label-letter-spacing: var(--letter-spacing-sm);
+  --label-text-transform: var(--text-transform-uppercase);
+
+  /* Key Label Typography */
+  --key-label-font-size: var(--text-normal);
+  --key-label-font-weight: var(--font-semibold);
+  --key-label-black-font-size: var(--text-mini);
+
+  /* Header Typography */
+  --header-font-size: var(--text-large);
+  --header-font-weight: var(--font-bold);
+  --header-letter-spacing: var(--letter-spacing-md);
+  --header-text-transform: var(--text-transform-uppercase);
+
+  /* Octave Button Typography */
+  --octave-font-size: 24px;
+  --octave-font-size-mobile: 20px;
+  --octave-font-weight: var(--font-bold);
+
+  /*
+    ===========================================
+    TEXT EFFECTS
+    ===========================================
+  */
+
+  /* Text Shadows */
+  --text-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --text-shadow-md: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --text-shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+  /* Glow Effects */
+  --text-glow-purple: 0 0 10px rgba(128, 0, 255, 0.5);
+  --text-glow-blue: 0 0 8px rgba(59, 130, 246, 0.5);
+  --text-glow-green: 0 0 8px rgba(34, 197, 94, 0.5);
+  --text-glow-red: 0 0 8px rgba(239, 68, 68, 0.5);
+
+  /* User Selection */
+  --user-select-none: none;
+  --user-select-auto: auto;
+  --user-select-text: text;
+  --user-select-all: all;
+
+  /*
+    ===========================================
+    TEXT ALIGNMENT
+    ===========================================
+  */
+  --text-left: left;
+  --text-center: center;
+  --text-right: right;
+  --text-justify: justify;
+
+  /*
+    ===========================================
+    TEXT OVERFLOW
+    ===========================================
+  */
+  --text-ellipsis: ellipsis;
+  --text-clip: clip;
+  --white-space-nowrap: nowrap;
+  --white-space-normal: normal;
+  --white-space-pre: pre;
+  --white-space-pre-wrap: pre-wrap;
+}

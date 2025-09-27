@@ -1,0 +1,178 @@
+/**
+ * spacing.css
+ * Comprehensive spacing and layout design tokens
+ * Standardizes all spacing, sizing, and layout values
+ */
+
+:root {
+  /*
+    ===========================================
+    SPACING SCALE (rem-based for scalability)
+    ===========================================
+  */
+  --space-0: 0;
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-5: 1.25rem;   /* 20px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-10: 2.5rem;   /* 40px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+  --space-24: 6rem;     /* 96px */
+
+  /*
+    ===========================================
+    LEGACY PIXEL-BASED SPACING (for precision)
+    ===========================================
+  */
+  --space-xs: 5px;
+  --space-sm: 10px;
+  --space-md: 15px;
+  --space-lg: 20px;
+  --space-xl: 25px;
+  --space-2xl: 30px;
+
+  /*
+    ===========================================
+    COMPONENT GAP SPACING
+    ===========================================
+  */
+  --gap-xs: 5px;
+  --gap-sm: 6px;
+  --gap-md: 8px;
+  --gap-lg: 10px;
+  --gap-xl: 12px;
+  --gap-2xl: 15px;
+  --gap-3xl: 20px;
+  --gap-4xl: 24px;
+
+  /*
+    ===========================================
+    PADDING SYSTEM
+    ===========================================
+  */
+  --padding-xs: 5px;
+  --padding-sm: 6px 10px;
+  --padding-md: 6px 12px;
+  --padding-lg: 10px 20px;
+  --padding-xl: 15px 20px;
+  --padding-button: 6px 12px;
+  --padding-control: 6px 10px;
+
+  /*
+    ===========================================
+    MARGIN SYSTEM
+    ===========================================
+  */
+  --margin-auto: 0 auto;
+  --margin-xs: 5px;
+  --margin-sm: 10px;
+  --margin-md: 15px;
+  --margin-lg: 20px;
+  --margin-xl: 25px;
+
+  /*
+    ===========================================
+    BORDER RADIUS SCALE
+    ===========================================
+  */
+  --radius-none: 0;
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-full: 50%;
+  --radius-round: 9999px;
+
+  /*
+    ===========================================
+    SIZING SYSTEM
+    ===========================================
+  */
+
+  /* Width Scale */
+  --width-auto: auto;
+  --width-full: 100%;
+  --width-screen: 100vw;
+  --width-min: min-content;
+  --width-max: max-content;
+  --width-fit: fit-content;
+
+  /* Component-specific widths */
+  --width-button-sm: 100px;
+  --width-button-md: 120px;
+  --width-button-lg: 140px;
+  --width-control-sm: 40px;
+  --width-control-md: 48px;
+  --width-control-lg: 60px;
+
+  /* Keyboard dimensions */
+  --width-white-key: 60px;
+  --width-black-key: 36px;
+  --height-white-key: 280px;
+  --height-black-key: 180px;
+
+  /* Control dimensions */
+  --height-control: 32px;
+  --height-control-lg: 40px;
+  --height-octave-button: 40px;
+  --height-octave-button-mobile: 35px;
+
+  /* Container dimensions */
+  --min-width-container: 320px;
+  --max-width-container: 1000px;
+  --max-width-screen: 95vw;
+  --min-height-instrument: 350px;
+  --min-height-keyboard: 300px;
+  --min-height-guitar: 240px;
+  --min-height-bass: 200px;
+
+  /*
+    ===========================================
+    Z-INDEX SCALE
+    ===========================================
+  */
+  --z-base: 1;
+  --z-frets: 10;
+  --z-strings: 15;
+  --z-checkboxes: 20;
+  --z-notes: 30;
+  --z-controls: 50;
+  --z-instrument-controls: 100;
+  --z-mobile-controls: 900;
+  --z-header: 1000;
+  --z-modal: 9999;
+
+  /*
+    ===========================================
+    BREAKPOINTS (for reference in media queries)
+    ===========================================
+  */
+  --breakpoint-xs: 360px;
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+
+  /*
+    ===========================================
+    LAYOUT CONSTRAINTS
+    ===========================================
+  */
+  --container-padding-mobile: 10px;
+  --container-padding-tablet: 20px;
+  --container-padding-desktop: 20px;
+
+  --content-max-width: 1200px;
+  --content-max-width-narrow: 800px;
+
+  --header-height: 80px;
+  --footer-height: 120px;
+}

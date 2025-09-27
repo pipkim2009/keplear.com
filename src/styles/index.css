@@ -9,7 +9,8 @@
 */
 
 /* Core Foundation */
-@import './variables.css';
+@import './DesignTokens.css';
+@import './CSSModules.css';
 @import './common-components.css';
 @import './responsive-utilities.css';
 @import './enhanced-effects.css';
@@ -23,7 +24,7 @@
 /* Interactive Components */
 @import './Guitar.css';
 @import './Bass.css';
-@import './Keyboard.css';
+@import './KeyboardModular.css';
 @import './Controls.css';
 @import './ControlsPanel.css';
 

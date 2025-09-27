@@ -1,0 +1,267 @@
+/**
+ * ThemeModule.css
+ * CSS Module for dynamic theme switching and component theming
+ * Provides utility classes for theme-aware components
+ */
+
+/*
+  ===========================================
+  THEME SWITCHING UTILITIES
+  ===========================================
+*/
+
+.themeContainer {
+  transition: var(--transition-slow);
+}
+
+.lightTheme {
+  composes: themeContainer;
+  background: var(--light-bg-primary);
+  color: var(--light-text-primary);
+}
+
+.darkTheme {
+  composes: themeContainer;
+  background: var(--dark-bg-primary);
+  color: var(--dark-text-primary);
+}
+
+/*
+  ===========================================
+  COMPONENT THEME VARIANTS
+  ===========================================
+*/
+
+/* Button Theme Variants */
+.buttonLight {
+  background: var(--light-bg-secondary);
+  color: var(--light-text-primary);
+  border: 2px solid var(--gray-300);
+}
+
+.buttonLight:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-400);
+}
+
+.buttonDark {
+  background: var(--dark-bg-secondary);
+  color: var(--dark-text-primary);
+  border: 2px solid var(--gray-600);
+}
+
+.buttonDark:hover {
+  background: var(--gray-700);
+  border-color: var(--gray-500);
+}
+
+/* Input Theme Variants */
+.inputLight {
+  background: var(--light-bg-primary);
+  color: var(--light-text-primary);
+  border: 2px solid var(--gray-300);
+}
+
+.inputLight:focus {
+  border-color: var(--blue-500);
+  box-shadow: 0 0 0 3px var(--blue-alpha-20);
+}
+
+.inputDark {
+  background: var(--primary-purple-alpha-15);
+  color: var(--dark-text-primary);
+  border: 2px solid var(--purple-600);
+}
+
+.inputDark:focus {
+  border-color: var(--purple-500);
+  box-shadow: 0 0 8px var(--purple-glow);
+}
+
+/*
+  ===========================================
+  SURFACE THEME VARIANTS
+  ===========================================
+*/
+
+.surfaceLight {
+  background: var(--light-bg-secondary);
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+}
+
+.surfaceDark {
+  background: var(--dark-bg-secondary);
+  border: 1px solid var(--gray-700);
+  box-shadow: var(--shadow-lg);
+}
+
+.surfaceElevatedLight {
+  background: var(--light-bg-primary);
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-md);
+}
+
+.surfaceElevatedDark {
+  background: var(--dark-bg-tertiary);
+  border: 1px solid var(--gray-600);
+  box-shadow: var(--shadow-xl);
+}
+
+/*
+  ===========================================
+  TEXT THEME VARIANTS
+  ===========================================
+*/
+
+.textPrimaryLight {
+  color: var(--light-text-primary);
+}
+
+.textPrimaryDark {
+  color: var(--dark-text-primary);
+}
+
+.textSecondaryLight {
+  color: var(--light-text-secondary);
+}
+
+.textSecondaryDark {
+  color: var(--dark-text-secondary);
+}
+
+.textMutedLight {
+  color: var(--gray-600);
+}
+
+.textMutedDark {
+  color: var(--gray-400);
+}
+
+/*
+  ===========================================
+  INTERACTIVE THEME VARIANTS
+  ===========================================
+*/
+
+.interactiveLight {
+  color: var(--blue-600);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.interactiveLight:hover {
+  color: var(--blue-700);
+  text-decoration: underline;
+}
+
+.interactiveDark {
+  color: var(--blue-400);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.interactiveDark:hover {
+  color: var(--blue-300);
+  text-decoration: underline;
+}
+
+/*
+  ===========================================
+  BORDER THEME VARIANTS
+  ===========================================
+*/
+
+.borderLight {
+  border-color: var(--gray-300);
+}
+
+.borderDark {
+  border-color: var(--gray-600);
+}
+
+.borderAccentLight {
+  border-color: var(--blue-500);
+}
+
+.borderAccentDark {
+  border-color: var(--blue-400);
+}
+
+/*
+  ===========================================
+  STATUS THEME VARIANTS
+  ===========================================
+*/
+
+.successLight {
+  background: var(--green-50);
+  color: var(--green-800);
+  border: 1px solid var(--green-200);
+}
+
+.successDark {
+  background: var(--green-alpha-10);
+  color: var(--green-300);
+  border: 1px solid var(--green-700);
+}
+
+.warningLight {
+  background: var(--yellow-50);
+  color: var(--yellow-800);
+  border: 1px solid var(--yellow-200);
+}
+
+.warningDark {
+  background: rgba(251, 191, 36, 0.1);
+  color: var(--yellow-300);
+  border: 1px solid var(--yellow-700);
+}
+
+.errorLight {
+  background: var(--red-50);
+  color: var(--red-800);
+  border: 1px solid var(--red-200);
+}
+
+.errorDark {
+  background: var(--red-alpha-10);
+  color: var(--red-300);
+  border: 1px solid var(--red-700);
+}
+
+/*
+  ===========================================
+  ANIMATION THEME VARIANTS
+  ===========================================
+*/
+
+.fadeInLight {
+  animation: fadeInLight 0.3s ease-out;
+}
+
+@keyframes fadeInLight {
+  from {
+    opacity: 0;
+    background: var(--gray-50);
+  }
+  to {
+    opacity: 1;
+    background: var(--light-bg-primary);
+  }
+}
+
+.fadeInDark {
+  animation: fadeInDark 0.3s ease-out;
+}
+
+@keyframes fadeInDark {
+  from {
+    opacity: 0;
+    background: var(--gray-900);
+  }
+  to {
+    opacity: 1;
+    background: var(--dark-bg-primary);
+  }
+}

@@ -1,0 +1,249 @@
+/**
+ * ControlButtons.css
+ * Generic control buttons, inputs, and form controls styling
+ * Extracted from Controls.css for better organization
+ */
+
+/* Control Labels */
+.control-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #d2d2f9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+/* Control Inputs */
+.control-input {
+  background: rgba(128, 0, 255, 0.15);
+  border: 2px solid #6b46c1;
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  outline: none;
+  text-align: center;
+  min-width: 50px;
+  height: 32px;
+}
+
+.control-input:hover {
+  background: rgba(128, 0, 255, 0.25);
+  border-color: #7c3aed;
+}
+
+.control-input:focus {
+  background: rgba(128, 0, 255, 0.3);
+  border-color: #8b5cf6;
+  box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+}
+
+/* Dropdown Styling */
+.control-input select {
+  background: inherit;
+  border: none;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  cursor: inherit;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  text-align-last: center;
+}
+
+/* Custom dropdown options styling */
+.control-input option {
+  background: #1f2937 !important;
+  color: #ffffff !important;
+  padding: 5px 10px;
+  font-weight: 600;
+}
+
+.control-input option:hover,
+.control-input option:focus {
+  background: #374151 !important;
+  color: #ffffff !important;
+}
+
+.control-input option:checked,
+.control-input option:selected {
+  background: #3b82f6 !important;
+  color: #000000 !important;
+  font-weight: 600;
+}
+
+/* Input with plus/minus buttons layout */
+.input-with-buttons {
+  position: relative;
+  display: inline-block;
+}
+
+.control-input.with-internal-buttons {
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.control-button-internal {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  color: #d2d2f9;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  outline: none;
+  z-index: 10;
+}
+
+.control-button-internal:hover {
+  background: rgba(128, 0, 255, 0.1);
+}
+
+.control-button-internal:active {
+  background: rgba(128, 0, 255, 0.2);
+  transform: translateY(-50%) scale(0.95);
+}
+
+.control-button-internal.minus {
+  left: 3px;
+}
+
+.control-button-internal.plus {
+  right: 3px;
+}
+
+.input-with-buttons .control-button-internal {
+  color: #ffffff !important;
+}
+
+.input-with-buttons .control-button-internal:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.input-with-buttons .control-button-internal:active {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.input-with-buttons .control-button-internal.minus,
+.input-with-buttons .control-button-internal.plus {
+  color: #ffffff !important;
+}
+
+.input-with-buttons .control-button-internal.minus:hover,
+.input-with-buttons .control-button-internal.plus:hover {
+  color: #ffffff !important;
+}
+
+.input-with-buttons .control-button-internal.minus:active,
+.input-with-buttons .control-button-internal.plus:active {
+  color: #ffffff !important;
+}
+
+/* Delete selection button */
+.control-button.delete-selection {
+  background: rgba(220, 53, 69, 0.1);
+  border: 2px solid #dc3545;
+  color: #f5c2c7;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  outline: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  min-width: 120px;
+  margin-top: 0;
+  border-color: #dc3545; /* Original red border color */
+}
+
+.control-button.delete-selection:hover {
+  background: rgba(220, 53, 69, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.control-button.delete-selection:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Instrument-specific delete button positioning */
+/* Keyboard mode: 19px margin on tablets/desktop */
+body:has([data-instrument="keyboard"]) .control-button.delete-selection {
+  margin-top: 19px !important;
+}
+
+/* Guitar mode: 0px margin on tablets/desktop */
+body:has([data-instrument="guitar"]) .control-button.delete-selection {
+  margin-top: 0 !important;
+}
+
+/* Bass mode: 0px margin on tablets/desktop */
+body:has([data-instrument="bass"]) .control-button.delete-selection {
+  margin-top: 0 !important;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 480px) {
+  .control-button-internal {
+    width: 20px;
+    height: 24px;
+    font-size: 14px;
+  }
+
+  .control-button.delete-selection {
+    min-width: 100px;
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+
+  /* Mobile override: keyboard mode gets 0px margin on phones only */
+  body:has([data-instrument="keyboard"]) .control-button.delete-selection {
+    margin-top: 0 !important;
+  }
+}
+
+@media (max-width: 480px) and (min-width: 361px) {
+  .control-button.delete-selection {
+    margin: 0 auto !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .control-button.delete-selection {
+    min-width: 120px;
+    width: 120px;
+    font-size: 12px;
+    padding: 6px 12px;
+    margin: 0 auto;
+  }
+}
