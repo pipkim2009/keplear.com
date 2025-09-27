@@ -726,6 +726,8 @@
   color: #d2d2f9;
   border-radius: 3px;
   font-size: 12px;
+  z-index: 10;
+  pointer-events: auto;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -1533,6 +1535,24 @@
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.4) !important;
 }
 
+/* Green border for select dropdowns when flashing */
+select.control-input.flashing {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Green border for modern input containers */
+.modern-control-item .input-with-buttons .control-input.flashing {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Green border for the entire input container when flashing */
+.modern-control-item .input-with-buttons:has(.control-input.flashing) {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4) !important;
+}
+
 /* Notes toggle row styling */
 .control-group.notes-toggle-row {
   width: 100%;
@@ -2224,7 +2244,7 @@
   background: rgba(0, 123, 255, 0.1) !important;
   border: 2px solid #007bff !important;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible;
   transition: all 0.2s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -2265,6 +2285,8 @@
   justify-content: center;
   font-size: 18px;
   font-weight: bold;
+  z-index: 10;
+  pointer-events: auto;
   color: #007bff;
 }
 

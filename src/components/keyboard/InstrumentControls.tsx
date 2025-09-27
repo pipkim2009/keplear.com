@@ -120,14 +120,18 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const notesIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const isHoldingBpm = useRef<boolean>(false)
   const isHoldingNotes = useRef<boolean>(false)
+  const currentBpmRef = useRef<number>(bpm)
+  const currentNotesRef = useRef<number>(numberOfNotes)
   
   // Update display values when props change
   useEffect(() => {
     setBpmDisplay(bpm.toString())
+    currentBpmRef.current = bpm
   }, [bpm])
-  
+
   useEffect(() => {
     setNotesDisplay(numberOfNotes.toString())
+    currentNotesRef.current = numberOfNotes
   }, [numberOfNotes])
   
   const handleBpmChange = (value: string) => {
@@ -207,77 +211,81 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const startBpmIncrement = () => {
     isHoldingBpm.current = true
     setInputActive('bpm', true) // Set to green immediately
+    triggerInputFlash('bpm') // Flash the input border green
 
-    const increment = () => {
-      setBpm(prevBpm => {
-        // Ensure prevBpm is a valid number
-        const safePrevBpm = isNaN(prevBpm) ? 120 : prevBpm
-        const newBpm = Math.min(safePrevBpm + 1, 200)
-        setBpmDisplay(newBpm.toString())
-        return newBpm
-      })
-    }
+    // First increment immediately
+    const newBpm = Math.min(currentBpmRef.current + 1, 999)
+    currentBpmRef.current = newBpm
+    setBpm(newBpm)
+    setBpmDisplay(newBpm.toString())
 
-    increment() // First increment immediately
     if (bpmIntervalRef.current) clearInterval(bpmIntervalRef.current)
-    bpmIntervalRef.current = setInterval(increment, 200)
+    bpmIntervalRef.current = setInterval(() => {
+      const newBpm = Math.min(currentBpmRef.current + 1, 999)
+      currentBpmRef.current = newBpm
+      setBpm(newBpm)
+      setBpmDisplay(newBpm.toString())
+    }, 200)
   }
 
   const startBpmDecrement = () => {
     isHoldingBpm.current = true
     setInputActive('bpm', true) // Set to green immediately
+    triggerInputFlash('bpm') // Flash the input border green
 
-    const decrement = () => {
-      setBpm(prevBpm => {
-        // Ensure prevBpm is a valid number
-        const safePrevBpm = isNaN(prevBpm) ? 120 : prevBpm
-        const newBpm = Math.max(safePrevBpm - 1, 60)
-        setBpmDisplay(newBpm.toString())
-        return newBpm
-      })
-    }
+    // First decrement immediately
+    const newBpm = Math.max(currentBpmRef.current - 1, 1)
+    currentBpmRef.current = newBpm
+    setBpm(newBpm)
+    setBpmDisplay(newBpm.toString())
 
-    decrement() // First decrement immediately
     if (bpmIntervalRef.current) clearInterval(bpmIntervalRef.current)
-    bpmIntervalRef.current = setInterval(decrement, 200)
+    bpmIntervalRef.current = setInterval(() => {
+      const newBpm = Math.max(currentBpmRef.current - 1, 1)
+      currentBpmRef.current = newBpm
+      setBpm(newBpm)
+      setBpmDisplay(newBpm.toString())
+    }, 200)
   }
 
   const startNotesIncrement = () => {
     isHoldingNotes.current = true
     setInputActive('notes', true) // Set to green immediately
+    triggerInputFlash('notes') // Flash the input border green
 
-    const increment = () => {
-      setNumberOfNotes(prevNotes => {
-        // Ensure prevNotes is a valid number
-        const safePrevNotes = isNaN(prevNotes) ? 5 : prevNotes
-        const newNotes = Math.min(safePrevNotes + 1, 16)
-        setNotesDisplay(newNotes.toString())
-        return newNotes
-      })
-    }
+    // First increment immediately
+    const newNotes = Math.min(currentNotesRef.current + 1, 100)
+    currentNotesRef.current = newNotes
+    setNumberOfNotes(newNotes)
+    setNotesDisplay(newNotes.toString())
 
-    increment() // First increment immediately
     if (notesIntervalRef.current) clearInterval(notesIntervalRef.current)
-    notesIntervalRef.current = setInterval(increment, 200)
+    notesIntervalRef.current = setInterval(() => {
+      const newNotes = Math.min(currentNotesRef.current + 1, 100)
+      currentNotesRef.current = newNotes
+      setNumberOfNotes(newNotes)
+      setNotesDisplay(newNotes.toString())
+    }, 200)
   }
 
   const startNotesDecrement = () => {
     isHoldingNotes.current = true
     setInputActive('notes', true) // Set to green immediately
+    triggerInputFlash('notes') // Flash the input border green
 
-    const decrement = () => {
-      setNumberOfNotes(prevNotes => {
-        // Ensure prevNotes is a valid number
-        const safePrevNotes = isNaN(prevNotes) ? 5 : prevNotes
-        const newNotes = Math.max(safePrevNotes - 1, 4)
-        setNotesDisplay(newNotes.toString())
-        return newNotes
-      })
-    }
+    // First decrement immediately
+    const newNotes = Math.max(currentNotesRef.current - 1, 1)
+    currentNotesRef.current = newNotes
+    setNumberOfNotes(newNotes)
+    setNotesDisplay(newNotes.toString())
 
-    decrement() // First decrement immediately
     if (notesIntervalRef.current) clearInterval(notesIntervalRef.current)
-    notesIntervalRef.current = setInterval(decrement, 200)
+    notesIntervalRef.current = setInterval(() => {
+      const newNotes = Math.max(currentNotesRef.current - 1, 1)
+      currentNotesRef.current = newNotes
+      setNumberOfNotes(newNotes)
+      setNotesDisplay(newNotes.toString())
+    }, 200)
   }
 
   const stopBpmInterval = () => {
@@ -755,40 +763,26 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               />
               <button
                 className="control-button-internal minus"
-                onClick={(e) => {
-                  console.log('BPM - button clicked')
+                onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  // Single click decrement
-                  setBpm(prevBpm => {
-                    console.log('BPM - decrementing from:', prevBpm)
-                    const safePrevBpm = isNaN(prevBpm) ? 120 : prevBpm
-                    const newBpm = Math.max(safePrevBpm - 1, 60)
-                    console.log('BPM - new value:', newBpm)
-                    setBpmDisplay(newBpm.toString())
-                    return newBpm
-                  })
+                  startBpmDecrement();
                 }}
+                onMouseUp={stopBpmInterval}
+                onMouseLeave={stopBpmInterval}
                 style={{ userSelect: 'none', touchAction: 'none' }}
               >
                 −
               </button>
               <button
                 className="control-button-internal plus"
-                onClick={(e) => {
-                  console.log('BPM + button clicked')
+                onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  // Single click increment
-                  setBpm(prevBpm => {
-                    console.log('BPM + incrementing from:', prevBpm)
-                    const safePrevBpm = isNaN(prevBpm) ? 120 : prevBpm
-                    const newBpm = Math.min(safePrevBpm + 1, 200)
-                    console.log('BPM + new value:', newBpm)
-                    setBpmDisplay(newBpm.toString())
-                    return newBpm
-                  })
+                  startBpmIncrement();
                 }}
+                onMouseUp={stopBpmInterval}
+                onMouseLeave={stopBpmInterval}
                 style={{ userSelect: 'none', touchAction: 'none' }}
               >
                 +
@@ -809,40 +803,26 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               />
               <button
                 className="control-button-internal minus"
-                onClick={(e) => {
-                  console.log('Notes - button clicked')
+                onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  // Single click decrement
-                  setNumberOfNotes(prevNotes => {
-                    console.log('Notes - decrementing from:', prevNotes)
-                    const safePrevNotes = isNaN(prevNotes) ? 5 : prevNotes
-                    const newNotes = Math.max(safePrevNotes - 1, 4)
-                    console.log('Notes - new value:', newNotes)
-                    setNotesDisplay(newNotes.toString())
-                    return newNotes
-                  })
+                  startNotesDecrement();
                 }}
+                onMouseUp={stopNotesInterval}
+                onMouseLeave={stopNotesInterval}
                 style={{ userSelect: 'none', touchAction: 'none' }}
               >
                 −
               </button>
               <button
                 className="control-button-internal plus"
-                onClick={(e) => {
-                  console.log('Notes + button clicked')
+                onMouseDown={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  // Single click increment
-                  setNumberOfNotes(prevNotes => {
-                    console.log('Notes + incrementing from:', prevNotes)
-                    const safePrevNotes = isNaN(prevNotes) ? 5 : prevNotes
-                    const newNotes = Math.min(safePrevNotes + 1, 16)
-                    console.log('Notes + new value:', newNotes)
-                    setNotesDisplay(newNotes.toString())
-                    return newNotes
-                  })
+                  startNotesIncrement();
                 }}
+                onMouseUp={stopNotesInterval}
+                onMouseLeave={stopNotesInterval}
                 style={{ userSelect: 'none', touchAction: 'none' }}
               >
                 +

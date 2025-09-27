@@ -217,7 +217,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
   const handleKeyboardSelectionModeChange = useCallback((mode: 'range' | 'multi'): void => {
     setKeyboardSelectionMode(mode as any)
     clearSelection()
-  }, [setKeyboardSelectionMode, clearSelection])
+    triggerInputFlash('mode')
+  }, [setKeyboardSelectionMode, clearSelection, triggerInputFlash])
 
   const value: InstrumentContextType = {
     // Audio functions
