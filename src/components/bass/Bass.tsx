@@ -91,7 +91,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   }
 
   // Get note name for a specific string and fret
-  const getNoteForStringAndFret = (stringIndex: number, fretIndex: number): string => {
+  const getNoteForStringAndFret = useCallback((stringIndex: number, fretIndex: number): string => {
     // Map visual string index to technical string number (G D A E -> 1 2 3 4)
     const stringMapping = [1, 2, 3, 4] // High G to Low E in bassNotes
     const bassString = stringMapping[stringIndex] // Direct mapping since bass is simpler
@@ -99,7 +99,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
     const note = bassNotes.find(note => note.string === bassString && note.fret === fret)
     return note ? note.name : ''
-  }
+  }, [])
 
   // Handle clicking on open strings (fret 0)
   const handleOpenStringClick = async (stringIndex: number) => {
@@ -285,7 +285,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   }
 
   // Check if a specific note is selected
-  const isNoteSelected = (stringIndex: number, fretIndex: number): boolean => {
+  const isNoteSelected = useCallback((stringIndex: number, fretIndex: number): boolean => {
     const noteKey = `${stringIndex}-${fretIndex}`
     const negativeKey = `-${noteKey}`
 
@@ -310,10 +310,10 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     }
 
     return false
-  }
+  }, [selectedNotes, stringCheckboxes, fretCheckboxes])
 
   // Check if an open string is selected
-  const isOpenStringSelected = (stringIndex: number): boolean => {
+  const isOpenStringSelected = useCallback((stringIndex: number): boolean => {
     const openKey = `${stringIndex}-open`
     const negativeKey = `-${openKey}`
 
@@ -322,7 +322,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       stringCheckboxes[stringIndex] ||
       fretCheckboxes[0]
     )
-  }
+  }, [selectedNotes, stringCheckboxes, fretCheckboxes])
 
   // Convert bass notes to the Note format expected by the melody system
   const convertToMelodyNotes = useCallback((): Note[] => {
@@ -378,7 +378,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   useEffect(() => {
     const melodyNotes = convertToMelodyNotes()
     setBassNotes(melodyNotes)
-  }, [selectedNotes, stringCheckboxes, fretCheckboxes, setBassNotes, convertToMelodyNotes])
+  }, [stringCheckboxes, fretCheckboxes, setBassNotes])
 
   // Note: Removed useEffect that was causing infinite loop
   // The Bass component manages its own state internally
