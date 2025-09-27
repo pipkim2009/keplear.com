@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useTheme } from '../../hooks/useTheme'
-import './UserMenu.css'
+import styles from './UserMenu.module.css'
 
 interface UserProfile {
   username: string
@@ -167,14 +167,14 @@ const UserMenu = () => {
         </div>
       )}
       
-      <div className="user-menu" ref={menuRef}>
+      <div className={styles.userMenu} ref={menuRef}>
         <button 
-          className="user-menu-trigger"
+          className={styles.userMenuTrigger}
           onClick={() => setIsOpen(!isOpen)}
           aria-expanded={isOpen}
           aria-haspopup="true"
         >
-        <div className="user-avatar">
+        <div className={styles.userAvatar}>
           {userProfile.avatarUrl ? (
             <img 
               src={userProfile.avatarUrl} 
@@ -188,13 +188,13 @@ const UserMenu = () => {
             />
           ) : null}
           <div 
-            className="avatar-initials"
+            className={styles.avatarInitials}
             style={{ display: userProfile.avatarUrl ? 'none' : 'flex' }}
           >
             {getInitials(userProfile.username)}
           </div>
         </div>
-        <span className="user-name">
+        <span className={styles.userName}>
           {userProfile.username}
         </span>
         <svg 

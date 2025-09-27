@@ -11,7 +11,7 @@ import { useInstrumentConfig } from './hooks/useInstrumentConfig'
 import { useMelodyPlayer } from './hooks/useMelodyPlayer'
 import { notes, generateNotesWithSeparateOctaves } from './utils/notes'
 import type { Note } from './utils/notes'
-import './styles/App.css'
+import styles from './styles/App.module.css'
 
 /**
  * Main application component
@@ -183,7 +183,7 @@ function App() {
 
   return (
     <AuthProvider>
-      <div className={`app-container ${isDarkMode ? 'dark' : 'light'}`}>
+      <div className={`${styles.appContainer} ${isDarkMode ? styles.dark : styles.light}`}>
 
         <Header 
           isDarkMode={isDarkMode} 
