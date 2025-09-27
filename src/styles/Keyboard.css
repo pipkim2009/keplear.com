@@ -70,7 +70,7 @@
     width: 700px;
     max-width: 90vw;
     margin: 1rem auto 0 auto;
-    padding: 20px 20px;
+    padding: 0 20px;
   }
 
   /* Removed guitar-mode and bass-mode container styling - use default keyboard layout */
@@ -155,7 +155,7 @@
   justify-content: center;
   align-items: center;
   background: linear-gradient(145deg, #2d3748, #1a202c);
-  padding: 20px 30px;
+  padding: 0 30px;
   margin-top: 0;
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
@@ -183,7 +183,7 @@
     width: 700px;
     max-width: 90vw;
     margin: 1rem auto 0 auto;
-    padding: 20px 20px;
+    padding: 0 20px;
   }
 
   /* Removed guitar-mode and bass-mode container styling - use default keyboard layout */
@@ -194,7 +194,7 @@
     width: 100% !important;
     max-width: 100vw !important;
     margin: 1rem 0 0 0 !important;
-    padding: 20px 0 !important;
+    padding: 0 !important;
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -204,7 +204,7 @@
   .instrument-controls-container.bass-mode {
     width: 100% !important;
     max-width: 100vw !important;
-    padding: 20px 0 !important;
+    padding: 0 !important;
   }
 }
 
