@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import '../../styles/Guitar.css'
 import { guitarNotes } from '../../utils/guitarNotes'
 import { applyScaleToGuitar, applyScaleBoxToGuitar, GUITAR_SCALES, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
@@ -367,16 +367,27 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   // Auto-apply checkboxes when all individual notes are selected
   // DISABLED: This was causing infinite render loops and flickering with the scale system
 
-  // TEMPORARILY DISABLED: Sync guitar selections with parent component for deselect all button visibility
-  // This was causing infinite re-render loops
-  // useEffect(() => {
-  //   const melodyNotes = convertToMelodyNotes()
-  //   setGuitarNotes(melodyNotes)
-  // }, [selectedNotes, stringCheckboxes, fretCheckboxes, convertToMelodyNotes])
+  // Sync guitar selections with parent component for deselect all button visibility
+  // Only sync when selectedNotes, stringCheckboxes, or fretCheckboxes change
+  // Use a ref to prevent infinite loops by tracking the last synced state
+  const lastSyncedState = useRef<string>('')
 
-  // Note: Removed useEffect that was causing infinite loop
-  // The Guitar component manages its own state internally
-  // setGuitarNotes is called when selections change to keep parent in sync
+  useEffect(() => {
+    const melodyNotes = convertToMelodyNotes()
+
+    // Create a state signature to prevent unnecessary updates
+    const currentStateSignature = JSON.stringify({
+      selectedNotes: Array.from(selectedNotes).sort(),
+      stringCheckboxes,
+      fretCheckboxes
+    })
+
+    // Only update parent if the state actually changed
+    if (currentStateSignature !== lastSyncedState.current) {
+      lastSyncedState.current = currentStateSignature
+      setGuitarNotes(melodyNotes)
+    }
+  }, [selectedNotes, stringCheckboxes, fretCheckboxes, convertToMelodyNotes, setGuitarNotes])
 
   // Handle scale selection - COPY THE CHORD PATTERN EXACTLY
   const handleScaleSelect = useCallback((rootNote: string, scale: GuitarScale) => {
@@ -666,6 +677,27 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       noteKeys.forEach(key => newSet.delete(key))
       return newSet
     })
+    // Also remove from scale highlighting state to prevent visual artifacts
+    setScaleSelectedNotes(prev => {
+      const newSet = new Set(prev)
+      noteKeys.forEach(key => newSet.delete(key))
+      return newSet
+    })
+  }, [])
+
+  // Handle removing chord notes only (preserves scale notes for individual chord deletion)
+  const handleRemoveChordNotesOnly = useCallback((noteKeys: string[]) => {
+    setSelectedNotes(prev => {
+      const newSet = new Set(prev)
+      noteKeys.forEach(key => newSet.delete(key))
+      return newSet
+    })
+    setChordSelectedNotes(prev => {
+      const newSet = new Set(prev)
+      noteKeys.forEach(key => newSet.delete(key))
+      return newSet
+    })
+    // Do NOT remove from scaleSelectedNotes to preserve scale highlighting
   }, [])
 
   // Check if a note was selected as part of the current scale application
@@ -758,7 +790,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         handleChordSelect,
         handleChordShapeSelect,
         handleClearChord,
-        handleRemoveChordNotes
+        handleRemoveChordNotes,
+        handleRemoveChordNotesOnly
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

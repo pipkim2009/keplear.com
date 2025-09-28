@@ -378,7 +378,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   useEffect(() => {
     const melodyNotes = convertToMelodyNotes()
     setBassNotes(melodyNotes)
-  }, [stringCheckboxes, fretCheckboxes, setBassNotes])
+  }, [selectedNotes, stringCheckboxes, fretCheckboxes, convertToMelodyNotes, setBassNotes])
 
   // Note: Removed useEffect that was causing infinite loop
   // The Bass component manages its own state internally
@@ -602,6 +602,27 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       noteKeys.forEach(key => newSet.delete(key))
       return newSet
     })
+    // Also remove from scale highlighting state to prevent visual artifacts
+    setScaleSelectedNotes(prev => {
+      const newSet = new Set(prev)
+      noteKeys.forEach(key => newSet.delete(key))
+      return newSet
+    })
+  }, [])
+
+  // Handle removing chord notes only (preserves scale notes for individual chord deletion)
+  const handleRemoveChordNotesOnly = useCallback((noteKeys: string[]) => {
+    setSelectedNotes(prev => {
+      const newSet = new Set(prev)
+      noteKeys.forEach(key => newSet.delete(key))
+      return newSet
+    })
+    setChordSelectedNotes(prev => {
+      const newSet = new Set(prev)
+      noteKeys.forEach(key => newSet.delete(key))
+      return newSet
+    })
+    // Do NOT remove from scaleSelectedNotes to preserve scale highlighting
   }, [])
 
   // Check if a note was selected as part of the current scale application
@@ -694,7 +715,8 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         handleChordSelect,
         handleChordShapeSelect,
         handleClearChord,
-        handleRemoveChordNotes
+        handleRemoveChordNotes,
+        handleRemoveChordNotesOnly
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
