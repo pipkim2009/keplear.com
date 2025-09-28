@@ -244,7 +244,6 @@ export const useScaleChordManagement = ({
     }
 
     if (instrument === 'guitar' && scaleHandlers) {
-      console.log('🎸 Applying scale to guitar')
       // Get the scale selections first to store as notes
       const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes)
 
@@ -262,10 +261,8 @@ export const useScaleChordManagement = ({
         displayName: `${rootNote} ${scale.name}`,
         notes: scaleNotes // Store the actual notes for removal
       }
-      console.log('🎸 Adding to applied scales with notes:', newAppliedScale)
       setAppliedScales(prev => {
         const newList = [...prev, newAppliedScale]
-        console.log('🎸 New applied scales length:', newList.length)
         return newList
       })
     } else if (instrument === 'bass' && bassScaleHandlers) {
@@ -579,12 +576,10 @@ export const useScaleChordManagement = ({
     if (instrument === 'guitar' && scaleHandlers) {
       // For guitar, use overlap-aware removal
       const noteKeysToRemove = getNotesToRemove(scaleToDelete, 'scale')
-      console.log('🎸 Removing guitar scale notes (overlap-aware):', noteKeysToRemove)
 
       if (noteKeysToRemove.length > 0 && chordHandlers?.handleRemoveChordNotes) {
         chordHandlers.handleRemoveChordNotes(noteKeysToRemove)
       } else if (noteKeysToRemove.length === 0) {
-        console.log('🎸 No notes to remove - all scale notes are shared with other scales/chords')
       } else {
         // Fallback: call the specific scale delete function
         scaleHandlers.handleScaleDelete(scaleToDelete.root, scaleToDelete.scale as any)
@@ -691,7 +686,6 @@ export const useScaleChordManagement = ({
     if (instrument === 'guitar' && chordHandlers) {
       // For guitar, use overlap-aware removal
       const noteKeysToRemove = getNotesToRemove(chordToDelete, 'chord')
-      console.log('🎸 Removing guitar chord notes (overlap-aware):', noteKeysToRemove)
 
       if (noteKeysToRemove.length > 0) {
         // Use the chord-only removal handler to preserve scale highlighting
@@ -702,7 +696,6 @@ export const useScaleChordManagement = ({
           chordHandlers.handleRemoveChordNotes(noteKeysToRemove)
         }
       } else {
-        console.log('🎸 No notes to remove - all chord notes are shared with other scales/chords')
       }
     } else if (instrument === 'bass' && bassChordHandlers) {
       // For bass, use overlap-aware removal

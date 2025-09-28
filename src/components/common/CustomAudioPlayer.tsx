@@ -149,9 +149,23 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
     localStorage.setItem('audioPlayerVolume', newVolume.toString())
   }
 
-  const formatTime = (time: number) => {
+  const formatTime = (time: number, isCurrentTime: boolean = false, totalDuration: number = 0) => {
     const minutes = Math.floor(time / 60)
-    const seconds = Math.floor(time % 60)
+    let seconds: number
+
+    if (isCurrentTime && totalDuration > 0 && time >= totalDuration - 0.1) {
+      // If current time is very close to end, show the rounded total duration
+      const totalMinutes = Math.floor(totalDuration / 60)
+      const totalSeconds = Math.round(totalDuration % 60)
+      return `${totalMinutes}:${totalSeconds.toString().padStart(2, '0')}`
+    } else if (isCurrentTime) {
+      // For current time, use floor (normal progression)
+      seconds = Math.floor(time % 60)
+    } else {
+      // For total duration, use round (closest second)
+      seconds = Math.round(time % 60)
+    }
+
     return `${minutes}:${seconds.toString().padStart(2, '0')}`
   }
 
@@ -185,7 +199,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
         </button>
 
         <div className="time-display">
-          <span>{formatTime(currentTime)}</span>
+          <span>{formatTime(currentTime, true, duration)}</span>
         </div>
 
         <div
@@ -209,13 +223,13 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
                 left: `${Math.max(0, Math.min(100, (hoverTime / duration) * 100))}%`
               }}
             >
-              {formatTime(hoverTime)}
+              {formatTime(hoverTime, true, duration)}
             </div>
           )}
         </div>
 
         <div className="time-display">
-          <span>{formatTime(duration)}</span>
+          <span>{formatTime(duration, false)}</span>
         </div>
 
         <div className="volume-control">

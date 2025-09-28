@@ -39,7 +39,7 @@ interface UseMelodyPlayerReturn {
   clearAllAudio: () => void
 
   // Computed values
-  calculateMelodyDuration: (melodyLength: number, bpm: number) => number
+  calculateMelodyDuration: (melodyLength: number, bpm: number, instrument: InstrumentType) => number
 }
 
 /**
@@ -58,15 +58,19 @@ export const useMelodyPlayer = ({
   const [state, dispatch] = useReducer(melodyReducer, initialMelodyState)
 
   // Calculate melody duration in milliseconds
-  const calculateMelodyDuration = useCallback((melodyLength: number, bpm: number) => {
+  const calculateMelodyDuration = useCallback((melodyLength: number, bpm: number, instrument: InstrumentType) => {
     if (melodyLength === 0) return 0
     // Match the exact timing from useAudio.ts:
-    // - Each note has a delay of (60 / bpm) * 800 milliseconds
-    // - There are (numberOfNotes - 1) delays between notes
-    // - Plus one final delay after the last note
-    // Total: numberOfNotes * (60 / bpm) * 800
-    const noteDuration = (60 / bpm) * 800
-    return melodyLength * noteDuration
+    // - Each note has a delay of (60 / bpm) * 1000 milliseconds between notes
+    // - Final delay: instrument-specific release time
+    const noteDuration = (60 / bpm) * 1000
+    const instrumentDelays = {
+      keyboard: 1500, // 1.5 seconds
+      guitar: 1000,   // 1.0 seconds
+      bass: 1500      // 1.5 seconds
+    }
+    const finalDelay = instrumentDelays[instrument]
+    return (melodyLength - 1) * noteDuration + finalDelay
   }, [])
 
   // Action creators

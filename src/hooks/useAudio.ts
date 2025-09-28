@@ -221,6 +221,21 @@ export const useAudio = (): UseAudioReturn => {
       .triggerAttackRelease(noteName, duration || INSTRUMENTS.bass.defaultDuration)
   }, [initializeAudio])
 
+  /**
+   * Calculate the final delay after the last note for both playback and recording
+   * @param bpm - Beats per minute
+   * @returns Delay in milliseconds
+   */
+  const calculateFinalDelay = useCallback((bpm: number, instrument: 'keyboard' | 'guitar' | 'bass'): number => {
+    // Simply use each instrument's actual release time
+    const instrumentDelays = {
+      keyboard: 1500, // 1.5 seconds
+      guitar: 1000,   // 1.0 seconds
+      bass: 1500      // 1.5 seconds
+    }
+    return instrumentDelays[instrument]
+  }, [])
+
   const playMelodyGeneric = useCallback(async (
     melody: Note[],
     bpm: number,
@@ -236,7 +251,7 @@ export const useAudio = (): UseAudioReturn => {
     setShouldStop(false)
     setCurrentTimeoutId(null) // Reset any lingering timeout ID
     
-    const noteDuration = (60 / bpm) * 800
+    const noteDuration = (60 / bpm) * 1000
     const playDuration = instrument === 'guitar' ? "0.6" : instrument === 'bass' ? "0.8" : "0.5"
     
     const samplerWithMethod = sampler as { triggerAttackRelease: (note: string, duration: string) => void }
@@ -260,8 +275,9 @@ export const useAudio = (): UseAudioReturn => {
       
       // Add delay for the last note to finish playing (only if not stopped manually)
       if (!shouldStop) {
+        const finalDelay = calculateFinalDelay(bpm, instrument)
         await new Promise(resolve => {
-          const timeoutId = setTimeout(resolve, noteDuration)
+          const timeoutId = setTimeout(resolve, finalDelay)
           setCurrentTimeoutId(timeoutId)
         })
       }
@@ -270,7 +286,7 @@ export const useAudio = (): UseAudioReturn => {
       setShouldStop(false)
       setCurrentTimeoutId(null)
     }
-  }, [initializeAudio, isPlaying, shouldStop])
+  }, [initializeAudio, isPlaying, shouldStop, calculateFinalDelay])
 
   const playMelody = useCallback((melody: Note[], bpm: number) => {
     return playMelodyGeneric(melody, bpm, 'keyboard')
@@ -334,22 +350,27 @@ export const useAudio = (): UseAudioReturn => {
       // Start recording
       recorder.start()
 
-      const noteDuration = (60 / bpm) * 800
+      const noteDuration = (60 / bpm) * 1000
       const playDuration = instrument === 'guitar' ? "0.6" : instrument === 'bass' ? "0.8" : "0.5"
       const samplerWithMethod = sampler as { triggerAttackRelease: (note: string, duration: string) => void }
 
-      // Play melody while recording
-      for (let i = 0; i < melody.length; i++) {
-        samplerWithMethod.triggerAttackRelease(melody[i].name, playDuration)
-        if (i < melody.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, noteDuration))
-        }
-      }
+      // Use Web Audio API precise timing instead of setTimeout
+      const startTimeAudio = Tone.now()
 
-      // Wait for the last note to finish playing completely
-      // Wait one beat duration (60/bpm seconds) to capture the full note
-      const beatDuration = (60 / bpm) * 1000 // Convert to milliseconds
-      await new Promise(resolve => setTimeout(resolve, noteDuration + beatDuration))
+      // Schedule all notes with precise Web Audio API timing
+      melody.forEach((note, i) => {
+        const noteTime = startTimeAudio + (i * (noteDuration / 1000))
+        samplerWithMethod.triggerAttackRelease(note.name, playDuration, noteTime)
+      })
+
+      // Calculate exact duration to match useMelodyPlayer calculation
+      const totalDurationMs = (melody.length - 1) * noteDuration + calculateFinalDelay(bpm, instrument)
+      const totalDuration = totalDurationMs / 1000
+      const endTimeAudio = startTimeAudio + totalDuration
+
+      // Wait for the exact audio timeline to finish
+      const waitTime = (endTimeAudio - Tone.now()) * 1000
+      await new Promise(resolve => setTimeout(resolve, Math.max(0, waitTime)))
 
       // Stop recording and get the audio blob
       const recording = await recorder.stop()
@@ -366,7 +387,7 @@ export const useAudio = (): UseAudioReturn => {
       setIsRecording(false)
       return null
     }
-  }, [initializeAudio, isPlaying, isRecording])
+  }, [initializeAudio, isPlaying, isRecording, calculateFinalDelay])
 
   return {
     playNote,

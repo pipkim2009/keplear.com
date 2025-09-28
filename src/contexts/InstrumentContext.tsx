@@ -195,7 +195,6 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
       }
       selectNote(note, keyboardSelectionMode as 'range' | 'multi')
     } catch (error) {
-      console.warn('Failed to play note:', error)
     }
   }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, keyboardSelectionMode])
 
@@ -209,7 +208,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
 
     generateMelody(melodyNotes, numberOfNotes, instrument, keyboardSelectionMode)
 
-    const duration = calculateMelodyDuration(numberOfNotes, bpm)
+    const duration = calculateMelodyDuration(numberOfNotes, bpm, instrument)
     setMelodyDuration(duration)
     setPlaybackProgress(0)
     handleClearRecordedAudio()
