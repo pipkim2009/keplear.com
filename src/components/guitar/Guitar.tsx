@@ -827,6 +827,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       setStringCheckboxes(new Array(6).fill(false))
       setFretCheckboxes(new Array(25).fill(false))
       setSelectedNotes(new Set())
+      setManualSelectedNotes(new Set()) // Clear manual blue notes
       setScaleSelectedNotes(new Set())
       setCurrentScale(null)
       setChordSelectedNotes(new Set())
