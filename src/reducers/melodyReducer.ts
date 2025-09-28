@@ -31,9 +31,10 @@ export const initialMelodyState: MelodyState = {
   recordedAudioBlob: null,
   isAutoRecording: false,
   showNotes: (() => {
+    // Force default to false (hidden) and clear any existing value
     try {
-      const saved = localStorage.getItem('keplear-showNotes')
-      return saved ? JSON.parse(saved) : false
+      localStorage.setItem('keplear-showNotes', 'false')
+      return false
     } catch {
       return false
     }

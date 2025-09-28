@@ -35,6 +35,7 @@ interface InstrumentContextType {
   setNumberOfNotes: (notes: number) => void
   triggerInputFlash: (input: 'bpm' | 'notes' | 'mode') => void
   setInputActive: (input: 'bpm' | 'notes' | 'mode', active: boolean) => void
+  setCurrentPage: (page: string) => void
 
   // Instrument Config
   instrument: string
@@ -118,7 +119,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     setBpm,
     setNumberOfNotes,
     triggerInputFlash,
-    setInputActive
+    setInputActive,
+    setCurrentPage
   } = useUIState()
 
   const {
@@ -281,6 +283,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     setNumberOfNotes,
     triggerInputFlash,
     setInputActive,
+    setCurrentPage,
 
     // Instrument Config
     instrument,

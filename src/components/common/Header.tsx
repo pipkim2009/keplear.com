@@ -4,6 +4,7 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import ThemeToggle from './ThemeToggle'
 import AuthModal from '../auth/AuthModal'
 import UserMenu from '../auth/UserMenu'
+import ErrorTrigger from '../ErrorTrigger'
 import '../../styles/Header.css'
 
 interface HeaderProps {
@@ -62,12 +63,13 @@ const Header = memo(function Header({
           >
             Sandbox
           </button>
-          <button 
+          <button
             className={`nav-link ${currentPage === 'practice' ? 'nav-link-active' : ''}`}
             onClick={navigateToPractice}
           >
             Practice
           </button>
+
         </nav>
         
         <div className="header-right">

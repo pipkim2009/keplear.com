@@ -1,4 +1,5 @@
 import Home from './pages/Home'
+import NotFound from './pages/NotFound'
 import InstrumentDisplay from './keyboard/InstrumentDisplay'
 import { useInstrument } from '../contexts/InstrumentContext'
 
@@ -9,6 +10,7 @@ import { useInstrument } from '../contexts/InstrumentContext'
 function Router() {
   const {
     currentPage,
+    navigateToHome,
     navigateToSandbox,
     navigateToPractice,
     handleNoteClick,
@@ -120,7 +122,23 @@ function Router() {
         </div>
       )
 
+    case '404':
+      return (
+        <NotFound
+          onNavigateToHome={navigateToHome}
+        />
+      )
+
     default:
+      // For unknown pages, show 404 instead of defaulting to Home
+      if (currentPage !== 'home' && currentPage !== 'sandbox' && currentPage !== 'practice') {
+        return (
+          <NotFound
+            onNavigateToHome={navigateToHome}
+          />
+        )
+      }
+
       return (
         <Home
           onNavigateToSandbox={navigateToSandbox}
