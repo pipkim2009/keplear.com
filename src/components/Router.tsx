@@ -45,7 +45,10 @@ function Router() {
     melodyDuration,
     setPlaybackProgress,
     handleClearRecordedAudio,
-    recordedAudioBlob
+    recordedAudioBlob,
+    hasChanges,
+    isGeneratingMelody,
+    isAutoRecording
   } = useInstrument()
   switch (currentPage) {
     case 'home':
@@ -98,6 +101,9 @@ function Router() {
           onClearRecordedAudio={handleClearRecordedAudio}
           recordedAudioBlob={recordedAudioBlob}
           generatedMelody={[...generatedMelody]}
+          hasChanges={hasChanges}
+          isGeneratingMelody={isGeneratingMelody}
+          isAutoRecording={isAutoRecording}
         />
       )
 

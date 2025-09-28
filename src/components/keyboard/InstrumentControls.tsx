@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import '../../styles/Controls.css'
+import '../../styles/MelodyControls.css'
 import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
 import { guitarNotes } from '../../utils/guitarNotes'
 import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/keyboardScales'
@@ -51,6 +52,9 @@ interface InstrumentControlsProps {
   onClearRecordedAudio?: () => void
   recordedAudioBlob?: Blob | null
   generatedMelody?: Note[]
+  hasChanges?: boolean
+  isGeneratingMelody?: boolean
+  isAutoRecording?: boolean
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -92,7 +96,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   onProgressChange,
   onClearRecordedAudio,
   recordedAudioBlob,
-  generatedMelody
+  generatedMelody,
+  hasChanges = false,
+  isGeneratingMelody = false,
+  isAutoRecording = false
 }) => {
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
@@ -846,23 +853,32 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               }
             }}
             disabled={!canGenerateMelody}
-            className="modern-generate-button"
+            className={`modern-generate-button ${hasChanges ? 'has-changes' : ''}`}
             title="Generate a melody from selected notes"
+            style={{ position: 'relative' }}
           >
             Generate Melody
+            {hasChanges && <span className="change-badge">●</span>}
           </button>
 
         </div>
 
-        {/* Second row - Auto-recorded audio player */}
-        {audioFileBlob && (
+        {/* Second row - Auto-recorded audio player or generating indicator */}
+        {(audioFileBlob || isGeneratingMelody || isAutoRecording) && (
           <div className="controls-container second-row">
             <div className="modern-control-item audio-player-section centered">
-              {audioFileUrl && (
-                <CustomAudioPlayer
-                  src={audioFileUrl}
-                  preload="metadata"
-                />
+              {(isGeneratingMelody || isAutoRecording) ? (
+                <div className="generating-indicator">
+                  <div className="generating-spinner"></div>
+                  <span className="generating-text">Generating melody...</span>
+                </div>
+              ) : (
+                audioFileUrl && (
+                  <CustomAudioPlayer
+                    src={audioFileUrl}
+                    preload="metadata"
+                  />
+                )
               )}
             </div>
           </div>

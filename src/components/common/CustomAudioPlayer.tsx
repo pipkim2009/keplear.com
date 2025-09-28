@@ -15,7 +15,10 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
-  const [volume, setVolume] = useState(1)
+  const [volume, setVolume] = useState(() => {
+    const savedVolume = localStorage.getItem('audioPlayerVolume')
+    return savedVolume ? parseFloat(savedVolume) : 1
+  })
   const [showVolumeSlider, setShowVolumeSlider] = useState(false)
   const [hoverTime, setHoverTime] = useState<number | null>(null)
   const [showHoverTime, setShowHoverTime] = useState(false)
@@ -24,6 +27,9 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
+
+    // Set volume to current state when src changes
+    audio.volume = volume
 
     const updateTime = () => setCurrentTime(audio.currentTime)
     const updateDuration = () => setDuration(audio.duration || 0)
@@ -38,7 +44,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
       audio.removeEventListener('loadedmetadata', updateDuration)
       audio.removeEventListener('ended', handleEnded)
     }
-  }, [src])
+  }, [src, volume])
 
   useEffect(() => {
     const handleGlobalMouseMove = (event: MouseEvent) => {
@@ -140,6 +146,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
     const newVolume = parseFloat(event.target.value)
     audio.volume = newVolume
     setVolume(newVolume)
+    localStorage.setItem('audioPlayerVolume', newVolume.toString())
   }
 
   const formatTime = (time: number) => {
@@ -237,6 +244,9 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
                 step="0.1"
                 value={volume}
                 onChange={handleVolumeChange}
+                style={{
+                  '--volume-percentage': `${volume * 100}%`
+                } as React.CSSProperties}
               />
             </div>
           )}

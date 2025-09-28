@@ -13,6 +13,7 @@ const mockInstrumentContext = {
   generatedMelody: [{ name: 'C4', frequency: 261.63 }],
   handleClearRecordedAudio: vi.fn(),
   recordedAudioBlob: null,
+  hasChanges: false,
 }
 
 vi.mock('../../contexts/InstrumentContext', () => ({
@@ -73,5 +74,19 @@ describe('MelodyControls', () => {
     render(<MelodyControls />)
 
     expect(screen.getByRole('button', { name: /clear recording/i })).toBeInTheDocument()
+  })
+
+  it('shows change badge when hasChanges is true', () => {
+    mockInstrumentContext.hasChanges = true
+    render(<MelodyControls />)
+
+    expect(screen.getByText('●')).toBeInTheDocument()
+  })
+
+  it('does not show change badge when hasChanges is false', () => {
+    mockInstrumentContext.hasChanges = false
+    render(<MelodyControls />)
+
+    expect(screen.queryByText('●')).not.toBeInTheDocument()
   })
 })

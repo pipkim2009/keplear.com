@@ -241,9 +241,10 @@
   appearance: none;
   width: 4px;
   height: 80px;
-  background: #444;
+  background: linear-gradient(to top, #4a90e2 0%, #4a90e2 var(--volume-percentage, 100%), #444 var(--volume-percentage, 100%), #444 100%);
   outline: none;
   cursor: pointer;
+  border-radius: 2px;
 }
 
 .volume-slider input[type="range"]::-webkit-slider-thumb {

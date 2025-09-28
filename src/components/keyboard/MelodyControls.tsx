@@ -1,5 +1,6 @@
 import React from 'react'
 import { useInstrument } from '../../contexts/InstrumentContext'
+import '../../styles/MelodyControls.css'
 
 /**
  * Component responsible for melody generation and playback controls
@@ -14,18 +15,20 @@ const MelodyControls: React.FC = () => {
     isRecording,
     generatedMelody,
     handleClearRecordedAudio,
-    recordedAudioBlob
+    recordedAudioBlob,
+    hasChanges
   } = useInstrument()
 
   return (
     <div className="melody-controls">
       <div className="control-row">
         <button
-          className="button generate-button"
+          className={`button generate-button ${hasChanges ? 'has-changes' : ''}`}
           onClick={handleGenerateMelody}
           disabled={isPlaying || isRecording}
         >
           🎵 Generate Melody
+          {hasChanges && <span className="change-badge">●</span>}
         </button>
 
         <button

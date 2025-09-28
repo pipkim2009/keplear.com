@@ -44,6 +44,9 @@ interface InstrumentDisplayProps {
   onClearRecordedAudio?: () => void
   recordedAudioBlob?: Blob | null
   generatedMelody?: Note[]
+  hasChanges?: boolean
+  isGeneratingMelody?: boolean
+  isAutoRecording?: boolean
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -82,7 +85,10 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   onProgressChange,
   onClearRecordedAudio,
   recordedAudioBlob,
-  generatedMelody
+  generatedMelody,
+  hasChanges = false,
+  isGeneratingMelody = false,
+  isAutoRecording = false
 }) => {
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
   const [higherOctaves, setHigherOctaves] = useState<number>(0)
@@ -205,6 +211,9 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           onClearRecordedAudio={onClearRecordedAudio}
           recordedAudioBlob={recordedAudioBlob}
           generatedMelody={generatedMelody}
+          hasChanges={hasChanges}
+          isGeneratingMelody={isGeneratingMelody}
+          isAutoRecording={isAutoRecording}
         />
       </div>
 

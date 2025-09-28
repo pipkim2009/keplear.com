@@ -4,9 +4,10 @@ import { useMelodyGenerator } from '../hooks/useMelodyGenerator'
 import { useUIState } from '../hooks/useUIState'
 import { useInstrumentConfig } from '../hooks/useInstrumentConfig'
 import { useMelodyPlayer } from '../hooks/useMelodyPlayer'
-import { useCallback } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { notes, generateNotesWithSeparateOctaves } from '../utils/notes'
 import type { Note } from '../utils/notes'
+import { useMelodyChanges } from '../hooks/useMelodyChanges'
 
 interface InstrumentContextType {
   // Audio functions
@@ -67,6 +68,14 @@ interface InstrumentContextType {
   handleClearRecordedAudio: () => void
   calculateMelodyDuration: (notes: number, bpm: number) => number
 
+  // Melody Changes Tracking
+  hasChanges: boolean
+  clearChanges: () => void
+
+  // Melody Generation Status
+  isGeneratingMelody: boolean
+  isAutoRecording: boolean
+
   // Handlers
   handleNoteClick: (note: Note) => Promise<void>
   handleGenerateMelody: () => void
@@ -91,6 +100,9 @@ interface InstrumentProviderProps {
 }
 
 export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children }) => {
+  // State for melody generation
+  const [isGeneratingMelody, setIsGeneratingMelody] = useState(false)
+
   // All the existing hooks from App.tsx
   const { playNote, playGuitarNote, playBassNote, playMelody, playGuitarMelody, playBassMelody, stopMelody, recordMelody, isPlaying, isRecording } = useAudio()
 
@@ -136,6 +148,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     melodyDuration,
     recordedAudioBlob,
     showNotes,
+    isAutoRecording,
     setPlaybackProgress,
     setMelodyDuration,
     toggleShowNotes,
@@ -151,6 +164,22 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     stopMelody,
     instrument
   })
+
+  const { hasChanges, clearChanges } = useMelodyChanges({
+    selectedNotes,
+    bpm,
+    numberOfNotes,
+    generatedMelody,
+    instrument,
+    keyboardSelectionMode
+  })
+
+  // Turn off generating indicator only when we have recorded audio ready
+  useEffect(() => {
+    if (recordedAudioBlob && isGeneratingMelody) {
+      setIsGeneratingMelody(false)
+    }
+  }, [recordedAudioBlob, isGeneratingMelody])
 
   // Handlers from App.tsx
   const handleNoteClick = useCallback(async (note: Note): Promise<void> => {
@@ -169,6 +198,9 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
   }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, keyboardSelectionMode])
 
   const handleGenerateMelody = useCallback((): void => {
+    setIsGeneratingMelody(true)
+
+    // Generate melody immediately with current values
     const melodyNotes = instrument === 'keyboard' && (keyboardOctaves.lower !== 0 || keyboardOctaves.higher !== 0)
       ? generateNotesWithSeparateOctaves(keyboardOctaves.lower, keyboardOctaves.higher)
       : notes
@@ -179,7 +211,10 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     setMelodyDuration(duration)
     setPlaybackProgress(0)
     handleClearRecordedAudio()
-  }, [generateMelody, numberOfNotes, instrument, keyboardOctaves, keyboardSelectionMode, calculateMelodyDuration, bpm, setMelodyDuration, setPlaybackProgress, handleClearRecordedAudio])
+    clearChanges()
+
+    // isGeneratingMelody will stay true until recorded audio is ready
+  }, [generateMelody, numberOfNotes, instrument, keyboardOctaves, keyboardSelectionMode, calculateMelodyDuration, bpm, setMelodyDuration, setPlaybackProgress, handleClearRecordedAudio, clearChanges])
 
   const handlePlayMelody = useCallback((): void => {
     if (isPlaying) {
@@ -278,6 +313,14 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     handleRecordMelody,
     handleClearRecordedAudio,
     calculateMelodyDuration,
+
+    // Melody Changes Tracking
+    hasChanges,
+    clearChanges,
+
+    // Melody Generation Status
+    isGeneratingMelody,
+    isAutoRecording,
 
     // Handlers
     handleNoteClick,

@@ -2592,5 +2592,55 @@ body:has([data-instrument="bass"]) .control-button.delete-selection {
   }
 }
 
+/* Generating indicator styles */
+.generating-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 24px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  color: #93c5fd;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.generating-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(147, 197, 253, 0.3);
+  border-left: 2px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.generating-text {
+  color: #93c5fd;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .generating-indicator {
+    padding: 12px 16px;
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .generating-spinner {
+    width: 16px;
+    height: 16px;
+  }
+}
+
 
 
