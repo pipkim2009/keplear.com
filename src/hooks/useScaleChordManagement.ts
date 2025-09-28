@@ -99,6 +99,8 @@ export const useScaleChordManagement = ({
       // Clear keyboard scales and chords
       setCurrentKeyboardScale(null)
       setCurrentKeyboardChord(null)
+
+      // Clear applied lists for all instruments (this was missing!)
       setAppliedChords([])
       setAppliedScales([])
 
@@ -387,6 +389,8 @@ export const useScaleChordManagement = ({
     } else if (instrument === 'bass' && bassScaleHandlers) {
       bassScaleHandlers.handleClearScale()
     }
+    // Clear applied scales list
+    setAppliedScales([])
   }, [instrument, scaleHandlers, bassScaleHandlers])
 
   // Chord selection handlers
