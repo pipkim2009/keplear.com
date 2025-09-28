@@ -76,9 +76,9 @@ export const useMelodyChanges = ({
     const last = lastValuesRef.current
     const currentNoteNames = selectedNotes.map(note => note.name)
 
-    // If no melody has been generated yet, show badge when user can generate a melody
+    // If no melody has been generated yet, don't show changes indicator
     if (!lastValuesRef.current.melodyGenerated) {
-      setHasChanges(canGenerateMelody())
+      setHasChanges(false)
       return
     }
 

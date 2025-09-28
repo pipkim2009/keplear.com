@@ -26,6 +26,7 @@ interface GuitarProps {
 }
 
 const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady }) => {
+  console.log('🎸 Guitar component rendering/re-rendering')
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -366,11 +367,12 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   // Auto-apply checkboxes when all individual notes are selected
   // DISABLED: This was causing infinite render loops and flickering with the scale system
 
-  // Sync guitar selections with parent component for deselect all button visibility
-  useEffect(() => {
-    const melodyNotes = convertToMelodyNotes()
-    setGuitarNotes(melodyNotes)
-  }, [selectedNotes, stringCheckboxes, fretCheckboxes, setGuitarNotes, convertToMelodyNotes])
+  // TEMPORARILY DISABLED: Sync guitar selections with parent component for deselect all button visibility
+  // This was causing infinite re-render loops
+  // useEffect(() => {
+  //   const melodyNotes = convertToMelodyNotes()
+  //   setGuitarNotes(melodyNotes)
+  // }, [selectedNotes, stringCheckboxes, fretCheckboxes, convertToMelodyNotes])
 
   // Note: Removed useEffect that was causing infinite loop
   // The Guitar component manages its own state internally
@@ -407,8 +409,74 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
 
   // Handle scale deletion
   const handleScaleDelete = useCallback((rootNote: string, scale: GuitarScale) => {
-    // Remove scale notes from selection by reapplying the scale and removing those notes
-    const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes)
+    console.log('🎸 Guitar handleScaleDelete called:', rootNote, scale.name)
+    console.log('🎸 Scale intervals:', scale.intervals)
+    console.log('🎸 Scale object:', scale)
+
+    // For scale box selections (empty intervals), we need a different approach
+    let scaleSelections: any[] = []
+
+    if (scale.intervals && scale.intervals.length > 0) {
+      // Traditional scale with intervals - use the normal approach
+      scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes)
+      console.log('🎸 scaleSelections from applyScaleToGuitar (traditional scale):', scaleSelections)
+    } else {
+      // Scale box selection - we need to re-derive which notes belong to this scale
+      console.log('🎸 Scale box detected (empty intervals) - re-deriving scale notes for removal')
+
+      // For scale boxes, we need to determine which notes belong to this specific scale
+      // Since the scale name contains the fret range, we can derive the scale box
+      const scaleName = scale.name // "Open Position (Frets 0-4)"
+      const fretRangeMatch = scaleName.match(/Frets (\d+)-(\d+)/)
+
+      if (fretRangeMatch) {
+        const minFret = parseInt(fretRangeMatch[1])
+        const maxFret = parseInt(fretRangeMatch[2])
+
+        console.log(`🎸 Detected scale box: ${scaleName}, fret range: ${minFret}-${maxFret}`)
+
+        // Create a scale box object to re-apply and get the selections
+        const scaleBox = {
+          name: scaleName,
+          minFret: minFret,
+          maxFret: maxFret,
+          positions: [] // We'll derive this or use a different approach
+        }
+
+        // For "Open Position (Frets 0-4)", we'll manually create selections for the common notes
+        // This is a targeted approach for this specific scale box
+        scaleSelections = []
+
+        // Re-derive the scale box selections to remove them, regardless of current state
+        console.log('🎸 Re-applying scale box to determine which notes to remove')
+
+        // Create a fake scale box and re-apply it to get the original selections
+        const fakeScaleBox = {
+          name: scaleName,
+          minFret: minFret,
+          maxFret: maxFret,
+          positions: [] as any[] // We don't need positions for this approach
+        }
+
+        // Re-apply the scale box to get the original selections
+        const originalScaleSelections = applyScaleBoxToGuitar(fakeScaleBox)
+        console.log('🎸 Original scale selections to remove:', originalScaleSelections)
+
+        scaleSelections = originalScaleSelections
+
+        console.log('🎸 Re-derived scaleSelections for removal:', scaleSelections)
+      } else {
+        console.log('🎸 Could not parse fret range from scale name, clearing all scale selections')
+        scaleSelections = Array.from(scaleSelectedNotes).map(noteKey => {
+          const [stringIndex, fretInfo] = noteKey.split('-')
+          const fretIndex = fretInfo === 'open' ? 0 : parseInt(fretInfo) + 1
+          return { stringIndex: parseInt(stringIndex), fretIndex }
+        })
+      }
+
+      // Clear all scale selected notes
+      setScaleSelectedNotes(new Set())
+    }
 
     setSelectedNotes(prev => {
       const newSelectedNotes = new Set(prev)
@@ -427,20 +495,27 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       })
       return newScaleSelectedNotes
     })
+
+    // Note: Visual highlighting clearing is handled by useEffect watching appliedScales
   }, [guitarNotes])
 
   // Handle scale box selection
   const handleScaleBoxSelect = useCallback((scaleBox: ScaleBox) => {
     // Apply scale box to guitar
+    console.log('🎸 handleScaleBoxSelect called with scaleBox:', scaleBox)
     const scaleSelections = applyScaleBoxToGuitar(scaleBox)
+    console.log('🎸 scaleSelections from applyScaleBoxToGuitar:', scaleSelections)
 
     // Use functional updates to accumulate scales (SAME AS handleScaleSelect)
     setSelectedNotes(prev => {
+      console.log('🎸 Previous selectedNotes:', Array.from(prev))
       const newSelectedNotes = new Set(prev)
       scaleSelections.forEach(({ stringIndex, fretIndex }) => {
         const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        console.log(`🎸 Adding noteKey: ${noteKey}`)
         newSelectedNotes.add(noteKey)
       })
+      console.log('🎸 New selectedNotes after scale box:', Array.from(newSelectedNotes))
       return newSelectedNotes
     })
 
@@ -489,7 +564,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       }
     })
     setGuitarNotes(melodyNotes)
-  }, [])
+  }, [guitarNotes])
 
   // Handle clearing scale
   const handleClearScale = useCallback(() => {
@@ -502,7 +577,10 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     // Clear chord state when clearing scale
     setCurrentChord(null)
     setChordSelectedNotes(new Set())
-  }, [])
+
+    // Notify parent that selections are cleared for "deselect all" button visibility
+    setGuitarNotes([])
+  }, [setGuitarNotes])
 
   // Handle chord selection
   const handleChordSelect = useCallback((rootNote: string, chord: GuitarChord) => {
@@ -671,7 +749,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleScaleSelect, handleScaleBoxSelect, handleClearScale])
+  }, [handleScaleSelect, handleScaleBoxSelect, handleClearScale, handleScaleDelete])
 
   // Provide chord handlers to parent component
   useEffect(() => {
@@ -688,7 +766,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
 
   // Clear all selections when clearTrigger changes
   useEffect(() => {
+    console.log('🎸 clearTrigger changed:', clearTrigger)
     if (clearTrigger !== undefined && clearTrigger > 0) {
+      console.log('🎸 CLEARING ALL SELECTIONS due to clearTrigger')
       setStringCheckboxes(new Array(6).fill(false))
       setFretCheckboxes(new Array(25).fill(false))
       setSelectedNotes(new Set())

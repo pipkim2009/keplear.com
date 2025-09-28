@@ -415,6 +415,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
   // Handle scale deletion
   const handleScaleDelete = useCallback((rootNote: string, scale: BassScale) => {
+    console.log('🎻 Bass handleScaleDelete called:', rootNote, scale.name)
     // Remove scale notes from selection by reapplying the scale and removing those notes
     const scaleSelections = applyScaleToBass(rootNote, scale, bassNotes)
 
@@ -435,6 +436,13 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       })
       return newScaleSelectedNotes
     })
+
+    // Clear scale highlighting if this was the current scale
+    if (currentScale &&
+        currentScale.root === rootNote &&
+        currentScale.scale.name === scale.name) {
+      setCurrentScale(null)
+    }
   }, [bassNotes])
 
   // Handle scale box selection
@@ -677,7 +685,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleScaleSelect, handleScaleBoxSelect, handleClearScale])
+  }, [handleScaleSelect, handleScaleBoxSelect, handleClearScale, handleScaleDelete])
 
   // Provide chord handlers to parent component
   useEffect(() => {

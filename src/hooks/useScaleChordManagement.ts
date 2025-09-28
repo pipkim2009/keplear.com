@@ -370,7 +370,7 @@ export const useScaleChordManagement = ({
 
     // Store current scale info for visual highlighting
     setCurrentKeyboardScale({ root: rootNote, scale })
-  }, [appliedScales, onKeyboardSelectionModeChange, keyboardSelectionMode, lowerOctaves, higherOctaves, selectNote, selectedNotes, setGuitarNotes])
+  }, [appliedScales, onKeyboardSelectionModeChange, keyboardSelectionMode, lowerOctaves, higherOctaves, selectNote, selectedNotes])
 
   const handleKeyboardScaleClear = useCallback(() => {
     // Clear all selected notes
@@ -382,21 +382,23 @@ export const useScaleChordManagement = ({
   }, [clearSelection])
 
   const handleScaleDelete = useCallback((scaleId: string) => {
-    // Find the scale to delete
-    const scaleToDelete = appliedScales.find(scale => scale.id === scaleId)
+    console.log('🔧 handleScaleDelete called with scaleId:', scaleId)
+    console.log('🔧 Using simple approach like chords - just clear all selections')
 
-    if (scaleToDelete) {
-      // Call the appropriate deletion handler
-      if (instrument === 'guitar' && scaleHandlers?.handleScaleDelete) {
-        scaleHandlers.handleScaleDelete(scaleToDelete.root, scaleToDelete.scale as GuitarScale)
-      } else if (instrument === 'bass' && bassScaleHandlers?.handleScaleDelete) {
-        bassScaleHandlers.handleScaleDelete(scaleToDelete.root, scaleToDelete.scale as BassScale)
-      }
+    // Copy the exact same approach as chords - just clear everything!
+    if (instrument === 'guitar' && scaleHandlers) {
+      scaleHandlers.handleClearScale()
+    } else if (instrument === 'bass' && bassScaleHandlers) {
+      bassScaleHandlers.handleClearScale()
+    } else if (instrument === 'keyboard') {
+      // For keyboard, clear all selected notes
+      clearSelection()
+      setCurrentKeyboardScale(null)
     }
 
     // Remove from applied scales list
     setAppliedScales(prev => prev.filter(scale => scale.id !== scaleId))
-  }, [appliedScales, instrument, scaleHandlers, bassScaleHandlers])
+  }, [instrument, scaleHandlers, bassScaleHandlers, clearSelection])
 
   // Keyboard chord handlers
   const handleKeyboardChordApply = useCallback((rootNote: string, chord: KeyboardChord) => {
@@ -446,7 +448,7 @@ export const useScaleChordManagement = ({
       notes: chordNotes
     }
     setAppliedChords(prev => [...prev, newAppliedChord])
-  }, [isChordAlreadyApplied, onKeyboardSelectionModeChange, keyboardSelectionMode, lowerOctaves, higherOctaves, selectNote, selectedNotes, setGuitarNotes])
+  }, [isChordAlreadyApplied, onKeyboardSelectionModeChange, keyboardSelectionMode, lowerOctaves, higherOctaves, selectNote, selectedNotes])
 
   const handleKeyboardChordClear = useCallback(() => {
     // Clear all selected notes

@@ -120,7 +120,7 @@ export const useKeyboardHighlighting = ({
       )
       setGuitarNotes(uniqueNotes)
     }
-  }, [lowerOctaves, higherOctaves, currentKeyboardScale, appliedChords, instrument, setGuitarNotes])
+  }, [lowerOctaves, higherOctaves, currentKeyboardScale, appliedChords, instrument])
 
   return {
     isNoteInKeyboardScale,
