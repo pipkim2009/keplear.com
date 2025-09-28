@@ -22,6 +22,15 @@
   width: auto;
 }
 
+/* Fix height issue for guitar and bass instruments */
+.scale-options-container.collapsed:has(.scale-options-toggle.instrument-guitar),
+.scale-options-container.collapsed:has(.scale-options-toggle.instrument-bass) {
+  min-height: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+}
+
 .scale-options-container.expanded {
   width: auto;
 }
