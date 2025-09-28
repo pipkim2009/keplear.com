@@ -407,7 +407,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   // DISABLED: This was causing infinite render loops and flickering with the scale system
 
   // Sync guitar selections with parent component for deselect all button visibility
-  // Only sync when selectedNotes, stringCheckboxes, or fretCheckboxes change
+  // Only sync when selectedNotes, manualSelectedNotes, stringCheckboxes, or fretCheckboxes change
   // Use a ref to prevent infinite loops by tracking the last synced state
   const lastSyncedState = useRef<string>('')
 
@@ -417,6 +417,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     // Create a state signature to prevent unnecessary updates
     const currentStateSignature = JSON.stringify({
       selectedNotes: Array.from(selectedNotes).sort(),
+      manualSelectedNotes: Array.from(manualSelectedNotes).sort(),
       stringCheckboxes,
       fretCheckboxes
     })
@@ -426,7 +427,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       lastSyncedState.current = currentStateSignature
       setGuitarNotes(melodyNotes)
     }
-  }, [selectedNotes, stringCheckboxes, fretCheckboxes, convertToMelodyNotes, setGuitarNotes])
+  }, [selectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes, convertToMelodyNotes, setGuitarNotes])
 
   // Handle scale selection - COPY THE CHORD PATTERN EXACTLY
   const handleScaleSelect = useCallback((rootNote: string, scale: GuitarScale) => {
@@ -779,6 +780,26 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     return chordSelectedNotes.has(noteKey)
   }, [chordSelectedNotes])
 
+  // Check if a note is in the manual layer (manually selected)
+  const isNoteInManualLayer = useCallback((stringIndex: number, fretIndex: number): boolean => {
+    const noteKey = `${stringIndex}-${fretIndex}`
+    const isManuallySelected = manualSelectedNotes.has(noteKey)
+    const isStringSelected = stringCheckboxes[stringIndex]
+    const isFretSelected = fretCheckboxes[fretIndex + 1] // Adjust for open fret offset
+    const isCheckboxSelected = isStringSelected || isFretSelected
+    return isManuallySelected || isCheckboxSelected
+  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+
+  // Check if an open string is in the manual layer (manually selected)
+  const isOpenStringInManualLayer = useCallback((stringIndex: number): boolean => {
+    const openKey = `${stringIndex}-open`
+    const isManuallySelected = manualSelectedNotes.has(openKey)
+    const isStringSelected = stringCheckboxes[stringIndex]
+    const isOpenFretSelected = fretCheckboxes[0]
+    const isCheckboxSelected = isStringSelected || isOpenFretSelected
+    return isManuallySelected || isCheckboxSelected
+  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+
   // Check if a note should show preview on string hover
   const shouldShowStringPreview = useCallback((stringIndex: number): boolean => {
     return hoveredString === stringIndex && !stringCheckboxes[stringIndex]
@@ -975,39 +996,69 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           const isInGeneratedMelody = isInMelody(noteObj, showNotes)
           const isInScale = isOpenStringInCurrentScale(stringIndex)
           const isInChord = isOpenStringInCurrentChord(stringIndex)
+          const isInManual = isOpenStringInManualLayer(stringIndex)
 
           let noteClass = 'note-circle'
           if (isInGeneratedMelody) {
             noteClass += ' melody-note'
           } else {
-            // Check all possible combinations of chord/scale and root states
+            // Check all possible combinations of manual, chord/scale and root states
             const isChordRoot = isChordRootNote(openNote.name) && isInChord
             const isScaleRoot = isScaleRootNote(openNote.name) && isInScale
+            const isAnyRoot = isChordRoot || isScaleRoot
 
-            if (isChordRoot && isScaleRoot) {
-              // Both roots - stays red
-              noteClass += ' chord-root-scale-root'
-            } else if (isChordRoot && isInScale) {
-              // Chord root + scale note - red + orange mix
-              noteClass += ' chord-root-scale-note'
-            } else if (isInChord && isScaleRoot) {
-              // Chord note + scale root - purple + red mix
-              noteClass += ' chord-note-scale-root'
-            } else if (isChordRoot) {
-              // Just chord root
-              noteClass += ' chord-root-note'
-            } else if (isScaleRoot) {
-              // Just scale root
-              noteClass += ' scale-root-note'
-            } else if (isInChord && isInScale) {
-              // Regular chord note + scale note - purple + orange mix
-              noteClass += ' chord-scale-note'
-            } else if (isInChord) {
-              // Just chord note
-              noteClass += ' chord-note'
-            } else if (isInScale) {
-              // Just scale note
-              noteClass += ' scale-note'
+            // Manual note combinations with gradients
+            if (isInManual) {
+              if (isAnyRoot && isInChord && isInScale) {
+                // Manual + Scale + Chord + Root (blue + orange + purple + red)
+                // Only include orange if it's actually a scale note, not just a scale root
+                noteClass += ' manual-scale-chord-root-note'
+              } else if (isAnyRoot && isInChord) {
+                // Manual + Chord + Root (blue + purple + red)
+                noteClass += ' manual-chord-root-note'
+              } else if (isInChord && isInScale) {
+                // Manual + Scale + Chord (blue + orange + purple)
+                noteClass += ' manual-scale-chord-note'
+              } else if (isAnyRoot) {
+                // Manual + Root (blue + red) - just root, no scale/chord colors
+                noteClass += isScaleRoot ? ' manual-scale-root' : ' manual-chord-root'
+              } else if (isInScale) {
+                // Manual + Scale (blue + orange) - regular scale note, not root
+                noteClass += ' manual-scale-note'
+              } else if (isInChord) {
+                // Manual + Chord (blue + purple) - regular chord note, not root
+                noteClass += ' manual-chord-note'
+              } else {
+                // Just manual (blue)
+                noteClass += ' manual-note'
+              }
+            } else {
+              // Non-manual combinations (existing logic)
+              if (isChordRoot && isScaleRoot) {
+                // Both roots - stays red
+                noteClass += ' chord-root-scale-root'
+              } else if (isChordRoot && isInScale) {
+                // Chord root + scale note - red + orange mix
+                noteClass += ' chord-root-scale-note'
+              } else if (isInChord && isScaleRoot) {
+                // Chord note + scale root - purple + red mix
+                noteClass += ' chord-note-scale-root'
+              } else if (isChordRoot) {
+                // Just chord root
+                noteClass += ' chord-root-note'
+              } else if (isScaleRoot) {
+                // Just scale root
+                noteClass += ' scale-root-note'
+              } else if (isInChord && isInScale) {
+                // Regular chord note + scale note - purple + orange mix
+                noteClass += ' chord-scale-note'
+              } else if (isInChord) {
+                // Just chord note
+                noteClass += ' chord-note'
+              } else if (isInScale) {
+                // Just scale note
+                noteClass += ' scale-note'
+              }
             }
           }
           
@@ -1043,39 +1094,69 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             const isInGeneratedMelody = isInMelody(noteObj, showNotes)
             const isInScale = isNoteInCurrentScale(stringIndex, fretIndex)
             const isInChord = isNoteInCurrentChord(stringIndex, fretIndex)
+            const isInManual = isNoteInManualLayer(stringIndex, fretIndex)
 
             let noteClass = 'note-circle'
             if (isInGeneratedMelody) {
               noteClass += ' melody-note'
             } else {
-              // Check all possible combinations of chord/scale and root states
+              // Check all possible combinations of manual, chord/scale and root states
               const isChordRoot = isChordRootNote(noteName) && isInChord
               const isScaleRoot = isScaleRootNote(noteName) && isInScale
+              const isAnyRoot = isChordRoot || isScaleRoot
 
-              if (isChordRoot && isScaleRoot) {
-                // Both roots - stays red
-                noteClass += ' chord-root-scale-root'
-              } else if (isChordRoot && isInScale) {
-                // Chord root + scale note - red + orange mix
-                noteClass += ' chord-root-scale-note'
-              } else if (isInChord && isScaleRoot) {
-                // Chord note + scale root - purple + red mix
-                noteClass += ' chord-note-scale-root'
-              } else if (isChordRoot) {
-                // Just chord root
-                noteClass += ' chord-root-note'
-              } else if (isScaleRoot) {
-                // Just scale root
-                noteClass += ' scale-root-note'
-              } else if (isInChord && isInScale) {
-                // Regular chord note + scale note - purple + orange mix
-                noteClass += ' chord-scale-note'
-              } else if (isInChord) {
-                // Just chord note
-                noteClass += ' chord-note'
-              } else if (isInScale) {
-                // Just scale note
-                noteClass += ' scale-note'
+              // Manual note combinations with gradients
+              if (isInManual) {
+                if (isAnyRoot && isInChord && isInScale) {
+                  // Manual + Scale + Chord + Root (blue + orange + purple + red)
+                  // Only include orange if it's actually a scale note, not just a scale root
+                  noteClass += ' manual-scale-chord-root-note'
+                } else if (isAnyRoot && isInChord) {
+                  // Manual + Chord + Root (blue + purple + red)
+                  noteClass += ' manual-chord-root-note'
+                } else if (isInChord && isInScale) {
+                  // Manual + Scale + Chord (blue + orange + purple)
+                  noteClass += ' manual-scale-chord-note'
+                } else if (isAnyRoot) {
+                  // Manual + Root (blue + red) - just root, no scale/chord colors
+                  noteClass += isScaleRoot ? ' manual-scale-root' : ' manual-chord-root'
+                } else if (isInScale) {
+                  // Manual + Scale (blue + orange) - regular scale note, not root
+                  noteClass += ' manual-scale-note'
+                } else if (isInChord) {
+                  // Manual + Chord (blue + purple) - regular chord note, not root
+                  noteClass += ' manual-chord-note'
+                } else {
+                  // Just manual (blue)
+                  noteClass += ' manual-note'
+                }
+              } else {
+                // Non-manual combinations (existing logic)
+                if (isChordRoot && isScaleRoot) {
+                  // Both roots - stays red
+                  noteClass += ' chord-root-scale-root'
+                } else if (isChordRoot && isInScale) {
+                  // Chord root + scale note - red + orange mix
+                  noteClass += ' chord-root-scale-note'
+                } else if (isInChord && isScaleRoot) {
+                  // Chord note + scale root - purple + red mix
+                  noteClass += ' chord-note-scale-root'
+                } else if (isChordRoot) {
+                  // Just chord root
+                  noteClass += ' chord-root-note'
+                } else if (isScaleRoot) {
+                  // Just scale root
+                  noteClass += ' scale-root-note'
+                } else if (isInChord && isInScale) {
+                  // Regular chord note + scale note - purple + orange mix
+                  noteClass += ' chord-scale-note'
+                } else if (isInChord) {
+                  // Just chord note
+                  noteClass += ' chord-note'
+                } else if (isInScale) {
+                  // Just scale note
+                  noteClass += ' scale-note'
+                }
               }
             }
             

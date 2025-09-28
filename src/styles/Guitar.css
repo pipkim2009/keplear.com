@@ -608,15 +608,16 @@
 }
 
 /* Mixed chord/scale note highlighting - blend of purple (chord) and orange (scale) */
+/* Color hierarchy: Red (top) → Purple → Orange → Blue (bottom) */
 .note-circle.chord-scale-note {
-  background: linear-gradient(145deg, #f97316, #8b5cf6) !important;
+  background: linear-gradient(145deg, #8b5cf6, #f97316) !important;
   border: 1px solid #ffffff;
   box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.2),
     inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 
-/* Mixed chord note + scale root - blend of purple (chord) and red (scale root) */
+/* Mixed chord note + scale root - blend of red (scale root) and purple (chord) */
 .note-circle.chord-note-scale-root {
   background: linear-gradient(145deg, #dc2626, #8b5cf6) !important;
   border: 1px solid #ffffff;
@@ -662,6 +663,90 @@
   border: 1px solid #ffffff;
   box-shadow:
     0 0 8px rgba(220, 38, 38, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Manual note combinations with blue gradients */
+/* Color hierarchy: Red (top) → Purple → Orange → Blue (bottom) */
+
+/* Manual + Scale (orange + blue) */
+.note-circle.manual-scale-note {
+  background: linear-gradient(145deg, #f97316, #3b82f6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Manual + Chord (purple + blue) */
+.note-circle.manual-chord-note {
+  background: linear-gradient(145deg, #8b5cf6, #3b82f6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Manual + Scale Root (red + blue) */
+.note-circle.manual-scale-root {
+  background: linear-gradient(145deg, #dc2626, #3b82f6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Manual + Chord Root (red + blue) */
+.note-circle.manual-chord-root {
+  background: linear-gradient(145deg, #dc2626, #3b82f6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Manual + Scale + Chord (purple + orange + blue) */
+.note-circle.manual-scale-chord-note {
+  background: linear-gradient(145deg, #8b5cf6, #f97316, #3b82f6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Manual + Scale + Root (red + orange + blue) */
+.note-circle.manual-scale-root-note {
+  background: linear-gradient(145deg, #dc2626, #f97316, #3b82f6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Manual + Chord + Root (red + purple + blue) */
+.note-circle.manual-chord-root-note {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6, #3b82f6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Manual + Scale + Chord + Root (red + purple + orange + blue) */
+.note-circle.manual-scale-chord-root-note {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6, #f97316, #3b82f6) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+/* Manual notes only (just blue) - override the default blue */
+.note-circle.manual-note {
+  background: linear-gradient(145deg, #3b82f6, #1d4ed8) !important;
+  border: 1px solid #ffffff;
+  box-shadow:
     0 2px 4px rgba(0, 0, 0, 0.3),
     inset 0 1px 2px rgba(255, 255, 255, 0.3);
 }
