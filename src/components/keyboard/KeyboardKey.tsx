@@ -65,6 +65,19 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
       <span className="key-label">{note.name}</span>
     </button>
   )
+}, (prevProps, nextProps) => {
+  // Custom equality check for optimal performance
+  return (
+    prevProps.note.name === nextProps.note.name &&
+    prevProps.note.position === nextProps.note.position &&
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.isInMelody === nextProps.isInMelody &&
+    prevProps.isInScale === nextProps.isInScale &&
+    prevProps.isRoot === nextProps.isRoot &&
+    prevProps.isInChord === nextProps.isInChord &&
+    prevProps.isChordRoot === nextProps.isChordRoot &&
+    prevProps.className === nextProps.className
+  )
 })
 
 KeyboardKey.displayName = 'KeyboardKey'

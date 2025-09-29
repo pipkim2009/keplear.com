@@ -1,12 +1,13 @@
-import React from 'react'
+import { memo } from 'react'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import '../../styles/MelodyControls.css'
 
 /**
  * Component responsible for melody generation and playback controls
  * Extracted from InstrumentControls for better separation of concerns
+ * Optimized with React.memo
  */
-const MelodyControls: React.FC = () => {
+const MelodyControls = memo(function MelodyControls() {
   const {
     handleGenerateMelody,
     handlePlayMelody,
@@ -61,6 +62,6 @@ const MelodyControls: React.FC = () => {
       )}
     </div>
   )
-}
+})
 
 export default MelodyControls

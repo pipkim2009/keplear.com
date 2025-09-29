@@ -8,6 +8,7 @@ import { useCallback, useState, useEffect } from 'react'
 import { notes, generateNotesWithSeparateOctaves } from '../utils/notes'
 import type { Note } from '../utils/notes'
 import { useMelodyChanges } from '../hooks/useMelodyChanges'
+import type { InstrumentType } from '../types/instrument'
 
 interface InstrumentContextType {
   // Audio functions
@@ -18,7 +19,7 @@ interface InstrumentContextType {
   playGuitarMelody: (melody: readonly Note[], bpm: number) => Promise<void>
   playBassMelody: (melody: readonly Note[], bpm: number) => Promise<void>
   stopMelody: () => void
-  recordMelody: (notes: readonly Note[], bpm: number, instrument: any) => Promise<Blob | null>
+  recordMelody: (notes: readonly Note[], bpm: number, instrument: InstrumentType) => Promise<Blob | null>
   isPlaying: boolean
   isRecording: boolean
 
@@ -38,11 +39,11 @@ interface InstrumentContextType {
   setCurrentPage: (page: string) => void
 
   // Instrument Config
-  instrument: string
+  instrument: InstrumentType
   keyboardOctaves: { lower: number; higher: number }
-  keyboardSelectionMode: string
+  keyboardSelectionMode: 'range' | 'multi'
   clearChordsAndScalesTrigger: number
-  setInstrument: (instrument: string) => void
+  setInstrument: (instrument: InstrumentType) => void
   setKeyboardSelectionMode: (mode: 'range' | 'multi') => void
   triggerClearChordsAndScales: () => void
 
@@ -50,7 +51,7 @@ interface InstrumentContextType {
   selectedNotes: Note[]
   generatedMelody: Note[]
   selectNote: (note: Note, mode?: 'range' | 'multi') => void
-  generateMelody: (notes: Note[], count: number, instrument: string, mode: string, notesToUse?: readonly Note[]) => void
+  generateMelody: (notes: Note[], count: number, instrument: InstrumentType, mode: 'range' | 'multi', notesToUse?: readonly Note[]) => void
   setGuitarNotes: (notes: Note[]) => void
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
@@ -81,7 +82,7 @@ interface InstrumentContextType {
   handleNoteClick: (note: Note) => Promise<void>
   handleGenerateMelody: () => void
   handlePlayMelody: () => void
-  handleInstrumentChange: (newInstrument: string) => void
+  handleInstrumentChange: (newInstrument: InstrumentType) => void
   handleOctaveRangeChange: (lowerOctaves: number, higherOctaves: number) => void
   handleKeyboardSelectionModeChange: (mode: 'range' | 'multi') => void
 }
@@ -245,8 +246,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     }
   }, [isPlaying, stopMelody, generatedMelody, instrument, playGuitarMelody, playBassMelody, playMelody, bpm, setPlaybackProgress])
 
-  const handleInstrumentChange = useCallback((newInstrument: string): void => {
-    setInstrument(newInstrument as any)
+  const handleInstrumentChange = useCallback((newInstrument: InstrumentType): void => {
+    setInstrument(newInstrument)
     clearSelection()
     handleClearRecordedAudio()
     triggerClearChordsAndScales()

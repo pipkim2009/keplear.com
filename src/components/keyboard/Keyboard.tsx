@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react'
 import KeyboardKey from './KeyboardKey'
 import { whiteKeys, blackKeys, getBlackKeyLeft, getBlackKeyLeftDynamic, generateWhiteKeysWithSeparateOctaves, generateBlackKeysWithSeparateOctaves, type Note } from '../../utils/notes'
 import type { KeyboardSelectionMode } from './InstrumentControls'
@@ -17,7 +18,7 @@ interface KeyboardProps {
   isNoteChordRoot?: (note: Note) => boolean
 }
 
-const Keyboard: React.FC<KeyboardProps> = ({
+const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   onNoteClick,
   isSelected,
   isInMelody,
@@ -29,10 +30,19 @@ const Keyboard: React.FC<KeyboardProps> = ({
   isNoteRoot,
   isNoteInChord,
   isNoteChordRoot
-}) => {
+}) {
   const hasExtendedRange = lowerOctaves !== 0 || higherOctaves !== 0
-  const currentWhiteKeys = hasExtendedRange ? generateWhiteKeysWithSeparateOctaves(lowerOctaves, higherOctaves) : whiteKeys
-  const currentBlackKeys = hasExtendedRange ? generateBlackKeysWithSeparateOctaves(lowerOctaves, higherOctaves) : blackKeys
+
+  // Memoize expensive key generation
+  const currentWhiteKeys = useMemo(
+    () => hasExtendedRange ? generateWhiteKeysWithSeparateOctaves(lowerOctaves, higherOctaves) : whiteKeys,
+    [hasExtendedRange, lowerOctaves, higherOctaves]
+  )
+
+  const currentBlackKeys = useMemo(
+    () => hasExtendedRange ? generateBlackKeysWithSeparateOctaves(lowerOctaves, higherOctaves) : blackKeys,
+    [hasExtendedRange, lowerOctaves, higherOctaves]
+  )
 
   return (
     <div className="keyboard-container">
@@ -77,6 +87,6 @@ const Keyboard: React.FC<KeyboardProps> = ({
       </div>
     </div>
   )
-}
+})
 
 export default Keyboard

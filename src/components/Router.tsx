@@ -77,7 +77,7 @@ function Router() {
           setGuitarNotes={setGuitarNotes}
           clearSelection={clearSelection}
           clearTrigger={clearTrigger}
-          selectedNotes={[...selectedNotes]}
+          selectedNotes={selectedNotes}
           selectNote={selectNote}
           onOctaveRangeChange={handleOctaveRangeChange}
           keyboardSelectionMode={keyboardSelectionMode}
@@ -102,7 +102,7 @@ function Router() {
           onProgressChange={setPlaybackProgress}
           onClearRecordedAudio={handleClearRecordedAudio}
           recordedAudioBlob={recordedAudioBlob}
-          generatedMelody={[...generatedMelody]}
+          generatedMelody={generatedMelody}
           hasChanges={hasChanges}
           isGeneratingMelody={isGeneratingMelody}
           isAutoRecording={isAutoRecording}

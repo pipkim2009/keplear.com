@@ -1,11 +1,12 @@
-import React from 'react'
+import { memo } from 'react'
 import { useInstrument } from '../../contexts/InstrumentContext'
 
 /**
  * Component for controlling melody parameters (BPM, number of notes, etc.)
  * Extracted from InstrumentControls for better organization
+ * Optimized with React.memo
  */
-const ParameterControls: React.FC = () => {
+const ParameterControls = memo(function ParameterControls() {
   const {
     bpm,
     setBpm,
@@ -80,6 +81,6 @@ const ParameterControls: React.FC = () => {
       </div>
     </div>
   )
-}
+})
 
 export default ParameterControls
