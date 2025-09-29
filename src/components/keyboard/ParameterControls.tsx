@@ -40,6 +40,7 @@ const ParameterControls: React.FC = () => {
         <div className="input-container">
           <input
             id="bpm-control"
+            name="bpm"
             type="range"
             min="60"
             max="200"
@@ -61,6 +62,7 @@ const ParameterControls: React.FC = () => {
         <div className="input-container">
           <input
             id="notes-control"
+            name="numberOfNotes"
             type="range"
             min="4"
             max="16"

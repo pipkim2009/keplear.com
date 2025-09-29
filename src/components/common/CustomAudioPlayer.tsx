@@ -251,13 +251,17 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
 
           {showVolumeSlider && (
             <div className="volume-slider">
+              <label htmlFor="volume-slider" className="sr-only">Volume</label>
               <input
+                id="volume-slider"
+                name="volume"
                 type="range"
                 min="0"
                 max="1"
                 step="0.1"
                 value={volume}
                 onChange={handleVolumeChange}
+                aria-label="Volume"
                 style={{
                   '--volume-percentage': `${volume * 100}%`
                 } as React.CSSProperties}
