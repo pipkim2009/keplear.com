@@ -265,6 +265,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           onBassScaleHandlersReady={setBassScaleHandlers}
           onChordHandlersReady={setChordHandlers}
           onBassChordHandlersReady={setBassChordHandlers}
+          appliedScales={appliedScales}
+          appliedChords={appliedChords}
         />
       </div>
     </>

@@ -7,6 +7,7 @@ import type { BassScale, BassScaleBox } from '../../utils/bassScales'
 import type { GuitarChord, ChordShape } from '../../utils/guitarChords'
 import type { BassChord, BassChordShape } from '../../utils/bassChords'
 import type { KeyboardSelectionMode } from './InstrumentControls'
+import type { AppliedChord, AppliedScale } from '../common/ScaleChordOptions'
 
 interface InstrumentRendererProps {
   instrument: string
@@ -48,6 +49,8 @@ interface InstrumentRendererProps {
     handleClearChord: () => void;
     handleRemoveChordNotes: (noteKeys: string[]) => void;
   } | null) => void
+  appliedScales?: AppliedScale[]
+  appliedChords?: AppliedChord[]
 }
 
 const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
@@ -69,7 +72,9 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
   onScaleHandlersReady,
   onBassScaleHandlersReady,
   onChordHandlersReady,
-  onBassChordHandlersReady
+  onBassChordHandlersReady,
+  appliedScales,
+  appliedChords
 }) => {
   return (
     <div className="instrument-wrapper">
@@ -96,6 +101,8 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           clearTrigger={clearTrigger}
           onScaleHandlersReady={onScaleHandlersReady}
           onChordHandlersReady={onChordHandlersReady}
+          appliedScales={appliedScales}
+          appliedChords={appliedChords}
         />
       ) : (
         <Bass
@@ -106,6 +113,8 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           clearTrigger={clearTrigger}
           onScaleHandlersReady={onBassScaleHandlersReady}
           onChordHandlersReady={onBassChordHandlersReady}
+          appliedScales={appliedScales}
+          appliedChords={appliedChords}
         />
       )}
     </div>

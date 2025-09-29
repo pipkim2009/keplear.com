@@ -4,6 +4,7 @@ import { guitarNotes } from '../../utils/guitarNotes'
 import { applyScaleToGuitar, applyScaleBoxToGuitar, GUITAR_SCALES, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
 import { applyChordToGuitar, applyChordShapeToGuitar, type GuitarChord, type ChordShape } from '../../utils/guitarChords'
 import type { Note } from '../../utils/notes'
+import type { AppliedChord, AppliedScale } from '../common/ScaleChordOptions'
 
 interface GuitarProps {
   setGuitarNotes: (notes: Note[]) => void
@@ -23,15 +24,16 @@ interface GuitarProps {
     handleClearChord: () => void;
     handleRemoveChordNotes: (noteKeys: string[]) => void;
   }) => void
+  appliedScales?: AppliedScale[]
+  appliedChords?: AppliedChord[]
 }
 
-const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady }) => {
+const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, appliedScales, appliedChords }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
   const [manualSelectedNotes, setManualSelectedNotes] = useState<Set<string>>(() => new Set()) // Track manual selections separately
   const [currentScale, setCurrentScale] = useState<{ root: string; scale: GuitarScale } | null>(null)
-  const [appliedScales, setAppliedScales] = useState<{ root: string; scale: GuitarScale; notes: Set<string> }[]>([])
   const [scaleSelectedNotes, setScaleSelectedNotes] = useState<Set<string>>(() => new Set())
   const [currentChord, setCurrentChord] = useState<{ root: string; chord: GuitarChord } | null>(null)
   const [chordSelectedNotes, setChordSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -605,7 +607,6 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   // Handle clearing scale
   const handleClearScale = useCallback(() => {
     setCurrentScale(null)
-    setAppliedScales([])
     setStringCheckboxes(new Array(6).fill(false))
     setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(new Set())
@@ -737,16 +738,40 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     return scaleSelectedNotes.has(noteKey)
   }, [scaleSelectedNotes])
 
-  // Check if a note is the root note of any applied scale
-  const isScaleRootNote = (noteName: string): boolean => {
+  // Check if a note is the root note of its applied scale (only if it's actually part of that scale)
+  const isScaleRootNote = (noteName: string, stringIndex?: number, fretIndex?: number): boolean => {
     const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
 
-    // Check against all applied scales first
-    if (appliedScales.length > 0) {
-      return appliedScales.some(appliedScale => noteNameWithoutOctave === appliedScale.root)
+    // Only check if this specific note position is part of a scale AND is the root of that scale
+    if (stringIndex !== undefined && fretIndex !== undefined) {
+      const noteKey = fretIndex === -1 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex}`
+
+      // Only return true if this note is part of a scale AND this note's name matches that scale's root
+      if (scaleSelectedNotes.has(noteKey)) {
+        // Check against all applied scales to see if any contains this note and has this note as root
+        if (appliedScales && appliedScales.length > 0) {
+          return appliedScales.some(appliedScale => {
+            return noteNameWithoutOctave === appliedScale.root &&
+                   appliedScale.notes &&
+                   appliedScale.notes.some((note: any) => {
+                     // Check if this applied scale contains this specific note position
+                     if (note.__guitarCoord) {
+                       const { stringIndex: noteStringIndex, fretIndex: noteFretIndex } = note.__guitarCoord
+                       const appliedNoteKey = noteFretIndex === 0 ? `${noteStringIndex}-open` : `${noteStringIndex}-${noteFretIndex - 1}`
+                       return appliedNoteKey === noteKey
+                     }
+                     return false
+                   })
+          })
+        }
+
+        // Fallback to current scale for backward compatibility
+        return currentScale && noteNameWithoutOctave === currentScale.root
+      }
+      return false
     }
 
-    // Fallback to current scale for backward compatibility
+    // Fallback for cases without position (shouldn't happen in normal usage)
     if (currentScale) {
       return noteNameWithoutOctave === currentScale.root
     }
@@ -754,19 +779,47 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     return false
   }
 
-  // Check if a note is the root note of the current chord
-  const isChordRootNote = (noteName: string): boolean => {
+  // Check if a note is the root note of its applied chord (only if it's actually part of that chord)
+  const isChordRootNote = (noteName: string, stringIndex?: number, fretIndex?: number): boolean => {
+    const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
+
+    // Only check if this specific note position is part of a chord AND is the root of that chord
+    if (stringIndex !== undefined && fretIndex !== undefined) {
+      const noteKey = fretIndex === -1 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex}`
+
+      // Only return true if this note is part of a chord AND this note's name matches that chord's root
+      if (chordSelectedNotes.has(noteKey)) {
+        // Check against all applied chords to see if any contains this note and has this note as root
+        if (appliedChords && appliedChords.length > 0) {
+          return appliedChords.some(appliedChord => {
+            return noteNameWithoutOctave === appliedChord.root &&
+                   appliedChord.notes &&
+                   appliedChord.notes.some((note: any) => {
+                     // Check if this applied chord contains this specific note position
+                     if (note.__guitarCoord) {
+                       const { stringIndex: noteStringIndex, fretIndex: noteFretIndex } = note.__guitarCoord
+                       const appliedNoteKey = noteFretIndex === 0 ? `${noteStringIndex}-open` : `${noteStringIndex}-${noteFretIndex - 1}`
+                       return appliedNoteKey === noteKey
+                     }
+                     return false
+                   })
+          })
+        }
+
+        // Fallback to current chord for backward compatibility
+        return currentChord && noteNameWithoutOctave === currentChord.root
+      }
+      return false
+    }
+
+    // Fallback for cases without position (shouldn't happen in normal usage)
     if (currentChord) {
-      const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
       return noteNameWithoutOctave === currentChord.root
     }
+
     return false
   }
 
-  // Check if a note is the root note of the current scale or chord
-  const isRootNote = (noteName: string): boolean => {
-    return isScaleRootNote(noteName) || isChordRootNote(noteName)
-  }
 
   // Check if a note was selected as part of the current chord application
   const isNoteInCurrentChord = useCallback((stringIndex: number, fretIndex: number): boolean => {
@@ -1003,8 +1056,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             noteClass += ' melody-note'
           } else {
             // Check all possible combinations of manual, chord/scale and root states
-            const isChordRoot = isChordRootNote(openNote.name) && isInChord
-            const isScaleRoot = isScaleRootNote(openNote.name) && isInScale
+            const isChordRoot = isChordRootNote(openNote.name, stringIndex, -1) && isInChord
+            const isScaleRoot = isScaleRootNote(openNote.name, stringIndex, -1) && isInScale
             const isAnyRoot = isChordRoot || isScaleRoot
 
             // Manual note combinations with gradients
@@ -1101,8 +1154,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
               noteClass += ' melody-note'
             } else {
               // Check all possible combinations of manual, chord/scale and root states
-              const isChordRoot = isChordRootNote(noteName) && isInChord
-              const isScaleRoot = isScaleRootNote(noteName) && isInScale
+              const isChordRoot = isChordRootNote(noteName, stringIndex, fretIndex) && isInChord
+              const isScaleRoot = isScaleRootNote(noteName, stringIndex, fretIndex) && isInScale
               const isAnyRoot = isChordRoot || isScaleRoot
 
               // Manual note combinations with gradients
