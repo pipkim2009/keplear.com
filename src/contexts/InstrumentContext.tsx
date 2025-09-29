@@ -50,7 +50,7 @@ interface InstrumentContextType {
   selectedNotes: Note[]
   generatedMelody: Note[]
   selectNote: (note: Note, mode?: 'range' | 'multi') => void
-  generateMelody: (notes: Note[], count: number, instrument: string, mode: string) => void
+  generateMelody: (notes: Note[], count: number, instrument: string, mode: string, notesToUse?: readonly Note[]) => void
   setGuitarNotes: (notes: Note[]) => void
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
@@ -186,17 +186,20 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
   // Handlers from App.tsx
   const handleNoteClick = useCallback(async (note: Note): Promise<void> => {
     try {
-      if (instrument === 'guitar') {
-        await playGuitarNote(note.name)
-      } else if (instrument === 'bass') {
-        await playBassNote(note.name)
-      } else {
-        await playNote(note.name)
+      // Don't play sounds during melody generation to prevent interference with recording
+      if (!isGeneratingMelody && !isAutoRecording) {
+        if (instrument === 'guitar') {
+          await playGuitarNote(note.name)
+        } else if (instrument === 'bass') {
+          await playBassNote(note.name)
+        } else {
+          await playNote(note.name)
+        }
       }
       selectNote(note, keyboardSelectionMode as 'range' | 'multi')
     } catch (error) {
     }
-  }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, keyboardSelectionMode])
+  }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, keyboardSelectionMode, isGeneratingMelody, isAutoRecording])
 
   const handleGenerateMelody = useCallback((): void => {
     setIsGeneratingMelody(true)
@@ -206,7 +209,10 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
       ? generateNotesWithSeparateOctaves(keyboardOctaves.lower, keyboardOctaves.higher)
       : notes
 
-    generateMelody(melodyNotes, numberOfNotes, instrument, keyboardSelectionMode)
+    // Take a snapshot of currently selected notes to prevent interference from note clicks during generation
+    const selectedNotesSnapshot = [...selectedNotes]
+
+    generateMelody(melodyNotes, numberOfNotes, instrument, keyboardSelectionMode, selectedNotesSnapshot)
 
     const duration = calculateMelodyDuration(numberOfNotes, bpm, instrument)
     setMelodyDuration(duration)
@@ -215,7 +221,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     clearChanges()
 
     // isGeneratingMelody will stay true until recorded audio is ready
-  }, [generateMelody, numberOfNotes, instrument, keyboardOctaves, keyboardSelectionMode, calculateMelodyDuration, bpm, setMelodyDuration, setPlaybackProgress, handleClearRecordedAudio, clearChanges])
+  }, [generateMelody, numberOfNotes, instrument, keyboardOctaves, keyboardSelectionMode, selectedNotes, calculateMelodyDuration, bpm, setMelodyDuration, setPlaybackProgress, handleClearRecordedAudio, clearChanges])
 
   const handlePlayMelody = useCallback((): void => {
     if (isPlaying) {

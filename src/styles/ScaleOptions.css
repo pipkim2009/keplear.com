@@ -22,17 +22,25 @@
   width: auto;
 }
 
-/* Fix height issue for guitar and bass instruments */
+/* Set container height to exactly match button height for guitar and bass */
 .scale-options-container.collapsed:has(.scale-options-toggle.instrument-guitar),
 .scale-options-container.collapsed:has(.scale-options-toggle.instrument-bass) {
-  min-height: 32px;
   height: 32px;
-  display: flex;
-  align-items: center;
+  min-height: 32px;
+  max-height: 32px;
 }
+
 
 .scale-options-container.expanded {
   width: auto;
+}
+
+/* Keep expanded container height same as button for guitar/bass */
+.scale-options-container.expanded:has(.scale-options-toggle.instrument-guitar),
+.scale-options-container.expanded:has(.scale-options-toggle.instrument-bass) {
+  height: 32px;
+  min-height: 32px;
+  max-height: 32px;
 }
 
 .scale-options-popup {

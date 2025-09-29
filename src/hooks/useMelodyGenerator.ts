@@ -14,7 +14,7 @@ interface UseMelodyGeneratorReturn {
   readonly generatedMelody: readonly Note[]
   readonly clearTrigger: number
   selectNote: (note: Note, selectionMode?: 'range' | 'multi') => void
-  generateMelody: (notes: readonly Note[], numberOfNotes: number, instrument?: InstrumentType, selectionMode?: 'range' | 'multi') => void
+  generateMelody: (notes: readonly Note[], numberOfNotes: number, instrument?: InstrumentType, selectionMode?: 'range' | 'multi', notesToUse?: readonly Note[]) => void
   setGuitarNotes: (notes: Note[]) => void
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
@@ -60,27 +60,32 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
    * @param numberOfNotes - Number of notes to generate in the melody
    * @param instrument - The instrument type ('keyboard' or 'guitar')
    * @param selectionMode - The keyboard selection mode
+   * @param notesToUse - Optional snapshot of notes to use instead of current selectedNotes
    */
   const generateMelody = useCallback((
     notes: readonly Note[],
     numberOfNotes: number,
     instrument: InstrumentType = 'keyboard',
-    selectionMode: 'range' | 'multi' = 'range'
+    selectionMode: 'range' | 'multi' = 'range',
+    notesToUse?: readonly Note[]
   ): void => {
     if (numberOfNotes <= 0) {
       console.warn('Number of notes must be positive')
       return
     }
 
+    // Use provided notes snapshot or current selectedNotes
+    const currentSelectedNotes = notesToUse || selectedNotes
+
     if (instrument === 'keyboard') {
       if (selectionMode === 'range') {
         // Range mode: requires exactly 2 notes for range selection
-        if (selectedNotes.length !== 2) {
+        if (currentSelectedNotes.length !== 2) {
           console.warn('Range mode requires exactly 2 notes selected')
           return
         }
 
-        const [note1, note2] = [...selectedNotes].sort((a, b) => a.position - b.position)
+        const [note1, note2] = [...currentSelectedNotes].sort((a, b) => a.position - b.position)
 
         // If the same note is selected twice, create melody with just that note
         if (note1.name === note2.name) {
@@ -108,43 +113,43 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
         setGeneratedMelody(melody)
       } else {
         // Multi mode: use selected notes directly (like guitar)
-        if (selectedNotes.length === 0) {
+        if (currentSelectedNotes.length === 0) {
           console.warn('Multi-select mode requires at least one note selected')
           return
         }
 
         const melody = Array(numberOfNotes).fill(null).map(() =>
-          selectedNotes[Math.floor(Math.random() * selectedNotes.length)]
+          currentSelectedNotes[Math.floor(Math.random() * currentSelectedNotes.length)]
         )
 
         setGeneratedMelody(melody)
       }
     } else if (instrument === 'guitar') {
       // Guitar logic: use all selected notes directly
-      if (selectedNotes.length === 0) {
+      if (currentSelectedNotes.length === 0) {
         console.warn('Guitar requires at least one note selected')
         return
       }
 
       const melody = Array(numberOfNotes).fill(null).map(() =>
-        selectedNotes[Math.floor(Math.random() * selectedNotes.length)]
+        currentSelectedNotes[Math.floor(Math.random() * currentSelectedNotes.length)]
       )
 
       setGeneratedMelody(melody)
     } else if (instrument === 'bass') {
       // Bass logic: use all selected notes directly (same as guitar)
-      if (selectedNotes.length === 0) {
+      if (currentSelectedNotes.length === 0) {
         console.warn('Bass requires at least one note selected')
         return
       }
 
       const melody = Array(numberOfNotes).fill(null).map(() =>
-        selectedNotes[Math.floor(Math.random() * selectedNotes.length)]
+        currentSelectedNotes[Math.floor(Math.random() * currentSelectedNotes.length)]
       )
 
       setGeneratedMelody(melody)
     }
-  }, [selectedNotes])
+  }, [])
 
   /**
    * Guitar-specific method to set all selected notes at once
