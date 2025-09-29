@@ -264,10 +264,11 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
       {isExpanded && (
         <div
-          className="scale-options-popup"
+          className={`scale-options-popup ${!isScaleMode ? 'chord-mode' : ''}`}
         >
-          {/* Mode Toggle Slider */}
-          <div className="control-section">
+          <div className={`scale-options-content ${!isScaleMode ? 'chord-mode' : ''}`}>
+            {/* Mode Toggle Slider */}
+            <div className="control-section">
             <div className="mode-toggle">
               <label className="toggle-switch">
                 <input
@@ -283,7 +284,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
             </div>
           </div>
 
-          <div className="scale-controls">
+          <div className={`scale-controls ${!isScaleMode ? 'chord-mode' : ''}`}>
             <div className="control-section">
               <label className="control-label">Root Note</label>
               <select
@@ -295,7 +296,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     onChordRootChange(e.target.value)
                   }
                 }}
-                className="control-select"
+                className={`control-select ${!isScaleMode ? 'chord-mode' : ''}`}
               >
                 {currentRootNotes.map(note => (
                   <option key={note} value={note}>{note}</option>
@@ -321,7 +322,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                         if (scale) handleKeyboardScaleChange(scale)
                       }
                     }}
-                    className="control-select"
+                    className={`control-select ${!isScaleMode ? 'chord-mode' : ''}`}
                   >
                     {(instrument === 'guitar' ? GUITAR_SCALES : instrument === 'bass' ? BASS_SCALES : KEYBOARD_SCALES).map(scale => (
                       <option key={scale.name} value={scale.name}>{scale.name}</option>
@@ -335,7 +336,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     <select
                       value={selectedBoxIndex}
                       onChange={(e) => handleBoxChange(parseInt(e.target.value))}
-                      className="control-select"
+                      className={`control-select ${!isScaleMode ? 'chord-mode' : ''}`}
                     >
                       {availableBoxes.map((box, index) => (
                         <option key={index} value={index}>
@@ -355,7 +356,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     <select
                       value={selectedBoxIndex}
                       onChange={(e) => handleBoxChange(parseInt(e.target.value))}
-                      className="control-select"
+                      className={`control-select ${!isScaleMode ? 'chord-mode' : ''}`}
                     >
                       {availableBassBoxes.map((box, index) => (
                         <option key={index} value={index}>
@@ -418,7 +419,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                         if (chord) handleKeyboardChordChange(chord)
                       }
                     }}
-                    className="control-select"
+                    className={`control-select ${!isScaleMode ? 'chord-mode' : ''}`}
                   >
                     {(instrument === 'guitar' ? GUITAR_CHORDS : instrument === 'bass' ? BASS_CHORDS : KEYBOARD_CHORDS).map(chord => (
                       <option key={chord.name} value={chord.name}>{chord.name}</option>
@@ -432,7 +433,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     <select
                       value={selectedShapeIndex}
                       onChange={(e) => handleShapeChange(parseInt(e.target.value))}
-                      className="control-select"
+                      className={`control-select ${!isScaleMode ? 'chord-mode' : ''}`}
                     >
                       {availableShapes.map((shape, index) => (
                         <option key={index} value={index}>
@@ -449,7 +450,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     <select
                       value={selectedShapeIndex}
                       onChange={(e) => handleShapeChange(parseInt(e.target.value))}
-                      className="control-select"
+                      className={`control-select ${!isScaleMode ? 'chord-mode' : ''}`}
                     >
                       {availableBassShapes.map((shape, index) => (
                         <option key={index} value={index}>
@@ -492,6 +493,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                 )}
               </>
             )}
+          </div>
           </div>
         </div>
       )}
