@@ -12,12 +12,32 @@ interface AuthModalProps {
 
 const AuthModal = ({ isOpen, onClose, initialForm = 'login' }: AuthModalProps) => {
   const [currentForm, setCurrentForm] = useState<'login' | 'signup'>(initialForm)
+  const [isDarkMode, setIsDarkMode] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
       setCurrentForm(initialForm)
     }
   }, [isOpen, initialForm])
+
+  // Check for dark mode from document.body
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDarkMode(document.body.classList.contains('dark'))
+    }
+
+    // Check initially
+    checkDarkMode()
+
+    // Set up observer to watch for theme changes
+    const observer = new MutationObserver(checkDarkMode)
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   if (!isOpen) return null
 
@@ -46,16 +66,18 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login' }: AuthModalProps) =
   }
 
   const modalContent = (
-    <div className={styles.authModalOverlay} onClick={handleBackdropClick}>
-      <div className={styles.authModal}>
-        <button 
-          className="close-button" 
+    <div className={`${styles.authModalOverlay} ${isDarkMode ? 'dark' : ''}`} onClick={handleBackdropClick}>
+      <div className={`${styles.authModal} ${isDarkMode ? 'dark' : ''}`}>
+        <button
+          className={styles.closeButton}
           onClick={handleClose}
           aria-label="Close"
         >
           ×
         </button>
-        {renderCurrentForm()}
+        <div className={isDarkMode ? 'dark' : ''}>
+          {renderCurrentForm()}
+        </div>
       </div>
     </div>
   )

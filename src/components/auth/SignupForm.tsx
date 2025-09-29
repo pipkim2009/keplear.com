@@ -82,7 +82,7 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
   return (
     <div className={styles.authForm}>
       <h2>Sign Up</h2>
-      
+
       {error && (
         <div className={styles.errorMessage}>
           {error}
@@ -90,7 +90,7 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
       )}
 
       {message && (
-        <div className="success-message">
+        <div className={styles.successMessage}>
           {message}
         </div>
       )}
@@ -143,21 +143,21 @@ const SignupForm = ({ onToggleForm }: SignupFormProps) => {
           />
         </div>
 
-        <button 
-          type="submit" 
-          className={`${styles.authButton} primary create-account`}
+        <button
+          type="submit"
+          className={`${styles.authButton} ${styles.primary} ${styles.createAccount}`}
           disabled={loading}
         >
           {loading ? 'Creating account...' : 'Create Account'}
         </button>
       </form>
 
-      <div className="auth-footer">
+      <div className={styles.authFooter}>
         <p>
           Already have an account?{' '}
-          <button 
+          <button
             type="button"
-            className="link-button"
+            className={styles.linkButton}
             onClick={() => onToggleForm('login')}
           >
             Sign in

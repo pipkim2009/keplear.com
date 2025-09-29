@@ -42,7 +42,7 @@ const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
   return (
     <div className={styles.authForm}>
       <h2>Sign In</h2>
-      
+
       {error && (
         <div className={styles.errorMessage}>
           {error}
@@ -80,21 +80,21 @@ const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
           />
         </div>
 
-        <button 
-          type="submit" 
-          className={`${styles.authButton} primary create-account`}
+        <button
+          type="submit"
+          className={`${styles.authButton} ${styles.primary} ${styles.createAccount}`}
           disabled={loading}
         >
           {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
 
-      <div className="auth-footer">
+      <div className={styles.authFooter}>
         <p>
           Don't have an account?{' '}
-          <button 
+          <button
             type="button"
-            className="link-button"
+            className={styles.linkButton}
             onClick={() => onToggleForm('signup')}
           >
             Sign up
