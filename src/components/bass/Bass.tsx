@@ -29,7 +29,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(new Array(4).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(new Set())
-  const [manualSelectedNotes, setManualSelectedNotes] = useState<Set<string>>(new Set()) // Track manual selections separately
+  const [manualSelectedNotes, setManualSelectedNotes] = useState<Set<string>>(new Set())
   const [currentScale, setCurrentScale] = useState<{ root: string; scale: BassScale } | null>(null)
   const [appliedScales, setAppliedScales] = useState<{ root: string; scale: BassScale; notes: Set<string> }[]>([])
   const [scaleSelectedNotes, setScaleSelectedNotes] = useState<Set<string>>(new Set())
@@ -40,358 +40,46 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const [hoveredNote, setHoveredNote] = useState<{ string: number; fret: number } | null>(null)
 
   const handleStringCheckboxChange = (index: number) => {
-    const newCheckboxes = [...stringCheckboxes]
-    const wasChecked = newCheckboxes[index]
-
-    if (wasChecked) {
-      // If unchecking, clear manual layer notes for this string (scales/chords remain)
-      setManualSelectedNotes(prevManual => {
-        const newManualNotes = new Set(prevManual)
-
-        // Remove open string from manual layer
-        newManualNotes.delete(`${index}-open`)
-
-        // Remove all frets on this string from manual layer
-        for (let fretIndex = 0; fretIndex < 24; fretIndex++) {
-          newManualNotes.delete(`${index}-${fretIndex}`)
-        }
-
-        return newManualNotes
-      })
-    } else {
-      // If checking, add all notes on this string to manual layer
-      setManualSelectedNotes(prevManual => {
-        const newManualNotes = new Set(prevManual)
-
-        // Add open string to manual layer
-        newManualNotes.add(`${index}-open`)
-
-        // Add all frets on this string to manual layer
-        for (let fretIndex = 0; fretIndex < 24; fretIndex++) {
-          newManualNotes.add(`${index}-${fretIndex}`)
-        }
-
-        return newManualNotes
-      })
-    }
-
-    newCheckboxes[index] = !newCheckboxes[index]
-    setStringCheckboxes(newCheckboxes)
+    // No functionality
   }
 
   const handleFretCheckboxChange = (index: number) => {
-    const newCheckboxes = [...fretCheckboxes]
-    const wasChecked = newCheckboxes[index]
-
-    if (wasChecked) {
-      // If unchecking, clear manual layer notes for this fret (scales/chords remain)
-      setManualSelectedNotes(prevManual => {
-        const newManualNotes = new Set(prevManual)
-
-        for (let stringIndex = 0; stringIndex < 4; stringIndex++) {
-          let noteKey: string
-          if (index === 0) {
-            // Open fret - remove open string selections
-            noteKey = `${stringIndex}-open`
-          } else {
-            // Regular fret
-            noteKey = `${stringIndex}-${index - 1}` // Adjust for open fret offset
-          }
-          newManualNotes.delete(noteKey)
-        }
-
-        return newManualNotes
-      })
-    } else {
-      // If checking, add all notes on this fret to manual layer
-      setManualSelectedNotes(prevManual => {
-        const newManualNotes = new Set(prevManual)
-
-        for (let stringIndex = 0; stringIndex < 4; stringIndex++) {
-          let noteKey: string
-          if (index === 0) {
-            // Open fret - add open string selections
-            noteKey = `${stringIndex}-open`
-          } else {
-            // Regular fret
-            noteKey = `${stringIndex}-${index - 1}` // Adjust for open fret offset
-          }
-          newManualNotes.add(noteKey)
-        }
-
-        return newManualNotes
-      })
-    }
-
-    newCheckboxes[index] = !newCheckboxes[index]
-    setFretCheckboxes(newCheckboxes)
+    // No functionality
   }
 
   // Get note name for a specific string and fret
   const getNoteForStringAndFret = useCallback((stringIndex: number, fretIndex: number): string => {
-    // Map visual string index to technical string number (G D A E -> 1 2 3 4)
-    const stringMapping = [1, 2, 3, 4] // High G to Low E in bassNotes
-    const bassString = stringMapping[stringIndex] // Direct mapping since bass is simpler
-    const fret = fretIndex + 1 // Convert to 1-indexed for fret (0 = open, but we're showing frets 1-12)
-
+    const stringMapping = [1, 2, 3, 4]
+    const bassString = stringMapping[stringIndex]
+    const fret = fretIndex + 1
     const note = bassNotes.find(note => note.string === bassString && note.fret === fret)
     return note ? note.name : ''
   }, [])
 
   // Handle clicking on open strings (fret 0)
   const handleOpenStringClick = async (stringIndex: number) => {
-    const noteKey = `${stringIndex}-open`
-    const newSelectedNotes = new Set(selectedNotes)
-
-    // Play the note sound if onNoteClick is provided
-    if (onNoteClick) {
-      // Get open string note (fret 0)
-      const stringMapping = [1, 2, 3, 4] // Map visual index to bass string number
-      const bassString = stringMapping[stringIndex]
-      const openNote = bassNotes.find(note => note.string === bassString && note.fret === 0)
-
-      if (openNote) {
-        const noteObj: Note = {
-          name: openNote.name,
-          frequency: openNote.frequency,
-          isBlack: openNote.name.includes('#'),
-          position: stringIndex * 100 - 1 // Unique position for open strings
-        }
-        await onNoteClick(noteObj)
-      }
-    }
-
-    // Check current state - note is visible if it's in ANY layer
-    const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
-    const isManuallySelected = manualSelectedNotes.has(noteKey)
-    const isStringSelected = stringCheckboxes[stringIndex]
-    const isOpenFretSelected = fretCheckboxes[0]
-    const isCheckboxSelected = isStringSelected || isOpenFretSelected
-    const isInManualLayer = isManuallySelected || isCheckboxSelected
-    const currentlyVisible = isInScaleChordLayer || isInManualLayer
-
-    if (currentlyVisible && isInManualLayer) {
-      // Note is currently showing and has a manual layer - remove only the manual layer
-      setManualSelectedNotes(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(noteKey) // Remove from manual layer
-        return newSet
-      })
-
-      // Handle checkbox conversions if needed
-      if (isCheckboxSelected && !isManuallySelected) {
-        const newStringCheckboxes = [...stringCheckboxes]
-        const newFretCheckboxes = [...fretCheckboxes]
-
-        // Convert string checkbox selections to individual selections
-        if (isStringSelected) {
-          newStringCheckboxes[stringIndex] = false
-          // Add all other notes on this string as individual manual selections (except the clicked one)
-          setManualSelectedNotes(prev => {
-            const newSet = new Set(prev)
-            // Don't add open string since we're clicking on it to deselect
-            for (let fret = 0; fret < 24; fret++) {
-              newSet.add(`${stringIndex}-${fret}`)
-            }
-            return newSet
-          })
-        }
-
-        // Convert open fret checkbox selections to individual selections
-        if (isOpenFretSelected) {
-          newFretCheckboxes[0] = false
-          // Add all other open strings as individual manual selections (except the clicked one)
-          setManualSelectedNotes(prev => {
-            const newSet = new Set(prev)
-            for (let str = 0; str < 4; str++) {
-              if (str !== stringIndex) {
-                newSet.add(`${str}-open`)
-              }
-            }
-            return newSet
-          })
-        }
-
-        setStringCheckboxes(newStringCheckboxes)
-        setFretCheckboxes(newFretCheckboxes)
-      }
-    } else if (!currentlyVisible || (currentlyVisible && !isInManualLayer)) {
-      // Note is not showing OR it's only showing via scale/chord layer - add to manual layer
-      setManualSelectedNotes(prev => {
-        const newSet = new Set(prev)
-        newSet.add(noteKey) // Add to manual layer
-        return newSet
-      })
-    }
+    // No functionality
   }
 
   // Handle clicking on individual fret positions
   const handleNoteClick = async (stringIndex: number, fretIndex: number) => {
-    const noteKey = `${stringIndex}-${fretIndex}`
-    const newSelectedNotes = new Set(selectedNotes)
-
-    // Play the note sound if onNoteClick is provided
-    if (onNoteClick) {
-      const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
-      if (noteName) {
-        // Find the corresponding bass note for full Note object
-        const stringMapping = [1, 2, 3, 4] // Map visual index to bass string number
-        const bassString = stringMapping[stringIndex]
-        const bassNote = bassNotes.find(note =>
-          note.string === bassString && note.fret === fretIndex + 1
-        )
-
-        if (bassNote) {
-          const noteObj: Note = {
-            name: noteName,
-            frequency: bassNote.frequency,
-            isBlack: noteName.includes('#'),
-            position: stringIndex * 100 + fretIndex
-          }
-          await onNoteClick(noteObj)
-        }
-      }
-    }
-
-    // Check current state - note is visible if it's in ANY layer
-    const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
-    const isManuallySelected = manualSelectedNotes.has(noteKey)
-    const isStringSelected = stringCheckboxes[stringIndex]
-    const isFretSelected = fretCheckboxes[fretIndex + 1] // Adjust for open fret offset
-    const isCheckboxSelected = isStringSelected || isFretSelected
-    const isInManualLayer = isManuallySelected || isCheckboxSelected
-    const currentlyVisible = isInScaleChordLayer || isInManualLayer
-
-    if (currentlyVisible && isInManualLayer) {
-      // Note is currently showing and has a manual layer - remove only the manual layer
-      setManualSelectedNotes(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(noteKey) // Remove from manual layer
-        return newSet
-      })
-
-      // Handle checkbox conversions if needed
-      if (isCheckboxSelected && !isManuallySelected) {
-        const newStringCheckboxes = [...stringCheckboxes]
-        const newFretCheckboxes = [...fretCheckboxes]
-
-        // Convert string checkbox selections to individual selections
-        if (isStringSelected) {
-          newStringCheckboxes[stringIndex] = false
-          // Add all other notes on this string as individual manual selections (except the clicked one)
-          setManualSelectedNotes(prev => {
-            const newSet = new Set(prev)
-            newSet.add(`${stringIndex}-open`) // Add open string
-            for (let fret = 0; fret < 24; fret++) {
-              if (fret !== fretIndex) {
-                newSet.add(`${stringIndex}-${fret}`)
-              }
-            }
-            // Don't add the clicked note since we're deselecting it
-            return newSet
-          })
-        }
-
-        // Convert fret checkbox selections to individual selections
-        if (isFretSelected) {
-          newFretCheckboxes[fretIndex + 1] = false // Adjust for open fret offset
-          // Add all other notes on this fret as individual manual selections (except the clicked one)
-          setManualSelectedNotes(prev => {
-            const newSet = new Set(prev)
-            for (let str = 0; str < 4; str++) {
-              if (str !== stringIndex) {
-                newSet.add(`${str}-${fretIndex}`)
-              }
-            }
-            // Don't add the clicked note since we're deselecting it
-            return newSet
-          })
-        }
-
-        setStringCheckboxes(newStringCheckboxes)
-        setFretCheckboxes(newFretCheckboxes)
-      }
-    } else if (!currentlyVisible || (currentlyVisible && !isInManualLayer)) {
-      // Note is not showing OR it's only showing via scale/chord layer - add to manual layer
-      setManualSelectedNotes(prev => {
-        const newSet = new Set(prev)
-        newSet.add(noteKey) // Add to manual layer
-        return newSet
-      })
-    }
+    // No functionality
   }
 
   // Check if a specific note is selected
   const isNoteSelected = useCallback((stringIndex: number, fretIndex: number): boolean => {
-    const noteKey = `${stringIndex}-${fretIndex}`
-
-    // A note is selected if it's in any layer: scale/chord layer OR manual layer
-    const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
-    const isInManualLayer = manualSelectedNotes.has(noteKey) || stringCheckboxes[stringIndex] || fretCheckboxes[fretIndex + 1]
-
-    return isInScaleChordLayer || isInManualLayer
-  }, [scaleSelectedNotes, chordSelectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+    return false
+  }, [])
 
   // Check if an open string is selected (considering all layers)
   const isOpenStringSelected = useCallback((stringIndex: number): boolean => {
-    const openKey = `${stringIndex}-open`
-
-    // A note is selected if it's in any layer: scale/chord layer OR manual layer
-    const isInScaleChordLayer = scaleSelectedNotes.has(openKey) || chordSelectedNotes.has(openKey)
-    const isInManualLayer = manualSelectedNotes.has(openKey) || stringCheckboxes[stringIndex] || fretCheckboxes[0]
-
-    return isInScaleChordLayer || isInManualLayer
-  }, [scaleSelectedNotes, chordSelectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+    return false
+  }, [])
 
   // Convert bass notes to the Note format expected by the melody system
   const convertToMelodyNotes = useCallback((): Note[] => {
-    const melodyNotes: Note[] = []
-
-    // Check open strings first
-    for (let stringIndex = 0; stringIndex < 4; stringIndex++) {
-      if (isOpenStringSelected(stringIndex)) {
-        const stringMapping = [1, 2, 3, 4] // Map visual index to bass string number
-        const bassString = stringMapping[stringIndex]
-        const openNote = bassNotes.find(note => note.string === bassString && note.fret === 0)
-
-        if (openNote) {
-          melodyNotes.push({
-            name: openNote.name,
-            frequency: openNote.frequency,
-            isBlack: openNote.name.includes('#'),
-            position: stringIndex * 100 - 1 // Position for open strings
-          })
-        }
-      }
-    }
-
-    // Check all fretted note positions
-    for (let stringIndex = 0; stringIndex < 4; stringIndex++) {
-      for (let fretIndex = 0; fretIndex < 24; fretIndex++) {
-        if (isNoteSelected(stringIndex, fretIndex)) {
-          const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
-          if (noteName) {
-            // Find the corresponding bass note for frequency
-            const stringMapping = [1, 2, 3, 4] // Map visual index to bass string number
-            const bassString = stringMapping[stringIndex]
-            const bassNote = bassNotes.find(note =>
-              note.string === bassString && note.fret === fretIndex + 1
-            )
-
-            // Convert to melody system format
-            melodyNotes.push({
-              name: noteName,
-              frequency: bassNote ? bassNote.frequency : 0,
-              isBlack: noteName.includes('#'),
-              position: stringIndex * 100 + fretIndex // Unique position for bass notes
-            })
-          }
-        }
-      }
-    }
-
-    return melodyNotes
-  }, [isOpenStringSelected, isNoteSelected, getNoteForStringAndFret, bassNotes])
+    return []
+  }, [])
 
   // Sync bass selections with parent component for deselect all button visibility
   useEffect(() => {
@@ -399,319 +87,99 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     setBassNotes(melodyNotes)
   }, [selectedNotes, stringCheckboxes, fretCheckboxes, convertToMelodyNotes, setBassNotes])
 
-  // Note: Removed useEffect that was causing infinite loop
-  // The Bass component manages its own state internally
-  // setBassNotes is called when selections change to keep parent in sync
-
-  // Handle scale selection - MULTIPLE SCALES VERSION
+  // Handle scale selection
   const handleScaleSelect = useCallback((rootNote: string, scale: BassScale) => {
-    // Apply scale to bass
-    const scaleSelections = applyScaleToBass(rootNote, scale, bassNotes)
-
-    // Use functional updates to avoid dependencies on current state (SAME AS CHORDS)
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
-      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.add(noteKey)
-      })
-      return newSelectedNotes
-    })
-
-    setScaleSelectedNotes(prev => {
-      const newScaleSelectedNotes = new Set(prev)
-      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newScaleSelectedNotes.add(noteKey)
-      })
-      return newScaleSelectedNotes
-    })
-
-    // Update scale state
-    setCurrentScale({ root: rootNote, scale })
-    // Keep scale state when scale is applied - allow coexistence
-  }, [bassNotes])
+    // No functionality
+  }, [])
 
   // Handle scale deletion
   const handleScaleDelete = useCallback((rootNote: string, scale: BassScale) => {
-    console.log('🎻 Bass handleScaleDelete called:', rootNote, scale.name)
-    // Remove scale notes from selection by reapplying the scale and removing those notes
-    const scaleSelections = applyScaleToBass(rootNote, scale, bassNotes)
-
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
-      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.delete(noteKey)
-      })
-      return newSelectedNotes
-    })
-
-    setScaleSelectedNotes(prev => {
-      const newScaleSelectedNotes = new Set(prev)
-      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newScaleSelectedNotes.delete(noteKey)
-      })
-      return newScaleSelectedNotes
-    })
-
-    // Clear scale highlighting if this was the current scale
-    if (currentScale &&
-        currentScale.root === rootNote &&
-        currentScale.scale.name === scale.name) {
-      setCurrentScale(null)
-    }
-  }, [bassNotes])
+    // No functionality
+  }, [])
 
   // Handle scale box selection
   const handleScaleBoxSelect = useCallback((scaleBox: BassScaleBox) => {
-    // Apply scale box to bass
-    const scaleSelections = applyScaleBoxToBass(scaleBox)
-    // Use functional updates to accumulate scales (SAME AS handleScaleSelect)
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
-      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.add(noteKey)
-      })
-      return newSelectedNotes
-    })
-
-    setScaleSelectedNotes(prev => {
-      const newScaleSelectedNotes = new Set(prev)
-      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newScaleSelectedNotes.add(noteKey)
-      })
-      return newScaleSelectedNotes
-    })
-
-    // Convert scale selections to melody notes and update melody system
-    const melodyNotes: Note[] = []
-    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
-      if (noteName) {
-        const stringMapping = [4, 3, 2, 1] // Bass string mapping
-        const bassString = stringMapping[stringIndex]
-        const bassNote = bassNotes.find(note =>
-          note.string === bassString && note.fret === fretIndex + 1
-        )
-        if (bassNote) {
-          melodyNotes.push({
-            name: noteName,
-            frequency: bassNote.frequency,
-            isBlack: noteName.includes('#'),
-            position: stringIndex * 100 + fretIndex
-          })
-        }
-      }
-    })
-    setBassNotes(melodyNotes)
-
-    // For box selection, we need to derive the scale info from the box
-    // We'll use the first position's root information
-    const rootPosition = scaleBox.positions.find(pos => pos.isRoot)
-    if (rootPosition) {
-      const rootNote = rootPosition.note.replace(/\d+$/, '') // Remove octave
-      // We need to find the scale that matches this box - for now, use the current scale
-      // In a more complete implementation, you'd store scale info with the box
-      setCurrentScale({ root: rootNote, scale: currentScale?.scale || BASS_SCALES[0] })
-    }
-
-    // Update checkboxes to reflect no individual selections
-    setStringCheckboxes(new Array(4).fill(false))
-    setFretCheckboxes(new Array(25).fill(false))
-  }, [currentScale, setBassNotes])
+    // No functionality
+  }, [])
 
   // Handle clearing scale
   const handleClearScale = useCallback(() => {
-    setCurrentScale(null)
-    setAppliedScales([])
-    setStringCheckboxes(new Array(4).fill(false))
-    setFretCheckboxes(new Array(25).fill(false))
-    setSelectedNotes(new Set())
-    setScaleSelectedNotes(new Set())
-    // Clear chord state when clearing scale
-    setCurrentChord(null)
-    setChordSelectedNotes(new Set())
+    // No functionality
   }, [])
 
   // Handle chord selection
   const handleChordSelect = useCallback((rootNote: string, chord: BassChord) => {
-    // Apply chord to bass
-    const chordSelections = applyChordToBass(rootNote, chord, bassNotes)
-
-    // Use functional updates to avoid dependencies on current state
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
-      chordSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.add(noteKey)
-      })
-      return newSelectedNotes
-    })
-
-    setChordSelectedNotes(prev => {
-      const newChordSelectedNotes = new Set(prev)
-      chordSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newChordSelectedNotes.add(noteKey)
-      })
-      return newChordSelectedNotes
-    })
-
-    // Update chord state
-    setCurrentChord({ root: rootNote, chord })
-    // Keep scale state when chord is applied - allow coexistence
+    // No functionality
   }, [])
 
   // Handle chord shape selection
   const handleChordShapeSelect = useCallback((chordShape: BassChordShape & { root?: string }) => {
-    // Apply chord shape to bass
-    const chordSelections = applyBassChordShapeToBass(chordShape)
-
-    // Use functional updates to avoid dependencies on current state
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
-      chordSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.add(noteKey)
-      })
-      return newSelectedNotes
-    })
-
-    setChordSelectedNotes(prev => {
-      const newChordSelectedNotes = new Set(prev)
-      chordSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newChordSelectedNotes.add(noteKey)
-      })
-      return newChordSelectedNotes
-    })
-
-    // Set current chord information for root note detection
-    if (chordShape.root) {
-      // Create a basic chord object for root detection
-      const basicChord = { name: chordShape.name, intervals: [] }
-      setCurrentChord({ root: chordShape.root, chord: basicChord as any })
-    }
-
-    // Keep scale state when chord shape is applied - allow coexistence
+    // No functionality
   }, [])
 
   // Handle clearing chord
   const handleClearChord = useCallback(() => {
-    setCurrentChord(null)
-    setStringCheckboxes(new Array(4).fill(false))
-    setFretCheckboxes(new Array(25).fill(false))
-    setSelectedNotes(new Set())
-    setChordSelectedNotes(new Set())
+    // No functionality
   }, [])
 
   // Handle removing specific chord notes
   const handleRemoveChordNotes = useCallback((noteKeys: string[]) => {
-    setSelectedNotes(prev => {
-      const newSet = new Set(prev)
-      noteKeys.forEach(key => newSet.delete(key))
-      return newSet
-    })
-    setChordSelectedNotes(prev => {
-      const newSet = new Set(prev)
-      noteKeys.forEach(key => newSet.delete(key))
-      return newSet
-    })
-    // Also remove from scale highlighting state to prevent visual artifacts
-    setScaleSelectedNotes(prev => {
-      const newSet = new Set(prev)
-      noteKeys.forEach(key => newSet.delete(key))
-      return newSet
-    })
+    // No functionality
   }, [])
 
-  // Handle removing chord notes only (preserves scale notes for individual chord deletion)
+  // Handle removing chord notes only
   const handleRemoveChordNotesOnly = useCallback((noteKeys: string[]) => {
-    setSelectedNotes(prev => {
-      const newSet = new Set(prev)
-      noteKeys.forEach(key => newSet.delete(key))
-      return newSet
-    })
-    setChordSelectedNotes(prev => {
-      const newSet = new Set(prev)
-      noteKeys.forEach(key => newSet.delete(key))
-      return newSet
-    })
-    // Do NOT remove from scaleSelectedNotes to preserve scale highlighting
+    // No functionality
   }, [])
 
   // Check if a note was selected as part of the current scale application
   const isNoteInCurrentScale = (stringIndex: number, fretIndex: number): boolean => {
-    const noteKey = `${stringIndex}-${fretIndex}`
-    return scaleSelectedNotes.has(noteKey)
+    return false
   }
 
   // Check if an open string was selected as part of the current scale application
   const isOpenStringInCurrentScale = (stringIndex: number): boolean => {
-    const noteKey = `${stringIndex}-open`
-    return scaleSelectedNotes.has(noteKey)
+    return false
   }
 
   // Check if a note is the root note of any applied scale
   const isScaleRootNote = (noteName: string): boolean => {
-    const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
-
-    // Check against all applied scales first
-    if (appliedScales.length > 0) {
-      return appliedScales.some(appliedScale => noteNameWithoutOctave === appliedScale.root)
-    }
-
-    // Fallback to current scale for backward compatibility
-    if (currentScale) {
-      return noteNameWithoutOctave === currentScale.root
-    }
-
     return false
   }
 
   // Check if a note is the root note of the current chord
   const isChordRootNote = (noteName: string): boolean => {
-    if (currentChord) {
-      const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
-      return noteNameWithoutOctave === currentChord.root
-    }
     return false
   }
 
   // Check if a note is the root note of the current scale or chord
   const isRootNote = (noteName: string): boolean => {
-    return isScaleRootNote(noteName) || isChordRootNote(noteName)
+    return false
   }
 
   // Check if a note was selected as part of the current chord application
   const isNoteInCurrentChord = (stringIndex: number, fretIndex: number): boolean => {
-    const noteKey = `${stringIndex}-${fretIndex}`
-    return chordSelectedNotes.has(noteKey)
+    return false
   }
 
   // Check if an open string was selected as part of the current chord application
   const isOpenStringInCurrentChord = (stringIndex: number): boolean => {
-    const noteKey = `${stringIndex}-open`
-    return chordSelectedNotes.has(noteKey)
+    return false
   }
 
   // Check if a note should show preview on string hover
   const shouldShowStringPreview = (stringIndex: number): boolean => {
-    return hoveredString === stringIndex && !stringCheckboxes[stringIndex]
+    return false
   }
 
   // Check if a note should show preview on fret hover
   const shouldShowFretPreview = (fretIndex: number): boolean => {
-    return hoveredFret === fretIndex && !fretCheckboxes[fretIndex]
+    return false
   }
 
   // Check if a specific note should show preview on individual note hover
   const shouldShowNotePreview = (stringIndex: number, fretIndex: number): boolean => {
-    return hoveredNote?.string === stringIndex && hoveredNote?.fret === fretIndex
+    return false
   }
 
   // Provide scale handlers to parent component
