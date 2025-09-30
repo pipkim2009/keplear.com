@@ -165,75 +165,69 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       }
     }
 
-    // Check if note is part of an applied scale or chord - prevent deselection if so
-    const isInScale = scaleSelectedNotes.has(noteKey)
-    const isInChord = chordSelectedNotes.has(noteKey)
-
-    // Check current state
-    const isIndividuallySelected = selectedNotes.has(noteKey)
-    const isNegativelySelected = selectedNotes.has(`-${noteKey}`)
+    // Check current state - note is visible if it's in ANY layer
+    const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
+    const isManuallySelected = manualSelectedNotes.has(noteKey)
     const isStringSelected = stringCheckboxes[stringIndex]
     const isOpenFretSelected = fretCheckboxes[0]
     const isCheckboxSelected = isStringSelected || isOpenFretSelected
-    const currentlyVisible = (isIndividuallySelected || isCheckboxSelected) && !isNegativelySelected
+    const isInManualLayer = isManuallySelected || isCheckboxSelected
+    const currentlyVisible = isInScaleChordLayer || isInManualLayer
 
-    if (currentlyVisible) {
-      // Note is currently showing - check if we can hide it
-      if (isInScale || isInChord) {
-        // Note is part of a scale or chord - prevent manual deselection
-        console.log(`Cannot deselect open string ${noteKey} - it's part of an applied scale or chord`)
-        return
-      }
+    if (currentlyVisible && isInManualLayer) {
+      // Note is currently showing and has a manual layer - remove only the manual layer
+      setManualSelectedNotes(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(noteKey) // Remove from manual layer
+        return newSet
+      })
 
-      // Note can be deselected - proceed with normal logic
-      if (isIndividuallySelected && !isCheckboxSelected) {
-        // It's ONLY individually selected, just remove it
-        newSelectedNotes.delete(noteKey)
-      } else {
-        // It's selected via checkboxes (or both individual + checkbox) - convert to individual selections
+      // Handle checkbox conversions if needed
+      if (isCheckboxSelected && !isManuallySelected) {
         const newStringCheckboxes = [...stringCheckboxes]
         const newFretCheckboxes = [...fretCheckboxes]
 
         // Convert string checkbox selections to individual selections
         if (isStringSelected) {
           newStringCheckboxes[stringIndex] = false
-          // Add all other notes on this string as individual selections (except the clicked one)
-          // Don't add open string since we're clicking on it to deselect
-          for (let fret = 0; fret < 24; fret++) {
-            newSelectedNotes.add(`${stringIndex}-${fret}`)
-          }
-          // Explicitly ensure the clicked note is not individually selected
-          newSelectedNotes.delete(noteKey)
+          // Add all other notes on this string as individual manual selections (except the clicked one)
+          setManualSelectedNotes(prev => {
+            const newSet = new Set(prev)
+            // Don't add open string since we're clicking on it to deselect
+            for (let fret = 0; fret < 24; fret++) {
+              newSet.add(`${stringIndex}-${fret}`)
+            }
+            return newSet
+          })
         }
 
         // Convert open fret checkbox selections to individual selections
         if (isOpenFretSelected) {
           newFretCheckboxes[0] = false
-          // Add all other open strings as individual selections (except the clicked one)
-          for (let str = 0; str < 6; str++) {
-            if (str !== stringIndex) {
-              newSelectedNotes.add(`${str}-open`)
+          // Add all other open strings as individual manual selections (except the clicked one)
+          setManualSelectedNotes(prev => {
+            const newSet = new Set(prev)
+            for (let str = 0; str < 6; str++) {
+              if (str !== stringIndex) {
+                newSet.add(`${str}-open`)
+              }
             }
-          }
-          // Explicitly ensure the clicked note is not individually selected
-          newSelectedNotes.delete(noteKey)
+            // Don't add the clicked note since we're deselecting it
+            return newSet
+          })
         }
 
         setStringCheckboxes(newStringCheckboxes)
         setFretCheckboxes(newFretCheckboxes)
       }
-    } else {
-      // Note is not showing - we need to show it
-      if (isNegativelySelected) {
-        // It was negatively selected, remove the negative
-        newSelectedNotes.delete(`-${noteKey}`)
-      } else {
-        // Just add positive selection
-        newSelectedNotes.add(noteKey)
-      }
+    } else if (!currentlyVisible || (currentlyVisible && !isInManualLayer)) {
+      // Note is not showing OR it's only showing via scale/chord layer - add to manual layer
+      setManualSelectedNotes(prev => {
+        const newSet = new Set(prev)
+        newSet.add(noteKey) // Add to manual layer
+        return newSet
+      })
     }
-
-    setSelectedNotes(newSelectedNotes)
   }
 
   // Handle clicking on individual fret positions

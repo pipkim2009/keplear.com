@@ -142,57 +142,69 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       }
     }
 
-    const isInScale = scaleSelectedNotes.has(noteKey)
-    const isInChord = chordSelectedNotes.has(noteKey)
-    const isIndividuallySelected = selectedNotes.has(noteKey)
-    const isNegativelySelected = selectedNotes.has(`-${noteKey}`)
+    // Check current state - note is visible if it's in ANY layer
+    const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
+    const isManuallySelected = manualSelectedNotes.has(noteKey)
     const isStringSelected = stringCheckboxes[stringIndex]
     const isOpenFretSelected = fretCheckboxes[0]
     const isCheckboxSelected = isStringSelected || isOpenFretSelected
-    const currentlyVisible = (isIndividuallySelected || isCheckboxSelected) && !isNegativelySelected
+    const isInManualLayer = isManuallySelected || isCheckboxSelected
+    const currentlyVisible = isInScaleChordLayer || isInManualLayer
 
-    if (currentlyVisible) {
-      if (isInScale || isInChord) {
-        console.log(`Cannot deselect open string ${noteKey} - it's part of an applied scale or chord`)
-        return
-      }
+    if (currentlyVisible && isInManualLayer) {
+      // Note is currently showing and has a manual layer - remove only the manual layer
+      setManualSelectedNotes(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(noteKey) // Remove from manual layer
+        return newSet
+      })
 
-      if (isIndividuallySelected && !isCheckboxSelected) {
-        newSelectedNotes.delete(noteKey)
-      } else {
+      // Handle checkbox conversions if needed
+      if (isCheckboxSelected && !isManuallySelected) {
         const newStringCheckboxes = [...stringCheckboxes]
         const newFretCheckboxes = [...fretCheckboxes]
 
+        // Convert string checkbox selections to individual selections
         if (isStringSelected) {
           newStringCheckboxes[stringIndex] = false
-          for (let fret = 0; fret < 24; fret++) {
-            newSelectedNotes.add(`${stringIndex}-${fret}`)
-          }
-          newSelectedNotes.delete(noteKey)
+          // Add all other notes on this string as individual manual selections (except the clicked one)
+          setManualSelectedNotes(prev => {
+            const newSet = new Set(prev)
+            // Don't add open string since we're clicking on it to deselect
+            for (let fret = 0; fret < 24; fret++) {
+              newSet.add(`${stringIndex}-${fret}`)
+            }
+            return newSet
+          })
         }
 
+        // Convert open fret checkbox selections to individual selections
         if (isOpenFretSelected) {
           newFretCheckboxes[0] = false
-          for (let str = 0; str < 4; str++) {
-            if (str !== stringIndex) {
-              newSelectedNotes.add(`${str}-open`)
+          // Add all other open strings as individual manual selections (except the clicked one)
+          setManualSelectedNotes(prev => {
+            const newSet = new Set(prev)
+            for (let str = 0; str < 4; str++) {
+              if (str !== stringIndex) {
+                newSet.add(`${str}-open`)
+              }
             }
-          }
-          newSelectedNotes.delete(noteKey)
+            // Don't add the clicked note since we're deselecting it
+            return newSet
+          })
         }
 
         setStringCheckboxes(newStringCheckboxes)
         setFretCheckboxes(newFretCheckboxes)
       }
-    } else {
-      if (isNegativelySelected) {
-        newSelectedNotes.delete(`-${noteKey}`)
-      } else {
-        newSelectedNotes.add(noteKey)
-      }
+    } else if (!currentlyVisible || (currentlyVisible && !isInManualLayer)) {
+      // Note is not showing OR it's only showing via scale/chord layer - add to manual layer
+      setManualSelectedNotes(prev => {
+        const newSet = new Set(prev)
+        newSet.add(noteKey) // Add to manual layer
+        return newSet
+      })
     }
-
-    setSelectedNotes(newSelectedNotes)
   }
 
   const handleNoteClick = async (stringIndex: number, fretIndex: number) => {
