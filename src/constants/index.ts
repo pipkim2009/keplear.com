@@ -65,12 +65,12 @@ export const LAYOUT_CONFIG = {
  * External service URLs
  */
 export const SERVICE_URLS = {
-  /** Salamander Grand Piano samples base URL */
-  keyboardSamples: 'https://tonejs.github.io/audio/salamander/',
-  /** Acoustic guitar samples base URL */
+  /** Piano samples base URL from tonejs-instruments */
+  keyboardSamples: 'https://nbrosowsky.github.io/tonejs-instruments/samples/piano/',
+  /** Acoustic guitar samples base URL from tonejs-instruments */
   guitarSamples: 'https://nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/',
-  /** Bass samples base URL (using lower octave piano samples) */
-  bassSamples: 'https://tonejs.github.io/audio/salamander/'
+  /** Bass samples base URL from tonejs-instruments */
+  bassSamples: 'https://nbrosowsky.github.io/tonejs-instruments/samples/bass-electric/'
 } as const
 
 /**
