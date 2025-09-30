@@ -116,7 +116,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   }, [])
 
   const getNoteForStringAndFret = useCallback((stringIndex: number, fretIndex: number): string => {
-    const bassString = STRING_MAPPING[3 - stringIndex]
+    const bassString = STRING_MAPPING[stringIndex]
     const fret = fretIndex + 1
     const note = bassNotes.find(n => n.string === bassString && n.fret === fret)
     return note?.name ?? ''
@@ -127,7 +127,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     const newSelectedNotes = new Set(selectedNotes)
 
     if (onNoteClick) {
-      const stringMapping = [4, 3, 2, 1]
+      const stringMapping = [1, 2, 3, 4]
       const bassString = stringMapping[stringIndex]
       const openNote = bassNotes.find(note => note.string === bassString && note.fret === 0)
 
@@ -202,7 +202,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     if (onNoteClick) {
       const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
       if (noteName) {
-        const stringMapping = [4, 3, 2, 1]
+        const stringMapping = [1, 2, 3, 4]
         const bassString = stringMapping[stringIndex]
         const bassNote = bassNotes.find(note =>
           note.string === bassString && note.fret === fretIndex + 1
@@ -297,7 +297,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
     for (let stringIndex = 0; stringIndex < 4; stringIndex++) {
       if (isOpenStringSelected(stringIndex)) {
-        const stringMapping = [4, 3, 2, 1]
+        const stringMapping = [1, 2, 3, 4]
         const bassString = stringMapping[stringIndex]
         const openNote = bassNotes.find(note => note.string === bassString && note.fret === 0)
 
@@ -317,7 +317,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         if (isNoteSelected(stringIndex, fretIndex)) {
           const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
           if (noteName) {
-            const stringMapping = [4, 3, 2, 1]
+            const stringMapping = [1, 2, 3, 4]
             const bassString = stringMapping[stringIndex]
             const bassNote = bassNotes.find(note =>
               note.string === bassString && note.fret === fretIndex + 1
@@ -465,7 +465,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     scaleSelections.forEach(({ stringIndex, fretIndex }) => {
       const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
       if (noteName) {
-        const stringMapping = [4, 3, 2, 1]
+        const stringMapping = [1, 2, 3, 4]
         const bassString = stringMapping[stringIndex]
         const bassNote = bassNotes.find(note =>
           note.string === bassString && note.fret === fretIndex + 1
@@ -864,7 +864,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         {[...Array(4)].map((_, stringIndex) => {
           if (!isOpenStringSelected(stringIndex)) return null
 
-          const stringMapping = [4, 3, 2, 1]
+          const stringMapping = [1, 2, 3, 4]
           const bassString = stringMapping[stringIndex]
           const openNote = bassNotes.find(note => note.string === bassString && note.fret === 0)
 
@@ -880,6 +880,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
           const isInGeneratedMelody = isInMelody(noteObj, showNotes)
           const isInScale = isOpenStringInCurrentScale(stringIndex)
           const isInChord = isOpenStringInCurrentChord(stringIndex)
+          const isInManual = isOpenStringInManualLayer(stringIndex)
 
           let noteClass = 'bass-note-circle'
           if (isInGeneratedMelody) {
@@ -887,23 +888,44 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
           } else {
             const isChordRoot = isChordRootNote(openNote.name, stringIndex, -1) && isInChord
             const isScaleRoot = isScaleRootNote(openNote.name, stringIndex, -1) && isInScale
+            const isAnyRoot = isChordRoot || isScaleRoot
 
-            if (isChordRoot && isScaleRoot) {
-              noteClass += ' chord-root-scale-root'
-            } else if (isChordRoot && isInScale) {
-              noteClass += ' chord-root-scale-note'
-            } else if (isInChord && isScaleRoot) {
-              noteClass += ' chord-note-scale-root'
-            } else if (isChordRoot) {
-              noteClass += ' chord-root-note'
-            } else if (isScaleRoot) {
-              noteClass += ' scale-root-note'
-            } else if (isInChord && isInScale) {
-              noteClass += ' chord-scale-note'
-            } else if (isInChord) {
-              noteClass += ' chord-note'
-            } else if (isInScale) {
-              noteClass += ' scale-note'
+            // Manual note combinations with gradients
+            if (isInManual) {
+              if (isAnyRoot && isInChord && isInScale) {
+                noteClass += ' manual-scale-chord-root-note'
+              } else if (isAnyRoot && isInChord) {
+                noteClass += ' manual-chord-root-note'
+              } else if (isInChord && isInScale) {
+                noteClass += ' manual-scale-chord-note'
+              } else if (isAnyRoot) {
+                noteClass += isScaleRoot ? ' manual-scale-root' : ' manual-chord-root'
+              } else if (isInScale) {
+                noteClass += ' manual-scale-note'
+              } else if (isInChord) {
+                noteClass += ' manual-chord-note'
+              } else {
+                noteClass += ' manual-note'
+              }
+            } else {
+              // Non-manual combinations
+              if (isChordRoot && isScaleRoot) {
+                noteClass += ' chord-root-scale-root'
+              } else if (isChordRoot && isInScale) {
+                noteClass += ' chord-root-scale-note'
+              } else if (isInChord && isScaleRoot) {
+                noteClass += ' chord-note-scale-root'
+              } else if (isChordRoot) {
+                noteClass += ' chord-root-note'
+              } else if (isScaleRoot) {
+                noteClass += ' scale-root-note'
+              } else if (isInChord && isInScale) {
+                noteClass += ' chord-scale-note'
+              } else if (isInChord) {
+                noteClass += ' chord-note'
+              } else if (isInScale) {
+                noteClass += ' scale-note'
+              }
             }
           }
 
@@ -939,6 +961,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             const isInGeneratedMelody = isInMelody(noteObj, showNotes)
             const isInScale = isNoteInCurrentScale(stringIndex, fretIndex)
             const isInChord = isNoteInCurrentChord(stringIndex, fretIndex)
+            const isInManual = isNoteInManualLayer(stringIndex, fretIndex)
 
             let noteClass = 'bass-note-circle'
             if (isInGeneratedMelody) {
@@ -946,23 +969,44 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             } else {
               const isChordRoot = isChordRootNote(noteName, stringIndex, fretIndex) && isInChord
               const isScaleRoot = isScaleRootNote(noteName, stringIndex, fretIndex) && isInScale
+              const isAnyRoot = isChordRoot || isScaleRoot
 
-              if (isChordRoot && isScaleRoot) {
-                noteClass += ' chord-root-scale-root'
-              } else if (isChordRoot && isInScale) {
-                noteClass += ' chord-root-scale-note'
-              } else if (isInChord && isScaleRoot) {
-                noteClass += ' chord-note-scale-root'
-              } else if (isChordRoot) {
-                noteClass += ' chord-root-note'
-              } else if (isScaleRoot) {
-                noteClass += ' scale-root-note'
-              } else if (isInChord && isInScale) {
-                noteClass += ' chord-scale-note'
-              } else if (isInChord) {
-                noteClass += ' chord-note'
-              } else if (isInScale) {
-                noteClass += ' scale-note'
+              // Manual note combinations with gradients
+              if (isInManual) {
+                if (isAnyRoot && isInChord && isInScale) {
+                  noteClass += ' manual-scale-chord-root-note'
+                } else if (isAnyRoot && isInChord) {
+                  noteClass += ' manual-chord-root-note'
+                } else if (isInChord && isInScale) {
+                  noteClass += ' manual-scale-chord-note'
+                } else if (isAnyRoot) {
+                  noteClass += isScaleRoot ? ' manual-scale-root' : ' manual-chord-root'
+                } else if (isInScale) {
+                  noteClass += ' manual-scale-note'
+                } else if (isInChord) {
+                  noteClass += ' manual-chord-note'
+                } else {
+                  noteClass += ' manual-note'
+                }
+              } else {
+                // Non-manual combinations
+                if (isChordRoot && isScaleRoot) {
+                  noteClass += ' chord-root-scale-root'
+                } else if (isChordRoot && isInScale) {
+                  noteClass += ' chord-root-scale-note'
+                } else if (isInChord && isScaleRoot) {
+                  noteClass += ' chord-note-scale-root'
+                } else if (isChordRoot) {
+                  noteClass += ' chord-root-note'
+                } else if (isScaleRoot) {
+                  noteClass += ' scale-root-note'
+                } else if (isInChord && isInScale) {
+                  noteClass += ' chord-scale-note'
+                } else if (isInChord) {
+                  noteClass += ' chord-note'
+                } else if (isInScale) {
+                  noteClass += ' scale-note'
+                }
               }
             }
 
