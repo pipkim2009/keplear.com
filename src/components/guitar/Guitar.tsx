@@ -1062,27 +1062,29 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
 
             // Manual note combinations with gradients
             if (isInManual) {
-              if (isAnyRoot && isInChord && isInScale) {
-                // Manual + Scale + Chord + Root (blue + orange + purple + red)
-                // Only include orange if it's actually a scale note, not just a scale root
+              if (isScaleRoot && isChordRoot) {
+                // Both roots - just red + blue (no orange/purple for non-root notes)
+                noteClass += ' manual-scale-root'
+              } else if (isAnyRoot && isInChord && isInScale) {
+                // Root + scale note + chord note - all 4 colors
                 noteClass += ' manual-scale-chord-root-note'
               } else if (isAnyRoot && isInChord) {
-                // Manual + Chord + Root (blue + purple + red)
+                // Root + chord note - red + purple + blue
                 noteClass += ' manual-chord-root-note'
               } else if (isInChord && isInScale) {
-                // Manual + Scale + Chord (blue + orange + purple)
+                // Scale note + chord note - purple + orange + blue
                 noteClass += ' manual-scale-chord-note'
               } else if (isAnyRoot) {
-                // Manual + Root (blue + red) - just root, no scale/chord colors
+                // Just root - red + blue
                 noteClass += isScaleRoot ? ' manual-scale-root' : ' manual-chord-root'
               } else if (isInScale) {
-                // Manual + Scale (blue + orange) - regular scale note, not root
+                // Just scale - orange + blue
                 noteClass += ' manual-scale-note'
               } else if (isInChord) {
-                // Manual + Chord (blue + purple) - regular chord note, not root
+                // Just chord - purple + blue
                 noteClass += ' manual-chord-note'
               } else {
-                // Just manual (blue)
+                // Just manual - blue
                 noteClass += ' manual-note'
               }
             } else {
@@ -1160,27 +1162,29 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
 
               // Manual note combinations with gradients
               if (isInManual) {
-                if (isAnyRoot && isInChord && isInScale) {
-                  // Manual + Scale + Chord + Root (blue + orange + purple + red)
-                  // Only include orange if it's actually a scale note, not just a scale root
+                if (isScaleRoot && isChordRoot) {
+                  // Both roots - just red + blue (no orange/purple for non-root notes)
+                  noteClass += ' manual-scale-root'
+                } else if (isAnyRoot && isInChord && isInScale) {
+                  // Root + scale note + chord note - all 4 colors
                   noteClass += ' manual-scale-chord-root-note'
                 } else if (isAnyRoot && isInChord) {
-                  // Manual + Chord + Root (blue + purple + red)
+                  // Root + chord note - red + purple + blue
                   noteClass += ' manual-chord-root-note'
                 } else if (isInChord && isInScale) {
-                  // Manual + Scale + Chord (blue + orange + purple)
+                  // Scale note + chord note - purple + orange + blue
                   noteClass += ' manual-scale-chord-note'
                 } else if (isAnyRoot) {
-                  // Manual + Root (blue + red) - just root, no scale/chord colors
+                  // Just root - red + blue
                   noteClass += isScaleRoot ? ' manual-scale-root' : ' manual-chord-root'
                 } else if (isInScale) {
-                  // Manual + Scale (blue + orange) - regular scale note, not root
+                  // Just scale - orange + blue
                   noteClass += ' manual-scale-note'
                 } else if (isInChord) {
-                  // Manual + Chord (blue + purple) - regular chord note, not root
+                  // Just chord - purple + blue
                   noteClass += ' manual-chord-note'
                 } else {
-                  // Just manual (blue)
+                  // Just manual - blue
                   noteClass += ' manual-note'
                 }
               } else {

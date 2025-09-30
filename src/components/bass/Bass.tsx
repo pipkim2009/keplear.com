@@ -892,19 +892,29 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
             // Manual note combinations with gradients
             if (isInManual) {
-              if (isAnyRoot && isInChord && isInScale) {
+              if (isScaleRoot && isChordRoot) {
+                // Both roots - just red + blue (no orange/purple for non-root notes)
+                noteClass += ' manual-scale-root'
+              } else if (isAnyRoot && isInChord && isInScale) {
+                // Root + scale note + chord note - all 4 colors
                 noteClass += ' manual-scale-chord-root-note'
               } else if (isAnyRoot && isInChord) {
+                // Root + chord note - red + purple + blue
                 noteClass += ' manual-chord-root-note'
               } else if (isInChord && isInScale) {
+                // Scale note + chord note - purple + orange + blue
                 noteClass += ' manual-scale-chord-note'
               } else if (isAnyRoot) {
+                // Just root - red + blue
                 noteClass += isScaleRoot ? ' manual-scale-root' : ' manual-chord-root'
               } else if (isInScale) {
+                // Just scale - orange + blue
                 noteClass += ' manual-scale-note'
               } else if (isInChord) {
+                // Just chord - purple + blue
                 noteClass += ' manual-chord-note'
               } else {
+                // Just manual - blue
                 noteClass += ' manual-note'
               }
             } else {
@@ -973,19 +983,29 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
               // Manual note combinations with gradients
               if (isInManual) {
-                if (isAnyRoot && isInChord && isInScale) {
+                if (isScaleRoot && isChordRoot) {
+                  // Both roots - just red + blue (no orange/purple for non-root notes)
+                  noteClass += ' manual-scale-root'
+                } else if (isAnyRoot && isInChord && isInScale) {
+                  // Root + scale note + chord note - all 4 colors
                   noteClass += ' manual-scale-chord-root-note'
                 } else if (isAnyRoot && isInChord) {
+                  // Root + chord note - red + purple + blue
                   noteClass += ' manual-chord-root-note'
                 } else if (isInChord && isInScale) {
+                  // Scale note + chord note - purple + orange + blue
                   noteClass += ' manual-scale-chord-note'
                 } else if (isAnyRoot) {
+                  // Just root - red + blue
                   noteClass += isScaleRoot ? ' manual-scale-root' : ' manual-chord-root'
                 } else if (isInScale) {
+                  // Just scale - orange + blue
                   noteClass += ' manual-scale-note'
                 } else if (isInChord) {
+                  // Just chord - purple + blue
                   noteClass += ' manual-chord-note'
                 } else {
+                  // Just manual - blue
                   noteClass += ' manual-note'
                 }
               } else {
