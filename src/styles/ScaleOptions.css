@@ -14,7 +14,7 @@
   width: auto;
   min-height: 40px;
   background: transparent;
-  z-index: 10000;
+  z-index: 100;
   pointer-events: auto;
 }
 
@@ -53,7 +53,7 @@
   max-width: 200px !important;
   min-width: 200px !important;
   box-sizing: border-box;
-  z-index: 999999 !important;
+  z-index: 102 !important;
   background: rgba(0, 0, 0, 0.95);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -101,7 +101,7 @@
   border-image: linear-gradient(145deg, #f97316, #8b5cf6) 1;
   border-radius: 6px;
   cursor: pointer;
-  z-index: 1;
+  z-index: 101;
   pointer-events: auto;
   font-size: 12px;
   font-weight: 600;

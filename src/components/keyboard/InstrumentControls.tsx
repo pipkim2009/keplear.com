@@ -9,6 +9,7 @@ import type { Note } from '../../utils/notes'
 import MelodyDisplay from '../MelodyDisplay'
 import CustomAudioPlayer from '../common/CustomAudioPlayer'
 import '../../styles/CustomAudioPlayer.css'
+import AIButton from '../common/AIButton'
 
 export type KeyboardSelectionMode = 'range' | 'multi'
 
@@ -916,6 +917,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
       </div>
 
+      {/* AI Assistant Button */}
+      <div className="ai-button-container">
+        <AIButton />
+      </div>
 
     </div>
   )

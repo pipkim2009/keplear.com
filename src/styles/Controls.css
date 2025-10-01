@@ -2642,5 +2642,17 @@ body:has([data-instrument="bass"]) .control-button.delete-selection {
   }
 }
 
+/* AI Button Container */
+.ai-button-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+}
 
-
+@media (max-width: 768px) {
+  .ai-button-container {
+    bottom: 15px;
+    right: 15px;
+  }
+}
