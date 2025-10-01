@@ -2644,15 +2644,18 @@ body:has([data-instrument="bass"]) .control-button.delete-selection {
 
 /* AI Button Container */
 .ai-button-container {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
   z-index: 100;
 }
 
 @media (max-width: 768px) {
   .ai-button-container {
-    bottom: 15px;
-    right: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
   }
 }

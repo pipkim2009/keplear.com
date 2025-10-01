@@ -917,11 +917,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
       </div>
 
-      {/* AI Assistant Button */}
-      <div className="ai-button-container">
-        <AIButton />
-      </div>
-
     </div>
   )
 }

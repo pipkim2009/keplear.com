@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { createPortal } from 'react-dom'
 import '../../styles/AIButton.css'
 
 interface AIButtonProps {
@@ -7,10 +6,11 @@ interface AIButtonProps {
 }
 
 const AIButton: React.FC<AIButtonProps> = ({ onTranscriptChange }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false)
   const [isListening, setIsListening] = useState(false)
   const [transcript, setTranscript] = useState('')
   const recognitionRef = useRef<any>(null)
+  const isListeningRef = useRef(false)
+  const finalTranscriptRef = useRef('')
 
   useEffect(() => {
     // Check if browser supports Web Speech API
@@ -23,18 +23,17 @@ const AIButton: React.FC<AIButtonProps> = ({ onTranscriptChange }) => {
 
       recognitionRef.current.onresult = (event: any) => {
         let interimTranscript = ''
-        let finalTranscript = ''
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcriptSegment = event.results[i][0].transcript
           if (event.results[i].isFinal) {
-            finalTranscript += transcriptSegment + ' '
+            finalTranscriptRef.current += transcriptSegment + ' '
           } else {
             interimTranscript += transcriptSegment
           }
         }
 
-        const newTranscript = transcript + finalTranscript + interimTranscript
+        const newTranscript = finalTranscriptRef.current + interimTranscript
         setTranscript(newTranscript)
         if (onTranscriptChange) {
           onTranscriptChange(newTranscript)
@@ -43,11 +42,17 @@ const AIButton: React.FC<AIButtonProps> = ({ onTranscriptChange }) => {
 
       recognitionRef.current.onerror = (event: any) => {
         console.error('Speech recognition error:', event.error)
-        setIsListening(false)
+        if (event.error === 'aborted') {
+          setIsListening(false)
+          isListeningRef.current = false
+        }
       }
 
       recognitionRef.current.onend = () => {
-        setIsListening(false)
+        // Auto-restart if still supposed to be listening
+        if (isListeningRef.current && recognitionRef.current) {
+          recognitionRef.current.start()
+        }
       }
     }
 
@@ -56,89 +61,51 @@ const AIButton: React.FC<AIButtonProps> = ({ onTranscriptChange }) => {
         recognitionRef.current.stop()
       }
     }
-  }, [transcript, onTranscriptChange])
+  }, [onTranscriptChange])
 
-  const handleAIButtonClick = () => {
-    setIsModalOpen(true)
-  }
-
-  const handleCloseModal = () => {
-    if (isListening && recognitionRef.current) {
-      recognitionRef.current.stop()
-      setIsListening(false)
-    }
-    setIsModalOpen(false)
-  }
-
-  const handleStartListening = () => {
-    if (recognitionRef.current && !isListening) {
-      setTranscript('')
-      recognitionRef.current.start()
-      setIsListening(true)
-    }
-  }
-
-  const handleStopListening = () => {
-    if (recognitionRef.current && isListening) {
-      recognitionRef.current.stop()
-      setIsListening(false)
-    }
-  }
-
-  const handleClearTranscript = () => {
-    setTranscript('')
-    if (onTranscriptChange) {
-      onTranscriptChange('')
+  const handleToggleListening = () => {
+    if (isListening) {
+      // Stop listening
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
+        setIsListening(false)
+        isListeningRef.current = false
+      }
+    } else {
+      // Start listening
+      if (recognitionRef.current) {
+        setTranscript('')
+        finalTranscriptRef.current = ''
+        recognitionRef.current.start()
+        setIsListening(true)
+        isListeningRef.current = true
+      }
     }
   }
 
   return (
-    <>
-      <button className="ai-button" onClick={handleAIButtonClick} title="AI Assistant">
-        <span className="ai-icon">🤖</span>
+    <div className="ai-inline-container">
+      <button
+        className={`ai-button ${isListening ? 'recording' : ''}`}
+        onClick={handleToggleListening}
+        title={isListening ? "Stop Recording" : "Start AI Assistant"}
+        disabled={!recognitionRef.current}
+      >
+        <span className="ai-icon">{isListening ? '⏹' : '🤖'}</span>
       </button>
 
-      {isModalOpen && createPortal(
-        <div className="ai-modal-overlay" onClick={handleCloseModal}>
-          <div className="ai-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="ai-modal-header">
-              <h3>AI Assistant</h3>
-              <button className="ai-modal-close" onClick={handleCloseModal}>×</button>
-            </div>
-
-            <div className="ai-modal-content">
-              <div className="ai-controls">
-                <button
-                  className={`ai-control-button ${isListening ? 'listening' : ''}`}
-                  onClick={isListening ? handleStopListening : handleStartListening}
-                  disabled={!recognitionRef.current}
-                >
-                  {isListening ? '⏹ Stop' : '🎤 Start Speaking'}
-                </button>
-                <button
-                  className="ai-control-button clear"
-                  onClick={handleClearTranscript}
-                  disabled={!transcript}
-                >
-                  Clear
-                </button>
-              </div>
-
-              <div className="ai-transcript-box">
-                {transcript || (isListening ? 'Listening...' : 'Click "Start Speaking" to begin')}
-              </div>
-
-              {!recognitionRef.current && (
-                <div className="ai-error">
-                  Speech recognition is not supported in your browser.
-                </div>
-              )}
-            </div>
-          </div>
-        </div>,
-        document.body
+      {(isListening || transcript) && (
+        <div className="ai-transcript-display">
+          {transcript || 'Listening...'}
+        </div>
       )}
-    </>
+
+      {!recognitionRef.current && (
+        <div className="ai-error-inline">
+          Speech recognition is not supported in your browser.
+        </div>
+      )}
+    </div>
   )
 }
 
