@@ -27,7 +27,7 @@ const AIButton: React.FC<AIButtonProps> = ({ onTranscriptChange }) => {
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const transcriptSegment = event.results[i][0].transcript
           if (event.results[i].isFinal) {
-            finalTranscriptRef.current += transcriptSegment + ' '
+            finalTranscriptRef.current += transcriptSegment
           } else {
             interimTranscript += transcriptSegment
           }
@@ -91,7 +91,7 @@ const AIButton: React.FC<AIButtonProps> = ({ onTranscriptChange }) => {
         title={isListening ? "Stop Recording" : "Start AI Assistant"}
         disabled={!recognitionRef.current}
       >
-        <span className="ai-icon">{isListening ? '⏹' : '🤖'}</span>
+        <span className="ai-icon">{isListening ? '⏹' : '🧠'}</span>
       </button>
 
       {(isListening || transcript) && (
