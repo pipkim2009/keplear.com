@@ -6,7 +6,6 @@ import type { Note } from '../../utils/notes'
 import type { KeyboardSelectionMode } from './InstrumentControls'
 import { useScaleChordManagement } from '../../hooks/useScaleChordManagement'
 import { useKeyboardHighlighting } from '../../hooks/useKeyboardHighlighting'
-import AIButton from '../common/AIButton'
 
 interface InstrumentDisplayProps {
   onNoteClick: (note: Note) => void
@@ -269,11 +268,6 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           appliedScales={appliedScales}
           appliedChords={appliedChords}
         />
-      </div>
-
-      {/* AI Assistant Button */}
-      <div className="ai-button-container">
-        <AIButton />
       </div>
     </>
   )

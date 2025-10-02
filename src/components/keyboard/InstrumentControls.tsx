@@ -9,7 +9,6 @@ import type { Note } from '../../utils/notes'
 import MelodyDisplay from '../MelodyDisplay'
 import CustomAudioPlayer from '../common/CustomAudioPlayer'
 import '../../styles/CustomAudioPlayer.css'
-import AIButton from '../common/AIButton'
 
 export type KeyboardSelectionMode = 'range' | 'multi'
 
