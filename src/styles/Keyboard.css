@@ -90,15 +90,15 @@
   }
 
   .keyboard:not(.default-mode) .black-keys {
-    left: 39px;
+    left: 0px;
   }
 
   .black-keys {
-    left: 5px;
+    left: 0px;
   }
 
   .keyboard.default-mode .black-keys {
-    left: 5px;
+    left: 0px;
   }
 }
 
@@ -247,7 +247,7 @@
   }
 
   .keyboard:not(.default-mode) .black-keys {
-    left: 39px;
+    left: 0px;
   }
 }
 
@@ -299,7 +299,7 @@
 .black-keys {
   position: absolute;
   top: 0;
-  left: 40px;
+  left: 0px;
   pointer-events: none;
 }
 
@@ -309,11 +309,11 @@
 
 @media (max-width: 480px) {
   .black-keys {
-    left: 5px;
+    left: 0px;
   }
 
   .keyboard.default-mode .black-keys {
-    left: 5px;
+    left: 0px;
   }
 }
 

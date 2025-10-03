@@ -215,36 +215,37 @@ export const getBlackKeyLeft = (position: number): number => {
  */
 export const getBlackKeyLeftDynamic = (note: Note, whiteKeys: readonly Note[]): number => {
   if (!note.isBlack) return 0
-  
+
   // Extract the note name without octave (e.g., "C#" from "C#4")
   const noteName = note.name.slice(0, -1)
   const blackOctave = parseInt(note.name.slice(-1))
-  
-  // Find the index of this black key in the sorted list of all notes
-  let whiteKeysBeforeThisBlack = 0
-  
-  for (const whiteKey of whiteKeys) {
-    const whiteOctave = parseInt(whiteKey.name.slice(-1))
-    const whiteNoteName = whiteKey.name.slice(0, -1)
-    
-    // Count white keys that come before this black key chronologically
-    if (whiteOctave < blackOctave) {
-      // All white keys from previous octaves
-      whiteKeysBeforeThisBlack++
-    } else if (whiteOctave === blackOctave) {
-      // White keys from same octave that come before this black key
-      const noteOrder = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
-      const whiteNotePosition = noteOrder.indexOf(whiteNoteName)
-      const blackNotePosition = noteOrder.indexOf(noteName)
-      
-      if (whiteNotePosition < blackNotePosition) {
-        whiteKeysBeforeThisBlack++
-      }
+
+  // Map to get the white key that comes immediately before each black key
+  const blackKeyToWhiteKeyMap: Record<string, string> = {
+    'C#': 'C',
+    'D#': 'D',
+    'F#': 'F',
+    'G#': 'G',
+    'A#': 'A'
+  }
+
+  const precedingWhiteKey = blackKeyToWhiteKeyMap[noteName]
+  if (!precedingWhiteKey) return 0
+
+  // Find the index of the preceding white key in the white keys array
+  const precedingWhiteKeyName = `${precedingWhiteKey}${blackOctave}`
+  let whiteKeyIndex = -1
+
+  for (let i = 0; i < whiteKeys.length; i++) {
+    if (whiteKeys[i].name === precedingWhiteKeyName) {
+      whiteKeyIndex = i
+      break
     }
   }
-  
-  // Calculate position: (white keys before) * (white key width including margin) - half black key width
-  // whiteKeyWidth already includes the 2px margin (62px total)
-  // Base offset for expanded keyboard - will be adjusted by CSS for mobile
-  return (whiteKeysBeforeThisBlack * KEYBOARD_DIMENSIONS.whiteKeyWidth) - (KEYBOARD_DIMENSIONS.blackKeyWidth / 2) - 40
+
+  if (whiteKeyIndex === -1) return 0
+
+  // Position the black key between the white key and the next one
+  // Each white key is 62px wide, black key is centered between two white keys
+  return (whiteKeyIndex * KEYBOARD_DIMENSIONS.whiteKeyWidth) + KEYBOARD_DIMENSIONS.whiteKeyWidth - (KEYBOARD_DIMENSIONS.blackKeyWidth / 2)
 }
