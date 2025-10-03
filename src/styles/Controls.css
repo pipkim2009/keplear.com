@@ -2070,7 +2070,7 @@ select.control-input.flashing {
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin: 15px 0;
+  margin: 0 0 15px 0;
 }
 
 .controls-container {
@@ -2459,7 +2459,7 @@ body.dark .modern-control-item.audio-player-section audio {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
-    margin: 0 auto !important;
+    margin: 0 auto 15px auto !important;
     padding: 15px !important;
     position: static !important;
     width: auto !important;
