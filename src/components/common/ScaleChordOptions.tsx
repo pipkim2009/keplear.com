@@ -9,7 +9,7 @@ import { CHORD_ROOT_NOTES, GUITAR_CHORDS, getChordShapes, type GuitarChord, type
 import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, type BassChord, type BassChordShape } from '../../utils/bassChords'
 import { KEYBOARD_CHORDS, type KeyboardChord } from '../../utils/keyboardChords'
 import '../../styles/ScaleOptions.css'
-import { MdExpandMore, MdChevronRight } from 'react-icons/md'
+import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io'
 
 export interface AppliedChord {
   id: string
@@ -259,7 +259,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         onClick={toggleExpanded}
         title={isExpanded ? 'Close Scales/Chords' : 'Open Scales/Chords'}
       >
-        <span className="toggle-arrow">{isExpanded ? <MdExpandMore /> : <MdChevronRight />}</span>
+        <span className="toggle-arrow">{isExpanded ? <IoIosArrowDown /> : <IoIosArrowForward />}</span>
         <span className="toggle-text">Scales/Chords</span>
       </button>
 
