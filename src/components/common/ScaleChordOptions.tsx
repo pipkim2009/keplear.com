@@ -258,7 +258,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         onClick={toggleExpanded}
         title={isExpanded ? 'Close Scales/Chords' : 'Open Scales/Chords'}
       >
-        {isExpanded ? '▼' : '▶'}
+        <span className="toggle-arrow">{isExpanded ? '▼' : '▶'}</span>
         <span className="toggle-text">Scales/Chords</span>
       </button>
 

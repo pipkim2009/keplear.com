@@ -86,8 +86,7 @@
   position: relative;
   top: 0;
   left: 0;
-  width: auto;
-  min-width: 90px;
+  width: 140px;
   height: 32px;
   display: flex;
   align-items: center;
@@ -105,7 +104,6 @@
   pointer-events: auto;
   font-size: 12px;
   font-weight: 600;
-  transition: all 0.2s ease;
   box-sizing: border-box;
   margin-top: 19px;
   padding: 0 12px;
@@ -126,8 +124,7 @@
 
 .scale-options-container.expanded .scale-options-toggle {
   position: relative;
-  width: auto;
-  min-width: 90px;
+  width: 140px;
   justify-content: center;
   gap: 8px;
   border-radius: 6px;
@@ -140,12 +137,21 @@
 }
 
 
+.toggle-arrow {
+  display: inline-block;
+  width: 12px;
+  text-align: center;
+  flex-shrink: 0;
+  transition: none;
+}
+
 .scale-options-container.collapsed .toggle-text {
   display: inline;
   font-size: 12px;
   font-weight: 600;
   color: #ffffff;
-  margin-left: 4px;
+  margin-left: 9px;
+  transition: none;
 }
 
 .scale-options-container.expanded .toggle-text {
@@ -153,7 +159,8 @@
   font-size: 12px;
   font-weight: 600;
   color: #ffffff;
-  margin-left: 4px;
+  margin-left: 0;
+  transition: none;
 }
 
 
@@ -407,7 +414,6 @@
   font-weight: 600;
   z-index: 2;
   position: relative;
-  transition: all 0.3s ease;
   color: #999999;
   opacity: 0.7;
   pointer-events: none;
