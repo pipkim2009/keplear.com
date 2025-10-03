@@ -87,7 +87,7 @@
   top: 0;
   left: 0;
   width: 140px;
-  height: 32px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -96,8 +96,7 @@
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
-  border: 2px solid;
-  border-image: linear-gradient(145deg, #f97316, #8b5cf6) 1;
+  border: 2px solid transparent;
   border-radius: 6px;
   cursor: pointer;
   z-index: 101;
@@ -105,13 +104,27 @@
   font-size: 12px;
   font-weight: 600;
   box-sizing: border-box;
-  margin-top: 19px;
+  margin-top: 20px;
   padding: 0 12px;
+}
+
+.scale-options-toggle::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  padding: 2px;
+  background: linear-gradient(145deg, #f97316, #8b5cf6);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .scale-options-toggle.instrument-guitar,
 .scale-options-toggle.instrument-bass {
-  margin-top: 0;
+  margin-top: 3px;
 }
 
 .scale-options-toggle:hover {
@@ -119,7 +132,10 @@
   background-image: linear-gradient(145deg, #ea580c, #7c3aed);
   background-clip: text;
   -webkit-background-clip: text;
-  border-image: linear-gradient(145deg, #ea580c, #7c3aed) 1;
+}
+
+.scale-options-toggle:hover::before {
+  background: linear-gradient(145deg, #ea580c, #7c3aed);
 }
 
 .scale-options-container.expanded .scale-options-toggle {
@@ -132,8 +148,11 @@
   background-image: linear-gradient(145deg, #ea580c, #7c3aed);
   background-clip: text;
   -webkit-background-clip: text;
-  border-image: linear-gradient(145deg, #ea580c, #7c3aed) 1;
   box-sizing: border-box;
+}
+
+.scale-options-container.expanded .scale-options-toggle::before {
+  background: linear-gradient(145deg, #ea580c, #7c3aed);
 }
 
 
