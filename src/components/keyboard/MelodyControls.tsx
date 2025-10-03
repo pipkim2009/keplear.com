@@ -1,6 +1,9 @@
 import { memo } from 'react'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import '../../styles/MelodyControls.css'
+import { IoMusicalNotes } from 'react-icons/io5'
+import { FaPlay, FaPause, FaStop } from 'react-icons/fa'
+import { BsFillMicFill, BsTrashFill } from 'react-icons/bs'
 
 /**
  * Component responsible for melody generation and playback controls
@@ -28,7 +31,7 @@ const MelodyControls = memo(function MelodyControls() {
           onClick={handleGenerateMelody}
           disabled={isPlaying || isRecording}
         >
-          🎵 Generate Melody
+          <IoMusicalNotes /> Generate Melody
           {hasChanges && <span className="change-badge">●</span>}
         </button>
 
@@ -37,7 +40,7 @@ const MelodyControls = memo(function MelodyControls() {
           onClick={handlePlayMelody}
           disabled={generatedMelody.length === 0 || isRecording}
         >
-          {isPlaying ? '⏸️ Stop' : '▶️ Play'}
+          {isPlaying ? <><FaPause /> Stop</> : <><FaPlay /> Play</>}
         </button>
 
         <button
@@ -45,7 +48,7 @@ const MelodyControls = memo(function MelodyControls() {
           onClick={handleRecordMelody}
           disabled={generatedMelody.length === 0 || isPlaying}
         >
-          {isRecording ? '⏹️ Stop Recording' : '🎤 Record'}
+          {isRecording ? <><FaStop /> Stop Recording</> : <><BsFillMicFill /> Record</>}
         </button>
       </div>
 
@@ -56,7 +59,7 @@ const MelodyControls = memo(function MelodyControls() {
             className="button clear-button"
             onClick={handleClearRecordedAudio}
           >
-            🗑️ Clear Recording
+            <BsTrashFill /> Clear Recording
           </button>
         </div>
       )}

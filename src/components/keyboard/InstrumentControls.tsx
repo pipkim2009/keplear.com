@@ -9,6 +9,9 @@ import type { Note } from '../../utils/notes'
 import MelodyDisplay from '../MelodyDisplay'
 import CustomAudioPlayer from '../common/CustomAudioPlayer'
 import '../../styles/CustomAudioPlayer.css'
+import { PiPianoKeysFill } from 'react-icons/pi'
+import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
+import { IoMdArrowDropdown } from 'react-icons/io'
 
 export type KeyboardSelectionMode = 'range' | 'multi'
 
@@ -513,7 +516,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               setInstrument('keyboard')
             }}
           >
-            <div className="instrument-icon">🎹</div>
+            <div className="instrument-icon"><PiPianoKeysFill /></div>
             <div className="instrument-name">Keyboard</div>
             <div className="instrument-glow"></div>
           </div>
@@ -532,7 +535,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               setInstrument('guitar')
             }}
           >
-            <div className="instrument-icon">🎸</div>
+            <div className="instrument-icon"><GiGuitarHead /></div>
             <div className="instrument-name">Guitar</div>
             <div className="instrument-glow"></div>
           </div>
@@ -551,7 +554,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               setInstrument('bass')
             }}
           >
-            <div className="instrument-icon">🎸</div>
+            <div className="instrument-icon"><GiGuitarBassHead /></div>
             <div className="instrument-name">Bass</div>
             <div className="instrument-glow"></div>
           </div>
@@ -565,16 +568,16 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           >
             <div className="current-instrument">
               <div className="instrument-icon">
-                {instrument === 'keyboard' && '🎹'}
-                {instrument === 'guitar' && '🎸'}
-                {instrument === 'bass' && '🎸'}
+                {instrument === 'keyboard' && <PiPianoKeysFill />}
+                {instrument === 'guitar' && <GiGuitarHead />}
+                {instrument === 'bass' && <GiGuitarBassHead />}
               </div>
               <div className="instrument-name">
                 {instrument === 'keyboard' && 'Keyboard'}
                 {instrument === 'guitar' && 'Guitar'}
                 {instrument === 'bass' && 'Bass'}
               </div>
-              <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}>▼</div>
+              <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}><IoMdArrowDropdown /></div>
             </div>
             {isInstrumentDropdownOpen && (
               <div className="dropdown-options">
@@ -596,7 +599,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                       setIsInstrumentDropdownOpen(false);
                     }}
                   >
-                    <div className="instrument-icon">🎹</div>
+                    <div className="instrument-icon"><PiPianoKeysFill /></div>
                     <div className="instrument-name">Keyboard</div>
                   </div>
                 )}
@@ -618,7 +621,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                       setIsInstrumentDropdownOpen(false);
                     }}
                   >
-                    <div className="instrument-icon">🎸</div>
+                    <div className="instrument-icon"><GiGuitarHead /></div>
                     <div className="instrument-name">Guitar</div>
                   </div>
                 )}
@@ -640,7 +643,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                       setIsInstrumentDropdownOpen(false);
                     }}
                   >
-                    <div className="instrument-icon">🎸</div>
+                    <div className="instrument-icon"><GiGuitarBassHead /></div>
                     <div className="instrument-name">Bass</div>
                   </div>
                 )}

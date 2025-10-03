@@ -28,22 +28,22 @@ describe('MelodyControls', () => {
   it('renders all control buttons', () => {
     render(<MelodyControls />)
 
-    expect(screen.getByText('🎵 Generate Melody')).toBeInTheDocument()
-    expect(screen.getByText('▶️ Play')).toBeInTheDocument()
-    expect(screen.getByText('🎤 Record')).toBeInTheDocument()
+    expect(screen.getByText('Generate Melody')).toBeInTheDocument()
+    expect(screen.getByText('Play')).toBeInTheDocument()
+    expect(screen.getByText('Record')).toBeInTheDocument()
   })
 
   it('calls handleGenerateMelody when generate button is clicked', () => {
     render(<MelodyControls />)
 
-    fireEvent.click(screen.getByText('🎵 Generate Melody'))
+    fireEvent.click(screen.getByText('Generate Melody'))
     expect(mockInstrumentContext.handleGenerateMelody).toHaveBeenCalledOnce()
   })
 
   it('calls handlePlayMelody when play button is clicked', () => {
     render(<MelodyControls />)
 
-    fireEvent.click(screen.getByText('▶️ Play'))
+    fireEvent.click(screen.getByText('Play'))
     expect(mockInstrumentContext.handlePlayMelody).toHaveBeenCalledOnce()
   })
 
@@ -51,21 +51,21 @@ describe('MelodyControls', () => {
     mockInstrumentContext.isPlaying = true
     render(<MelodyControls />)
 
-    expect(screen.getByText('⏸️ Stop')).toBeInTheDocument()
+    expect(screen.getByText('Stop')).toBeInTheDocument()
   })
 
   it('shows stop recording button when recording', () => {
     mockInstrumentContext.isRecording = true
     render(<MelodyControls />)
 
-    expect(screen.getByText('⏹️ Stop Recording')).toBeInTheDocument()
+    expect(screen.getByText('Stop Recording')).toBeInTheDocument()
   })
 
   it('disables play button when no melody is generated', () => {
     mockInstrumentContext.generatedMelody = []
     render(<MelodyControls />)
 
-    const playButton = screen.getByText('▶️ Play')
+    const playButton = screen.getByText('Play')
     expect(playButton).toBeDisabled()
   })
 

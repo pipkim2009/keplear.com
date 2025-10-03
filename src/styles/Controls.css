@@ -154,6 +154,7 @@
 
 .instrument-card:nth-child(1) .instrument-icon {
   filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));
+  color: #3b82f6;
 }
 
 .instrument-card:nth-child(1):hover .instrument-icon {
@@ -189,6 +190,7 @@
 
 .instrument-card:nth-child(2) .instrument-icon {
   filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.5));
+  color: #22c55e;
 }
 
 .instrument-card:nth-child(2):hover .instrument-icon {
@@ -224,6 +226,7 @@
 
 .instrument-card:nth-child(3) .instrument-icon {
   filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+  color: #ef4444;
 }
 
 .instrument-card:nth-child(3):hover .instrument-icon {
@@ -466,6 +469,7 @@
 
   .dropdown-option.keyboard-option .instrument-icon {
     filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.5));
+    color: #3b82f6;
   }
 
   .dropdown-option.keyboard-option .instrument-name {
@@ -478,6 +482,7 @@
 
   .dropdown-option.guitar-option .instrument-icon {
     filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.5));
+    color: #22c55e;
   }
 
   .dropdown-option.guitar-option .instrument-name {
@@ -490,6 +495,7 @@
 
   .dropdown-option.bass-option .instrument-icon {
     filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.5));
+    color: #ef4444;
   }
 
   .dropdown-option.bass-option .instrument-name {
@@ -511,6 +517,7 @@
 
   .instrument-dropdown.keyboard-active .current-instrument .instrument-icon {
     filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.8));
+    color: #3b82f6;
   }
 
   .instrument-dropdown.keyboard-active .current-instrument .instrument-name {
@@ -531,6 +538,7 @@
 
   .instrument-dropdown.guitar-active .current-instrument .instrument-icon {
     filter: drop-shadow(0 0 12px rgba(34, 197, 94, 0.8));
+    color: #22c55e;
   }
 
   .instrument-dropdown.guitar-active .current-instrument .instrument-name {
@@ -551,6 +559,7 @@
 
   .instrument-dropdown.bass-active .current-instrument .instrument-icon {
     filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.8));
+    color: #ef4444;
   }
 
   .instrument-dropdown.bass-active .current-instrument .instrument-name {

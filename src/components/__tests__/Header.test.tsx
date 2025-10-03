@@ -32,7 +32,7 @@ describe('Header', () => {
   it('renders the logo and navigation', () => {
     render(<Header {...defaultProps} />)
 
-    expect(screen.getByText('🎹 Keplear')).toBeInTheDocument()
+    expect(screen.getByText('Keplear')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /toggle theme/i })).toBeInTheDocument()
   })
 

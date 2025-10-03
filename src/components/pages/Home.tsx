@@ -1,4 +1,6 @@
 import '../../styles/Home.css'
+import { IoMusicalNotes } from 'react-icons/io5'
+import { FaBullseye, FaChartLine } from 'react-icons/fa'
 
 interface HomeProps {
   onNavigateToSandbox: () => void
@@ -34,10 +36,10 @@ function Home({ onNavigateToSandbox, onNavigateToPractice }: HomeProps) {
         </div>
         <div className="hero-visual">
           <div className="visual-element">
-            <div className="floating-note note-1">♪</div>
-            <div className="floating-note note-2">♫</div>
-            <div className="floating-note note-3">♪</div>
-            <div className="floating-note note-4">♬</div>
+            <div className="floating-note note-1"><IoMusicalNotes /></div>
+            <div className="floating-note note-2"><IoMusicalNotes /></div>
+            <div className="floating-note note-3"><IoMusicalNotes /></div>
+            <div className="floating-note note-4"><IoMusicalNotes /></div>
           </div>
         </div>
       </section>
@@ -47,26 +49,26 @@ function Home({ onNavigateToSandbox, onNavigateToPractice }: HomeProps) {
           <h2 className="features-title">Your Ear Training Toolbox</h2>
           <div className="features-grid">
             <div className="feature-card">
-              <div className="feature-icon">🎵</div>
+              <div className="feature-icon"><IoMusicalNotes /></div>
               <h3 className="feature-title">Melody Generation</h3>
               <p className="feature-description">
-                Create custom melodies based on your skill level, develop your melody 
+                Create custom melodies based on your skill level, develop your melody
                 recognition abilities.
               </p>
             </div>
             <div className="feature-card">
-              <div className="feature-icon">🎯</div>
+              <div className="feature-icon"><FaBullseye /></div>
               <h3 className="feature-title">Structured Practice</h3>
               <p className="feature-description">
-                Follow personalised exercises to build your ear training skills from 
+                Follow personalised exercises to build your ear training skills from
                 beginner to pro.
               </p>
             </div>
             <div className="feature-card">
-              <div className="feature-icon">📊</div>
+              <div className="feature-icon"><FaChartLine /></div>
               <h3 className="feature-title">Track Progress</h3>
               <p className="feature-description">
-                Track your progress over time with personalised analytics and 
+                Track your progress over time with personalised analytics and
                 recommendations.
               </p>
             </div>

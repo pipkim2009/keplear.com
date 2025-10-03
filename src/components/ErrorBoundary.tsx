@@ -1,5 +1,7 @@
 import React, { Component, type ReactNode } from 'react'
 import { logErrorToService, type ErrorInfo } from '../utils/errorHandler'
+import { IoMusicalNotes } from 'react-icons/io5'
+import { createRoot } from 'react-dom/client'
 
 interface ErrorBoundaryProps {
   children: ReactNode
@@ -116,9 +118,21 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               WebkitTextFillColor: 'transparent',
               fontSize: '2rem',
               fontWeight: 'bold',
-              marginBottom: '1rem'
+              marginBottom: '1rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem'
             }}>
-              🎵 Oops! Something went wrong
+              <span style={{
+                background: 'linear-gradient(145deg, #6b46c1, #8b5cf6)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }}>
+                <IoMusicalNotes />
+              </span>
+              Oops! Something went wrong
             </h2>
             <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>
               We're sorry, but something unexpected happened while making music.

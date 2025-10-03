@@ -1,5 +1,8 @@
 import { memo } from 'react'
 import { useInstrument } from '../../contexts/InstrumentContext'
+import { IoSettingsSharp } from 'react-icons/io5'
+import { IoMusicalNotes } from 'react-icons/io5'
+import { MdMusicNote } from 'react-icons/md'
 
 /**
  * Component for controlling melody parameters (BPM, number of notes, etc.)
@@ -34,10 +37,10 @@ const ParameterControls = memo(function ParameterControls() {
 
   return (
     <div className="parameter-controls">
-      <h3>⚙️ Melody Settings</h3>
+      <h3><IoSettingsSharp /> Melody Settings</h3>
 
       <div className="control-group">
-        <label htmlFor="bpm-control">🎵 BPM (Beats Per Minute)</label>
+        <label htmlFor="bpm-control"><IoMusicalNotes /> BPM (Beats Per Minute)</label>
         <div className="input-container">
           <input
             id="bpm-control"
@@ -59,7 +62,7 @@ const ParameterControls = memo(function ParameterControls() {
       </div>
 
       <div className="control-group">
-        <label htmlFor="notes-control">🎼 Number of Notes</label>
+        <label htmlFor="notes-control"><MdMusicNote /> Number of Notes</label>
         <div className="input-container">
           <input
             id="notes-control"

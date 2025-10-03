@@ -7,6 +7,8 @@ import Router from './components/Router'
 import ErrorBoundary from './components/ErrorBoundary'
 import { useTheme } from './hooks/useTheme'
 import styles from './styles/App.module.css'
+import { IoMusicalNotes } from 'react-icons/io5'
+import { MdRefresh } from 'react-icons/md'
 
 /**
  * Main application component
@@ -61,7 +63,7 @@ const App = memo(function App() {
                     fontSize: '3rem',
                     marginBottom: '1rem'
                   }}>
-                    🎵
+                    <IoMusicalNotes />
                   </div>
                   <h3 style={{
                     fontSize: '1.8rem',
@@ -104,7 +106,7 @@ const App = memo(function App() {
                       e.currentTarget.style.boxShadow = '0 4px 12px rgba(107, 70, 193, 0.3)'
                     }}
                   >
-                    🔄 Refresh Page
+                    <MdRefresh /> Refresh Page
                   </button>
                 </div>
               </div>

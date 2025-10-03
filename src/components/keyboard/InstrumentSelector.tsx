@@ -1,11 +1,14 @@
 import { memo, useMemo, useCallback } from 'react'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import type { InstrumentType } from '../../types/instrument'
+import { PiPianoKeysFill } from 'react-icons/pi'
+import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
+import { IoMusicalNotes } from 'react-icons/io5'
 
 const INSTRUMENTS = [
-  { value: 'keyboard' as const, label: '🎹 Keyboard', emoji: '🎹' },
-  { value: 'guitar' as const, label: '🎸 Guitar', emoji: '🎸' },
-  { value: 'bass' as const, label: '🎸 Bass', emoji: '🎸' }
+  { value: 'keyboard' as const, label: 'Keyboard', icon: PiPianoKeysFill },
+  { value: 'guitar' as const, label: 'Guitar', icon: GiGuitarHead },
+  { value: 'bass' as const, label: 'Bass', icon: GiGuitarBassHead }
 ] as const
 
 /**
@@ -29,18 +32,21 @@ const InstrumentSelector = memo(function InstrumentSelector() {
 
   return (
     <div className="instrument-selector">
-      <h3>🎵 Choose Your Instrument</h3>
+      <h3><IoMusicalNotes /> Choose Your Instrument</h3>
       <div className="instrument-options">
-        {INSTRUMENTS.map((inst) => (
-          <button
-            key={inst.value}
-            className={`instrument-button ${instrument === inst.value ? 'active' : ''}`}
-            onClick={handlers[inst.value]}
-          >
-            <span className="instrument-emoji">{inst.emoji}</span>
-            <span className="instrument-name">{inst.label.replace(/🎹|🎸/, '').trim()}</span>
-          </button>
-        ))}
+        {INSTRUMENTS.map((inst) => {
+          const Icon = inst.icon
+          return (
+            <button
+              key={inst.value}
+              className={`instrument-button ${instrument === inst.value ? 'active' : ''}`}
+              onClick={handlers[inst.value]}
+            >
+              <span className="instrument-emoji"><Icon /></span>
+              <span className="instrument-name">{inst.label}</span>
+            </button>
+          )
+        })}
       </div>
     </div>
   )

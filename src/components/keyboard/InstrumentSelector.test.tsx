@@ -20,7 +20,7 @@ describe('InstrumentSelector', () => {
   it('renders all instrument options', () => {
     render(<InstrumentSelector />)
 
-    expect(screen.getByText('🎵 Choose Your Instrument')).toBeInTheDocument()
+    expect(screen.getByText('Choose Your Instrument')).toBeInTheDocument()
     expect(screen.getByText('Keyboard')).toBeInTheDocument()
     expect(screen.getByText('Guitar')).toBeInTheDocument()
     expect(screen.getByText('Bass')).toBeInTheDocument()

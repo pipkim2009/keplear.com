@@ -56,7 +56,7 @@ describe('Audio Workflow Integration', () => {
 
     // Wait for app to load
     await waitFor(() => {
-      expect(screen.getByText('🎹 Keplear')).toBeInTheDocument()
+      expect(screen.getByText('Keplear')).toBeInTheDocument()
     })
 
     // Check that keyboard is default instrument
@@ -87,7 +87,7 @@ describe('Audio Workflow Integration', () => {
     render(<App />, { wrapper: TestWrapper })
 
     await waitFor(() => {
-      expect(screen.getByText('🎹 Keplear')).toBeInTheDocument()
+      expect(screen.getByText('Keplear')).toBeInTheDocument()
     })
 
     // Switch to guitar
@@ -110,7 +110,7 @@ describe('Audio Workflow Integration', () => {
     render(<App />, { wrapper: TestWrapper })
 
     await waitFor(() => {
-      expect(screen.getByText('🎹 Keplear')).toBeInTheDocument()
+      expect(screen.getByText('Keplear')).toBeInTheDocument()
     })
 
     // Toggle theme
@@ -134,7 +134,7 @@ describe('Audio Workflow Integration', () => {
     render(<App />, { wrapper: TestWrapper })
 
     await waitFor(() => {
-      expect(screen.getByText('🎹 Keplear')).toBeInTheDocument()
+      expect(screen.getByText('Keplear')).toBeInTheDocument()
     })
 
     // Change BPM
@@ -157,7 +157,7 @@ describe('Audio Workflow Integration', () => {
     render(<App />, { wrapper: TestWrapper })
 
     await waitFor(() => {
-      expect(screen.getByText('🎹 Keplear')).toBeInTheDocument()
+      expect(screen.getByText('Keplear')).toBeInTheDocument()
     })
 
     // Try to play a note - should not crash
@@ -167,6 +167,6 @@ describe('Audio Workflow Integration', () => {
     }
 
     // App should still be functional
-    expect(screen.getByText('🎹 Keplear')).toBeInTheDocument()
+    expect(screen.getByText('Keplear')).toBeInTheDocument()
   })
 })
