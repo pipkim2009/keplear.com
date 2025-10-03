@@ -156,9 +156,6 @@ export const useMelodyPlayer = ({
           // Ensure any previous playback is stopped
           stopMelody()
 
-          // Wait a bit for stop to take effect
-          await new Promise(resolve => setTimeout(resolve, 100))
-
           const result = await handleRecordMelody()
           if (result) {
             dispatch({ type: 'SET_HAS_RECORDED_AUDIO', payload: true })
@@ -171,8 +168,7 @@ export const useMelodyPlayer = ({
         }
       }
 
-      // Small delay to ensure melody is fully processed
-      setTimeout(autoRecord, 500)
+      autoRecord()
     }
   }, [generatedMelody.length, isPlaying, isRecording, state.isAutoRecording, state.hasRecordedAudio, stopMelody, handleRecordMelody])
 
