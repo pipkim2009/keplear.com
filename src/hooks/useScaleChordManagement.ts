@@ -515,9 +515,9 @@ export const useScaleChordManagement = ({
       return // Don't add duplicate scales
     }
 
-    // Switch to multi-select mode automatically
+    // Switch to multi-select mode automatically (but keep existing selections)
     if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
-      onKeyboardSelectionModeChange('multi')
+      onKeyboardSelectionModeChange('multi', false) // false = don't clear selections
     }
 
     // Generate current keyboard notes based on octave range
@@ -530,11 +530,14 @@ export const useScaleChordManagement = ({
 
     // Add each scale note individually using selectNote in multi mode
     if (selectNote) {
-      scaleNotes.forEach(note => {
-        // Only add if not already selected
-        if (!selectedNotes.some(selectedNote => selectedNote.name === note.name)) {
-          selectNote(note, 'multi')
-        }
+      // Create a set to track notes being added in this operation
+      const notesToAdd = scaleNotes.filter(note =>
+        !selectedNotes.some(selectedNote => selectedNote.name === note.name)
+      )
+
+      // Add all notes that aren't already selected
+      notesToAdd.forEach(note => {
+        selectNote(note, 'multi')
       })
     } else {
       // Fallback to the old method if selectNote is not available
@@ -623,9 +626,9 @@ export const useScaleChordManagement = ({
       return
     }
 
-    // Switch to multi-select mode automatically
+    // Switch to multi-select mode automatically (but keep existing selections)
     if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
-      onKeyboardSelectionModeChange('multi')
+      onKeyboardSelectionModeChange('multi', false) // false = don't clear selections
     }
 
     // Generate current keyboard notes based on octave range

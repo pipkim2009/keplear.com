@@ -84,7 +84,7 @@ interface InstrumentContextType {
   handlePlayMelody: () => void
   handleInstrumentChange: (newInstrument: InstrumentType) => void
   handleOctaveRangeChange: (lowerOctaves: number, higherOctaves: number) => void
-  handleKeyboardSelectionModeChange: (mode: 'range' | 'multi') => void
+  handleKeyboardSelectionModeChange: (mode: 'range' | 'multi', clearSelections?: boolean) => void
 }
 
 const InstrumentContext = createContext<InstrumentContextType | undefined>(undefined)
@@ -257,9 +257,11 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     // Handled by useInstrumentConfig hook internally
   }, [])
 
-  const handleKeyboardSelectionModeChange = useCallback((mode: 'range' | 'multi'): void => {
+  const handleKeyboardSelectionModeChange = useCallback((mode: 'range' | 'multi', clearSelections: boolean = true): void => {
     setKeyboardSelectionMode(mode as any)
-    clearSelection()
+    if (clearSelections) {
+      clearSelection()
+    }
     triggerInputFlash('mode')
   }, [setKeyboardSelectionMode, clearSelection, triggerInputFlash])
 
