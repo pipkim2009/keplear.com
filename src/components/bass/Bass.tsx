@@ -43,7 +43,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
   const STRING_COUNT = 4
   const FRET_COUNT = 24
-  const STRING_MAPPING = useMemo(() => [1, 2, 3, 4], [])
+  const STRING_MAPPING = useMemo(() => [4, 3, 2, 1], []) // Top visual string = highest pitch (G), bottom = lowest (E)
 
   const handleStringCheckboxChange = useCallback((index: number) => {
     setStringCheckboxes(prev => {
@@ -77,8 +77,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     const newSelectedNotes = new Set(selectedNotes)
 
     if (onNoteClick) {
-      const stringMapping = [1, 2, 3, 4]
-      const bassString = stringMapping[stringIndex]
+      const bassString = STRING_MAPPING[stringIndex]
       const openNote = bassNotes.find(note => note.string === bassString && note.fret === 0)
 
       if (openNote) {
@@ -168,8 +167,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     if (onNoteClick) {
       const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
       if (noteName) {
-        const stringMapping = [1, 2, 3, 4]
-        const bassString = stringMapping[stringIndex]
+        const bassString = STRING_MAPPING[stringIndex]
         const bassNote = bassNotes.find(note =>
           note.string === bassString && note.fret === fretIndex + 1
         )
@@ -268,8 +266,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
     for (let stringIndex = 0; stringIndex < 4; stringIndex++) {
       if (isOpenStringSelected(stringIndex)) {
-        const stringMapping = [1, 2, 3, 4]
-        const bassString = stringMapping[stringIndex]
+        const bassString = STRING_MAPPING[stringIndex]
         const openNote = bassNotes.find(note => note.string === bassString && note.fret === 0)
 
         if (openNote) {
@@ -288,8 +285,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         if (isNoteSelected(stringIndex, fretIndex)) {
           const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
           if (noteName) {
-            const stringMapping = [1, 2, 3, 4]
-            const bassString = stringMapping[stringIndex]
+            const bassString = STRING_MAPPING[stringIndex]
             const bassNote = bassNotes.find(note =>
               note.string === bassString && note.fret === fretIndex + 1
             )
@@ -436,8 +432,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     scaleSelections.forEach(({ stringIndex, fretIndex }) => {
       const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
       if (noteName) {
-        const stringMapping = [1, 2, 3, 4]
-        const bassString = stringMapping[stringIndex]
+        const bassString = STRING_MAPPING[stringIndex]
         const bassNote = bassNotes.find(note =>
           note.string === bassString && note.fret === fretIndex + 1
         )
@@ -835,8 +830,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         {[...Array(4)].map((_, stringIndex) => {
           if (!isOpenStringSelected(stringIndex)) return null
 
-          const stringMapping = [1, 2, 3, 4]
-          const bassString = stringMapping[stringIndex]
+          const bassString = STRING_MAPPING[stringIndex]
           const openNote = bassNotes.find(note => note.string === bassString && note.fret === 0)
 
           if (!openNote) return null
