@@ -2580,14 +2580,14 @@ body:has([data-instrument="keyboard"]) .control-button.delete-selection {
   margin-top: 22px !important;
 }
 
-/* Guitar mode: 3px margin on tablets/desktop */
+/* Guitar mode: 5px margin on tablets/desktop */
 body:has([data-instrument="guitar"]) .control-button.delete-selection {
-  margin-top: 3px !important;
+  margin-top: 5px !important;
 }
 
-/* Bass mode: 3px margin on tablets/desktop */
+/* Bass mode: 5px margin on tablets/desktop */
 body:has([data-instrument="bass"]) .control-button.delete-selection {
-  margin-top: 3px !important;
+  margin-top: 5px !important;
 }
 
 /* Mobile override: keyboard mode gets 0px margin on phones only */
