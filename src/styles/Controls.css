@@ -823,8 +823,6 @@
 
 .control-button.delete-selection:hover {
   background: rgba(220, 53, 69, 0.2);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
 .control-button.delete-selection:active {
@@ -2283,7 +2281,7 @@ select.control-input.flashing {
   background: transparent;
   border: none;
   width: 32px;
-  height: 32px;
+  height: 27px;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
