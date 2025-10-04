@@ -124,6 +124,9 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
   const handleGenerateMelody = useCallback((): void => {
     setIsGeneratingMelody(true)
 
+    // Hide notes before generating new melody
+    melodyPlayer.setShowNotes(false)
+
     const melodyNotes = config.instrument === 'keyboard' && (config.keyboardOctaves.lower !== 0 || config.keyboardOctaves.higher !== 0)
       ? generateNotesWithSeparateOctaves(config.keyboardOctaves.lower, config.keyboardOctaves.higher)
       : notes

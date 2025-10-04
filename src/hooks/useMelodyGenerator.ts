@@ -177,11 +177,11 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     showNotes && generatedMelody.some(n => n.name === note.name), [generatedMelody])
 
   /**
-   * Clears all selections and generated melody
+   * Clears all selections but keeps generated melody
    */
   const clearSelection = useCallback((): void => {
     setSelectedNotes([])
-    setGeneratedMelody([])
+    // Don't clear generated melody - keep it so audio player stays visible
     setClearTrigger(prev => prev + 1)
   }, [])
 

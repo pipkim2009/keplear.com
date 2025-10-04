@@ -106,11 +106,18 @@ export function melodyReducer(state: MelodyState, action: MelodyAction): MelodyS
       }
 
     case 'RESET_RECORDING':
+      // Also reset showNotes to false when clearing recording
+      try {
+        localStorage.setItem('keplear-showNotes', 'false')
+      } catch {
+        // Handle localStorage errors gracefully
+      }
       return {
         ...state,
         hasRecordedAudio: false,
         recordedAudioBlob: null,
-        isAutoRecording: false
+        isAutoRecording: false,
+        showNotes: false
       }
 
     case 'CLEAR_ALL_AUDIO':
