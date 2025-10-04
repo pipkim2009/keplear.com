@@ -858,7 +858,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             disabled={!canGenerateMelody}
             className={`modern-generate-button ${hasChanges ? 'has-changes' : ''}`}
             title="Generate a melody from selected notes"
-            style={{ position: 'relative' }}
+            style={{ position: 'relative', marginTop: '6.5px', padding: '8.5px 18.5px' }}
           >
             Generate Melody
             {hasChanges && <span className="change-badge">●</span>}
