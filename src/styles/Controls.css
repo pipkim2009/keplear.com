@@ -1387,19 +1387,19 @@
 }
 
 .range-slider.range-low::-webkit-slider-thumb {
-  margin-left: -10px;
+  margin-left: 0px;
 }
 
 .range-slider.range-high::-webkit-slider-thumb {
-  margin-left: 10px;
+  margin-left: 0px;
 }
 
 .range-slider.range-low::-moz-range-thumb {
-  transform: translateX(-10px);
+  transform: translateX(0px);
 }
 
 .range-slider.range-high::-moz-range-thumb {
-  transform: translateX(10px);
+  transform: translateX(0px);
 }
 
 .range-slider:hover::-webkit-slider-thumb {
