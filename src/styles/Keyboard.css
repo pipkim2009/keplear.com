@@ -18,16 +18,17 @@
 .instrument-header-controls {
   display: flex;
   justify-content: flex-start;
-  align-items: center;
+  align-items: flex-start;
   padding: 1rem;
   border-bottom: 2px solid #4a5568;
   background: linear-gradient(145deg, #374151, #1f2937);
   border-radius: 16px 16px 0 0;
+  min-height: 72px;
 }
 
 .header-controls-left {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 1rem;
 }
 

@@ -819,6 +819,7 @@
   height: 32px;
   min-width: 120px;
   margin-top: 0;
+  margin-bottom: 0;
 }
 
 .control-button.delete-selection:hover {
