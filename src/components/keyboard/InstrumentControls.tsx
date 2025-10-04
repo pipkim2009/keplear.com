@@ -698,7 +698,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                     }
                   }
                 }}
-                className="range-slider range-low"
+                className={`range-slider range-low ${Math.max(1, 4 - lowerOctaves) === Math.min(8, 5 + higherOctaves) ? 'same-position' : ''}`}
                 title="Set lowest octave"
               />
               <input
@@ -726,7 +726,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                     }
                   }
                 }}
-                className="range-slider range-high"
+                className={`range-slider range-high ${Math.max(1, 4 - lowerOctaves) === Math.min(8, 5 + higherOctaves) ? 'same-position' : ''}`}
                 title="Set highest octave"
               />
             </div>

@@ -1403,6 +1403,23 @@
   transform: translateX(0px);
 }
 
+/* Offset thumbs when at same position */
+.range-slider.range-low.same-position::-webkit-slider-thumb {
+  margin-left: -10px;
+}
+
+.range-slider.range-high.same-position::-webkit-slider-thumb {
+  margin-left: 10px;
+}
+
+.range-slider.range-low.same-position::-moz-range-thumb {
+  transform: translateX(-10px);
+}
+
+.range-slider.range-high.same-position::-moz-range-thumb {
+  transform: translateX(10px);
+}
+
 .range-slider:hover::-webkit-slider-thumb {
   transform: scale(1.1);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
