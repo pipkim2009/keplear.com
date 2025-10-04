@@ -91,10 +91,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.3);
-  background-image: linear-gradient(145deg, #f97316, #8b5cf6);
-  background-clip: text;
-  -webkit-background-clip: text;
+  background: transparent;
   color: transparent;
   border: 2px solid transparent;
   border-radius: 6px;
@@ -106,6 +103,28 @@
   box-sizing: border-box;
   margin-top: 20px;
   padding: 0 12px;
+}
+
+.scale-options-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 1.5px;
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.1), rgba(139, 92, 246, 0.1));
+  border-radius: 4.5px;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.scale-options-toggle .toggle-text {
+  background: linear-gradient(145deg, #fee7d6, #f3f0ff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.scale-options-toggle .toggle-arrow {
+  color: #fee7d6;
 }
 
 .scale-options-toggle::before {
@@ -127,11 +146,8 @@
   margin-top: 3px;
 }
 
-.scale-options-toggle:hover {
-  background: rgba(0, 0, 0, 0.5);
-  background-image: linear-gradient(145deg, #ea580c, #7c3aed);
-  background-clip: text;
-  -webkit-background-clip: text;
+.scale-options-toggle:hover::after {
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.2), rgba(139, 92, 246, 0.2));
 }
 
 .scale-options-toggle:hover::before {
@@ -144,11 +160,11 @@
   justify-content: center;
   gap: 8px;
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.5);
-  background-image: linear-gradient(145deg, #ea580c, #7c3aed);
-  background-clip: text;
-  -webkit-background-clip: text;
   box-sizing: border-box;
+}
+
+.scale-options-container.expanded .scale-options-toggle::after {
+  background: linear-gradient(145deg, rgba(249, 115, 22, 0.2), rgba(139, 92, 246, 0.2));
 }
 
 .scale-options-container.expanded .scale-options-toggle::before {
@@ -165,18 +181,12 @@
   flex-shrink: 0;
   transition: none;
   font-size: 14px;
-  background: none !important;
-  -webkit-background-clip: initial !important;
-  background-clip: initial !important;
-  -webkit-text-fill-color: initial !important;
-  color: #ffffff !important;
 }
 
 .scale-options-container.collapsed .toggle-text {
   display: inline;
   font-size: 12px;
   font-weight: 600;
-  color: #ffffff;
   margin-left: 9px;
   transition: none;
 }
@@ -185,7 +195,6 @@
   display: inline;
   font-size: 12px;
   font-weight: 600;
-  color: #ffffff;
   margin-left: 0;
   transition: none;
 }
