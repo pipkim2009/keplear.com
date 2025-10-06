@@ -4,6 +4,7 @@ import InstrumentRenderer from './InstrumentRenderer'
 import { useState, useEffect } from 'react'
 import type { Note } from '../../utils/notes'
 import type { KeyboardSelectionMode } from './InstrumentControls'
+import type { ChordMode } from '../../reducers/uiReducer'
 import { useScaleChordManagement } from '../../hooks/useScaleChordManagement'
 import { useKeyboardHighlighting } from '../../hooks/useKeyboardHighlighting'
 
@@ -16,6 +17,8 @@ interface InstrumentDisplayProps {
   setBpm: (bpm: number) => void
   numberOfNotes: number
   setNumberOfNotes: (count: number) => void
+  chordMode?: ChordMode
+  setChordMode?: (mode: ChordMode) => void
   instrument: string
   setInstrument: (instrument: string) => void
   setGuitarNotes: (notes: Note[]) => void
@@ -58,6 +61,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   setBpm,
   numberOfNotes,
   setNumberOfNotes,
+  chordMode = 'arpeggiator',
+  setChordMode,
   instrument,
   setInstrument,
   setGuitarNotes,
@@ -176,6 +181,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           setBpm={setBpm}
           numberOfNotes={numberOfNotes}
           setNumberOfNotes={setNumberOfNotes}
+          chordMode={chordMode}
+          setChordMode={setChordMode}
           instrument={instrument}
           setInstrument={setInstrument}
           clearSelection={clearSelection}

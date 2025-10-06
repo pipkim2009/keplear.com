@@ -1,6 +1,7 @@
 import NotesToggle from './common/NotesToggle'
 import type { Note } from '../utils/notes'
 import { downloadAudioFile, generateMelodyFilename } from '../utils/audioExport'
+import type { ChordMode } from '../reducers/uiReducer'
 import '../styles/MelodyControls.css'
 
 interface MelodyControlsProps {
@@ -16,6 +17,8 @@ interface MelodyControlsProps {
   showNotes: boolean
   onToggleNotes: () => void
   keyboardSelectionMode?: 'range' | 'multi'
+  chordMode?: ChordMode
+  onToggleChordMode?: () => void
 }
 
 const MelodyControls: React.FC<MelodyControlsProps> = ({
@@ -30,7 +33,9 @@ const MelodyControls: React.FC<MelodyControlsProps> = ({
   instrument = 'keyboard',
   showNotes,
   onToggleNotes,
-  keyboardSelectionMode = 'range'
+  keyboardSelectionMode = 'range',
+  chordMode = 'arpeggiator',
+  onToggleChordMode
 }) => {
   
   // Different enable conditions based on instrument and selection mode
@@ -76,7 +81,18 @@ const MelodyControls: React.FC<MelodyControlsProps> = ({
       >
         <NotesToggle showNotes={showNotes} onToggle={() => {}} />
       </button>
-      
+
+      {onToggleChordMode && (
+        <button
+          className="chord-mode-toggle"
+          onClick={onToggleChordMode}
+          title={`Switch to ${chordMode === 'arpeggiator' ? 'progression' : 'arpeggiator'} mode`}
+          aria-label={`Chord mode: ${chordMode}`}
+        >
+          <span className="chord-mode-label">{chordMode === 'arpeggiator' ? 'Arpeggiator' : 'Progression'}</span>
+        </button>
+      )}
+
       <div className="selected-notes">
         Selected Notes: {selectedNotes.map(n => n.name).join(', ') || 'None'}
       </div>

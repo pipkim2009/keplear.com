@@ -9,6 +9,7 @@ import { notes, generateNotesWithSeparateOctaves } from '../utils/notes'
 import type { Note } from '../utils/notes'
 import { useMelodyChanges } from '../hooks/useMelodyChanges'
 import type { InstrumentType } from '../types/instrument'
+import type { ChordMode } from '../reducers/uiReducer'
 
 interface InstrumentContextType {
   // Audio functions
@@ -27,6 +28,7 @@ interface InstrumentContextType {
   currentPage: string
   bpm: number
   numberOfNotes: number
+  chordMode: ChordMode
   flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
   activeInputs: { bpm: boolean; notes: boolean; mode: boolean }
   navigateToHome: () => void
@@ -34,6 +36,7 @@ interface InstrumentContextType {
   navigateToPractice: () => void
   setBpm: (bpm: number) => void
   setNumberOfNotes: (notes: number) => void
+  setChordMode: (mode: ChordMode) => void
   triggerInputFlash: (input: 'bpm' | 'notes' | 'mode') => void
   setInputActive: (input: 'bpm' | 'notes' | 'mode', active: boolean) => void
   setCurrentPage: (page: string) => void
@@ -112,6 +115,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     currentPage,
     bpm,
     numberOfNotes,
+    chordMode,
     flashingInputs,
     activeInputs,
     navigateToHome,
@@ -119,6 +123,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     navigateToPractice,
     setBpm,
     setNumberOfNotes,
+    setChordMode,
     triggerInputFlash,
     setInputActive,
     setCurrentPage
@@ -282,6 +287,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     currentPage,
     bpm,
     numberOfNotes,
+    chordMode,
     flashingInputs,
     activeInputs,
     navigateToHome,
@@ -289,6 +295,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     navigateToPractice,
     setBpm,
     setNumberOfNotes,
+    setChordMode,
     triggerInputFlash,
     setInputActive,
     setCurrentPage,

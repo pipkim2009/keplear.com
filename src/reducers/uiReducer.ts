@@ -5,11 +5,13 @@
 
 export type PageType = 'home' | 'sandbox' | 'practice'
 export type InputType = 'bpm' | 'notes' | 'mode'
+export type ChordMode = 'arpeggiator' | 'progression'
 
 export interface UIState {
   readonly currentPage: PageType
   readonly bpm: number
   readonly numberOfNotes: number
+  readonly chordMode: ChordMode
   readonly flashingInputs: Record<InputType, boolean>
   readonly activeInputs: Record<InputType, boolean>
 }
@@ -18,6 +20,7 @@ export type UIAction =
   | { type: 'SET_CURRENT_PAGE'; payload: PageType }
   | { type: 'SET_BPM'; payload: number }
   | { type: 'SET_NUMBER_OF_NOTES'; payload: number }
+  | { type: 'SET_CHORD_MODE'; payload: ChordMode }
   | { type: 'TRIGGER_INPUT_FLASH'; payload: InputType }
   | { type: 'CLEAR_INPUT_FLASH'; payload: InputType }
   | { type: 'SET_INPUT_ACTIVE'; payload: { inputType: InputType; active: boolean } }
@@ -27,13 +30,15 @@ export type UIAction =
 
 export const DEFAULT_SETTINGS = {
   bpm: 120,
-  numberOfNotes: 5
+  numberOfNotes: 5,
+  chordMode: 'arpeggiator' as ChordMode
 } as const
 
 export const initialUIState: UIState = {
   currentPage: 'home',
   bpm: DEFAULT_SETTINGS.bpm,
   numberOfNotes: DEFAULT_SETTINGS.numberOfNotes,
+  chordMode: DEFAULT_SETTINGS.chordMode,
   flashingInputs: {
     bpm: false,
     notes: false,
@@ -68,6 +73,12 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
       return {
         ...state,
         numberOfNotes: Math.max(1, Math.min(100, notesValue))
+      }
+
+    case 'SET_CHORD_MODE':
+      return {
+        ...state,
+        chordMode: action.payload
       }
 
     case 'TRIGGER_INPUT_FLASH':
@@ -122,6 +133,7 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
         ...state,
         bpm: DEFAULT_SETTINGS.bpm,
         numberOfNotes: DEFAULT_SETTINGS.numberOfNotes,
+        chordMode: DEFAULT_SETTINGS.chordMode,
         flashingInputs: {
           bpm: false,
           notes: false,

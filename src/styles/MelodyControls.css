@@ -44,6 +44,61 @@
   background: rgba(128, 0, 255, 0.15);
 }
 
+/* Chord Mode Select - blue accent for controls row */
+.chord-mode-select {
+  background: rgba(0, 128, 255, 0.15) !important;
+  border: 2px solid rgba(0, 128, 255, 0.5) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  text-align-last: center !important;
+  min-width: 120px !important;
+  width: 120px !important;
+  padding: 6px 10px !important;
+  height: 32px !important;
+  line-height: 1.2 !important;
+  font-size: 12px !important;
+}
+
+.chord-mode-select:hover {
+  background: rgba(0, 128, 255, 0.25) !important;
+  border-color: rgba(0, 128, 255, 0.7) !important;
+  box-shadow: 0 4px 8px rgba(0, 128, 255, 0.3) !important;
+}
+
+.chord-mode-select:focus {
+  box-shadow: 0 0 0 2px rgba(0, 128, 255, 0.5) !important;
+  border-color: rgba(0, 128, 255, 0.8) !important;
+}
+
+.chord-mode-select option {
+  background: #1a1a1a !important;
+  color: #ffffff !important;
+  padding: 8px !important;
+  text-align: center !important;
+}
+
+.light .chord-mode-select {
+  background: rgba(0, 128, 255, 0.12) !important;
+  border-color: rgba(0, 128, 255, 0.4) !important;
+  color: #003d7a !important;
+}
+
+.light .chord-mode-select:hover {
+  background: rgba(0, 128, 255, 0.2) !important;
+  border-color: rgba(0, 128, 255, 0.6) !important;
+}
+
+.light .chord-mode-select:focus {
+  box-shadow: 0 0 0 2px rgba(0, 128, 255, 0.4) !important;
+  border-color: rgba(0, 128, 255, 0.7) !important;
+}
+
+.light .chord-mode-select option {
+  background: #f0f9ff !important;
+  color: #003d7a !important;
+}
+
 .selected-notes {
   font-size: 18px;
   font-weight: 600;

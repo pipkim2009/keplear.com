@@ -6,6 +6,7 @@ import { guitarNotes } from '../../utils/guitarNotes'
 import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/keyboardScales'
 import NotesToggle from '../common/NotesToggle'
 import type { Note } from '../../utils/notes'
+import type { ChordMode } from '../../reducers/uiReducer'
 import MelodyDisplay from '../MelodyDisplay'
 import CustomAudioPlayer from '../common/CustomAudioPlayer'
 import '../../styles/CustomAudioPlayer.css'
@@ -20,6 +21,8 @@ interface InstrumentControlsProps {
   setBpm: (bpm: number) => void
   numberOfNotes: number
   setNumberOfNotes: (count: number) => void
+  chordMode?: ChordMode
+  setChordMode?: (mode: ChordMode) => void
   instrument: string
   setInstrument: (instrument: string) => void
   clearSelection: () => void
@@ -65,6 +68,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   setBpm,
   numberOfNotes,
   setNumberOfNotes,
+  chordMode = 'arpeggiator',
+  setChordMode,
   instrument,
   setInstrument,
   clearSelection,
@@ -839,6 +844,22 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               </button>
             </div>
           </div>
+
+          {/* Chord Mode Select */}
+          {setChordMode && (
+            <div className="modern-control-item">
+              <label className="control-label">Chord Mode</label>
+              <select
+                value={chordMode}
+                onChange={(e) => setChordMode(e.target.value as 'arpeggiator' | 'progression')}
+                className="control-input chord-mode-select"
+                style={{ color: '#ffffff', fontWeight: '600' }}
+              >
+                <option value="arpeggiator">Arpeggiator</option>
+                <option value="progression">Progression</option>
+              </select>
+            </div>
+          )}
 
           <button
             onClick={() => {

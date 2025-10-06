@@ -5,7 +5,8 @@ import {
   type UIState,
   type UIAction,
   type PageType,
-  type InputType
+  type InputType,
+  type ChordMode
 } from '../reducers/uiReducer'
 
 interface UseUIStateReturn {
@@ -13,6 +14,7 @@ interface UseUIStateReturn {
   readonly currentPage: PageType
   readonly bpm: number
   readonly numberOfNotes: number
+  readonly chordMode: ChordMode
   readonly flashingInputs: Record<InputType, boolean>
   readonly activeInputs: Record<InputType, boolean>
 
@@ -25,6 +27,7 @@ interface UseUIStateReturn {
   // Settings actions
   setBpm: (bpm: number) => void
   setNumberOfNotes: (count: number) => void
+  setChordMode: (mode: ChordMode) => void
 
   // Input flash actions
   triggerInputFlash: (inputType: InputType) => void
@@ -72,6 +75,10 @@ export const useUIState = (): UseUIStateReturn => {
 
   const setNumberOfNotes = useCallback((count: number) => {
     dispatch({ type: 'SET_NUMBER_OF_NOTES', payload: count })
+  }, [])
+
+  const setChordMode = useCallback((mode: ChordMode) => {
+    dispatch({ type: 'SET_CHORD_MODE', payload: mode })
   }, [])
 
   // Input flash actions
@@ -124,6 +131,7 @@ export const useUIState = (): UseUIStateReturn => {
     currentPage: state.currentPage,
     bpm: state.bpm,
     numberOfNotes: state.numberOfNotes,
+    chordMode: state.chordMode,
     flashingInputs: state.flashingInputs,
     activeInputs: state.activeInputs,
 
@@ -136,6 +144,7 @@ export const useUIState = (): UseUIStateReturn => {
     // Settings actions
     setBpm,
     setNumberOfNotes,
+    setChordMode,
 
     // Input flash actions
     triggerInputFlash,

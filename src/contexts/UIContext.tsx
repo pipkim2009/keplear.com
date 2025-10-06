@@ -1,5 +1,6 @@
 import { createContext, useContext, ReactNode } from 'react'
 import { useUIState } from '../hooks/useUIState'
+import type { ChordMode } from '../reducers/uiReducer'
 
 interface UIContextType {
   // Navigation
@@ -14,6 +15,8 @@ interface UIContextType {
   setBpm: (bpm: number) => void
   numberOfNotes: number
   setNumberOfNotes: (notes: number) => void
+  chordMode: ChordMode
+  setChordMode: (mode: ChordMode) => void
 
   // UI Feedback
   flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
@@ -49,6 +52,8 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
     setBpm: uiState.setBpm,
     numberOfNotes: uiState.numberOfNotes,
     setNumberOfNotes: uiState.setNumberOfNotes,
+    chordMode: uiState.chordMode,
+    setChordMode: uiState.setChordMode,
     flashingInputs: uiState.flashingInputs,
     activeInputs: uiState.activeInputs,
     triggerInputFlash: uiState.triggerInputFlash,

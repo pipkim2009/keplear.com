@@ -21,6 +21,8 @@ function Router() {
     setBpm,
     numberOfNotes,
     setNumberOfNotes,
+    chordMode,
+    setChordMode,
     instrument,
     handleInstrumentChange,
     setGuitarNotes,
@@ -72,6 +74,8 @@ function Router() {
           setBpm={setBpm}
           numberOfNotes={numberOfNotes}
           setNumberOfNotes={setNumberOfNotes}
+          chordMode={chordMode}
+          setChordMode={setChordMode}
           instrument={instrument}
           setInstrument={handleInstrumentChange}
           setGuitarNotes={setGuitarNotes}
