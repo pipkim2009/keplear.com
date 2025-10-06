@@ -924,14 +924,11 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               {/* Expanded melody content */}
               {showNotes && generatedMelody && generatedMelody.length > 0 && (
                 <div className="expanded-melody-content">
-                  <div className="melody-title">Generated Melody:</div>
-                  <div className="melody-notes">
-                    {generatedMelody.map((note, index) => (
-                      <span key={`${note.name}-${index}`} className="melody-note">
-                        {note.name}
-                      </span>
-                    ))}
-                  </div>
+                  <MelodyDisplay
+                    generatedMelody={generatedMelody}
+                    showNotes={showNotes}
+                    chordMode={chordMode}
+                  />
                 </div>
               )}
             </div>

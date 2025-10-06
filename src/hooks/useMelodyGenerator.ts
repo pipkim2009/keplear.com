@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react'
-import type { Note } from '../utils/notes'
+import type { Note, ChordGroupInfo } from '../utils/notes'
+import type { AppliedChord } from '../components/common/ScaleChordOptions'
 
 /**
  * Supported instrument types for melody generation
@@ -14,7 +15,7 @@ interface UseMelodyGeneratorReturn {
   readonly generatedMelody: readonly Note[]
   readonly clearTrigger: number
   selectNote: (note: Note, selectionMode?: 'range' | 'multi') => void
-  generateMelody: (notes: readonly Note[], numberOfNotes: number, instrument?: InstrumentType, selectionMode?: 'range' | 'multi', notesToUse?: readonly Note[]) => void
+  generateMelody: (notes: readonly Note[], numberOfNotes: number, instrument?: InstrumentType, selectionMode?: 'range' | 'multi', notesToUse?: readonly Note[], chordMode?: 'arpeggiator' | 'progression', appliedChords?: AppliedChord[]) => void
   setGuitarNotes: (notes: Note[]) => void
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
@@ -67,7 +68,9 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     numberOfNotes: number,
     instrument: InstrumentType = 'keyboard',
     selectionMode: 'range' | 'multi' = 'range',
-    notesToUse?: readonly Note[]
+    notesToUse?: readonly Note[],
+    chordMode: 'arpeggiator' | 'progression' = 'arpeggiator',
+    appliedChords?: AppliedChord[]
   ): void => {
     if (numberOfNotes <= 0) {
       console.warn('Number of notes must be positive')
@@ -77,6 +80,52 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     // Use provided notes snapshot or current selectedNotes
     const currentSelectedNotes = notesToUse || selectedNotes
 
+    // PROGRESSION MODE: Generate chord progression melody
+    if (chordMode === 'progression' && appliedChords && appliedChords.length > 0) {
+      const melody: Note[] = []
+
+      for (let i = 0; i < numberOfNotes; i++) {
+        // Randomly pick a chord group for this beat
+        const randomChordGroup = appliedChords[Math.floor(Math.random() * appliedChords.length)]
+
+        // Get all notes from this chord group
+        const chordNotes = randomChordGroup.notes || []
+
+        if (chordNotes.length > 0) {
+          // Pick a random note from this chord (just for melody display)
+          const randomNote = chordNotes[Math.floor(Math.random() * chordNotes.length)]
+
+          // Validate that the note has valid properties
+          if (!randomNote || !randomNote.name || typeof randomNote.frequency !== 'number') {
+            console.warn('Invalid note in chord group:', randomNote, randomChordGroup)
+            continue
+          }
+
+          // Create a new note with chord group information
+          const noteWithChordInfo: Note = {
+            ...randomNote,
+            chordGroup: {
+              id: randomChordGroup.id,
+              displayName: randomChordGroup.displayName,
+              rootNote: randomChordGroup.root,
+              allNotes: chordNotes.filter(n => n && n.name).map(n => n.name)
+            }
+          }
+
+          melody.push(noteWithChordInfo)
+        }
+      }
+
+      if (melody.length === 0) {
+        console.warn('No valid notes generated in progression mode')
+        return
+      }
+
+      setGeneratedMelody(melody)
+      return
+    }
+
+    // ARPEGGIATOR MODE: Generate regular melody
     if (instrument === 'keyboard') {
       if (selectionMode === 'range') {
         // Range mode: requires exactly 2 notes for range selection

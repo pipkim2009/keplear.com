@@ -115,11 +115,11 @@ interface UseAudioReturn {
   playNote: (noteName: string, duration?: string) => Promise<void>
   playGuitarNote: (noteName: string, duration?: string) => Promise<void>
   playBassNote: (noteName: string, duration?: string) => Promise<void>
-  playMelody: (melody: Note[], bpm: number) => Promise<void>
-  playGuitarMelody: (melody: Note[], bpm: number) => Promise<void>
-  playBassMelody: (melody: Note[], bpm: number) => Promise<void>
+  playMelody: (melody: Note[], bpm: number, chordMode?: 'arpeggiator' | 'progression') => Promise<void>
+  playGuitarMelody: (melody: Note[], bpm: number, chordMode?: 'arpeggiator' | 'progression') => Promise<void>
+  playBassMelody: (melody: Note[], bpm: number, chordMode?: 'arpeggiator' | 'progression') => Promise<void>
   stopMelody: () => void
-  recordMelody: (melody: Note[], bpm: number, instrument?: 'keyboard' | 'guitar' | 'bass') => Promise<Blob | null>
+  recordMelody: (melody: Note[], bpm: number, instrument?: 'keyboard' | 'guitar' | 'bass', chordMode?: 'arpeggiator' | 'progression') => Promise<Blob | null>
   readonly isPlaying: boolean
   readonly isRecording: boolean
 }
@@ -265,40 +265,78 @@ export const useAudio = (): UseAudioReturn => {
   const playMelodyGeneric = useCallback(async (
     melody: Note[],
     bpm: number,
-    instrument: 'keyboard' | 'guitar' | 'bass'
+    instrument: 'keyboard' | 'guitar' | 'bass',
+    chordMode: 'arpeggiator' | 'progression' = 'arpeggiator'
   ) => {
     if (melody.length === 0 || isPlaying) return
-    
+
     const currentSamplers = await initializeAudio()
     const sampler = currentSamplers[instrument]
     if (!sampler || typeof sampler !== 'object' || !('triggerAttackRelease' in sampler)) return
-    
+
     setIsPlaying(true)
     setShouldStop(false)
     setCurrentTimeoutId(null) // Reset any lingering timeout ID
-    
+
     const noteDuration = (60 / bpm) * 1000
     const playDuration = instrument === 'guitar' ? "0.6" : instrument === 'bass' ? "0.8" : "0.5"
-    
-    const samplerWithMethod = sampler as { triggerAttackRelease: (note: string, duration: string) => void }
-    
+
+    const samplerWithMethod = sampler as { triggerAttackRelease: (note: string | string[], duration: string) => void }
+
     try {
-      for (let i = 0; i < melody.length; i++) {
-        if (shouldStop) {
-          break
+      if (chordMode === 'progression') {
+        // In progression mode, play the chord group for each note
+        const chordDuration = (60 / bpm) * 1000
+
+        for (let i = 0; i < melody.length; i++) {
+          if (shouldStop) break
+
+          const note = melody[i]
+
+          // Check if note has chord group info
+          if (note.chordGroup && note.chordGroup.allNotes && note.chordGroup.allNotes.length > 0) {
+            // Validate all notes in the chord group
+            const validNotes = note.chordGroup.allNotes.filter(noteName => noteName && typeof noteName === 'string')
+            if (validNotes.length > 0) {
+              // Play all notes in the chord group
+              samplerWithMethod.triggerAttackRelease(validNotes, playDuration)
+            } else {
+              console.warn('No valid notes in chord group, skipping beat', i)
+            }
+          } else if (note.name) {
+            // Fallback: just play the single note
+            samplerWithMethod.triggerAttackRelease(note.name, playDuration)
+          } else {
+            console.warn('Invalid note at position', i, note)
+          }
+
+          if (i < melody.length - 1) {
+            await new Promise(resolve => {
+              const timeoutId = setTimeout(resolve, chordDuration)
+              setCurrentTimeoutId(timeoutId)
+            })
+            if (shouldStop) break
+          }
         }
-        samplerWithMethod.triggerAttackRelease(melody[i].name, playDuration)
-        if (i < melody.length - 1) {
-          await new Promise(resolve => {
-            const timeoutId = setTimeout(resolve, noteDuration)
-            setCurrentTimeoutId(timeoutId)
-          })
+      } else {
+        // Arpeggiator mode - play notes one by one
+        for (let i = 0; i < melody.length; i++) {
           if (shouldStop) {
             break
           }
+          samplerWithMethod.triggerAttackRelease(melody[i].name, playDuration)
+          if (i < melody.length - 1) {
+            await new Promise(resolve => {
+              const timeoutId = setTimeout(resolve, noteDuration)
+              setCurrentTimeoutId(timeoutId)
+            })
+            if (shouldStop) {
+              break
+            }
+          }
         }
       }
-      
+
       // Add delay for the last note to finish playing (only if not stopped manually)
       if (!shouldStop) {
         const finalDelay = calculateFinalDelay(bpm, instrument)
@@ -314,16 +352,16 @@ export const useAudio = (): UseAudioReturn => {
     }
   }, [initializeAudio, isPlaying, shouldStop, calculateFinalDelay])
 
-  const playMelody = useCallback((melody: Note[], bpm: number) => {
-    return playMelodyGeneric(melody, bpm, 'keyboard')
+  const playMelody = useCallback((melody: Note[], bpm: number, chordMode: 'arpeggiator' | 'progression' = 'arpeggiator') => {
+    return playMelodyGeneric(melody, bpm, 'keyboard', chordMode)
   }, [playMelodyGeneric])
 
-  const playGuitarMelody = useCallback((melody: Note[], bpm: number) => {
-    return playMelodyGeneric(melody, bpm, 'guitar')
+  const playGuitarMelody = useCallback((melody: Note[], bpm: number, chordMode: 'arpeggiator' | 'progression' = 'arpeggiator') => {
+    return playMelodyGeneric(melody, bpm, 'guitar', chordMode)
   }, [playMelodyGeneric])
 
-  const playBassMelody = useCallback((melody: Note[], bpm: number) => {
-    return playMelodyGeneric(melody, bpm, 'bass')
+  const playBassMelody = useCallback((melody: Note[], bpm: number, chordMode: 'arpeggiator' | 'progression' = 'arpeggiator') => {
+    return playMelodyGeneric(melody, bpm, 'bass', chordMode)
   }, [playMelodyGeneric])
 
   const stopMelody = useCallback(() => {
@@ -344,7 +382,8 @@ export const useAudio = (): UseAudioReturn => {
   const recordMelody = useCallback(async (
     melody: Note[],
     bpm: number,
-    instrument: 'keyboard' | 'guitar' | 'bass' = 'keyboard'
+    instrument: 'keyboard' | 'guitar' | 'bass' = 'keyboard',
+    chordMode: 'arpeggiator' | 'progression' = 'arpeggiator'
   ): Promise<Blob | null> => {
     if (melody.length === 0 || isPlaying || isRecording) return null
 
@@ -378,25 +417,62 @@ export const useAudio = (): UseAudioReturn => {
 
       const noteDuration = (60 / bpm) * 1000
       const playDuration = instrument === 'guitar' ? "0.6" : instrument === 'bass' ? "0.8" : "0.5"
-      const samplerWithMethod = sampler as { triggerAttackRelease: (note: string, duration: string) => void }
+      const samplerWithMethod = sampler as { triggerAttackRelease: (note: string | string[], duration: string, time?: number) => void }
 
       // Use Web Audio API precise timing instead of setTimeout
       const startTimeAudio = Tone.now()
 
-      // Schedule all notes with precise Web Audio API timing
-      melody.forEach((note, i) => {
-        const noteTime = startTimeAudio + (i * (noteDuration / 1000))
-        samplerWithMethod.triggerAttackRelease(note.name, playDuration, noteTime)
-      })
+      if (chordMode === 'progression') {
+        // Each melody position is one beat
+        const chordDuration = (60 / bpm) * 1000
 
-      // Calculate exact duration to match useMelodyPlayer calculation
-      const totalDurationMs = (melody.length - 1) * noteDuration + calculateFinalDelay(bpm, instrument)
-      const totalDuration = totalDurationMs / 1000
-      const endTimeAudio = startTimeAudio + totalDuration
+        // Schedule chord for each melody position
+        for (let i = 0; i < melody.length; i++) {
+          const note = melody[i]
+          const noteTime = startTimeAudio + (i * (chordDuration / 1000))
 
-      // Wait for the exact audio timeline to finish
-      const waitTime = (endTimeAudio - Tone.now()) * 1000
-      await new Promise(resolve => setTimeout(resolve, Math.max(0, waitTime)))
+          // Check if note has chord group info
+          if (note.chordGroup && note.chordGroup.allNotes && note.chordGroup.allNotes.length > 0) {
+            // Validate all notes in the chord group
+            const validNotes = note.chordGroup.allNotes.filter(noteName => noteName && typeof noteName === 'string')
+            if (validNotes.length > 0) {
+              // Play all notes in the chord group
+              samplerWithMethod.triggerAttackRelease(validNotes, playDuration, noteTime)
+            } else {
+              console.warn('No valid notes in chord group, skipping beat', i)
+            }
+          } else if (note.name) {
+            // Fallback: just play the single note
+            samplerWithMethod.triggerAttackRelease(note.name, playDuration, noteTime)
+          } else {
+            console.warn('Invalid note at position', i, note)
+          }
+        }
+
+        // Calculate duration based on melody length
+        const totalDurationMs = (melody.length - 1) * chordDuration + calculateFinalDelay(bpm, instrument)
+        const totalDuration = totalDurationMs / 1000
+        const endTimeAudio = startTimeAudio + totalDuration
+
+        // Wait for the exact audio timeline to finish
+        const waitTime = (endTimeAudio - Tone.now()) * 1000
+        await new Promise(resolve => setTimeout(resolve, Math.max(0, waitTime)))
+      } else {
+        // Arpeggiator mode - schedule all notes individually
+        melody.forEach((note, i) => {
+          const noteTime = startTimeAudio + (i * (noteDuration / 1000))
+          samplerWithMethod.triggerAttackRelease(note.name, playDuration, noteTime)
+        })
+
+        // Calculate exact duration to match useMelodyPlayer calculation
+        const totalDurationMs = (melody.length - 1) * noteDuration + calculateFinalDelay(bpm, instrument)
+        const totalDuration = totalDurationMs / 1000
+        const endTimeAudio = startTimeAudio + totalDuration
+
+        // Wait for the exact audio timeline to finish
+        const waitTime = (endTimeAudio - Tone.now()) * 1000
+        await new Promise(resolve => setTimeout(resolve, Math.max(0, waitTime)))
+      }
 
       // Stop recording and get the audio blob
       const recording = await recorder.stop()

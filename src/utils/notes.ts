@@ -1,6 +1,20 @@
 import { MUSIC_CONFIG, LAYOUT_CONFIG } from '../constants'
 
 /**
+ * Information about the chord group a note belongs to
+ */
+export interface ChordGroupInfo {
+  /** Unique ID of the chord group */
+  readonly id: string
+  /** Display name of the chord (e.g., "C Major", "G Minor") */
+  readonly displayName: string
+  /** Root note of the chord */
+  readonly rootNote: string
+  /** All notes in this chord group */
+  readonly allNotes: readonly string[]
+}
+
+/**
  * Represents a musical note with its properties
  */
 export interface Note {
@@ -12,6 +26,8 @@ export interface Note {
   readonly isBlack: boolean
   /** The position index in the note sequence */
   readonly position: number
+  /** Optional: chord group this note belongs to (for progression mode) */
+  readonly chordGroup?: ChordGroupInfo
 }
 
 /**

@@ -13,9 +13,10 @@ interface UseMelodyPlayerProps {
   bpm: number
   isPlaying: boolean
   isRecording: boolean
-  recordMelody: (notes: readonly Note[], bpm: number, instrument: InstrumentType) => Promise<Blob | null>
+  recordMelody: (notes: readonly Note[], bpm: number, instrument: InstrumentType, chordMode?: 'arpeggiator' | 'progression') => Promise<Blob | null>
   stopMelody: () => void
   instrument: InstrumentType
+  chordMode?: 'arpeggiator' | 'progression'
 }
 
 interface UseMelodyPlayerReturn {
@@ -53,7 +54,8 @@ export const useMelodyPlayer = ({
   isRecording,
   recordMelody,
   stopMelody,
-  instrument
+  instrument,
+  chordMode = 'arpeggiator'
 }: UseMelodyPlayerProps): UseMelodyPlayerReturn => {
   const [state, dispatch] = useReducer(melodyReducer, initialMelodyState)
 
@@ -96,12 +98,12 @@ export const useMelodyPlayer = ({
       return null
     }
 
-    const result = await recordMelody([...generatedMelody], bpm, instrument)
+    const result = await recordMelody([...generatedMelody], bpm, instrument, chordMode)
     if (result) {
       dispatch({ type: 'SET_RECORDED_AUDIO_BLOB', payload: result })
     }
     return result
-  }, [recordMelody, generatedMelody, bpm, instrument])
+  }, [recordMelody, generatedMelody, bpm, instrument, chordMode])
 
   const handleClearRecordedAudio = useCallback(() => {
     dispatch({ type: 'RESET_RECORDING' })

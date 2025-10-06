@@ -142,10 +142,15 @@ export const useScaleChordManagement = ({
     if (instrument === 'guitar') {
       selections.forEach(({ stringIndex, fretIndex }) => {
         const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+
+        // Find the actual guitar note to get the real note name and frequency
+        const guitarString = 6 - stringIndex // Convert visual string index to guitar string number (1-6)
+        const actualGuitarNote = guitarNotes.find(gn => gn.string === guitarString && gn.fret === fretIndex)
+
         notes.push({
-          name: noteKey, // Use the noteKey as a unique identifier
-          frequency: 0, // Not needed for removal
-          isBlack: false, // Not needed for removal
+          name: actualGuitarNote?.name || noteKey, // Use actual note name (e.g., "C4") or fallback to noteKey
+          frequency: actualGuitarNote?.frequency || 0,
+          isBlack: actualGuitarNote?.name.includes('#') || false,
           position: stringIndex * 100 + fretIndex, // Unique position
           __guitarCoord: { stringIndex, fretIndex } // Store the original coordinate for removal
         } as any)
@@ -153,10 +158,15 @@ export const useScaleChordManagement = ({
     } else if (instrument === 'bass') {
       selections.forEach(({ stringIndex, fretIndex }) => {
         const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+
+        // Find the actual bass note to get the real note name and frequency
+        const bassString = 4 - stringIndex // Convert visual string index to bass string number (1-4)
+        const actualBassNote = bassNotes.find(bn => bn.string === bassString && bn.fret === fretIndex)
+
         notes.push({
-          name: noteKey, // Use the noteKey as a unique identifier
-          frequency: 0, // Not needed for removal
-          isBlack: false, // Not needed for removal
+          name: actualBassNote?.name || noteKey, // Use actual note name (e.g., "E2") or fallback to noteKey
+          frequency: actualBassNote?.frequency || 0,
+          isBlack: actualBassNote?.name.includes('#') || false,
           position: stringIndex * 100 + fretIndex, // Unique position
           __bassCoord: { stringIndex, fretIndex } // Store the original coordinate for removal
         } as any)

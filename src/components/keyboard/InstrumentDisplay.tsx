@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react'
 import type { Note } from '../../utils/notes'
 import type { KeyboardSelectionMode } from './InstrumentControls'
 import type { ChordMode } from '../../reducers/uiReducer'
-import { useScaleChordManagement } from '../../hooks/useScaleChordManagement'
+import { useInstrument } from '../../contexts/InstrumentContext'
 import { useKeyboardHighlighting } from '../../hooks/useKeyboardHighlighting'
 
 interface InstrumentDisplayProps {
@@ -98,10 +98,10 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
   const [higherOctaves, setHigherOctaves] = useState<number>(0)
 
-  // Use the scale/chord management hook
+  // Get scale/chord management from context
+  const { appliedChords, appliedScales, scaleChordManagement } = useInstrument()
+
   const {
-    appliedChords,
-    appliedScales,
     selectedRoot,
     selectedChordRoot,
     currentKeyboardScale,
@@ -123,18 +123,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     handleChordDelete,
     handleRootChange,
     handleChordRootChange
-  } = useScaleChordManagement({
-    instrument,
-    selectedNotes,
-    setGuitarNotes,
-    selectNote,
-    clearSelection,
-    clearChordsAndScales,
-    keyboardSelectionMode,
-    onKeyboardSelectionModeChange,
-    lowerOctaves,
-    higherOctaves
-  })
+  } = scaleChordManagement
 
   // Use the keyboard highlighting hook
   const {
