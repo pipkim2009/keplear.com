@@ -548,7 +548,10 @@ const convertBassFingeringToPositions = (
     if (fret === 'x') return // Skip muted strings
 
     const actualFret = typeof fret === 'number' ? fret : 0
-    const bassString = stringNumber + 1 // Convert 0-based to 1-based
+    // Fingering format is [low E, A, D, G] (stringNumber 0-3)
+    // Bass string numbering is: 1=G, 2=D, 3=A, 4=low E
+    // So we need to reverse: stringNumber 0 (low E) -> bassString 4, stringNumber 3 (G) -> bassString 1
+    const bassString = 4 - stringNumber
 
     // Find the corresponding bass note
     const bassNote = bassNotes.find((note: any) =>
