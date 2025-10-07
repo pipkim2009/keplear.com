@@ -2316,7 +2316,7 @@ select.control-input.flashing {
 .modern-control-item .control-button-internal:hover {
   background: #007bff;
   color: white;
-  transform: translateY(-50%) scale(1.1);
+  transform: translateY(-50%);
 }
 
 .modern-control-item .control-button-internal.minus {
