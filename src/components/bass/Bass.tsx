@@ -464,15 +464,9 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const handleChordSelect = useCallback((rootNote: string, chord: BassChord) => {
     const chordSelections = applyChordToBass(rootNote, chord, bassNotes)
 
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
-      chordSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.add(noteKey)
-      })
-      return newSelectedNotes
-    })
-
+    // Only add to chordSelectedNotes, NOT to selectedNotes
+    // This way selectedNotes only contains manually selected notes/scales
+    // and can be used for mixing with chords in progression mode
     setChordSelectedNotes(prev => {
       const newChordSelectedNotes = new Set(prev)
       chordSelections.forEach(({ stringIndex, fretIndex }) => {
@@ -488,15 +482,9 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const handleChordShapeSelect = useCallback((chordShape: BassChordShape & { root?: string }) => {
     const chordSelections = applyBassChordShapeToBass(chordShape)
 
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
-      chordSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.add(noteKey)
-      })
-      return newSelectedNotes
-    })
-
+    // Only add to chordSelectedNotes, NOT to selectedNotes
+    // This way selectedNotes only contains manually selected notes/scales
+    // and can be used for mixing with chords in progression mode
     setChordSelectedNotes(prev => {
       const newChordSelectedNotes = new Set(prev)
       chordSelections.forEach(({ stringIndex, fretIndex }) => {

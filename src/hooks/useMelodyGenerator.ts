@@ -119,7 +119,8 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
             melody.push(noteWithChordInfo)
           }
         } else {
-          // Pick a random individual note from selected notes/scale
+          // Pick a random individual note from selected notes
+          // This includes notes from applied chords + any additional manual selections
           const randomNote = currentSelectedNotes[Math.floor(Math.random() * currentSelectedNotes.length)]
           // No chord group info = plays as single note
           melody.push(randomNote)

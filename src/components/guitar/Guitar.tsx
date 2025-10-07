@@ -571,16 +571,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     // Apply chord to guitar
     const chordSelections = applyChordToGuitar(rootNote, chord, guitarNotes)
 
-    // Use functional updates to avoid dependencies on current state
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
-      chordSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.add(noteKey)
-      })
-      return newSelectedNotes
-    })
-
+    // Only add to chordSelectedNotes, NOT to selectedNotes
+    // This way selectedNotes only contains manually selected notes/scales
+    // and can be used for mixing with chords in progression mode
     setChordSelectedNotes(prev => {
       const newChordSelectedNotes = new Set(prev)
       chordSelections.forEach(({ stringIndex, fretIndex }) => {
@@ -600,16 +593,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     // Apply chord shape to guitar
     const chordSelections = applyChordShapeToGuitar(chordShape)
 
-    // Use functional updates to avoid dependencies on current state
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
-      chordSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.add(noteKey)
-      })
-      return newSelectedNotes
-    })
-
+    // Only add to chordSelectedNotes, NOT to selectedNotes
+    // This way selectedNotes only contains manually selected notes/scales
+    // and can be used for mixing with chords in progression mode
     setChordSelectedNotes(prev => {
       const newChordSelectedNotes = new Set(prev)
       chordSelections.forEach(({ stringIndex, fretIndex }) => {
