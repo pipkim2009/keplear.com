@@ -966,8 +966,8 @@
 }
 
 .play-icon svg {
-  width: 48px;
-  height: 48px;
+  width: 96px;
+  height: 96px;
   transition: all 0.2s ease;
 }
 
@@ -1110,8 +1110,8 @@
   }
 
   .play-icon svg {
-    width: 48px;
-    height: 48px;
+    width: 80px;
+    height: 80px;
   }
 
   .progress-bar-background {
@@ -1158,8 +1158,8 @@
   }
 
   .play-icon svg {
-    width: 48px;
-    height: 48px;
+    width: 80px;
+    height: 80px;
   }
 
   .progress-bar-background {
@@ -2330,7 +2330,7 @@ select.control-input.flashing {
 /* Second row styling */
 .controls-container.second-row {
   margin-top: 20px;
-  padding-top: 20px;
+  padding-top: 0;
   justify-content: center;
 }
 
@@ -2431,15 +2431,16 @@ body.dark .modern-control-item.audio-player-section audio {
 }
 
 
-/* Tablet and Mobile layout - BPM and Notes on same row */
+/* Tablet and Mobile layout - BPM and Beats on first row, Chord Mode on second row */
 @media (max-width: 768px) {
   .controls-container:not(.second-row):not(.third-row) {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     gap: 12px 8px;
     grid-template-areas:
       "bpm notes"
+      "chord chord"
       "generate generate";
   }
 
@@ -2449,6 +2450,10 @@ body.dark .modern-control-item.audio-player-section audio {
 
   .modern-control-item:nth-child(2) {
     grid-area: notes;
+  }
+
+  .modern-control-item:nth-child(3) {
+    grid-area: chord;
   }
 
   .modern-generate-button {

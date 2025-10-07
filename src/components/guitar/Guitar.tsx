@@ -203,25 +203,11 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     const isInManualLayer = isManuallySelected || isCheckboxSelected
     const currentlyVisible = isInScaleChordLayer || isInManualLayer
 
-    console.log(`🎸 Click on string ${stringIndex}, fret ${fretIndex}:`, {
-      noteKey,
-      isInScaleChordLayer,
-      isManuallySelected,
-      isStringSelected,
-      isFretSelected,
-      isCheckboxSelected,
-      currentlyVisible,
-      isInManualLayer
-    })
-
     if (currentlyVisible && isInManualLayer) {
       // Handle checkbox conversions if needed
       if (isCheckboxSelected && !isManuallySelected) {
-        console.log(`  ➡️ Deselecting note via checkbox conversion`)
-
         // Uncheck the checkboxes FIRST
         if (isStringSelected) {
-          console.log(`    - Unchecking string ${stringIndex}`)
           setStringCheckboxes(prev => {
             const newCheckboxes = [...prev]
             newCheckboxes[stringIndex] = false
@@ -242,7 +228,6 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         }
 
         if (isFretSelected) {
-          console.log(`    - Unchecking fret ${fretIndex + 1}`)
           setFretCheckboxes(prev => {
             const newCheckboxes = [...prev]
             newCheckboxes[fretIndex + 1] = false
@@ -262,7 +247,6 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         }
       } else {
         // Note is manually selected (not via checkbox) - just remove it
-        console.log(`  ➡️ Removing from manual layer`)
         setManualSelectedNotes(prev => {
           const newSet = new Set(prev)
           newSet.delete(noteKey) // Remove from manual layer

@@ -236,11 +236,6 @@ export const useScaleChordManagement = ({
     // Only remove notes that are NOT used by other active scales/chords
     const notesToRemove = itemNoteKeys.filter(noteKey => !otherActiveNoteKeys.has(noteKey))
 
-    console.log(`🔧 Overlap analysis for ${itemType} ${itemToDelete.id}:`)
-    console.log(`  - Item notes: [${itemNoteKeys.join(', ')}]`)
-    console.log(`  - Other active notes: [${Array.from(otherActiveNoteKeys).join(', ')}]`)
-    console.log(`  - Safe to remove: [${notesToRemove.join(', ')}]`)
-
     return notesToRemove
   }, [appliedScales, appliedChords])
 
@@ -251,7 +246,6 @@ export const useScaleChordManagement = ({
     )
 
     if (isScaleAlreadyApplied) {
-      console.log('🚫 Scale already applied, skipping')
       return // Don't add duplicate scales
     }
 
@@ -278,7 +272,6 @@ export const useScaleChordManagement = ({
         return newList
       })
     } else if (instrument === 'bass' && bassScaleHandlers) {
-      console.log('🎻 Applying scale to bass')
       // Get the scale selections first to store as notes
       const scaleSelections = applyScaleToBass(rootNote, scale as any, bassNotes)
 
@@ -296,14 +289,12 @@ export const useScaleChordManagement = ({
         displayName: `${rootNote} ${scale.name}`,
         notes: scaleNotes // Store the actual notes for removal
       }
-      console.log('🎻 Adding to applied scales with notes:', newAppliedScale)
       setAppliedScales(prev => {
         const newList = [...prev, newAppliedScale]
-        console.log('🎻 New applied scales length:', newList.length)
         return newList
       })
     } else {
-      console.log('❌ No handlers or wrong condition:', {
+      console.warn('No handlers or wrong condition:', {
         instrument,
         hasScaleHandlers: !!scaleHandlers,
         hasBassScaleHandlers: !!bassScaleHandlers
@@ -407,7 +398,6 @@ export const useScaleChordManagement = ({
   const handleChordSelect = useCallback((rootNote: string, chord: GuitarChord) => {
     // Check if this chord is already applied
     if (isChordAlreadyApplied(rootNote, chord.name)) {
-      console.log(`Chord ${rootNote}${chord.name} is already applied, skipping...`)
       return
     }
 
@@ -457,7 +447,6 @@ export const useScaleChordManagement = ({
   const handleChordShapeSelect = useCallback((chordShape: ChordShape & { root?: string }) => {
     // Check if this chord shape is already applied (simplified check)
     if (appliedChords.some(chord => chord.displayName === chordShape.name)) {
-      console.log(`Chord shape ${chordShape.name} is already applied, skipping...`)
       return
     }
 
@@ -579,16 +568,11 @@ export const useScaleChordManagement = ({
   }, [clearSelection])
 
   const handleScaleDelete = useCallback((scaleId: string) => {
-    console.log('🔧 handleScaleDelete called with scaleId:', scaleId)
-
     // Find the scale to delete by ID
     const scaleToDelete = appliedScales.find(scale => scale.id === scaleId)
     if (!scaleToDelete) {
-      console.log('🔧 Scale not found in applied scales list')
       return
     }
-
-    console.log('🔧 Found scale to delete:', scaleToDelete)
 
     if (instrument === 'guitar' && scaleHandlers) {
       // For guitar, use overlap-aware removal
@@ -604,12 +588,9 @@ export const useScaleChordManagement = ({
     } else if (instrument === 'bass' && bassScaleHandlers) {
       // For bass, use overlap-aware removal
       const noteKeysToRemove = getNotesToRemove(scaleToDelete, 'scale')
-      console.log('🎻 Removing bass scale notes (overlap-aware):', noteKeysToRemove)
 
       if (noteKeysToRemove.length > 0 && bassChordHandlers?.handleRemoveChordNotes) {
         bassChordHandlers.handleRemoveChordNotes(noteKeysToRemove)
-      } else if (noteKeysToRemove.length === 0) {
-        console.log('🎻 No notes to remove - all scale notes are shared with other scales/chords')
       } else {
         // Fallback: call the specific scale delete function
         bassScaleHandlers.handleScaleDelete(scaleToDelete.root, scaleToDelete.scale as any)
@@ -632,7 +613,6 @@ export const useScaleChordManagement = ({
   const handleKeyboardChordApply = useCallback((rootNote: string, chord: KeyboardChord) => {
     // Check if this chord is already applied
     if (isChordAlreadyApplied(rootNote, chord.name)) {
-      console.log(`Keyboard chord ${rootNote}${chord.name} is already applied, skipping...`)
       return
     }
 
@@ -689,16 +669,11 @@ export const useScaleChordManagement = ({
 
   // Handle deleting individual chords
   const handleChordDelete = useCallback((chordId: string) => {
-    console.log('🔧 handleChordDelete called with chordId:', chordId)
-
     // Find the chord to delete by ID
     const chordToDelete = appliedChords.find(chord => chord.id === chordId)
     if (!chordToDelete) {
-      console.log('🔧 Chord not found in applied chords list')
       return
     }
-
-    console.log('🔧 Found chord to delete:', chordToDelete)
 
     if (instrument === 'guitar' && chordHandlers) {
       // For guitar, use overlap-aware removal
@@ -717,7 +692,6 @@ export const useScaleChordManagement = ({
     } else if (instrument === 'bass' && bassChordHandlers) {
       // For bass, use overlap-aware removal
       const noteKeysToRemove = getNotesToRemove(chordToDelete, 'chord')
-      console.log('🎻 Removing bass chord notes (overlap-aware):', noteKeysToRemove)
 
       if (noteKeysToRemove.length > 0) {
         // Use the chord-only removal handler to preserve scale highlighting
@@ -727,8 +701,6 @@ export const useScaleChordManagement = ({
           // Fallback to regular removal if chord-only function not available
           bassChordHandlers.handleRemoveChordNotes(noteKeysToRemove)
         }
-      } else {
-        console.log('🎻 No notes to remove - all chord notes are shared with other scales/chords')
       }
     } else if (instrument === 'keyboard') {
       // For keyboard, clear all selected notes (same as before)

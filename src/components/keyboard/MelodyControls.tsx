@@ -40,7 +40,7 @@ const MelodyControls = memo(function MelodyControls() {
           onClick={handlePlayMelody}
           disabled={generatedMelody.length === 0 || isRecording}
         >
-          {isPlaying ? <><FaPause /> Stop</> : <><FaPlay /> Play</>}
+          {isPlaying ? <><FaPause size={24} /> Stop</> : <><FaPlay size={24} /> Play</>}
         </button>
 
         <button
