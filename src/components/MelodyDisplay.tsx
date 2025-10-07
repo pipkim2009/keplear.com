@@ -98,14 +98,21 @@ const MelodyDisplay: React.FC<MelodyDisplayProps> = ({
         <div className="melody-title">Generated Melody:</div>
         <div className="melody-notes">
           {generatedMelody.map((note, index) => {
-            // Check if note has chord group info
-            const chordName = note.chordGroup?.displayName || detectChordName([note.name])
-
-            return (
-              <span key={`chord-${index}`} className="melody-note">
-                {chordName}
-              </span>
-            )
+            // Check if note has chord group info - display chord name
+            // Otherwise display individual note name (for mixed mode)
+            if (note.chordGroup?.displayName) {
+              return (
+                <span key={`prog-${index}`} className="melody-note chord-indicator">
+                  {note.chordGroup.displayName}
+                </span>
+              )
+            } else {
+              return (
+                <span key={`prog-${index}`} className="melody-note">
+                  {note.name}
+                </span>
+              )
+            }
           })}
         </div>
       </div>

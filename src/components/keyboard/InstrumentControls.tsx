@@ -851,7 +851,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               <label className="control-label">Chord Mode</label>
               <select
                 value={chordMode}
-                onChange={(e) => setChordMode(e.target.value as 'arpeggiator' | 'progression')}
+                onChange={(e) => setChordMode(e.target.value as ChordMode)}
                 className="control-input chord-mode-select"
                 style={{ color: '#ffffff', fontWeight: '600' }}
               >

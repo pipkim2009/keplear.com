@@ -81,38 +81,48 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     const currentSelectedNotes = notesToUse || selectedNotes
 
     // PROGRESSION MODE: Generate chord progression melody
+    // If both chords AND individual notes are selected, automatically mix them
     if (chordMode === 'progression' && appliedChords && appliedChords.length > 0) {
       const melody: Note[] = []
+      const hasIndividualNotes = currentSelectedNotes.length > 0
 
       for (let i = 0; i < numberOfNotes; i++) {
-        // Randomly pick a chord group for this beat
-        const randomChordGroup = appliedChords[Math.floor(Math.random() * appliedChords.length)]
+        // If we have both chords and individual notes, mix them (50/50 chance)
+        const useChord = hasIndividualNotes ? Math.random() < 0.5 : true
 
-        // Get all notes from this chord group
-        const chordNotes = randomChordGroup.notes || []
+        if (useChord) {
+          // Pick a random chord group for this beat
+          const randomChordGroup = appliedChords[Math.floor(Math.random() * appliedChords.length)]
+          const chordNotes = randomChordGroup.notes || []
 
-        if (chordNotes.length > 0) {
-          // Pick a random note from this chord (just for melody display)
-          const randomNote = chordNotes[Math.floor(Math.random() * chordNotes.length)]
+          if (chordNotes.length > 0) {
+            // Pick a random note from this chord (just for melody display)
+            const randomNote = chordNotes[Math.floor(Math.random() * chordNotes.length)]
 
-          // Validate that the note has valid properties
-          if (!randomNote || !randomNote.name || typeof randomNote.frequency !== 'number') {
-            console.warn('Invalid note in chord group:', randomNote, randomChordGroup)
-            continue
-          }
-
-          // Create a new note with chord group information
-          const noteWithChordInfo: Note = {
-            ...randomNote,
-            chordGroup: {
-              id: randomChordGroup.id,
-              displayName: randomChordGroup.displayName,
-              rootNote: randomChordGroup.root,
-              allNotes: chordNotes.filter(n => n && n.name).map(n => n.name)
+            // Validate that the note has valid properties
+            if (!randomNote || !randomNote.name || typeof randomNote.frequency !== 'number') {
+              console.warn('Invalid note in chord group:', randomNote, randomChordGroup)
+              continue
             }
-          }
 
-          melody.push(noteWithChordInfo)
+            // Create a new note with chord group information
+            const noteWithChordInfo: Note = {
+              ...randomNote,
+              chordGroup: {
+                id: randomChordGroup.id,
+                displayName: randomChordGroup.displayName,
+                rootNote: randomChordGroup.root,
+                allNotes: chordNotes.filter(n => n && n.name).map(n => n.name)
+              }
+            }
+
+            melody.push(noteWithChordInfo)
+          }
+        } else {
+          // Pick a random individual note from selected notes/scale
+          const randomNote = currentSelectedNotes[Math.floor(Math.random() * currentSelectedNotes.length)]
+          // No chord group info = plays as single note
+          melody.push(randomNote)
         }
       }
 

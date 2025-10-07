@@ -285,26 +285,26 @@ export const useAudio = (): UseAudioReturn => {
 
     try {
       if (chordMode === 'progression') {
-        // In progression mode, play the chord group for each note
-        const chordDuration = (60 / bpm) * 1000
+        // In progression mode, check each note for chord group info
+        // This allows mixing chords and individual notes automatically
+        const beatDuration = (60 / bpm) * 1000
 
         for (let i = 0; i < melody.length; i++) {
           if (shouldStop) break
 
           const note = melody[i]
 
-          // Check if note has chord group info
+          // Check if note has chord group info (play as chord) or not (play as single note)
           if (note.chordGroup && note.chordGroup.allNotes && note.chordGroup.allNotes.length > 0) {
-            // Validate all notes in the chord group
+            // This beat is a chord - play all notes together
             const validNotes = note.chordGroup.allNotes.filter(noteName => noteName && typeof noteName === 'string')
             if (validNotes.length > 0) {
-              // Play all notes in the chord group
               samplerWithMethod.triggerAttackRelease(validNotes, playDuration)
             } else {
               console.warn('No valid notes in chord group, skipping beat', i)
             }
           } else if (note.name) {
-            // Fallback: just play the single note
+            // This beat is a single note
             samplerWithMethod.triggerAttackRelease(note.name, playDuration)
           } else {
             console.warn('Invalid note at position', i, note)
@@ -312,7 +312,7 @@ export const useAudio = (): UseAudioReturn => {
 
           if (i < melody.length - 1) {
             await new Promise(resolve => {
-              const timeoutId = setTimeout(resolve, chordDuration)
+              const timeoutId = setTimeout(resolve, beatDuration)
               setCurrentTimeoutId(timeoutId)
             })
             if (shouldStop) break
@@ -423,26 +423,25 @@ export const useAudio = (): UseAudioReturn => {
       const startTimeAudio = Tone.now()
 
       if (chordMode === 'progression') {
-        // Each melody position is one beat
-        const chordDuration = (60 / bpm) * 1000
+        // In progression mode, check each note for chord group info
+        // This allows mixing chords and individual notes automatically
+        const beatDuration = (60 / bpm) * 1000
 
-        // Schedule chord for each melody position
         for (let i = 0; i < melody.length; i++) {
           const note = melody[i]
-          const noteTime = startTimeAudio + (i * (chordDuration / 1000))
+          const noteTime = startTimeAudio + (i * (beatDuration / 1000))
 
-          // Check if note has chord group info
+          // Check if note has chord group info (play as chord) or not (play as single note)
           if (note.chordGroup && note.chordGroup.allNotes && note.chordGroup.allNotes.length > 0) {
-            // Validate all notes in the chord group
+            // This beat is a chord - schedule all notes together
             const validNotes = note.chordGroup.allNotes.filter(noteName => noteName && typeof noteName === 'string')
             if (validNotes.length > 0) {
-              // Play all notes in the chord group
               samplerWithMethod.triggerAttackRelease(validNotes, playDuration, noteTime)
             } else {
               console.warn('No valid notes in chord group, skipping beat', i)
             }
           } else if (note.name) {
-            // Fallback: just play the single note
+            // This beat is a single note
             samplerWithMethod.triggerAttackRelease(note.name, playDuration, noteTime)
           } else {
             console.warn('Invalid note at position', i, note)
@@ -450,7 +449,7 @@ export const useAudio = (): UseAudioReturn => {
         }
 
         // Calculate duration based on melody length
-        const totalDurationMs = (melody.length - 1) * chordDuration + calculateFinalDelay(bpm, instrument)
+        const totalDurationMs = (melody.length - 1) * beatDuration + calculateFinalDelay(bpm, instrument)
         const totalDuration = totalDurationMs / 1000
         const endTimeAudio = startTimeAudio + totalDuration
 
