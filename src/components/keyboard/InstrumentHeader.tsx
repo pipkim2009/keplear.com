@@ -10,7 +10,7 @@ interface InstrumentHeaderProps {
   instrument: string
   keyboardSelectionMode?: KeyboardSelectionMode
   onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
-  flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
+  flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
   selectedNotes: Note[]
   appliedChords: AppliedChord[]
   appliedScales: AppliedScale[]

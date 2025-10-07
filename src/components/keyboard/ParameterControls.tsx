@@ -13,8 +13,8 @@ const ParameterControls = memo(function ParameterControls() {
   const {
     bpm,
     setBpm,
-    numberOfNotes,
-    setNumberOfNotes,
+    numberOfBeats,
+    setNumberOfBeats,
     flashingInputs,
     activeInputs,
     triggerInputFlash,
@@ -28,11 +28,11 @@ const ParameterControls = memo(function ParameterControls() {
     triggerInputFlash('bpm')
   }
 
-  const handleNotesChange = (newNotes: number) => {
+  const handleBeatsChange = (newBeats: number) => {
     // Validate input to prevent NaN
-    const validNotes = isNaN(newNotes) ? numberOfNotes : newNotes
-    setNumberOfNotes(validNotes)
-    triggerInputFlash('notes')
+    const validBeats = isNaN(newBeats) ? numberOfBeats : newBeats
+    setNumberOfBeats(validBeats)
+    triggerInputFlash('beats')
   }
 
   return (
@@ -62,24 +62,24 @@ const ParameterControls = memo(function ParameterControls() {
       </div>
 
       <div className="control-group">
-        <label htmlFor="notes-control"><MdMusicNote /> Number of Notes</label>
+        <label htmlFor="beats-control"><MdMusicNote /> Number of Beats</label>
         <div className="input-container">
           <input
-            id="notes-control"
-            name="numberOfNotes"
+            id="beats-control"
+            name="numberOfBeats"
             type="range"
             min="4"
             max="16"
-            value={numberOfNotes}
+            value={numberOfBeats}
             onChange={(e) => {
               const value = Number(e.target.value)
-              handleNotesChange(value)
+              handleBeatsChange(value)
             }}
-            onFocus={() => setInputActive('notes', true)}
-            onBlur={() => setInputActive('notes', false)}
-            className={`slider ${flashingInputs.notes || activeInputs.notes ? 'flashing' : ''}`}
+            onFocus={() => setInputActive('beats', true)}
+            onBlur={() => setInputActive('beats', false)}
+            className={`slider ${flashingInputs.beats || activeInputs.beats ? 'flashing' : ''}`}
           />
-          <span className="value-display">{numberOfNotes}</span>
+          <span className="value-display">{numberOfBeats}</span>
         </div>
       </div>
     </div>

@@ -15,8 +15,8 @@ interface InstrumentDisplayProps {
   showNotes: boolean
   bpm: number
   setBpm: (bpm: number) => void
-  numberOfNotes: number
-  setNumberOfNotes: (count: number) => void
+  numberOfBeats: number
+  setNumberOfBeats: (count: number) => void
   chordMode?: ChordMode
   setChordMode?: (mode: ChordMode) => void
   instrument: string
@@ -30,9 +30,9 @@ interface InstrumentDisplayProps {
   onOctaveRangeChange?: (lowerOctaves: number, higherOctaves: number) => void
   keyboardSelectionMode?: KeyboardSelectionMode
   onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
-  flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
-  triggerInputFlash: (inputType: 'bpm' | 'notes' | 'mode') => void
-  setInputActive: (inputType: 'bpm' | 'notes' | 'mode', active: boolean) => void
+  flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
+  triggerInputFlash: (inputType: 'bpm' | 'beats' | 'mode') => void
+  setInputActive: (inputType: 'bpm' | 'beats' | 'mode', active: boolean) => void
   clearChordsAndScales?: number
   onGenerateMelody?: () => void
   onPlayMelody?: () => void
@@ -59,8 +59,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   showNotes,
   bpm,
   setBpm,
-  numberOfNotes,
-  setNumberOfNotes,
+  numberOfBeats,
+  setNumberOfBeats,
   chordMode = 'arpeggiator',
   setChordMode,
   instrument,
@@ -168,8 +168,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
         <InstrumentControls
           bpm={bpm}
           setBpm={setBpm}
-          numberOfNotes={numberOfNotes}
-          setNumberOfNotes={setNumberOfNotes}
+          numberOfBeats={numberOfBeats}
+          setNumberOfBeats={setNumberOfBeats}
           chordMode={chordMode}
           setChordMode={setChordMode}
           instrument={instrument}

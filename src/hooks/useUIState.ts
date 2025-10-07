@@ -13,7 +13,7 @@ interface UseUIStateReturn {
   // State
   readonly currentPage: PageType
   readonly bpm: number
-  readonly numberOfNotes: number
+  readonly numberOfBeats: number
   readonly chordMode: ChordMode
   readonly flashingInputs: Record<InputType, boolean>
   readonly activeInputs: Record<InputType, boolean>
@@ -26,7 +26,7 @@ interface UseUIStateReturn {
 
   // Settings actions
   setBpm: (bpm: number) => void
-  setNumberOfNotes: (count: number) => void
+  setNumberOfBeats: (count: number) => void
   setChordMode: (mode: ChordMode) => void
 
   // Input flash actions
@@ -73,8 +73,8 @@ export const useUIState = (): UseUIStateReturn => {
     dispatch({ type: 'SET_BPM', payload: bpm })
   }, [])
 
-  const setNumberOfNotes = useCallback((count: number) => {
-    dispatch({ type: 'SET_NUMBER_OF_NOTES', payload: count })
+  const setNumberOfBeats = useCallback((count: number) => {
+    dispatch({ type: 'SET_NUMBER_OF_BEATS', payload: count })
   }, [])
 
   const setChordMode = useCallback((mode: ChordMode) => {
@@ -116,21 +116,21 @@ export const useUIState = (): UseUIStateReturn => {
     }
   }, [state.bpm, triggerInputFlash, state.activeInputs.bpm])
 
-  // Auto-flash effects for number of notes changes (skip initial render and when actively changing)
+  // Auto-flash effects for number of beats changes (skip initial render and when actively changing)
   useEffect(() => {
     if (isInitialNotes.current) {
       isInitialNotes.current = false
-    } else if (!state.activeInputs.notes) {
+    } else if (!state.activeInputs.beats) {
       // Only trigger if not currently in active state (being held down)
-      triggerInputFlash('notes')
+      triggerInputFlash('beats')
     }
-  }, [state.numberOfNotes, triggerInputFlash, state.activeInputs.notes])
+  }, [state.numberOfBeats, triggerInputFlash, state.activeInputs.beats])
 
   return {
     // State
     currentPage: state.currentPage,
     bpm: state.bpm,
-    numberOfNotes: state.numberOfNotes,
+    numberOfBeats: state.numberOfBeats,
     chordMode: state.chordMode,
     flashingInputs: state.flashingInputs,
     activeInputs: state.activeInputs,
@@ -143,7 +143,7 @@ export const useUIState = (): UseUIStateReturn => {
 
     // Settings actions
     setBpm,
-    setNumberOfNotes,
+    setNumberOfBeats,
     setChordMode,
 
     // Input flash actions

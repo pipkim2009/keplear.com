@@ -4,13 +4,13 @@
  */
 
 export type PageType = 'home' | 'sandbox' | 'practice'
-export type InputType = 'bpm' | 'notes' | 'mode'
+export type InputType = 'bpm' | 'beats' | 'mode'
 export type ChordMode = 'arpeggiator' | 'progression'
 
 export interface UIState {
   readonly currentPage: PageType
   readonly bpm: number
-  readonly numberOfNotes: number
+  readonly numberOfBeats: number
   readonly chordMode: ChordMode
   readonly flashingInputs: Record<InputType, boolean>
   readonly activeInputs: Record<InputType, boolean>
@@ -19,7 +19,7 @@ export interface UIState {
 export type UIAction =
   | { type: 'SET_CURRENT_PAGE'; payload: PageType }
   | { type: 'SET_BPM'; payload: number }
-  | { type: 'SET_NUMBER_OF_NOTES'; payload: number }
+  | { type: 'SET_NUMBER_OF_BEATS'; payload: number }
   | { type: 'SET_CHORD_MODE'; payload: ChordMode }
   | { type: 'TRIGGER_INPUT_FLASH'; payload: InputType }
   | { type: 'CLEAR_INPUT_FLASH'; payload: InputType }
@@ -30,23 +30,23 @@ export type UIAction =
 
 export const DEFAULT_SETTINGS = {
   bpm: 120,
-  numberOfNotes: 5,
+  numberOfBeats: 5,
   chordMode: 'arpeggiator' as ChordMode
 } as const
 
 export const initialUIState: UIState = {
   currentPage: 'home',
   bpm: DEFAULT_SETTINGS.bpm,
-  numberOfNotes: DEFAULT_SETTINGS.numberOfNotes,
+  numberOfBeats: DEFAULT_SETTINGS.numberOfBeats,
   chordMode: DEFAULT_SETTINGS.chordMode,
   flashingInputs: {
     bpm: false,
-    notes: false,
+    beats: false,
     mode: false
   },
   activeInputs: {
     bpm: false,
-    notes: false,
+    beats: false,
     mode: false
   }
 }
@@ -67,12 +67,12 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
         bpm: Math.max(1, Math.min(999, bpmValue))
       }
 
-    case 'SET_NUMBER_OF_NOTES':
+    case 'SET_NUMBER_OF_BEATS':
       // Ensure we never store NaN values
-      const notesValue = isNaN(action.payload) ? state.numberOfNotes : action.payload
+      const beatsValue = isNaN(action.payload) ? state.numberOfBeats : action.payload
       return {
         ...state,
-        numberOfNotes: Math.max(1, Math.min(100, notesValue))
+        numberOfBeats: Math.max(1, Math.min(100, beatsValue))
       }
 
     case 'SET_CHORD_MODE':
@@ -113,7 +113,7 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
         ...state,
         flashingInputs: {
           bpm: false,
-          notes: false,
+          beats: false,
           mode: false
         }
       }
@@ -123,7 +123,7 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
         ...state,
         activeInputs: {
           bpm: false,
-          notes: false,
+          beats: false,
           mode: false
         }
       }
@@ -132,16 +132,16 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
       return {
         ...state,
         bpm: DEFAULT_SETTINGS.bpm,
-        numberOfNotes: DEFAULT_SETTINGS.numberOfNotes,
+        numberOfBeats: DEFAULT_SETTINGS.numberOfBeats,
         chordMode: DEFAULT_SETTINGS.chordMode,
         flashingInputs: {
           bpm: false,
-          notes: false,
+          beats: false,
           mode: false
         },
         activeInputs: {
           bpm: false,
-          notes: false,
+          beats: false,
           mode: false
         }
       }

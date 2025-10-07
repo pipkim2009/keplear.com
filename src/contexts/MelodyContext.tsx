@@ -88,7 +88,7 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
   const changes = useMelodyChanges({
     selectedNotes: melodyGen.selectedNotes,
     bpm: ui.bpm,
-    numberOfNotes: ui.numberOfNotes,
+    numberOfBeats: ui.numberOfBeats,
     generatedMelody: melodyGen.generatedMelody,
     instrument: config.instrument,
     keyboardSelectionMode: config.keyboardSelectionMode
@@ -133,9 +133,9 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
 
     const selectedNotesSnapshot = [...melodyGen.selectedNotes]
 
-    melodyGen.generateMelody(melodyNotes, ui.numberOfNotes, config.instrument, config.keyboardSelectionMode, selectedNotesSnapshot)
+    melodyGen.generateMelody(melodyNotes, ui.numberOfBeats, config.instrument, config.keyboardSelectionMode, selectedNotesSnapshot)
 
-    const duration = melodyPlayer.calculateMelodyDuration(ui.numberOfNotes, ui.bpm, config.instrument)
+    const duration = melodyPlayer.calculateMelodyDuration(ui.numberOfBeats, ui.bpm, config.instrument)
     melodyPlayer.setMelodyDuration(duration)
     melodyPlayer.setPlaybackProgress(0)
     melodyPlayer.handleClearRecordedAudio()

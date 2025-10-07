@@ -19,8 +19,8 @@ export type KeyboardSelectionMode = 'range' | 'multi'
 interface InstrumentControlsProps {
   bpm: number
   setBpm: (bpm: number) => void
-  numberOfNotes: number
-  setNumberOfNotes: (count: number) => void
+  numberOfBeats: number
+  setNumberOfBeats: (count: number) => void
   chordMode?: ChordMode
   setChordMode?: (mode: ChordMode) => void
   instrument: string
@@ -40,9 +40,9 @@ interface InstrumentControlsProps {
   onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
   onKeyboardScaleApply?: (rootNote: string, scale: KeyboardScale) => void
   onKeyboardScaleClear?: () => void
-  flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
-  triggerInputFlash: (inputType: 'bpm' | 'notes' | 'mode') => void
-  setInputActive: (inputType: 'bpm' | 'notes' | 'mode', active: boolean) => void
+  flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
+  triggerInputFlash: (inputType: 'bpm' | 'beats' | 'mode') => void
+  setInputActive: (inputType: 'bpm' | 'beats' | 'mode', active: boolean) => void
   selectedNotesCount?: number
   onGenerateMelody?: () => void
   onPlayMelody?: () => void
@@ -66,8 +66,8 @@ interface InstrumentControlsProps {
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   bpm,
   setBpm,
-  numberOfNotes,
-  setNumberOfNotes,
+  numberOfBeats,
+  setNumberOfBeats,
   chordMode = 'arpeggiator',
   setChordMode,
   instrument,
@@ -111,7 +111,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 }) => {
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
-  const [notesDisplay, setNotesDisplay] = useState(numberOfNotes.toString())
+  const [beatsDisplay, setBeatsDisplay] = useState(numberOfBeats.toString())
   const [selectedRoot, setSelectedRoot] = useState<string>('C')
   const [selectedScale, setSelectedScale] = useState<GuitarScale>(GUITAR_SCALES[0])
   const [hasActiveScale, setHasActiveScale] = useState<boolean>(false)
@@ -136,7 +136,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const isHoldingBpm = useRef<boolean>(false)
   const isHoldingNotes = useRef<boolean>(false)
   const currentBpmRef = useRef<number>(bpm)
-  const currentNotesRef = useRef<number>(numberOfNotes)
+  const currentNotesRef = useRef<number>(numberOfBeats)
   
   // Update display values when props change
   useEffect(() => {
@@ -145,9 +145,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   }, [bpm])
 
   useEffect(() => {
-    setNotesDisplay(numberOfNotes.toString())
-    currentNotesRef.current = numberOfNotes
-  }, [numberOfNotes])
+    setBeatsDisplay(numberOfBeats.toString())
+    currentNotesRef.current = numberOfBeats
+  }, [numberOfBeats])
   
   const handleBpmChange = (value: string) => {
     // Only allow numbers and empty string
@@ -175,7 +175,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     if (numericValue !== '' && Number(numericValue) > 999) {
       numericValue = '999'
     }
-    setNotesDisplay(numericValue)
+    setBeatsDisplay(numericValue)
     // Don't update actual value while typing - only on blur/enter
   }
   
@@ -194,11 +194,11 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   
   const handleNotesKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      if (notesDisplay === '') {
-        setNumberOfNotes(DEFAULT_NOTES)
-        setNotesDisplay(DEFAULT_NOTES.toString())
-      } else if (!isNaN(Number(notesDisplay))) {
-        setNumberOfNotes(Number(notesDisplay))
+      if (beatsDisplay === '') {
+        setNumberOfBeats(DEFAULT_NOTES)
+        setBeatsDisplay(DEFAULT_NOTES.toString())
+      } else if (!isNaN(Number(beatsDisplay))) {
+        setNumberOfBeats(Number(beatsDisplay))
       }
       // Exit the input field
       e.currentTarget.blur()
@@ -214,10 +214,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   }
   
   const handleNotesBlur = () => {
-    if (notesDisplay !== '' && !isNaN(Number(notesDisplay))) {
-      setNumberOfNotes(Number(notesDisplay))
+    if (beatsDisplay !== '' && !isNaN(Number(beatsDisplay))) {
+      setNumberOfBeats(Number(beatsDisplay))
     } else {
-      setNotesDisplay(numberOfNotes.toString())
+      setBeatsDisplay(numberOfBeats.toString())
     }
   }
 
@@ -265,41 +265,41 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
   const startNotesIncrement = () => {
     isHoldingNotes.current = true
-    setInputActive('notes', true) // Set to green immediately
-    triggerInputFlash('notes') // Flash the input border green
+    setInputActive('beats', true) // Set to green immediately
+    triggerInputFlash('beats') // Flash the input border green
 
     // First increment immediately
     const newNotes = Math.min(currentNotesRef.current + 1, 100)
     currentNotesRef.current = newNotes
-    setNumberOfNotes(newNotes)
-    setNotesDisplay(newNotes.toString())
+    setNumberOfBeats(newNotes)
+    setBeatsDisplay(newNotes.toString())
 
     if (notesIntervalRef.current) clearInterval(notesIntervalRef.current)
     notesIntervalRef.current = setInterval(() => {
       const newNotes = Math.min(currentNotesRef.current + 1, 100)
       currentNotesRef.current = newNotes
-      setNumberOfNotes(newNotes)
-      setNotesDisplay(newNotes.toString())
+      setNumberOfBeats(newNotes)
+      setBeatsDisplay(newNotes.toString())
     }, 200)
   }
 
   const startNotesDecrement = () => {
     isHoldingNotes.current = true
-    setInputActive('notes', true) // Set to green immediately
-    triggerInputFlash('notes') // Flash the input border green
+    setInputActive('beats', true) // Set to green immediately
+    triggerInputFlash('beats') // Flash the input border green
 
     // First decrement immediately
     const newNotes = Math.max(currentNotesRef.current - 1, 1)
     currentNotesRef.current = newNotes
-    setNumberOfNotes(newNotes)
-    setNotesDisplay(newNotes.toString())
+    setNumberOfBeats(newNotes)
+    setBeatsDisplay(newNotes.toString())
 
     if (notesIntervalRef.current) clearInterval(notesIntervalRef.current)
     notesIntervalRef.current = setInterval(() => {
       const newNotes = Math.max(currentNotesRef.current - 1, 1)
       currentNotesRef.current = newNotes
-      setNumberOfNotes(newNotes)
-      setNotesDisplay(newNotes.toString())
+      setNumberOfBeats(newNotes)
+      setBeatsDisplay(newNotes.toString())
     }, 200)
   }
 
@@ -320,7 +320,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
       notesIntervalRef.current = null
     }
     // Turn off green immediately
-    setInputActive('notes', false)
+    setInputActive('beats', false)
   }
 
 
@@ -806,15 +806,15 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
 
           <div className="modern-control-item">
-            <label className="control-label">Notes</label>
+            <label className="control-label">Beats</label>
             <div className="input-with-buttons">
               <input
                 type="text"
-                value={notesDisplay}
+                value={beatsDisplay}
                 onChange={(e) => handleNotesChange(e.target.value)}
                 onKeyPress={handleNotesKeyPress}
                 onBlur={handleNotesBlur}
-                className={`control-input with-internal-buttons ${flashingInputs.notes ? 'flashing' : ''}`}
+                className={`control-input with-internal-buttons ${flashingInputs.beats ? 'flashing' : ''}`}
               />
               <button
                 className="control-button-internal minus"

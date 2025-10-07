@@ -29,18 +29,18 @@ interface InstrumentContextType {
   // UI State
   currentPage: string
   bpm: number
-  numberOfNotes: number
+  numberOfBeats: number
   chordMode: ChordMode
-  flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
-  activeInputs: { bpm: boolean; notes: boolean; mode: boolean }
+  flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
+  activeInputs: { bpm: boolean; beats: boolean; mode: boolean }
   navigateToHome: () => void
   navigateToSandbox: () => void
   navigateToPractice: () => void
   setBpm: (bpm: number) => void
-  setNumberOfNotes: (notes: number) => void
+  setNumberOfBeats: (beats: number) => void
   setChordMode: (mode: ChordMode) => void
-  triggerInputFlash: (input: 'bpm' | 'notes' | 'mode') => void
-  setInputActive: (input: 'bpm' | 'notes' | 'mode', active: boolean) => void
+  triggerInputFlash: (input: 'bpm' | 'beats' | 'mode') => void
+  setInputActive: (input: 'bpm' | 'beats' | 'mode', active: boolean) => void
   setCurrentPage: (page: string) => void
 
   // Instrument Config
@@ -125,7 +125,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
   const {
     currentPage,
     bpm,
-    numberOfNotes,
+    numberOfBeats,
     chordMode,
     flashingInputs,
     activeInputs,
@@ -133,7 +133,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     navigateToSandbox,
     navigateToPractice,
     setBpm,
-    setNumberOfNotes,
+    setNumberOfBeats,
     setChordMode,
     triggerInputFlash,
     setInputActive,
@@ -188,7 +188,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
   const { hasChanges, clearChanges } = useMelodyChanges({
     selectedNotes,
     bpm,
-    numberOfNotes,
+    numberOfBeats,
     generatedMelody,
     instrument,
     keyboardSelectionMode
@@ -256,16 +256,16 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     const selectedNotesSnapshot = [...selectedNotes]
 
     // Pass chordMode and appliedChords to generateMelody
-    generateMelody(melodyNotes, numberOfNotes, instrument, keyboardSelectionMode, selectedNotesSnapshot, chordMode, appliedChords)
+    generateMelody(melodyNotes, numberOfBeats, instrument, keyboardSelectionMode, selectedNotesSnapshot, chordMode, appliedChords)
 
-    const duration = calculateMelodyDuration(numberOfNotes, bpm, instrument)
+    const duration = calculateMelodyDuration(numberOfBeats, bpm, instrument)
     setMelodyDuration(duration)
     setPlaybackProgress(0)
     handleClearRecordedAudio()
     clearChanges()
 
     // isGeneratingMelody will stay true until recorded audio is ready
-  }, [generateMelody, numberOfNotes, instrument, keyboardOctaves, keyboardSelectionMode, selectedNotes, calculateMelodyDuration, bpm, setMelodyDuration, setPlaybackProgress, handleClearRecordedAudio, clearChanges, chordMode, appliedChords])
+  }, [generateMelody, numberOfBeats, instrument, keyboardOctaves, keyboardSelectionMode, selectedNotes, calculateMelodyDuration, bpm, setMelodyDuration, setPlaybackProgress, handleClearRecordedAudio, clearChanges, chordMode, appliedChords])
 
   const handlePlayMelody = useCallback((): void => {
     if (isPlaying) {
@@ -317,7 +317,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     // UI State
     currentPage,
     bpm,
-    numberOfNotes,
+    numberOfBeats,
     chordMode,
     flashingInputs,
     activeInputs,
@@ -325,7 +325,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     navigateToSandbox,
     navigateToPractice,
     setBpm,
-    setNumberOfNotes,
+    setNumberOfBeats,
     setChordMode,
     triggerInputFlash,
     setInputActive,

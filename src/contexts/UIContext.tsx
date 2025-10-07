@@ -13,16 +13,16 @@ interface UIContextType {
   // Controls State
   bpm: number
   setBpm: (bpm: number) => void
-  numberOfNotes: number
-  setNumberOfNotes: (notes: number) => void
+  numberOfBeats: number
+  setNumberOfBeats: (beats: number) => void
   chordMode: ChordMode
   setChordMode: (mode: ChordMode) => void
 
   // UI Feedback
-  flashingInputs: { bpm: boolean; notes: boolean; mode: boolean }
-  activeInputs: { bpm: boolean; notes: boolean; mode: boolean }
-  triggerInputFlash: (input: 'bpm' | 'notes' | 'mode') => void
-  setInputActive: (input: 'bpm' | 'notes' | 'mode', active: boolean) => void
+  flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
+  activeInputs: { bpm: boolean; beats: boolean; mode: boolean }
+  triggerInputFlash: (input: 'bpm' | 'beats' | 'mode') => void
+  setInputActive: (input: 'bpm' | 'beats' | 'mode', active: boolean) => void
 }
 
 const UIContext = createContext<UIContextType | undefined>(undefined)
@@ -50,8 +50,8 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
     setCurrentPage: uiState.setCurrentPage,
     bpm: uiState.bpm,
     setBpm: uiState.setBpm,
-    numberOfNotes: uiState.numberOfNotes,
-    setNumberOfNotes: uiState.setNumberOfNotes,
+    numberOfBeats: uiState.numberOfBeats,
+    setNumberOfBeats: uiState.setNumberOfBeats,
     chordMode: uiState.chordMode,
     setChordMode: uiState.setChordMode,
     flashingInputs: uiState.flashingInputs,

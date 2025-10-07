@@ -4,7 +4,7 @@ import type { Note } from '../utils/notes'
 interface UseMelodyChangesProps {
   selectedNotes: readonly Note[]
   bpm: number
-  numberOfNotes: number
+  numberOfBeats: number
   generatedMelody: readonly Note[]
   instrument: string
   keyboardSelectionMode: string
@@ -22,7 +22,7 @@ interface UseMelodyChangesReturn {
 export const useMelodyChanges = ({
   selectedNotes,
   bpm,
-  numberOfNotes,
+  numberOfBeats,
   generatedMelody,
   instrument,
   keyboardSelectionMode
@@ -47,12 +47,12 @@ export const useMelodyChanges = ({
   const lastValuesRef = useRef<{
     selectedNotes: string[]
     bpm: number
-    numberOfNotes: number
+    numberOfBeats: number
     melodyGenerated: boolean
   }>({
     selectedNotes: [],
     bpm: 120,
-    numberOfNotes: 8,
+    numberOfBeats: 8,
     melodyGenerated: false
   })
 
@@ -63,13 +63,13 @@ export const useMelodyChanges = ({
       lastValuesRef.current = {
         selectedNotes: [...noteNames],
         bpm,
-        numberOfNotes,
+        numberOfBeats,
         melodyGenerated: true
       }
       setHasChanges(false)
       setLastMelodyLength(generatedMelody.length)
     }
-  }, [generatedMelody.length, selectedNotes, bpm, numberOfNotes, lastMelodyLength])
+  }, [generatedMelody.length, selectedNotes, bpm, numberOfBeats, lastMelodyLength])
 
   // Track changes in parameters
   useEffect(() => {
@@ -86,15 +86,15 @@ export const useMelodyChanges = ({
     const notesChanged = currentNoteNames.length !== last.selectedNotes.length ||
       currentNoteNames.some((name, index) => name !== last.selectedNotes[index])
 
-    // Check if BPM or number of notes changed
+    // Check if BPM or number of beats changed
     const bpmChanged = bpm !== last.bpm
-    const numberOfNotesChanged = numberOfNotes !== last.numberOfNotes
+    const numberOfBeatsChanged = numberOfBeats !== last.numberOfBeats
 
-    const hasAnyChanges = notesChanged || bpmChanged || numberOfNotesChanged
+    const hasAnyChanges = notesChanged || bpmChanged || numberOfBeatsChanged
 
     // Only show badge if there are changes AND user can generate a melody
     setHasChanges(hasAnyChanges && canGenerateMelody())
-  }, [selectedNotes, bpm, numberOfNotes, instrument, keyboardSelectionMode])
+  }, [selectedNotes, bpm, numberOfBeats, instrument, keyboardSelectionMode])
 
   const clearChanges = () => {
     const noteNames = selectedNotes.map(note => note.name)
@@ -102,7 +102,7 @@ export const useMelodyChanges = ({
     lastValuesRef.current = {
       selectedNotes: [...noteNames],
       bpm,
-      numberOfNotes,
+      numberOfBeats,
       melodyGenerated: true
     }
   }

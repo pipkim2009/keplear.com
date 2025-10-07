@@ -19,8 +19,8 @@ function Router() {
     showNotes,
     bpm,
     setBpm,
-    numberOfNotes,
-    setNumberOfNotes,
+    numberOfBeats,
+    setNumberOfBeats,
     chordMode,
     setChordMode,
     instrument,
@@ -72,8 +72,8 @@ function Router() {
           showNotes={showNotes}
           bpm={bpm}
           setBpm={setBpm}
-          numberOfNotes={numberOfNotes}
-          setNumberOfNotes={setNumberOfNotes}
+          numberOfBeats={numberOfBeats}
+          setNumberOfBeats={setNumberOfBeats}
           chordMode={chordMode}
           setChordMode={setChordMode}
           instrument={instrument}
@@ -88,7 +88,7 @@ function Router() {
           onKeyboardSelectionModeChange={handleKeyboardSelectionModeChange}
           flashingInputs={{
             bpm: flashingInputs.bpm || activeInputs.bpm,
-            notes: flashingInputs.notes || activeInputs.notes,
+            beats: flashingInputs.beats || activeInputs.beats,
             mode: flashingInputs.mode || activeInputs.mode
           }}
           triggerInputFlash={triggerInputFlash}
