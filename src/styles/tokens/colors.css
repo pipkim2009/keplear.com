@@ -1,195 +1,207 @@
 /**
- * colors.css
- * Comprehensive color design tokens extracted from the application
- * Standardizes all color values used across components
+ * 🎨 Keplear Color System
+ * Single source of truth for all colors in the application
  */
 
 :root {
-  /*
-    ===========================================
-    PRIMARY BRAND COLORS
-    ===========================================
-  */
+  /* ========================================
+     PRIMARY BRAND COLORS
+     ======================================== */
   --primary-purple: #8000ff;
   --primary-purple-dark: #6b00cc;
-  --primary-purple-darker: #6600cc;
-  --primary-purple-light: #c77dff;
+  --primary-purple-light: #a855f7;
+  --primary-purple-lighter: #c77dff;
+
+  /* Primary Purple Alpha Variations */
+  --primary-purple-alpha-5: rgba(128, 0, 255, 0.05);
   --primary-purple-alpha-10: rgba(128, 0, 255, 0.1);
   --primary-purple-alpha-15: rgba(128, 0, 255, 0.15);
   --primary-purple-alpha-20: rgba(128, 0, 255, 0.2);
   --primary-purple-alpha-25: rgba(128, 0, 255, 0.25);
   --primary-purple-alpha-30: rgba(128, 0, 255, 0.3);
 
-  /*
-    ===========================================
-    SEMANTIC COLORS
-    ===========================================
-  */
+  /* ========================================
+     THEME COLORS - LIGHT MODE
+     ======================================== */
+  --light-bg-primary: #ffffff;
+  --light-bg-secondary: #f8f9fa;
+  --light-bg-tertiary: #e8e4ff;
+  --light-bg-quaternary: #f0f0ff;
 
-  /* Blue System */
-  --blue-50: #eff6ff;
-  --blue-100: #dbeafe;
-  --blue-200: #bfdbfe;
-  --blue-300: #93c5fd;
-  --blue-400: #60a5fa;
+  --light-text-primary: #121212;
+  --light-text-secondary: #374151;
+  --light-text-tertiary: #6b7280;
+
+  --light-border-primary: #e2e8f0;
+  --light-border-secondary: #d1d5db;
+
+  /* ========================================
+     THEME COLORS - DARK MODE
+     ======================================== */
+  --dark-bg-primary: #121212;
+  --dark-bg-secondary: #1a202c;
+  --dark-bg-tertiary: #2d1b69;
+  --dark-bg-quaternary: #1a0d2e;
+  --dark-bg-surface: #0a0a0a;
+
+  --dark-text-primary: #d2d2f9;
+  --dark-text-secondary: #ffffff;
+  --dark-text-tertiary: #e9ecef;
+
+  --dark-border-primary: #4a5568;
+  --dark-border-secondary: #2d3748;
+
+  /* ========================================
+     SEMANTIC COLORS - BLUE (INFO)
+     ======================================== */
   --blue-500: #3b82f6;
   --blue-600: #2563eb;
   --blue-700: #1d4ed8;
-  --blue-800: #1e40af;
-  --blue-900: #1e3a8a;
+  --blue-alpha-10: rgba(59, 130, 246, 0.1);
+  --blue-alpha-20: rgba(59, 130, 246, 0.2);
+  --blue-alpha-40: rgba(59, 130, 246, 0.4);
 
-  /* Green System */
-  --green-50: #f0fdf4;
-  --green-100: #dcfce7;
-  --green-200: #bbf7d0;
-  --green-300: #86efac;
+  /* ========================================
+     SEMANTIC COLORS - GREEN (SUCCESS)
+     ======================================== */
   --green-400: #4ade80;
   --green-500: #22c55e;
   --green-600: #16a34a;
   --green-700: #15803d;
   --green-800: #166534;
-  --green-900: #14532d;
-  --green-border: #10b981;
+  --green-light: #86efac;
+  --green-alpha-05: rgba(32, 201, 151, 0.05);
+  --green-alpha-10: rgba(32, 201, 151, 0.1);
+  --green-alpha-20: rgba(32, 201, 151, 0.2);
+  --green-alpha-60: rgba(34, 197, 94, 0.6);
 
-  /* Red System */
-  --red-50: #fef2f2;
-  --red-100: #fee2e2;
-  --red-200: #fecaca;
-  --red-300: #fca5a5;
-  --red-400: #f87171;
+  /* ========================================
+     SEMANTIC COLORS - RED (ERROR/DANGER)
+     ======================================== */
   --red-500: #ef4444;
   --red-600: #dc2626;
   --red-700: #b91c1c;
-  --red-800: #991b1b;
-  --red-900: #7f1d1d;
+  --red-light: #f87171;
+  --red-lighter: #fca5a5;
+  --red-alpha-10: rgba(220, 53, 69, 0.1);
+  --red-alpha-20: rgba(220, 53, 69, 0.2);
+  --red-alpha-40: rgba(220, 38, 38, 0.4);
+  --red-alpha-60: rgba(220, 38, 38, 0.6);
 
-  /* Orange System (for scales) */
-  --orange-50: #fff7ed;
-  --orange-100: #ffedd5;
-  --orange-200: #fed7aa;
-  --orange-300: #fdba74;
-  --orange-400: #fb923c;
+  /* ========================================
+     SEMANTIC COLORS - ORANGE (SCALES)
+     ======================================== */
   --orange-500: #f97316;
   --orange-600: #ea580c;
   --orange-700: #c2410c;
-  --orange-800: #9a3412;
-  --orange-900: #7c2d12;
-  --orange-scale: #fbbf24;
-  --orange-scale-dark: #f59e0b;
-  --orange-scale-darker: #d97706;
-  --orange-scale-darkest: #b45309;
+  --orange-alpha-40: rgba(249, 115, 22, 0.4);
 
-  /* Purple System (for chords) */
-  --purple-50: #faf5ff;
-  --purple-100: #f3e8ff;
-  --purple-200: #e9d5ff;
-  --purple-300: #d8b4fe;
-  --purple-400: #c084fc;
+  /* ========================================
+     SEMANTIC COLORS - PURPLE (CHORDS)
+     ======================================== */
   --purple-500: #a855f7;
-  --purple-600: #9333ea;
+  --purple-600: #8b5cf6;
   --purple-700: #7c3aed;
   --purple-800: #6b46c1;
-  --purple-900: #581c87;
-  --purple-chord: #8b5cf6;
-  --purple-chord-dark: #7c3aed;
-  --purple-chord-darker: #6d28d9;
+  --purple-alpha-40: rgba(139, 92, 246, 0.4);
 
-  /* Yellow System */
-  --yellow-50: #fefce8;
-  --yellow-100: #fef3c7;
-  --yellow-200: #fde68a;
-  --yellow-300: #fcd34d;
-  --yellow-400: #fbbf24;
-  --yellow-500: #f59e0b;
-  --yellow-600: #d97706;
-  --yellow-700: #b45309;
-  --yellow-800: #92400e;
-  --yellow-900: #78350f;
-
-  /*
-    ===========================================
-    NEUTRAL GRAYS
-    ===========================================
-  */
-  --gray-50: #f9fafb;
-  --gray-100: #f3f4f6;
+  /* ========================================
+     NEUTRAL GRAYS
+     ======================================== */
   --gray-200: #e5e7eb;
   --gray-300: #d1d5db;
   --gray-400: #9ca3af;
   --gray-500: #6b7280;
   --gray-600: #4b5563;
   --gray-700: #374151;
-  --gray-800: #1f2937;
   --gray-900: #111827;
 
-  /*
-    ===========================================
-    THEME COLORS
-    ===========================================
-  */
-
-  /* Light Theme */
-  --light-bg-primary: #ffffff;
-  --light-bg-secondary: #f8f9fa;
-  --light-bg-tertiary: #e8e4ff;
-  --light-text-primary: #121212;
-  --light-text-secondary: #374151;
-  --light-text-tertiary: #1f2937;
-  --light-border: #e2e8f0;
-
-  /* Dark Theme */
-  --dark-bg-primary: #121212;
-  --dark-bg-secondary: #1a202c;
-  --dark-bg-tertiary: #2d3748;
-  --dark-bg-quaternary: #2d1b69;
-  --dark-text-primary: #d2d2f9;
-  --dark-text-secondary: #ffffff;
-  --dark-text-tertiary: #e9ecef;
-  --dark-border: #4a5568;
-
-  /*
-    ===========================================
-    INSTRUMENT-SPECIFIC COLORS
-    ===========================================
-  */
-
-  /* Keyboard Colors */
+  /* ========================================
+     INSTRUMENT COLORS - KEYBOARD
+     ======================================== */
   --keyboard-white-key: #ffffff;
-  --keyboard-white-key-secondary: #f7fafc;
+  --keyboard-white-key-hover: #f7fafc;
   --keyboard-white-key-border: #e2e8f0;
   --keyboard-black-key: #374151;
   --keyboard-black-key-secondary: #111827;
   --keyboard-black-key-border: #4b5563;
 
-  /* Guitar/Bass Surface Colors */
+  /* ========================================
+     INSTRUMENT COLORS - GUITAR
+     ======================================== */
+  --guitar-fretboard-primary: #3e2723;
+  --guitar-fretboard-secondary: #1e1e1e;
   --guitar-surface: #2a1f1c;
   --guitar-border: #2d2d2d;
-  --bass-surface: #1a1a1a;
-  --bass-border: #333333;
 
-  /* String Colors */
-  --string-1: #e6e6e6;    /* High E */
-  --string-2: #d9d9d9;    /* B */
-  --string-3: #d0d0d0;    /* G */
-  --string-4: #c8c8c8;    /* D */
-  --string-5: #b0b0b0;    /* A */
-  --string-6: #a0a0a0;    /* Low E */
+  /* Fret Colors */
+  --fret-wire-primary: #c9c9c9;
+  --fret-wire-secondary: #888888;
+  --fret-marker: #f5f5dc;
+  --fret-marker-secondary: #dddddd;
+  --fret-marker-border: #bbbbbb;
+
+  /* String Colors (High E to Low E) */
+  --string-1: #e6e6e6;
+  --string-2: #d9d9d9;
+  --string-3: #d0d0d0;
+  --string-4: #c8c8c8;
+  --string-5: #b0b0b0;
+  --string-6: #a0a0a0;
+
+  /* String Center Gradients */
   --string-center: #999999;
   --string-center-dark: #808080;
   --string-center-darker: #707070;
   --string-center-darkest: #606060;
 
-  /* Fret Colors */
-  --fret-wire: #a0a0a0;
-  --fret-marker: #e6e6cc;
-  --fret-marker-border: #bbbbbb;
 
-  /*
-    ===========================================
-    ALPHA COLORS (WITH TRANSPARENCY)
-    ===========================================
-  */
+  /* ========================================
+     NOTE CIRCLE COLORS
+     ======================================== */
+  /* Selected Notes */
+  --note-selected: #3b82f6;
+  --note-selected-dark: #1d4ed8;
 
+  /* Melody Notes */
+  --note-melody: #4caf50;
+  --note-melody-dark: #2e7d32;
+
+  /* Scale Notes */
+  --note-scale: #f97316;
+  --note-scale-dark: #ea580c;
+  --note-scale-root: #dc2626;
+  --note-scale-root-dark: #b91c1c;
+
+  /* Chord Notes */
+  --note-chord: #8b5cf6;
+  --note-chord-dark: #7c3aed;
+  --note-chord-root: #dc2626;
+  --note-chord-root-dark: #b91c1c;
+
+  /* ========================================
+     SCROLLBAR COLORS
+     ======================================== */
+  --scrollbar-track: #1a1a1a;
+  --scrollbar-thumb-primary: #6b46c1;
+  --scrollbar-thumb-secondary: #8b5cf6;
+  --scrollbar-thumb-hover-primary: #7c3aed;
+  --scrollbar-thumb-hover-secondary: #a855f7;
+  --scrollbar-thumb-active-primary: #5b21b6;
+  --scrollbar-thumb-active-secondary: #7c3aed;
+
+  /* Guitar Scrollbar (Green theme) */
+  --scrollbar-guitar-track: #2d2d2d;
+  --scrollbar-guitar-track-secondary: #1a1a1a;
+  --scrollbar-guitar-thumb-primary: #22c55e;
+  --scrollbar-guitar-thumb-secondary: #16a34a;
+  --scrollbar-guitar-thumb-border: #4ade80;
+  --scrollbar-guitar-thumb-hover-primary: #16a34a;
+  --scrollbar-guitar-thumb-hover-secondary: #15803d;
+
+  /* ========================================
+     ALPHA COLORS (TRANSPARENCY)
+     ======================================== */
   /* Black Alpha */
   --black-alpha-10: rgba(0, 0, 0, 0.1);
   --black-alpha-20: rgba(0, 0, 0, 0.2);
@@ -201,29 +213,34 @@
   --white-alpha-10: rgba(255, 255, 255, 0.1);
   --white-alpha-15: rgba(255, 255, 255, 0.15);
   --white-alpha-20: rgba(255, 255, 255, 0.2);
+  --white-alpha-30: rgba(255, 255, 255, 0.3);
   --white-alpha-80: rgba(255, 255, 255, 0.8);
+  --white-alpha-90: rgba(255, 255, 255, 0.9);
 
-  /* Blue Alpha */
-  --blue-alpha-10: rgba(59, 130, 246, 0.1);
-  --blue-alpha-20: rgba(59, 130, 246, 0.2);
-  --blue-alpha-30: rgba(59, 130, 246, 0.3);
-  --blue-alpha-40: rgba(59, 130, 246, 0.4);
-  --blue-alpha-60: rgba(59, 130, 246, 0.6);
+  /* ========================================
+     BUTTON COLORS
+     ======================================== */
+  --btn-primary-bg: #3b82f6;
+  --btn-primary-bg-hover: #1d4ed8;
+  --btn-primary-border: #3b82f6;
+  --btn-primary-text: #ffffff;
 
-  /* Green Alpha */
-  --green-alpha-05: rgba(32, 201, 151, 0.05);
-  --green-alpha-10: rgba(32, 201, 151, 0.1);
-  --green-alpha-20: rgba(32, 201, 151, 0.2);
-  --green-alpha-30: rgba(32, 201, 151, 0.3);
+  --btn-secondary-bg-light: rgba(255, 255, 255, 0.9);
+  --btn-secondary-bg-dark: rgba(45, 27, 105, 0.8);
+  --btn-secondary-border-light: rgba(210, 210, 249, 0.4);
+  --btn-secondary-border-dark: rgba(210, 210, 249, 0.3);
+  --btn-secondary-text-light: #2d1b69;
+  --btn-secondary-text-dark: #d2d2f9;
 
-  /* Red Alpha */
-  --red-alpha-10: rgba(220, 53, 69, 0.1);
-  --red-alpha-20: rgba(220, 53, 69, 0.2);
-  --red-alpha-60: rgba(220, 38, 38, 0.6);
-  --red-alpha-70: rgba(220, 53, 69, 0.7);
-
-  /* Gray Alpha */
-  --gray-alpha-10: rgba(128, 128, 128, 0.1);
-  --gray-alpha-15: rgba(156, 163, 175, 0.3);
-  --gray-alpha-20: rgba(128, 128, 128, 0.2);
+  /* ========================================
+     SHADOW COLORS
+     ======================================== */
+  --shadow-primary-light: rgba(45, 27, 105, 0.1);
+  --shadow-primary-dark: rgba(0, 0, 0, 0.2);
+  --shadow-hover-light: rgba(45, 27, 105, 0.2);
+  --shadow-hover-dark: rgba(0, 0, 0, 0.3);
+  --shadow-button: rgba(59, 130, 246, 0.2);
+  --shadow-button-hover: rgba(59, 130, 246, 0.3);
+  --shadow-note: rgba(0, 0, 0, 0.3);
+  --shadow-scale-root: rgba(220, 38, 38, 0.6);
 }

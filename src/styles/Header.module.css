@@ -10,12 +10,12 @@
 
 .light .header {
   background: rgba(232, 228, 255, 0.8);
-  border-bottom: 1px solid rgba(18, 18, 18, 0.1);
+  border-bottom: 1px solid var(--black-alpha-10);
 }
 
 .dark .header {
   background: rgba(18, 18, 18, 0.8);
-  border-bottom: 1px solid rgba(210, 210, 249, 0.1);
+  border-bottom: 1px solid var(--white-alpha-10);
 }
 
 .headerContent {
@@ -43,26 +43,26 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
-  color: #121212;
+  color: var(--light-text-primary);
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .dark .headerTitle {
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
 }
 
 .headerSlogan {
   font-size: 0.75rem;
   font-weight: 400;
   margin: 0;
-  color: #121212;
+  color: var(--light-text-primary);
   opacity: 0.7;
   font-style: italic;
 }
 
 .dark .headerSlogan {
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
 }
 
 .headerNav {
@@ -80,7 +80,7 @@
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #121212;
+  color: var(--light-text-primary);
   opacity: 0.7;
   transition: all 0.3s ease;
   padding: 0.5rem 0;
@@ -89,7 +89,7 @@
 }
 
 .dark .navLink {
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
 }
 
 .navLink:hover {
@@ -100,11 +100,11 @@
 .navLinkActive {
   opacity: 1;
   font-weight: 600;
-  color: #8000ff;
+  color: var(--primary-purple);
 }
 
 .dark .navLinkActive {
-  color: #a855f7;
+  color: var(--primary-purple-light);
 }
 
 .navLinkActive::after {
@@ -114,12 +114,12 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: #8000ff;
+  background: var(--primary-purple);
   border-radius: 1px;
 }
 
 .dark .navLinkActive::after {
-  background: #a855f7;
+  background: var(--primary-purple-light);
 }
 
 .headerRight {
@@ -155,45 +155,45 @@
 }
 
 .loginBtn {
-  background: rgba(255, 255, 255, 0.9);
-  color: #2d1b69;
-  border: 2px solid rgba(210, 210, 249, 0.4);
-  box-shadow: 0 4px 15px rgba(45, 27, 105, 0.1);
+  background: var(--btn-secondary-bg-light);
+  color: var(--btn-secondary-text-light);
+  border: 2px solid var(--btn-secondary-border-light);
+  box-shadow: 0 4px 15px var(--shadow-primary-light);
 }
 
 .dark .loginBtn {
-  background: rgba(45, 27, 105, 0.8);
-  color: #d2d2f9;
-  border-color: rgba(210, 210, 249, 0.3);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  background: var(--btn-secondary-bg-dark);
+  color: var(--btn-secondary-text-dark);
+  border-color: var(--btn-secondary-border-dark);
+  box-shadow: 0 4px 15px var(--shadow-primary-dark);
 }
 
 .loginBtn:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: rgba(210, 210, 249, 0.6);
+  background: var(--white-alpha-90);
+  border-color: var(--btn-secondary-border-light);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(45, 27, 105, 0.2);
+  box-shadow: 0 6px 20px var(--shadow-hover-light);
 }
 
 .dark .loginBtn:hover {
-  background: rgba(45, 27, 105, 1);
-  border-color: rgba(210, 210, 249, 0.5);
+  background: var(--dark-bg-tertiary);
+  border-color: var(--btn-secondary-border-dark);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 20px var(--shadow-hover-dark);
 }
 
 .signupBtn {
-  background: #3b82f6;
-  color: white;
-  border: 2px solid #3b82f6;
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  border: 2px solid var(--btn-primary-border);
+  box-shadow: 0 4px 15px var(--shadow-button);
 }
 
 .signupBtn:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: var(--btn-primary-bg-hover);
+  border-color: var(--btn-primary-bg-hover);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 6px 20px var(--shadow-button-hover);
 }
 
 @media (min-width: 1024px) {
