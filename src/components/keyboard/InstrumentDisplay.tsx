@@ -137,8 +137,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     appliedChords,
     currentKeyboardScale,
     lowerOctaves,
-    higherOctaves,
-    setGuitarNotes
+    higherOctaves
   })
 
   // Handle clear all selections

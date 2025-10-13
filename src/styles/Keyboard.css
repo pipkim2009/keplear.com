@@ -284,8 +284,8 @@
 }
 
 .white-key.selected {
-  background: linear-gradient(145deg, #dbeafe, #bfdbfe);
-  border-color: #3b82f6;
+  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  border-color: #bfdbfe;
 }
 
 .white-key.melody {
@@ -323,30 +323,32 @@
   width: 36px;
   height: 180px;
   background: linear-gradient(145deg, #374151, #111827);
-  border: 1px solid #4b5563;
+  border: 2px solid #4b5563;
   border-radius: 0 0 6px 6px;
   cursor: pointer;
   pointer-events: all;
   transition: all 0.1s ease;
-  box-shadow: 
+  box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.1),
     inset 0 -1px 2px rgba(0, 0, 0, 0.3),
     0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
 .black-key:active {
-  box-shadow: 
+  box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.1),
     inset 0 -1px 1px rgba(0, 0, 0, 0.4),
     0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .black-key.selected {
-  background: linear-gradient(145deg, #1e40af, #1d4ed8);
+  background: linear-gradient(145deg, #3b82f6, #2563eb);
+  border-color: #bfdbfe;
 }
 
 .black-key.melody {
-  background: linear-gradient(145deg, #22c55e, #16a34a);
+  background: linear-gradient(145deg, #dcfce7, #bbf7d0);
+  border-color: #10b981;
 }
 
 /* Scale highlighting for keyboard keys */
@@ -356,7 +358,8 @@
 }
 
 .black-key.scale-note {
-  background: linear-gradient(145deg, #d97706, #b45309);
+  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  border-color: #d97706;
 }
 
 .white-key.scale-root {
@@ -370,7 +373,8 @@
 }
 
 .black-key.scale-root {
-  background: linear-gradient(145deg, #b91c1c, #991b1b);
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+  border-color: #991b1b;
   box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.1),
     inset 0 -1px 2px rgba(0, 0, 0, 0.3),
@@ -381,18 +385,22 @@
 /* Ensure scale styling takes precedence over selected when both are active */
 .white-key.selected.scale-note {
   background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  border-color: #d97706;
 }
 
 .black-key.selected.scale-note {
-  background: linear-gradient(145deg, #d97706, #b45309);
+  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  border-color: #d97706;
 }
 
 .white-key.selected.scale-root {
   background: linear-gradient(145deg, #dc2626, #b91c1c);
+  border-color: #991b1b;
 }
 
 .black-key.selected.scale-root {
-  background: linear-gradient(145deg, #b91c1c, #991b1b);
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+  border-color: #991b1b;
 }
 
 /* Chord highlighting for keyboard keys */
@@ -402,7 +410,8 @@
 }
 
 .black-key.chord-note {
-  background: linear-gradient(145deg, #7c3aed, #6d28d9);
+  background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+  border-color: #a78bfa;
 }
 
 /* Mixed chord/scale note highlighting - blend of orange (scale) and purple (chord) */
@@ -412,15 +421,18 @@
 }
 
 .black-key.chord-scale-note {
-  background: linear-gradient(145deg, #ea580c, #7c3aed);
+  background: linear-gradient(145deg, #f97316, #8b5cf6);
+  border-color: #d97706;
 }
 
 .white-key.selected.chord-scale-note {
   background: linear-gradient(145deg, #f97316, #8b5cf6);
+  border-color: #d97706;
 }
 
 .black-key.selected.chord-scale-note {
-  background: linear-gradient(145deg, #ea580c, #7c3aed);
+  background: linear-gradient(145deg, #f97316, #8b5cf6);
+  border-color: #d97706;
 }
 
 /* Mixed chord note + scale root - blend of red (scale root) and purple (chord) */
@@ -430,15 +442,18 @@
 }
 
 .black-key.chord-note-scale-root {
-  background: linear-gradient(145deg, #b91c1c, #7c3aed);
+  background: linear-gradient(145deg, #dc2626, #8b5cf6);
+  border-color: #b91c1c;
 }
 
 .white-key.selected.chord-note-scale-root {
   background: linear-gradient(145deg, #dc2626, #8b5cf6);
+  border-color: #b91c1c;
 }
 
 .black-key.selected.chord-note-scale-root {
-  background: linear-gradient(145deg, #b91c1c, #7c3aed);
+  background: linear-gradient(145deg, #dc2626, #8b5cf6);
+  border-color: #b91c1c;
 }
 
 /* Mixed chord root + scale note - blend of red (chord root) and orange (scale) */
@@ -448,15 +463,18 @@
 }
 
 .black-key.chord-root-scale-note {
-  background: linear-gradient(145deg, #b91c1c, #ea580c);
+  background: linear-gradient(145deg, #dc2626, #f97316);
+  border-color: #b91c1c;
 }
 
 .white-key.selected.chord-root-scale-note {
   background: linear-gradient(145deg, #dc2626, #f97316);
+  border-color: #b91c1c;
 }
 
 .black-key.selected.chord-root-scale-note {
-  background: linear-gradient(145deg, #b91c1c, #ea580c);
+  background: linear-gradient(145deg, #dc2626, #f97316);
+  border-color: #b91c1c;
 }
 
 /* Both roots (chord root + scale root) - stays red since both are roots */
@@ -466,15 +484,18 @@
 }
 
 .black-key.chord-root-scale-root {
-  background: linear-gradient(145deg, #b91c1c, #991b1b);
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+  border-color: #b91c1c;
 }
 
 .white-key.selected.chord-root-scale-root {
   background: linear-gradient(145deg, #dc2626, #b91c1c);
+  border-color: #b91c1c;
 }
 
 .black-key.selected.chord-root-scale-root {
-  background: linear-gradient(145deg, #b91c1c, #991b1b);
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+  border-color: #b91c1c;
 }
 
 /* Chord root notes should always be red */
@@ -491,7 +512,8 @@
 
 .black-key.chord-root,
 .black-key.chord-note.chord-root {
-  background: linear-gradient(145deg, #b91c1c, #991b1b) !important;
+  background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
+  border-color: #991b1b;
   box-shadow:
     inset 0 1px 2px rgba(255, 255, 255, 0.1),
     inset 0 -1px 2px rgba(0, 0, 0, 0.3),
@@ -505,7 +527,8 @@
 }
 
 .black-key.selected.chord-note {
-  background: linear-gradient(145deg, #7c3aed, #6d28d9);
+  background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+  border-color: #a78bfa;
 }
 
 .white-key.selected.chord-root,
@@ -515,7 +538,8 @@
 
 .black-key.selected.chord-root,
 .black-key.selected.chord-note.chord-root {
-  background: linear-gradient(145deg, #b91c1c, #991b1b) !important;
+  background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
+  border-color: #991b1b;
 }
 
 .key-label {
@@ -709,4 +733,127 @@
     padding: 0 !important;
     min-height: 200px !important;
   }
+}
+/* Manual selection + scale/chord gradient combinations (same as guitar/bass) */
+
+/* Manual + Scale Note - orange + blue gradient */
+.white-key.manual-scale-note {
+  background: linear-gradient(145deg, #f97316, #3b82f6) !important;
+  border-color: #f97316;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.black-key.manual-scale-note {
+  background: linear-gradient(145deg, #f97316, #3b82f6) !important;
+  border-color: #f97316;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Manual + Chord Note - purple + blue gradient */
+.white-key.manual-chord-note {
+  background: linear-gradient(145deg, #8b5cf6, #3b82f6) !important;
+  border-color: #8b5cf6;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.black-key.manual-chord-note {
+  background: linear-gradient(145deg, #8b5cf6, #3b82f6) !important;
+  border-color: #8b5cf6;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Manual + Scale Note + Chord Note - purple + orange + blue gradient */
+.white-key.manual-scale-chord-note {
+  background: linear-gradient(145deg, #8b5cf6, #f97316, #3b82f6) !important;
+  border-color: #8b5cf6;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.black-key.manual-scale-chord-note {
+  background: linear-gradient(145deg, #8b5cf6, #f97316, #3b82f6) !important;
+  border-color: #8b5cf6;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Manual + Scale Root - red + blue gradient */
+.white-key.manual-scale-root,
+.white-key.manual-chord-root {
+  background: linear-gradient(145deg, #dc2626, #3b82f6) !important;
+  border-color: #dc2626;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.black-key.manual-scale-root,
+.black-key.manual-chord-root {
+  background: linear-gradient(145deg, #dc2626, #3b82f6) !important;
+  border-color: #dc2626;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Manual + Chord Root Note - red + purple + blue gradient */
+.white-key.manual-chord-root-note {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6, #3b82f6) !important;
+  border-color: #dc2626;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.black-key.manual-chord-root-note {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6, #3b82f6) !important;
+  border-color: #dc2626;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Manual + Scale Note + Chord Note + Root - all 4 colors gradient */
+.white-key.manual-scale-chord-root-note {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6, #f97316, #3b82f6) !important;
+  border-color: #dc2626;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.black-key.manual-scale-chord-root-note {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6, #f97316, #3b82f6) !important;
+  border-color: #dc2626;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.5);
 }

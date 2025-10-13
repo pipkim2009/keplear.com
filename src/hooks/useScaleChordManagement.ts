@@ -527,21 +527,8 @@ export const useScaleChordManagement = ({
     // Apply scale to get scale notes
     const scaleNotes = applyScaleToKeyboard(rootNote, scale, currentNotes)
 
-    // Add each scale note individually using selectNote in multi mode
-    if (selectNote) {
-      // Create a set to track notes being added in this operation
-      const notesToAdd = scaleNotes.filter(note =>
-        !selectedNotes.some(selectedNote => selectedNote.name === note.name)
-      )
-
-      // Add all notes that aren't already selected
-      notesToAdd.forEach(note => {
-        selectNote(note, 'multi')
-      })
-    } else {
-      // Fallback to the old method if selectNote is not available
-      setGuitarNotes(scaleNotes)
-    }
+    // DON'T add scale notes to selectedNotes - they should only be in appliedScales
+    // This allows clicking them to add a "manual" layer for gradient colors
 
     // Add scale to applied scales list
     const newAppliedScale: AppliedScale = {
@@ -629,22 +616,8 @@ export const useScaleChordManagement = ({
     // Apply chord to get chord notes
     const chordNotes = applyChordToKeyboard(rootNote, chord, currentNotes)
 
-    // Add each chord note individually using selectNote in multi mode
-    if (selectNote) {
-      chordNotes.forEach(note => {
-        // Only add if not already selected
-        if (!selectedNotes.some(selectedNote => selectedNote.name === note.name)) {
-          selectNote(note, 'multi')
-        }
-      })
-    } else {
-      // Fallback to the old method if selectNote is not available
-      const combinedNotes = [...selectedNotes, ...chordNotes]
-      const uniqueNotes = Array.from(
-        new Map(combinedNotes.map(note => [note.position, note])).values()
-      )
-      setGuitarNotes(uniqueNotes)
-    }
+    // DON'T add chord notes to selectedNotes - they should only be in appliedChords
+    // This allows clicking them to add a "manual" layer for gradient colors
 
     // Add keyboard chord to applied chords list with the actual notes
     const chordId = `keyboard-${rootNote}-${chord.name}-${Date.now()}`

@@ -1,11 +1,8 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback } from 'react'
 import type { Note } from '../utils/notes'
 import type { AppliedChord, AppliedScale } from '../components/common/ScaleChordOptions'
 import type { KeyboardScale } from '../utils/keyboardScales'
-import type { KeyboardChord } from '../utils/keyboardChords'
-import { isKeyboardNoteInScale, isKeyboardNoteRoot, applyScaleToKeyboard } from '../utils/keyboardScales'
-import { applyChordToKeyboard } from '../utils/keyboardChords'
-import { generateNotesWithSeparateOctaves } from '../utils/notes'
+import { isKeyboardNoteInScale, isKeyboardNoteRoot } from '../utils/keyboardScales'
 
 interface UseKeyboardHighlightingProps {
   instrument: string
@@ -14,7 +11,6 @@ interface UseKeyboardHighlightingProps {
   currentKeyboardScale: { root: string; scale: KeyboardScale } | null
   lowerOctaves: number
   higherOctaves: number
-  setGuitarNotes: (notes: Note[]) => void
 }
 
 export const useKeyboardHighlighting = ({
@@ -23,8 +19,7 @@ export const useKeyboardHighlighting = ({
   appliedChords,
   currentKeyboardScale,
   lowerOctaves,
-  higherOctaves,
-  setGuitarNotes
+  higherOctaves
 }: UseKeyboardHighlightingProps) => {
 
   // Helper functions for keyboard scale and chord highlighting
@@ -85,42 +80,9 @@ export const useKeyboardHighlighting = ({
     return false
   }, [instrument, appliedChords])
 
-  // Auto-reapply keyboard scale/chords when octave range changes (but not on initial application)
-  useEffect(() => {
-    if (currentKeyboardScale) {
-      // Generate current keyboard notes based on octave range
-      const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
-        ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
-        : generateNotesWithSeparateOctaves(0, 0) // Default range
-
-      // Apply scale to get scale notes
-      const scaleNotes = applyScaleToKeyboard(currentKeyboardScale.root, currentKeyboardScale.scale, currentNotes)
-
-      // Set these notes as selected (this will trigger the melody system)
-      setGuitarNotes(scaleNotes)
-    } else if (appliedChords.length > 0 && instrument === 'keyboard') {
-      // Generate current keyboard notes based on octave range
-      const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
-        ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
-        : generateNotesWithSeparateOctaves(0, 0) // Default range
-
-      // Reapply all keyboard chords to the new octave range
-      let allChordNotes: Note[] = []
-      appliedChords.forEach(appliedChord => {
-        if (appliedChord.notes) {
-          // Re-generate chord notes for the new octave range
-          const chordNotes = applyChordToKeyboard(appliedChord.root, appliedChord.chord as KeyboardChord, currentNotes)
-          allChordNotes.push(...chordNotes)
-        }
-      })
-
-      // Remove duplicates and set as selected
-      const uniqueNotes = Array.from(
-        new Map(allChordNotes.map(note => [note.position, note])).values()
-      )
-      setGuitarNotes(uniqueNotes)
-    }
-  }, [lowerOctaves, higherOctaves, currentKeyboardScale, appliedChords, instrument])
+  // NOTE: We removed the useEffect that was auto-adding scale/chord notes to selectedNotes
+  // This hook should ONLY provide highlighting detection, not modify selections
+  // Scale/chord notes are stored in appliedScales/appliedChords and should NOT be in selectedNotes
 
   return {
     isNoteInKeyboardScale,

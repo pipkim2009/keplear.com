@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react'
+import { memo, useMemo, useCallback } from 'react'
 import KeyboardKey from './KeyboardKey'
 import { whiteKeys, blackKeys, getBlackKeyLeft, getBlackKeyLeftDynamic, generateWhiteKeysWithSeparateOctaves, generateBlackKeysWithSeparateOctaves, type Note } from '../../utils/notes'
 import type { KeyboardSelectionMode } from './InstrumentControls'
@@ -33,6 +33,25 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
 }) {
   const hasExtendedRange = lowerOctaves !== 0 || higherOctaves !== 0
 
+  // Check if a note is in scale or chord layer
+  const isInScaleChordLayer = useCallback((note: Note): boolean => {
+    const inScale = isNoteInScale ? isNoteInScale(note) : false
+    const inChord = isNoteInChord ? isNoteInChord(note) : false
+    return inScale || inChord
+  }, [isNoteInScale, isNoteInChord])
+
+  // Check if a note is manually selected
+  // After the architecture change, selectedNotes only contains manually clicked notes
+  // Scale/chord notes are NOT in selectedNotes
+  const isManuallySelected = useCallback((note: Note): boolean => {
+    return isSelected(note)
+  }, [isSelected])
+
+  // Check if a note should be visible (either manual OR in scale/chord)
+  const isNoteVisible = useCallback((note: Note): boolean => {
+    return isManuallySelected(note) || isInScaleChordLayer(note)
+  }, [isManuallySelected, isInScaleChordLayer])
+
   // Memoize expensive key generation
   const currentWhiteKeys = useMemo(
     () => hasExtendedRange ? generateWhiteKeysWithSeparateOctaves(lowerOctaves, higherOctaves) : whiteKeys,
@@ -52,7 +71,8 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
           <KeyboardKey
             key={note.name}
             note={note}
-            isSelected={isSelected(note)}
+            isSelected={isManuallySelected(note)}
+            isVisible={isNoteVisible(note)}
             isInMelody={isInMelody(note, showNotes)}
             onClick={onNoteClick}
             isInScale={isNoteInScale ? isNoteInScale(note) : false}
@@ -61,7 +81,7 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
             isChordRoot={isNoteChordRoot ? isNoteChordRoot(note) : false}
           />
         ))}
-        
+
         {/* Black Keys */}
         <div className="black-keys">
           {currentBlackKeys.map((note) => {
@@ -72,7 +92,8 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
               <KeyboardKey
                 key={note.name}
                 note={note}
-                isSelected={isSelected(note)}
+                isSelected={isManuallySelected(note)}
+                isVisible={isNoteVisible(note)}
                 isInMelody={isInMelody(note, showNotes)}
                 onClick={onNoteClick}
                 style={{ left: `${leftPosition}px` }}
