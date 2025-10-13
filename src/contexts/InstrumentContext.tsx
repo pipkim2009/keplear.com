@@ -159,6 +159,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     isSelected,
     isInMelody,
     clearSelection,
+    clearMelody,
     clearTrigger
   } = useMelodyGenerator()
 
@@ -249,8 +250,9 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     setIsGeneratingMelody(true)
 
     // Generate melody immediately with current values
-    const melodyNotes = instrument === 'keyboard' && (keyboardOctaves.lower !== 0 || keyboardOctaves.higher !== 0)
-      ? generateNotesWithSeparateOctaves(keyboardOctaves.lower, keyboardOctaves.higher)
+    // Use local lowerOctaves/higherOctaves state which is updated by the octave buttons
+    const melodyNotes = instrument === 'keyboard' && (lowerOctaves !== 0 || higherOctaves !== 0)
+      ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
       : notes
 
     // Take a snapshot of currently selected notes to prevent interference from note clicks during generation
@@ -266,7 +268,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     clearChanges()
 
     // isGeneratingMelody will stay true until recorded audio is ready
-  }, [generateMelody, numberOfBeats, instrument, keyboardOctaves, keyboardSelectionMode, selectedNotes, calculateMelodyDuration, bpm, setMelodyDuration, setPlaybackProgress, handleClearRecordedAudio, clearChanges, chordMode, appliedChords])
+  }, [generateMelody, numberOfBeats, instrument, lowerOctaves, higherOctaves, keyboardSelectionMode, selectedNotes, calculateMelodyDuration, bpm, setMelodyDuration, setPlaybackProgress, handleClearRecordedAudio, clearChanges, chordMode, appliedChords, appliedScales])
 
   const handlePlayMelody = useCallback((): void => {
     if (isPlaying) {
@@ -291,11 +293,23 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
   }, [isPlaying, stopMelody, generatedMelody, instrument, playGuitarMelody, playBassMelody, playMelody, bpm, chordMode, setPlaybackProgress])
 
   const handleInstrumentChange = useCallback((newInstrument: InstrumentType): void => {
+    // FIRST: Abort any ongoing recording before anything else
+    handleClearRecordedAudio()
+
+    // Stop any ongoing melody playback or recording
+    if (isPlaying || isRecording) {
+      stopMelody()
+    }
+
+    // Cancel melody generation if in progress
+    setIsGeneratingMelody(false)
+
+    // Clear all melody-related state
     setInstrument(newInstrument)
     clearSelection()
-    handleClearRecordedAudio()
+    clearMelody()
     triggerClearChordsAndScales()
-  }, [setInstrument, clearSelection, handleClearRecordedAudio, triggerClearChordsAndScales])
+  }, [setInstrument, clearSelection, clearMelody, handleClearRecordedAudio, triggerClearChordsAndScales, isPlaying, isRecording, stopMelody])
 
   const handleOctaveRangeChange = useCallback((newLowerOctaves: number, newHigherOctaves: number): void => {
     setLowerOctaves(newLowerOctaves)

@@ -20,6 +20,7 @@ interface UseMelodyGeneratorReturn {
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
   clearSelection: () => void
+  clearMelody: () => void
 }
 
 /**
@@ -291,6 +292,13 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     setClearTrigger(prev => prev + 1)
   }, [])
 
+  /**
+   * Clears the generated melody
+   */
+  const clearMelody = useCallback((): void => {
+    setGeneratedMelody([])
+  }, [])
+
   return {
     selectedNotes,
     generatedMelody,
@@ -300,6 +308,7 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     isSelected,
     isInMelody,
     clearSelection,
+    clearMelody,
     clearTrigger
   }
 }

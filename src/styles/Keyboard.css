@@ -289,7 +289,7 @@
 }
 
 .white-key.melody {
-  background: linear-gradient(145deg, #dcfce7, #bbf7d0);
+  background: linear-gradient(145deg, #4caf50, #2e7d32);
   border-color: #ffffff;
 }
 
@@ -309,7 +309,7 @@
 .white-key.melody.manual-chord-root,
 .white-key.melody.manual-chord-root-note,
 .white-key.melody.manual-scale-chord-root-note {
-  background: linear-gradient(145deg, #dcfce7, #bbf7d0) !important;
+  background: linear-gradient(145deg, #4caf50, #2e7d32) !important;
   border-color: #ffffff !important;
 }
 
@@ -367,7 +367,7 @@
 }
 
 .black-key.melody {
-  background: linear-gradient(145deg, #dcfce7, #bbf7d0);
+  background: linear-gradient(145deg, #4caf50, #2e7d32);
   border-color: #ffffff;
 }
 
@@ -387,7 +387,7 @@
 .black-key.melody.manual-chord-root,
 .black-key.melody.manual-chord-root-note,
 .black-key.melody.manual-scale-chord-root-note {
-  background: linear-gradient(145deg, #dcfce7, #bbf7d0) !important;
+  background: linear-gradient(145deg, #4caf50, #2e7d32) !important;
   border-color: #ffffff !important;
 }
 

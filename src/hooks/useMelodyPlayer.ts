@@ -59,6 +59,9 @@ export const useMelodyPlayer = ({
 }: UseMelodyPlayerProps): UseMelodyPlayerReturn => {
   const [state, dispatch] = useReducer(melodyReducer, initialMelodyState)
 
+  // Ref to track if recording should be aborted (e.g., during instrument change)
+  const abortRecordingRef = useRef(false)
+
   // Calculate melody duration in milliseconds
   const calculateMelodyDuration = useCallback((melodyLength: number, bpm: number, instrument: InstrumentType) => {
     if (melodyLength === 0) return 0
@@ -99,13 +102,17 @@ export const useMelodyPlayer = ({
     }
 
     const result = await recordMelody([...generatedMelody], bpm, instrument, chordMode)
-    if (result) {
+
+    // Only dispatch if recording wasn't aborted (e.g., during instrument change)
+    if (result && !abortRecordingRef.current) {
       dispatch({ type: 'SET_RECORDED_AUDIO_BLOB', payload: result })
     }
     return result
   }, [recordMelody, generatedMelody, bpm, instrument, chordMode])
 
   const handleClearRecordedAudio = useCallback(() => {
+    // Abort any ongoing recording
+    abortRecordingRef.current = true
     dispatch({ type: 'RESET_RECORDING' })
   }, [])
 
@@ -151,6 +158,9 @@ export const useMelodyPlayer = ({
   // Auto-record melody when it changes
   useEffect(() => {
     if (generatedMelody.length > 0 && !isPlaying && !isRecording && !state.isAutoRecording && !state.hasRecordedAudio) {
+      // Reset abort flag for new recording
+      abortRecordingRef.current = false
+
       const autoRecord = async () => {
         try {
           dispatch({ type: 'SET_IS_AUTO_RECORDING', payload: true })
@@ -159,14 +169,23 @@ export const useMelodyPlayer = ({
           stopMelody()
 
           const result = await handleRecordMelody()
-          if (result) {
+
+          // Only set the recorded audio if recording wasn't aborted
+          if (result && !abortRecordingRef.current) {
             dispatch({ type: 'SET_HAS_RECORDED_AUDIO', payload: true })
             dispatch({ type: 'SET_RECORDED_AUDIO_BLOB', payload: result })
           }
         } catch (error) {
           console.warn('Auto-recording failed:', error)
         } finally {
-          dispatch({ type: 'SET_IS_AUTO_RECORDING', payload: false })
+          // Only reset auto-recording flag if not aborted
+          if (!abortRecordingRef.current) {
+            dispatch({ type: 'SET_IS_AUTO_RECORDING', payload: false })
+          } else {
+            // If aborted, ensure everything is reset
+            dispatch({ type: 'SET_IS_AUTO_RECORDING', payload: false })
+            dispatch({ type: 'RESET_RECORDING' })
+          }
         }
       }
 
