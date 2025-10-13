@@ -185,15 +185,6 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     chordMode
   })
 
-  const { hasChanges, clearChanges } = useMelodyChanges({
-    selectedNotes,
-    bpm,
-    numberOfBeats,
-    generatedMelody,
-    instrument,
-    keyboardSelectionMode
-  })
-
   // Define handler needed by useScaleChordManagement before using it
   const handleKeyboardSelectionModeChange = useCallback((mode: 'range' | 'multi', clearSelections: boolean = true): void => {
     setKeyboardSelectionMode(mode as any)
@@ -203,7 +194,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     triggerInputFlash('mode')
   }, [setKeyboardSelectionMode, clearSelection, triggerInputFlash])
 
-  // Scale and chord management
+  // Scale and chord management (must come before useMelodyChanges)
   const scaleChordManagement = useScaleChordManagement({
     instrument,
     selectedNotes,
@@ -218,6 +209,16 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
   })
 
   const { appliedChords, appliedScales } = scaleChordManagement
+
+  const { hasChanges, clearChanges } = useMelodyChanges({
+    selectedNotes,
+    bpm,
+    numberOfBeats,
+    generatedMelody,
+    instrument,
+    keyboardSelectionMode,
+    appliedChords
+  })
 
   // Turn off generating indicator only when we have recorded audio ready
   useEffect(() => {

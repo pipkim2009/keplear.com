@@ -44,6 +44,7 @@ interface InstrumentControlsProps {
   triggerInputFlash: (inputType: 'bpm' | 'beats' | 'mode') => void
   setInputActive: (inputType: 'bpm' | 'beats' | 'mode', active: boolean) => void
   selectedNotesCount?: number
+  appliedChordsCount?: number
   onGenerateMelody?: () => void
   onPlayMelody?: () => void
   onRecordMelody?: () => Promise<Blob | null>
@@ -91,6 +92,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   triggerInputFlash,
   setInputActive,
   selectedNotesCount = 0,
+  appliedChordsCount = 0,
   onGenerateMelody,
   onPlayMelody,
   onRecordMelody,
@@ -495,11 +497,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   }, [audioFileUrl])
 
   // Determine if melody can be generated based on instrument and selection mode
-  const canGenerateMelody = instrument === 'keyboard'
-    ? (keyboardSelectionMode === 'range'
-        ? selectedNotesCount === 2  // Range mode needs exactly 2 notes
-        : selectedNotesCount > 0)   // Multi mode needs at least 1 note
-    : selectedNotesCount > 0        // Guitar/Bass needs at least 1 note
+  const canGenerateMelody = appliedChordsCount > 0 || // Can always generate with applied chords
+    (instrument === 'keyboard'
+      ? (keyboardSelectionMode === 'range'
+          ? selectedNotesCount === 2  // Range mode needs exactly 2 notes
+          : selectedNotesCount > 0)   // Multi mode needs at least 1 note
+      : selectedNotesCount > 0)       // Guitar/Bass needs at least 1 note
   return (
     <div className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
       {/* Top row: Instrument selector */}

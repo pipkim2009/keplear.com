@@ -193,6 +193,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           triggerInputFlash={triggerInputFlash}
           setInputActive={setInputActive}
           selectedNotesCount={selectedNotes.length}
+          appliedChordsCount={appliedChords.length}
           onGenerateMelody={onGenerateMelody}
           onPlayMelody={onPlayMelody}
           onRecordMelody={onRecordMelody}

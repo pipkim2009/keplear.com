@@ -78,7 +78,23 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     }
 
     // Use provided notes snapshot or current selectedNotes
-    const currentSelectedNotes = notesToUse || selectedNotes
+    let currentSelectedNotes = notesToUse || selectedNotes
+
+    // If no individual notes are selected but we have applied chords, extract notes from chords for arpeggiator mode
+    if (currentSelectedNotes.length === 0 && appliedChords && appliedChords.length > 0 && chordMode === 'arpeggiator') {
+      const notesFromChords: Note[] = []
+      appliedChords.forEach(chord => {
+        if (chord.notes && chord.notes.length > 0) {
+          chord.notes.forEach(note => {
+            // Avoid duplicates by checking if note already exists
+            if (!notesFromChords.some(n => n.name === note.name)) {
+              notesFromChords.push(note)
+            }
+          })
+        }
+      })
+      currentSelectedNotes = notesFromChords
+    }
 
     // PROGRESSION MODE: Generate chord progression melody
     // If both chords AND individual notes are selected, automatically mix them
@@ -233,8 +249,21 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
    * @param showNotes - Whether notes are currently being displayed
    * @returns True if the note is in the melody and notes are shown
    */
-  const isInMelody = useCallback((note: Note, showNotes: boolean): boolean => 
-    showNotes && generatedMelody.some(n => n.name === note.name), [generatedMelody])
+  const isInMelody = useCallback((note: Note, showNotes: boolean): boolean => {
+    if (!showNotes) return false
+
+    return generatedMelody.some(n => {
+      // Direct match - note is played individually
+      if (n.name === note.name) return true
+
+      // Check if note is part of a chord group being played
+      if (n.chordGroup && n.chordGroup.allNotes) {
+        return n.chordGroup.allNotes.includes(note.name)
+      }
+
+      return false
+    })
+  }, [generatedMelody])
 
   /**
    * Clears all selections but keeps generated melody
