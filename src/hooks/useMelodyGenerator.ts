@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import type { Note, ChordGroupInfo } from '../utils/notes'
-import type { AppliedChord } from '../components/common/ScaleChordOptions'
+import type { AppliedChord, AppliedScale } from '../components/common/ScaleChordOptions'
 
 /**
  * Supported instrument types for melody generation
@@ -15,7 +15,7 @@ interface UseMelodyGeneratorReturn {
   readonly generatedMelody: readonly Note[]
   readonly clearTrigger: number
   selectNote: (note: Note, selectionMode?: 'range' | 'multi') => void
-  generateMelody: (notes: readonly Note[], numberOfNotes: number, instrument?: InstrumentType, selectionMode?: 'range' | 'multi', notesToUse?: readonly Note[], chordMode?: 'arpeggiator' | 'progression', appliedChords?: AppliedChord[]) => void
+  generateMelody: (notes: readonly Note[], numberOfNotes: number, instrument?: InstrumentType, selectionMode?: 'range' | 'multi', notesToUse?: readonly Note[], chordMode?: 'arpeggiator' | 'progression', appliedChords?: AppliedChord[], appliedScales?: AppliedScale[]) => void
   setGuitarNotes: (notes: Note[]) => void
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
@@ -70,7 +70,8 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     selectionMode: 'range' | 'multi' = 'range',
     notesToUse?: readonly Note[],
     chordMode: 'arpeggiator' | 'progression' = 'arpeggiator',
-    appliedChords?: AppliedChord[]
+    appliedChords?: AppliedChord[],
+    appliedScales?: AppliedScale[]
   ): void => {
     if (numberOfNotes <= 0) {
       console.warn('Number of notes must be positive')
@@ -94,6 +95,22 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
         }
       })
       currentSelectedNotes = notesFromChords
+    }
+
+    // If no individual notes are selected and no chords, but we have applied scales, extract notes from scales
+    if (currentSelectedNotes.length === 0 && appliedScales && appliedScales.length > 0) {
+      const notesFromScales: Note[] = []
+      appliedScales.forEach(scale => {
+        if (scale.notes && scale.notes.length > 0) {
+          scale.notes.forEach(note => {
+            // Avoid duplicates by checking if note already exists
+            if (!notesFromScales.some(n => n.name === note.name)) {
+              notesFromScales.push(note)
+            }
+          })
+        }
+      })
+      currentSelectedNotes = notesFromScales
     }
 
     // PROGRESSION MODE: Generate chord progression melody

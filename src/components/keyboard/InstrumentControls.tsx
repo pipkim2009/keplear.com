@@ -45,6 +45,7 @@ interface InstrumentControlsProps {
   setInputActive: (inputType: 'bpm' | 'beats' | 'mode', active: boolean) => void
   selectedNotesCount?: number
   appliedChordsCount?: number
+  appliedScalesCount?: number
   onGenerateMelody?: () => void
   onPlayMelody?: () => void
   onRecordMelody?: () => Promise<Blob | null>
@@ -93,6 +94,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   setInputActive,
   selectedNotesCount = 0,
   appliedChordsCount = 0,
+  appliedScalesCount = 0,
   onGenerateMelody,
   onPlayMelody,
   onRecordMelody,
@@ -498,6 +500,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
   // Determine if melody can be generated based on instrument and selection mode
   const canGenerateMelody = appliedChordsCount > 0 || // Can always generate with applied chords
+    appliedScalesCount > 0 || // Can always generate with applied scales
     (instrument === 'keyboard'
       ? (keyboardSelectionMode === 'range'
           ? selectedNotesCount === 2  // Range mode needs exactly 2 notes

@@ -256,8 +256,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     // Take a snapshot of currently selected notes to prevent interference from note clicks during generation
     const selectedNotesSnapshot = [...selectedNotes]
 
-    // Pass chordMode and appliedChords to generateMelody
-    generateMelody(melodyNotes, numberOfBeats, instrument, keyboardSelectionMode, selectedNotesSnapshot, chordMode, appliedChords)
+    // Pass chordMode, appliedChords, and appliedScales to generateMelody
+    generateMelody(melodyNotes, numberOfBeats, instrument, keyboardSelectionMode, selectedNotesSnapshot, chordMode, appliedChords, appliedScales)
 
     const duration = calculateMelodyDuration(numberOfBeats, bpm, instrument)
     setMelodyDuration(duration)

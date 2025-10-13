@@ -127,6 +127,47 @@ export const useScaleChordManagement = ({
     setAppliedChords([])
   }, [instrument])
 
+  // Update keyboard scales and chords when octave range changes
+  useEffect(() => {
+    if (instrument !== 'keyboard') return
+
+    // Generate notes for the new octave range
+    const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
+      ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+      : generateNotesWithSeparateOctaves(0, 0)
+
+    // Update all applied scales with new octave range using callback form
+    setAppliedScales(prevScales => {
+      if (prevScales.length === 0) return prevScales
+
+      return prevScales.map(appliedScale => {
+        // Regenerate notes for this scale with the new octave range
+        const scaleNotes = applyScaleToKeyboard(appliedScale.root, appliedScale.scale as KeyboardScale, currentNotes)
+        return {
+          ...appliedScale,
+          notes: scaleNotes
+        }
+      })
+    })
+
+    // Update all applied chords with new octave range using callback form
+    setAppliedChords(prevChords => {
+      if (prevChords.length === 0) return prevChords
+
+      return prevChords.map(appliedChord => {
+        // Only update keyboard chords (they have 'keyboard' in their ID)
+        if (appliedChord.id.startsWith('keyboard')) {
+          const chordNotes = applyChordToKeyboard(appliedChord.root, appliedChord.chord as KeyboardChord, currentNotes)
+          return {
+            ...appliedChord,
+            notes: chordNotes
+          }
+        }
+        return appliedChord
+      })
+    })
+  }, [instrument, lowerOctaves, higherOctaves])
+
   // Helper function to check if a chord already exists
   const isChordAlreadyApplied = useCallback((root: string, chordName: string): boolean => {
     return appliedChords.some(appliedChord =>
