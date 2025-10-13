@@ -1,8 +1,10 @@
 import ScaleChordOptions, { type AppliedChord, type AppliedScale } from '../common/ScaleChordOptions'
+import Tooltip from '../common/Tooltip'
 import type { Note } from '../../utils/notes'
 import type { KeyboardScale } from '../../utils/keyboardScales'
 import type { KeyboardChord } from '../../utils/keyboardChords'
 import type { GuitarChord, ChordShape } from '../../utils/guitarChords'
+import type { GuitarScale, ScaleBox } from '../../utils/guitarScales'
 import type { BassChord, BassChordShape } from '../../utils/bassChords'
 import type { KeyboardSelectionMode } from './InstrumentControls'
 
@@ -64,7 +66,17 @@ const InstrumentHeader: React.FC<InstrumentHeaderProps> = ({
       <div className="header-controls-left">
         {instrument === 'keyboard' && (
           <div className="control-group">
-            <label className="control-label">Selection Mode</label>
+            <div className="label-with-tooltip">
+              <label className="control-label">Selection Mode</label>
+              <Tooltip
+                title="Selection Mode"
+                text="Select your note selection method
+Range Select - Select 2 notes and use the inclusive interval
+Multi Select - Select the specific notes to use"
+              >
+                <div className="tooltip-icon">?</div>
+              </Tooltip>
+            </div>
             <select
               value={keyboardSelectionMode}
               onChange={(e) => onKeyboardSelectionModeChange && onKeyboardSelectionModeChange(e.target.value as KeyboardSelectionMode)}

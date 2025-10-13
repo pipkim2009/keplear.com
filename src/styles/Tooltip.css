@@ -1,0 +1,210 @@
+.label-with-tooltip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tooltip-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: help;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+  flex-shrink: 0;
+}
+
+.tooltip-icon:hover,
+.active .tooltip-icon {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+}
+
+.dark .tooltip-icon {
+  border-color: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+}
+
+.dark .tooltip-icon:hover,
+.dark .active .tooltip-icon {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-box {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-8px);
+  background: #000000;
+  color: #ffffff;
+  padding: 0.875rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  z-index: 1000;
+  border: 2px solid #9333ea;
+  box-shadow:
+    0 0 20px rgba(147, 51, 234, 0.8),
+    0 0 40px rgba(147, 51, 234, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.8);
+  min-width: 280px;
+  max-width: 400px;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.tooltip-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #60d5f8;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 0.4rem;
+  text-align: left;
+  text-shadow:
+    0 0 10px rgba(96, 213, 248, 0.8),
+    0 0 20px rgba(96, 213, 248, 0.6),
+    0 0 30px rgba(96, 213, 248, 0.4);
+  animation: titleGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes titleGlow {
+  0%, 100% {
+    text-shadow:
+      0 0 10px rgba(96, 213, 248, 0.8),
+      0 0 20px rgba(96, 213, 248, 0.6),
+      0 0 30px rgba(96, 213, 248, 0.4);
+  }
+  50% {
+    text-shadow:
+      0 0 15px rgba(96, 213, 248, 1),
+      0 0 30px rgba(96, 213, 248, 0.8),
+      0 0 45px rgba(96, 213, 248, 0.6);
+  }
+}
+
+.tooltip-text {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: #e5e5e5;
+  line-height: 1.45;
+  max-width: 100%;
+  text-align: left;
+  white-space: pre-line;
+}
+
+.tooltip-box::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #9333ea;
+}
+
+.tooltip-box.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-12px);
+}
+
+.tooltip-container:hover .tooltip-box {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-12px);
+}
+
+.dark .tooltip-box {
+  background: #000000;
+  border-color: #a855f7;
+  box-shadow:
+    0 0 20px rgba(168, 85, 247, 0.8),
+    0 0 40px rgba(168, 85, 247, 0.5),
+    0 4px 12px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+
+.dark .tooltip-box::after {
+  border-top-color: #a855f7;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .tooltip-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 0.7rem;
+  }
+
+  .label-with-tooltip {
+    gap: 0.4rem;
+  }
+
+  .tooltip-box {
+    min-width: 220px;
+    max-width: 280px;
+    padding: 0.75rem 1.25rem;
+  }
+
+  .tooltip-title {
+    font-size: 1rem;
+    letter-spacing: 1px;
+    margin-bottom: 0.35rem;
+  }
+
+  .tooltip-text {
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 480px) {
+  .tooltip-icon {
+    width: 14px;
+    height: 14px;
+    font-size: 0.65rem;
+  }
+
+  .label-with-tooltip {
+    gap: 0.35rem;
+  }
+
+  .tooltip-box {
+    min-width: 180px;
+    max-width: 240px;
+    padding: 0.65rem 1rem;
+  }
+
+  .tooltip-title {
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+  }
+
+  .tooltip-text {
+    font-size: 0.75rem;
+  }
+}

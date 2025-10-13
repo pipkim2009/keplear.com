@@ -5,6 +5,7 @@ import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleB
 import { guitarNotes } from '../../utils/guitarNotes'
 import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/keyboardScales'
 import NotesToggle from '../common/NotesToggle'
+import Tooltip from '../common/Tooltip'
 import type { Note } from '../../utils/notes'
 import type { ChordMode } from '../../reducers/uiReducer'
 import MelodyDisplay from '../MelodyDisplay'
@@ -667,7 +668,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
       {/* Second row: Octave range (keyboard only) */}
       {instrument === 'keyboard' && (
         <div className="control-group octave-range-control">
-          <label className="control-label">Octave Range</label>
+          <div className="label-with-tooltip">
+            <label className="control-label">Octave Range</label>
+            <Tooltip title="Octave Range" text="Select which octaves are visible in the keyboard interface">
+              <div className="tooltip-icon">?</div>
+            </Tooltip>
+          </div>
           <div className="octave-range-slider">
             <div className="range-labels-center">
               <span className="range-label-center">
@@ -772,7 +778,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
       <div className="control-group modern-controls-row">
         <div className="controls-container">
           <div className="modern-control-item">
-            <label className="control-label">BPM</label>
+            <div className="label-with-tooltip">
+              <label className="control-label">BPM</label>
+              <Tooltip title="BPM" text="Specify the speed of the melody (BEATS PER MINUTE)">
+                <div className="tooltip-icon">?</div>
+              </Tooltip>
+            </div>
             <div className="input-with-buttons">
               <input
                 type="text"
@@ -812,7 +823,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
 
           <div className="modern-control-item">
-            <label className="control-label">Beats</label>
+            <div className="label-with-tooltip">
+              <label className="control-label">Beats</label>
+              <Tooltip title="Beats" text="Specify the number of beats within the melody">
+                <div className="tooltip-icon">?</div>
+              </Tooltip>
+            </div>
             <div className="input-with-buttons">
               <input
                 type="text"
@@ -854,7 +870,17 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           {/* Chord Mode Select */}
           {setChordMode && (
             <div className="modern-control-item">
-              <label className="control-label">Chord Mode</label>
+              <div className="label-with-tooltip">
+                <label className="control-label">Chord Mode</label>
+                <Tooltip
+                  title="Chord Mode"
+                  text="Select how chords should be used in the melody.
+Arpeggiator - Use individual chord notes
+Progression - Use entire chords"
+                >
+                  <div className="tooltip-icon">?</div>
+                </Tooltip>
+              </div>
               <select
                 value={chordMode}
                 onChange={(e) => setChordMode(e.target.value as ChordMode)}
