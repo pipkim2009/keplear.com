@@ -80,14 +80,14 @@ export const GUITAR_CHORDS: GuitarChord[] = [
     description: 'Major chord with added color tone'
   },
   {
-    name: 'Minor 9th',
-    intervals: [0, 3, 7, 10, 14],
-    description: 'Rich, complex minor sound'
-  },
-  {
     name: 'Major 9th',
     intervals: [0, 4, 7, 11, 14],
     description: 'Rich, complex major sound'
+  },
+  {
+    name: 'Minor 9th',
+    intervals: [0, 3, 7, 10, 14],
+    description: 'Rich, complex minor sound'
   }
 ]
 
@@ -140,13 +140,13 @@ export const CHORD_FINGERINGS: { [key: string]: { [chordType: string]: ChordFing
       { name: 'Open Cadd9', frets: ['x', 3, 2, 0, 3, 0], baseFret: 0, difficulty: 'Medium', description: 'Open C add9 chord' },
       { name: 'Partial Cadd9', frets: ['x', 3, 2, 0, 3, 3], baseFret: 0, difficulty: 'Medium', description: 'C add9 partial chord' }
     ],
-    'Minor 9th': [
-      { name: 'Cm9', frets: ['x', 3, 1, 3, 3, 3], baseFret: 0, difficulty: 'Hard', description: 'C minor 9th chord' },
-      { name: 'Barre Cm9', frets: [3, 3, 5, 3, 4, 6], baseFret: 3, difficulty: 'Hard', description: 'Cm9 barre chord' }
-    ],
     'Major 9th': [
       { name: 'Cmaj9', frets: ['x', 3, 2, 4, 3, 0], baseFret: 0, difficulty: 'Hard', description: 'C major 9th chord' },
       { name: 'Barre Cmaj9', frets: [3, 3, 5, 4, 5, 5], baseFret: 3, difficulty: 'Hard', description: 'Cmaj9 barre chord' }
+    ],
+    'Minor 9th': [
+      { name: 'Cm9', frets: ['x', 3, 1, 3, 3, 3], baseFret: 0, difficulty: 'Hard', description: 'C minor 9th chord' },
+      { name: 'Barre Cm9', frets: [3, 3, 5, 3, 4, 6], baseFret: 3, difficulty: 'Hard', description: 'Cm9 barre chord' }
     ]
   },
   'D': {

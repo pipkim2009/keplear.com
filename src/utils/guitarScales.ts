@@ -21,24 +21,14 @@ export type ScaleBox = {
 // Common guitar scales with their interval patterns
 export const GUITAR_SCALES: GuitarScale[] = [
   {
-    name: 'Major (Ionian)',
+    name: 'Major',
     intervals: [0, 2, 4, 5, 7, 9, 11],
     description: 'The most common scale, bright and happy sounding'
   },
   {
-    name: 'Natural Minor (Aeolian)',
+    name: 'Minor',
     intervals: [0, 2, 3, 5, 7, 8, 10],
     description: 'Minor scale with a sad, melancholic sound'
-  },
-  {
-    name: 'Pentatonic Major',
-    intervals: [0, 2, 4, 7, 9],
-    description: 'Five-note scale, great for blues and rock'
-  },
-  {
-    name: 'Pentatonic Minor',
-    intervals: [0, 3, 5, 7, 10],
-    description: 'Five-note minor scale, essential for blues and rock'
   },
   {
     name: 'Dorian',
@@ -64,6 +54,16 @@ export const GUITAR_SCALES: GuitarScale[] = [
     name: 'Locrian',
     intervals: [0, 1, 3, 5, 6, 8, 10],
     description: 'Diminished scale, unstable and dark'
+  },
+  {
+    name: 'Pentatonic Major',
+    intervals: [0, 2, 4, 7, 9],
+    description: 'Five-note scale, great for blues and rock'
+  },
+  {
+    name: 'Pentatonic Minor',
+    intervals: [0, 3, 5, 7, 10],
+    description: 'Five-note minor scale, essential for blues and rock'
   },
   {
     name: 'Harmonic Minor',
