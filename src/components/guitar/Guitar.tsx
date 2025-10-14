@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import '../../styles/Guitar.css'
-import { guitarNotes } from '../../utils/guitarNotes'
-import { applyScaleToGuitar, applyScaleBoxToGuitar, GUITAR_SCALES, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
-import { applyChordToGuitar, applyChordShapeToGuitar, type GuitarChord, type ChordShape } from '../../utils/guitarChords'
+import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
+import { applyScaleToGuitar, applyScaleBoxToGuitar, GUITAR_SCALES, type GuitarScale, type ScaleBox } from '../../utils/instruments/guitar/guitarScales'
+import { applyChordToGuitar, applyChordShapeToGuitar, type GuitarChord, type ChordShape } from '../../utils/instruments/guitar/guitarChords'
 import type { Note } from '../../utils/notes'
 import type { AppliedChord, AppliedScale } from '../common/ScaleChordOptions'
 

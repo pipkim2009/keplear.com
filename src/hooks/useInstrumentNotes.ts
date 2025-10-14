@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { notes, type Note } from '../utils/notes'
-import { guitarNotes, type GuitarNote } from '../utils/guitarNotes'
-import { bassNotes, type BassNote } from '../utils/bassNotes'
+import { guitarNotes, type GuitarNote } from '../utils/instruments/guitar/guitarNotes'
+import { bassNotes, type BassNote } from '../utils/instruments/bass/bassNotes'
 
 export const useInstrumentNotes = (instrument: string) => {
   const instrumentNotes = useMemo(() => {

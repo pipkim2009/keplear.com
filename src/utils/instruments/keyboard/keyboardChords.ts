@@ -1,5 +1,5 @@
-import { GUITAR_CHORDS, getChordNotes, type GuitarChord } from './guitarChords'
-import type { Note } from './notes'
+import { GUITAR_CHORDS, getChordNotes, type GuitarChord } from '../guitar/guitarChords'
+import type { Note } from '../../notes'
 
 /**
  * Apply a chord to keyboard notes within the current octave range
@@ -121,4 +121,4 @@ export const getKeyboardChordVoicings = (
 }
 
 // Re-export guitar chords and utilities for keyboard use
-export { GUITAR_CHORDS as KEYBOARD_CHORDS, CHORD_ROOT_NOTES as KEYBOARD_CHORD_ROOT_NOTES, type GuitarChord as KeyboardChord } from './guitarChords'
+export { GUITAR_CHORDS as KEYBOARD_CHORDS, CHORD_ROOT_NOTES as KEYBOARD_CHORD_ROOT_NOTES, type GuitarChord as KeyboardChord } from '../guitar/guitarChords'

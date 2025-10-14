@@ -7,14 +7,14 @@ export * from './audioExport'
 export * from './notes'
 
 // Instrument utilities
-export * from './guitarNotes'
-export * from './guitarScales'
-export * from './guitarChords'
-export * from './bassNotes'
-export * from './bassScales'
-export * from './bassChords'
-export * from './keyboardScales'
-export * from './keyboardChords'
+export * from './instruments/guitar/guitarNotes'
+export * from './instruments/guitar/guitarScales'
+export * from './instruments/guitar/guitarChords'
+export * from './instruments/bass/bassNotes'
+export * from './instruments/bass/bassScales'
+export * from './instruments/bass/bassChords'
+export * from './instruments/keyboard/keyboardScales'
+export * from './instruments/keyboard/keyboardChords'
 export * from './instrumentHelpers'
 
 // Core utilities

@@ -1,8 +1,8 @@
 import { useCallback } from 'react'
 import type { Note } from '../utils/notes'
 import type { AppliedChord, AppliedScale } from '../components/common/ScaleChordOptions'
-import type { KeyboardScale } from '../utils/keyboardScales'
-import { isKeyboardNoteInScale, isKeyboardNoteRoot } from '../utils/keyboardScales'
+import type { KeyboardScale } from '../utils/instruments/keyboard/keyboardScales'
+import { isKeyboardNoteInScale, isKeyboardNoteRoot } from '../utils/instruments/keyboard/keyboardScales'
 
 interface UseKeyboardHighlightingProps {
   instrument: string

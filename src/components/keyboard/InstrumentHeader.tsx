@@ -1,11 +1,11 @@
 import ScaleChordOptions, { type AppliedChord, type AppliedScale } from '../common/ScaleChordOptions'
 import Tooltip from '../common/Tooltip'
 import type { Note } from '../../utils/notes'
-import type { KeyboardScale } from '../../utils/keyboardScales'
-import type { KeyboardChord } from '../../utils/keyboardChords'
-import type { GuitarChord, ChordShape } from '../../utils/guitarChords'
-import type { GuitarScale, ScaleBox } from '../../utils/guitarScales'
-import type { BassChord, BassChordShape } from '../../utils/bassChords'
+import type { KeyboardScale } from '../../utils/instruments/keyboard/keyboardScales'
+import type { KeyboardChord } from '../../utils/instruments/keyboard/keyboardChords'
+import type { GuitarChord, ChordShape } from '../../utils/instruments/guitar/guitarChords'
+import type { GuitarScale, ScaleBox } from '../../utils/instruments/guitar/guitarScales'
+import type { BassChord, BassChordShape } from '../../utils/instruments/bass/bassChords'
 import type { KeyboardSelectionMode } from './InstrumentControls'
 
 interface InstrumentHeaderProps {

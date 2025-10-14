@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/guitarScales'
-import { guitarNotes } from '../../utils/guitarNotes'
-import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, type BassScale, type BassScaleBox } from '../../utils/bassScales'
-import { bassNotes } from '../../utils/bassNotes'
-import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/keyboardScales'
+import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/instruments/guitar/guitarScales'
+import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
+import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, type BassScale, type BassScaleBox } from '../../utils/instruments/bass/bassScales'
+import { bassNotes } from '../../utils/instruments/bass/bassNotes'
+import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/instruments/keyboard/keyboardScales'
 import '../../styles/ScaleOptions.css'
 
 interface ScaleOptionsProps {

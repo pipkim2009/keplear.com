@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { CHORD_ROOT_NOTES, GUITAR_CHORDS, getChordShapes, type GuitarChord, type ChordShape } from '../../utils/guitarChords'
-import { guitarNotes } from '../../utils/guitarNotes'
-import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, type BassChord, type BassChordShape } from '../../utils/bassChords'
-import { bassNotes } from '../../utils/bassNotes'
-import { KEYBOARD_CHORDS, type KeyboardChord } from '../../utils/keyboardChords'
+import { CHORD_ROOT_NOTES, GUITAR_CHORDS, getChordShapes, type GuitarChord, type ChordShape } from '../../utils/instruments/guitar/guitarChords'
+import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
+import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, type BassChord, type BassChordShape } from '../../utils/instruments/bass/bassChords'
+import { bassNotes } from '../../utils/instruments/bass/bassNotes'
+import { KEYBOARD_CHORDS, type KeyboardChord } from '../../utils/instruments/keyboard/keyboardChords'
 import '../../styles/ScaleOptions.css'
 
 interface ChordOptionsProps {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { GUITAR_SCALES, ROOT_NOTES, type GuitarScale, type ScaleBox, getScaleBoxes, applyScaleBoxToGuitar } from '../../utils/guitarScales'
-import { guitarNotes } from '../../utils/guitarNotes'
+import { GUITAR_SCALES, ROOT_NOTES, type GuitarScale, type ScaleBox, getScaleBoxes, applyScaleBoxToGuitar } from '../../utils/instruments/guitar/guitarScales'
+import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
 
 interface ScaleSelectorProps {
   onScaleSelect: (rootNote: string, scale: GuitarScale) => void

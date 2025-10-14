@@ -1,5 +1,5 @@
-import { GUITAR_SCALES, ROOT_NOTES, getScaleNotes, type GuitarScale } from './guitarScales'
-import type { Note } from './notes'
+import { GUITAR_SCALES, ROOT_NOTES, getScaleNotes, type GuitarScale } from '../guitar/guitarScales'
+import type { Note } from '../../notes'
 
 /**
  * Apply a scale to keyboard notes within the current octave range

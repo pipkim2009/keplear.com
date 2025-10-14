@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import '../../styles/Bass.css'
-import { bassNotes } from '../../utils/bassNotes'
-import { applyScaleToBass, applyScaleBoxToBass, BASS_SCALES, type BassScale, type BassScaleBox } from '../../utils/bassScales'
-import { applyChordToBass, applyBassChordShapeToBass, type BassChord, type BassChordShape } from '../../utils/bassChords'
+import { bassNotes } from '../../utils/instruments/bass/bassNotes'
+import { applyScaleToBass, applyScaleBoxToBass, BASS_SCALES, type BassScale, type BassScaleBox } from '../../utils/instruments/bass/bassScales'
+import { applyChordToBass, applyBassChordShapeToBass, type BassChord, type BassChordShape } from '../../utils/instruments/bass/bassChords'
 import type { Note } from '../../utils/notes'
 import type { AppliedChord, AppliedScale } from '../common/ScaleChordOptions'
 

@@ -1,5 +1,5 @@
 import type { Note } from '../utils/notes'
-import { GUITAR_CHORDS } from '../utils/guitarChords'
+import { GUITAR_CHORDS } from '../utils/instruments/guitar/guitarChords'
 import '../styles/MelodyDisplay.css'
 
 interface MelodyDisplayProps {
