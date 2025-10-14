@@ -80,38 +80,40 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     }
 
     // Use provided notes snapshot or current selectedNotes
-    let currentSelectedNotes = notesToUse || selectedNotes
+    let currentSelectedNotes = [...(notesToUse || selectedNotes)]
 
-    // If no individual notes are selected but we have applied chords, extract notes from chords for arpeggiator mode
-    if (currentSelectedNotes.length === 0 && appliedChords && appliedChords.length > 0 && chordMode === 'arpeggiator') {
-      const notesFromChords: Note[] = []
+    // Add notes from applied chords (for arpeggiator mode)
+    if (appliedChords && appliedChords.length > 0 && chordMode === 'arpeggiator') {
       appliedChords.forEach(chord => {
         if (chord.notes && chord.notes.length > 0) {
           chord.notes.forEach(note => {
             // Avoid duplicates by checking if note already exists
-            if (!notesFromChords.some(n => n.name === note.name)) {
-              notesFromChords.push(note)
+            if (!currentSelectedNotes.some(n => n.name === note.name)) {
+              currentSelectedNotes.push(note)
             }
           })
         }
       })
-      currentSelectedNotes = notesFromChords
     }
 
-    // If no individual notes are selected and no chords, but we have applied scales, extract notes from scales
-    if (currentSelectedNotes.length === 0 && appliedScales && appliedScales.length > 0) {
-      const notesFromScales: Note[] = []
+    // Add notes from applied scales
+    if (appliedScales && appliedScales.length > 0) {
       appliedScales.forEach(scale => {
         if (scale.notes && scale.notes.length > 0) {
           scale.notes.forEach(note => {
             // Avoid duplicates by checking if note already exists
-            if (!notesFromScales.some(n => n.name === note.name)) {
-              notesFromScales.push(note)
+            if (!currentSelectedNotes.some(n => n.name === note.name)) {
+              currentSelectedNotes.push(note)
             }
           })
         }
       })
-      currentSelectedNotes = notesFromScales
+    }
+
+    // If after all that we still have no notes, bail out
+    if (currentSelectedNotes.length === 0 && chordMode !== 'progression') {
+      console.warn('No notes available for melody generation')
+      return
     }
 
     // PROGRESSION MODE: Generate chord progression melody
