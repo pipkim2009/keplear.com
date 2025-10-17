@@ -566,8 +566,8 @@ export const useScaleChordManagement = ({
   const handleKeyboardScaleApply = useCallback((rootNote: string, scale: KeyboardScale, octave?: number) => {
     // Check if this exact scale with this octave is already applied
     const displayName = octave !== undefined
-      ? `${rootNote} ${scale.name} (Oct ${octave})`
-      : `${rootNote} ${scale.name}`
+      ? `${rootNote}${scale.name}${octave}`
+      : `${rootNote}${scale.name}`
     const isScaleAlreadyApplied = appliedScales.some(appliedScale =>
       appliedScale.displayName === displayName
     )
@@ -671,7 +671,7 @@ export const useScaleChordManagement = ({
   const handleKeyboardChordApply = useCallback((rootNote: string, chord: KeyboardChord, octave?: number) => {
     // Check if this chord with this octave is already applied
     const displayName = octave !== undefined
-      ? `${rootNote}${chord.name} (Oct ${octave})`
+      ? `${rootNote}${chord.name}${octave}`
       : `${rootNote}${chord.name}`
     const isAlreadyApplied = appliedChords.some(appliedChord =>
       appliedChord.displayName === displayName
