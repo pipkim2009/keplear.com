@@ -142,7 +142,16 @@ export const useScaleChordManagement = ({
 
       return prevScales.map(appliedScale => {
         // Regenerate notes for this scale with the new octave range
-        const scaleNotes = applyScaleToKeyboard(appliedScale.root, appliedScale.scale as KeyboardScale, currentNotes)
+        let scaleNotes = applyScaleToKeyboard(appliedScale.root, appliedScale.scale as KeyboardScale, currentNotes)
+
+        // If this scale was applied to a specific octave, filter to only that octave
+        if (appliedScale.octave !== undefined) {
+          scaleNotes = scaleNotes.filter(note => {
+            const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
+            return noteOctave === appliedScale.octave
+          })
+        }
+
         return {
           ...appliedScale,
           notes: scaleNotes
@@ -157,7 +166,16 @@ export const useScaleChordManagement = ({
       return prevChords.map(appliedChord => {
         // Only update keyboard chords (they have 'keyboard' in their ID)
         if (appliedChord.id.startsWith('keyboard')) {
-          const chordNotes = applyChordToKeyboard(appliedChord.root, appliedChord.chord as KeyboardChord, currentNotes)
+          let chordNotes = applyChordToKeyboard(appliedChord.root, appliedChord.chord as KeyboardChord, currentNotes)
+
+          // If this chord was applied to a specific octave, filter to only that octave
+          if (appliedChord.octave !== undefined) {
+            chordNotes = chordNotes.filter(note => {
+              const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
+              return noteOctave === appliedChord.octave
+            })
+          }
+
           return {
             ...appliedChord,
             notes: chordNotes
@@ -545,10 +563,13 @@ export const useScaleChordManagement = ({
   }, [instrument, chordHandlers, bassChordHandlers])
 
   // Keyboard scale handlers
-  const handleKeyboardScaleApply = useCallback((rootNote: string, scale: KeyboardScale) => {
-    // Check if this exact scale is already applied
+  const handleKeyboardScaleApply = useCallback((rootNote: string, scale: KeyboardScale, octave?: number) => {
+    // Check if this exact scale with this octave is already applied
+    const displayName = octave !== undefined
+      ? `${rootNote} ${scale.name} (Oct ${octave})`
+      : `${rootNote} ${scale.name}`
     const isScaleAlreadyApplied = appliedScales.some(appliedScale =>
-      appliedScale.root === rootNote && appliedScale.scale.name === scale.name
+      appliedScale.displayName === displayName
     )
 
     if (isScaleAlreadyApplied) {
@@ -566,18 +587,27 @@ export const useScaleChordManagement = ({
       : generateNotesWithSeparateOctaves(0, 0) // Default range
 
     // Apply scale to get scale notes
-    const scaleNotes = applyScaleToKeyboard(rootNote, scale, currentNotes)
+    let scaleNotes = applyScaleToKeyboard(rootNote, scale, currentNotes)
+
+    // If octave is specified, filter to only that octave
+    if (octave !== undefined) {
+      scaleNotes = scaleNotes.filter(note => {
+        const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
+        return noteOctave === octave
+      })
+    }
 
     // DON'T add scale notes to selectedNotes - they should only be in appliedScales
     // This allows clicking them to add a "manual" layer for gradient colors
 
     // Add scale to applied scales list
     const newAppliedScale: AppliedScale = {
-      id: `${rootNote}-${scale.name}-${Date.now()}`,
+      id: `${rootNote}-${scale.name}-${octave !== undefined ? octave : 'all'}-${Date.now()}`,
       root: rootNote,
       scale: scale,
-      displayName: `${rootNote} ${scale.name}`,
-      notes: scaleNotes
+      displayName: displayName,
+      notes: scaleNotes,
+      octave: octave // Store the octave for regeneration
     }
 
     setAppliedScales(prev => [...prev, newAppliedScale])
@@ -638,9 +668,16 @@ export const useScaleChordManagement = ({
   }, [instrument, scaleHandlers, bassScaleHandlers, chordHandlers, bassChordHandlers, clearSelection, appliedScales])
 
   // Keyboard chord handlers
-  const handleKeyboardChordApply = useCallback((rootNote: string, chord: KeyboardChord) => {
-    // Check if this chord is already applied
-    if (isChordAlreadyApplied(rootNote, chord.name)) {
+  const handleKeyboardChordApply = useCallback((rootNote: string, chord: KeyboardChord, octave?: number) => {
+    // Check if this chord with this octave is already applied
+    const displayName = octave !== undefined
+      ? `${rootNote}${chord.name} (Oct ${octave})`
+      : `${rootNote}${chord.name}`
+    const isAlreadyApplied = appliedChords.some(appliedChord =>
+      appliedChord.displayName === displayName
+    )
+
+    if (isAlreadyApplied) {
       return
     }
 
@@ -655,22 +692,31 @@ export const useScaleChordManagement = ({
       : generateNotesWithSeparateOctaves(0, 0) // Default range
 
     // Apply chord to get chord notes
-    const chordNotes = applyChordToKeyboard(rootNote, chord, currentNotes)
+    let chordNotes = applyChordToKeyboard(rootNote, chord, currentNotes)
+
+    // If octave is specified, filter to only that octave
+    if (octave !== undefined) {
+      chordNotes = chordNotes.filter(note => {
+        const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
+        return noteOctave === octave
+      })
+    }
 
     // DON'T add chord notes to selectedNotes - they should only be in appliedChords
     // This allows clicking them to add a "manual" layer for gradient colors
 
     // Add keyboard chord to applied chords list with the actual notes
-    const chordId = `keyboard-${rootNote}-${chord.name}-${Date.now()}`
+    const chordId = `keyboard-${rootNote}-${chord.name}-${octave !== undefined ? octave : 'all'}-${Date.now()}`
     const newAppliedChord: AppliedChord = {
       id: chordId,
       root: rootNote,
       chord: chord,
-      displayName: `${rootNote}${chord.name}`,
-      notes: chordNotes
+      displayName: displayName,
+      notes: chordNotes,
+      octave: octave // Store the octave for regeneration
     }
     setAppliedChords(prev => [...prev, newAppliedChord])
-  }, [isChordAlreadyApplied, onKeyboardSelectionModeChange, keyboardSelectionMode, lowerOctaves, higherOctaves, selectNote, selectedNotes])
+  }, [isChordAlreadyApplied, appliedChords, onKeyboardSelectionModeChange, keyboardSelectionMode, lowerOctaves, higherOctaves, selectNote, selectedNotes])
 
   const handleKeyboardChordClear = useCallback(() => {
     // Clear all selected notes

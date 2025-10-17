@@ -27,6 +27,11 @@ export const useKeyboardHighlighting = ({
     // Check against all applied keyboard scales, not just the current one
     if (instrument === 'keyboard' && appliedScales.length > 0) {
       return appliedScales.some(appliedScale => {
+        // If the scale has notes (with octave filtering), check against those
+        if (appliedScale.notes) {
+          return appliedScale.notes.some(scaleNote => scaleNote.name === note.name)
+        }
+        // Fallback: check by note name without octave (for backward compatibility)
         return isKeyboardNoteInScale(note, appliedScale.root, appliedScale.scale)
       })
     }
@@ -55,6 +60,15 @@ export const useKeyboardHighlighting = ({
     // Check against all applied keyboard scales, not just the current one
     if (instrument === 'keyboard' && appliedScales.length > 0) {
       return appliedScales.some(appliedScale => {
+        // If the scale has notes (with octave filtering), check if this note is the root in those notes
+        if (appliedScale.notes) {
+          const noteNameWithoutOctave = note.name.replace(/\d+$/, '')
+          return appliedScale.notes.some(scaleNote => {
+            const scaleNoteWithoutOctave = scaleNote.name.replace(/\d+$/, '')
+            return scaleNote.name === note.name && scaleNoteWithoutOctave === appliedScale.root
+          })
+        }
+        // Fallback: check by root note without octave (for backward compatibility)
         return isKeyboardNoteRoot(note, appliedScale.root)
       })
     }

@@ -26,13 +26,15 @@ interface InstrumentHeaderProps {
   onClearChord: () => void
   onRootChange: (rootNote: string) => void
   onChordRootChange: (rootNote: string) => void
-  onKeyboardScaleApply: (rootNote: string, scale: KeyboardScale) => void
+  onKeyboardScaleApply: (rootNote: string, scale: KeyboardScale, octave?: number) => void
   onKeyboardScaleClear: () => void
-  onKeyboardChordApply: (rootNote: string, chord: KeyboardChord) => void
+  onKeyboardChordApply: (rootNote: string, chord: KeyboardChord, octave?: number) => void
   onKeyboardChordClear: () => void
   onChordDelete: (chordId: string) => void
   onScaleDelete: (scaleId: string) => void
   onClearAllSelections: () => void
+  lowerOctaves?: number
+  higherOctaves?: number
 }
 
 const InstrumentHeader: React.FC<InstrumentHeaderProps> = ({
@@ -59,7 +61,9 @@ const InstrumentHeader: React.FC<InstrumentHeaderProps> = ({
   onKeyboardChordClear,
   onChordDelete,
   onScaleDelete,
-  onClearAllSelections
+  onClearAllSelections,
+  lowerOctaves = 0,
+  higherOctaves = 0
 }) => {
   return (
     <div className="instrument-header-controls">
@@ -110,6 +114,8 @@ Multi Select - Select the specific notes to use"
             onChordDelete={onChordDelete}
             appliedScales={appliedScales}
             onScaleDelete={onScaleDelete}
+            lowerOctaves={lowerOctaves}
+            higherOctaves={higherOctaves}
           />
         </div>
 

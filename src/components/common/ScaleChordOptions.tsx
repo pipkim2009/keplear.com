@@ -17,6 +17,7 @@ export interface AppliedChord {
   displayName: string
   noteKeys?: string[] // For guitar/bass: note keys like "0-open", "1-2" etc.
   notes?: any[] // For keyboard: actual Note objects
+  octave?: number // For keyboard: specific octave position
 }
 
 export interface AppliedScale {
@@ -26,6 +27,7 @@ export interface AppliedScale {
   displayName: string
   noteKeys?: string[] // For guitar/bass: note keys like "0-open", "1-2" etc.
   notes?: any[] // For keyboard: actual Note objects
+  octave?: number // For keyboard: specific octave position
 }
 
 interface ScaleChordOptionsProps {
@@ -37,17 +39,19 @@ interface ScaleChordOptionsProps {
   onScaleSelect?: (rootNote: string, scale: GuitarScale) => void
   onScaleBoxSelect?: (scaleBox: ScaleBox) => void
   onClearScale?: () => void
-  onKeyboardScaleApply?: (rootNote: string, scale: KeyboardScale) => void
+  onKeyboardScaleApply?: (rootNote: string, scale: KeyboardScale, octave?: number) => void
   onKeyboardScaleClear?: () => void
   onChordSelect?: (rootNote: string, chord: GuitarChord) => void
   onChordShapeSelect?: (chordShape: ChordShape) => void
   onClearChord?: () => void
-  onKeyboardChordApply?: (rootNote: string, chord: KeyboardChord) => void
+  onKeyboardChordApply?: (rootNote: string, chord: KeyboardChord, octave?: number) => void
   onKeyboardChordClear?: () => void
   appliedChords?: AppliedChord[]
   onChordDelete?: (chordId: string) => void
   appliedScales?: AppliedScale[]
   onScaleDelete?: (scaleId: string) => void
+  lowerOctaves?: number
+  higherOctaves?: number
 }
 
 const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
@@ -69,7 +73,9 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   appliedChords = [],
   onChordDelete,
   appliedScales = [],
-  onScaleDelete
+  onScaleDelete,
+  lowerOctaves = 0,
+  higherOctaves = 0
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isScaleMode, setIsScaleMode] = useState(true) // true for scales, false for chords
@@ -93,6 +99,18 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   const [availableBassShapes, setAvailableBassShapes] = useState<BassChordShape[]>([])
   const [selectedShapeIndex, setSelectedShapeIndex] = useState<number>(0)
   const [showShapes, setShowShapes] = useState<boolean>(true)
+
+  // Keyboard position (octave) states
+  const [selectedScaleOctave, setSelectedScaleOctave] = useState<number>(4)
+  const [selectedChordOctave, setSelectedChordOctave] = useState<number>(4)
+
+  // Calculate available octaves based on octave range
+  const minOctave = Math.max(1, 4 - lowerOctaves)
+  const maxOctave = Math.min(8, 5 + higherOctaves)
+  const availableOctaves = Array.from(
+    { length: maxOctave - minOctave + 1 },
+    (_, i) => minOctave + i
+  )
 
   const toggleExpanded = () => {
     if (!isExpanded && containerRef.current) {
@@ -196,7 +214,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         onScaleSelect(selectedRoot, selectedBassScale as any)
       }
     } else if (instrument === 'keyboard' && onKeyboardScaleApply) {
-      onKeyboardScaleApply(selectedRoot, keyboardSelectedScale)
+      onKeyboardScaleApply(selectedRoot, keyboardSelectedScale, selectedScaleOctave)
     }
 
     // Keep popup open for multiple scale application
@@ -239,7 +257,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         onChordSelect(selectedChordRoot, selectedBassChord as any)
       }
     } else if (instrument === 'keyboard' && onKeyboardChordApply) {
-      onKeyboardChordApply(selectedChordRoot, keyboardSelectedChord)
+      onKeyboardChordApply(selectedChordRoot, keyboardSelectedChord, selectedChordOctave)
     }
 
     // Don't auto-close the popup to allow adding multiple chords
@@ -374,6 +392,23 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                   </div>
                 )}
 
+                {instrument === 'keyboard' && availableOctaves.length > 0 && (
+                  <div className="control-section">
+                    <label className="control-label">Position (Octave)</label>
+                    <select
+                      value={selectedScaleOctave}
+                      onChange={(e) => setSelectedScaleOctave(parseInt(e.target.value))}
+                      className={`control-select ${!isScaleMode ? 'chord-mode' : ''}`}
+                    >
+                      {availableOctaves.map((octave) => (
+                        <option key={octave} value={octave}>
+                          Octave {octave}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
                 <div className="control-section">
                   <button
                     onClick={handleApplyScale}
@@ -459,6 +494,23 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                       {availableBassShapes.map((shape, index) => (
                         <option key={index} value={index}>
                           {shape.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                {instrument === 'keyboard' && availableOctaves.length > 0 && (
+                  <div className="control-section">
+                    <label className="control-label">Position (Octave)</label>
+                    <select
+                      value={selectedChordOctave}
+                      onChange={(e) => setSelectedChordOctave(parseInt(e.target.value))}
+                      className={`control-select ${!isScaleMode ? 'chord-mode' : ''}`}
+                    >
+                      {availableOctaves.map((octave) => (
+                        <option key={octave} value={octave}>
+                          Octave {octave}
                         </option>
                       ))}
                     </select>

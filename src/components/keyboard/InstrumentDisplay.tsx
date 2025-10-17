@@ -240,6 +240,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           onChordDelete={handleChordDelete}
           onScaleDelete={handleScaleDelete}
           onClearAllSelections={handleClearAllSelections}
+          lowerOctaves={lowerOctaves}
+          higherOctaves={higherOctaves}
         />
 
         <InstrumentRenderer
