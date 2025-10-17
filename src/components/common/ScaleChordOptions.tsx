@@ -394,7 +394,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
                 {instrument === 'keyboard' && availableOctaves.length > 0 && (
                   <div className="control-section">
-                    <label className="control-label">Position (Octave)</label>
+                    <label className="control-label">Position</label>
                     <select
                       value={selectedScaleOctave}
                       onChange={(e) => setSelectedScaleOctave(parseInt(e.target.value))}
@@ -468,7 +468,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
                 {instrument === 'guitar' && availableShapes.length > 0 && (
                   <div className="control-section">
-                    <label className="control-label">Shape</label>
+                    <label className="control-label">Position</label>
                     <select
                       value={selectedShapeIndex}
                       onChange={(e) => handleShapeChange(parseInt(e.target.value))}
@@ -485,7 +485,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
                 {instrument === 'bass' && availableBassShapes.length > 0 && (
                   <div className="control-section">
-                    <label className="control-label">Shape</label>
+                    <label className="control-label">Position</label>
                     <select
                       value={selectedShapeIndex}
                       onChange={(e) => handleShapeChange(parseInt(e.target.value))}
@@ -502,7 +502,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
                 {instrument === 'keyboard' && availableOctaves.length > 0 && (
                   <div className="control-section">
-                    <label className="control-label">Position (Octave)</label>
+                    <label className="control-label">Position</label>
                     <select
                       value={selectedChordOctave}
                       onChange={(e) => setSelectedChordOctave(parseInt(e.target.value))}
