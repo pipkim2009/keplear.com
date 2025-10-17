@@ -79,8 +79,6 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isScaleMode, setIsScaleMode] = useState(true) // true for scales, false for chords
-  const [isFlashing, setIsFlashing] = useState(false)
-  const isInitialMount = useRef(true)
   const containerRef = useRef<HTMLDivElement>(null)
   const [popupPosition, setPopupPosition] = useState({ top: 0, left: 0 })
 
@@ -147,19 +145,6 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isExpanded])
-
-  // Trigger flash animation when mode changes
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false
-      return
-    }
-    setIsFlashing(true)
-    const timer = setTimeout(() => {
-      setIsFlashing(false)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [isScaleMode])
 
   // Update available boxes when root or scale changes (Scale mode)
   useEffect(() => {
@@ -313,7 +298,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                   checked={!isScaleMode}
                   onChange={(e) => setIsScaleMode(!e.target.checked)}
                 />
-                <span className={`toggle-slider ${isFlashing ? 'flashing' : ''}`}>
+                <span className="toggle-slider">
                   <span className="toggle-text left">Scales</span>
                   <span className="toggle-text right">Chords</span>
                 </span>
@@ -438,13 +423,13 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                 {appliedScales.length > 0 && (
                   <div className="control-section">
                     <label className="control-label">Applied Scales</label>
-                    <div className="applied-chords-list">
+                    <div className="applied-scales-list">
                       {appliedScales.map((appliedScale) => (
-                        <div key={appliedScale.id} className="applied-chord-item">
-                          <span className="chord-name">{appliedScale.displayName}</span>
+                        <div key={appliedScale.id} className="applied-scale-item">
+                          <span className="scale-name">{appliedScale.displayName}</span>
                           <button
                             onClick={() => onScaleDelete?.(appliedScale.id)}
-                            className="delete-chord-button"
+                            className="delete-scale-button"
                             title={`Remove ${appliedScale.displayName}`}
                           >
                             ×
