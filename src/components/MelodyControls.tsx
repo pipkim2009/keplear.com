@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef } from 'react'
 import NotesToggle from './common/NotesToggle'
 import type { Note } from '../utils/notes'
 import { downloadAudioFile, generateMelodyFilename } from '../utils/audioExport'
@@ -37,7 +38,22 @@ const MelodyControls: React.FC<MelodyControlsProps> = ({
   chordMode = 'arpeggiator',
   onToggleChordMode
 }) => {
-  
+  const [isFlashing, setIsFlashing] = useState(false)
+  const isInitialMount = useRef(true)
+
+  // Trigger flash animation when chord mode changes
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
+    setIsFlashing(true)
+    const timer = setTimeout(() => {
+      setIsFlashing(false)
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [chordMode])
+
   // Different enable conditions based on instrument and selection mode
   const canGenerate = instrument === 'keyboard'
     ? (keyboardSelectionMode === 'range'
@@ -84,7 +100,7 @@ const MelodyControls: React.FC<MelodyControlsProps> = ({
 
       {onToggleChordMode && (
         <button
-          className="chord-mode-toggle"
+          className={`chord-mode-toggle ${isFlashing ? 'flashing' : ''}`}
           onClick={onToggleChordMode}
           title={`Switch to ${chordMode === 'arpeggiator' ? 'progression' : 'arpeggiator'} mode`}
           aria-label={`Chord mode: ${chordMode}`}

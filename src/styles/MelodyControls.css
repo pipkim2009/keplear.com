@@ -100,6 +100,80 @@
   color: #003d7a !important;
 }
 
+/* Chord Mode Toggle - matches BPM and Beats input colors */
+.chord-mode-toggle {
+  background: rgba(0, 123, 255, 0.1);
+  border: 2px solid #007bff;
+  color: #007bff;
+  font-weight: 600;
+  text-align: center;
+  min-width: 120px;
+  width: 120px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  height: 35px;
+  line-height: 1.2;
+  font-size: 12px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  margin: 0 auto 20px auto;
+  display: block;
+}
+
+.chord-mode-toggle:hover {
+  background: rgba(0, 123, 255, 0.15);
+  border-color: #007bff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.chord-mode-toggle:focus {
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  border-color: #007bff;
+}
+
+.chord-mode-toggle:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Green flash for chord mode toggle when mode changes */
+.chord-mode-toggle.flashing {
+  border-color: #10b981 !important;
+  border-width: 4px !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.8) !important;
+  background: rgba(16, 185, 129, 0.4) !important;
+  transition: none !important;
+  transform: scale(1.05) !important;
+}
+
+.light .chord-mode-toggle.flashing {
+  border-color: #10b981 !important;
+  border-width: 4px !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 1) !important;
+  background: rgba(16, 185, 129, 0.5) !important;
+  transition: none !important;
+  transform: scale(1.05) !important;
+}
+
+.light .chord-mode-toggle {
+  background: rgba(0, 128, 255, 0.12);
+  border-color: rgba(0, 128, 255, 0.4);
+  color: #003d7a;
+}
+
+.light .chord-mode-toggle:hover {
+  background: rgba(0, 128, 255, 0.2);
+  border-color: rgba(0, 128, 255, 0.6);
+}
+
+.light .chord-mode-toggle:focus {
+  box-shadow: 0 0 0 2px rgba(0, 128, 255, 0.4);
+  border-color: rgba(0, 128, 255, 0.7);
+}
+
 .selected-notes {
   font-size: 18px;
   font-weight: 600;

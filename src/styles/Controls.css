@@ -637,7 +637,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   outline: none;
   min-width: 120px;
   width: 120px;
@@ -2085,7 +2084,6 @@ select.control-input.flashing {
   border: 1px solid #dee2e6;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   margin: 0;
 }
 
@@ -2268,7 +2266,6 @@ select.control-input.flashing {
   border-radius: 8px;
   overflow: visible;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .modern-control-item .input-with-buttons:focus-within {
@@ -2372,8 +2369,8 @@ select.control-input.flashing {
   }
 
   .modern-control-item .input-with-buttons:focus-within {
-    border-color: #20c997;
-    box-shadow: 0 0 0 3px rgba(32, 201, 151, 0.1);
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
   }
 
   .modern-control-item .control-input {

@@ -285,28 +285,52 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     return isInScaleChordLayer || isInManualLayer
   }, [scaleSelectedNotes, chordSelectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes])
 
+  // Check if a note is in the manual layer (manually selected)
+  const isNoteInManualLayer = useCallback((stringIndex: number, fretIndex: number): boolean => {
+    const noteKey = `${stringIndex}-${fretIndex}`
+    const isManuallySelected = manualSelectedNotes.has(noteKey)
+    const isStringSelected = stringCheckboxes[stringIndex]
+    const isFretSelected = fretCheckboxes[fretIndex + 1] // Adjust for open fret offset
+    const isCheckboxSelected = isStringSelected || isFretSelected
+    return isManuallySelected || isCheckboxSelected
+  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+
+  // Check if an open string is in the manual layer (manually selected)
+  const isOpenStringInManualLayer = useCallback((stringIndex: number): boolean => {
+    const openKey = `${stringIndex}-open`
+    const isManuallySelected = manualSelectedNotes.has(openKey)
+    const isStringSelected = stringCheckboxes[stringIndex]
+    const isOpenFretSelected = fretCheckboxes[0]
+    const isCheckboxSelected = isStringSelected || isOpenFretSelected
+    return isManuallySelected || isCheckboxSelected
+  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+
   // Convert guitar notes to the Note format expected by the melody system
   const convertToMelodyNotes = useCallback((): Note[] => {
     const melodyNotes: Note[] = []
-    
+
     // Check open strings first
     for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
       if (isOpenStringSelected(stringIndex)) {
         const stringMapping = [6, 5, 4, 3, 2, 1] // Map visual index to guitar string number
         const guitarString = stringMapping[stringIndex]
         const openNote = guitarNotes.find(note => note.string === guitarString && note.fret === 0)
-        
+
         if (openNote) {
+          // Check if this note is in the manual layer
+          const isManual = isOpenStringInManualLayer(stringIndex)
+
           melodyNotes.push({
             name: openNote.name,
             frequency: openNote.frequency,
             isBlack: openNote.name.includes('#'),
-            position: stringIndex * 100 - 1 // Position for open strings
+            position: stringIndex * 100 - 1, // Position for open strings
+            isManualSelection: isManual // Tag whether this is a manual selection
           })
         }
       }
     }
-    
+
     // Check all fretted note positions
     for (let stringIndex = 0; stringIndex < 6; stringIndex++) {
       for (let fretIndex = 0; fretIndex < 24; fretIndex++) {
@@ -316,16 +340,20 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             // Find the corresponding guitar note for frequency
             const stringMapping = [6, 5, 4, 3, 2, 1] // Map visual index to guitar string number
             const guitarString = stringMapping[stringIndex]
-            const guitarNote = guitarNotes.find(note => 
+            const guitarNote = guitarNotes.find(note =>
               note.string === guitarString && note.fret === fretIndex + 1
             )
-            
+
+            // Check if this note is in the manual layer
+            const isManual = isNoteInManualLayer(stringIndex, fretIndex)
+
             // Convert to melody system format
             melodyNotes.push({
               name: noteName,
               frequency: guitarNote ? guitarNote.frequency : 0,
               isBlack: noteName.includes('#'),
-              position: stringIndex * 100 + fretIndex // Unique position for guitar notes
+              position: stringIndex * 100 + fretIndex, // Unique position for guitar notes
+              isManualSelection: isManual // Tag whether this is a manual selection
             })
           }
         }
@@ -333,7 +361,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     }
 
     return melodyNotes
-  }, [isOpenStringSelected, isNoteSelected, getNoteForStringAndFret, guitarNotes])
+  }, [isOpenStringSelected, isNoteSelected, getNoteForStringAndFret, guitarNotes, isOpenStringInManualLayer, isNoteInManualLayer])
 
 
   // Auto-apply checkboxes when all individual notes are selected
@@ -749,26 +777,6 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     const noteKey = `${stringIndex}-open`
     return chordSelectedNotes.has(noteKey)
   }, [chordSelectedNotes])
-
-  // Check if a note is in the manual layer (manually selected)
-  const isNoteInManualLayer = useCallback((stringIndex: number, fretIndex: number): boolean => {
-    const noteKey = `${stringIndex}-${fretIndex}`
-    const isManuallySelected = manualSelectedNotes.has(noteKey)
-    const isStringSelected = stringCheckboxes[stringIndex]
-    const isFretSelected = fretCheckboxes[fretIndex + 1] // Adjust for open fret offset
-    const isCheckboxSelected = isStringSelected || isFretSelected
-    return isManuallySelected || isCheckboxSelected
-  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
-
-  // Check if an open string is in the manual layer (manually selected)
-  const isOpenStringInManualLayer = useCallback((stringIndex: number): boolean => {
-    const openKey = `${stringIndex}-open`
-    const isManuallySelected = manualSelectedNotes.has(openKey)
-    const isStringSelected = stringCheckboxes[stringIndex]
-    const isOpenFretSelected = fretCheckboxes[0]
-    const isCheckboxSelected = isStringSelected || isOpenFretSelected
-    return isManuallySelected || isCheckboxSelected
-  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
 
   // Check if a note should show preview on string hover
   const shouldShowStringPreview = useCallback((stringIndex: number): boolean => {

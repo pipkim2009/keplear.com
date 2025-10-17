@@ -82,45 +82,15 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     // Use provided notes snapshot or current selectedNotes
     let currentSelectedNotes = [...(notesToUse || selectedNotes)]
 
-    // Add notes from applied chords (for arpeggiator mode)
-    if (appliedChords && appliedChords.length > 0 && chordMode === 'arpeggiator') {
-      appliedChords.forEach(chord => {
-        if (chord.notes && chord.notes.length > 0) {
-          chord.notes.forEach(note => {
-            // Avoid duplicates by checking if note already exists
-            if (!currentSelectedNotes.some(n => n.name === note.name)) {
-              currentSelectedNotes.push(note)
-            }
-          })
-        }
-      })
-    }
-
-    // Add notes from applied scales
-    if (appliedScales && appliedScales.length > 0) {
-      appliedScales.forEach(scale => {
-        if (scale.notes && scale.notes.length > 0) {
-          scale.notes.forEach(note => {
-            // Avoid duplicates by checking if note already exists
-            if (!currentSelectedNotes.some(n => n.name === note.name)) {
-              currentSelectedNotes.push(note)
-            }
-          })
-        }
-      })
-    }
-
-    // If after all that we still have no notes, bail out
-    if (currentSelectedNotes.length === 0 && chordMode !== 'progression') {
-      console.warn('No notes available for melody generation')
-      return
-    }
-
-    // PROGRESSION MODE: Generate chord progression melody
-    // If both chords AND individual notes are selected, automatically mix them
+    // PROGRESSION MODE: Keep manually selected notes separate
+    // In progression mode, manually selected notes should ONLY be the actual selections,
+    // not including any notes from applied chords or scales
     if (chordMode === 'progression' && appliedChords && appliedChords.length > 0) {
       const melody: Note[] = []
-      const hasIndividualNotes = currentSelectedNotes.length > 0
+
+      // Filter to ONLY manually selected notes (not chord/scale notes)
+      const manualNotes = currentSelectedNotes.filter(note => note.isManualSelection === true)
+      const hasIndividualNotes = manualNotes.length > 0
 
       for (let i = 0; i < numberOfNotes; i++) {
         // If we have both chords and individual notes, mix them (50/50 chance)
@@ -155,11 +125,19 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
             melody.push(noteWithChordInfo)
           }
         } else {
-          // Pick a random individual note from selected notes
-          // This includes notes from applied chords + any additional manual selections
-          const randomNote = currentSelectedNotes[Math.floor(Math.random() * currentSelectedNotes.length)]
-          // No chord group info = plays as single note
-          melody.push(randomNote)
+          // Pick a random individual note from ONLY manually selected notes
+          // IMPORTANT: Strip any chordGroup info to ensure it plays as a single note
+          const randomNote = manualNotes[Math.floor(Math.random() * manualNotes.length)]
+
+          // Create a clean copy without chordGroup info
+          const cleanNote: Note = {
+            name: randomNote.name,
+            frequency: randomNote.frequency,
+            position: randomNote.position,
+            octave: randomNote.octave
+          }
+
+          melody.push(cleanNote)
         }
       }
 
@@ -169,6 +147,41 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
       }
 
       setGeneratedMelody(melody)
+      return
+    }
+
+    // ARPEGGIATOR MODE: Add notes from applied chords and scales
+    // Add notes from applied chords (for arpeggiator mode only)
+    if (appliedChords && appliedChords.length > 0 && chordMode === 'arpeggiator') {
+      appliedChords.forEach(chord => {
+        if (chord.notes && chord.notes.length > 0) {
+          chord.notes.forEach(note => {
+            // Avoid duplicates by checking if note already exists
+            if (!currentSelectedNotes.some(n => n.name === note.name)) {
+              currentSelectedNotes.push(note)
+            }
+          })
+        }
+      })
+    }
+
+    // Add notes from applied scales (for arpeggiator mode only)
+    if (appliedScales && appliedScales.length > 0) {
+      appliedScales.forEach(scale => {
+        if (scale.notes && scale.notes.length > 0) {
+          scale.notes.forEach(note => {
+            // Avoid duplicates by checking if note already exists
+            if (!currentSelectedNotes.some(n => n.name === note.name)) {
+              currentSelectedNotes.push(note)
+            }
+          })
+        }
+      })
+    }
+
+    // If after all that we still have no notes, bail out
+    if (currentSelectedNotes.length === 0) {
+      console.warn('No notes available for melody generation')
       return
     }
 
