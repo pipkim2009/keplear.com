@@ -354,8 +354,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(128, 128, 128, 0.2);
-  border: 2px solid #666666;
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 2px solid #3b82f6;
   transition: all 0.3s ease;
   border-radius: 6px;
   display: flex;
@@ -389,7 +389,7 @@
   width: 58px;
   left: 0px;
   top: 0px;
-  background-color: #f97316;
+  background-color: #3b82f6;
   transition: all 0.3s ease;
   border-radius: 4px;
   z-index: 1;
@@ -411,13 +411,13 @@
 
 /* Chords mode (checked) */
 input:checked + .toggle-slider {
-  background-color: rgba(128, 128, 128, 0.2);
-  border-color: #666666;
+  background-color: rgba(59, 130, 246, 0.1);
+  border-color: #3b82f6;
 }
 
 input:checked + .toggle-slider:before {
   transform: translateX(58px);
-  background-color: #8b5cf6;
+  background-color: #3b82f6;
 }
 
 input:checked + .toggle-slider .toggle-text.left {
@@ -434,11 +434,11 @@ input:checked + .toggle-slider .toggle-text.right {
 }
 
 .toggle-slider:hover {
-  background-color: rgba(128, 128, 128, 0.3);
+  background-color: rgba(59, 130, 246, 0.2);
 }
 
 input:checked + .toggle-slider:hover {
-  background-color: rgba(128, 128, 128, 0.3);
+  background-color: rgba(59, 130, 246, 0.2);
 }
 
 /* Mobile responsive styles for scale options toggle */
