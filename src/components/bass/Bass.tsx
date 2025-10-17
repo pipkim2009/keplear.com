@@ -261,25 +261,51 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     return isInScaleChordLayer || isInManualLayer
   }, [scaleSelectedNotes, chordSelectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes])
 
+  // Check if a note is in the manual layer (manually selected)
+  const isNoteInManualLayer = useCallback((stringIndex: number, fretIndex: number): boolean => {
+    const noteKey = `${stringIndex}-${fretIndex}`
+    const isManuallySelected = manualSelectedNotes.has(noteKey)
+    const isStringSelected = stringCheckboxes[stringIndex]
+    const isFretSelected = fretCheckboxes[fretIndex + 1]
+    const isCheckboxSelected = isStringSelected || isFretSelected
+    return isManuallySelected || isCheckboxSelected
+  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+
+  // Check if an open string is in the manual layer (manually selected)
+  const isOpenStringInManualLayer = useCallback((stringIndex: number): boolean => {
+    const openKey = `${stringIndex}-open`
+    const isManuallySelected = manualSelectedNotes.has(openKey)
+    const isStringSelected = stringCheckboxes[stringIndex]
+    const isOpenFretSelected = fretCheckboxes[0]
+    const isCheckboxSelected = isStringSelected || isOpenFretSelected
+    return isManuallySelected || isCheckboxSelected
+  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+
   const convertToMelodyNotes = useCallback((): Note[] => {
     const melodyNotes: Note[] = []
 
+    // Check open strings first
     for (let stringIndex = 0; stringIndex < 4; stringIndex++) {
       if (isOpenStringSelected(stringIndex)) {
         const bassString = STRING_MAPPING[stringIndex]
         const openNote = bassNotes.find(note => note.string === bassString && note.fret === 0)
 
         if (openNote) {
+          // Check if this note is in the manual layer
+          const isManual = isOpenStringInManualLayer(stringIndex)
+
           melodyNotes.push({
             name: openNote.name,
             frequency: openNote.frequency,
             isBlack: openNote.name.includes('#'),
-            position: stringIndex * 100 - 1
+            position: stringIndex * 100 - 1,
+            isManualSelection: isManual // Tag whether this is a manual selection
           })
         }
       }
     }
 
+    // Check all fretted note positions
     for (let stringIndex = 0; stringIndex < 4; stringIndex++) {
       for (let fretIndex = 0; fretIndex < 24; fretIndex++) {
         if (isNoteSelected(stringIndex, fretIndex)) {
@@ -290,11 +316,15 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               note.string === bassString && note.fret === fretIndex + 1
             )
 
+            // Check if this note is in the manual layer
+            const isManual = isNoteInManualLayer(stringIndex, fretIndex)
+
             melodyNotes.push({
               name: noteName,
               frequency: bassNote ? bassNote.frequency : 0,
               isBlack: noteName.includes('#'),
-              position: stringIndex * 100 + fretIndex
+              position: stringIndex * 100 + fretIndex,
+              isManualSelection: isManual // Tag whether this is a manual selection
             })
           }
         }
@@ -302,7 +332,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     }
 
     return melodyNotes
-  }, [isOpenStringSelected, isNoteSelected, getNoteForStringAndFret, bassNotes])
+  }, [isOpenStringSelected, isNoteSelected, getNoteForStringAndFret, bassNotes, isOpenStringInManualLayer, isNoteInManualLayer])
 
   const lastSyncedState = useRef<string>('')
 
@@ -626,24 +656,6 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     const noteKey = `${stringIndex}-open`
     return chordSelectedNotes.has(noteKey)
   }, [chordSelectedNotes])
-
-  const isNoteInManualLayer = useCallback((stringIndex: number, fretIndex: number): boolean => {
-    const noteKey = `${stringIndex}-${fretIndex}`
-    const isManuallySelected = manualSelectedNotes.has(noteKey)
-    const isStringSelected = stringCheckboxes[stringIndex]
-    const isFretSelected = fretCheckboxes[fretIndex + 1]
-    const isCheckboxSelected = isStringSelected || isFretSelected
-    return isManuallySelected || isCheckboxSelected
-  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
-
-  const isOpenStringInManualLayer = useCallback((stringIndex: number): boolean => {
-    const openKey = `${stringIndex}-open`
-    const isManuallySelected = manualSelectedNotes.has(openKey)
-    const isStringSelected = stringCheckboxes[stringIndex]
-    const isOpenFretSelected = fretCheckboxes[0]
-    const isCheckboxSelected = isStringSelected || isOpenFretSelected
-    return isManuallySelected || isCheckboxSelected
-  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
 
   const shouldShowStringPreview = useCallback((stringIndex: number): boolean => {
     return hoveredString === stringIndex && !stringCheckboxes[stringIndex]
