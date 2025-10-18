@@ -883,8 +883,11 @@ Progression - Use entire chords"
               </div>
               <select
                 value={chordMode}
-                onChange={(e) => setChordMode(e.target.value as ChordMode)}
-                className="control-input chord-mode-select"
+                onChange={(e) => {
+                  triggerInputFlash('mode')
+                  setChordMode(e.target.value as ChordMode)
+                }}
+                className={`control-input chord-mode-select ${flashingInputs.mode ? 'flashing' : ''}`}
                 style={{ color: '#ffffff', fontWeight: '600' }}
               >
                 <option value="arpeggiator">Arpeggiator</option>
