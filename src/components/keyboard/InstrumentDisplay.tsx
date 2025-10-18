@@ -161,6 +161,56 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     }
   }, [lowerOctaves, higherOctaves, onOctaveRangeChange])
 
+  // Clean up notes, chords, and scales when octave range changes (keyboard only)
+  useEffect(() => {
+    if (instrument !== 'keyboard') return
+
+    // Calculate visible octave range (base is 4-5, can be expanded)
+    const minVisibleOctave = Math.max(1, 4 - lowerOctaves)
+    const maxVisibleOctave = Math.min(8, 5 + higherOctaves)
+
+    // Helper to extract octave from note name (e.g., "C4" -> 4)
+    const getNoteOctave = (noteName: string): number => {
+      const octaveMatch = noteName.match(/\d+$/)
+      return octaveMatch ? parseInt(octaveMatch[0]) : 0
+    }
+
+    // Helper to check if a note is in visible range
+    const isNoteInVisibleRange = (note: Note): boolean => {
+      const octave = getNoteOctave(note.name)
+      return octave >= minVisibleOctave && octave <= maxVisibleOctave
+    }
+
+    // Remove selected notes outside visible range
+    const notesToRemove = selectedNotes.filter(note => !isNoteInVisibleRange(note))
+    if (notesToRemove.length > 0 && selectNote) {
+      // Remove each note that's outside the range
+      notesToRemove.forEach(note => {
+        selectNote(note, keyboardSelectionMode)
+      })
+    }
+
+    // Remove applied chords that have any notes outside visible range
+    const chordsToRemove = appliedChords.filter(chord => {
+      if (!chord.notes || chord.notes.length === 0) return false
+      // If any note in the chord is outside the visible range, remove the chord
+      return chord.notes.some((note: Note) => !isNoteInVisibleRange(note))
+    })
+    chordsToRemove.forEach(chord => {
+      handleChordDelete(chord.id)
+    })
+
+    // Remove applied scales that have any notes outside visible range
+    const scalesToRemove = appliedScales.filter(scale => {
+      if (!scale.notes || scale.notes.length === 0) return false
+      // If any note in the scale is outside the visible range, remove the scale
+      return scale.notes.some((note: Note) => !isNoteInVisibleRange(note))
+    })
+    scalesToRemove.forEach(scale => {
+      handleScaleDelete(scale.id)
+    })
+  }, [lowerOctaves, higherOctaves, instrument, selectedNotes, appliedChords, appliedScales, selectNote, keyboardSelectionMode, handleChordDelete, handleScaleDelete])
+
   return (
     <>
       <div className={`instrument-controls-container ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`} data-instrument={instrument}>
