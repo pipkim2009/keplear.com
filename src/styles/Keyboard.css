@@ -302,8 +302,6 @@
     0 0 40px rgba(245, 158, 11, 0.6),
     inset 0 2px 4px rgba(255, 255, 255, 0.8),
     inset 0 -2px 4px rgba(0, 0, 0, 0.1) !important;
-  transform: scale(1.05);
-  animation: pulse-playing 0.3s ease-in-out;
 }
 
 @keyframes pulse-playing {
@@ -352,8 +350,6 @@
     0 0 40px rgba(245, 158, 11, 0.6),
     inset 0 2px 4px rgba(255, 255, 255, 0.8),
     inset 0 -2px 4px rgba(0, 0, 0, 0.1) !important;
-  transform: scale(1.05) !important;
-  animation: pulse-playing 0.3s ease-in-out !important;
 }
 
 .white-key:last-child {
@@ -423,8 +419,6 @@
     0 0 40px rgba(245, 158, 11, 0.6),
     inset 0 1px 2px rgba(255, 255, 255, 0.1),
     inset 0 -1px 2px rgba(0, 0, 0, 0.3) !important;
-  transform: scale(1.05);
-  animation: pulse-playing 0.3s ease-in-out;
 }
 
 /* Ensure melody (green) takes precedence over all other states EXCEPT currently-playing */
@@ -468,18 +462,23 @@
     0 0 40px rgba(245, 158, 11, 0.6),
     inset 0 1px 2px rgba(255, 255, 255, 0.1),
     inset 0 -1px 2px rgba(0, 0, 0, 0.3) !important;
-  transform: scale(1.05) !important;
-  animation: pulse-playing 0.3s ease-in-out !important;
+}
+
+/* Dim all non-melody notes when melody is active */
+.keyboard.melody-active .white-key:not(.melody):not(.currently-playing),
+.keyboard.melody-active .black-key:not(.melody):not(.currently-playing) {
+  opacity: 0.2 !important;
+  transition: opacity 0.2s ease;
 }
 
 /* Scale highlighting for keyboard keys */
 .white-key.scale-note {
-  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  background: linear-gradient(145deg, #f97316, #ea580c);
   border-color: #ffffff;
 }
 
 .black-key.scale-note {
-  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  background: linear-gradient(145deg, #f97316, #ea580c);
   border-color: #ffffff;
 }
 
@@ -505,12 +504,12 @@
 
 /* Ensure scale styling takes precedence over selected when both are active */
 .white-key.selected.scale-note {
-  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  background: linear-gradient(145deg, #f97316, #ea580c);
   border-color: #ffffff;
 }
 
 .black-key.selected.scale-note {
-  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  background: linear-gradient(145deg, #f97316, #ea580c);
   border-color: #ffffff;
 }
 
@@ -979,4 +978,11 @@
     inset 0 -1px 2px rgba(0, 0, 0, 0.3),
     0 0 8px rgba(220, 38, 38, 0.6),
     0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* DIMMING - MUST BE LAST */
+.keyboard.melody-active .white-key:not(.melody):not(.currently-playing),
+.keyboard.melody-active .black-key:not(.melody):not(.currently-playing) {
+  opacity: 0.5 !important;
+  filter: brightness(0.7) !important;
 }

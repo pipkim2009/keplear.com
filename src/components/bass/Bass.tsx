@@ -711,7 +711,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
   return (
     <div className="bass-container">
-      <div className="bass-fretboard">
+      <div className={`bass-fretboard ${showNotes ? 'melody-active' : ''}`}>
         {/* Open fret checkbox */}
         <div className="bass-fret-checkbox-container" style={{ left: '4.5px', bottom: '-40px' }}>
           <input

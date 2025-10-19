@@ -75,7 +75,7 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
 
   return (
     <div className="keyboard-container">
-      <div className={`keyboard ${!hasExtendedRange ? 'default-mode' : ''}`}>
+      <div className={`keyboard ${!hasExtendedRange ? 'default-mode' : ''} ${showNotes ? 'melody-active' : ''}`}>
         {/* White Keys */}
         {currentWhiteKeys.map((note) => (
           <KeyboardKey

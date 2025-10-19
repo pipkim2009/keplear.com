@@ -315,7 +315,6 @@
   box-shadow:
     0 3px 5px var(--black-alpha-40),
     inset 0 1px 3px var(--white-alpha-30);
-  animation: bassNoteAppear 0.3s ease-out;
   pointer-events: none;
 }
 
@@ -370,8 +369,6 @@
     0 0 40px rgba(245, 158, 11, 0.6),
     inset 0 1px 2px rgba(255, 255, 255, 0.8),
     inset 0 -1px 2px rgba(0, 0, 0, 0.1) !important;
-  transform: scale(1.15) !important;
-  animation: bass-pulse-playing 0.3s ease-in-out !important;
   width: 22px !important;
   height: 22px !important;
   border-radius: 50% !important;
@@ -390,6 +387,12 @@
   height: 22px !important;
   border-radius: 50% !important;
   padding: 0 !important;
+}
+
+/* Dim all non-melody notes when melody is active */
+.bass-fretboard.melody-active .bass-note-circle:not(.melody-note):not(.currently-playing) {
+  opacity: 0.2 !important;
+  transition: opacity 0.2s ease;
 }
 
 .bass-note-name {
@@ -845,4 +848,9 @@
 .bass-container {
   scrollbar-width: auto;
   scrollbar-color: var(--scrollbar-guitar-thumb-primary) var(--scrollbar-guitar-track);
+}
+/* DIMMING - MUST BE LAST */
+.bass-fretboard.melody-active .bass-note-circle:not(.melody-note):not(.currently-playing) {
+  opacity: 0.5 !important;
+  filter: brightness(0.7) !important;
 }
