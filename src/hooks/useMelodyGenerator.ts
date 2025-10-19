@@ -82,52 +82,52 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
     // Use provided notes snapshot or current selectedNotes
     let currentSelectedNotes = [...(notesToUse || selectedNotes)]
 
-    // PROGRESSION MODE: Keep manually selected notes separate
-    // In progression mode, manually selected notes should ONLY be the actual selections,
-    // not including any notes from applied chords or scales
+    // PROGRESSION MODE: Treat chords as pool options alongside individual notes
+    // In progression mode, chords and individual notes are all options that can be randomly selected
     if (chordMode === 'progression' && appliedChords && appliedChords.length > 0) {
       const melody: Note[] = []
 
-      // Filter to ONLY manually selected notes (not chord/scale notes)
-      const manualNotes = currentSelectedNotes.filter(note => note.isManualSelection === true)
-      const hasIndividualNotes = manualNotes.length > 0
+      // Collect manually selected notes
+      // For keyboard: all notes in currentSelectedNotes are manual (no isManualSelection flag)
+      // For guitar/bass: only notes with isManualSelection === true are manual
+      const manualNotes = currentSelectedNotes.filter(note =>
+        note.isManualSelection === true || note.isManualSelection === undefined
+      )
+
+      // Collect scale notes to add to the single note pool
+      const scaleNotes: Note[] = []
+      if (appliedScales && appliedScales.length > 0) {
+        appliedScales.forEach(scale => {
+          if (scale.notes && scale.notes.length > 0) {
+            scale.notes.forEach(note => {
+              // Avoid duplicates
+              if (!scaleNotes.some(n => n.name === note.name)) {
+                scaleNotes.push(note)
+              }
+            })
+          }
+        })
+      }
+
+      // Combine manual notes and scale notes as individual options
+      const individualNotes = [...manualNotes, ...scaleNotes]
+
+      // Build the pool: each individual note is one option, each chord is one option
+      // This way chords can randomly appear in the melody alongside single notes
+      const totalPoolSize = individualNotes.length + appliedChords.length
+
+      if (totalPoolSize === 0) {
+        console.warn('No notes or chords available for progression mode')
+        return
+      }
 
       for (let i = 0; i < numberOfNotes; i++) {
-        // If we have both chords and individual notes, mix them (50/50 chance)
-        const useChord = hasIndividualNotes ? Math.random() < 0.5 : true
+        // Pick a random index from the combined pool
+        const randomIndex = Math.floor(Math.random() * totalPoolSize)
 
-        if (useChord) {
-          // Pick a random chord group for this beat
-          const randomChordGroup = appliedChords[Math.floor(Math.random() * appliedChords.length)]
-          const chordNotes = randomChordGroup.notes || []
-
-          if (chordNotes.length > 0) {
-            // Pick a random note from this chord (just for melody display)
-            const randomNote = chordNotes[Math.floor(Math.random() * chordNotes.length)]
-
-            // Validate that the note has valid properties
-            if (!randomNote || !randomNote.name || typeof randomNote.frequency !== 'number') {
-              console.warn('Invalid note in chord group:', randomNote, randomChordGroup)
-              continue
-            }
-
-            // Create a new note with chord group information
-            const noteWithChordInfo: Note = {
-              ...randomNote,
-              chordGroup: {
-                id: randomChordGroup.id,
-                displayName: randomChordGroup.displayName,
-                rootNote: randomChordGroup.root,
-                allNotes: chordNotes.filter(n => n && n.name).map(n => n.name)
-              }
-            }
-
-            melody.push(noteWithChordInfo)
-          }
-        } else {
-          // Pick a random individual note from ONLY manually selected notes
-          // IMPORTANT: Strip any chordGroup info to ensure it plays as a single note
-          const randomNote = manualNotes[Math.floor(Math.random() * manualNotes.length)]
+        if (randomIndex < individualNotes.length) {
+          // Picked an individual note
+          const randomNote = individualNotes[randomIndex]
 
           // Create a clean copy without chordGroup info
           const cleanNote: Note = {
@@ -138,6 +138,35 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
           }
 
           melody.push(cleanNote)
+        } else {
+          // Picked a chord
+          const chordIndex = randomIndex - individualNotes.length
+          const selectedChord = appliedChords[chordIndex]
+          const chordNotes = selectedChord.notes || []
+
+          if (chordNotes.length > 0) {
+            // Pick a random note from this chord (just for melody display)
+            const randomNote = chordNotes[Math.floor(Math.random() * chordNotes.length)]
+
+            // Validate that the note has valid properties
+            if (!randomNote || !randomNote.name || typeof randomNote.frequency !== 'number') {
+              console.warn('Invalid note in chord group:', randomNote, selectedChord)
+              continue
+            }
+
+            // Create a new note with chord group information
+            const noteWithChordInfo: Note = {
+              ...randomNote,
+              chordGroup: {
+                id: selectedChord.id,
+                displayName: selectedChord.displayName,
+                rootNote: selectedChord.root,
+                allNotes: chordNotes.filter(n => n && n.name).map(n => n.name)
+              }
+            }
+
+            melody.push(noteWithChordInfo)
+          }
         }
       }
 
