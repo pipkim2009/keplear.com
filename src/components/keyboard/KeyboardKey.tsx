@@ -13,6 +13,7 @@ interface KeyboardKeyProps {
   isRoot?: boolean
   isInChord?: boolean
   isChordRoot?: boolean
+  isCurrentlyPlaying?: boolean
 }
 
 const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
@@ -26,11 +27,13 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
   isInScale = false,
   isRoot = false,
   isInChord = false,
-  isChordRoot = false
+  isChordRoot = false,
+  isCurrentlyPlaying = false
 }) => {
   const baseClass = useMemo(() => note.isBlack ? 'black-key' : 'white-key', [note.isBlack])
   const selectedClass = isSelected ? 'selected' : ''
   const melodyClass = isInMelody ? 'melody' : ''
+  const playingClass = isCurrentlyPlaying ? 'currently-playing' : ''
 
   // Memoize the note type class calculation
   const noteTypeClass = useMemo(() => {
@@ -83,8 +86,8 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
   }, [onClick, note])
 
   const classNames = useMemo(() => {
-    return `${baseClass} ${selectedClass} ${melodyClass} ${noteTypeClass} ${className}`.trim()
-  }, [baseClass, selectedClass, melodyClass, noteTypeClass, className])
+    return `${baseClass} ${selectedClass} ${melodyClass} ${playingClass} ${noteTypeClass} ${className}`.trim()
+  }, [baseClass, selectedClass, melodyClass, playingClass, noteTypeClass, className])
 
   return (
     <button
@@ -109,6 +112,7 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
     prevProps.isRoot === nextProps.isRoot &&
     prevProps.isInChord === nextProps.isInChord &&
     prevProps.isChordRoot === nextProps.isChordRoot &&
+    prevProps.isCurrentlyPlaying === nextProps.isCurrentlyPlaying &&
     prevProps.className === nextProps.className
   )
 })

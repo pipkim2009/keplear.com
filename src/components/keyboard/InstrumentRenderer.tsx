@@ -25,6 +25,8 @@ interface InstrumentRendererProps {
   isNoteKeyboardRoot: (note: Note) => boolean
   isNoteInKeyboardChord: (note: Note) => boolean
   isNoteKeyboardChordRoot: (note: Note) => boolean
+  currentlyPlayingNote?: Note | null
+  currentlyPlayingNoteNames?: string[]
   onScaleHandlersReady: (handlers: {
     handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
     handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
@@ -69,6 +71,8 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
   isNoteKeyboardRoot,
   isNoteInKeyboardChord,
   isNoteKeyboardChordRoot,
+  currentlyPlayingNote,
+  currentlyPlayingNoteNames,
   onScaleHandlersReady,
   onBassScaleHandlersReady,
   onChordHandlersReady,
@@ -91,6 +95,8 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           isNoteRoot={isNoteKeyboardRoot}
           isNoteInChord={isNoteInKeyboardChord}
           isNoteChordRoot={isNoteKeyboardChordRoot}
+          currentlyPlayingNote={currentlyPlayingNote}
+          currentlyPlayingNoteNames={currentlyPlayingNoteNames}
         />
       ) : instrument === 'guitar' ? (
         <Guitar
@@ -103,6 +109,8 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           onChordHandlersReady={onChordHandlersReady}
           appliedScales={appliedScales}
           appliedChords={appliedChords}
+          currentlyPlayingNote={currentlyPlayingNote}
+          currentlyPlayingNoteNames={currentlyPlayingNoteNames}
         />
       ) : (
         <Bass
@@ -115,6 +123,8 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           onChordHandlersReady={onBassChordHandlersReady}
           appliedScales={appliedScales}
           appliedChords={appliedChords}
+          currentlyPlayingNote={currentlyPlayingNote}
+          currentlyPlayingNoteNames={currentlyPlayingNoteNames}
         />
       )}
     </div>

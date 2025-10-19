@@ -16,6 +16,8 @@ interface KeyboardProps {
   isNoteRoot?: (note: Note) => boolean
   isNoteInChord?: (note: Note) => boolean
   isNoteChordRoot?: (note: Note) => boolean
+  currentlyPlayingNote?: Note | null
+  currentlyPlayingNoteNames?: string[]
 }
 
 const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
@@ -29,7 +31,9 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   isNoteInScale,
   isNoteRoot,
   isNoteInChord,
-  isNoteChordRoot
+  isNoteChordRoot,
+  currentlyPlayingNote = null,
+  currentlyPlayingNoteNames = []
 }) {
   const hasExtendedRange = lowerOctaves !== 0 || higherOctaves !== 0
 
@@ -51,6 +55,12 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   const isNoteVisible = useCallback((note: Note): boolean => {
     return isManuallySelected(note) || isInScaleChordLayer(note)
   }, [isManuallySelected, isInScaleChordLayer])
+
+  // Check if a note is currently playing (only highlight when notes are shown)
+  // Supports both single notes and chords (multiple notes playing simultaneously)
+  const isNoteCurrentlyPlaying = useCallback((note: Note): boolean => {
+    return showNotes && currentlyPlayingNoteNames.length > 0 && currentlyPlayingNoteNames.includes(note.name)
+  }, [currentlyPlayingNoteNames, showNotes])
 
   // Memoize expensive key generation
   const currentWhiteKeys = useMemo(
@@ -79,6 +89,7 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
             isRoot={isNoteRoot ? isNoteRoot(note) : false}
             isInChord={isNoteInChord ? isNoteInChord(note) : false}
             isChordRoot={isNoteChordRoot ? isNoteChordRoot(note) : false}
+            isCurrentlyPlaying={isNoteCurrentlyPlaying(note)}
           />
         ))}
 
@@ -101,6 +112,7 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
                 isRoot={isNoteRoot ? isNoteRoot(note) : false}
                 isInChord={isNoteInChord ? isNoteInChord(note) : false}
                 isChordRoot={isNoteChordRoot ? isNoteChordRoot(note) : false}
+                isCurrentlyPlaying={isNoteCurrentlyPlaying(note)}
               />
             )
           })}

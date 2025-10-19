@@ -31,6 +31,7 @@ interface MelodyContextType {
   setPlaybackProgress: (progress: number) => void
   setMelodyDuration: (duration: number) => void
   calculateMelodyDuration: (notes: number, bpm: number) => number
+  currentlyPlayingNoteIndex: number | null
 
   // Recording
   recordedAudioBlob: Blob | null
@@ -188,6 +189,7 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
     setPlaybackProgress: melodyPlayer.setPlaybackProgress,
     setMelodyDuration: melodyPlayer.setMelodyDuration,
     calculateMelodyDuration: melodyPlayer.calculateMelodyDuration,
+    currentlyPlayingNoteIndex: melodyPlayer.currentlyPlayingNoteIndex,
 
     // Recording
     recordedAudioBlob: melodyPlayer.recordedAudioBlob,

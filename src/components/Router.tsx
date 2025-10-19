@@ -52,8 +52,11 @@ function Router() {
     recordedAudioBlob,
     hasChanges,
     isGeneratingMelody,
-    isAutoRecording
+    isAutoRecording,
+    currentlyPlayingNoteIndex,
+    handleCurrentlyPlayingNoteChange
   } = useInstrument()
+
   switch (currentPage) {
     case 'home':
       return (
@@ -110,6 +113,8 @@ function Router() {
           hasChanges={hasChanges}
           isGeneratingMelody={isGeneratingMelody}
           isAutoRecording={isAutoRecording}
+          currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
+          onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
         />
       )
 

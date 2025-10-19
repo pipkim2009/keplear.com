@@ -27,6 +27,7 @@ interface UseMelodyPlayerReturn {
   readonly recordedAudioBlob: Blob | null
   readonly isAutoRecording: boolean
   readonly showNotes: boolean
+  readonly currentlyPlayingNoteIndex: number | null
 
   // Actions
   setPlaybackProgress: (progress: number) => void
@@ -38,6 +39,7 @@ interface UseMelodyPlayerReturn {
   resetPlayback: () => void
   resetRecording: () => void
   clearAllAudio: () => void
+  setCurrentlyPlayingNoteIndex: (index: number | null) => void
 
   // Computed values
   calculateMelodyDuration: (melodyLength: number, bpm: number, instrument: InstrumentType) => number
@@ -128,19 +130,34 @@ export const useMelodyPlayer = ({
     dispatch({ type: 'CLEAR_ALL_AUDIO' })
   }, [])
 
+  const setCurrentlyPlayingNoteIndex = useCallback((index: number | null) => {
+    dispatch({ type: 'SET_CURRENTLY_PLAYING_NOTE', payload: index })
+  }, [])
+
   // Progress tracking effect - only for ToneJS playback
   useEffect(() => {
     let progressInterval: NodeJS.Timeout | null = null
 
     if (isPlaying && state.melodyDuration > 0) {
       const startTime = Date.now()
+      const noteDuration = (60 / bpm) * 1000 // Time between notes in milliseconds
+
       progressInterval = setInterval(() => {
         const elapsed = Date.now() - startTime
         if (elapsed >= state.melodyDuration) {
           dispatch({ type: 'SET_PLAYBACK_PROGRESS', payload: state.melodyDuration })
+          dispatch({ type: 'SET_CURRENTLY_PLAYING_NOTE', payload: null })
           clearInterval(progressInterval!)
         } else {
           dispatch({ type: 'SET_PLAYBACK_PROGRESS', payload: elapsed })
+
+          // Calculate which note is currently playing based on elapsed time
+          const currentNoteIndex = Math.floor(elapsed / noteDuration)
+          if (currentNoteIndex < generatedMelody.length) {
+            dispatch({ type: 'SET_CURRENTLY_PLAYING_NOTE', payload: currentNoteIndex })
+          } else {
+            dispatch({ type: 'SET_CURRENTLY_PLAYING_NOTE', payload: null })
+          }
         }
       }, 50) // Update every 50ms for smooth progress
     } else if (!isPlaying && !state.hasRecordedAudio) {
@@ -153,7 +170,7 @@ export const useMelodyPlayer = ({
         clearInterval(progressInterval)
       }
     }
-  }, [isPlaying, state.hasRecordedAudio, state.melodyDuration])
+  }, [isPlaying, state.hasRecordedAudio, state.melodyDuration, bpm, generatedMelody.length])
 
   // Auto-record melody when it changes
   useEffect(() => {
@@ -201,6 +218,7 @@ export const useMelodyPlayer = ({
     recordedAudioBlob: state.recordedAudioBlob,
     isAutoRecording: state.isAutoRecording,
     showNotes: state.showNotes,
+    currentlyPlayingNoteIndex: state.currentlyPlayingNoteIndex,
 
     // Actions
     setPlaybackProgress,
@@ -212,6 +230,7 @@ export const useMelodyPlayer = ({
     resetPlayback,
     resetRecording,
     clearAllAudio,
+    setCurrentlyPlayingNoteIndex,
 
     // Computed values
     calculateMelodyDuration

@@ -293,7 +293,25 @@
   border-color: #ffffff;
 }
 
-/* Ensure melody (green) takes precedence over all other states */
+/* Currently playing note - highest priority */
+.white-key.currently-playing {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b) !important;
+  border-color: #fef3c7 !important;
+  box-shadow:
+    0 0 20px rgba(251, 191, 36, 0.8),
+    0 0 40px rgba(245, 158, 11, 0.6),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1) !important;
+  transform: scale(1.05);
+  animation: pulse-playing 0.3s ease-in-out;
+}
+
+@keyframes pulse-playing {
+  0%, 100% { transform: scale(1.05); }
+  50% { transform: scale(1.08); }
+}
+
+/* Ensure melody (green) takes precedence over all other states EXCEPT currently-playing */
 .white-key.melody.scale-note,
 .white-key.melody.scale-root,
 .white-key.melody.chord-note,
@@ -311,6 +329,31 @@
 .white-key.melody.manual-scale-chord-root-note {
   background: linear-gradient(145deg, #4caf50, #2e7d32) !important;
   border-color: #ffffff !important;
+}
+
+/* Currently playing ALWAYS takes top priority - override everything including melody */
+.white-key.currently-playing,
+.white-key.currently-playing.melody,
+.white-key.currently-playing.selected,
+.white-key.currently-playing.scale-note,
+.white-key.currently-playing.scale-root,
+.white-key.currently-playing.chord-note,
+.white-key.currently-playing.chord-root,
+.white-key.currently-playing.melody.scale-note,
+.white-key.currently-playing.melody.scale-root,
+.white-key.currently-playing.melody.chord-note,
+.white-key.currently-playing.melody.chord-root,
+.white-key.currently-playing.melody.chord-scale-note,
+.white-key.currently-playing.selected.melody {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b) !important;
+  border-color: #fef3c7 !important;
+  box-shadow:
+    0 0 20px rgba(251, 191, 36, 0.8),
+    0 0 40px rgba(245, 158, 11, 0.6),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1) !important;
+  transform: scale(1.05) !important;
+  animation: pulse-playing 0.3s ease-in-out !important;
 }
 
 .white-key:last-child {
@@ -371,7 +414,20 @@
   border-color: #ffffff;
 }
 
-/* Ensure melody (green) takes precedence over all other states */
+/* Currently playing note - highest priority */
+.black-key.currently-playing {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b) !important;
+  border-color: #fef3c7 !important;
+  box-shadow:
+    0 0 20px rgba(251, 191, 36, 0.8),
+    0 0 40px rgba(245, 158, 11, 0.6),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3) !important;
+  transform: scale(1.05);
+  animation: pulse-playing 0.3s ease-in-out;
+}
+
+/* Ensure melody (green) takes precedence over all other states EXCEPT currently-playing */
 .black-key.melody.scale-note,
 .black-key.melody.scale-root,
 .black-key.melody.chord-note,
@@ -389,6 +445,31 @@
 .black-key.melody.manual-scale-chord-root-note {
   background: linear-gradient(145deg, #4caf50, #2e7d32) !important;
   border-color: #ffffff !important;
+}
+
+/* Currently playing ALWAYS takes top priority - override everything including melody */
+.black-key.currently-playing,
+.black-key.currently-playing.melody,
+.black-key.currently-playing.selected,
+.black-key.currently-playing.scale-note,
+.black-key.currently-playing.scale-root,
+.black-key.currently-playing.chord-note,
+.black-key.currently-playing.chord-root,
+.black-key.currently-playing.melody.scale-note,
+.black-key.currently-playing.melody.scale-root,
+.black-key.currently-playing.melody.chord-note,
+.black-key.currently-playing.melody.chord-root,
+.black-key.currently-playing.melody.chord-scale-note,
+.black-key.currently-playing.selected.melody {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b) !important;
+  border-color: #fef3c7 !important;
+  box-shadow:
+    0 0 20px rgba(251, 191, 36, 0.8),
+    0 0 40px rgba(245, 158, 11, 0.6),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3) !important;
+  transform: scale(1.05) !important;
+  animation: pulse-playing 0.3s ease-in-out !important;
 }
 
 /* Scale highlighting for keyboard keys */

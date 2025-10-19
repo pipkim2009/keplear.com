@@ -10,6 +10,7 @@ export interface MelodyState {
   readonly recordedAudioBlob: Blob | null
   readonly isAutoRecording: boolean
   readonly showNotes: boolean
+  readonly currentlyPlayingNoteIndex: number | null
 }
 
 export type MelodyAction =
@@ -20,6 +21,7 @@ export type MelodyAction =
   | { type: 'SET_IS_AUTO_RECORDING'; payload: boolean }
   | { type: 'TOGGLE_SHOW_NOTES' }
   | { type: 'SET_SHOW_NOTES'; payload: boolean }
+  | { type: 'SET_CURRENTLY_PLAYING_NOTE'; payload: number | null }
   | { type: 'RESET_PLAYBACK' }
   | { type: 'RESET_RECORDING' }
   | { type: 'CLEAR_ALL_AUDIO' }
@@ -38,7 +40,8 @@ export const initialMelodyState: MelodyState = {
     } catch {
       return false
     }
-  })()
+  })(),
+  currentlyPlayingNoteIndex: null
 }
 
 export function melodyReducer(state: MelodyState, action: MelodyAction): MelodyState {
@@ -99,10 +102,17 @@ export function melodyReducer(state: MelodyState, action: MelodyAction): MelodyS
         showNotes: action.payload
       }
 
+    case 'SET_CURRENTLY_PLAYING_NOTE':
+      return {
+        ...state,
+        currentlyPlayingNoteIndex: action.payload
+      }
+
     case 'RESET_PLAYBACK':
       return {
         ...state,
-        playbackProgress: 0
+        playbackProgress: 0,
+        currentlyPlayingNoteIndex: null
       }
 
     case 'RESET_RECORDING':
@@ -127,7 +137,8 @@ export function melodyReducer(state: MelodyState, action: MelodyAction): MelodyS
         melodyDuration: 0,
         hasRecordedAudio: false,
         recordedAudioBlob: null,
-        isAutoRecording: false
+        isAutoRecording: false,
+        currentlyPlayingNoteIndex: null
       }
 
     default:

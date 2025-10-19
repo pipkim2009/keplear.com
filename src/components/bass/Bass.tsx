@@ -26,9 +26,11 @@ interface BassProps {
   }) => void
   appliedScales?: AppliedScale[]
   appliedChords?: AppliedChord[]
+  currentlyPlayingNote?: Note | null
+  currentlyPlayingNoteNames?: string[]
 }
 
-const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, appliedScales, appliedChords }) => {
+const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [] }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(4).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -842,13 +844,16 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             position: stringIndex * 100 - 1
           }
 
+          const isCurrentlyPlaying = showNotes && currentlyPlayingNoteNames.length > 0 && currentlyPlayingNoteNames.includes(noteObj.name)
           const isInGeneratedMelody = isInMelody(noteObj, showNotes)
           const isInScale = isOpenStringInCurrentScale(stringIndex)
           const isInChord = isOpenStringInCurrentChord(stringIndex)
           const isInManual = isOpenStringInManualLayer(stringIndex)
 
           let noteClass = 'bass-note-circle'
-          if (isInGeneratedMelody) {
+          if (isCurrentlyPlaying) {
+            noteClass += ' currently-playing'
+          } else if (isInGeneratedMelody) {
             noteClass += ' melody-note'
           } else {
             const isChordRoot = isChordRootNote(openNote.name, stringIndex, -1) && isInChord
@@ -933,13 +938,16 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               position: stringIndex * 100 + fretIndex
             }
 
+            const isCurrentlyPlaying = showNotes && currentlyPlayingNoteNames.length > 0 && currentlyPlayingNoteNames.includes(noteObj.name)
             const isInGeneratedMelody = isInMelody(noteObj, showNotes)
             const isInScale = isNoteInCurrentScale(stringIndex, fretIndex)
             const isInChord = isNoteInCurrentChord(stringIndex, fretIndex)
             const isInManual = isNoteInManualLayer(stringIndex, fretIndex)
 
             let noteClass = 'bass-note-circle'
-            if (isInGeneratedMelody) {
+            if (isCurrentlyPlaying) {
+              noteClass += ' currently-playing'
+            } else if (isInGeneratedMelody) {
               noteClass += ' melody-note'
             } else {
               const isChordRoot = isChordRootNote(noteName, stringIndex, fretIndex) && isInChord

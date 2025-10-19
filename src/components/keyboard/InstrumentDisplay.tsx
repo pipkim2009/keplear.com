@@ -50,6 +50,8 @@ interface InstrumentDisplayProps {
   hasChanges?: boolean
   isGeneratingMelody?: boolean
   isAutoRecording?: boolean
+  currentlyPlayingNoteIndex?: number | null
+  onCurrentlyPlayingNoteChange?: (index: number | null) => void
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -93,10 +95,38 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   generatedMelody,
   hasChanges = false,
   isGeneratingMelody = false,
-  isAutoRecording = false
+  isAutoRecording = false,
+  currentlyPlayingNoteIndex,
+  onCurrentlyPlayingNoteChange
 }) => {
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
   const [higherOctaves, setHigherOctaves] = useState<number>(0)
+
+  // Calculate the currently playing note(s) from the index
+  // For chords (progression mode), this will be multiple notes
+  const currentlyPlayingNoteNames: string[] = (() => {
+    if (currentlyPlayingNoteIndex === null || currentlyPlayingNoteIndex === undefined || !generatedMelody) {
+      return []
+    }
+
+    const currentNote = generatedMelody[currentlyPlayingNoteIndex]
+    if (!currentNote) {
+      return []
+    }
+
+    // If this note has chord information, return all chord notes
+    if (currentNote.chordGroup && currentNote.chordGroup.allNotes && currentNote.chordGroup.allNotes.length > 0) {
+      return [...currentNote.chordGroup.allNotes]
+    }
+
+    // Otherwise, just return the single note
+    return [currentNote.name]
+  })()
+
+  // Keep the single note for backward compatibility (used by some components)
+  const currentlyPlayingNote = currentlyPlayingNoteIndex !== null && currentlyPlayingNoteIndex !== undefined && generatedMelody
+    ? generatedMelody[currentlyPlayingNoteIndex] || null
+    : null
 
   // Get scale/chord management from context
   const { appliedChords, appliedScales, scaleChordManagement } = useInstrument()
@@ -261,6 +291,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           hasChanges={hasChanges}
           isGeneratingMelody={isGeneratingMelody}
           isAutoRecording={isAutoRecording}
+          onCurrentlyPlayingNoteChange={onCurrentlyPlayingNoteChange}
         />
       </div>
 
@@ -310,6 +341,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           isNoteKeyboardRoot={isNoteKeyboardRoot}
           isNoteInKeyboardChord={isNoteInKeyboardChord}
           isNoteKeyboardChordRoot={isNoteKeyboardChordRoot}
+          currentlyPlayingNote={currentlyPlayingNote}
+          currentlyPlayingNoteNames={currentlyPlayingNoteNames}
           onScaleHandlersReady={setScaleHandlers}
           onBassScaleHandlersReady={setBassScaleHandlers}
           onChordHandlersReady={setChordHandlers}

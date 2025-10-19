@@ -3,11 +3,17 @@ import React, { useState, useRef, useEffect } from 'react'
 interface CustomAudioPlayerProps {
   src: string
   preload?: 'none' | 'metadata' | 'auto'
+  bpm?: number
+  melodyLength?: number
+  onNoteIndexChange?: (index: number | null) => void
 }
 
 const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   src,
-  preload = 'metadata'
+  preload = 'metadata',
+  bpm,
+  melodyLength,
+  onNoteIndexChange
 }) => {
   const audioRef = useRef<HTMLAudioElement>(null)
   const progressRef = useRef<HTMLDivElement>(null)
@@ -31,9 +37,29 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
     // Set volume to current state when src changes
     audio.volume = volume
 
-    const updateTime = () => setCurrentTime(audio.currentTime)
+    const updateTime = () => {
+      const newTime = audio.currentTime
+      setCurrentTime(newTime)
+
+      // Calculate currently playing note index
+      if (bpm && melodyLength && onNoteIndexChange) {
+        const noteDuration = (60 / bpm) // seconds between notes
+        const currentNoteIndex = Math.floor(newTime / noteDuration)
+
+        if (currentNoteIndex < melodyLength) {
+          onNoteIndexChange(currentNoteIndex)
+        } else {
+          onNoteIndexChange(null)
+        }
+      }
+    }
     const updateDuration = () => setDuration(audio.duration || 0)
-    const handleEnded = () => setIsPlaying(false)
+    const handleEnded = () => {
+      setIsPlaying(false)
+      if (onNoteIndexChange) {
+        onNoteIndexChange(null)
+      }
+    }
 
     audio.addEventListener('timeupdate', updateTime)
     audio.addEventListener('loadedmetadata', updateDuration)
@@ -44,7 +70,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
       audio.removeEventListener('loadedmetadata', updateDuration)
       audio.removeEventListener('ended', handleEnded)
     }
-  }, [src, volume])
+  }, [src, volume, bpm, melodyLength, onNoteIndexChange])
 
   useEffect(() => {
     const handleGlobalMouseMove = (event: MouseEvent) => {

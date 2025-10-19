@@ -68,6 +68,7 @@ interface InstrumentContextType {
   melodyDuration: number
   recordedAudioBlob: Blob | null
   showNotes: boolean
+  currentlyPlayingNoteIndex: number | null
   setPlaybackProgress: (progress: number) => void
   setMelodyDuration: (duration: number) => void
   toggleShowNotes: () => void
@@ -90,6 +91,7 @@ interface InstrumentContextType {
   handleInstrumentChange: (newInstrument: InstrumentType) => void
   handleOctaveRangeChange: (lowerOctaves: number, higherOctaves: number) => void
   handleKeyboardSelectionModeChange: (mode: 'range' | 'multi', clearSelections?: boolean) => void
+  handleCurrentlyPlayingNoteChange: (index: number | null) => void
 
   // Scale/Chord Management
   appliedChords: AppliedChord[]
@@ -169,12 +171,14 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     recordedAudioBlob,
     showNotes,
     isAutoRecording,
+    currentlyPlayingNoteIndex,
     setPlaybackProgress,
     setMelodyDuration,
     toggleShowNotes,
     handleRecordMelody,
     handleClearRecordedAudio,
-    calculateMelodyDuration
+    calculateMelodyDuration,
+    setCurrentlyPlayingNoteIndex
   } = useMelodyPlayer({
     generatedMelody,
     bpm,
@@ -316,6 +320,10 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     setHigherOctaves(newHigherOctaves)
   }, [])
 
+  const handleCurrentlyPlayingNoteChange = useCallback((index: number | null): void => {
+    setCurrentlyPlayingNoteIndex(index)
+  }, [setCurrentlyPlayingNoteIndex])
+
   const value: InstrumentContextType = {
     // Audio functions
     playNote,
@@ -371,6 +379,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     melodyDuration,
     recordedAudioBlob,
     showNotes,
+    currentlyPlayingNoteIndex,
     setPlaybackProgress,
     setMelodyDuration,
     toggleShowNotes,
@@ -393,6 +402,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     handleInstrumentChange,
     handleOctaveRangeChange,
     handleKeyboardSelectionModeChange,
+    handleCurrentlyPlayingNoteChange,
 
     // Scale/Chord Management
     appliedChords,
