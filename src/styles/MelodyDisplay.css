@@ -27,8 +27,21 @@
   border-radius: 4px;
   font-size: 12px;
   font-weight: 500;
-  border: none;
-  transition: all 0.15s ease;
+  border: 2px solid transparent;
+  transition: none;
+}
+
+/* Golden highlight for currently playing note - matches keyboard styling */
+.melody-note.currently-playing {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b) !important;
+  color: #1f2937 !important;
+  border: 2px solid #fef3c7 !important;
+  box-shadow:
+    0 0 20px rgba(251, 191, 36, 0.8),
+    0 0 40px rgba(245, 158, 11, 0.6),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1) !important;
+  transition: none !important;
 }
 
 /* Dark mode support */
@@ -45,5 +58,18 @@
   .melody-note {
     background: #20c997 !important;
     color: #212529 !important;
+  }
+
+  /* Golden highlight in dark mode - matches keyboard styling */
+  .melody-note.currently-playing {
+    background: linear-gradient(145deg, #fbbf24, #f59e0b) !important;
+    color: #1f2937 !important;
+    border: 2px solid #fef3c7 !important;
+    box-shadow:
+      0 0 20px rgba(251, 191, 36, 0.8),
+      0 0 40px rgba(245, 158, 11, 0.6),
+      inset 0 2px 4px rgba(255, 255, 255, 0.8),
+      inset 0 -2px 4px rgba(0, 0, 0, 0.1) !important;
+    transition: none !important;
   }
 }

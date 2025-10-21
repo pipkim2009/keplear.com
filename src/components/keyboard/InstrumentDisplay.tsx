@@ -292,6 +292,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           isGeneratingMelody={isGeneratingMelody}
           isAutoRecording={isAutoRecording}
           onCurrentlyPlayingNoteChange={onCurrentlyPlayingNoteChange}
+          currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
         />
       </div>
 

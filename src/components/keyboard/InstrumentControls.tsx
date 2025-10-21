@@ -65,6 +65,7 @@ interface InstrumentControlsProps {
   isGeneratingMelody?: boolean
   isAutoRecording?: boolean
   onCurrentlyPlayingNoteChange?: (index: number | null) => void
+  currentlyPlayingNoteIndex?: number | null
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -114,7 +115,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   hasChanges = false,
   isGeneratingMelody = false,
   isAutoRecording = false,
-  onCurrentlyPlayingNoteChange
+  onCurrentlyPlayingNoteChange,
+  currentlyPlayingNoteIndex
 }) => {
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
@@ -968,6 +970,7 @@ Progression - Use entire chords"
                     generatedMelody={generatedMelody}
                     showNotes={showNotes}
                     chordMode={chordMode}
+                    currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
                   />
                 </div>
               )}

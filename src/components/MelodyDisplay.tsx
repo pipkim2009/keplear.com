@@ -6,6 +6,7 @@ interface MelodyDisplayProps {
   generatedMelody: Note[]
   showNotes: boolean
   chordMode?: 'arpeggiator' | 'progression'
+  currentlyPlayingNoteIndex?: number | null
 }
 
 // Function to detect chord name from a set of notes
@@ -86,7 +87,8 @@ const detectChordName = (notes: string[]): string => {
 const MelodyDisplay: React.FC<MelodyDisplayProps> = ({
   generatedMelody,
   showNotes,
-  chordMode = 'arpeggiator'
+  chordMode = 'arpeggiator',
+  currentlyPlayingNoteIndex
 }) => {
   if (generatedMelody.length === 0 || !showNotes) {
     return null
@@ -98,17 +100,24 @@ const MelodyDisplay: React.FC<MelodyDisplayProps> = ({
         <div className="melody-title">Generated Melody:</div>
         <div className="melody-notes">
           {generatedMelody.map((note, index) => {
+            const isCurrentlyPlaying = currentlyPlayingNoteIndex === index
             // Check if note has chord group info - display chord name
             // Otherwise display individual note name (for mixed mode)
             if (note.chordGroup?.displayName) {
               return (
-                <span key={`prog-${index}`} className="melody-note chord-indicator">
+                <span
+                  key={`prog-${index}`}
+                  className={`melody-note chord-indicator ${isCurrentlyPlaying ? 'currently-playing' : ''}`}
+                >
                   {note.chordGroup.displayName}
                 </span>
               )
             } else {
               return (
-                <span key={`prog-${index}`} className="melody-note">
+                <span
+                  key={`prog-${index}`}
+                  className={`melody-note ${isCurrentlyPlaying ? 'currently-playing' : ''}`}
+                >
                   {note.name}
                 </span>
               )
@@ -124,11 +133,17 @@ const MelodyDisplay: React.FC<MelodyDisplayProps> = ({
     <div className="melody-display">
       <div className="melody-title">Generated Melody:</div>
       <div className="melody-notes">
-        {generatedMelody.map((note, index) => (
-          <span key={`${note.name}-${index}`} className="melody-note">
-            {note.name}
-          </span>
-        ))}
+        {generatedMelody.map((note, index) => {
+          const isCurrentlyPlaying = currentlyPlayingNoteIndex === index
+          return (
+            <span
+              key={`${note.name}-${index}`}
+              className={`melody-note ${isCurrentlyPlaying ? 'currently-playing' : ''}`}
+            >
+              {note.name}
+            </span>
+          )
+        })}
       </div>
     </div>
   )
