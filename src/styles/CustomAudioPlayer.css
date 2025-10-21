@@ -1,7 +1,7 @@
 .custom-audio-player {
   width: 100%;
   max-width: 480px;
-  min-width: 350px;
+  min-width: 420px;
   background: rgba(26, 26, 26, 0.9);
   border-radius: 8px;
   padding: 12px;
@@ -9,6 +9,8 @@
   border: 1px solid #333;
   position: relative;
   overflow: visible;
+  box-sizing: border-box;
+  margin: 0 auto;
 }
 
 .audio-controls {
@@ -59,8 +61,8 @@
 }
 
 .progress-bar {
-  width: 200px;
-  flex: none;
+  flex: 1;
+  min-width: 100px;
   cursor: pointer;
   padding: 12px 0;
   position: relative;
@@ -271,13 +273,12 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .custom-audio-player {
-    max-width: 100%;
-    min-width: 300px;
     padding: 10px;
+    min-width: 0;
   }
 
   .progress-bar {
-    width: 150px;
+    min-width: 80px;
   }
 
   .time-display {
@@ -288,10 +289,7 @@
 
 @media (max-width: 480px) {
   .custom-audio-player {
-    max-width: 100%;
-    min-width: 280px;
     padding: 8px;
-    margin: 0 auto;
   }
 
   .audio-controls {
@@ -316,7 +314,7 @@
   }
 
   .progress-bar {
-    width: 120px;
+    min-width: 60px;
   }
 
   .progress-track {
@@ -351,7 +349,6 @@
 
 @media (max-width: 360px) {
   .custom-audio-player {
-    min-width: 260px;
     padding: 6px;
   }
 
@@ -377,7 +374,7 @@
   }
 
   .progress-bar {
-    width: 100px;
+    min-width: 50px;
   }
 
   .progress-track {

@@ -1992,7 +1992,7 @@ select.control-input.flashing {
     align-items: center !important;
     gap: 12px !important;
     flex-wrap: wrap !important;
-    margin-top: 15px !important;
+    margin-top: 7px !important;
   }
 }
 
@@ -2085,14 +2085,19 @@ select.control-input.flashing {
   border-radius: 12px;
   padding: 20px;
   margin: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .controls-container {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 12px;
   justify-content: center;
   flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .modern-generate-button {
@@ -2100,26 +2105,32 @@ select.control-input.flashing {
   color: white;
   border: 1px solid #007bff;
   border-radius: 6px;
-  padding: 10px 20px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 12px 24px;
+  font-size: 15px;
+  font-weight: 600;
   transition: all 0.2s ease;
   cursor: pointer;
-  min-width: 140px;
-  transform: translateY(10px);
+  width: 100%;
+  min-width: auto;
+  margin-top: 0;
 }
 
 .modern-generate-button:hover:not(:disabled) {
   background: #0056b3;
   border-color: #0056b3;
-  transform: translateY(10px);
 }
 
 .modern-generate-button:disabled {
   background: #6c757d;
   border-color: #6c757d;
   cursor: not-allowed;
-  transform: translateY(10px);
+}
+
+/* Desktop - add margin when in flex row layout */
+@media (min-width: 769px) {
+  .controls-container:not(.second-row):not(.third-row) {
+    gap: 12px;
+  }
 }
 
 /* Modern Notes Toggle Button - Same green as melody container border */
@@ -2266,6 +2277,8 @@ select.control-input.flashing {
   flex-direction: column;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .modern-control-item .control-label {
@@ -2343,14 +2356,14 @@ select.control-input.flashing {
 
 /* Second row styling */
 .controls-container.second-row {
-  margin-top: 20px;
+  margin-top: 7px;
   padding-top: 0;
   justify-content: center;
 }
 
 /* Third row styling - for reveal/hide button */
 .controls-container.third-row {
-  margin-top: 15px;
+  margin-top: 7px;
   justify-content: center;
   display: flex;
   align-items: center;
@@ -2361,7 +2374,8 @@ select.control-input.flashing {
 /* Audio player section styling */
 .modern-control-item.audio-player-section {
   flex: 1;
-  max-width: 600px;
+  max-width: 100%;
+  width: 100%;
 }
 
 .modern-control-item.audio-player-section.centered {
@@ -2418,7 +2432,7 @@ body.dark .modern-control-item.audio-player-section audio {
 @media (max-width: 768px) {
   .controls-container {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
   }
 
   .modern-generate-button {
@@ -2439,23 +2453,22 @@ body.dark .modern-control-item.audio-player-section audio {
     flex-direction: row !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 16px !important;
+    gap: 12px !important;
     flex-wrap: wrap !important;
   }
 }
 
 
-/* Tablet and Mobile layout - BPM and Beats on first row, Chord Mode on second row */
-@media (max-width: 768px) {
+/* Medium screens - 3 columns on first row */
+@media (max-width: 768px) and (min-width: 601px) {
   .controls-container:not(.second-row):not(.third-row) {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
     gap: 12px 8px;
     grid-template-areas:
-      "bpm notes"
-      "chord chord"
-      "generate generate";
+      "bpm notes chord"
+      "generate generate generate";
   }
 
   .modern-control-item:nth-child(1) {
@@ -2482,8 +2495,75 @@ body.dark .modern-control-item.audio-player-section audio {
   }
 }
 
-/* Phone layout - additional styling */
+/* Small-medium screens - BPM and Beats on row 1, Chord on row 2, Generate on row 3 */
+@media (max-width: 600px) and (min-width: 481px) {
+  .control-group.modern-controls-row {
+    padding: 25px 20px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .controls-container:not(.second-row):not(.third-row) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 12px 8px;
+    grid-template-areas:
+      "bpm notes"
+      "chord chord"
+      "generate generate";
+  }
+
+  .modern-control-item:nth-child(1) {
+    grid-area: bpm;
+  }
+
+  .modern-control-item:nth-child(2) {
+    grid-area: notes;
+  }
+
+  .modern-control-item:nth-child(3) {
+    grid-area: chord;
+  }
+
+  .modern-generate-button {
+    grid-area: generate;
+    width: 100%;
+    min-width: auto;
+  }
+
+  .modern-notes-toggle-button {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+/* Phone layout - stack everything vertically for very small screens */
 @media (max-width: 480px) {
+  .control-group.modern-controls-row {
+    padding: 25px 20px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .controls-container:not(.second-row):not(.third-row) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modern-control-item:nth-child(1),
+  .modern-control-item:nth-child(2),
+  .modern-control-item:nth-child(3) {
+    width: 100%;
+  }
+
+  .modern-generate-button {
+    width: 100%;
+  }
+
   .controls-container {
     flex-direction: column;
     gap: 12px;

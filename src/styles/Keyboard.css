@@ -24,12 +24,30 @@
   background: linear-gradient(145deg, #374151, #1f2937);
   border-radius: 16px 16px 0 0;
   min-height: 72px;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
+  flex-wrap: wrap;
 }
 
 .header-controls-left {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
+  max-width: 100%;
+  box-sizing: border-box;
+  flex-wrap: wrap;
+}
+
+.header-controls-left .control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.header-controls-left .control-group.scale-chord-options,
+.header-controls-left > .control-group:has(.delete-selection) {
+  align-self: center;
 }
 
 .header-controls-left .notes-toggle-row {
