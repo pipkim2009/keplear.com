@@ -81,14 +81,30 @@ Multi Select - Select the specific notes to use"
                 <div className="tooltip-icon">?</div>
               </Tooltip>
             </div>
-            <select
-              value={keyboardSelectionMode}
-              onChange={(e) => onKeyboardSelectionModeChange && onKeyboardSelectionModeChange(e.target.value as KeyboardSelectionMode)}
-              className={`control-input ${flashingInputs.mode ? 'flashing' : ''}`}
-            >
-              <option value="range">Range Select</option>
-              <option value="multi">Multi Select</option>
-            </select>
+            <div className={`selection-mode-switch ${flashingInputs.mode ? 'flashing' : ''}`}>
+              <button
+                className={`switch-option ${keyboardSelectionMode === 'range' ? 'active' : ''}`}
+                onClick={() => {
+                  if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'range') {
+                    onKeyboardSelectionModeChange('range')
+                  }
+                }}
+                title="Range Select"
+              >
+                Range
+              </button>
+              <button
+                className={`switch-option ${keyboardSelectionMode === 'multi' ? 'active' : ''}`}
+                onClick={() => {
+                  if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
+                    onKeyboardSelectionModeChange('multi')
+                  }
+                }}
+                title="Multi Select"
+              >
+                Multi
+              </button>
+            </div>
           </div>
         )}
 

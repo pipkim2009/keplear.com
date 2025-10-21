@@ -134,6 +134,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const [audioFileBlob, setAudioFileBlob] = useState<Blob | null>(null)
   const [audioFileUrl, setAudioFileUrl] = useState<string | null>(null)
   const [isInstrumentDropdownOpen, setIsInstrumentDropdownOpen] = useState<boolean>(false)
+  const [isChordModeFlashing, setIsChordModeFlashing] = useState<boolean>(false)
 
   // Original default values
   const DEFAULT_BPM = 120
@@ -885,18 +886,34 @@ Progression - Use entire chords"
                   <div className="tooltip-icon">?</div>
                 </Tooltip>
               </div>
-              <select
-                value={chordMode}
-                onChange={(e) => {
-                  triggerInputFlash('mode')
-                  setChordMode(e.target.value as ChordMode)
-                }}
-                className={`control-input chord-mode-select ${flashingInputs.mode ? 'flashing' : ''}`}
-                style={{ color: '#ffffff', fontWeight: '600' }}
-              >
-                <option value="arpeggiator">Arpeggiator</option>
-                <option value="progression">Progression</option>
-              </select>
+              <div className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''}`}>
+                <button
+                  className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
+                  onClick={() => {
+                    if (chordMode !== 'arpeggiator') {
+                      setChordMode('arpeggiator')
+                      setIsChordModeFlashing(true)
+                      setTimeout(() => setIsChordModeFlashing(false), 500)
+                    }
+                  }}
+                  title="Arpeggiator"
+                >
+                  Arpeggiator
+                </button>
+                <button
+                  className={`switch-option ${chordMode === 'progression' ? 'active' : ''}`}
+                  onClick={() => {
+                    if (chordMode !== 'progression') {
+                      setChordMode('progression')
+                      setIsChordModeFlashing(true)
+                      setTimeout(() => setIsChordModeFlashing(false), 500)
+                    }
+                  }}
+                  title="Progression"
+                >
+                  Progression
+                </button>
+              </div>
             </div>
           )}
 
