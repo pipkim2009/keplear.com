@@ -123,6 +123,26 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     return [currentNote.name]
   })()
 
+  // Get chord ID for guitar/bass (to match against specific applied chord)
+  const currentlyPlayingChordId: string | null = (() => {
+    if (currentlyPlayingNoteIndex === null || currentlyPlayingNoteIndex === undefined || !generatedMelody) {
+      return null
+    }
+
+    const currentNote = generatedMelody[currentlyPlayingNoteIndex]
+    if (!currentNote) {
+      return null
+    }
+
+    // If this note has chord group information, return the chord ID
+    if (currentNote.chordGroup && currentNote.chordGroup.id) {
+      return currentNote.chordGroup.id
+    }
+
+    // Otherwise, return null (not a chord)
+    return null
+  })()
+
   // Keep the single note for backward compatibility (used by some components)
   const currentlyPlayingNote = currentlyPlayingNoteIndex !== null && currentlyPlayingNoteIndex !== undefined && generatedMelody
     ? generatedMelody[currentlyPlayingNoteIndex] || null
@@ -344,6 +364,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           isNoteKeyboardChordRoot={isNoteKeyboardChordRoot}
           currentlyPlayingNote={currentlyPlayingNote}
           currentlyPlayingNoteNames={currentlyPlayingNoteNames}
+          currentlyPlayingChordId={currentlyPlayingChordId}
           onScaleHandlersReady={setScaleHandlers}
           onBassScaleHandlersReady={setBassScaleHandlers}
           onChordHandlersReady={setChordHandlers}

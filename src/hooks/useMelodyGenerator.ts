@@ -161,7 +161,8 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
                 id: selectedChord.id,
                 displayName: selectedChord.displayName,
                 rootNote: selectedChord.root,
-                allNotes: chordNotes.filter(n => n && n.name).map(n => n.name)
+                allNotes: chordNotes.filter(n => n && n.name).map(n => n.name),
+                chordPositions: selectedChord.noteKeys || []
               }
             }
 

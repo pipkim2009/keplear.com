@@ -470,6 +470,11 @@ export const useScaleChordManagement = ({
       // Convert selections to Note objects for storage
       const chordNotes = convertSelectionsToNotes(chordSelections, 'guitar')
 
+      // Convert selections to noteKeys (position strings like "0-open", "1-3")
+      const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
+        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      })
+
       // Track the chord with actual notes
       const chordId = `${instrument}-${rootNote}-${chord.name}-${Date.now()}`
       const newAppliedChord: AppliedChord = {
@@ -477,7 +482,8 @@ export const useScaleChordManagement = ({
         root: rootNote,
         chord: chord,
         displayName: `${rootNote}${chord.name}`,
-        notes: chordNotes // Store the actual notes for removal
+        notes: chordNotes, // Store the actual notes for removal
+        noteKeys: noteKeys // Store the fretboard positions for shape-specific highlighting
       }
       setAppliedChords(prev => [...prev, newAppliedChord])
     } else if (instrument === 'bass' && bassChordHandlers) {
@@ -490,6 +496,11 @@ export const useScaleChordManagement = ({
       // Convert selections to Note objects for storage
       const chordNotes = convertSelectionsToNotes(chordSelections, 'bass')
 
+      // Convert selections to noteKeys (position strings like "0-open", "1-3")
+      const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
+        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      })
+
       // Track the chord with actual notes
       const chordId = `${instrument}-${rootNote}-${chord.name}-${Date.now()}`
       const newAppliedChord: AppliedChord = {
@@ -497,7 +508,8 @@ export const useScaleChordManagement = ({
         root: rootNote,
         chord: chord,
         displayName: `${rootNote}${chord.name}`,
-        notes: chordNotes // Store the actual notes for removal
+        notes: chordNotes, // Store the actual notes for removal
+        noteKeys: noteKeys // Store the fretboard positions for shape-specific highlighting
       }
       setAppliedChords(prev => [...prev, newAppliedChord])
     }
@@ -519,6 +531,11 @@ export const useScaleChordManagement = ({
       // Convert selections to Note objects for storage
       const chordNotes = convertSelectionsToNotes(chordSelections, 'guitar')
 
+      // Convert selections to noteKeys (position strings like "0-open", "1-3")
+      const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
+        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      })
+
       // Track the chord shape with actual notes
       const chordId = `${instrument}-shape-${chordShape.name}-${Date.now()}`
       const newAppliedChord: AppliedChord = {
@@ -526,7 +543,8 @@ export const useScaleChordManagement = ({
         root: chordShape.root || 'Unknown', // Use provided root or fallback
         chord: { name: chordShape.name, intervals: [] } as any, // Simplified for shapes
         displayName: chordShape.name,
-        notes: chordNotes // Store the actual notes for removal
+        notes: chordNotes, // Store the actual notes for removal
+        noteKeys: noteKeys // Store the fretboard positions for shape-specific highlighting
       }
       setAppliedChords(prev => [...prev, newAppliedChord])
     } else if (instrument === 'bass' && bassChordHandlers) {
@@ -539,6 +557,11 @@ export const useScaleChordManagement = ({
       // Convert selections to Note objects for storage
       const chordNotes = convertSelectionsToNotes(chordSelections, 'bass')
 
+      // Convert selections to noteKeys (position strings like "0-open", "1-3")
+      const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
+        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      })
+
       // Track the chord shape with actual notes
       const chordId = `${instrument}-shape-${chordShape.name}-${Date.now()}`
       const newAppliedChord: AppliedChord = {
@@ -546,7 +569,8 @@ export const useScaleChordManagement = ({
         root: chordShape.root || 'Unknown', // Use provided root or fallback
         chord: { name: chordShape.name, intervals: [] } as any, // Simplified for shapes
         displayName: chordShape.name,
-        notes: chordNotes // Store the actual notes for removal
+        notes: chordNotes, // Store the actual notes for removal
+        noteKeys: noteKeys // Store the fretboard positions for shape-specific highlighting
       }
       setAppliedChords(prev => [...prev, newAppliedChord])
     }

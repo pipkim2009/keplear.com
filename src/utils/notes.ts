@@ -12,6 +12,8 @@ export interface ChordGroupInfo {
   readonly rootNote: string
   /** All notes in this chord group */
   readonly allNotes: readonly string[]
+  /** For guitar/bass: specific fretboard positions for this chord shape */
+  readonly chordPositions?: readonly string[]
 }
 
 /**

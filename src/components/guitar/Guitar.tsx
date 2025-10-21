@@ -28,9 +28,10 @@ interface GuitarProps {
   appliedChords?: AppliedChord[]
   currentlyPlayingNote?: Note | null
   currentlyPlayingNoteNames?: string[]
+  currentlyPlayingChordId?: string | null
 }
 
-const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [] }) => {
+const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingChordId = null }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -977,7 +978,25 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           const isInScale = isOpenStringInCurrentScale(stringIndex)
           const isInChord = isOpenStringInCurrentChord(stringIndex)
           const isInManual = isOpenStringInManualLayer(stringIndex)
-          const isCurrentlyPlaying = showNotes && currentlyPlayingNoteNames.length > 0 && currentlyPlayingNoteNames.includes(noteObj.name)
+
+          // For chords, match by chord ID to get specific shape; otherwise check note names
+          const noteKey = `${stringIndex}-open`
+          let isCurrentlyPlaying = false
+          if (showNotes) {
+            if (currentlyPlayingChordId && appliedChords && appliedChords.length > 0) {
+              // Find the specific chord being played by ID
+              const playingChord = appliedChords.find(c => c.id === currentlyPlayingChordId)
+              if (playingChord && playingChord.noteKeys && playingChord.noteKeys.length > 0) {
+                isCurrentlyPlaying = playingChord.noteKeys.includes(noteKey)
+              } else if (currentlyPlayingNoteNames.length > 0) {
+                // Fallback: chord found but no noteKeys, use note name
+                isCurrentlyPlaying = currentlyPlayingNoteNames.includes(noteObj.name)
+              }
+            } else if (currentlyPlayingNoteNames.length > 0) {
+              // Not a chord - use note name matching
+              isCurrentlyPlaying = currentlyPlayingNoteNames.includes(noteObj.name)
+            }
+          }
 
           let noteClass = 'note-circle'
           if (isCurrentlyPlaying) {
@@ -1080,7 +1099,25 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             const isInScale = isNoteInCurrentScale(stringIndex, fretIndex)
             const isInChord = isNoteInCurrentChord(stringIndex, fretIndex)
             const isInManual = isNoteInManualLayer(stringIndex, fretIndex)
-            const isCurrentlyPlaying = showNotes && currentlyPlayingNoteNames.length > 0 && currentlyPlayingNoteNames.includes(noteObj.name)
+
+            // For chords, match by chord ID to get specific shape; otherwise check note names
+            const noteKey = `${stringIndex}-${fretIndex}`
+            let isCurrentlyPlaying = false
+            if (showNotes) {
+              if (currentlyPlayingChordId && appliedChords && appliedChords.length > 0) {
+                // Find the specific chord being played by ID
+                const playingChord = appliedChords.find(c => c.id === currentlyPlayingChordId)
+                if (playingChord && playingChord.noteKeys && playingChord.noteKeys.length > 0) {
+                  isCurrentlyPlaying = playingChord.noteKeys.includes(noteKey)
+                } else if (currentlyPlayingNoteNames.length > 0) {
+                  // Fallback: chord found but no noteKeys, use note name
+                  isCurrentlyPlaying = currentlyPlayingNoteNames.includes(noteObj.name)
+                }
+              } else if (currentlyPlayingNoteNames.length > 0) {
+                // Not a chord - use note name matching
+                isCurrentlyPlaying = currentlyPlayingNoteNames.includes(noteObj.name)
+              }
+            }
 
             let noteClass = 'note-circle'
             if (isCurrentlyPlaying) {
