@@ -2103,9 +2103,9 @@ select.control-input.flashing {
 .modern-generate-button {
   background: #007bff;
   color: white;
-  border: 1px solid #007bff;
+  border: 2px solid #0056b3;
   border-radius: 6px;
-  padding: 12px 24px;
+  padding: 7.5px 24px;
   font-size: 15px;
   font-weight: 600;
   transition: all 0.2s ease;
@@ -2122,7 +2122,7 @@ select.control-input.flashing {
 
 .modern-generate-button:disabled {
   background: #6c757d;
-  border-color: #6c757d;
+  border: 2px solid #5a6268;
   cursor: not-allowed;
 }
 
@@ -2130,6 +2130,11 @@ select.control-input.flashing {
 @media (min-width: 769px) {
   .controls-container:not(.second-row):not(.third-row) {
     gap: 12px;
+    flex-wrap: nowrap;
+  }
+
+  .modern-generate-button {
+    margin-top: 29px;
   }
 }
 

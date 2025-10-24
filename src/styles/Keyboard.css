@@ -19,7 +19,7 @@
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  padding: 1rem;
+  padding: 4px;
   border-bottom: 2px solid #4a5568;
   background: linear-gradient(145deg, #374151, #1f2937);
   border-radius: 16px 16px 0 0;
@@ -28,6 +28,12 @@
   box-sizing: border-box;
   overflow: visible;
   flex-wrap: wrap;
+}
+
+/* Reduce height for guitar and bass */
+.instrument-container:has(.guitar-container) .instrument-header-controls,
+.instrument-container:has(.bass-container) .instrument-header-controls {
+  min-height: 50px;
 }
 
 .header-controls-left {
@@ -43,11 +49,6 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-}
-
-.header-controls-left .control-group.scale-chord-options,
-.header-controls-left > .control-group:has(.delete-selection) {
-  align-self: center;
 }
 
 .header-controls-left .notes-toggle-row {
@@ -73,7 +74,7 @@
 
   .instrument-header-controls {
     border-radius: 0;
-    padding: 0.75rem;
+    padding: 4px;
   }
 
   .instrument-wrapper {
@@ -131,7 +132,7 @@
 
   .instrument-header-controls {
     border-radius: 0;
-    padding: 0.5rem;
+    padding: 4px;
     gap: 0.5rem;
   }
 
