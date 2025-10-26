@@ -1,10 +1,11 @@
-import { createContext, useContext, ReactNode, useCallback, useState, useEffect } from 'react'
+import { createContext, useContext, ReactNode, useCallback, useState, useEffect, useRef } from 'react'
 import { useMelodyGenerator } from '../hooks/useMelodyGenerator'
 import { useMelodyPlayer } from '../hooks/useMelodyPlayer'
 import { useMelodyChanges } from '../hooks/useMelodyChanges'
 import { useAudioContext } from './AudioContext'
 import { useUI } from './UIContext'
 import { useInstrumentConfigContext } from './InstrumentConfigContext'
+import { useInstrument } from './InstrumentContext'
 import { notes, generateNotesWithSeparateOctaves, type Note } from '../utils/notes'
 import type { InstrumentType } from '../types/instrument'
 
@@ -70,6 +71,18 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
   const audio = useAudioContext()
   const ui = useUI()
   const config = useInstrumentConfigContext()
+  const { appliedChords, appliedScales } = useInstrument()
+
+  // Track previous selection state to detect changes
+  const prevSelectionRef = useRef<{
+    noteCount: number
+    chordCount: number
+    scaleCount: number
+  }>({
+    noteCount: 0,
+    chordCount: 0,
+    scaleCount: 0
+  })
 
   // Melody generation and selection
   const melodyGen = useMelodyGenerator()
@@ -92,7 +105,9 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
     numberOfBeats: ui.numberOfBeats,
     generatedMelody: melodyGen.generatedMelody,
     instrument: config.instrument,
-    keyboardSelectionMode: config.keyboardSelectionMode
+    keyboardSelectionMode: config.keyboardSelectionMode,
+    appliedChords,
+    appliedScales
   })
 
   // Turn off generating indicator when recorded audio is ready
@@ -101,6 +116,47 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
       setIsGeneratingMelody(false)
     }
   }, [melodyPlayer.recordedAudioBlob, isGeneratingMelody])
+
+  // Hide notes when selection changes
+  useEffect(() => {
+    const currentNoteCount = melodyGen.selectedNotes.length
+    const currentChordCount = appliedChords.length
+    const currentScaleCount = appliedScales.length
+
+    const prev = prevSelectionRef.current
+
+    console.log('Selection change effect:', {
+      currentNoteCount,
+      currentChordCount,
+      currentScaleCount,
+      prevNoteCount: prev.noteCount,
+      prevChordCount: prev.chordCount,
+      prevScaleCount: prev.scaleCount,
+      showNotes: melodyPlayer.showNotes,
+      hasMelody: melodyGen.generatedMelody.length > 0
+    })
+
+    // Check if selection has changed
+    const selectionChanged =
+      currentNoteCount !== prev.noteCount ||
+      currentChordCount !== prev.chordCount ||
+      currentScaleCount !== prev.scaleCount
+
+    console.log('Selection changed:', selectionChanged)
+
+    // Hide melody if it's visible and selection changed
+    if (melodyPlayer.showNotes && selectionChanged && melodyGen.generatedMelody.length > 0) {
+      console.log('HIDING MELODY NOW!')
+      melodyPlayer.setShowNotes(false)
+    }
+
+    // Update previous values
+    prevSelectionRef.current = {
+      noteCount: currentNoteCount,
+      chordCount: currentChordCount,
+      scaleCount: currentScaleCount
+    }
+  }, [melodyGen.selectedNotes.length, appliedChords.length, appliedScales.length, melodyPlayer.showNotes, melodyPlayer.setShowNotes, melodyGen.generatedMelody.length])
 
   // Handle note click
   const handleNoteClick = useCallback(async (note: Note): Promise<void> => {

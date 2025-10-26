@@ -4,7 +4,7 @@ import { useMelodyGenerator } from '../hooks/useMelodyGenerator'
 import { useUIState } from '../hooks/useUIState'
 import { useInstrumentConfig } from '../hooks/useInstrumentConfig'
 import { useMelodyPlayer } from '../hooks/useMelodyPlayer'
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useState, useEffect, useRef } from 'react'
 import { notes, generateNotesWithSeparateOctaves } from '../utils/notes'
 import type { Note } from '../utils/notes'
 import { useMelodyChanges } from '../hooks/useMelodyChanges'
@@ -121,6 +121,17 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
   const [higherOctaves, setHigherOctaves] = useState<number>(0)
 
+  // Track previous selection state to detect changes
+  const prevSelectionRef = useRef<{
+    noteCount: number
+    chordCount: number
+    scaleCount: number
+  }>({
+    noteCount: 0,
+    chordCount: 0,
+    scaleCount: 0
+  })
+
   // All the existing hooks from App.tsx
   const { playNote, playGuitarNote, playBassNote, playMelody, playGuitarMelody, playBassMelody, stopMelody, recordMelody, isPlaying, isRecording } = useAudio()
 
@@ -175,6 +186,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     setPlaybackProgress,
     setMelodyDuration,
     toggleShowNotes,
+    setShowNotes,
     handleRecordMelody,
     handleClearRecordedAudio,
     calculateMelodyDuration,
@@ -231,6 +243,33 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
       setIsGeneratingMelody(false)
     }
   }, [recordedAudioBlob, isGeneratingMelody])
+
+  // Hide notes when selection changes (notes, chords, or scales)
+  useEffect(() => {
+    const currentNoteCount = selectedNotes.length
+    const currentChordCount = appliedChords.length
+    const currentScaleCount = appliedScales.length
+
+    const prev = prevSelectionRef.current
+
+    // Check if selection has changed
+    const selectionChanged =
+      currentNoteCount !== prev.noteCount ||
+      currentChordCount !== prev.chordCount ||
+      currentScaleCount !== prev.scaleCount
+
+    // Hide melody if it's visible and selection changed
+    if (showNotes && selectionChanged && generatedMelody.length > 0) {
+      setShowNotes(false)
+    }
+
+    // Update previous values
+    prevSelectionRef.current = {
+      noteCount: currentNoteCount,
+      chordCount: currentChordCount,
+      scaleCount: currentScaleCount
+    }
+  }, [selectedNotes.length, appliedChords.length, appliedScales.length, showNotes, generatedMelody.length, setShowNotes])
 
   // Handlers from App.tsx
   const handleNoteClick = useCallback(async (note: Note): Promise<void> => {

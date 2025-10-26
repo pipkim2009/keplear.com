@@ -2271,7 +2271,7 @@ select.control-input.flashing {
 .modern-notes-toggle-button .toggle-content {
   background: #20c997;
   color: black !important;
-  border: 1px solid #20c997;
+  border: 2px solid #20c997;
   border-radius: 6px;
   padding: 10px 20px;
   font-size: 14px;

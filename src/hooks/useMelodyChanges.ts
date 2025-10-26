@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import type { Note } from '../utils/notes'
-import type { AppliedChord } from '../components/common/ScaleChordOptions'
+import type { AppliedChord, AppliedScale } from '../components/common/ScaleChordOptions'
 
 interface UseMelodyChangesProps {
   selectedNotes: readonly Note[]
@@ -10,6 +10,7 @@ interface UseMelodyChangesProps {
   instrument: string
   keyboardSelectionMode: string
   appliedChords?: AppliedChord[]
+  appliedScales?: AppliedScale[]
 }
 
 interface UseMelodyChangesReturn {
@@ -28,15 +29,16 @@ export const useMelodyChanges = ({
   generatedMelody,
   instrument,
   keyboardSelectionMode,
-  appliedChords = []
+  appliedChords = [],
+  appliedScales = []
 }: UseMelodyChangesProps): UseMelodyChangesReturn => {
   const [hasChanges, setHasChanges] = useState(false)
   const [lastMelodyLength, setLastMelodyLength] = useState(0)
 
   // Check if user has enough notes selected to generate a melody
   const canGenerateMelody = () => {
-    // If there are applied chords, we can always generate a melody (progression mode)
-    if (appliedChords.length > 0) {
+    // If there are applied chords or scales, we can always generate a melody
+    if (appliedChords.length > 0 || appliedScales.length > 0) {
       return true
     }
 
@@ -55,12 +57,14 @@ export const useMelodyChanges = ({
   const lastValuesRef = useRef<{
     selectedNotes: string[]
     appliedChordIds: string[]
+    appliedScaleIds: string[]
     bpm: number
     numberOfBeats: number
     melodyGenerated: boolean
   }>({
     selectedNotes: [],
     appliedChordIds: [],
+    appliedScaleIds: [],
     bpm: 120,
     numberOfBeats: 8,
     melodyGenerated: false
@@ -71,9 +75,11 @@ export const useMelodyChanges = ({
     if (generatedMelody.length > 0 && generatedMelody.length !== lastMelodyLength) {
       const noteNames = selectedNotes.map(note => note.name)
       const chordIds = appliedChords.map(chord => chord.id)
+      const scaleIds = appliedScales.map(scale => scale.id)
       lastValuesRef.current = {
         selectedNotes: [...noteNames],
         appliedChordIds: [...chordIds],
+        appliedScaleIds: [...scaleIds],
         bpm,
         numberOfBeats,
         melodyGenerated: true
@@ -81,13 +87,14 @@ export const useMelodyChanges = ({
       setHasChanges(false)
       setLastMelodyLength(generatedMelody.length)
     }
-  }, [generatedMelody.length, selectedNotes, appliedChords, bpm, numberOfBeats, lastMelodyLength])
+  }, [generatedMelody.length, selectedNotes, appliedChords, appliedScales, bpm, numberOfBeats, lastMelodyLength])
 
   // Track changes in parameters
   useEffect(() => {
     const last = lastValuesRef.current
     const currentNoteNames = selectedNotes.map(note => note.name)
     const currentChordIds = appliedChords.map(chord => chord.id)
+    const currentScaleIds = appliedScales.map(scale => scale.id)
 
     // If no melody has been generated yet, don't show changes indicator
     if (!lastValuesRef.current.melodyGenerated) {
@@ -103,23 +110,29 @@ export const useMelodyChanges = ({
     const chordsChanged = currentChordIds.length !== last.appliedChordIds.length ||
       currentChordIds.some((id, index) => id !== last.appliedChordIds[index])
 
+    // Check if applied scales changed
+    const scalesChanged = currentScaleIds.length !== last.appliedScaleIds.length ||
+      currentScaleIds.some((id, index) => id !== last.appliedScaleIds[index])
+
     // Check if BPM or number of beats changed
     const bpmChanged = bpm !== last.bpm
     const numberOfBeatsChanged = numberOfBeats !== last.numberOfBeats
 
-    const hasAnyChanges = notesChanged || chordsChanged || bpmChanged || numberOfBeatsChanged
+    const hasAnyChanges = notesChanged || chordsChanged || scalesChanged || bpmChanged || numberOfBeatsChanged
 
     // Only show badge if there are changes AND user can generate a melody
     setHasChanges(hasAnyChanges && canGenerateMelody())
-  }, [selectedNotes, appliedChords, bpm, numberOfBeats, instrument, keyboardSelectionMode])
+  }, [selectedNotes, appliedChords, appliedScales, bpm, numberOfBeats, instrument, keyboardSelectionMode])
 
   const clearChanges = () => {
     const noteNames = selectedNotes.map(note => note.name)
     const chordIds = appliedChords.map(chord => chord.id)
+    const scaleIds = appliedScales.map(scale => scale.id)
     setHasChanges(false)
     lastValuesRef.current = {
       selectedNotes: [...noteNames],
       appliedChordIds: [...chordIds],
+      appliedScaleIds: [...scaleIds],
       bpm,
       numberOfBeats,
       melodyGenerated: true
