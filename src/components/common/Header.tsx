@@ -4,7 +4,6 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import ThemeToggle from './ThemeToggle'
 import AuthModal from '../auth/AuthModal'
 import UserMenu from '../auth/UserMenu'
-import ErrorTrigger from '../ErrorTrigger'
 import '../../styles/Header.css'
 
 interface HeaderProps {
