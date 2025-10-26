@@ -836,25 +836,28 @@
 
 @media (max-width: 480px) {
   .control-button.delete-selection {
-    min-width: 100px;
+    min-width: 120px !important;
+    width: 120px !important;
     font-size: 11px;
-    padding: 6px 8px;
+    padding: 6px 12px;
   }
 }
 
 @media (max-width: 480px) and (min-width: 361px) {
   .control-button.delete-selection {
-    margin: 0 auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 }
 
 @media (max-width: 360px) {
   .control-button.delete-selection {
-    min-width: 120px;
-    width: 120px;
+    min-width: 120px !important;
+    width: 120px !important;
     font-size: 12px;
     padding: 6px 12px;
-    margin: 0 auto;
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
@@ -1267,6 +1270,113 @@
   justify-content: flex-start !important;
   gap: 0 !important;
   flex: 0 0 auto !important;
+}
+
+/* Mobile only: add top margins to match deselect all button */
+@media (max-width: 480px) {
+  /* Keyboard mode: 23px margin on mobile */
+  body:has([data-instrument="keyboard"]) .control-group.scale-chord-options {
+    margin-top: 23px !important;
+  }
+
+  /* Guitar mode: 6px margin on mobile */
+  body:has([data-instrument="guitar"]) .control-group.scale-chord-options {
+    margin-top: 6px !important;
+  }
+
+  /* Bass mode: 6px margin on mobile */
+  body:has([data-instrument="bass"]) .control-group.scale-chord-options {
+    margin-top: 6px !important;
+  }
+}
+
+/* Very small screens - one button per row, centered */
+@media (max-width: 360px) {
+  .header-controls-left {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+    width: 100% !important;
+  }
+
+  .header-controls-left .control-group {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Reset all child element margins/padding */
+  .header-controls-left .control-group > * {
+    margin: 0 !important;
+  }
+
+  /* Remove top margins on very small screens for vertical stacking */
+  body:has([data-instrument="keyboard"]) .control-group.scale-chord-options,
+  body:has([data-instrument="guitar"]) .control-group.scale-chord-options,
+  body:has([data-instrument="bass"]) .control-group.scale-chord-options {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  body:has([data-instrument="keyboard"]) .control-button.delete-selection,
+  body:has([data-instrument="guitar"]) .control-button.delete-selection,
+  body:has([data-instrument="bass"]) .control-button.delete-selection {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Ensure selection mode control group has no extra spacing */
+  .header-controls-left .control-group:has(.selection-mode-switch),
+  .header-controls-left .control-group.selection-mode-group {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Force deselect all button container to have no margins */
+  .header-controls-left .control-group:has(.delete-selection),
+  .header-controls-left > .control-group:has(.delete-selection) {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .control-button.delete-selection {
+    margin: 0 !important;
+  }
+
+  /* Force scale-chord-options to have no gap */
+  .control-group.scale-chord-options {
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .control-group.scale-chord-options > * {
+    margin: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Override any scale-chord-options child elements */
+  .control-group.scale-chord-options .scale-chord-container,
+  .control-group.scale-chord-options .scale-options-custom,
+  .control-group.scale-chord-options > div {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Fix collapsed scale-options-container height */
+  .scale-options-container.collapsed {
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
 }
 
 /* Make header controls layout horizontal */
@@ -2710,27 +2820,22 @@ body.dark .modern-control-item.audio-player-section audio {
   border-color: #dc3545; /* Original red border color */
 }
 
-/* Keyboard mode: 22px margin on tablets/desktop */
+/* Keyboard mode: 23px margin on tablets/desktop */
 body:has([data-instrument="keyboard"]) .control-button.delete-selection {
-  margin-top: 22px !important;
+  margin-top: 23px !important;
 }
 
-/* Guitar mode: 5px margin on tablets/desktop */
+/* Guitar mode: 6px margin on tablets/desktop */
 body:has([data-instrument="guitar"]) .control-button.delete-selection {
-  margin-top: 5px !important;
+  margin-top: 6px !important;
 }
 
-/* Bass mode: 5px margin on tablets/desktop */
+/* Bass mode: 6px margin on tablets/desktop */
 body:has([data-instrument="bass"]) .control-button.delete-selection {
-  margin-top: 5px !important;
+  margin-top: 6px !important;
 }
 
-/* Mobile override: keyboard mode gets 0px margin on phones only */
-@media (max-width: 480px) {
-  body:has([data-instrument="keyboard"]) .control-button.delete-selection {
-    margin-top: 0 !important;
-  }
-}
+/* Mobile: keep the same margins as desktop */
 
 /* Generating indicator styles */
 .generating-indicator {

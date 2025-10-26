@@ -286,7 +286,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
       {isExpanded && (
         <div
-          className={`scale-options-popup ${!isScaleMode ? 'chord-mode' : ''}`}
+          className={`scale-options-popup ${!isScaleMode ? 'chord-mode' : ''} instrument-${instrument}`}
         >
           <div className={`scale-options-content ${!isScaleMode ? 'chord-mode' : ''}`}>
             {/* Mode Toggle Slider */}
