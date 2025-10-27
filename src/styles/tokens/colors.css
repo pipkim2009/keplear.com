@@ -13,16 +13,16 @@
   --primary-purple-lighter: #c77dff;
 
   /* Primary Purple Alpha Variations */
-  --primary-purple-alpha-5: rgba(128, 0, 255, 0.05);
-  --primary-purple-alpha-10: rgba(128, 0, 255, 0.1);
-  --primary-purple-alpha-15: rgba(128, 0, 255, 0.15);
-  --primary-purple-alpha-20: rgba(128, 0, 255, 0.2);
-  --primary-purple-alpha-25: rgba(128, 0, 255, 0.25);
-  --primary-purple-alpha-30: rgba(128, 0, 255, 0.3);
-  --primary-purple-alpha-40: rgba(128, 0, 255, 0.4);
-  --primary-purple-alpha-50: rgba(128, 0, 255, 0.5);
-  --primary-purple-alpha-60: rgba(128, 0, 255, 0.6);
-  --primary-purple-alpha-80: rgba(128, 0, 255, 0.8);
+  --primary-purple-alpha-5: rgb(128, 0, 255, 0.05);
+  --primary-purple-alpha-10: rgb(128, 0, 255, 0.1);
+  --primary-purple-alpha-15: rgb(128, 0, 255, 0.15);
+  --primary-purple-alpha-20: rgb(128, 0, 255, 0.2);
+  --primary-purple-alpha-25: rgb(128, 0, 255, 0.25);
+  --primary-purple-alpha-30: rgb(128, 0, 255, 0.3);
+  --primary-purple-alpha-40: rgb(128, 0, 255, 0.4);
+  --primary-purple-alpha-50: rgb(128, 0, 255, 0.5);
+  --primary-purple-alpha-60: rgb(128, 0, 255, 0.6);
+  --primary-purple-alpha-80: rgb(128, 0, 255, 0.8);
 
   /* ========================================
      THEME COLORS - LIGHT MODE
@@ -31,11 +31,9 @@
   --light-bg-secondary: #f8f9fa;
   --light-bg-tertiary: #e8e4ff;
   --light-bg-quaternary: #f0f0ff;
-
   --light-text-primary: #121212;
   --light-text-secondary: #374151;
   --light-text-tertiary: #6b7280;
-
   --light-border-primary: #e2e8f0;
   --light-border-secondary: #d1d5db;
 
@@ -47,11 +45,9 @@
   --dark-bg-tertiary: #2d1b69;
   --dark-bg-quaternary: #1a0d2e;
   --dark-bg-surface: #0a0a0a;
-
   --dark-text-primary: #d2d2f9;
   --dark-text-secondary: #ffffff;
   --dark-text-tertiary: #e9ecef;
-
   --dark-border-primary: #4a5568;
   --dark-border-secondary: #2d3748;
 
@@ -64,14 +60,14 @@
   --blue-700: #1d4ed8;
   --blue-800: #1e40af;
   --blue-900: #1e3a8a;
-  --blue-alpha-05: rgba(59, 130, 246, 0.05);
-  --blue-alpha-10: rgba(59, 130, 246, 0.1);
-  --blue-alpha-20: rgba(59, 130, 246, 0.2);
-  --blue-alpha-30: rgba(59, 130, 246, 0.3);
-  --blue-alpha-40: rgba(59, 130, 246, 0.4);
-  --blue-alpha-50: rgba(59, 130, 246, 0.5);
-  --blue-alpha-60: rgba(59, 130, 246, 0.6);
-  --blue-alpha-80: rgba(59, 130, 246, 0.8);
+  --blue-alpha-05: rgb(59, 130, 246, 0.05);
+  --blue-alpha-10: rgb(59, 130, 246, 0.1);
+  --blue-alpha-20: rgb(59, 130, 246, 0.2);
+  --blue-alpha-30: rgb(59, 130, 246, 0.3);
+  --blue-alpha-40: rgb(59, 130, 246, 0.4);
+  --blue-alpha-50: rgb(59, 130, 246, 0.5);
+  --blue-alpha-60: rgb(59, 130, 246, 0.6);
+  --blue-alpha-80: rgb(59, 130, 246, 0.8);
 
   /* ========================================
      SEMANTIC COLORS - GREEN (SUCCESS)
@@ -83,15 +79,15 @@
   --green-700: #15803d;
   --green-800: #166534;
   --green-light: #86efac;
-  --green-alpha-05: rgba(34, 197, 94, 0.05);
-  --green-alpha-10: rgba(34, 197, 94, 0.1);
-  --green-alpha-20: rgba(34, 197, 94, 0.2);
-  --green-alpha-30: rgba(34, 197, 94, 0.3);
-  --green-alpha-40: rgba(34, 197, 94, 0.4);
-  --green-alpha-50: rgba(34, 197, 94, 0.5);
-  --green-alpha-60: rgba(34, 197, 94, 0.6);
-  --green-alpha-80: rgba(34, 197, 94, 0.8);
-  --green-light-alpha-50: rgba(134, 239, 172, 0.5);
+  --green-alpha-05: rgb(34, 197, 94, 0.05);
+  --green-alpha-10: rgb(34, 197, 94, 0.1);
+  --green-alpha-20: rgb(34, 197, 94, 0.2);
+  --green-alpha-30: rgb(34, 197, 94, 0.3);
+  --green-alpha-40: rgb(34, 197, 94, 0.4);
+  --green-alpha-50: rgb(34, 197, 94, 0.5);
+  --green-alpha-60: rgb(34, 197, 94, 0.6);
+  --green-alpha-80: rgb(34, 197, 94, 0.8);
+  --green-light-alpha-50: rgb(134, 239, 172, 0.5);
 
   /* ========================================
      SEMANTIC COLORS - RED (ERROR/DANGER)
@@ -101,15 +97,15 @@
   --red-700: #b91c1c;
   --red-light: #f87171;
   --red-lighter: #fca5a5;
-  --red-alpha-05: rgba(239, 68, 68, 0.05);
-  --red-alpha-10: rgba(239, 68, 68, 0.1);
-  --red-alpha-20: rgba(239, 68, 68, 0.2);
-  --red-alpha-30: rgba(239, 68, 68, 0.3);
-  --red-alpha-40: rgba(239, 68, 68, 0.4);
-  --red-alpha-50: rgba(239, 68, 68, 0.5);
-  --red-alpha-60: rgba(239, 68, 68, 0.6);
-  --red-alpha-80: rgba(239, 68, 68, 0.8);
-  --red-light-alpha-60: rgba(248, 113, 113, 0.6);
+  --red-alpha-05: rgb(239, 68, 68, 0.05);
+  --red-alpha-10: rgb(239, 68, 68, 0.1);
+  --red-alpha-20: rgb(239, 68, 68, 0.2);
+  --red-alpha-30: rgb(239, 68, 68, 0.3);
+  --red-alpha-40: rgb(239, 68, 68, 0.4);
+  --red-alpha-50: rgb(239, 68, 68, 0.5);
+  --red-alpha-60: rgb(239, 68, 68, 0.6);
+  --red-alpha-80: rgb(239, 68, 68, 0.8);
+  --red-light-alpha-60: rgb(248, 113, 113, 0.6);
 
   /* ========================================
      SEMANTIC COLORS - ORANGE (SCALES)
@@ -118,9 +114,9 @@
   --orange-500: #f97316;
   --orange-600: #ea580c;
   --orange-700: #c2410c;
-  --orange-alpha-40: rgba(249, 115, 22, 0.4);
-  --orange-400-alpha-60: rgba(251, 146, 60, 0.6);
-  --orange-600-alpha-60: rgba(217, 119, 6, 0.6);
+  --orange-alpha-40: rgb(249, 115, 22, 0.4);
+  --orange-400-alpha-60: rgb(251, 146, 60, 0.6);
+  --orange-600-alpha-60: rgb(217, 119, 6, 0.6);
 
   /* ========================================
      SEMANTIC COLORS - AMBER/YELLOW (PLAYING)
@@ -128,8 +124,8 @@
   --amber-200: #fef3c7;
   --amber-400: #fbbf24;
   --amber-500: #f59e0b;
-  --amber-alpha-60: rgba(245, 158, 11, 0.6);
-  --amber-alpha-80: rgba(251, 191, 36, 0.8);
+  --amber-alpha-60: rgb(245, 158, 11, 0.6);
+  --amber-alpha-80: rgb(251, 191, 36, 0.8);
 
   /* ========================================
      SEMANTIC COLORS - PURPLE (CHORDS)
@@ -138,8 +134,8 @@
   --purple-600: #8b5cf6;
   --purple-700: #7c3aed;
   --purple-800: #6b46c1;
-  --purple-alpha-40: rgba(139, 92, 246, 0.4);
-  --purple-600-alpha-60: rgba(167, 139, 250, 0.6);
+  --purple-alpha-40: rgb(139, 92, 246, 0.4);
+  --purple-600-alpha-60: rgb(167, 139, 250, 0.6);
 
   /* ========================================
      NEUTRAL GRAYS
@@ -150,7 +146,7 @@
   --gray-200: #e5e7eb;
   --gray-300: #d1d5db;
   --gray-400: #9ca3af;
-  --gray-400-alpha-30: rgba(156, 163, 175, 0.3);
+  --gray-400-alpha-30: rgb(156, 163, 175, 0.3);
   --gray-neutral: #808080;
   --gray-500: #6b7280;
   --gray-600: #4b5563;
@@ -202,6 +198,7 @@
   /* ========================================
      NOTE CIRCLE COLORS
      ======================================== */
+
   /* Selected Notes */
   --note-selected: #3b82f6;
   --note-selected-dark: #1d4ed8;
@@ -245,22 +242,23 @@
   /* ========================================
      ALPHA COLORS (TRANSPARENCY)
      ======================================== */
+
   /* Black Alpha */
-  --black-alpha-10: rgba(0, 0, 0, 0.1);
-  --black-alpha-20: rgba(0, 0, 0, 0.2);
-  --black-alpha-30: rgba(0, 0, 0, 0.3);
-  --black-alpha-40: rgba(0, 0, 0, 0.4);
-  --black-alpha-50: rgba(0, 0, 0, 0.5);
+  --black-alpha-10: rgb(0, 0, 0, 0.1);
+  --black-alpha-20: rgb(0, 0, 0, 0.2);
+  --black-alpha-30: rgb(0, 0, 0, 0.3);
+  --black-alpha-40: rgb(0, 0, 0, 0.4);
+  --black-alpha-50: rgb(0, 0, 0, 0.5);
 
   /* White Alpha */
-  --white-alpha-10: rgba(255, 255, 255, 0.1);
-  --white-alpha-15: rgba(255, 255, 255, 0.15);
-  --white-alpha-20: rgba(255, 255, 255, 0.2);
-  --white-alpha-30: rgba(255, 255, 255, 0.3);
-  --white-alpha-50: rgba(255, 255, 255, 0.5);
-  --white-alpha-60: rgba(255, 255, 255, 0.6);
-  --white-alpha-80: rgba(255, 255, 255, 0.8);
-  --white-alpha-90: rgba(255, 255, 255, 0.9);
+  --white-alpha-10: rgb(255, 255, 255, 0.1);
+  --white-alpha-15: rgb(255, 255, 255, 0.15);
+  --white-alpha-20: rgb(255, 255, 255, 0.2);
+  --white-alpha-30: rgb(255, 255, 255, 0.3);
+  --white-alpha-50: rgb(255, 255, 255, 0.5);
+  --white-alpha-60: rgb(255, 255, 255, 0.6);
+  --white-alpha-80: rgb(255, 255, 255, 0.8);
+  --white-alpha-90: rgb(255, 255, 255, 0.9);
 
   /* ========================================
      BUTTON COLORS
@@ -269,23 +267,22 @@
   --btn-primary-bg-hover: #1d4ed8;
   --btn-primary-border: #3b82f6;
   --btn-primary-text: #ffffff;
-
-  --btn-secondary-bg-light: rgba(255, 255, 255, 0.9);
-  --btn-secondary-bg-dark: rgba(45, 27, 105, 0.8);
-  --btn-secondary-border-light: rgba(210, 210, 249, 0.4);
-  --btn-secondary-border-dark: rgba(210, 210, 249, 0.3);
+  --btn-secondary-bg-light: rgb(255, 255, 255, 0.9);
+  --btn-secondary-bg-dark: rgb(45, 27, 105, 0.8);
+  --btn-secondary-border-light: rgb(210, 210, 249, 0.4);
+  --btn-secondary-border-dark: rgb(210, 210, 249, 0.3);
   --btn-secondary-text-light: #2d1b69;
   --btn-secondary-text-dark: #d2d2f9;
 
   /* ========================================
      SHADOW COLORS
      ======================================== */
-  --shadow-primary-light: rgba(45, 27, 105, 0.1);
-  --shadow-primary-dark: rgba(0, 0, 0, 0.2);
-  --shadow-hover-light: rgba(45, 27, 105, 0.2);
-  --shadow-hover-dark: rgba(0, 0, 0, 0.3);
-  --shadow-button: rgba(59, 130, 246, 0.2);
-  --shadow-button-hover: rgba(59, 130, 246, 0.3);
-  --shadow-note: rgba(0, 0, 0, 0.3);
-  --shadow-scale-root: rgba(220, 38, 38, 0.6);
+  --shadow-primary-light: rgb(45, 27, 105, 0.1);
+  --shadow-primary-dark: rgb(0, 0, 0, 0.2);
+  --shadow-hover-light: rgb(45, 27, 105, 0.2);
+  --shadow-hover-dark: rgb(0, 0, 0, 0.3);
+  --shadow-button: rgb(59, 130, 246, 0.2);
+  --shadow-button-hover: rgb(59, 130, 246, 0.3);
+  --shadow-note: rgb(0, 0, 0, 0.3);
+  --shadow-scale-root: rgb(220, 38, 38, 0.6);
 }

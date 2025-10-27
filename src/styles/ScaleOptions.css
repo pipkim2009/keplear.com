@@ -59,9 +59,9 @@
   min-width: 200px !important;
   box-sizing: border-box;
   z-index: 102 !important;
-  background: rgba(0, 0, 0, 0.95);
+  background: rgb(0, 0, 0, 0.95);
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.3);
   border: 2px solid #f97316;
   pointer-events: auto !important;
   backdrop-filter: blur(8px);
@@ -78,9 +78,9 @@
 }
 
 .dark .scale-options-popup {
-  background: rgba(0, 0, 0, 0.95);
+  background: rgb(0, 0, 0, 0.95);
   border: 2px solid #f97316;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.4);
 }
 
 .dark .scale-options-popup.chord-mode {
@@ -88,7 +88,7 @@
 }
 
 .scale-options-toggle {
-  background: rgba(139, 92, 246, 0.1);
+  background: rgb(139, 92, 246, 0.1);
   border: 2px solid #8b5cf6;
   color: #c4b5fd;
   padding: 6px 12px;
@@ -116,20 +116,20 @@
 }
 
 .scale-options-toggle:hover {
-  background: rgba(139, 92, 246, 0.2);
+  background: rgb(139, 92, 246, 0.2);
 }
 
 .scale-options-toggle:active {
-  background: rgba(139, 92, 246, 0.15);
+  background: rgb(139, 92, 246, 0.15);
 }
 
 
 .scale-controls {
   margin: 0 auto;
   padding: 8px;
-  background: rgba(249, 115, 22, 0.05);
+  background: rgb(249, 115, 22, 0.05);
   border-radius: 6px;
-  border: 1px solid rgba(249, 115, 22, 0.3);
+  border: 1px solid rgb(249, 115, 22, 0.3);
   width: calc(100% - 16px);
   display: flex;
   flex-direction: column;
@@ -138,18 +138,18 @@
 
 /* Purple styling for chord mode */
 .scale-controls.chord-mode {
-  background: rgba(139, 92, 246, 0.05);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: rgb(139, 92, 246, 0.05);
+  border: 1px solid rgb(139, 92, 246, 0.3);
 }
 
 .dark .scale-controls {
-  background: rgba(249, 115, 22, 0.05);
-  border-color: rgba(249, 115, 22, 0.3);
+  background: rgb(249, 115, 22, 0.05);
+  border-color: rgb(249, 115, 22, 0.3);
 }
 
 .dark .scale-controls.chord-mode {
-  background: rgba(139, 92, 246, 0.05);
-  border-color: rgba(139, 92, 246, 0.3);
+  background: rgb(139, 92, 246, 0.05);
+  border-color: rgb(139, 92, 246, 0.3);
 }
 
 .control-section {
@@ -197,52 +197,52 @@
   padding: 6px 10px;
   border: 2px solid #f97316;
   border-radius: 6px;
-  background: rgba(249, 115, 22, 0.1);
+  background: rgb(249, 115, 22, 0.1);
   color: #f97316;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
   outline: none;
 }
 
 /* Purple styling for chord mode */
 .control-select.chord-mode {
   border: 2px solid #8b5cf6;
-  background: rgba(139, 92, 246, 0.1);
+  background: rgb(139, 92, 246, 0.1);
   color: #8b5cf6;
 }
 
 .dark .control-select {
-  background: rgba(249, 115, 22, 0.1);
+  background: rgb(249, 115, 22, 0.1);
   border-color: #f97316;
   color: #f97316;
 }
 
 .dark .control-select.chord-mode {
-  background: rgba(139, 92, 246, 0.1);
+  background: rgb(139, 92, 246, 0.1);
   border-color: #8b5cf6;
   color: #8b5cf6;
 }
 
 .control-select:hover {
-  background: rgba(249, 115, 22, 0.3);
+  background: rgb(249, 115, 22, 0.3);
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
 .control-select.chord-mode:hover {
-  background: rgba(139, 92, 246, 0.3);
+  background: rgb(139, 92, 246, 0.3);
 }
 
 .control-select:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.4);
+  box-shadow: 0 0 0 2px rgb(249, 115, 22, 0.4);
 }
 
 .control-select.chord-mode:focus {
-  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 0 2px rgb(139, 92, 246, 0.4);
 }
 
 /* Custom dropdown options styling */
@@ -271,7 +271,7 @@
 .apply-button {
   width: 100%;
   padding: 6px 12px;
-  background: rgba(76, 175, 80, 0.1);
+  background: rgb(76, 175, 80, 0.1);
   border: 2px solid #4caf50;
   color: #a5d6a7;
   border-radius: 6px;
@@ -279,20 +279,20 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
   outline: none;
   height: 32px;
 }
 
 .apply-button:hover {
-  background: rgba(76, 175, 80, 0.2);
+  background: rgb(76, 175, 80, 0.2);
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
 .apply-button:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
 }
 
 
@@ -355,11 +355,8 @@
 .toggle-slider {
   position: absolute;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(249, 115, 22, 0.1);
+  inset: 0;
+  background-color: rgb(249, 115, 22, 0.1);
   border: 2px solid #f97316;
   transition: all 0.3s ease;
   border-radius: 6px;
@@ -387,13 +384,13 @@
   margin-right: 2px;
 }
 
-.toggle-slider:before {
+.toggle-slider::before {
   position: absolute;
   content: "";
   height: 28px;
   width: 58px;
-  left: 0px;
-  top: 0px;
+  left: 0;
+  top: 0;
   background-color: #f97316;
   transition: all 0.3s ease;
   border-radius: 0;
@@ -416,11 +413,11 @@
 
 /* Chords mode (checked) */
 input:checked + .toggle-slider {
-  background-color: rgba(139, 92, 246, 0.1);
+  background-color: rgb(139, 92, 246, 0.1);
   border-color: #8b5cf6;
 }
 
-input:checked + .toggle-slider:before {
+input:checked + .toggle-slider::before {
   transform: translateX(58px);
   background-color: #8b5cf6;
 }
@@ -439,11 +436,11 @@ input:checked + .toggle-slider .toggle-text.right {
 }
 
 .toggle-slider:hover {
-  background-color: rgba(249, 115, 22, 0.2);
+  background-color: rgb(249, 115, 22, 0.2);
 }
 
 input:checked + .toggle-slider:hover {
-  background-color: rgba(139, 92, 246, 0.2);
+  background-color: rgb(139, 92, 246, 0.2);
 }
 
 /* Green flash for toggle slider when mode changes */
@@ -578,14 +575,14 @@ input:checked + .toggle-slider:hover {
     font-size: 10px;
   }
 
-  .toggle-slider:before {
+  .toggle-slider::before {
     height: 24px;
     width: 52px;
-    top: 0px;
+    top: 0;
     border-radius: 0;
   }
 
-  input:checked + .toggle-slider:before {
+  input:checked + .toggle-slider::before {
     transform: translateX(54px);
   }
 }
@@ -598,7 +595,7 @@ input:checked + .toggle-slider:hover {
   max-height: 120px;
   overflow-y: auto;
   padding: 4px;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0, 0, 0, 0.3);
   border-radius: 4px;
   border: 1px solid #333333;
 }
@@ -608,15 +605,15 @@ input:checked + .toggle-slider:hover {
   align-items: center;
   justify-content: space-between;
   padding: 4px 8px;
-  background: rgba(249, 115, 22, 0.1);
-  border: 1px solid rgba(249, 115, 22, 0.3);
+  background: rgb(249, 115, 22, 0.1);
+  border: 1px solid rgb(249, 115, 22, 0.3);
   border-radius: 4px;
   transition: all 0.2s ease;
 }
 
 .applied-scale-item:hover {
-  background: rgba(249, 115, 22, 0.2);
-  border-color: rgba(249, 115, 22, 0.5);
+  background: rgb(249, 115, 22, 0.2);
+  border-color: rgb(249, 115, 22, 0.5);
 }
 
 .scale-name {
@@ -629,8 +626,8 @@ input:checked + .toggle-slider:hover {
 .delete-scale-button {
   width: 18px;
   height: 18px;
-  background: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.4);
+  background: rgb(220, 38, 38, 0.1);
+  border: 1px solid rgb(220, 38, 38, 0.4);
   color: #f87171;
   border-radius: 50%;
   cursor: pointer;
@@ -645,8 +642,8 @@ input:checked + .toggle-slider:hover {
 }
 
 .delete-scale-button:hover {
-  background: rgba(220, 38, 38, 0.2);
-  border-color: rgba(220, 38, 38, 0.6);
+  background: rgb(220, 38, 38, 0.2);
+  border-color: rgb(220, 38, 38, 0.6);
   color: #dc2626;
   transform: scale(1.1);
 }
@@ -661,17 +658,17 @@ input:checked + .toggle-slider:hover {
 }
 
 .applied-scales-list::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0, 0, 0, 0.2);
   border-radius: 2px;
 }
 
 .applied-scales-list::-webkit-scrollbar-thumb {
-  background: rgba(249, 115, 22, 0.3);
+  background: rgb(249, 115, 22, 0.3);
   border-radius: 2px;
 }
 
 .applied-scales-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(249, 115, 22, 0.5);
+  background: rgb(249, 115, 22, 0.5);
 }
 
 /* Applied Chords List Styles - Purple Theme */
@@ -682,7 +679,7 @@ input:checked + .toggle-slider:hover {
   max-height: 120px;
   overflow-y: auto;
   padding: 4px;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgb(0, 0, 0, 0.3);
   border-radius: 4px;
   border: 1px solid #333333;
 }
@@ -692,15 +689,15 @@ input:checked + .toggle-slider:hover {
   align-items: center;
   justify-content: space-between;
   padding: 4px 8px;
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: rgb(139, 92, 246, 0.1);
+  border: 1px solid rgb(139, 92, 246, 0.3);
   border-radius: 4px;
   transition: all 0.2s ease;
 }
 
 .applied-chord-item:hover {
-  background: rgba(139, 92, 246, 0.2);
-  border-color: rgba(139, 92, 246, 0.5);
+  background: rgb(139, 92, 246, 0.2);
+  border-color: rgb(139, 92, 246, 0.5);
 }
 
 .chord-name {
@@ -713,8 +710,8 @@ input:checked + .toggle-slider:hover {
 .delete-chord-button {
   width: 18px;
   height: 18px;
-  background: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.4);
+  background: rgb(220, 38, 38, 0.1);
+  border: 1px solid rgb(220, 38, 38, 0.4);
   color: #f87171;
   border-radius: 50%;
   cursor: pointer;
@@ -729,8 +726,8 @@ input:checked + .toggle-slider:hover {
 }
 
 .delete-chord-button:hover {
-  background: rgba(220, 38, 38, 0.2);
-  border-color: rgba(220, 38, 38, 0.6);
+  background: rgb(220, 38, 38, 0.2);
+  border-color: rgb(220, 38, 38, 0.6);
   color: #dc2626;
   transform: scale(1.1);
 }
@@ -745,17 +742,17 @@ input:checked + .toggle-slider:hover {
 }
 
 .applied-chords-list::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgb(0, 0, 0, 0.2);
   border-radius: 2px;
 }
 
 .applied-chords-list::-webkit-scrollbar-thumb {
-  background: rgba(139, 92, 246, 0.3);
+  background: rgb(139, 92, 246, 0.3);
   border-radius: 2px;
 }
 
 .applied-chords-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.5);
+  background: rgb(139, 92, 246, 0.5);
 }
 
 

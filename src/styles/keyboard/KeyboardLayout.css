@@ -38,23 +38,23 @@
   transition: all 0.1s ease;
   flex-shrink: 0;
   box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.8),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.1),
-    0 4px 8px rgba(0, 0, 0, 0.2);
+    inset 0 2px 4px rgb(255, 255, 255, 0.8),
+    inset 0 -2px 4px rgb(0, 0, 0, 0.1),
+    0 4px 8px rgb(0, 0, 0, 0.2);
 }
 
 .dark .white-key {
   box-shadow:
-    inset 0 2px 4px rgba(156, 163, 175, 0.3),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.1),
-    0 4px 8px rgba(0, 0, 0, 0.4);
+    inset 0 2px 4px rgb(156, 163, 175, 0.3),
+    inset 0 -2px 4px rgb(0, 0, 0, 0.1),
+    0 4px 8px rgb(0, 0, 0, 0.4);
 }
 
 .white-key:active {
   box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.6),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.2),
-    0 1px 2px rgba(0, 0, 0, 0.2);
+    inset 0 2px 4px rgb(255, 255, 255, 0.6),
+    inset 0 -1px 2px rgb(0, 0, 0, 0.2),
+    0 1px 2px rgb(0, 0, 0, 0.2);
 }
 
 .white-key.selected {
@@ -80,7 +80,7 @@
 }
 
 .keyboard.default-mode .black-keys {
-  left: 0px;
+  left: 0;
 }
 
 /* Black Keys */
@@ -95,16 +95,16 @@
   pointer-events: all;
   transition: all 0.1s ease;
   box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.1),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
-    0 4px 8px rgba(0, 0, 0, 0.5);
+    inset 0 1px 2px rgb(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgb(0, 0, 0, 0.3),
+    0 4px 8px rgb(0, 0, 0, 0.5);
 }
 
 .black-key:active {
   box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.1),
-    inset 0 -1px 1px rgba(0, 0, 0, 0.4),
-    0 1px 2px rgba(0, 0, 0, 0.5);
+    inset 0 1px 2px rgb(255, 255, 255, 0.1),
+    inset 0 -1px 1px rgb(0, 0, 0, 0.4),
+    0 1px 2px rgb(0, 0, 0, 0.5);
 }
 
 .black-key.selected {
@@ -124,7 +124,7 @@
 
   .keyboard {
     min-width: 320px !important;
-    margin: 0 0 0 0 !important;
+    margin: 0 !important;
   }
 
   .keyboard.default-mode {
@@ -153,7 +153,7 @@
 
   .keyboard {
     min-width: 320px;
-    margin: 0 0 0 0;
+    margin: 0;
   }
 
   .keyboard.default-mode {

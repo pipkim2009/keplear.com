@@ -16,7 +16,7 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 15px;
-  text-shadow: 0 0 10px rgba(128, 0, 255, 0.5);
+  text-shadow: 0 0 10px rgb(128, 0, 255, 0.5);
 }
 
 .instrument-selector {
@@ -32,8 +32,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, rgba(128, 0, 255, 0.1), rgba(128, 0, 255, 0.05));
-  border: 2px solid rgba(128, 0, 255, 0.3);
+  background: linear-gradient(145deg, rgb(128, 0, 255, 0.1), rgb(128, 0, 255, 0.05));
+  border: 2px solid rgb(128, 0, 255, 0.3);
   border-radius: 16px;
   padding: 20px;
   min-width: 120px;
@@ -42,115 +42,115 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   backdrop-filter: blur(10px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px rgb(0, 0, 0, 0.2);
 }
 
 /* Keyboard - Blue theme */
 .instrument-card:nth-child(1) {
-  background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
-  border-color: rgba(59, 130, 246, 0.3);
+  background: linear-gradient(145deg, rgb(59, 130, 246, 0.1), rgb(59, 130, 246, 0.05));
+  border-color: rgb(59, 130, 246, 0.3);
 }
 
 .instrument-card:nth-child(1):hover {
   transform: translateY(-5px) scale(1.05);
-  border-color: rgba(59, 130, 246, 0.6);
-  box-shadow: 0 15px 40px rgba(59, 130, 246, 0.3);
+  border-color: rgb(59, 130, 246, 0.6);
+  box-shadow: 0 15px 40px rgb(59, 130, 246, 0.3);
 }
 
 .instrument-card:nth-child(1).active {
-  background: linear-gradient(145deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.2));
+  background: linear-gradient(145deg, rgb(59, 130, 246, 0.3), rgb(59, 130, 246, 0.2));
   border-color: #3b82f6;
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 12px 35px rgb(59, 130, 246, 0.4);
 }
 
 .instrument-card:nth-child(1) .instrument-icon {
-  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));
+  filter: drop-shadow(0 0 8px rgb(59, 130, 246, 0.5));
   color: #3b82f6;
 }
 
 .instrument-card:nth-child(1):hover .instrument-icon {
-  filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.8));
+  filter: drop-shadow(0 0 15px rgb(59, 130, 246, 0.8));
 }
 
 .instrument-card:nth-child(1) .instrument-name {
-  text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+  text-shadow: 0 0 8px rgb(59, 130, 246, 0.5);
 }
 
 .instrument-card:nth-child(1) .instrument-glow {
-  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgb(59, 130, 246, 0.2) 0%, transparent 70%);
 }
 
 /* Guitar - Green theme */
 .instrument-card:nth-child(2) {
-  background: linear-gradient(145deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
-  border-color: rgba(34, 197, 94, 0.3);
+  background: linear-gradient(145deg, rgb(34, 197, 94, 0.1), rgb(34, 197, 94, 0.05));
+  border-color: rgb(34, 197, 94, 0.3);
 }
 
 .instrument-card:nth-child(2):hover {
   transform: translateY(-5px) scale(1.05);
-  border-color: rgba(34, 197, 94, 0.6);
-  box-shadow: 0 15px 40px rgba(34, 197, 94, 0.3);
+  border-color: rgb(34, 197, 94, 0.6);
+  box-shadow: 0 15px 40px rgb(34, 197, 94, 0.3);
 }
 
 .instrument-card:nth-child(2).active {
-  background: linear-gradient(145deg, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.2));
+  background: linear-gradient(145deg, rgb(34, 197, 94, 0.3), rgb(34, 197, 94, 0.2));
   border-color: #22c55e;
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 12px 35px rgba(34, 197, 94, 0.4);
+  box-shadow: 0 12px 35px rgb(34, 197, 94, 0.4);
 }
 
 .instrument-card:nth-child(2) .instrument-icon {
-  filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.5));
+  filter: drop-shadow(0 0 8px rgb(34, 197, 94, 0.5));
   color: #22c55e;
 }
 
 .instrument-card:nth-child(2):hover .instrument-icon {
-  filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.8));
+  filter: drop-shadow(0 0 15px rgb(34, 197, 94, 0.8));
 }
 
 .instrument-card:nth-child(2) .instrument-name {
-  text-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+  text-shadow: 0 0 8px rgb(34, 197, 94, 0.5);
 }
 
 .instrument-card:nth-child(2) .instrument-glow {
-  background: radial-gradient(circle, rgba(34, 197, 94, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgb(34, 197, 94, 0.2) 0%, transparent 70%);
 }
 
 /* Bass - Red theme */
 .instrument-card:nth-child(3) {
-  background: linear-gradient(145deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
-  border-color: rgba(239, 68, 68, 0.3);
+  background: linear-gradient(145deg, rgb(239, 68, 68, 0.1), rgb(239, 68, 68, 0.05));
+  border-color: rgb(239, 68, 68, 0.3);
 }
 
 .instrument-card:nth-child(3):hover {
   transform: translateY(-5px) scale(1.05);
-  border-color: rgba(239, 68, 68, 0.6);
-  box-shadow: 0 15px 40px rgba(239, 68, 68, 0.3);
+  border-color: rgb(239, 68, 68, 0.6);
+  box-shadow: 0 15px 40px rgb(239, 68, 68, 0.3);
 }
 
 .instrument-card:nth-child(3).active {
-  background: linear-gradient(145deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.2));
+  background: linear-gradient(145deg, rgb(239, 68, 68, 0.3), rgb(239, 68, 68, 0.2));
   border-color: #ef4444;
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 12px 35px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 12px 35px rgb(239, 68, 68, 0.4);
 }
 
 .instrument-card:nth-child(3) .instrument-icon {
-  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+  filter: drop-shadow(0 0 8px rgb(239, 68, 68, 0.5));
   color: #ef4444;
 }
 
 .instrument-card:nth-child(3):hover .instrument-icon {
-  filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8));
+  filter: drop-shadow(0 0 15px rgb(239, 68, 68, 0.8));
 }
 
 .instrument-card:nth-child(3) .instrument-name {
-  text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+  text-shadow: 0 0 8px rgb(239, 68, 68, 0.5);
 }
 
 .instrument-card:nth-child(3) .instrument-glow {
-  background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgb(239, 68, 68, 0.2) 0%, transparent 70%);
 }
 
 .instrument-card.active .instrument-glow {
@@ -183,10 +183,7 @@
 
 .instrument-glow {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  right: -50%;
-  bottom: -50%;
+  inset: -50%;
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -198,6 +195,7 @@
   0%, 100% {
     opacity: 0.3;
   }
+
   50% {
     opacity: 0.6;
   }
@@ -207,6 +205,7 @@
   0%, 100% {
     transform: scale(1.1) translateY(0);
   }
+
   50% {
     transform: scale(1.1) translateY(-5px);
   }

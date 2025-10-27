@@ -17,7 +17,7 @@
 
 /* Control Inputs */
 .control-input {
-  background: rgba(128, 0, 255, 0.15);
+  background: rgb(128, 0, 255, 0.15);
   border: 2px solid #6b46c1;
   color: #ffffff;
   padding: 6px 10px;
@@ -26,7 +26,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
   outline: none;
   text-align: center;
   min-width: 50px;
@@ -34,14 +34,14 @@
 }
 
 .control-input:hover {
-  background: rgba(128, 0, 255, 0.25);
+  background: rgb(128, 0, 255, 0.25);
   border-color: #7c3aed;
 }
 
 .control-input:focus {
-  background: rgba(128, 0, 255, 0.3);
+  background: rgb(128, 0, 255, 0.3);
   border-color: #8b5cf6;
-  box-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 8px rgb(139, 92, 246, 0.4);
 }
 
 /* Dropdown Styling */
@@ -108,7 +108,6 @@
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  z-index: 10;
   pointer-events: auto;
   transition: all 0.15s ease;
   display: flex;
@@ -120,11 +119,11 @@
 }
 
 .control-button-internal:hover {
-  background: rgba(128, 0, 255, 0.1);
+  background: rgb(128, 0, 255, 0.1);
 }
 
 .control-button-internal:active {
-  background: rgba(128, 0, 255, 0.2);
+  background: rgb(128, 0, 255, 0.2);
   transform: translateY(-50%) scale(0.95);
 }
 
@@ -142,12 +141,12 @@
 
 .input-with-buttons .control-button-internal:hover {
   color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: rgb(255, 255, 255, 0.1) !important;
 }
 
 .input-with-buttons .control-button-internal:active {
   color: #ffffff !important;
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: rgb(255, 255, 255, 0.2) !important;
 }
 
 .input-with-buttons .control-button-internal.minus,
@@ -167,7 +166,7 @@
 
 /* Delete selection button */
 .control-button.delete-selection {
-  background: rgba(220, 53, 69, 0.1);
+  background: rgb(220, 53, 69, 0.1);
   border: 2px solid #dc3545;
   color: #f5c2c7;
   padding: 6px 12px;
@@ -176,7 +175,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
   outline: none;
   display: flex;
   align-items: center;
@@ -188,17 +187,18 @@
 }
 
 .control-button.delete-selection:hover {
-  background: rgba(220, 53, 69, 0.2);
+  background: rgb(220, 53, 69, 0.2);
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
 .control-button.delete-selection:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
 }
 
 /* Instrument-specific delete button positioning */
+
 /* Keyboard mode: 19px margin on tablets/desktop */
 body:has([data-instrument="keyboard"]) .control-button.delete-selection {
   margin-top: 19px !important;

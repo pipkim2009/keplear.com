@@ -13,7 +13,8 @@
       "Bash(then echo \"$file - NO THEME\")",
       "Bash(fi)",
       "Bash(awk:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []

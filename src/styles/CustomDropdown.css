@@ -1,4 +1,5 @@
 /* Custom Dropdown Component - Following W3Schools Guide */
+
 /* Adapted for keplear.com with blue selected items and rounded borders */
 
 .custom-dropdown {
@@ -9,7 +10,7 @@
 }
 
 .custom-dropbtn {
-  background: rgba(128, 0, 255, 0.1);
+  background: rgb(128, 0, 255, 0.1);
   border: 2px solid #8000ff;
   color: #d2d2f9;
   padding: 6px 10px;
@@ -18,7 +19,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
   outline: none;
   min-width: 120px;
   width: 120px;
@@ -31,13 +32,13 @@
 }
 
 .custom-dropbtn:hover {
-  background: rgba(128, 0, 255, 0.2);
+  background: rgb(128, 0, 255, 0.2);
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
 .custom-dropbtn:focus {
-  box-shadow: 0 0 0 2px rgba(128, 0, 255, 0.3);
+  box-shadow: 0 0 0 2px rgb(128, 0, 255, 0.3);
 }
 
 /* Dropdown arrow */
@@ -59,7 +60,7 @@
   position: absolute;
   background: #000000;
   min-width: 100%;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 16px 0 rgb(0, 0, 0, 0.4);
   z-index: 100;
   border-radius: 8px;
   border: 2px solid #333333;
@@ -100,7 +101,7 @@
 
 /* Scale options specific styling */
 .scale-dropdown .custom-dropbtn {
-  background: rgba(255, 152, 0, 0.1);
+  background: rgb(255, 152, 0, 0.1);
   border: 2px solid #ffcc02;
   color: #ffcc02;
   width: 100%;
@@ -108,44 +109,44 @@
 }
 
 .scale-dropdown .custom-dropbtn:hover {
-  background: rgba(255, 204, 2, 0.3);
+  background: rgb(255, 204, 2, 0.3);
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
 .scale-dropdown .custom-dropbtn:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 204, 2, 0.4);
+  box-shadow: 0 0 0 2px rgb(255, 204, 2, 0.4);
 }
 
 /* Guitar mode styling */
 .guitar-mode .custom-dropdown .custom-dropbtn {
-  background: rgba(34, 197, 94, 0.1);
+  background: rgb(34, 197, 94, 0.1);
   border: 2px solid #22c55e;
   color: #4ade80;
 }
 
 .guitar-mode .custom-dropdown .custom-dropbtn:hover {
-  background: rgba(34, 197, 94, 0.2);
+  background: rgb(34, 197, 94, 0.2);
 }
 
 .guitar-mode .custom-dropdown .custom-dropbtn:focus {
-  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+  box-shadow: 0 0 0 2px rgb(34, 197, 94, 0.3);
 }
 
 /* Bass mode styling */
 .bass-mode .custom-dropdown .custom-dropbtn {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgb(239, 68, 68, 0.1);
   border: 2px solid #ef4444;
   color: #f87171;
 }
 
 .bass-mode .custom-dropdown .custom-dropbtn:hover {
-  background: rgba(239, 68, 68, 0.2);
+  background: rgb(239, 68, 68, 0.2);
 }
 
 .bass-mode .custom-dropdown .custom-dropbtn:focus {
-  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 0 0 2px rgb(239, 68, 68, 0.3);
 }
 
 /* Responsive adjustments */
@@ -207,13 +208,13 @@
 */
 
 .light .custom-dropbtn {
-  background: rgba(128, 0, 255, 0.05);
+  background: rgb(128, 0, 255, 0.05);
   color: var(--light-text-primary);
   border-color: #8000ff;
 }
 
 .light .custom-dropbtn:hover {
-  background: rgba(128, 0, 255, 0.1);
+  background: rgb(128, 0, 255, 0.1);
 }
 
 .light .custom-dropdown-content {
@@ -236,31 +237,31 @@
 }
 
 .light .scale-dropdown .custom-dropbtn {
-  background: rgba(255, 152, 0, 0.05);
+  background: rgb(255, 152, 0, 0.05);
   border-color: #ffcc02;
   color: #d97706;
 }
 
 .light .scale-dropdown .custom-dropbtn:hover {
-  background: rgba(255, 204, 2, 0.15);
+  background: rgb(255, 204, 2, 0.15);
 }
 
 .light .guitar-mode .custom-dropdown .custom-dropbtn {
-  background: rgba(34, 197, 94, 0.05);
+  background: rgb(34, 197, 94, 0.05);
   border-color: #22c55e;
   color: #16a34a;
 }
 
 .light .guitar-mode .custom-dropdown .custom-dropbtn:hover {
-  background: rgba(34, 197, 94, 0.1);
+  background: rgb(34, 197, 94, 0.1);
 }
 
 .light .bass-mode .custom-dropdown .custom-dropbtn {
-  background: rgba(239, 68, 68, 0.05);
+  background: rgb(239, 68, 68, 0.05);
   border-color: #ef4444;
   color: #dc2626;
 }
 
 .light .bass-mode .custom-dropdown .custom-dropbtn:hover {
-  background: rgba(239, 68, 68, 0.1);
+  background: rgb(239, 68, 68, 0.1);
 }

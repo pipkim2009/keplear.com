@@ -169,10 +169,8 @@
   --container-padding-mobile: 10px;
   --container-padding-tablet: 20px;
   --container-padding-desktop: 20px;
-
   --content-max-width: 1200px;
   --content-max-width-narrow: 800px;
-
   --header-height: 80px;
   --footer-height: 120px;
 }

@@ -60,15 +60,14 @@
   justify-content: center;
   align-items: center;
   flex: 1;
-  overflow-x: scroll;
-  overflow-y: visible;
+  overflow: scroll visible;
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
   .instrument-container {
     width: 100vw;
     max-width: 100vw;
-    margin: 0.5rem 0 0 0;
+    margin: 0.5rem 0 0;
     border-radius: 0;
   }
 
@@ -89,7 +88,7 @@
   .instrument-controls-container {
     width: 700px;
     max-width: 90vw;
-    margin: 1rem auto 0 auto;
+    margin: 1rem auto 0;
     padding: 0 20px;
   }
 
@@ -102,7 +101,7 @@
 
   .keyboard {
     min-width: 320px !important;
-    margin: 0 0 0 0 !important;
+    margin: 0 !important;
   }
 
   .keyboard.default-mode {
@@ -110,15 +109,15 @@
   }
 
   .keyboard:not(.default-mode) .black-keys {
-    left: 0px;
+    left: 0;
   }
 
   .black-keys {
-    left: 0px;
+    left: 0;
   }
 
   .keyboard.default-mode .black-keys {
-    left: 0px;
+    left: 0;
   }
 }
 
@@ -126,7 +125,7 @@
   .instrument-container {
     width: 100vw;
     max-width: 100vw;
-    margin: 0.5rem 0 0 0;
+    margin: 0.5rem 0 0;
     border-radius: 0;
   }
 
@@ -297,7 +296,7 @@
   .instrument-controls-container {
     width: 700px;
     max-width: 90vw;
-    margin: 1rem auto 0 auto;
+    margin: 1rem auto 0;
     padding: 0 20px;
   }
 
@@ -308,7 +307,7 @@
   .instrument-controls-container {
     width: 100% !important;
     max-width: 100vw !important;
-    margin: 1rem 0 0 0 !important;
+    margin: 1rem 0 0 !important;
     padding: 0 !important;
     display: flex !important;
     justify-content: center !important;
@@ -354,7 +353,7 @@
 @media (max-width: 480px) {
   .keyboard {
     min-width: 320px;
-    margin: 0 0 0 0;
+    margin: 0;
   }
 
   .keyboard.default-mode {
@@ -362,7 +361,7 @@
   }
 
   .keyboard:not(.default-mode) .black-keys {
-    left: 0px;
+    left: 0;
   }
 }
 
@@ -392,7 +391,7 @@
 
 .white-key:active {
   box-shadow:
-    inset 0 2px 4px rgba(255, 255, 255, 0.6),
+    inset 0 2px 4px rgb(255, 255, 255, 0.6),
     inset 0 -1px 2px var(--black-alpha-20),
     0 1px 2px var(--black-alpha-20);
 }
@@ -473,21 +472,21 @@
 .black-keys {
   position: absolute;
   top: 0;
-  left: 0px;
+  left: 0;
   pointer-events: none;
 }
 
 .keyboard.default-mode .black-keys {
-  left: 0px;
+  left: 0;
 }
 
 @media (max-width: 480px) {
   .black-keys {
-    left: 0px;
+    left: 0;
   }
 
   .keyboard.default-mode .black-keys {
-    left: 0px;
+    left: 0;
   }
 }
 
@@ -970,6 +969,7 @@
     min-height: 200px !important;
   }
 }
+
 /* Manual selection + scale/chord gradient combinations (same as guitar/bass) */
 
 /* Manual + Scale Note - orange + blue gradient */
@@ -1135,7 +1135,7 @@
 }
 
 .selection-mode-switch .switch-option:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(255, 255, 255, 0.05);
 }
 
 .selection-mode-switch .switch-option.active {
@@ -1189,7 +1189,7 @@
 }
 
 .chord-mode-switch .switch-option:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgb(255, 255, 255, 0.05);
 }
 
 .chord-mode-switch .switch-option.active {

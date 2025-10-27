@@ -58,7 +58,6 @@
   padding: 0.875rem 1.5rem;
   border-radius: 10px;
   font-size: 0.875rem;
-  white-space: nowrap;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
@@ -98,6 +97,7 @@
       0 0 20px var(--blue-alpha-60),
       0 0 30px var(--blue-alpha-40);
   }
+
   50% {
     text-shadow:
       0 0 15px var(--blue-500),
@@ -198,6 +198,7 @@
       0 0 20px var(--primary-purple-alpha-40),
       0 0 30px var(--primary-purple-alpha-30);
   }
+
   50% {
     text-shadow:
       0 0 15px var(--primary-purple-alpha-80),

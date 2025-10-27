@@ -6,7 +6,7 @@
 
 /* Melody control buttons */
 .control-button.generate-melody {
-  background: rgba(59, 130, 246, 0.1);
+  background: rgb(59, 130, 246, 0.1);
   border: 2px solid #3b82f6;
   color: #93c5fd;
   padding: 6px 12px;
@@ -15,7 +15,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
   outline: none;
   height: 32px;
   width: 120px;
@@ -28,20 +28,20 @@
 }
 
 .control-button.generate-melody:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.2);
+  background: rgb(59, 130, 246, 0.2);
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
 .control-button.generate-melody:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
 }
 
 .control-button.generate-melody:disabled {
-  background: rgba(128, 128, 128, 0.1);
-  border-color: #666;
-  color: #666;
+  background: rgb(128, 128, 128, 0.1);
+  border-color: #666666;
+  color: #666666;
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -154,11 +154,11 @@
 .progress-bar-background {
   width: 100%;
   height: 10px;
-  background: rgba(59, 130, 246, 0.2);
+  background: rgb(59, 130, 246, 0.2);
   border: 1px solid #3b82f6;
   border-radius: 4px;
   overflow: visible;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 1px 3px rgb(0, 0, 0, 0.3);
   position: relative;
   cursor: pointer;
 }
@@ -168,7 +168,7 @@
   background: linear-gradient(90deg, #3b82f6, #93c5fd);
   transition: width 0.15s ease-out;
   border-radius: 3px;
-  box-shadow: 0 0 6px rgba(59, 130, 246, 0.6);
+  box-shadow: 0 0 6px rgb(59, 130, 246, 0.6);
 }
 
 .progress-bar-head {
@@ -181,7 +181,7 @@
   border: 2px solid #3b82f6;
   border-radius: 50%;
   cursor: grab;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.3);
   transition: all 0.15s ease-out;
   z-index: 2;
 }
@@ -190,7 +190,7 @@
   width: 14px;
   height: 14px;
   border-color: #93c5fd;
-  box-shadow: 0 3px 6px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 3px 6px rgb(59, 130, 246, 0.4);
 }
 
 .progress-bar-head:active {
@@ -203,9 +203,11 @@
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(0.95);
   }
+
   100% {
     transform: scale(1);
   }
@@ -223,6 +225,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

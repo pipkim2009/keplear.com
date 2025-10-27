@@ -24,6 +24,7 @@
  * ============================================ */
 
 /* Custom Dropdown Component - Following W3Schools Guide */
+
 /* Adapted for keplear.com with blue selected items and rounded borders */
 
 .custom-dropdown {
@@ -84,7 +85,7 @@
   position: absolute;
   background: var(--black);
   min-width: 100%;
-  box-shadow: 0px 8px 16px 0px var(--black-alpha-40);
+  box-shadow: 0 8px 16px 0 var(--black-alpha-40);
   z-index: 100;
   border-radius: 8px;
   border: 2px solid var(--gray-800);
@@ -263,7 +264,7 @@
   cursor: pointer;
   font-size: 20px;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgb(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -271,7 +272,7 @@
 
 .notes-visibility-toggle:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
 /* Notes toggle content */
@@ -362,7 +363,7 @@
   font-weight: 700;
   cursor: help;
   transition: all 0.2s ease;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 8px rgb(255, 255, 255, 0.5);
   flex-shrink: 0;
 }
 
@@ -371,12 +372,12 @@
   background: #ffffff;
   color: #000000;
   border-color: #ffffff;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 12px rgb(255, 255, 255, 0.8);
 }
 
 .dark .tooltip-icon {
   border-color: #ffffff;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 8px rgb(255, 255, 255, 0.4);
 }
 
 .dark .tooltip-icon:hover,
@@ -384,7 +385,7 @@
   background: #ffffff;
   color: #000000;
   border-color: #ffffff;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  box-shadow: 0 0 12px rgb(255, 255, 255, 0.6);
 }
 
 .tooltip-container {
@@ -402,7 +403,6 @@
   padding: 0.875rem 1.5rem;
   border-radius: 10px;
   font-size: 0.875rem;
-  white-space: nowrap;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
@@ -410,9 +410,9 @@
   z-index: 1000;
   border: 2px solid #9333ea;
   box-shadow:
-    0 0 20px rgba(147, 51, 234, 0.8),
-    0 0 40px rgba(147, 51, 234, 0.5),
-    0 4px 12px rgba(0, 0, 0, 0.8);
+    0 0 20px rgb(147, 51, 234, 0.8),
+    0 0 40px rgb(147, 51, 234, 0.5),
+    0 4px 12px rgb(0, 0, 0, 0.8);
   min-width: 280px;
   max-width: 400px;
   white-space: normal;
@@ -429,24 +429,25 @@
   margin-bottom: 0.4rem;
   text-align: left;
   text-shadow:
-    0 0 10px rgba(96, 213, 248, 0.8),
-    0 0 20px rgba(96, 213, 248, 0.6),
-    0 0 30px rgba(96, 213, 248, 0.4);
+    0 0 10px rgb(96, 213, 248, 0.8),
+    0 0 20px rgb(96, 213, 248, 0.6),
+    0 0 30px rgb(96, 213, 248, 0.4);
   animation: titleGlow 1.5s ease-in-out infinite;
 }
 
 @keyframes titleGlow {
   0%, 100% {
     text-shadow:
-      0 0 10px rgba(96, 213, 248, 0.8),
-      0 0 20px rgba(96, 213, 248, 0.6),
-      0 0 30px rgba(96, 213, 248, 0.4);
+      0 0 10px rgb(96, 213, 248, 0.8),
+      0 0 20px rgb(96, 213, 248, 0.6),
+      0 0 30px rgb(96, 213, 248, 0.4);
   }
+
   50% {
     text-shadow:
-      0 0 15px rgba(96, 213, 248, 1),
-      0 0 30px rgba(96, 213, 248, 0.8),
-      0 0 45px rgba(96, 213, 248, 0.6);
+      0 0 15px rgb(96, 213, 248, 1),
+      0 0 30px rgb(96, 213, 248, 0.8),
+      0 0 45px rgb(96, 213, 248, 0.6);
   }
 }
 
@@ -486,10 +487,10 @@
   background: #000000;
   border-color: #a855f7;
   box-shadow:
-    0 0 20px rgba(168, 85, 247, 0.8),
-    0 0 40px rgba(168, 85, 247, 0.5),
-    0 4px 12px rgba(0, 0, 0, 0.8);
-  text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+    0 0 20px rgb(168, 85, 247, 0.8),
+    0 0 40px rgb(168, 85, 247, 0.5),
+    0 4px 12px rgb(0, 0, 0, 0.8);
+  text-shadow: 0 0 10px rgb(168, 85, 247, 0.5);
 }
 
 .dark .tooltip-box::after {
@@ -702,11 +703,11 @@
   width: 100%;
   max-width: 480px;
   min-width: 420px;
-  background: rgba(26, 26, 26, 0.9);
+  background: rgb(26, 26, 26, 0.9);
   border-radius: 8px;
   padding: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  border: 1px solid #333;
+  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.3);
+  border: 1px solid #333333;
   position: relative;
   overflow: visible;
   box-sizing: border-box;
@@ -740,7 +741,7 @@
 .play-pause-btn:hover {
   background: linear-gradient(145deg, #5a9ff2, #4589cd);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px rgb(0, 0, 0, 0.3);
 }
 
 .play-pause-btn:active {
@@ -755,7 +756,7 @@
 .time-display {
   font-size: 12px;
   font-weight: 600;
-  color: #ddd;
+  color: #dddddd;
   min-width: 40px;
   text-align: center;
 }
@@ -770,12 +771,12 @@
 
 .progress-track {
   height: 12px;
-  background: #333;
+  background: #333333;
   border-radius: 6px;
   position: relative;
   overflow: visible;
-  border: 1px solid #555;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  border: 1px solid #555555;
+  box-shadow: inset 0 1px 2px rgb(0, 0, 0, 0.3);
   z-index: 1;
 }
 
@@ -786,10 +787,10 @@
   transition: width 0.1s ease;
   position: relative;
   box-shadow:
-    0 1px 3px rgba(74, 144, 226, 0.3),
-    0 0 10px rgba(74, 144, 226, 0.4),
-    0 0 20px rgba(74, 144, 226, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    0 1px 3px rgb(74, 144, 226, 0.3),
+    0 0 10px rgb(74, 144, 226, 0.4),
+    0 0 20px rgb(74, 144, 226, 0.2),
+    inset 0 1px 0 rgb(255, 255, 255, 0.3);
 }
 
 .progress-fill::after {
@@ -803,34 +804,34 @@
   background: linear-gradient(145deg, #4a90e2, #357abd);
   border-radius: 50%;
   box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    0 0 6px rgba(74, 144, 226, 0.4);
+    0 2px 4px rgb(0, 0, 0, 0.3),
+    0 0 6px rgb(74, 144, 226, 0.4);
   opacity: 0;
   transition: all 0.2s ease;
-  border: 2px solid #fff;
+  border: 2px solid #ffffff;
   z-index: 10;
 }
 
 .progress-track:hover {
-  background: #444;
-  border-color: #666;
+  background: #444444;
+  border-color: #666666;
 }
 
 .progress-track:hover .progress-fill {
   box-shadow:
-    0 1px 3px rgba(74, 144, 226, 0.4),
-    0 0 15px rgba(74, 144, 226, 0.6),
-    0 0 30px rgba(74, 144, 226, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    0 1px 3px rgb(74, 144, 226, 0.4),
+    0 0 15px rgb(74, 144, 226, 0.6),
+    0 0 30px rgb(74, 144, 226, 0.3),
+    inset 0 1px 0 rgb(255, 255, 255, 0.4);
 }
 
 .progress-track:hover .progress-fill::after,
 .progress-bar.dragging .progress-fill::after {
   opacity: 1;
   box-shadow:
-    0 2px 4px rgba(0, 0, 0, 0.3),
-    0 0 8px rgba(74, 144, 226, 0.6),
-    0 0 16px rgba(74, 144, 226, 0.4);
+    0 2px 4px rgb(0, 0, 0, 0.3),
+    0 0 8px rgb(74, 144, 226, 0.6),
+    0 0 16px rgb(74, 144, 226, 0.4);
 }
 
 .progress-bar.dragging {
@@ -838,25 +839,22 @@
 }
 
 .progress-bar.dragging .progress-track {
-  background: #444;
-  border-color: #777;
+  background: #444444;
+  border-color: #777777;
 }
 
 .progress-bar.dragging .progress-fill {
   box-shadow:
-    0 1px 3px rgba(74, 144, 226, 0.5),
-    0 0 20px rgba(74, 144, 226, 0.8),
-    0 0 40px rgba(74, 144, 226, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    0 1px 3px rgb(74, 144, 226, 0.5),
+    0 0 20px rgb(74, 144, 226, 0.8),
+    0 0 40px rgb(74, 144, 226, 0.4),
+    inset 0 1px 0 rgb(255, 255, 255, 0.5);
 }
 
 .progress-bar::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: transparent;
   cursor: pointer;
 }
@@ -865,15 +863,15 @@
   position: absolute;
   top: -35px;
   transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.9);
-  color: #fff;
+  background: rgb(0, 0, 0, 0.9);
+  color: #ffffff;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
   pointer-events: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgb(0, 0, 0, 0.4);
   z-index: 10;
 }
 
@@ -887,7 +885,7 @@
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-top: 5px solid rgba(0, 0, 0, 0.9);
+  border-top: 5px solid rgb(0, 0, 0, 0.9);
 }
 
 .volume-control {
@@ -901,7 +899,7 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #ddd;
+  color: #dddddd;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -912,8 +910,8 @@
 }
 
 .volume-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: rgb(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 .volume-btn svg {
@@ -925,11 +923,11 @@
   position: absolute;
   right: 0;
   bottom: 40px;
-  background: rgba(26, 26, 26, 0.95);
-  border: 1px solid #333;
+  background: rgb(26, 26, 26, 0.95);
+  border: 1px solid #333333;
   border-radius: 4px;
   padding: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.4);
   z-index: 1000;
   min-width: 40px;
   display: flex;
@@ -943,7 +941,7 @@
   appearance: none;
   width: 4px;
   height: 80px;
-  background: linear-gradient(to top, #4a90e2 0%, #4a90e2 var(--volume-percentage, 100%), #444 var(--volume-percentage, 100%), #444 100%);
+  background: linear-gradient(to top, #4a90e2 0%, #4a90e2 var(--volume-percentage, 100%), #444444 var(--volume-percentage, 100%), #444444 100%);
   outline: none;
   cursor: pointer;
   border-radius: 2px;
@@ -957,7 +955,7 @@
   background: linear-gradient(145deg, #4a90e2, #357abd);
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.3);
 }
 
 .volume-slider input[type="range"]::-moz-range-thumb {
@@ -967,7 +965,7 @@
   border-radius: 50%;
   cursor: pointer;
   border: none;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.3);
 }
 
 /* Responsive adjustments */
@@ -1105,7 +1103,7 @@
 
 .melody-display {
   width: 100%;
-  background: rgba(59, 130, 246, 0.1);
+  background: rgb(59, 130, 246, 0.1);
   border: 2px solid #3b82f6;
   border-radius: 8px;
   padding: 12px;
@@ -1142,17 +1140,17 @@
   color: #1f2937 !important;
   border: 2px solid #fef3c7 !important;
   box-shadow:
-    0 0 20px rgba(251, 191, 36, 0.8),
-    0 0 40px rgba(245, 158, 11, 0.6),
-    inset 0 2px 4px rgba(255, 255, 255, 0.8),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.1) !important;
+    0 0 20px rgb(251, 191, 36, 0.8),
+    0 0 40px rgb(245, 158, 11, 0.6),
+    inset 0 2px 4px rgb(255, 255, 255, 0.8),
+    inset 0 -2px 4px rgb(0, 0, 0, 0.1) !important;
   transition: none !important;
 }
 
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .melody-display {
-    background: rgba(32, 201, 151, 0.1);
+    background: rgb(32, 201, 151, 0.1);
     border-color: #20c997;
   }
 
@@ -1171,10 +1169,10 @@
     color: #1f2937 !important;
     border: 2px solid #fef3c7 !important;
     box-shadow:
-      0 0 20px rgba(251, 191, 36, 0.8),
-      0 0 40px rgba(245, 158, 11, 0.6),
-      inset 0 2px 4px rgba(255, 255, 255, 0.8),
-      inset 0 -2px 4px rgba(0, 0, 0, 0.1) !important;
+      0 0 20px rgb(251, 191, 36, 0.8),
+      0 0 40px rgb(245, 158, 11, 0.6),
+      inset 0 2px 4px rgb(255, 255, 255, 0.8),
+      inset 0 -2px 4px rgb(0, 0, 0, 0.1) !important;
     transition: none !important;
   }
 }

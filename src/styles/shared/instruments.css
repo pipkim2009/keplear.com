@@ -6,10 +6,9 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 0px 20px 50px 45px;
+  padding: 0 20px 50px 45px;
   min-width: auto;
-  overflow-x: auto;
-  overflow-y: visible;
+  overflow: auto visible;
   max-width: 95vw;
 }
 
@@ -26,14 +25,14 @@
   font-weight: bold;
   color: white;
   z-index: 20;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.3);
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .note-circle-base:hover {
   transform: scale(1.1);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 6px rgb(0, 0, 0, 0.4);
 }
 
 /* Note state colors - unified across all instruments */
@@ -47,7 +46,7 @@
 
 .note-state-melody {
   background: linear-gradient(145deg, #ffd700, #ffed4e);
-  color: #333;
+  color: #333333;
 }
 
 .note-state-scale {
@@ -89,7 +88,7 @@
 /* Preview note styles */
 .note-preview {
   opacity: 0.4;
-  background: linear-gradient(145deg, #888, #666);
+  background: linear-gradient(145deg, #888888, #666666);
 }
 
 .note-preview:hover {
@@ -99,11 +98,11 @@
 /* Fret markers - shared */
 .fret-marker-base {
   position: absolute;
-  background: linear-gradient(145deg, #f0f0dc, #ccc);
+  background: linear-gradient(145deg, #f0f0dc, #cccccc);
   border-radius: 50%;
   box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.3),
-    0 1px 3px rgba(0, 0, 0, 0.4);
+    inset 0 1px 2px rgb(255, 255, 255, 0.3),
+    0 1px 3px rgb(0, 0, 0, 0.4);
 }
 
 /* Checkbox styles - shared */
@@ -122,7 +121,7 @@
 
 .instrument-checkbox-label {
   font-size: 11px;
-  color: #ddd;
+  color: #dddddd;
   margin-top: 2px;
   user-select: none;
   cursor: pointer;
@@ -133,7 +132,7 @@
   .instrument-container-base {
     min-width: auto !important;
     margin: 0 !important;
-    padding: 0px 20px 50px 45px !important;
+    padding: 0 20px 50px 45px !important;
     justify-content: flex-start !important;
     overflow-x: scroll !important;
     -webkit-overflow-scrolling: touch !important;
@@ -146,7 +145,7 @@
   .instrument-container-base {
     min-width: auto !important;
     margin: 0 !important;
-    padding: 0px 20px 50px 45px !important;
+    padding: 0 20px 50px 45px !important;
     justify-content: flex-start !important;
     overflow-x: scroll !important;
     -webkit-overflow-scrolling: touch !important;
@@ -160,20 +159,20 @@
   position: absolute;
   left: 0;
   right: 0;
-  background: linear-gradient(90deg, #999 0%, #ccc 50%, #999 100%);
+  background: linear-gradient(90deg, #999999 0%, #cccccc 50%, #999999 100%);
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.5),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.2);
+    0 1px 2px rgb(0, 0, 0, 0.5),
+    inset 0 -1px 1px rgb(255, 255, 255, 0.2);
 }
 
 /* Fret wire styles - shared */
 .fret-wire-base {
   width: 100%;
   height: 100%;
-  background: linear-gradient(145deg, #d5d5d5, #999);
+  background: linear-gradient(145deg, #d5d5d5, #999999);
   box-shadow:
-    0 2px 3px rgba(0, 0, 0, 0.6),
-    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+    0 2px 3px rgb(0, 0, 0, 0.6),
+    inset 0 1px 2px rgb(255, 255, 255, 0.4);
 }
 
 /* Interactive position styles */
@@ -185,5 +184,5 @@
 }
 
 .fret-position-base:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgb(255, 255, 255, 0.05);
 }

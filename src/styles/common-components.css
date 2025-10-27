@@ -37,13 +37,13 @@
 }
 
 .btn-secondary {
-  background: rgba(128, 0, 255, 0.1);
+  background: rgb(128, 0, 255, 0.1);
   color: var(--primary-purple);
   border: 2px solid var(--primary-purple);
 }
 
 .dark .btn-secondary {
-  background: rgba(168, 85, 247, 0.1);
+  background: rgb(168, 85, 247, 0.1);
   color: var(--primary-purple-light);
   border-color: var(--primary-purple-light);
 }
@@ -63,42 +63,42 @@
 .form-input-base {
   width: 100%;
   padding: var(--space-lg) var(--space-xl);
-  border: 2px solid rgba(210, 210, 249, 0.4);
+  border: 2px solid rgb(210, 210, 249, 0.4);
   border-radius: var(--radius-lg);
   font-size: var(--text-xl);
   font-weight: 500;
   transition: var(--transition-normal);
-  background: rgba(255, 255, 255, 0.8);
+  background: rgb(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   box-sizing: border-box;
   color: var(--text-primary-light);
 }
 
 .dark .form-input-base {
-  background: rgba(60, 60, 60, 0.8);
-  border-color: rgba(80, 80, 80, 0.4);
+  background: rgb(60, 60, 60, 0.8);
+  border-color: rgb(80, 80, 80, 0.4);
   color: var(--text-primary-dark);
 }
 
 .form-input-base:focus {
   outline: none;
   border-color: var(--blue-primary);
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  background: rgb(255, 255, 255, 0.95);
+  box-shadow: 0 0 0 4px rgb(99, 102, 241, 0.15);
   transform: translateY(-2px);
 }
 
 .dark .form-input-base:focus {
   border-color: var(--blue-primary);
-  background: rgba(70, 70, 70, 0.9);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  background: rgb(70, 70, 70, 0.9);
+  box-shadow: 0 0 0 4px rgb(99, 102, 241, 0.15);
 }
 
 /* Common card styles */
 .card-base {
-  background: rgba(255, 255, 255, 0.8);
+  background: rgb(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
-  border: 2px solid rgba(210, 210, 249, 0.4);
+  border: 2px solid rgb(210, 210, 249, 0.4);
   border-radius: var(--radius-xl);
   padding: var(--space-2xl);
   box-shadow: var(--shadow-lg);
@@ -106,8 +106,8 @@
 }
 
 .dark .card-base {
-  background: rgba(60, 60, 60, 0.8);
-  border-color: rgba(80, 80, 80, 0.4);
+  background: rgb(60, 60, 60, 0.8);
+  border-color: rgb(80, 80, 80, 0.4);
   box-shadow: var(--shadow-xl);
 }
 
@@ -125,7 +125,7 @@
   width: 1rem;
   height: 1rem;
   appearance: none;
-  background: rgba(128, 0, 255, 0.1);
+  background: rgb(128, 0, 255, 0.1);
   border: 2px solid var(--primary-purple);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -149,7 +149,7 @@
 }
 
 .checkbox-base:hover {
-  background: rgba(128, 0, 255, 0.2);
+  background: rgb(128, 0, 255, 0.2);
   transform: scale(1.1);
 }
 
@@ -205,7 +205,7 @@
 */
 
 .light .btn-secondary {
-  background: rgba(128, 0, 255, 0.05);
+  background: rgb(128, 0, 255, 0.05);
   color: var(--primary-purple);
   border-color: var(--primary-purple);
 }
@@ -224,7 +224,7 @@
 .light .form-input-base:focus {
   background: var(--light-bg-secondary);
   border-color: var(--blue-primary);
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 4px rgb(99, 102, 241, 0.1);
 }
 
 .light .card-base {
@@ -233,16 +233,16 @@
 }
 
 .light .card-base:hover {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 30px rgb(0, 0, 0, 0.15);
 }
 
 .light .checkbox-base {
-  background: rgba(128, 0, 255, 0.05);
+  background: rgb(128, 0, 255, 0.05);
   border-color: var(--primary-purple);
 }
 
 .light .checkbox-base:hover {
-  background: rgba(128, 0, 255, 0.1);
+  background: rgb(128, 0, 255, 0.1);
 }
 
 .light .text-primary {

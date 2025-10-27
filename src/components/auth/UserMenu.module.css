@@ -9,36 +9,36 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 2px solid rgba(210, 210, 249, 0.3);
+  background: rgb(255, 255, 255, 0.95);
+  border: 2px solid rgb(210, 210, 249, 0.3);
   border-radius: 12px;
   color: #2d1b69;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(45, 27, 105, 0.15);
+  box-shadow: 0 4px 12px rgb(45, 27, 105, 0.15);
 }
 
 .user-menu-trigger:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: rgba(210, 210, 249, 0.5);
+  background: rgb(255, 255, 255, 1);
+  border-color: rgb(210, 210, 249, 0.5);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(45, 27, 105, 0.2);
+  box-shadow: 0 6px 20px rgb(45, 27, 105, 0.2);
 }
 
 /* Dark mode overrides */
 .dark .userMenuTrigger {
-  background: rgba(45, 27, 105, 0.9);
-  border-color: rgba(210, 210, 249, 0.3);
+  background: rgb(45, 27, 105, 0.9);
+  border-color: rgb(210, 210, 249, 0.3);
   color: #d2d2f9;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.3);
 }
 
 .dark .user-menu-trigger:hover {
-  background: rgba(45, 27, 105, 1);
-  border-color: rgba(210, 210, 249, 0.5);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  background: rgb(45, 27, 105, 1);
+  border-color: rgb(210, 210, 249, 0.5);
+  box-shadow: 0 6px 20px rgb(0, 0, 0, 0.4);
 }
 
 .userAvatar {
@@ -90,11 +90,11 @@
   top: 100%;
   right: 0;
   margin-top: 8px;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgb(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  border: 2px solid rgba(210, 210, 249, 0.3);
+  border: 2px solid rgb(210, 210, 249, 0.3);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(45, 27, 105, 0.2);
+  box-shadow: 0 20px 60px rgb(45, 27, 105, 0.2);
   min-width: 240px;
   overflow: hidden;
   z-index: 200;
@@ -102,20 +102,20 @@
 }
 
 .dark .user-menu-dropdown {
-  background: rgba(45, 27, 105, 0.95);
-  border-color: rgba(210, 210, 249, 0.3);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  background: rgb(45, 27, 105, 0.95);
+  border-color: rgb(210, 210, 249, 0.3);
+  box-shadow: 0 20px 60px rgb(0, 0, 0, 0.4);
 }
 
 .user-menu-header {
   padding: 20px;
-  background: linear-gradient(135deg, rgba(232, 228, 255, 0.8), rgba(210, 210, 249, 0.6));
-  border-bottom: 1px solid rgba(210, 210, 249, 0.3);
+  background: linear-gradient(135deg, rgb(232, 228, 255, 0.8), rgb(210, 210, 249, 0.6));
+  border-bottom: 1px solid rgb(210, 210, 249, 0.3);
 }
 
 .dark .user-menu-header {
-  background: linear-gradient(135deg, rgba(45, 27, 105, 0.8), rgba(26, 13, 46, 0.6));
-  border-bottom-color: rgba(210, 210, 249, 0.2);
+  background: linear-gradient(135deg, rgb(45, 27, 105, 0.8), rgb(26, 13, 46, 0.6));
+  border-bottom-color: rgb(210, 210, 249, 0.2);
 }
 
 .user-info {
@@ -173,12 +173,12 @@
 }
 
 .menu-item:hover {
-  background: rgba(232, 228, 255, 0.8);
+  background: rgb(232, 228, 255, 0.8);
   transform: translateX(4px);
 }
 
 .dark .menu-item:hover {
-  background: rgba(45, 27, 105, 0.8);
+  background: rgb(45, 27, 105, 0.8);
 }
 
 .menu-item.danger {
@@ -190,11 +190,11 @@
 }
 
 .menu-item.danger:hover {
-  background: rgba(220, 38, 38, 0.1);
+  background: rgb(220, 38, 38, 0.1);
 }
 
 .dark .menu-item.danger:hover {
-  background: rgba(220, 38, 38, 0.2);
+  background: rgb(220, 38, 38, 0.2);
 }
 
 .menu-item svg {
@@ -208,6 +208,7 @@
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

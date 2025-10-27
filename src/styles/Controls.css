@@ -35,8 +35,7 @@
 /* Mobile screens */
 @media (max-width: 480px) {
   .instrument-controls {
-    flex-direction: column;
-    flex-wrap: nowrap;
+    flex-flow: column nowrap;
     gap: 10px;
     height: auto;
     justify-content: center;
@@ -271,10 +270,7 @@
 
 .instrument-glow {
   position: absolute;
-  top: -50%;
-  left: -50%;
-  right: -50%;
-  bottom: -50%;
+  inset: -50%;
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
@@ -285,6 +281,7 @@
   0%, 100% {
     opacity: 0.3;
   }
+
   50% {
     opacity: 0.6;
   }
@@ -294,6 +291,7 @@
   0%, 100% {
     transform: scale(1.1) translateY(0);
   }
+
   50% {
     transform: scale(1.1) translateY(-3px);
   }
@@ -732,7 +730,6 @@
   color: var(--dark-text-primary);
   border-radius: 3px;
   font-size: 12px;
-  z-index: 10;
   pointer-events: auto;
   font-weight: 700;
   cursor: pointer;
@@ -1382,10 +1379,9 @@
 /* Make header controls layout horizontal */
 .header-controls-left {
   display: flex !important;
-  flex-direction: row !important;
+  flex-flow: row wrap !important;
   align-items: flex-start !important;
   gap: 20px !important;
-  flex-wrap: wrap !important;
 }
 
 /* Octave range control styling */
@@ -1444,7 +1440,7 @@
 
 .range-fill {
   position: absolute;
-  top: 0px;
+  top: 0;
   height: 6px;
   background: linear-gradient(145deg, var(--primary-purple), var(--primary-purple-lighter));
   border-radius: 3px;
@@ -1497,19 +1493,19 @@
 }
 
 .range-slider.range-low::-webkit-slider-thumb {
-  margin-left: 0px;
+  margin-left: 0;
 }
 
 .range-slider.range-high::-webkit-slider-thumb {
-  margin-left: 0px;
+  margin-left: 0;
 }
 
 .range-slider.range-low::-moz-range-thumb {
-  transform: translateX(0px);
+  transform: translateX(0);
 }
 
 .range-slider.range-high::-moz-range-thumb {
-  transform: translateX(0px);
+  transform: translateX(0);
 }
 
 /* Offset thumbs when at same position */
@@ -1888,6 +1884,7 @@ select.control-input.flashing {
   }
 
   /* Mobile order: BPM, Notes, Generate Melody, Play */
+
   /* Play button (1st child in DOM) becomes 4th on mobile */
   .control-group.bpm-notes-melody-row .melody-controls-top .control-subgroup:first-child {
     order: 4;
@@ -2097,11 +2094,10 @@ select.control-input.flashing {
 @media (max-width: 360px) {
   .controls-container.third-row {
     display: flex !important;
-    flex-direction: row !important;
+    flex-flow: row wrap !important;
     justify-content: center !important;
     align-items: center !important;
     gap: 12px !important;
-    flex-wrap: wrap !important;
     margin-top: 7px !important;
   }
 }
@@ -2110,7 +2106,7 @@ select.control-input.flashing {
 /* Recording Controls */
 .control-group.recording-controls {
   margin-top: 12px;
-  border-top: 1px solid var(--border-color, #e0e0e0);
+  border-top: 1px solid var(--gray-300);
   padding-top: 12px;
 }
 
@@ -2262,7 +2258,7 @@ select.control-input.flashing {
   min-width: 300px;
   max-width: 600px;
   width: auto;
-  padding: 0 20px 15px 20px;
+  padding: 0 20px 15px;
   background: var(--green-alpha-10);
   border: 2px solid var(--green-550);
   border-radius: 6px;
@@ -2357,6 +2353,7 @@ select.control-input.flashing {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -2482,8 +2479,7 @@ select.control-input.flashing {
   justify-content: center;
   display: flex;
   align-items: center;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
 }
 
 /* Audio player section styling */
@@ -2565,11 +2561,10 @@ body.dark .modern-control-item.audio-player-section audio {
   /* Ensure third-row (reveal/hide button) stays centered on tablet */
   .controls-container.third-row {
     display: flex !important;
-    flex-direction: row !important;
+    flex-flow: row wrap !important;
     justify-content: center !important;
     align-items: center !important;
     gap: 12px !important;
-    flex-wrap: wrap !important;
   }
 }
 
@@ -2578,12 +2573,8 @@ body.dark .modern-control-item.audio-player-section audio {
 @media (max-width: 768px) and (min-width: 601px) {
   .controls-container:not(.second-row):not(.third-row) {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template: "bpm notes chord" auto "generate generate generate" auto / 1fr 1fr 1fr;
     gap: 12px 8px;
-    grid-template-areas:
-      "bpm notes chord"
-      "generate generate generate";
   }
 
   .modern-control-item:nth-child(1) {
@@ -2621,13 +2612,8 @@ body.dark .modern-control-item.audio-player-section audio {
 
   .controls-container:not(.second-row):not(.third-row) {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template: "bpm notes" auto "chord chord" auto "generate generate" auto / 1fr 1fr;
     gap: 12px 8px;
-    grid-template-areas:
-      "bpm notes"
-      "chord chord"
-      "generate generate";
   }
 
   .modern-control-item:nth-child(1) {
@@ -2705,11 +2691,10 @@ body.dark .modern-control-item.audio-player-section audio {
   /* Ensure third-row (reveal/hide button) stays centered on mobile */
   .controls-container.third-row {
     display: flex !important;
-    flex-direction: row !important;
+    flex-flow: row wrap !important;
     justify-content: center !important;
     align-items: center !important;
     gap: 12px !important;
-    flex-wrap: wrap !important;
   }
 
   /* Mobile styling for expandable notes button */
@@ -2746,8 +2731,8 @@ body.dark .modern-control-item.audio-player-section audio {
 .wav-player-container {
   margin-top: 12px;
   padding: 12px;
-  background: var(--input-background, #f8f9fa);
-  border: 1px solid var(--border-color, #e0e0e0);
+  background: var(--gray-100);
+  border: 1px solid var(--gray-300);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -2758,7 +2743,7 @@ body.dark .modern-control-item.audio-player-section audio {
 .wav-player-container .control-label {
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-color, #333);
+  color: var(--text-color, #333333);
   margin: 0;
 }
 
@@ -2771,7 +2756,7 @@ body.dark .modern-control-item.audio-player-section audio {
 }
 
 .wav-audio-player::-webkit-media-controls-panel {
-  background-color: var(--control-background, #fff);
+  background-color: var(--white);
   border-radius: 6px;
 }
 
@@ -2869,6 +2854,7 @@ body:has([data-instrument="bass"]) .control-button.delete-selection {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }

@@ -7,10 +7,9 @@
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  padding: 0px 20px 50px 45px;
+  padding: 0 20px 50px 45px;
   min-width: auto;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: auto hidden;
   max-width: 95vw;
 }
 
@@ -22,8 +21,8 @@
   background: linear-gradient(145deg, #3e2723, #1e1e1e);
   border-radius: 0;
   box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.5),
-    0 4px 8px rgba(0, 0, 0, 0.3);
+    inset 0 2px 4px rgb(0, 0, 0, 0.5),
+    0 4px 8px rgb(0, 0, 0, 0.3);
   border: 2px solid #2d2d2d;
 }
 
@@ -49,21 +48,21 @@
   display: block;
   width: 100%;
   height: 100%;
-  background: linear-gradient(145deg, #c9c9c9, #888);
+  background: linear-gradient(145deg, #c9c9c9, #888888);
   border-radius: 1px;
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.5),
-    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+    0 1px 2px rgb(0, 0, 0, 0.5),
+    inset 0 1px 1px rgb(255, 255, 255, 0.3);
 }
 
 /* Fret markers */
 .fret-marker {
   position: absolute;
-  background: linear-gradient(145deg, #f5f5dc, #ddd);
+  background: linear-gradient(145deg, #f5f5dc, #dddddd);
   border-radius: 50%;
   box-shadow:
-    inset 0 1px 2px rgba(255, 255, 255, 0.3),
-    0 1px 3px rgba(0, 0, 0, 0.4);
+    inset 0 1px 2px rgb(255, 255, 255, 0.3),
+    0 1px 3px rgb(0, 0, 0, 0.4);
 }
 
 .fret-marker.single {
@@ -102,10 +101,10 @@
   position: absolute;
   left: 0;
   width: 1299px;
-  background: linear-gradient(90deg, #999 0%, #ccc 50%, #999 100%);
+  background: linear-gradient(90deg, #999999 0%, #cccccc 50%, #999999 100%);
   box-shadow:
-    0 1px 2px rgba(0, 0, 0, 0.5),
-    inset 0 -1px 1px rgba(255, 255, 255, 0.2);
+    0 1px 2px rgb(0, 0, 0, 0.5),
+    inset 0 -1px 1px rgb(255, 255, 255, 0.2);
 }
 
 /* Interactive note positions */
@@ -120,7 +119,7 @@
 }
 
 .note-position:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgb(255, 255, 255, 0.05);
 }
 
 .note-position:focus-visible {
@@ -170,7 +169,7 @@
 .fret-selector__label,
 .string-selector__label {
   font-size: 11px;
-  color: #ddd;
+  color: #dddddd;
   user-select: none;
   pointer-events: none;
 }
@@ -188,20 +187,20 @@
   font-weight: bold;
   color: white;
   z-index: 35;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.3);
   transition: all 0.2s ease;
   pointer-events: none;
 }
 
 .note-marker:not(.preview):hover {
   transform: scale(1.1);
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 6px rgb(0, 0, 0, 0.4);
 }
 
 .note-marker__label {
   font-size: 9px;
   font-weight: 600;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 2px rgb(0, 0, 0, 0.5);
 }
 
 /* Note marker states */
@@ -211,7 +210,7 @@
 
 .note-marker.melody {
   background: linear-gradient(145deg, #ffd700, #ffed4e);
-  color: #333;
+  color: #333333;
 }
 
 .note-marker.scale {
@@ -248,7 +247,7 @@
 
 .note-marker.preview {
   opacity: 0.4;
-  background: linear-gradient(145deg, #888, #666);
+  background: linear-gradient(145deg, #888888, #666666);
   pointer-events: none;
 }
 
@@ -263,7 +262,7 @@
   .bass-instrument {
     min-width: auto !important;
     margin: 0 !important;
-    padding: 0px 20px 50px 45px !important;
+    padding: 0 20px 50px 45px !important;
     justify-content: flex-start !important;
     overflow-x: scroll !important;
     -webkit-overflow-scrolling: touch !important;
@@ -284,7 +283,7 @@
   .bass-instrument {
     min-width: auto !important;
     margin: 0 !important;
-    padding: 0px 20px 50px 45px !important;
+    padding: 0 20px 50px 45px !important;
     justify-content: flex-start !important;
     overflow-x: scroll !important;
     -webkit-overflow-scrolling: touch !important;

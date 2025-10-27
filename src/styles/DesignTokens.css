@@ -67,7 +67,6 @@
   --interactive-primary: var(--blue-500);
   --interactive-primary-hover: var(--blue-600);
   --interactive-primary-active: var(--blue-700);
-
   --interactive-secondary: var(--purple-500);
   --interactive-secondary-hover: var(--purple-600);
   --interactive-secondary-active: var(--purple-700);
@@ -89,12 +88,10 @@
   --button-primary-hover: var(--interactive-primary-hover);
   --button-primary-active: var(--interactive-primary-active);
   --button-primary-text: var(--white);
-
   --button-secondary-bg: var(--interactive-secondary);
   --button-secondary-hover: var(--interactive-secondary-hover);
   --button-secondary-active: var(--interactive-secondary-active);
   --button-secondary-text: var(--white);
-
   --button-danger-bg: var(--status-error);
   --button-danger-hover: var(--red-600);
   --button-danger-active: var(--red-700);
@@ -122,12 +119,10 @@
   /* Keyboard Colors */
   --keyboard-bg: var(--dark-bg-tertiary);
   --keyboard-border: var(--dark-border);
-
   --key-white-bg: var(--keyboard-white-key);
   --key-white-bg-secondary: var(--keyboard-white-key-secondary);
   --key-white-border: var(--keyboard-white-key-border);
   --key-white-text: var(--gray-700);
-
   --key-black-bg: var(--keyboard-black-key);
   --key-black-bg-secondary: var(--keyboard-black-key-secondary);
   --key-black-border: var(--keyboard-black-key-border);
@@ -144,7 +139,6 @@
   --scale-note-bg-alt: var(--orange-scale-dark);
   --scale-root-bg: var(--red-600);
   --scale-root-border: var(--red-800);
-
   --chord-note-bg: var(--purple-chord);
   --chord-note-bg-alt: var(--purple-chord-dark);
   --chord-root-bg: var(--red-600);

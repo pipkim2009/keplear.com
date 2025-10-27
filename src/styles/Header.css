@@ -4,18 +4,18 @@
   top: 0;
   z-index: 100;
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgb(255, 255, 255, 0.1);
   transition: all 0.3s ease;
 }
 
 .light .header {
-  background: rgba(232, 228, 255, 0.8);
-  border-bottom: 1px solid rgba(18, 18, 18, 0.1);
+  background: rgb(232, 228, 255, 0.8);
+  border-bottom: 1px solid rgb(18, 18, 18, 0.1);
 }
 
 .dark .header {
-  background: rgba(18, 18, 18, 0.8);
-  border-bottom: 1px solid rgba(210, 210, 249, 0.1);
+  background: rgb(18, 18, 18, 0.8);
+  border-bottom: 1px solid rgb(210, 210, 249, 0.1);
 }
 
 .header-content {
@@ -169,15 +169,15 @@
 }
 
 .login-btn:hover {
-  background: rgba(255, 255, 255, 1);
-  border-color: rgba(210, 210, 249, 0.6);
+  background: rgb(255, 255, 255, 1);
+  border-color: rgb(210, 210, 249, 0.6);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px var(--shadow-hover-light);
 }
 
 .dark .login-btn:hover {
-  background: rgba(45, 27, 105, 1);
-  border-color: rgba(210, 210, 249, 0.5);
+  background: rgb(45, 27, 105, 1);
+  border-color: rgb(210, 210, 249, 0.5);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px var(--shadow-hover-dark);
 }
@@ -210,7 +210,7 @@
 
 @media (max-width: 1023px) {
   .header-content {
-    padding: 1rem 1rem;
+    padding: 1rem;
     flex-wrap: wrap;
     gap: 1rem;
   }
@@ -229,14 +229,14 @@
     width: 100%;
     justify-content: center;
     padding-top: 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgb(255, 255, 255, 0.1);
     position: static;
     transform: none;
     left: auto;
   }
 
   .dark .header-nav {
-    border-top: 1px solid rgba(210, 210, 249, 0.1);
+    border-top: 1px solid rgb(210, 210, 249, 0.1);
   }
 
   .nav-link {
