@@ -55,7 +55,7 @@
 .time-display {
   font-size: 12px;
   font-weight: 600;
-  color: #dddddd;
+  color: var(--gray-ddd);
   min-width: 40px;
   text-align: center;
 }
@@ -74,7 +74,7 @@
   border-radius: 6px;
   position: relative;
   overflow: visible;
-  border: 1px solid #555555;
+  border: 1px solid var(--gray-555);
   box-shadow: inset 0 1px 2px var(--black-alpha-30);
   z-index: 1;
 }
@@ -112,7 +112,7 @@
 }
 
 .progress-track:hover {
-  background: #444444;
+  background: var(--gray-444);
   border-color: var(--gray-600);
 }
 
@@ -138,8 +138,8 @@
 }
 
 .progress-bar.dragging .progress-track {
-  background: #444444;
-  border-color: #777777;
+  background: var(--gray-444);
+  border-color: var(--gray-777);
 }
 
 .progress-bar.dragging .progress-fill {
@@ -198,7 +198,7 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #dddddd;
+  color: var(--gray-ddd);
   display: flex;
   align-items: center;
   justify-content: center;

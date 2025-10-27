@@ -255,8 +255,8 @@
   position: absolute;
   top: 80px;
   right: 20px;
-  background: #8000ff;
-  color: #d2d2f9;
+  background: var(--primary-purple);
+  color: var(--dark-text-primary);
   border: none;
   border-radius: 50%;
   width: 50px;
@@ -357,8 +357,8 @@
   height: 18px;
   border-radius: 50%;
   background: transparent;
-  border: 2px solid #ffffff;
-  color: #ffffff;
+  border: 2px solid var(--white);
+  color: var(--white);
   font-size: 0.75rem;
   font-weight: 700;
   cursor: help;
@@ -369,22 +369,22 @@
 
 .tooltip-icon:hover,
 .active .tooltip-icon {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
   box-shadow: 0 0 12px rgb(255, 255, 255, 0.8);
 }
 
 .dark .tooltip-icon {
-  border-color: #ffffff;
+  border-color: var(--white);
   box-shadow: 0 0 8px rgb(255, 255, 255, 0.4);
 }
 
 .dark .tooltip-icon:hover,
 .dark .active .tooltip-icon {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
+  background: var(--white);
+  color: var(--black);
+  border-color: var(--white);
   box-shadow: 0 0 12px rgb(255, 255, 255, 0.6);
 }
 
@@ -398,8 +398,8 @@
   bottom: 100%;
   left: 50%;
   transform: translateX(-50%) translateY(-8px);
-  background: #000000;
-  color: #ffffff;
+  background: var(--black);
+  color: var(--white);
   padding: 0.875rem 1.5rem;
   border-radius: 10px;
   font-size: 0.875rem;
@@ -408,7 +408,7 @@
   transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
   pointer-events: none;
   z-index: 1000;
-  border: 2px solid #9333ea;
+  border: 2px solid var(--purple-9333ea);
   box-shadow:
     0 0 20px rgb(147, 51, 234, 0.8),
     0 0 40px rgb(147, 51, 234, 0.5),
@@ -423,7 +423,7 @@
 .tooltip-title {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #60d5f8;
+  color: var(--cyan-60d5f8);
   text-transform: uppercase;
   letter-spacing: 1.5px;
   margin-bottom: 0.4rem;
@@ -454,7 +454,7 @@
 .tooltip-text {
   font-size: 0.8125rem;
   font-weight: 400;
-  color: #e5e5e5;
+  color: var(--white-e5e5e5);
   line-height: 1.45;
   max-width: 100%;
   text-align: left;
@@ -468,7 +468,7 @@
   left: 50%;
   transform: translateX(-50%);
   border: 6px solid transparent;
-  border-top-color: #9333ea;
+  border-top-color: var(--purple-9333ea);
 }
 
 .tooltip-box.visible {
@@ -484,8 +484,8 @@
 }
 
 .dark .tooltip-box {
-  background: #000000;
-  border-color: #a855f7;
+  background: var(--black);
+  border-color: var(--purple-500);
   box-shadow:
     0 0 20px rgb(168, 85, 247, 0.8),
     0 0 40px rgb(168, 85, 247, 0.5),
@@ -494,7 +494,7 @@
 }
 
 .dark .tooltip-box::after {
-  border-top-color: #a855f7;
+  border-top-color: var(--purple-500);
 }
 
 /* Mobile adjustments */
@@ -641,13 +641,13 @@
 .toggle-thumb.light {
   left: var(--space-1);
   background: #fbbf24;
-  color: #ffffff;
+  color: var(--white);
 }
 
 .toggle-thumb.dark {
   left: var(--space-5);
   background: #6366f1;
-  color: #ffffff;
+  color: var(--white);
 }
 
 .toggle-label {
@@ -718,7 +718,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #ffffff;
+  color: var(--white);
 }
 
 .play-pause-btn {
@@ -756,7 +756,7 @@
 .time-display {
   font-size: 12px;
   font-weight: 600;
-  color: #dddddd;
+  color: var(--gray-ddd);
   min-width: 40px;
   text-align: center;
 }
@@ -771,11 +771,11 @@
 
 .progress-track {
   height: 12px;
-  background: #333333;
+  background: var(--gray-333);
   border-radius: 6px;
   position: relative;
   overflow: visible;
-  border: 1px solid #555555;
+  border: 1px solid var(--gray-555);
   box-shadow: inset 0 1px 2px rgb(0, 0, 0, 0.3);
   z-index: 1;
 }
@@ -808,13 +808,13 @@
     0 0 6px rgb(74, 144, 226, 0.4);
   opacity: 0;
   transition: all 0.2s ease;
-  border: 2px solid #ffffff;
+  border: 2px solid var(--white);
   z-index: 10;
 }
 
 .progress-track:hover {
-  background: #444444;
-  border-color: #666666;
+  background: var(--gray-444);
+  border-color: var(--gray-666);
 }
 
 .progress-track:hover .progress-fill {
@@ -839,8 +839,8 @@
 }
 
 .progress-bar.dragging .progress-track {
-  background: #444444;
-  border-color: #777777;
+  background: var(--gray-444);
+  border-color: var(--gray-777);
 }
 
 .progress-bar.dragging .progress-fill {
@@ -864,7 +864,7 @@
   top: -35px;
   transform: translateX(-50%);
   background: rgb(0, 0, 0, 0.9);
-  color: #ffffff;
+  color: var(--white);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 11px;
@@ -899,7 +899,7 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #dddddd;
+  color: var(--gray-ddd);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -911,7 +911,7 @@
 
 .volume-btn:hover {
   background: rgb(255, 255, 255, 0.1);
-  color: #ffffff;
+  color: var(--white);
 }
 
 .volume-btn svg {
@@ -924,7 +924,7 @@
   right: 0;
   bottom: 40px;
   background: rgb(26, 26, 26, 0.95);
-  border: 1px solid #333333;
+  border: 1px solid var(--gray-333);
   border-radius: 4px;
   padding: 8px;
   box-shadow: 0 4px 12px rgb(0, 0, 0, 0.4);
@@ -1104,13 +1104,13 @@
 .melody-display {
   width: 100%;
   background: rgb(59, 130, 246, 0.1);
-  border: 2px solid #3b82f6;
+  border: 2px solid var(--blue-500);
   border-radius: 8px;
   padding: 12px;
 }
 
 .melody-title {
-  color: #3b82f6;
+  color: var(--blue-500);
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 8px;
@@ -1124,7 +1124,7 @@
 }
 
 .melody-note {
-  background: #3b82f6 !important;
+  background: var(--blue-500) !important;
   color: var(--white) !important;
   padding: 4px 8px;
   border-radius: 4px;
@@ -1151,16 +1151,16 @@
 @media (prefers-color-scheme: dark) {
   .melody-display {
     background: rgb(32, 201, 151, 0.1);
-    border-color: #20c997;
+    border-color: var(--green-20c997);
   }
 
   .melody-title {
-    color: #20c997;
+    color: var(--green-20c997);
   }
 
   .melody-note {
-    background: #20c997 !important;
-    color: #212529 !important;
+    background: var(--green-20c997) !important;
+    color: var(--gray-212529) !important;
   }
 
   /* Golden highlight in dark mode - matches keyboard styling */

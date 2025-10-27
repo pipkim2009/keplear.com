@@ -78,12 +78,12 @@
   display: flex;
 }
 
-.flexCol {
+.flex-col {
   display: flex;
   flex-direction: column;
 }
 
-.flexRow {
+.flex-row {
   display: flex;
   flex-direction: row;
 }
@@ -94,41 +94,41 @@
   justify-content: center;
 }
 
-.spaceBetween {
+.space-between {
   display: flex;
   justify-content: space-between;
 }
 
-.spaceAround {
+.space-around {
   display: flex;
   justify-content: space-around;
 }
 
-.alignCenter {
+.align-center {
   align-items: center;
 }
 
-.justifyCenter {
+.justify-center {
   justify-content: center;
 }
 
-.textCenter {
+.text-center {
   text-align: var(--text-center);
 }
 
-.textLeft {
+.text-left {
   text-align: var(--text-left);
 }
 
-.textRight {
+.text-right {
   text-align: var(--text-right);
 }
 
-.fullWidth {
+.full-width {
   width: var(--width-full);
 }
 
-.fullHeight {
+.full-height {
   height: 100%;
 }
 
@@ -319,15 +319,15 @@
  *
  * const MyComponent = ({ theme, instrument, size }) => (
  *   <div className={clsx(
- *     styles.instrumentContainer,
- *     styles[`${instrument}Container`],
- *     styles[`${theme}Theme`],
+ *     styles['instrument-container'],
+ *     styles[`${instrument}-container`],
+ *     styles[`${theme}-theme`],
  *     styles.interactive
  *   )}>
  *     <button className={clsx(
  *       styles.button,
- *       styles[`button${size}`],
- *       styles.buttonPrimary
+ *       styles[`button-${size}`],
+ *       styles['button-primary']
  *     )}>
  *       Click me
  *     </button>

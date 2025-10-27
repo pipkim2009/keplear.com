@@ -62,7 +62,7 @@
   background: rgb(0, 0, 0, 0.95);
   border-radius: 6px;
   box-shadow: 0 4px 12px rgb(0, 0, 0, 0.3);
-  border: 2px solid #f97316;
+  border: 2px solid var(--orange-500);
   pointer-events: auto !important;
   backdrop-filter: blur(8px);
   transform: none !important;
@@ -70,7 +70,7 @@
 
 /* Purple styling for chord mode */
 .scale-options-popup.chord-mode {
-  border: 2px solid #8b5cf6;
+  border: 2px solid var(--purple-600);
 }
 
 .scale-options-popup * {
@@ -79,18 +79,18 @@
 
 .dark .scale-options-popup {
   background: rgb(0, 0, 0, 0.95);
-  border: 2px solid #f97316;
+  border: 2px solid var(--orange-500);
   box-shadow: 0 4px 12px rgb(0, 0, 0, 0.4);
 }
 
 .dark .scale-options-popup.chord-mode {
-  border: 2px solid #8b5cf6;
+  border: 2px solid var(--purple-600);
 }
 
 .scale-options-toggle {
   background: rgb(139, 92, 246, 0.1);
-  border: 2px solid #8b5cf6;
-  color: #c4b5fd;
+  border: 2px solid var(--purple-600);
+  color: var(--purple-300);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
@@ -171,7 +171,7 @@
   font-size: 11px;
   font-weight: 600;
   margin-bottom: 6px;
-  color: #f97316 !important;
+  color: var(--orange-500) !important;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   text-align: center;
@@ -179,32 +179,32 @@
 
 /* Purple labels for chord mode */
 .scale-options-content.chord-mode .control-label {
-  color: #8b5cf6 !important;
+  color: var(--purple-600) !important;
 }
 
 .light .scale-options-content .control-label {
-  color: #f97316 !important;
+  color: var(--orange-500) !important;
 }
 
 .light .scale-options-content.chord-mode .control-label {
-  color: #8b5cf6 !important;
+  color: var(--purple-600) !important;
 }
 
 .dark .scale-options-content .control-label {
-  color: #f97316 !important;
+  color: var(--orange-500) !important;
 }
 
 .dark .scale-options-content.chord-mode .control-label {
-  color: #8b5cf6 !important;
+  color: var(--purple-600) !important;
 }
 
 .control-select {
   width: 100%;
   padding: 5px 8px;
-  border: 2px solid #f97316;
+  border: 2px solid var(--orange-500);
   border-radius: 6px;
   background: rgb(249, 115, 22, 0.1);
-  color: #f97316;
+  color: var(--orange-500);
   font-size: 11px;
   font-weight: 600;
   cursor: pointer;
@@ -215,21 +215,21 @@
 
 /* Purple styling for chord mode */
 .control-select.chord-mode {
-  border: 2px solid #8b5cf6;
+  border: 2px solid var(--purple-600);
   background: rgb(139, 92, 246, 0.1);
-  color: #8b5cf6;
+  color: var(--purple-600);
 }
 
 .dark .control-select {
   background: rgb(249, 115, 22, 0.1);
-  border-color: #f97316;
-  color: #f97316;
+  border-color: var(--orange-500);
+  color: var(--orange-500);
 }
 
 .dark .control-select.chord-mode {
   background: rgb(139, 92, 246, 0.1);
-  border-color: #8b5cf6;
-  color: #8b5cf6;
+  border-color: var(--purple-600);
+  color: var(--purple-600);
 }
 
 .control-select:hover {
@@ -253,13 +253,13 @@
 
 /* Custom dropdown options styling */
 .control-select option {
-  background: #000000;
-  color: #ffffff;
+  background: var(--black);
+  color: var(--white);
   text-align: center;
   text-align-last: center;
   padding: 8px 0;
   direction: ltr;
-  border: 1px solid #333333;
+  border: 1px solid var(--gray-333);
   display: block;
   width: 100%;
   box-sizing: border-box;
@@ -268,8 +268,8 @@
 }
 
 .control-select option:checked {
-  background: #3b82f6 !important;
-  color: #000000 !important;
+  background: var(--blue-500) !important;
+  color: var(--black) !important;
   font-weight: 600;
 }
 
@@ -278,7 +278,7 @@
   padding: 5px 10px;
   background: rgb(76, 175, 80, 0.1);
   border: 2px solid #4caf50;
-  color: #a5d6a7;
+  color: var(--green-a5d6a7);
   border-radius: 6px;
   font-size: 11px;
   font-weight: 600;
@@ -354,7 +354,7 @@
   cursor: pointer;
   inset: 0;
   background-color: rgb(249, 115, 22, 0.1);
-  border: 2px solid #f97316;
+  border: 2px solid var(--orange-500);
   transition: all 0.3s ease;
   border-radius: 6px;
   display: flex;
@@ -368,7 +368,7 @@
   font-weight: 600;
   z-index: 2;
   position: relative;
-  color: #999999;
+  color: var(--gray-999);
   opacity: 0.7;
   pointer-events: none;
 }
@@ -388,7 +388,7 @@
   width: 58px;
   left: 0;
   top: 0;
-  background-color: #f97316;
+  background-color: var(--orange-500);
   transition: all 0.3s ease;
   border-radius: 0;
   z-index: 1;
@@ -397,36 +397,36 @@
 
 /* Scales mode (default) */
 .toggle-slider .toggle-text.left {
-  color: #000000;
+  color: var(--black);
   opacity: 1;
   font-weight: 700;
   text-shadow: none;
 }
 
 .toggle-slider .toggle-text.right {
-  color: #999999;
+  color: var(--gray-999);
   opacity: 0.7;
 }
 
 /* Chords mode (checked) */
 input:checked + .toggle-slider {
   background-color: rgb(139, 92, 246, 0.1);
-  border-color: #8b5cf6;
+  border-color: var(--purple-600);
 }
 
 input:checked + .toggle-slider::before {
   transform: translateX(58px);
-  background-color: #8b5cf6;
+  background-color: var(--purple-600);
 }
 
 input:checked + .toggle-slider .toggle-text.left {
-  color: #999999;
+  color: var(--gray-999);
   opacity: 0.7;
   font-weight: 600;
 }
 
 input:checked + .toggle-slider .toggle-text.right {
-  color: #000000;
+  color: var(--black);
   opacity: 1;
   font-weight: 700;
   text-shadow: none;
@@ -442,7 +442,7 @@ input:checked + .toggle-slider:hover {
 
 /* Green flash for toggle slider when mode changes */
 .toggle-slider.flashing {
-  border-color: #10b981 !important;
+  border-color: var(--green-550) !important;
   box-shadow: none !important;
 }
 
@@ -594,7 +594,7 @@ input:checked + .toggle-slider:hover {
   padding: 4px;
   background: rgb(0, 0, 0, 0.3);
   border-radius: 4px;
-  border: 1px solid #333333;
+  border: 1px solid var(--gray-333);
 }
 
 .applied-scale-item {
@@ -616,7 +616,7 @@ input:checked + .toggle-slider:hover {
 .scale-name {
   font-size: 11px;
   font-weight: 600;
-  color: #fb923c;
+  color: var(--orange-400);
   flex: 1;
 }
 
@@ -625,7 +625,7 @@ input:checked + .toggle-slider:hover {
   height: 18px;
   background: rgb(220, 38, 38, 0.1);
   border: 1px solid rgb(220, 38, 38, 0.4);
-  color: #f87171;
+  color: var(--red-light);
   border-radius: 50%;
   cursor: pointer;
   font-size: 12px;
@@ -641,7 +641,7 @@ input:checked + .toggle-slider:hover {
 .delete-scale-button:hover {
   background: rgb(220, 38, 38, 0.2);
   border-color: rgb(220, 38, 38, 0.6);
-  color: #dc2626;
+  color: var(--red-600);
   transform: scale(1.1);
 }
 
@@ -684,7 +684,7 @@ input:checked + .toggle-slider:hover {
   padding: 4px;
   background: rgb(0, 0, 0, 0.3);
   border-radius: 4px;
-  border: 1px solid #333333;
+  border: 1px solid var(--gray-333);
 }
 
 .applied-chord-item {
@@ -706,7 +706,7 @@ input:checked + .toggle-slider:hover {
 .chord-name {
   font-size: 11px;
   font-weight: 600;
-  color: #a78bfa;
+  color: var(--purple-400);
   flex: 1;
 }
 
@@ -715,7 +715,7 @@ input:checked + .toggle-slider:hover {
   height: 18px;
   background: rgb(220, 38, 38, 0.1);
   border: 1px solid rgb(220, 38, 38, 0.4);
-  color: #f87171;
+  color: var(--red-light);
   border-radius: 50%;
   cursor: pointer;
   font-size: 12px;
@@ -731,7 +731,7 @@ input:checked + .toggle-slider:hover {
 .delete-chord-button:hover {
   background: rgb(220, 38, 38, 0.2);
   border-color: rgb(220, 38, 38, 0.6);
-  color: #dc2626;
+  color: var(--red-600);
   transform: scale(1.1);
 }
 

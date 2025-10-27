@@ -58,8 +58,12 @@
   /* ========================================
      SEMANTIC COLORS - BLUE (INFO)
      ======================================== */
+  --blue-007bff: #007bff;
+  --blue-0056b3: #0056b3;
+  --blue-003d7a: #003d7a;
   --blue-100: #dbeafe;
   --blue-200: #bfdbfe;
+  --blue-300: #93c5fd;
   --blue-400: #60a5fa;
   --blue-500: #3b82f6;
   --blue-600: #2563eb;
@@ -76,10 +80,19 @@
   --blue-alpha-80: rgb(59, 130, 246, 0.8);
 
   /* ========================================
+     SEMANTIC COLORS - CYAN (BRIGHT ACCENT)
+     ======================================== */
+  --cyan-60d5f8: #60d5f8;
+
+  /* ========================================
      SEMANTIC COLORS - GREEN (SUCCESS)
      ======================================== */
+  --green-20c997: #20c997;
+  --green-1ba085: #1ba085;
+  --green-1a9977: #1a9977;
   --green-100: #dcfce7;
   --green-200: #bbf7d0;
+  --green-a5d6a7: #a5d6a7;
   --green-400: #4ade80;
   --green-500: #22c55e;
   --green-550: #10b981;
@@ -100,11 +113,13 @@
   /* ========================================
      SEMANTIC COLORS - RED (ERROR/DANGER)
      ======================================== */
+  --red-991b1b: #991b1b;
   --red-500: #ef4444;
   --red-600: #dc2626;
   --red-700: #b91c1c;
   --red-light: #f87171;
   --red-lighter: #fca5a5;
+  --red-f5c2c7: #f5c2c7;
   --red-alpha-05: rgb(239, 68, 68, 0.05);
   --red-alpha-10: rgb(239, 68, 68, 0.1);
   --red-alpha-20: rgb(239, 68, 68, 0.2);
@@ -118,6 +133,7 @@
   /* ========================================
      SEMANTIC COLORS - ORANGE (SCALES)
      ======================================== */
+  --orange-d97706: #d97706;
   --orange-400: #fb923c;
   --orange-500: #f97316;
   --orange-600: #ea580c;
@@ -132,16 +148,20 @@
   --amber-200: #fef3c7;
   --amber-400: #fbbf24;
   --amber-500: #f59e0b;
+  --amber-ffcc02: #ffcc02;
   --amber-alpha-60: rgb(245, 158, 11, 0.6);
   --amber-alpha-80: rgb(251, 191, 36, 0.8);
 
   /* ========================================
      SEMANTIC COLORS - PURPLE (CHORDS)
      ======================================== */
+  --purple-300: #c4b5fd;
+  --purple-400: #a78bfa;
   --purple-500: #a855f7;
   --purple-600: #8b5cf6;
   --purple-700: #7c3aed;
   --purple-800: #6b46c1;
+  --purple-9333ea: #9333ea;
   --purple-alpha-40: rgb(139, 92, 246, 0.4);
   --purple-600-alpha-60: rgb(167, 139, 250, 0.6);
 
@@ -149,20 +169,32 @@
      NEUTRAL GRAYS
      ======================================== */
   --white: #ffffff;
+  --white-e5e5e5: #e5e5e5;
   --black: #000000;
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
+  --gray-f8f9fa: #f8f9fa;
+  --gray-e9ecef: #e9ecef;
   --gray-200: #e5e7eb;
   --gray-300: #d1d5db;
+  --gray-333: #333333;
   --gray-400: #9ca3af;
+  --gray-404040: #404040;
   --gray-400-alpha-30: rgb(156, 163, 175, 0.3);
   --gray-neutral: #808080;
   --gray-500: #6b7280;
+  --gray-6c757d: #6c757d;
   --gray-600: #4b5563;
+  --gray-666: #666666;
   --gray-700: #374151;
+  --gray-777: #777777;
   --gray-800: #1f2937;
+  --gray-212529: #212529;
+  --gray-2d3338: #2d3338;
   --gray-850: #2d3748;
   --gray-900: #111827;
+  --gray-999: #999999;
+  --gray-ddd: #dddddd;
 
   /* ========================================
      INSTRUMENT COLORS - KEYBOARD

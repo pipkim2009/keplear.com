@@ -48,16 +48,16 @@
 @media (prefers-color-scheme: dark) {
   .melody-display {
     background: rgb(32, 201, 151, 0.1);
-    border-color: #20c997;
+    border-color: var(--green-20c997);
   }
 
   .melody-title {
-    color: #20c997;
+    color: var(--green-20c997);
   }
 
   .melody-note {
-    background: #20c997 !important;
-    color: #212529 !important;
+    background: var(--green-20c997) !important;
+    color: var(--gray-212529) !important;
   }
 
   /* Golden highlight in dark mode - matches keyboard styling */

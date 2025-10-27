@@ -46,8 +46,8 @@
 /* Chord Mode Select - matches BPM and Beats input colors */
 .chord-mode-select {
   background: rgb(0, 123, 255, 0.1) !important;
-  border: 2px solid #007bff !important;
-  color: #007bff !important;
+  border: 2px solid var(--blue-007bff) !important;
+  color: var(--blue-007bff) !important;
   font-weight: 600 !important;
   text-align: center !important;
   text-align-last: center !important;
@@ -62,13 +62,13 @@
 
 .chord-mode-select:hover {
   background: rgb(0, 123, 255, 0.15) !important;
-  border-color: #007bff !important;
+  border-color: var(--blue-007bff) !important;
   box-shadow: 0 2px 4px rgb(0, 0, 0, 0.05) !important;
 }
 
 .chord-mode-select:focus {
   box-shadow: 0 0 0 3px rgb(0, 123, 255, 0.1) !important;
-  border-color: #007bff !important;
+  border-color: var(--blue-007bff) !important;
 }
 
 .chord-mode-select option {
@@ -81,7 +81,7 @@
 .light .chord-mode-select {
   background: rgb(0, 128, 255, 0.12) !important;
   border-color: rgb(0, 128, 255, 0.4) !important;
-  color: #003d7a !important;
+  color: var(--blue-003d7a) !important;
 }
 
 .light .chord-mode-select:hover {
@@ -96,14 +96,14 @@
 
 .light .chord-mode-select option {
   background: #f0f9ff !important;
-  color: #003d7a !important;
+  color: var(--blue-003d7a) !important;
 }
 
 /* Chord Mode Toggle - matches BPM and Beats input colors */
 .chord-mode-toggle {
   background: rgb(0, 123, 255, 0.1);
-  border: 2px solid #007bff;
-  color: #007bff;
+  border: 2px solid var(--blue-007bff);
+  color: var(--blue-007bff);
   font-weight: 600;
   text-align: center;
   min-width: 120px;
@@ -123,14 +123,14 @@
 
 .chord-mode-toggle:hover {
   background: rgb(0, 123, 255, 0.15);
-  border-color: #007bff;
+  border-color: var(--blue-007bff);
   transform: translateY(-1px);
   box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
 .chord-mode-toggle:focus {
   box-shadow: 0 0 0 3px rgb(0, 123, 255, 0.1);
-  border-color: #007bff;
+  border-color: var(--blue-007bff);
 }
 
 .chord-mode-toggle:active {
@@ -160,7 +160,7 @@
 .light .chord-mode-toggle {
   background: rgb(0, 128, 255, 0.12);
   border-color: rgb(0, 128, 255, 0.4);
-  color: #003d7a;
+  color: var(--blue-003d7a);
 }
 
 .light .chord-mode-toggle:hover {

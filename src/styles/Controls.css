@@ -2687,7 +2687,7 @@ body.dark .modern-control-item.audio-player-section audio {
 .wav-player-container .control-label {
   font-size: 14px;
   font-weight: 500;
-  color: var(--text-color, #333333);
+  color: var(--text-color, var(--gray-333));
   margin: 0;
 }
 

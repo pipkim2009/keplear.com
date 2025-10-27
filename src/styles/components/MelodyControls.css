@@ -7,8 +7,8 @@
 /* Melody control buttons */
 .control-button.generate-melody {
   background: rgb(59, 130, 246, 0.1);
-  border: 2px solid #3b82f6;
-  color: #93c5fd;
+  border: 2px solid var(--blue-500);
+  color: var(--blue-300);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
@@ -40,8 +40,8 @@
 
 .control-button.generate-melody:disabled {
   background: rgb(128, 128, 128, 0.1);
-  border-color: #666666;
-  color: #666666;
+  border-color: var(--gray-666);
+  color: var(--gray-666);
   cursor: not-allowed;
   opacity: 0.5;
 }
@@ -65,30 +65,30 @@
   padding: 0;
   background: transparent;
   border: none;
-  color: #ffffff;
+  color: var(--white);
   transition: all 0.2s ease;
   cursor: pointer;
   outline: none;
 }
 
 .control-button.play-melody:hover:not(:disabled) {
-  color: #ffffff;
+  color: var(--white);
   transform: translateY(-1px);
 }
 
 .control-button.play-melody:active:not(:disabled) {
   transform: translateY(0);
-  color: #ffffff;
+  color: var(--white);
 }
 
 .control-button.play-melody.playing {
   background: transparent;
   border: none;
-  color: #ffffff;
+  color: var(--white);
 }
 
 .control-button.play-melody.playing:hover {
-  color: #ffffff;
+  color: var(--white);
 }
 
 .control-button.play-melody.disabled {
@@ -98,7 +98,7 @@
 
 .control-button.play-melody.disabled:hover {
   transform: none;
-  color: #ffffff;
+  color: var(--white);
 }
 
 .play-icon {
@@ -155,7 +155,7 @@
   width: 100%;
   height: 10px;
   background: rgb(59, 130, 246, 0.2);
-  border: 1px solid #3b82f6;
+  border: 1px solid var(--blue-500);
   border-radius: 4px;
   overflow: visible;
   box-shadow: inset 0 1px 3px rgb(0, 0, 0, 0.3);
@@ -165,7 +165,7 @@
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #3b82f6, #93c5fd);
+  background: linear-gradient(90deg, var(--blue-500), var(--blue-300));
   transition: width 0.15s ease-out;
   border-radius: 3px;
   box-shadow: 0 0 6px rgb(59, 130, 246, 0.6);
@@ -177,8 +177,8 @@
   transform: translate(-50%, -50%);
   width: 12px;
   height: 12px;
-  background: #ffffff;
-  border: 2px solid #3b82f6;
+  background: var(--white);
+  border: 2px solid var(--blue-500);
   border-radius: 50%;
   cursor: grab;
   box-shadow: 0 2px 4px rgb(0, 0, 0, 0.3);
@@ -189,7 +189,7 @@
 .progress-bar-head:hover {
   width: 14px;
   height: 14px;
-  border-color: #93c5fd;
+  border-color: var(--blue-300);
   box-shadow: 0 3px 6px rgb(59, 130, 246, 0.4);
 }
 

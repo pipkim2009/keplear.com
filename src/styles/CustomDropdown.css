@@ -114,8 +114,8 @@
 /* Scale options specific styling */
 .scale-dropdown .custom-dropbtn {
   background: rgb(255, 152, 0, 0.1);
-  border: 2px solid #ffcc02;
-  color: #ffcc02;
+  border: 2px solid var(--amber-ffcc02);
+  color: var(--amber-ffcc02);
   width: 100%;
   min-width: auto;
 }
@@ -250,8 +250,8 @@
 
 .light .scale-dropdown .custom-dropbtn {
   background: rgb(255, 152, 0, 0.05);
-  border-color: #ffcc02;
-  color: #d97706;
+  border-color: var(--amber-ffcc02);
+  color: var(--orange-d97706);
 }
 
 .light .scale-dropdown .custom-dropbtn:hover {
