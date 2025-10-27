@@ -56,6 +56,8 @@
 /* Custom scrollbar for instrument wrapper (keyboard) - only show when needed */
 .instrument-wrapper {
   overflow-x: auto;
+  scrollbar-width: auto;
+  scrollbar-color: #3b82f6 #1a202c;
 }
 
 .instrument-wrapper::-webkit-scrollbar {
@@ -109,12 +111,6 @@
 
 .instrument-wrapper::-webkit-scrollbar-thumb:active {
   background: linear-gradient(145deg, #1e40af, #1e3a8a);
-}
-
-/* Firefox scrollbar - only show when needed */
-.instrument-wrapper {
-  scrollbar-width: auto;
-  scrollbar-color: #3b82f6 #1a202c;
 }
 
 /* Mobile adjustments for octave controls */

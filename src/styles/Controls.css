@@ -2283,7 +2283,7 @@ select.control-input.flashing {
 }
 
 .modern-notes-toggle-button .expanded-melody-content .melody-title {
-  color: var(--green-550);
+  color: var(--green-550) !important;
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 8px;
@@ -2341,20 +2341,6 @@ select.control-input.flashing {
 /* When expanded, make toggle text green */
 .modern-notes-toggle-button.expanded .toggle-content * {
   color: var(--green-550) !important;
-}
-
-/* Override text color for melody content */
-.modern-notes-toggle-button .expanded-melody-content .melody-title {
-  color: var(--green-550) !important;
-}
-
-.modern-notes-toggle-button .expanded-melody-content .melody-note {
-  color: var(--dark-bg-primary) !important;
-}
-
-/* Ensure golden color for currently playing note overrides above */
-.modern-notes-toggle-button .expanded-melody-content .melody-note.currently-playing {
-  color: var(--gray-800) !important;
 }
 
 .modern-control-item {
@@ -2616,10 +2602,14 @@ body.dark .modern-control-item.audio-player-section audio {
 /* Phone layout - stack everything vertically for very small screens */
 @media (max-width: 480px) {
   .control-group.modern-controls-row {
-    padding: 25px 20px;
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    padding: 15px !important;
+    position: static !important;
+    width: auto !important;
+    max-width: 360px !important;
   }
 
   .controls-container:not(.second-row):not(.third-row) {
@@ -2641,18 +2631,6 @@ body.dark .modern-control-item.audio-player-section audio {
   .controls-container {
     flex-direction: column;
     gap: 12px;
-  }
-
-  /* Use very small screen styles for modern-controls-row on all phones */
-  .control-group.modern-controls-row {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    margin: 0 auto !important;
-    padding: 15px !important;
-    position: static !important;
-    width: auto !important;
-    max-width: 360px !important;
   }
 
   /* Ensure modern control inputs maintain proper width on phones */
@@ -2771,12 +2749,6 @@ body.dark .modern-control-item.audio-player-section audio {
 }
 
 /* FINAL OVERRIDE: Ensure keyboard mode delete button has correct margin */
-
-/* Final working solution - red border for all instruments */
-.control-button.delete-selection {
-  margin-top: 0;
-  border-color: var(--red-600);
-}
 
 /* Keyboard mode: 23px margin on tablets/desktop */
 body:has([data-instrument="keyboard"]) .control-button.delete-selection {

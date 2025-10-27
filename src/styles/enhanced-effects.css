@@ -144,14 +144,6 @@ html {
   text-shadow: 0 1px 2px rgb(0, 0, 0, 0.2);
 }
 
-::selection {
-  background: linear-gradient(135deg,
-    var(--primary-purple),
-    var(--primary-purple-light));
-  color: white;
-  text-shadow: 0 1px 2px rgb(0, 0, 0, 0.2);
-}
-
 /* Enhanced scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;

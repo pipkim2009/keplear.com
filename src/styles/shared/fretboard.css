@@ -190,6 +190,7 @@
   box-shadow: 0 2px 4px rgb(0, 0, 0, 0.3);
   transition: all 0.2s ease;
   pointer-events: none;
+  background: linear-gradient(145deg, #4a90e2, #357abd);
 }
 
 .note-marker:not(.preview):hover {
@@ -204,10 +205,6 @@
 }
 
 /* Note marker states */
-.note-marker {
-  background: linear-gradient(145deg, #4a90e2, #357abd);
-}
-
 .note-marker.melody {
   background: linear-gradient(145deg, #ffd700, #ffed4e);
   color: #333333;

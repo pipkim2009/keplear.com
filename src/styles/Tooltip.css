@@ -189,6 +189,7 @@
     0 0 10px var(--primary-purple-alpha-60),
     0 0 20px var(--primary-purple-alpha-40),
     0 0 30px var(--primary-purple-alpha-30);
+  animation: lightTitleGlow 1.5s ease-in-out infinite;
 }
 
 @keyframes lightTitleGlow {
@@ -205,10 +206,6 @@
       0 0 30px var(--primary-purple-alpha-60),
       0 0 45px var(--primary-purple-alpha-50);
   }
-}
-
-.light .tooltip-title {
-  animation: lightTitleGlow 1.5s ease-in-out infinite;
 }
 
 .light .tooltip-text {

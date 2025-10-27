@@ -14,7 +14,8 @@
       "Bash(fi)",
       "Bash(awk:*)",
       "Bash(git restore:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npm run lint:css:*)"
     ],
     "deny": [],
     "ask": []
