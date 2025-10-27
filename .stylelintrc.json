@@ -13,13 +13,21 @@
         "ignorePseudoClasses": ["global"]
       }
     ],
+    "property-no-unknown": [
+      true,
+      {
+        "ignoreProperties": ["composes"]
+      }
+    ],
     "property-no-vendor-prefix": null,
     "value-no-vendor-prefix": null,
     "alpha-value-notation": "number",
     "color-function-notation": "legacy",
     "import-notation": "string",
     "media-feature-range-notation": "prefix",
-    "selector-not-notation": "simple"
+    "selector-not-notation": "simple",
+    "no-descending-specificity": null,
+    "keyframes-name-pattern": null
   },
   "ignoreFiles": [
     "node_modules/**",

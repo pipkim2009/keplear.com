@@ -438,7 +438,7 @@ html {
   will-change: transform;
   transform: translateZ(0);
   backface-visibility: hidden;
-  perspective: 1000;
+  perspective: 1000px;
 }
 
 /* Reduced motion preferences */

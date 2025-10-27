@@ -15,7 +15,10 @@
       "Bash(awk:*)",
       "Bash(git restore:*)",
       "Bash(npm install:*)",
-      "Bash(npm run lint:css:*)"
+      "Bash(npm run lint:css:*)",
+      "Bash(cat:*)",
+      "Bash(css-analyzer)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

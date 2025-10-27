@@ -7,6 +7,7 @@
   min-width: auto;
   overflow: auto hidden;
   max-width: 95vw;
+
   /* Firefox scrollbar - only show when needed */
   scrollbar-width: auto;
   scrollbar-color: var(--green-500) var(--scrollbar-guitar-track);

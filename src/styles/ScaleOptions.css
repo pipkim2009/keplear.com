@@ -261,8 +261,7 @@
   margin: 1px 0;
 }
 
-.control-select option:checked,
-.control-select option:selected {
+.control-select option:checked {
   background: #3b82f6 !important;
   color: #000000 !important;
   font-weight: 600;

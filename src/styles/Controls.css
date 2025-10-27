@@ -701,8 +701,7 @@
   margin: 1px 0;
 }
 
-.control-input option:checked,
-.control-input option:selected {
+.control-input option:checked {
   background: var(--blue-500) !important;
   color: var(--dark-bg-primary) !important;
   font-weight: 600;

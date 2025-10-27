@@ -77,8 +77,7 @@
   color: #ffffff !important;
 }
 
-.control-input option:checked,
-.control-input option:selected {
+.control-input option:checked {
   background: #3b82f6 !important;
   color: #000000 !important;
   font-weight: 600;
