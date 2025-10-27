@@ -277,25 +277,7 @@
   z-index: -1;
 }
 
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.3;
-  }
-
-  50% {
-    opacity: 0.6;
-  }
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: scale(1.1) translateY(0);
-  }
-
-  50% {
-    transform: scale(1.1) translateY(-3px);
-  }
-}
+/* Note: @keyframes pulse and bounce are defined in enhanced-effects.css */
 
 /* Mobile responsiveness for instrument selector */
 @media (max-width: 768px) {
@@ -2794,15 +2776,7 @@ body:has([data-instrument="bass"]) .control-button.delete-selection {
   font-weight: 500;
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
-}
+/* Note: @keyframes spin is defined in enhanced-effects.css */
 
 @media (max-width: 480px) {
   .generating-indicator {

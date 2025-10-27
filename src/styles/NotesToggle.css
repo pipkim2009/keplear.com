@@ -3,8 +3,8 @@
   position: absolute;
   top: 80px;
   right: 20px;
-  background: #8000ff;
-  color: #d2d2f9;
+  background: var(--primary-purple);
+  color: var(--dark-text-primary);
   border: none;
   border-radius: 50%;
   width: 50px;
@@ -28,17 +28,17 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
   font-size: 12px;
   font-weight: 600;
 }
 
 .light .notes-toggle-content {
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
 }
 
 .light .notes-toggle-content .toggle-label {
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
 }
 
 .notes-toggle-content .toggle-label {

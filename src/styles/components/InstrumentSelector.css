@@ -190,23 +190,4 @@
   z-index: -1;
 }
 
-/* Animations */
-@keyframes pulse {
-  0%, 100% {
-    opacity: 0.3;
-  }
-
-  50% {
-    opacity: 0.6;
-  }
-}
-
-@keyframes bounce {
-  0%, 100% {
-    transform: scale(1.1) translateY(0);
-  }
-
-  50% {
-    transform: scale(1.1) translateY(-5px);
-  }
-}
+/* Note: Animations pulse and bounce are defined in enhanced-effects.css */
