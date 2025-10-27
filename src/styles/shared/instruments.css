@@ -23,7 +23,7 @@
   align-items: center;
   font-size: 10px;
   font-weight: bold;
-  color: white;
+  color: var(--white);
   z-index: 20;
   box-shadow: 0 2px 4px rgb(0, 0, 0, 0.3);
   transition: all 0.2s ease;

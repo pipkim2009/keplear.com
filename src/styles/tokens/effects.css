@@ -226,4 +226,21 @@
   --filter-glow-green: drop-shadow(0 0 8px rgb(34, 197, 94, 0.5));
   --filter-glow-red: drop-shadow(0 0 8px rgb(239, 68, 68, 0.5));
   --filter-glow-purple: drop-shadow(0 0 10px rgb(128, 0, 255, 0.5));
+
+  /*
+    ===========================================
+    FOCUS RING SYSTEM (WCAG-COMPLIANT)
+    ===========================================
+  */
+
+  /* Focus Ring Variables */
+  --focus-ring-color: var(--primary-purple);
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+  --focus-ring-shadow: 0 0 0 4px var(--primary-purple-alpha-20);
+
+  /* Alternative Focus Colors for Different Contexts */
+  --focus-ring-color-light: rgb(128, 0, 255);
+  --focus-ring-color-dark: rgb(168, 85, 247);
+  --focus-ring-color-high-contrast: rgb(147, 51, 234);
 }

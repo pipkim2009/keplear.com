@@ -22,9 +22,15 @@
   font-size: var(--text-lg);
 }
 
+.btn-base:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
 .btn-primary {
   background: var(--primary-purple);
-  color: white;
+  color: var(--white);
   border: 2px solid var(--primary-purple);
   box-shadow: var(--shadow-md);
 }
@@ -34,6 +40,12 @@
   border-color: var(--primary-purple-dark);
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:focus-visible {
+  outline: var(--focus-ring-width) solid var(--white);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: 0 0 0 4px rgb(255, 255, 255, 0.3), var(--shadow-lg);
 }
 
 .btn-secondary {
@@ -50,13 +62,19 @@
 
 .btn-secondary:hover {
   background: var(--primary-purple);
-  color: white;
+  color: var(--white);
   transform: translateY(-2px);
   box-shadow: var(--shadow-lg);
 }
 
 .dark .btn-secondary:hover {
   background: var(--primary-purple-light);
+}
+
+.btn-secondary:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
 }
 
 /* Common form input styles */
@@ -88,10 +106,22 @@
   transform: translateY(-2px);
 }
 
+.form-input-base:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
 .dark .form-input-base:focus {
   border-color: var(--blue-primary);
   background: rgb(70, 70, 70, 0.9);
   box-shadow: 0 0 0 4px rgb(99, 102, 241, 0.15);
+}
+
+.dark .form-input-base:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color-dark);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: 0 0 0 4px rgb(168, 85, 247, 0.3);
 }
 
 /* Common card styles */
@@ -143,7 +173,7 @@
   position: absolute;
   top: -2px;
   left: 2px;
-  color: white;
+  color: var(--white);
   font-size: var(--text-base);
   font-weight: bold;
 }
@@ -153,23 +183,29 @@
   transform: scale(1.1);
 }
 
+.checkbox-base:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
 /* Common gradient backgrounds */
 .gradient-bg-light {
   background: linear-gradient(135deg,
-    #e8e4ff 0%,
-    #d2d2f9 25%,
-    #f0f0ff 50%,
-    #e1d8ff 75%,
-    #d2d2f9 100%);
+    var(--light-bg-gradient-1) 0%,
+    var(--light-bg-gradient-2) 25%,
+    var(--light-bg-gradient-3) 50%,
+    var(--light-bg-gradient-4) 75%,
+    var(--light-bg-gradient-2) 100%);
 }
 
 .gradient-bg-dark {
   background: linear-gradient(135deg,
-    #0a0a0a 0%,
-    #121212 25%,
-    #1a0d2e 50%,
-    #2d1b69 75%,
-    #121212 100%);
+    var(--dark-bg-surface) 0%,
+    var(--dark-bg-primary) 25%,
+    var(--dark-bg-quaternary) 50%,
+    var(--dark-bg-tertiary) 75%,
+    var(--dark-bg-primary) 100%);
 }
 
 /* Common text styles */
@@ -212,7 +248,7 @@
 
 .light .btn-secondary:hover {
   background: var(--primary-purple);
-  color: white;
+  color: var(--white);
 }
 
 .light .form-input-base {
@@ -251,4 +287,27 @@
 
 .light .text-secondary {
   color: var(--light-text-secondary);
+}
+
+/*
+  ===========================================
+  UNIVERSAL FOCUS STATES (WCAG-COMPLIANT)
+  ===========================================
+  Ensures all interactive elements have visible focus indicators
+*/
+
+/* Links */
+a:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
+/* Generic interactive elements that don't have specific styles */
+button:not([class]):focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
 }

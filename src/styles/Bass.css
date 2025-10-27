@@ -187,6 +187,12 @@
   transform: scale(1.05);
 }
 
+.bass-fret-checkbox:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
 .bass-fret-checkbox-label {
   position: absolute;
   top: 50%;
@@ -262,6 +268,12 @@
   transform: scale(1.05);
 }
 
+.bass-string-checkbox:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
 .bass-string-checkbox-label {
   position: absolute;
   top: 50%;
@@ -292,6 +304,12 @@
 
 .bass-fret-position:hover {
   background: transparent;
+}
+
+.bass-fret-position:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
 }
 
 /* Open string area styling for bass */
@@ -911,4 +929,21 @@
 
 .light .bass-position-info p {
   color: var(--light-text-secondary);
+}
+
+/*
+  ===========================================
+  REDUCED MOTION ACCESSIBILITY
+  ===========================================
+  Respects user's motion preferences for accessibility
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

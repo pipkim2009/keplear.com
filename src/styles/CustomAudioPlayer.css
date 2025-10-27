@@ -5,8 +5,8 @@
   background: rgb(26, 26, 26, 0.9);
   border-radius: 8px;
   padding: 12px;
-  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.3);
-  border: 1px solid #333333;
+  box-shadow: 0 4px 12px var(--black-alpha-30);
+  border: 1px solid var(--gray-800);
   position: relative;
   overflow: visible;
   box-sizing: border-box;
@@ -17,7 +17,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  color: #ffffff;
+  color: var(--white);
 }
 
 .play-pause-btn {
@@ -33,14 +33,14 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: white;
+  color: var(--white);
   flex-shrink: 0;
 }
 
 .play-pause-btn:hover {
   background: linear-gradient(145deg, #5a9ff2, #4589cd);
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgb(0, 0, 0, 0.3);
+  box-shadow: 0 4px 8px var(--black-alpha-30);
 }
 
 .play-pause-btn:active {
@@ -70,12 +70,12 @@
 
 .progress-track {
   height: 12px;
-  background: #333333;
+  background: var(--gray-800);
   border-radius: 6px;
   position: relative;
   overflow: visible;
   border: 1px solid #555555;
-  box-shadow: inset 0 1px 2px rgb(0, 0, 0, 0.3);
+  box-shadow: inset 0 1px 2px var(--black-alpha-30);
   z-index: 1;
 }
 
@@ -107,13 +107,13 @@
     0 0 6px rgb(74, 144, 226, 0.4);
   opacity: 0;
   transition: all 0.2s ease;
-  border: 2px solid #ffffff;
+  border: 2px solid var(--white);
   z-index: 10;
 }
 
 .progress-track:hover {
   background: #444444;
-  border-color: #666666;
+  border-color: var(--gray-600);
 }
 
 .progress-track:hover .progress-fill {
@@ -163,14 +163,14 @@
   top: -35px;
   transform: translateX(-50%);
   background: rgb(0, 0, 0, 0.9);
-  color: #ffffff;
+  color: var(--white);
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
   pointer-events: none;
-  box-shadow: 0 2px 8px rgb(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px var(--black-alpha-40);
   z-index: 10;
 }
 
@@ -209,8 +209,8 @@
 }
 
 .volume-btn:hover {
-  background: rgb(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: var(--white-alpha-10);
+  color: var(--white);
 }
 
 .volume-btn svg {
@@ -223,10 +223,10 @@
   right: 0;
   bottom: 40px;
   background: rgb(26, 26, 26, 0.95);
-  border: 1px solid #333333;
+  border: 1px solid var(--gray-800);
   border-radius: 4px;
   padding: 8px;
-  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.4);
+  box-shadow: 0 4px 12px var(--black-alpha-40);
   z-index: 1000;
   min-width: 40px;
   display: flex;
@@ -254,7 +254,7 @@
   background: linear-gradient(145deg, #4a90e2, #357abd);
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px var(--black-alpha-30);
 }
 
 .volume-slider input[type="range"]::-moz-range-thumb {
@@ -264,7 +264,7 @@
   border-radius: 50%;
   cursor: pointer;
   border: none;
-  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px var(--black-alpha-30);
 }
 
 /* Responsive adjustments */
@@ -445,7 +445,7 @@
 }
 
 .light .volume-btn:hover {
-  background: rgb(0, 0, 0, 0.05);
+  background: var(--black-alpha-10);
   color: var(--light-text-primary);
 }
 

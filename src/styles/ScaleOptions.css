@@ -123,6 +123,12 @@
   background: rgb(139, 92, 246, 0.15);
 }
 
+.scale-options-toggle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
 
 .scale-controls {
   margin: 0 auto;
@@ -294,6 +300,12 @@
   box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
 }
 
+.apply-button:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
 
 
 /* Mobile styles applied to all screen sizes - remove conflicting min-width */
@@ -329,6 +341,12 @@
   opacity: 0;
   width: 0;
   height: 0;
+}
+
+.toggle-switch input:focus-visible + .toggle-slider {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
 }
 
 .toggle-slider {
@@ -631,6 +649,12 @@ input:checked + .toggle-slider:hover {
   transform: scale(0.95);
 }
 
+.delete-scale-button:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 1px;
+  box-shadow: var(--focus-ring-shadow);
+}
+
 /* Scrollbar styling for applied scales list - Orange */
 .applied-scales-list::-webkit-scrollbar {
   width: 4px;
@@ -713,6 +737,12 @@ input:checked + .toggle-slider:hover {
 
 .delete-chord-button:active {
   transform: scale(0.95);
+}
+
+.delete-chord-button:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 1px;
+  box-shadow: var(--focus-ring-shadow);
 }
 
 /* Scrollbar styling for applied chords list - Purple */

@@ -21,7 +21,7 @@
 .control-button.record-button {
   min-width: 120px;
   background: var(--accent-color, #28a745);
-  color: white;
+  color: var(--white);
   border: none;
   transition: all 0.2s ease;
 }
@@ -41,7 +41,7 @@
   min-width: 40px;
   width: 40px;
   height: 40px;
-  background: white;
+  background: var(--white);
   color: #333333;
   border: 2px solid #e0e0e0;
   border-radius: 50%;
@@ -80,7 +80,7 @@
 
 .modern-generate-button {
   background: #007bff;
-  color: white;
+  color: var(--white);
   border: 1px solid #007bff;
   border-radius: 6px;
   padding: 10px 20px;
@@ -266,4 +266,21 @@
 .control-button.record-button.recording {
   animation: record-pulse 2s infinite;
   background: #dc3545 !important;
+}
+
+/*
+  ===========================================
+  REDUCED MOTION ACCESSIBILITY
+  ===========================================
+  Respects user's motion preferences for accessibility
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

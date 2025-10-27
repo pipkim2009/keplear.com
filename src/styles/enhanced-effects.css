@@ -140,7 +140,7 @@ html {
   background: linear-gradient(135deg,
     var(--primary-purple),
     var(--primary-purple-light));
-  color: white;
+  color: var(--white);
   text-shadow: 0 1px 2px rgb(0, 0, 0, 0.2);
 }
 
@@ -223,7 +223,7 @@ html {
   left: 50%;
   transform: translateX(-50%) translateY(-8px);
   background: rgb(0, 0, 0, 0.9);
-  color: white;
+  color: var(--white);
   padding: var(--space-sm) var(--space-base);
   border-radius: var(--radius-md);
   font-size: var(--text-sm);

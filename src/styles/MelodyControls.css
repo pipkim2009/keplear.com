@@ -7,7 +7,7 @@
   display: flex;
   justify-content: center;
   padding: 12px 20px;
-  background: rgb(128, 0, 255, 0.1);
+  background: var(--primary-purple-alpha-10);
   border: none;
   border-radius: 12px;
   backdrop-filter: blur(8px);
@@ -21,26 +21,26 @@
 }
 
 .notes-toggle-container:hover {
-  background: rgb(128, 0, 255, 0.2);
+  background: var(--primary-purple-alpha-20);
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px var(--black-alpha-30);
 }
 
 .notes-toggle-container:focus {
-  box-shadow: 0 0 0 2px rgb(128, 0, 255, 0.3);
+  box-shadow: 0 0 0 2px var(--primary-purple-alpha-30);
 }
 
 .dark .notes-toggle-container {
-  background: rgb(128, 0, 255, 0.15);
+  background: var(--primary-purple-alpha-15);
 }
 
 .light .notes-toggle-container {
-  background: rgb(128, 0, 255, 0.08);
-  color: #2d1b69;
+  background: var(--primary-purple-alpha-10);
+  color: var(--dark-bg-tertiary);
 }
 
 .light .notes-toggle-container:hover {
-  background: rgb(128, 0, 255, 0.15);
+  background: var(--primary-purple-alpha-15);
 }
 
 /* Chord Mode Select - matches BPM and Beats input colors */
@@ -73,7 +73,7 @@
 
 .chord-mode-select option {
   background: #1a1a1a !important;
-  color: #ffffff !important;
+  color: var(--white) !important;
   padding: 8px !important;
   text-align: center !important;
 }
@@ -140,19 +140,19 @@
 
 /* Green flash for chord mode toggle when mode changes */
 .chord-mode-toggle.flashing {
-  border-color: #10b981 !important;
+  border-color: var(--green-550) !important;
   border-width: 4px !important;
-  box-shadow: 0 0 20px rgb(16, 185, 129, 0.8) !important;
-  background: rgb(16, 185, 129, 0.4) !important;
+  box-shadow: 0 0 20px var(--green-alpha-80) !important;
+  background: var(--green-alpha-40) !important;
   transition: none !important;
   transform: scale(1.05) !important;
 }
 
 .light .chord-mode-toggle.flashing {
-  border-color: #10b981 !important;
+  border-color: var(--green-550) !important;
   border-width: 4px !important;
   box-shadow: 0 0 20px rgb(16, 185, 129, 1) !important;
-  background: rgb(16, 185, 129, 0.5) !important;
+  background: var(--green-alpha-50) !important;
   transition: none !important;
   transform: scale(1.05) !important;
 }
@@ -177,11 +177,11 @@
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 20px;
-  color: #121212;
+  color: var(--dark-bg-primary);
 }
 
 .dark .selected-notes {
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
 }
 
 .buttons {
@@ -199,8 +199,8 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: #8000ff;
-  color: #d2d2f9;
+  background: var(--primary-purple);
+  color: var(--dark-text-primary);
 }
 
 .button:disabled {
@@ -211,12 +211,12 @@
 .button:not(:disabled):hover {
   background: #6600cc;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgb(128, 0, 255, 0.4);
+  box-shadow: 0 4px 12px var(--primary-purple-alpha-40);
 }
 
 .button-stop {
   background: #e53e3e !important;
-  color: white !important;
+  color: var(--white) !important;
 }
 
 .button-stop:not(:disabled):hover {
@@ -257,11 +257,11 @@
   width: 18px;
   height: 18px;
   background: linear-gradient(45deg, #ff0066, #ff4444);
-  border: 3px solid #ffffff;
+  border: 3px solid var(--white);
   border-radius: 50%;
   font-size: 12px;
   font-weight: bold;
-  color: #ffffff;
+  color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -269,7 +269,7 @@
   z-index: 10;
   box-shadow:
     0 0 8px rgb(255, 68, 68, 0.6),
-    0 4px 8px rgb(0, 0, 0, 0.4);
+    0 4px 8px var(--black-alpha-40);
 }
 
 @keyframes attention {
@@ -277,14 +277,14 @@
     transform: scale(1) rotate(0deg);
     box-shadow:
       0 0 8px rgb(255, 68, 68, 0.6),
-      0 4px 8px rgb(0, 0, 0, 0.4);
+      0 4px 8px var(--black-alpha-40);
   }
 
   25% {
     transform: scale(1.2) rotate(-5deg);
     box-shadow:
       0 0 15px rgb(255, 68, 68, 0.8),
-      0 6px 12px rgb(0, 0, 0, 0.5);
+      0 6px 12px var(--black-alpha-50);
   }
 
   50% {
@@ -298,13 +298,30 @@
     transform: scale(1.2) rotate(5deg);
     box-shadow:
       0 0 15px rgb(255, 68, 68, 0.8),
-      0 6px 12px rgb(0, 0, 0, 0.5);
+      0 6px 12px var(--black-alpha-50);
   }
 
   100% {
     transform: scale(1) rotate(0deg);
     box-shadow:
       0 0 8px rgb(255, 68, 68, 0.6),
-      0 4px 8px rgb(0, 0, 0, 0.4);
+      0 4px 8px var(--black-alpha-40);
+  }
+}
+
+/*
+  ===========================================
+  REDUCED MOTION ACCESSIBILITY
+  ===========================================
+  Respects user's motion preferences for accessibility
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

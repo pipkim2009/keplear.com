@@ -23,6 +23,12 @@
   box-shadow: 0 6px 12px var(--shadow-hover-dark);
 }
 
+.theme-toggle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow), 0 4px 8px var(--shadow-primary-dark);
+}
+
 /* New navigation bar theme toggle */
 .theme-toggle-nav {
   display: flex;
@@ -49,6 +55,12 @@
   background: var(--white-alpha-10);
 }
 
+.theme-toggle-nav:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
 .toggle-track {
   position: relative;
   width: var(--space-10);
@@ -68,7 +80,7 @@
   width: var(--space-4);
   height: var(--space-4);
   border-radius: 50%;
-  background: white;
+  background: var(--white);
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -130,4 +142,10 @@
 
 .dark .theme-toggle-simple:hover {
   background: var(--white-alpha-10);
+}
+
+.theme-toggle-simple:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
 }

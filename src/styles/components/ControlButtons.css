@@ -8,7 +8,7 @@
 .control-label {
   font-size: 12px;
   font-weight: 600;
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 5px;
@@ -17,16 +17,16 @@
 
 /* Control Inputs */
 .control-input {
-  background: rgb(128, 0, 255, 0.15);
-  border: 2px solid #6b46c1;
-  color: #ffffff;
+  background: var(--primary-purple-alpha-15);
+  border: 2px solid var(--purple-800);
+  color: var(--white);
   padding: 6px 10px;
   border-radius: 6px;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px var(--black-alpha-20);
   outline: none;
   text-align: center;
   min-width: 50px;
@@ -34,14 +34,20 @@
 }
 
 .control-input:hover {
-  background: rgb(128, 0, 255, 0.25);
-  border-color: #7c3aed;
+  background: var(--primary-purple-alpha-25);
+  border-color: var(--purple-700);
 }
 
 .control-input:focus {
-  background: rgb(128, 0, 255, 0.3);
-  border-color: #8b5cf6;
-  box-shadow: 0 0 8px rgb(139, 92, 246, 0.4);
+  background: var(--primary-purple-alpha-30);
+  border-color: var(--purple-600);
+  box-shadow: 0 0 8px var(--purple-alpha-40);
+}
+
+.control-input:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
 }
 
 /* Dropdown Styling */
@@ -65,21 +71,21 @@
 
 /* Custom dropdown options styling */
 .control-input option {
-  background: #1f2937 !important;
-  color: #ffffff !important;
+  background: var(--gray-800) !important;
+  color: var(--white) !important;
   padding: 5px 10px;
   font-weight: 600;
 }
 
 .control-input option:hover,
 .control-input option:focus {
-  background: #374151 !important;
-  color: #ffffff !important;
+  background: var(--gray-700) !important;
+  color: var(--white) !important;
 }
 
 .control-input option:checked {
-  background: #3b82f6 !important;
-  color: #000000 !important;
+  background: var(--blue-500) !important;
+  color: var(--black) !important;
   font-weight: 600;
 }
 
@@ -102,7 +108,7 @@
   height: 20px;
   background: transparent;
   border: none;
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
   border-radius: 3px;
   font-size: 12px;
   font-weight: 700;
@@ -118,11 +124,11 @@
 }
 
 .control-button-internal:hover {
-  background: rgb(128, 0, 255, 0.1);
+  background: var(--primary-purple-alpha-10);
 }
 
 .control-button-internal:active {
-  background: rgb(128, 0, 255, 0.2);
+  background: var(--primary-purple-alpha-20);
   transform: translateY(-50%) scale(0.95);
 }
 
@@ -135,38 +141,38 @@
 }
 
 .input-with-buttons .control-button-internal {
-  color: #ffffff !important;
+  color: var(--white) !important;
 }
 
 .input-with-buttons .control-button-internal:hover {
-  color: #ffffff !important;
-  background: rgb(255, 255, 255, 0.1) !important;
+  color: var(--white) !important;
+  background: var(--white-alpha-10) !important;
 }
 
 .input-with-buttons .control-button-internal:active {
-  color: #ffffff !important;
-  background: rgb(255, 255, 255, 0.2) !important;
+  color: var(--white) !important;
+  background: var(--white-alpha-20) !important;
 }
 
 .input-with-buttons .control-button-internal.minus,
 .input-with-buttons .control-button-internal.plus {
-  color: #ffffff !important;
+  color: var(--white) !important;
 }
 
 .input-with-buttons .control-button-internal.minus:hover,
 .input-with-buttons .control-button-internal.plus:hover {
-  color: #ffffff !important;
+  color: var(--white) !important;
 }
 
 .input-with-buttons .control-button-internal.minus:active,
 .input-with-buttons .control-button-internal.plus:active {
-  color: #ffffff !important;
+  color: var(--white) !important;
 }
 
 /* Delete selection button */
 .control-button.delete-selection {
   background: rgb(220, 53, 69, 0.1);
-  border: 2px solid #dc3545;
+  border: 2px solid var(--red-600);
   color: #f5c2c7;
   padding: 6px 12px;
   border-radius: 6px;
@@ -174,7 +180,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px var(--black-alpha-20);
   outline: none;
   display: flex;
   align-items: center;
@@ -182,18 +188,18 @@
   height: 32px;
   min-width: 120px;
   margin-top: 0;
-  border-color: #dc3545; /* Original red border color */
+  border-color: var(--red-600); /* Original red border color */
 }
 
 .control-button.delete-selection:hover {
   background: rgb(220, 53, 69, 0.2);
   transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
+  box-shadow: 0 6px 12px var(--black-alpha-30);
 }
 
 .control-button.delete-selection:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
+  box-shadow: 0 2px 4px var(--black-alpha-20);
 }
 
 /* Instrument-specific delete button positioning */

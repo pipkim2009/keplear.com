@@ -184,7 +184,7 @@
 
 .signup-btn {
   background: var(--blue-500);
-  color: white;
+  color: var(--white);
   border: 2px solid var(--blue-500);
   box-shadow: 0 4px 15px var(--shadow-button);
 }

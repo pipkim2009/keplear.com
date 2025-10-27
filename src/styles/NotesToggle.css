@@ -23,6 +23,12 @@
   box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
+.notes-visibility-toggle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow), 0 4px 8px rgb(0, 0, 0, 0.2);
+}
+
 /* Notes toggle content */
 .notes-toggle-content {
   display: flex;

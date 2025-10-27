@@ -250,6 +250,12 @@
   transform: scale(1.05);
 }
 
+.fret-checkbox:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
 .fret-checkbox-label {
   position: absolute;
   top: 50%;
@@ -265,7 +271,7 @@
 }
 
 .fret-checkbox:checked + .fret-checkbox-label {
-  color: white;
+  color: var(--white);
 }
 
 /* Disabled state for fret checkboxes */
@@ -325,6 +331,12 @@
   transform: scale(1.05);
 }
 
+.string-checkbox:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
+}
+
 .string-checkbox-label {
   position: absolute;
   top: 50%;
@@ -340,7 +352,7 @@
 }
 
 .string-checkbox:checked + .string-checkbox-label {
-  color: white;
+  color: var(--white);
 }
 
 /* Clickable fret positions */
@@ -355,6 +367,12 @@
 
 .fret-position:hover {
   background: transparent;
+}
+
+.fret-position:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  box-shadow: var(--focus-ring-shadow);
 }
 
 /* Open string area styling */
@@ -921,4 +939,21 @@
 
 .light .position-info p {
   color: var(--light-text-secondary);
+}
+
+/*
+  ===========================================
+  REDUCED MOTION ACCESSIBILITY
+  ===========================================
+  Respects user's motion preferences for accessibility
+*/
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

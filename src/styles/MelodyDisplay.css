@@ -1,13 +1,13 @@
 .melody-display {
   width: 100%;
-  background: rgb(59, 130, 246, 0.1);
-  border: 2px solid #3b82f6;
+  background: var(--blue-alpha-10);
+  border: 2px solid var(--blue-500);
   border-radius: 8px;
   padding: 12px;
 }
 
 .melody-title {
-  color: #3b82f6;
+  color: var(--blue-500);
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 8px;
@@ -21,8 +21,8 @@
 }
 
 .melody-note {
-  background: #3b82f6 !important;
-  color: white !important;
+  background: var(--blue-500) !important;
+  color: var(--white) !important;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -33,14 +33,14 @@
 
 /* Golden highlight for currently playing note - matches keyboard styling */
 .melody-note.currently-playing {
-  background: linear-gradient(145deg, #fbbf24, #f59e0b) !important;
-  color: #1f2937 !important;
-  border: 2px solid #fef3c7 !important;
+  background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
+  color: var(--gray-800) !important;
+  border: 2px solid var(--amber-200) !important;
   box-shadow:
-    0 0 20px rgb(251, 191, 36, 0.8),
-    0 0 40px rgb(245, 158, 11, 0.6),
-    inset 0 2px 4px rgb(255, 255, 255, 0.8),
-    inset 0 -2px 4px rgb(0, 0, 0, 0.1) !important;
+    0 0 20px var(--amber-alpha-80),
+    0 0 40px var(--amber-alpha-60),
+    inset 0 2px 4px var(--white-alpha-80),
+    inset 0 -2px 4px var(--black-alpha-10) !important;
   transition: none !important;
 }
 
@@ -62,14 +62,14 @@
 
   /* Golden highlight in dark mode - matches keyboard styling */
   .melody-note.currently-playing {
-    background: linear-gradient(145deg, #fbbf24, #f59e0b) !important;
-    color: #1f2937 !important;
-    border: 2px solid #fef3c7 !important;
+    background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
+    color: var(--gray-800) !important;
+    border: 2px solid var(--amber-200) !important;
     box-shadow:
-      0 0 20px rgb(251, 191, 36, 0.8),
-      0 0 40px rgb(245, 158, 11, 0.6),
-      inset 0 2px 4px rgb(255, 255, 255, 0.8),
-      inset 0 -2px 4px rgb(0, 0, 0, 0.1) !important;
+      0 0 20px var(--amber-alpha-80),
+      0 0 40px var(--amber-alpha-60),
+      inset 0 2px 4px var(--white-alpha-80),
+      inset 0 -2px 4px var(--black-alpha-10) !important;
     transition: none !important;
   }
 }
@@ -82,28 +82,28 @@
 */
 
 .light .melody-display {
-  background: rgb(59, 130, 246, 0.05);
-  border-color: #3b82f6;
+  background: var(--blue-alpha-05);
+  border-color: var(--blue-500);
 }
 
 .light .melody-title {
-  color: #3b82f6;
+  color: var(--blue-500);
 }
 
 .light .melody-note {
-  background: #3b82f6 !important;
-  color: white !important;
+  background: var(--blue-500) !important;
+  color: var(--white) !important;
 }
 
 /* Golden highlight stays the same in light mode */
 .light .melody-note.currently-playing {
-  background: linear-gradient(145deg, #fbbf24, #f59e0b) !important;
-  color: #1f2937 !important;
-  border: 2px solid #fef3c7 !important;
+  background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
+  color: var(--gray-800) !important;
+  border: 2px solid var(--amber-200) !important;
   box-shadow:
-    0 0 20px rgb(251, 191, 36, 0.8),
-    0 0 40px rgb(245, 158, 11, 0.6),
-    inset 0 2px 4px rgb(255, 255, 255, 0.8),
-    inset 0 -2px 4px rgb(0, 0, 0, 0.1) !important;
+    0 0 20px var(--amber-alpha-80),
+    0 0 40px var(--amber-alpha-60),
+    inset 0 2px 4px var(--white-alpha-80),
+    inset 0 -2px 4px var(--black-alpha-10) !important;
   transition: none !important;
 }

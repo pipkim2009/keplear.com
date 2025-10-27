@@ -6,8 +6,8 @@
 
 /* Green border for input changes */
 .control-input.flashing {
-  border-color: #10b981 !important;
-  box-shadow: 0 0 8px rgb(16, 185, 129, 0.4) !important;
+  border-color: var(--green-550) !important;
+  box-shadow: 0 0 8px var(--green-alpha-40) !important;
 }
 
 /* Notes toggle row styling */
@@ -39,19 +39,19 @@
 .notes-toggle-container .toggle-text {
   font-size: 12px;
   font-weight: 600;
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
 }
 
 /* Light mode styles for notes toggle */
 .light .notes-toggle-container.control-input {
-  background: rgb(128, 0, 255, 0.15);
-  border: 2px solid #6b46c1;
-  color: #d2d2f9;
+  background: var(--primary-purple-alpha-15);
+  border: 2px solid var(--purple-800);
+  color: var(--dark-text-primary);
 }
 
 .light .notes-toggle-container.control-input:hover {
-  background: rgb(128, 0, 255, 0.25);
-  border-color: #7c3aed;
+  background: var(--primary-purple-alpha-25);
+  border-color: var(--purple-700);
 }
 
 /* BPM and Notes row styling */
@@ -71,10 +71,10 @@
   width: 100%;
   align-items: center;
   justify-content: center;
-  border: 2px solid #666666;
+  border: 2px solid var(--gray-600);
   border-radius: 8px;
   padding: 10px;
-  background: rgb(0, 0, 0, 0.1);
+  background: var(--black-alpha-10);
 }
 
 .control-group.bpm-notes-melody-row .melody-controls-top {

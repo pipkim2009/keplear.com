@@ -31,6 +31,10 @@
   --light-bg-secondary: #f8f9fa;
   --light-bg-tertiary: #e8e4ff;
   --light-bg-quaternary: #f0f0ff;
+  --light-bg-gradient-1: #e8e4ff;
+  --light-bg-gradient-2: #d2d2f9;
+  --light-bg-gradient-3: #f0f0ff;
+  --light-bg-gradient-4: #e1d8ff;
   --light-text-primary: #121212;
   --light-text-secondary: #374151;
   --light-text-tertiary: #6b7280;
@@ -145,6 +149,7 @@
      NEUTRAL GRAYS
      ======================================== */
   --white: #ffffff;
+  --black: #000000;
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
   --gray-200: #e5e7eb;
