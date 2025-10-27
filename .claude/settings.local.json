@@ -11,7 +11,9 @@
       "Bash(for file in ControlsModular.css CustomAudioPlayer.css CustomDropdown.css common-components.css ControlsPanel.css MelodyDisplay.css)",
       "Bash(do if ! grep -q \"\\.light\" \"$file\")",
       "Bash(then echo \"$file - NO THEME\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(awk:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []
