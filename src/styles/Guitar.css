@@ -15,14 +15,14 @@
 
 @media (min-width: 481px) and (max-width: 768px) {
   .guitar-container {
-    min-width: auto !important;
-    margin: 0 !important;
-    padding: 0 20px 50px 45px !important;
-    justify-content: flex-start !important;
-    overflow-x: scroll !important;
-    -webkit-overflow-scrolling: touch !important;
-    max-width: 100vw !important;
-    width: 100vw !important;
+    min-width: auto;
+    margin: 0;
+    padding: 0 20px 50px 45px;
+    justify-content: flex-start;
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100vw;
+    width: 100vw;
   }
 
   .fretboard {
@@ -39,14 +39,14 @@
 
 @media (max-width: 480px) {
   .guitar-container {
-    min-width: auto !important;
-    margin: 0 !important;
-    padding: 0 20px 50px 45px !important;
-    justify-content: flex-start !important;
-    overflow-x: scroll !important;
-    -webkit-overflow-scrolling: touch !important;
-    max-width: 100vw !important;
-    width: 100vw !important;
+    min-width: auto;
+    margin: 0;
+    padding: 0 20px 50px 45px;
+    justify-content: flex-start;
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100vw;
+    width: 100vw;
   }
 
   .fretboard {
@@ -182,7 +182,7 @@
 .guitar-container::-webkit-scrollbar-button:horizontal:start:decrement,
 .guitar-container::-webkit-scrollbar-button:horizontal:end:increment {
   display: none;
-  width: 0 !important;
+  width: 0;
 }
 
 .guitar-container::-webkit-scrollbar-track {
@@ -394,12 +394,12 @@
 }
 
 .note-circle.preview.scale-note {
-  background: linear-gradient(145deg, var(--orange-alpha-40), var(--orange-alpha-40)) !important;
+  background: linear-gradient(145deg, var(--orange-alpha-40), var(--orange-alpha-40));
   border: 1px solid var(--orange-400-alpha-60);
 }
 
 .note-circle.preview.scale-root-note {
-  background: linear-gradient(145deg, var(--red-alpha-40), var(--red-alpha-40)) !important;
+  background: linear-gradient(145deg, var(--red-alpha-40), var(--red-alpha-40));
   border: 1px solid var(--red-light-alpha-60);
   box-shadow:
     0 0 6px var(--red-alpha-40),
@@ -408,17 +408,17 @@
 }
 
 .note-circle.preview.chord-note {
-  background: linear-gradient(145deg, var(--purple-alpha-40), var(--purple-alpha-40)) !important;
+  background: linear-gradient(145deg, var(--purple-alpha-40), var(--purple-alpha-40));
   border: 1px solid var(--purple-600-alpha-60);
 }
 
 .note-circle.preview.chord-scale-note {
-  background: linear-gradient(145deg, var(--orange-alpha-40), var(--purple-alpha-40)) !important;
+  background: linear-gradient(145deg, var(--orange-alpha-40), var(--purple-alpha-40));
   border: 1px solid var(--orange-600-alpha-60);
 }
 
 .note-circle.preview.chord-root-note {
-  background: linear-gradient(145deg, var(--red-alpha-40), var(--red-alpha-40)) !important;
+  background: linear-gradient(145deg, var(--red-alpha-40), var(--red-alpha-40));
   border: 1px solid var(--red-light-alpha-60);
   box-shadow:
     0 0 6px var(--red-alpha-40),
@@ -435,10 +435,6 @@
     0 0 40px var(--amber-alpha-60),
     inset 0 1px 2px var(--white-alpha-80),
     inset 0 -1px 2px var(--black-alpha-10) !important;
-  width: 20px !important;
-  height: 20px !important;
-  border-radius: 50% !important;
-  padding: 0 !important;
 }
 
 @keyframes pulse-playing {
@@ -449,10 +445,6 @@
 /* Green styling for melody notes */
 .note-circle.melody-note {
   background: linear-gradient(145deg, var(--note-melody), var(--note-melody-dark)) !important;
-  width: 20px !important;
-  height: 20px !important;
-  border-radius: 50% !important;
-  padding: 0 !important;
 }
 
 /* Dim all non-melody notes when melody is active */
@@ -606,7 +598,7 @@
 
 /* Scale note highlighting */
 .note-circle.scale-note {
-  background: linear-gradient(145deg, var(--note-scale), var(--note-scale-dark)) !important;
+  background: linear-gradient(145deg, var(--note-scale), var(--note-scale-dark));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -614,7 +606,7 @@
 }
 
 .note-circle.scale-root-note {
-  background: linear-gradient(145deg, var(--note-scale-root), var(--note-scale-root-dark)) !important;
+  background: linear-gradient(145deg, var(--note-scale-root), var(--note-scale-root-dark));
   border: 1px solid var(--white);
   box-shadow:
     0 0 8px var(--shadow-scale-root),
@@ -624,7 +616,7 @@
 
 /* Chord note highlighting */
 .note-circle.chord-note {
-  background: linear-gradient(145deg, var(--note-chord), var(--note-chord-dark)) !important;
+  background: linear-gradient(145deg, var(--note-chord), var(--note-chord-dark));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -635,7 +627,7 @@
 
 /* Color hierarchy: Red (top) → Purple → Orange → Blue (bottom) */
 .note-circle.chord-scale-note {
-  background: linear-gradient(145deg, var(--note-chord), var(--note-scale)) !important;
+  background: linear-gradient(145deg, var(--note-chord), var(--note-scale));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -644,7 +636,7 @@
 
 /* Mixed chord note + scale root - blend of red (scale root) and purple (chord) */
 .note-circle.chord-note-scale-root {
-  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord)) !important;
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -653,7 +645,7 @@
 
 /* Mixed chord root + scale note - blend of red (chord root) and orange (scale) */
 .note-circle.chord-root-scale-note {
-  background: linear-gradient(145deg, var(--note-chord-root), var(--note-scale)) !important;
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-scale));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -662,7 +654,7 @@
 
 /* Both roots (chord root + scale root) - stays red since both are roots */
 .note-circle.chord-root-scale-root {
-  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord-root-dark)) !important;
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord-root-dark));
   border: 1px solid var(--white);
   box-shadow:
     0 0 8px var(--shadow-scale-root),
@@ -672,7 +664,7 @@
 
 /* Chord root + chord note - blend of red (chord root) and purple (chord note) */
 .note-circle.chord-root-chord-note {
-  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord)) !important;
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord));
   border: 1px solid var(--white);
   box-shadow:
     0 0 8px var(--red-alpha-40),
@@ -684,7 +676,7 @@
 /* Chord root notes should always be red */
 .note-circle.chord-root-note,
 .note-circle.chord-note.chord-root-note {
-  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord-root-dark)) !important;
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord-root-dark));
   border: 1px solid var(--white);
   box-shadow:
     0 0 8px var(--shadow-scale-root),
@@ -698,7 +690,7 @@
 
 /* Manual + Scale (orange + blue) */
 .note-circle.manual-scale-note {
-  background: linear-gradient(145deg, var(--note-scale), var(--note-selected)) !important;
+  background: linear-gradient(145deg, var(--note-scale), var(--note-selected));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -707,7 +699,7 @@
 
 /* Manual + Chord (purple + blue) */
 .note-circle.manual-chord-note {
-  background: linear-gradient(145deg, var(--note-chord), var(--note-selected)) !important;
+  background: linear-gradient(145deg, var(--note-chord), var(--note-selected));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -716,7 +708,7 @@
 
 /* Manual + Scale Root (red + blue) */
 .note-circle.manual-scale-root {
-  background: linear-gradient(145deg, var(--note-chord-root), var(--note-selected)) !important;
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-selected));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -725,7 +717,7 @@
 
 /* Manual + Chord Root (red + blue) */
 .note-circle.manual-chord-root {
-  background: linear-gradient(145deg, var(--note-chord-root), var(--note-selected)) !important;
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-selected));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -734,7 +726,7 @@
 
 /* Manual + Scale + Chord (purple + orange + blue) */
 .note-circle.manual-scale-chord-note {
-  background: linear-gradient(145deg, var(--note-chord), var(--note-scale), var(--note-selected)) !important;
+  background: linear-gradient(145deg, var(--note-chord), var(--note-scale), var(--note-selected));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -743,7 +735,7 @@
 
 /* Manual + Scale + Root (red + orange + blue) */
 .note-circle.manual-scale-root-note {
-  background: linear-gradient(145deg, var(--note-chord-root), var(--note-scale), var(--note-selected)) !important;
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-scale), var(--note-selected));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -752,7 +744,7 @@
 
 /* Manual + Chord + Root (red + purple + blue) */
 .note-circle.manual-chord-root-note {
-  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord), var(--note-selected)) !important;
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord), var(--note-selected));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -761,7 +753,7 @@
 
 /* Manual + Scale + Chord + Root (red + purple + orange + blue) */
 .note-circle.manual-scale-chord-root-note {
-  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord), var(--note-scale), var(--note-selected)) !important;
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord), var(--note-scale), var(--note-selected));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-20),
@@ -770,7 +762,7 @@
 
 /* Manual notes only (just blue) - override the default blue */
 .note-circle.manual-note {
-  background: linear-gradient(145deg, var(--note-selected), var(--note-selected-dark)) !important;
+  background: linear-gradient(145deg, var(--note-selected), var(--note-selected-dark));
   border: 1px solid var(--white);
   box-shadow:
     0 2px 4px var(--black-alpha-30),
