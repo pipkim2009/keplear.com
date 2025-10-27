@@ -11,7 +11,7 @@
 }
 
 .black-key.scale-note {
-  background: linear-gradient(145deg, #d97706, #b45309);
+  background: linear-gradient(145deg, var(--orange-d97706), var(--orange-b45309));
 }
 
 .white-key.scale-root {
@@ -25,7 +25,7 @@
 }
 
 .black-key.scale-root {
-  background: linear-gradient(145deg, var(--red-700), #991b1b);
+  background: linear-gradient(145deg, var(--red-700), var(--red-991b1b));
   box-shadow:
     inset 0 1px 2px var(--white-alpha-10),
     inset 0 -1px 2px var(--black-alpha-30),
@@ -39,7 +39,7 @@
 }
 
 .black-key.selected.scale-note {
-  background: linear-gradient(145deg, #d97706, #b45309);
+  background: linear-gradient(145deg, var(--orange-d97706), var(--orange-b45309));
 }
 
 .white-key.selected.scale-root {
@@ -47,7 +47,7 @@
 }
 
 .black-key.selected.scale-root {
-  background: linear-gradient(145deg, var(--red-700), #991b1b);
+  background: linear-gradient(145deg, var(--red-700), var(--red-991b1b));
 }
 
 /* Chord highlighting for keyboard keys */
@@ -57,7 +57,7 @@
 }
 
 .black-key.chord-note {
-  background: linear-gradient(145deg, var(--purple-700), #6d28d9);
+  background: linear-gradient(145deg, var(--purple-700), var(--purple-6d28d9));
 }
 
 /* Mixed chord/scale note highlighting - blend of orange (scale) and purple (chord) */
@@ -121,7 +121,7 @@
 }
 
 .black-key.chord-root-scale-root {
-  background: linear-gradient(145deg, var(--red-700), #991b1b);
+  background: linear-gradient(145deg, var(--red-700), var(--red-991b1b));
 }
 
 .white-key.selected.chord-root-scale-root {
@@ -129,7 +129,7 @@
 }
 
 .black-key.selected.chord-root-scale-root {
-  background: linear-gradient(145deg, var(--red-700), #991b1b);
+  background: linear-gradient(145deg, var(--red-700), var(--red-991b1b));
 }
 
 /* Chord root notes should always be red */
@@ -146,7 +146,7 @@
 
 .black-key.chord-root,
 .black-key.chord-note.chord-root {
-  background: linear-gradient(145deg, var(--red-700), #991b1b) !important;
+  background: linear-gradient(145deg, var(--red-700), var(--red-991b1b)) !important;
   box-shadow:
     inset 0 1px 2px var(--white-alpha-10),
     inset 0 -1px 2px var(--black-alpha-30),
@@ -160,7 +160,7 @@
 }
 
 .black-key.selected.chord-note {
-  background: linear-gradient(145deg, var(--purple-700), #6d28d9);
+  background: linear-gradient(145deg, var(--purple-700), var(--purple-6d28d9));
 }
 
 .white-key.selected.chord-root,
@@ -170,7 +170,7 @@
 
 .black-key.selected.chord-root,
 .black-key.selected.chord-note.chord-root {
-  background: linear-gradient(145deg, var(--red-700), #991b1b) !important;
+  background: linear-gradient(145deg, var(--red-700), var(--red-991b1b)) !important;
 }
 
 /* Key Labels */

@@ -2,7 +2,7 @@
   width: 100%;
   max-width: 480px;
   min-width: 420px;
-  background: rgb(26, 26, 26, 0.9);
+  background: var(--gray-1a1a1a-alpha-90);
   border-radius: 8px;
   padding: 12px;
   box-shadow: 0 4px 12px var(--black-alpha-30);
@@ -21,7 +21,7 @@
 }
 
 .play-pause-btn {
-  background: linear-gradient(145deg, #4a90e2, #357abd);
+  background: linear-gradient(145deg, var(--blue-450), var(--blue-550));
   border: none;
   border-radius: 50%;
   width: 40px;
@@ -38,7 +38,7 @@
 }
 
 .play-pause-btn:hover {
-  background: linear-gradient(145deg, #5a9ff2, #4589cd);
+  background: linear-gradient(145deg, var(--blue-590), var(--blue-580));
   transform: translateY(-1px);
   box-shadow: 0 4px 8px var(--black-alpha-30);
 }
@@ -81,15 +81,15 @@
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #4a90e2, #357abd, #2969a3);
+  background: linear-gradient(90deg, var(--blue-450), var(--blue-550), var(--blue-650));
   border-radius: 6px;
   transition: width 0.1s ease;
   position: relative;
   box-shadow:
-    0 1px 3px rgb(74, 144, 226, 0.3),
-    0 0 10px rgb(74, 144, 226, 0.4),
-    0 0 20px rgb(74, 144, 226, 0.2),
-    inset 0 1px 0 rgb(255, 255, 255, 0.3);
+    0 1px 3px var(--blue-450-alpha-30),
+    0 0 10px var(--blue-450-alpha-40),
+    0 0 20px var(--blue-450-alpha-30),
+    inset 0 1px 0 var(--white-alpha-30);
 }
 
 .progress-fill::after {
@@ -100,11 +100,11 @@
   transform: translateY(-50%);
   width: 16px;
   height: 16px;
-  background: linear-gradient(145deg, #4a90e2, #357abd);
+  background: linear-gradient(145deg, var(--blue-450), var(--blue-550));
   border-radius: 50%;
   box-shadow:
-    0 2px 4px rgb(0, 0, 0, 0.3),
-    0 0 6px rgb(74, 144, 226, 0.4);
+    0 2px 4px var(--black-alpha-30),
+    0 0 6px var(--blue-450-alpha-40);
   opacity: 0;
   transition: all 0.2s ease;
   border: 2px solid var(--white);
@@ -118,19 +118,19 @@
 
 .progress-track:hover .progress-fill {
   box-shadow:
-    0 1px 3px rgb(74, 144, 226, 0.4),
-    0 0 15px rgb(74, 144, 226, 0.6),
-    0 0 30px rgb(74, 144, 226, 0.3),
-    inset 0 1px 0 rgb(255, 255, 255, 0.4);
+    0 1px 3px var(--blue-450-alpha-40),
+    0 0 15px var(--blue-450-alpha-60),
+    0 0 30px var(--blue-450-alpha-30),
+    inset 0 1px 0 var(--white-alpha-40);
 }
 
 .progress-track:hover .progress-fill::after,
 .progress-bar.dragging .progress-fill::after {
   opacity: 1;
   box-shadow:
-    0 2px 4px rgb(0, 0, 0, 0.3),
-    0 0 8px rgb(74, 144, 226, 0.6),
-    0 0 16px rgb(74, 144, 226, 0.4);
+    0 2px 4px var(--black-alpha-30),
+    0 0 8px var(--blue-450-alpha-60),
+    0 0 16px var(--blue-450-alpha-40);
 }
 
 .progress-bar.dragging {
@@ -144,10 +144,10 @@
 
 .progress-bar.dragging .progress-fill {
   box-shadow:
-    0 1px 3px rgb(74, 144, 226, 0.5),
-    0 0 20px rgb(74, 144, 226, 0.8),
-    0 0 40px rgb(74, 144, 226, 0.4),
-    inset 0 1px 0 rgb(255, 255, 255, 0.5);
+    0 1px 3px var(--blue-450-alpha-50),
+    0 0 20px var(--blue-450-alpha-80),
+    0 0 40px var(--blue-450-alpha-40),
+    inset 0 1px 0 var(--white-alpha-50);
 }
 
 .progress-bar::before {
@@ -162,7 +162,7 @@
   position: absolute;
   top: -35px;
   transform: translateX(-50%);
-  background: rgb(0, 0, 0, 0.9);
+  background: var(--black-alpha-90);
   color: var(--white);
   padding: 4px 8px;
   border-radius: 4px;
@@ -184,7 +184,7 @@
   height: 0;
   border-left: 5px solid transparent;
   border-right: 5px solid transparent;
-  border-top: 5px solid rgb(0, 0, 0, 0.9);
+  border-top: 5px solid var(--black-alpha-90);
 }
 
 .volume-control {
@@ -222,7 +222,7 @@
   position: absolute;
   right: 0;
   bottom: 40px;
-  background: rgb(26, 26, 26, 0.95);
+  background: var(--gray-1a1a1a-alpha-95);
   border: 1px solid var(--gray-800);
   border-radius: 4px;
   padding: 8px;
@@ -240,7 +240,7 @@
   appearance: none;
   width: 4px;
   height: 80px;
-  background: linear-gradient(to top, #4a90e2 0%, #4a90e2 var(--volume-percentage, 100%), #444444 var(--volume-percentage, 100%), #444444 100%);
+  background: linear-gradient(to top, var(--blue-450) 0%, var(--blue-450) var(--volume-percentage, 100%), var(--gray-444) var(--volume-percentage, 100%), var(--gray-444) 100%);
   outline: none;
   cursor: pointer;
   border-radius: 2px;
@@ -251,7 +251,7 @@
   appearance: none;
   width: 16px;
   height: 16px;
-  background: linear-gradient(145deg, #4a90e2, #357abd);
+  background: linear-gradient(145deg, var(--blue-450), var(--blue-550));
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 2px 4px var(--black-alpha-30);
@@ -260,7 +260,7 @@
 .volume-slider input[type="range"]::-moz-range-thumb {
   width: 16px;
   height: 16px;
-  background: linear-gradient(145deg, #4a90e2, #357abd);
+  background: linear-gradient(145deg, var(--blue-450), var(--blue-550));
   border-radius: 50%;
   cursor: pointer;
   border: none;
@@ -455,5 +455,5 @@
 }
 
 .light .volume-slider input[type="range"] {
-  background: linear-gradient(to top, #4a90e2 0%, #4a90e2 var(--volume-percentage, 100%), var(--light-border-secondary) var(--volume-percentage, 100%), var(--light-border-secondary) 100%);
+  background: linear-gradient(to top, var(--blue-450) 0%, var(--blue-450) var(--volume-percentage, 100%), var(--light-border-secondary) var(--volume-percentage, 100%), var(--light-border-secondary) 100%);
 }

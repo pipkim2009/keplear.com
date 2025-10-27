@@ -9,21 +9,21 @@
 }
 
 .light {
-  background: linear-gradient(135deg, 
-    #e8e4ff 0%, 
-    #d2d2f9 25%, 
-    #f0f0ff 50%, 
-    #e1d8ff 75%, 
-    #d2d2f9 100%);
+  background: linear-gradient(135deg,
+    var(--light-bg-gradient-1) 0%,
+    var(--light-bg-gradient-2) 25%,
+    var(--light-bg-gradient-3) 50%,
+    var(--light-bg-gradient-4) 75%,
+    var(--light-bg-gradient-2) 100%);
 }
 
 .dark {
-  background: linear-gradient(135deg, 
-    #0a0a0a 0%, 
-    #121212 25%, 
-    #1a0d2e 50%, 
-    #2d1b69 75%, 
-    #121212 100%);
+  background: linear-gradient(135deg,
+    var(--dark-bg-surface) 0%,
+    var(--dark-bg-primary) 25%,
+    var(--dark-bg-quaternary) 50%,
+    var(--dark-bg-tertiary) 75%,
+    var(--dark-bg-primary) 100%);
 }
 
 .app-header {
@@ -35,10 +35,10 @@
   font-size: 1.125rem;
   text-align: center;
   margin-bottom: 2rem;
-  color: #121212;
+  color: var(--light-text-primary);
   opacity: 0.9;
 }
 
 .dark .app-description {
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
 }

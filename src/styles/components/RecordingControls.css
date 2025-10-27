@@ -7,7 +7,7 @@
 /* Recording Controls */
 .control-group.recording-controls {
   margin-top: 12px;
-  border-top: 1px solid var(--border-color, #e0e0e0);
+  border-top: 1px solid var(--border-color, var(--gray-e0e0e0));
   padding-top: 12px;
 }
 
@@ -20,19 +20,19 @@
 
 .control-button.record-button {
   min-width: 120px;
-  background: var(--accent-color, #28a745);
+  background: var(--accent-color, var(--green-28a745));
   color: var(--white);
   border: none;
   transition: all 0.2s ease;
 }
 
 .control-button.record-button:hover:not(:disabled) {
-  background: var(--accent-hover-color, #218838);
+  background: var(--accent-hover-color, var(--green-218838));
   transform: translateY(-1px);
 }
 
 .control-button.record-button:disabled {
-  background: var(--disabled-color, #6c757d);
+  background: var(--disabled-color, var(--gray-6c757d));
   cursor: not-allowed;
   transform: none;
 }
@@ -43,7 +43,7 @@
   height: 40px;
   background: var(--white);
   color: var(--gray-333);
-  border: 2px solid #e0e0e0;
+  border: 2px solid var(--gray-e0e0e0);
   border-radius: 50%;
   transition: all 0.2s ease;
   display: flex;
@@ -53,20 +53,20 @@
 }
 
 .control-button.download-button:hover:not(:disabled) {
-  background: #f5f5f5;
+  background: var(--gray-f5f5f5);
   border-color: var(--blue-007bff);
   color: var(--blue-007bff);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgb(0, 123, 255, 0.2);
+  box-shadow: 0 2px 8px var(--blue-alpha-20);
 }
 
 /* Modern Controls Row Styling */
 .control-group.modern-controls-row {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border: 1px solid #dee2e6;
+  background: linear-gradient(135deg, var(--gray-f8f9fa) 0%, var(--gray-e9ecef) 100%);
+  border: 1px solid var(--gray-dee2e6);
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgb(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--black-alpha-10);
   margin: 15px 0;
 }
 
@@ -192,7 +192,7 @@
   height: 40px;
   border-radius: 6px;
   background: var(--gray-f8f9fa);
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--gray-dee2e6);
 }
 
 .wav-audio-player audio::-webkit-media-controls-panel {
@@ -208,7 +208,7 @@
 /* Dark mode support for recording controls */
 @media (prefers-color-scheme: dark) {
   .control-group.recording-controls {
-    border-top-color: var(--border-color-dark, #404040);
+    border-top-color: var(--border-color-dark, var(--gray-404040));
   }
 
   .control-button.record-button {
@@ -223,14 +223,14 @@
   }
 
   .control-button.download-button:hover:not(:disabled) {
-    background: #343a40;
+    background: var(--gray-343a40);
     border-color: var(--green-20c997);
     color: var(--green-20c997);
     box-shadow: 0 2px 8px rgb(32, 201, 151, 0.2);
   }
 
   .control-group.modern-controls-row {
-    background: linear-gradient(135deg, var(--gray-2d3338) 0%, #343a40 100%);
+    background: linear-gradient(135deg, var(--gray-2d3338) 0%, var(--gray-343a40) 100%);
     border-color: var(--gray-404040);
   }
 
@@ -253,15 +253,7 @@
 
 /* Note: @keyframes expand-in is defined in Controls.css */
 
-@keyframes record-pulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgb(220, 53, 69, 0.7);
-  }
-
-  50% {
-    box-shadow: 0 0 0 10px rgb(220, 53, 69, 0);
-  }
-}
+/* Note: @keyframes record-pulse is defined in enhanced-effects.css */
 
 .control-button.record-button.recording {
   animation: record-pulse 2s infinite;

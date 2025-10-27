@@ -90,14 +90,14 @@
 
 .toggle-thumb.light {
   left: var(--space-1);
-  background: #fbbf24;
-  color: #ffffff;
+  background: var(--amber-400);
+  color: var(--white);
 }
 
 .toggle-thumb.dark {
   left: var(--space-5);
-  background: #6366f1;
-  color: #ffffff;
+  background: var(--purple-6366f1);
+  color: var(--white);
 }
 
 .toggle-label {

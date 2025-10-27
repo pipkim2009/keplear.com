@@ -441,27 +441,26 @@
     inset 0 -2px 4px var(--black-alpha-10) !important;
 }
 
-@keyframes pulse-playing {
-  0%, 100% { transform: scale(1.05); }
-  50% { transform: scale(1.08); }
-}
+/* Note: @keyframes pulse-playing-keyboard is defined in enhanced-effects.css */
 
 /* Ensure melody (green) takes precedence over all other states EXCEPT currently-playing */
-.white-key.melody.scale-note,
-.white-key.melody.scale-root,
-.white-key.melody.chord-note,
-.white-key.melody.chord-root,
-.white-key.melody.chord-scale-note,
-.white-key.melody.chord-note-scale-root,
-.white-key.melody.chord-root-scale-note,
-.white-key.melody.chord-root-scale-root,
-.white-key.melody.manual-scale-note,
-.white-key.melody.manual-chord-note,
-.white-key.melody.manual-scale-chord-note,
-.white-key.melody.manual-scale-root,
-.white-key.melody.manual-chord-root,
-.white-key.melody.manual-chord-root-note,
-.white-key.melody.manual-scale-chord-root-note {
+.white-key.melody:is(
+  .scale-note,
+  .scale-root,
+  .chord-note,
+  .chord-root,
+  .chord-scale-note,
+  .chord-note-scale-root,
+  .chord-root-scale-note,
+  .chord-root-scale-root,
+  .manual-scale-note,
+  .manual-chord-note,
+  .manual-scale-chord-note,
+  .manual-scale-root,
+  .manual-chord-root,
+  .manual-chord-root-note,
+  .manual-scale-chord-root-note
+) {
   background: linear-gradient(145deg, var(--note-melody), var(--note-melody-dark)) !important;
   border-color: var(--white) !important;
 }

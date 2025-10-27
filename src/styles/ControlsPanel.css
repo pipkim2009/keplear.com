@@ -36,13 +36,13 @@
 .control-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #121212;
+  color: var(--light-text-primary);
   opacity: 0.8;
   text-align: center;
 }
 
 .dark .control-label {
-  color: #d2d2f9;
+  color: var(--dark-text-primary);
 }
 
 @media (max-width: 768px) {

@@ -2085,19 +2085,19 @@ select.control-input.flashing {
 
 .control-button.record-button {
   min-width: 120px;
-  background: var(--accent-color, #28a745);
+  background: var(--accent-color, var(--green-28a745));
   color: var(--white);
   border: none;
   transition: all 0.2s ease;
 }
 
 .control-button.record-button:hover:not(:disabled) {
-  background: var(--accent-hover-color, #218838);
+  background: var(--accent-hover-color, var(--green-218838));
   transform: translateY(-1px);
 }
 
 .control-button.record-button:disabled {
-  background: var(--disabled-color, #6c757d);
+  background: var(--disabled-color, var(--gray-6c757d));
   cursor: not-allowed;
   transform: none;
 }
@@ -2128,12 +2128,12 @@ select.control-input.flashing {
 /* Dark mode support for recording controls */
 @media (prefers-color-scheme: dark) {
   .control-group.recording-controls {
-    border-top-color: var(--border-color-dark, #404040);
+    border-top-color: var(--border-color-dark, var(--gray-404040));
   }
 
   .control-button.record-button {
-    --accent-color: #20c997;
-    --accent-hover-color: #1a9977;
+    --accent-color: var(--green-20c997);
+    --accent-hover-color: var(--green-1a9977);
   }
 
   .control-button.download-button {
@@ -2706,7 +2706,7 @@ body.dark .modern-control-item.audio-player-section audio {
 
 .wav-audio-player::-webkit-media-controls-play-button,
 .wav-audio-player::-webkit-media-controls-pause-button {
-  background-color: var(--accent-color, #007bff);
+  background-color: var(--accent-color, var(--blue-007bff));
   border-radius: 50%;
   color: var(--white);
 }
@@ -2714,16 +2714,16 @@ body.dark .modern-control-item.audio-player-section audio {
 /* Dark mode support for WAV player */
 @media (prefers-color-scheme: dark) {
   .wav-player-container {
-    background: var(--input-background-dark, #2d3338);
-    border-color: var(--border-color-dark, #404040);
+    background: var(--input-background-dark, var(--gray-2d3338));
+    border-color: var(--border-color-dark, var(--gray-404040));
   }
 
   .wav-player-container .control-label {
-    color: var(--text-color-dark, #e9ecef);
+    color: var(--text-color-dark, var(--gray-e9ecef));
   }
 
   .wav-audio-player::-webkit-media-controls-panel {
-    background-color: var(--control-background-dark, #343a40);
+    background-color: var(--control-background-dark, var(--gray-343a40));
   }
 }
 

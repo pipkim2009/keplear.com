@@ -392,10 +392,7 @@
     inset 0 -1px 2px var(--black-alpha-10) !important;
 }
 
-@keyframes bass-pulse-playing {
-  0%, 100% { transform: scale(1.15); }
-  50% { transform: scale(1.2); }
-}
+/* Note: @keyframes pulse-playing-fretboard is defined in enhanced-effects.css */
 
 /* Green styling for bass melody notes */
 .bass-note-circle.melody-note {
