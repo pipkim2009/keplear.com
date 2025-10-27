@@ -407,7 +407,7 @@
   user-select: none;
 }
 
-@keyframes bassNoteAppear {
+@keyframes bass-note-appear {
   from {
     transform: scale(0);
     opacity: 0;

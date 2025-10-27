@@ -236,11 +236,11 @@
   ===========================================
 */
 
-.fadeInLight {
-  animation: fadeInLight 0.3s ease-out;
+.fade-in-light {
+  animation: fade-in-light 0.3s ease-out;
 }
 
-@keyframes fadeInLight {
+@keyframes fade-in-light {
   from {
     opacity: 0;
     background: var(--gray-50);
@@ -252,11 +252,11 @@
   }
 }
 
-.fadeInDark {
-  animation: fadeInDark 0.3s ease-out;
+.fade-in-dark {
+  animation: fade-in-dark 0.3s ease-out;
 }
 
-@keyframes fadeInDark {
+@keyframes fade-in-dark {
   from {
     opacity: 0;
     background: var(--gray-900);

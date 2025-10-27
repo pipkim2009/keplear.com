@@ -2278,7 +2278,7 @@ select.control-input.flashing {
   width: 100%;
   margin-top: 0;
   padding-top: 8px;
-  animation: expandIn 0.3s ease-out;
+  animation: expand-in 0.3s ease-out;
 }
 
 .modern-notes-toggle-button .expanded-melody-content .melody-title {
@@ -2320,7 +2320,7 @@ select.control-input.flashing {
   transition: none !important;
 }
 
-@keyframes expandIn {
+@keyframes expand-in {
   from {
     opacity: 0;
     transform: translateY(-10px);

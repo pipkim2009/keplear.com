@@ -266,11 +266,11 @@
   ===========================================
 */
 
-.pulseGlow {
-  animation: pulseGlow 2s ease-in-out infinite;
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
 }
 
-@keyframes pulseGlow {
+@keyframes pulse-glow {
   0%, 100% {
     opacity: 0.3;
   }
@@ -280,11 +280,11 @@
   }
 }
 
-.bounceIcon {
-  animation: bounceIcon 1.5s ease-in-out infinite;
+.bounce-icon {
+  animation: bounce-icon 1.5s ease-in-out infinite;
 }
 
-@keyframes bounceIcon {
+@keyframes bounce-icon {
   0%, 100% {
     transform: scale(1.1) translateY(0);
   }
@@ -294,11 +294,11 @@
   }
 }
 
-.keyPress {
-  animation: keyPress 0.1s ease;
+.key-press {
+  animation: key-press 0.1s ease;
 }
 
-@keyframes keyPress {
+@keyframes key-press {
   0% {
     transform: scale(1);
   }

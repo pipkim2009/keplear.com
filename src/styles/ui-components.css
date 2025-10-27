@@ -432,10 +432,10 @@
     0 0 10px rgb(96, 213, 248, 0.8),
     0 0 20px rgb(96, 213, 248, 0.6),
     0 0 30px rgb(96, 213, 248, 0.4);
-  animation: titleGlow 1.5s ease-in-out infinite;
+  animation: title-glow 1.5s ease-in-out infinite;
 }
 
-@keyframes titleGlow {
+@keyframes title-glow {
   0%, 100% {
     text-shadow:
       0 0 10px rgb(96, 213, 248, 0.8),

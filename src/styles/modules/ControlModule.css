@@ -169,10 +169,10 @@
   composes: input;
   border-color: var(--green-border) !important;
   box-shadow: var(--shadow-green-glow) !important;
-  animation: inputFlash 1s ease;
+  animation: input-flash 1s ease;
 }
 
-@keyframes inputFlash {
+@keyframes input-flash {
   0%, 100% {
     border-color: var(--input-border);
     box-shadow: none;
@@ -401,11 +401,11 @@
   ===========================================
 */
 
-.fadeIn {
-  animation: fadeIn 0.3s ease-out;
+.fade-in {
+  animation: fade-in 0.3s ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -417,11 +417,11 @@
   }
 }
 
-.slideIn {
-  animation: slideIn 0.3s ease-out;
+.slide-in {
+  animation: slide-in 0.3s ease-out;
 }
 
-@keyframes slideIn {
+@keyframes slide-in {
   from {
     opacity: 0;
     transform: translateX(-20px);
@@ -433,11 +433,11 @@
   }
 }
 
-.scaleIn {
-  animation: scaleIn 0.2s ease-out;
+.scale-in {
+  animation: scale-in 0.2s ease-out;
 }
 
-@keyframes scaleIn {
+@keyframes scale-in {
   from {
     opacity: 0;
     transform: scale(0.9);

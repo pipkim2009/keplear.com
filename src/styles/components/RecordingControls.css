@@ -168,7 +168,7 @@
   margin-top: 0;
   padding-top: 8px;
   border-top: 1px solid rgb(32, 201, 151, 0.3);
-  animation: expandIn 0.3s ease-out;
+  animation: expand-in 0.3s ease-out;
 }
 
 /* Audio player section styling */
@@ -250,7 +250,7 @@
 }
 
 /* Animations */
-@keyframes expandIn {
+@keyframes expand-in {
   from {
     opacity: 0;
     transform: translateY(-10px);
@@ -262,7 +262,7 @@
   }
 }
 
-@keyframes recordPulse {
+@keyframes record-pulse {
   0%, 100% {
     box-shadow: 0 0 0 0 rgb(220, 53, 69, 0.7);
   }
@@ -273,6 +273,6 @@
 }
 
 .control-button.record-button.recording {
-  animation: recordPulse 2s infinite;
+  animation: record-pulse 2s infinite;
   background: #dc3545 !important;
 }

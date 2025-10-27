@@ -199,7 +199,7 @@
 }
 
 /* Animations for play/stop state changes */
-@keyframes melodyButtonPress {
+@keyframes melody-button-press {
   0% {
     transform: scale(1);
   }
@@ -214,7 +214,7 @@
 }
 
 .control-button.generate-melody.pressed {
-  animation: melodyButtonPress 0.2s ease;
+  animation: melody-button-press 0.2s ease;
 }
 
 .play-icon.spinning svg {
