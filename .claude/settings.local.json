@@ -18,7 +18,9 @@
       "Bash(npm run lint:css:*)",
       "Bash(cat:*)",
       "Bash(css-analyzer)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nCSS perfection checkpoint - A+ grade achieved\n\n- Zero duplicate selectors eliminated\n- Zero linting errors\n- Deprecated properties replaced\n- Invalid pseudo-classes fixed\n- All modern CSS standards compliance\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []
