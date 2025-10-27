@@ -4,7 +4,14 @@
       "Bash(npm run dev:*)",
       "Bash(tree:*)",
       "Bash(find:*)",
-      "Bash(npm run typecheck:*)"
+      "Bash(npm run typecheck:*)",
+      "Bash(for file in Controls.css Keyboard.css Guitar.css)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(done)",
+      "Bash(for file in ControlsModular.css CustomAudioPlayer.css CustomDropdown.css common-components.css ControlsPanel.css MelodyDisplay.css)",
+      "Bash(do if ! grep -q \"\\.light\" \"$file\")",
+      "Bash(then echo \"$file - NO THEME\")",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []

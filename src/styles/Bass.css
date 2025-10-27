@@ -849,6 +849,78 @@
   scrollbar-width: auto;
   scrollbar-color: var(--scrollbar-guitar-thumb-primary) var(--scrollbar-guitar-track);
 }
+
+/*
+  ===========================================
+  LIGHT THEME SUPPORT
+  ===========================================
+  Override colors for light mode while keeping
+  the fretboard dark (bass looks better dark)
+*/
+
+.light .bass-fret-checkbox-label,
+.light .bass-string-checkbox-label {
+  color: var(--light-text-primary);
+}
+
+.light .bass-scale-selector {
+  background: var(--light-bg-tertiary);
+  border-color: var(--primary-purple-alpha-30);
+}
+
+.light .bass-scale-toggle-button {
+  color: var(--light-text-primary);
+}
+
+.light .bass-scale-toggle-button:hover {
+  background: var(--primary-purple-alpha-30);
+}
+
+.light .bass-scale-control-group label {
+  color: var(--light-text-primary);
+}
+
+.light .bass-scale-control-group select {
+  color: var(--light-text-primary);
+  background: var(--light-bg-primary);
+  border-color: var(--primary-purple);
+}
+
+.light .bass-scale-control-group select:hover,
+.light .bass-scale-control-group select:focus {
+  background: var(--light-bg-tertiary);
+}
+
+.light .bass-scale-description {
+  background: var(--light-bg-secondary);
+  border-left-color: var(--primary-purple);
+}
+
+.light .bass-scale-description p {
+  color: var(--light-text-secondary);
+}
+
+.light .bass-position-toggle {
+  background: var(--light-bg-secondary);
+}
+
+.light .bass-position-toggle label {
+  color: var(--light-text-primary);
+}
+
+.light .bass-position-selector {
+  background: var(--light-bg-secondary);
+  border-left-color: var(--orange-600);
+}
+
+.light .bass-position-info {
+  background: var(--light-bg-tertiary);
+}
+
+.light .bass-position-info p {
+  color: var(--light-text-secondary);
+}
+
 /* DIMMING - MUST BE LAST */
 .bass-fretboard.melody-active .bass-note-circle:not(.melody-note):not(.currently-playing) {
   opacity: 0.5 !important;

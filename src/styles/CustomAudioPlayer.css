@@ -397,3 +397,66 @@
     height: 14px;
   }
 }
+
+/*
+  ===========================================
+  LIGHT THEME SUPPORT
+  ===========================================
+  Override colors for light mode
+*/
+
+.light .custom-audio-player {
+  background: var(--light-bg-secondary);
+  border-color: var(--light-border-primary);
+}
+
+.light .audio-controls {
+  color: var(--light-text-primary);
+}
+
+.light .time-display {
+  color: var(--light-text-secondary);
+}
+
+.light .progress-track {
+  background: var(--light-bg-tertiary);
+  border-color: var(--light-border-secondary);
+}
+
+.light .progress-track:hover {
+  background: var(--light-bg-primary);
+  border-color: var(--light-border-primary);
+}
+
+.light .progress-bar.dragging .progress-track {
+  background: var(--light-bg-primary);
+  border-color: var(--light-border-primary);
+}
+
+.light .progress-hover-time {
+  background: var(--light-bg-primary);
+  color: var(--light-text-primary);
+  border: 1px solid var(--light-border-primary);
+}
+
+.light .progress-hover-time::after {
+  border-top-color: var(--light-bg-primary);
+}
+
+.light .volume-btn {
+  color: var(--light-text-secondary);
+}
+
+.light .volume-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--light-text-primary);
+}
+
+.light .volume-slider {
+  background: var(--light-bg-secondary);
+  border-color: var(--light-border-primary);
+}
+
+.light .volume-slider input[type="range"] {
+  background: linear-gradient(to top, #4a90e2 0%, #4a90e2 var(--volume-percentage, 100%), var(--light-border-secondary) var(--volume-percentage, 100%), var(--light-border-secondary) 100%);
+}

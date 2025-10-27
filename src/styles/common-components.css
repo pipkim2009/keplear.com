@@ -196,3 +196,59 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/*
+  ===========================================
+  LIGHT THEME SUPPORT
+  ===========================================
+  Override colors for light mode
+*/
+
+.light .btn-secondary {
+  background: rgba(128, 0, 255, 0.05);
+  color: var(--primary-purple);
+  border-color: var(--primary-purple);
+}
+
+.light .btn-secondary:hover {
+  background: var(--primary-purple);
+  color: white;
+}
+
+.light .form-input-base {
+  background: var(--light-bg-primary);
+  border-color: var(--light-border-primary);
+  color: var(--light-text-primary);
+}
+
+.light .form-input-base:focus {
+  background: var(--light-bg-secondary);
+  border-color: var(--blue-primary);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.light .card-base {
+  background: var(--light-bg-primary);
+  border-color: var(--light-border-primary);
+}
+
+.light .card-base:hover {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.light .checkbox-base {
+  background: rgba(128, 0, 255, 0.05);
+  border-color: var(--primary-purple);
+}
+
+.light .checkbox-base:hover {
+  background: rgba(128, 0, 255, 0.1);
+}
+
+.light .text-primary {
+  color: var(--light-text-primary);
+}
+
+.light .text-secondary {
+  color: var(--light-text-secondary);
+}

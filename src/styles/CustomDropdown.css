@@ -198,3 +198,69 @@
   background: #3b82f6 !important;
   color: #000000 !important;
 }
+
+/*
+  ===========================================
+  LIGHT THEME SUPPORT
+  ===========================================
+  Override colors for light mode
+*/
+
+.light .custom-dropbtn {
+  background: rgba(128, 0, 255, 0.05);
+  color: var(--light-text-primary);
+  border-color: #8000ff;
+}
+
+.light .custom-dropbtn:hover {
+  background: rgba(128, 0, 255, 0.1);
+}
+
+.light .custom-dropdown-content {
+  background: var(--light-bg-primary);
+  border-color: var(--light-border-primary);
+}
+
+.light .custom-dropdown-item {
+  background: var(--light-bg-primary);
+  color: var(--light-text-primary);
+}
+
+.light .custom-dropdown-item:hover {
+  background: var(--light-bg-tertiary);
+}
+
+.light .custom-dropdown-item.selected {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+.light .scale-dropdown .custom-dropbtn {
+  background: rgba(255, 152, 0, 0.05);
+  border-color: #ffcc02;
+  color: #d97706;
+}
+
+.light .scale-dropdown .custom-dropbtn:hover {
+  background: rgba(255, 204, 2, 0.15);
+}
+
+.light .guitar-mode .custom-dropdown .custom-dropbtn {
+  background: rgba(34, 197, 94, 0.05);
+  border-color: #22c55e;
+  color: #16a34a;
+}
+
+.light .guitar-mode .custom-dropdown .custom-dropbtn:hover {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.light .bass-mode .custom-dropdown .custom-dropbtn {
+  background: rgba(239, 68, 68, 0.05);
+  border-color: #ef4444;
+  color: #dc2626;
+}
+
+.light .bass-mode .custom-dropdown .custom-dropbtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}

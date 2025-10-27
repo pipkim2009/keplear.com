@@ -52,3 +52,18 @@
  * - Co-locate component-specific styles where appropriate
  * - Create comprehensive style guide
  */
+
+/*
+  ===========================================
+  LIGHT THEME SUPPORT
+  ===========================================
+  Light theme overrides are implemented in
+  the individual component files. This file
+  serves as a central import hub for all
+  modular control components.
+
+  Note: If you need to add global light theme
+  overrides that affect multiple components,
+  add them here. Component-specific overrides
+  should be added to their respective files.
+ */

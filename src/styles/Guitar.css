@@ -859,6 +859,76 @@
   color: var(--dark-text-primary);
 }
 
+/*
+  ===========================================
+  LIGHT THEME SUPPORT
+  ===========================================
+  Override colors for light mode while keeping
+  the fretboard dark (guitars look better dark)
+*/
+
+.light .fret-checkbox-label,
+.light .string-checkbox-label {
+  color: var(--light-text-primary);
+}
+
+.light .scale-selector {
+  background: var(--light-bg-tertiary);
+  border-color: var(--primary-purple-alpha-30);
+}
+
+.light .scale-toggle-button {
+  color: var(--light-text-primary);
+}
+
+.light .scale-toggle-button:hover {
+  background: var(--primary-purple-alpha-30);
+}
+
+.light .scale-control-group label {
+  color: var(--light-text-primary);
+}
+
+.light .scale-control-group select {
+  color: var(--light-text-primary);
+  background: var(--light-bg-primary);
+  border-color: var(--primary-purple);
+}
+
+.light .scale-control-group select:hover,
+.light .scale-control-group select:focus {
+  background: var(--light-bg-tertiary);
+}
+
+.light .scale-description {
+  background: var(--light-bg-secondary);
+  border-left-color: var(--primary-purple);
+}
+
+.light .scale-description p {
+  color: var(--light-text-secondary);
+}
+
+.light .position-toggle {
+  background: var(--light-bg-secondary);
+}
+
+.light .position-toggle label {
+  color: var(--light-text-primary);
+}
+
+.light .position-selector {
+  background: var(--light-bg-secondary);
+  border-left-color: var(--orange-600);
+}
+
+.light .position-info {
+  background: var(--light-bg-tertiary);
+}
+
+.light .position-info p {
+  color: var(--light-text-secondary);
+}
 
 /* DIMMING - MUST BE LAST */
 .fretboard.melody-active .note-circle:not(.melody-note):not(.currently-playing) {
