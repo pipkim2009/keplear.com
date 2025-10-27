@@ -714,11 +714,6 @@
   display: inline-block;
 }
 
-.control-input.with-internal-buttons {
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
 .control-button-internal {
   position: absolute;
   top: 50%;
@@ -1089,15 +1084,6 @@
 .progress-total {
   color: var(--white);
   opacity: 0.8;
-}
-
-/* Animations for play/stop state changes */
-.play-icon svg {
-  transition: transform 0.2s ease;
-}
-
-.control-button.play-melody:active .play-icon svg {
-  transform: scale(0.9);
 }
 
 @media (max-width: 480px) {
@@ -1923,20 +1909,15 @@ select.control-input.flashing {
   }
 
   /* Also reset for guitar and bass modes */
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child,
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child,
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2),
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2),
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3),
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3),
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4),
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4) {
+  .melody-controls-top .control-subgroup:first-child,
+  .melody-controls-top .control-subgroup:nth-child(2),
+  .melody-controls-top .control-subgroup:nth-child(3),
+  .melody-controls-top .control-subgroup:nth-child(4) {
     transform: none;
   }
 
   /* Apply mobile order to guitar and bass modes too */
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child,
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child {
+  .melody-controls-top .control-subgroup:first-child {
     order: 4;
     display: flex;
     align-items: center;
@@ -1944,8 +1925,7 @@ select.control-input.flashing {
     width: 100%;
   }
 
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2),
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2) {
+  .melody-controls-top .control-subgroup:nth-child(2) {
     order: 3;
     gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
     display: flex;
@@ -1954,8 +1934,7 @@ select.control-input.flashing {
     width: 100%;
   }
 
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3),
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3) {
+  .melody-controls-top .control-subgroup:nth-child(3) {
     order: 1;
     display: flex;
     align-items: center;
@@ -1963,8 +1942,7 @@ select.control-input.flashing {
     width: 100%;
   }
 
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4),
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4) {
+  .melody-controls-top .control-subgroup:nth-child(4) {
     order: 2;
     display: flex;
     align-items: center;
@@ -2044,16 +2022,14 @@ select.control-input.flashing {
     margin: 0 auto;
   }
 
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top,
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top {
+  .melody-controls-top {
     flex-direction: column;
     gap: 6px;
     align-items: center;
   }
 
   /* Apply mobile order to guitar and bass modes too */
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child,
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:first-child {
+  .melody-controls-top .control-subgroup:first-child {
     order: 4;
     display: flex;
     align-items: center;
@@ -2061,8 +2037,7 @@ select.control-input.flashing {
     width: 100%;
   }
 
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2),
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(2) {
+  .melody-controls-top .control-subgroup:nth-child(2) {
     order: 3;
     gap: 0; /* Remove gap for Generate Melody button to prevent extra height */
     display: flex;
@@ -2071,8 +2046,7 @@ select.control-input.flashing {
     width: 100%;
   }
 
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3),
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(3) {
+  .melody-controls-top .control-subgroup:nth-child(3) {
     order: 1;
     display: flex;
     align-items: center;
@@ -2080,8 +2054,7 @@ select.control-input.flashing {
     width: 100%;
   }
 
-  /* Removed: .instrument-controls.guitar-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4),
-  /* Removed: .instrument-controls.bass-mode .control-group.bpm-notes-melody-row */ .melody-controls-top .control-subgroup:nth-child(4) {
+  .melody-controls-top .control-subgroup:nth-child(4) {
     order: 2;
     display: flex;
     align-items: center;

@@ -7,6 +7,9 @@
   min-width: auto;
   overflow: auto hidden;
   max-width: 95vw;
+  /* Firefox scrollbar - only show when needed */
+  scrollbar-width: auto;
+  scrollbar-color: var(--green-500) var(--scrollbar-guitar-track);
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
@@ -205,12 +208,6 @@
 
 .guitar-container::-webkit-scrollbar-thumb:active {
   background: linear-gradient(145deg, var(--green-700), var(--green-800));
-}
-
-/* Firefox scrollbar - only show when needed */
-.guitar-container {
-  scrollbar-width: auto;
-  scrollbar-color: var(--green-500) var(--scrollbar-guitar-track);
 }
 
 
@@ -459,7 +456,8 @@
 
 /* Dim all non-melody notes when melody is active */
 .fretboard.melody-active .note-circle:not(.melody-note):not(.currently-playing) {
-  opacity: 0.2 !important;
+  opacity: 0.5 !important;
+  filter: brightness(0.7) !important;
   transition: opacity 0.2s ease;
 }
 
@@ -930,10 +928,4 @@
 
 .light .position-info p {
   color: var(--light-text-secondary);
-}
-
-/* DIMMING - MUST BE LAST */
-.fretboard.melody-active .note-circle:not(.melody-note):not(.currently-playing) {
-  opacity: 0.5 !important;
-  filter: brightness(0.7) !important;
 }
