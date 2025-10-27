@@ -1,0 +1,535 @@
+/**
+ * ============================================
+ * INSTRUMENTS CONSOLIDATED STYLES
+ * ============================================
+ *
+ * This file consolidates all instrument-specific CSS for better performance
+ * and maintainability. Includes instrument controls, selector, and shared
+ * instrument styles.
+ *
+ * Original files merged:
+ * - components/InstrumentControls.css
+ * - components/InstrumentSelector.css
+ * - shared/instruments.css
+ */
+
+
+/* ============================================
+ * INSTRUMENT CONTROLS
+ * Source: components/InstrumentControls.css
+ * ============================================ */
+
+/**
+ * InstrumentControls.css
+ * Core instrument control layout and responsive design
+ * Extracted from Controls.css for better organization
+ */
+
+.instrument-controls {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 20;
+  min-height: 40px;
+  height: auto;
+  width: 100%;
+  flex-wrap: wrap;
+  padding: 10px 0;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+/* Responsive Design */
+
+/* Tablet and larger screens */
+@media (min-width: 769px) {
+  .instrument-controls {
+    gap: 10px;
+  }
+}
+
+/* Small tablets */
+@media (max-width: 768px) and (min-width: 481px) {
+  .instrument-controls {
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .control-group {
+    flex: 0 0 auto;
+    min-width: 100px;
+  }
+}
+
+/* Mobile screens */
+@media (max-width: 480px) {
+  .instrument-controls {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 10px;
+    height: auto;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 10px;
+    width: 100%;
+  }
+
+  .control-group {
+    flex: 0 0 auto;
+    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: auto;
+    margin: 0 auto;
+  }
+}
+
+/* Very small screens - each input on its own row, centered */
+@media (max-width: 360px) {
+  .instrument-controls {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px;
+    padding: 15px 0 !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    position: relative !important;
+  }
+
+  .control-group {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    position: static !important;
+  }
+}
+
+/* ============================================
+ * INSTRUMENT SELECTOR
+ * Source: components/InstrumentSelector.css
+ * ============================================ */
+
+/**
+ * InstrumentSelector.css
+ * Instrument selection cards with themed styling and animations
+ * Extracted from Controls.css for better organization
+ */
+
+.instrument-selector-group {
+  flex: 1 0 100%;
+  margin-bottom: 15px;
+}
+
+.instrument-selector-group .control-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f8f9fa !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+  text-shadow: 0 0 10px rgba(128, 0, 255, 0.5);
+}
+
+.instrument-selector {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.instrument-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, rgba(128, 0, 255, 0.1), rgba(128, 0, 255, 0.05));
+  border: 2px solid rgba(128, 0, 255, 0.3);
+  border-radius: 16px;
+  padding: 20px;
+  min-width: 120px;
+  height: 100px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* Keyboard - Blue theme */
+.instrument-card:nth-child(1) {
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.instrument-card:nth-child(1):hover {
+  transform: translateY(-5px) scale(1.05);
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 15px 40px rgba(59, 130, 246, 0.3);
+}
+
+.instrument-card:nth-child(1).active {
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.2));
+  border-color: #3b82f6;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+}
+
+.instrument-card:nth-child(1) .instrument-icon {
+  filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.5));
+  color: #3b82f6;
+}
+
+.instrument-card:nth-child(1):hover .instrument-icon {
+  filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.8));
+}
+
+.instrument-card:nth-child(1) .instrument-name {
+  text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+}
+
+.instrument-card:nth-child(1) .instrument-glow {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+}
+
+/* Guitar - Green theme */
+.instrument-card:nth-child(2) {
+  background: linear-gradient(145deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.instrument-card:nth-child(2):hover {
+  transform: translateY(-5px) scale(1.05);
+  border-color: rgba(34, 197, 94, 0.6);
+  box-shadow: 0 15px 40px rgba(34, 197, 94, 0.3);
+}
+
+.instrument-card:nth-child(2).active {
+  background: linear-gradient(145deg, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.2));
+  border-color: #22c55e;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(34, 197, 94, 0.4);
+}
+
+.instrument-card:nth-child(2) .instrument-icon {
+  filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.5));
+  color: #22c55e;
+}
+
+.instrument-card:nth-child(2):hover .instrument-icon {
+  filter: drop-shadow(0 0 15px rgba(34, 197, 94, 0.8));
+}
+
+.instrument-card:nth-child(2) .instrument-name {
+  text-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+.instrument-card:nth-child(2) .instrument-glow {
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.2) 0%, transparent 70%);
+}
+
+/* Bass - Red theme */
+.instrument-card:nth-child(3) {
+  background: linear-gradient(145deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.instrument-card:nth-child(3):hover {
+  transform: translateY(-5px) scale(1.05);
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 15px 40px rgba(239, 68, 68, 0.3);
+}
+
+.instrument-card:nth-child(3).active {
+  background: linear-gradient(145deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.2));
+  border-color: #ef4444;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(239, 68, 68, 0.4);
+}
+
+.instrument-card:nth-child(3) .instrument-icon {
+  filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+  color: #ef4444;
+}
+
+.instrument-card:nth-child(3):hover .instrument-icon {
+  filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.8));
+}
+
+.instrument-card:nth-child(3) .instrument-name {
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+.instrument-card:nth-child(3) .instrument-glow {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.2) 0%, transparent 70%);
+}
+
+.instrument-card.active .instrument-glow {
+  opacity: 1;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.instrument-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.instrument-card:hover .instrument-icon {
+  transform: scale(1.2) rotate(5deg);
+}
+
+.instrument-card.active .instrument-icon {
+  transform: scale(1.1);
+  animation: bounce 1.5s ease-in-out infinite;
+}
+
+.instrument-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #f8f9fa;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.instrument-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  right: -50%;
+  bottom: -50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: scale(1.1) translateY(0);
+  }
+  50% {
+    transform: scale(1.1) translateY(-5px);
+  }
+}
+
+/* ============================================
+ * SHARED INSTRUMENT STYLES
+ * Source: shared/instruments.css
+ * ============================================ */
+
+/* Shared instrument styles */
+
+/* Container styles */
+.instrument-container-base {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0px 20px 50px 45px;
+  min-width: auto;
+  overflow-x: auto;
+  overflow-y: visible;
+  max-width: 95vw;
+}
+
+/* Note circle styles - shared between guitar and bass */
+.note-circle-base {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: white;
+  z-index: 20;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.note-circle-base:hover {
+  transform: scale(1.1);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Note state colors - unified across all instruments */
+.note-state-default {
+  background: linear-gradient(145deg, #4a90e2, #357abd);
+}
+
+.note-state-selected {
+  background: linear-gradient(145deg, #5cb85c, #449d44);
+}
+
+.note-state-melody {
+  background: linear-gradient(145deg, #ffd700, #ffed4e);
+  color: #333;
+}
+
+.note-state-scale {
+  background: linear-gradient(145deg, #ff8c00, #ff7700);
+}
+
+.note-state-scale-root {
+  background: linear-gradient(145deg, #dc3545, #c82333);
+}
+
+.note-state-chord {
+  background: linear-gradient(145deg, #9b59b6, #8e44ad);
+}
+
+.note-state-chord-root {
+  background: linear-gradient(145deg, #dc3545, #c82333);
+}
+
+.note-state-chord-scale {
+  background: linear-gradient(145deg, #ff8c00, #9b59b6);
+}
+
+.note-state-chord-root-scale {
+  background: linear-gradient(145deg, #dc3545, #ff8c00);
+}
+
+.note-state-chord-root-scale-root {
+  background: linear-gradient(145deg, #dc3545, #c82333);
+}
+
+.note-state-chord-root-scale-note {
+  background: linear-gradient(145deg, #dc3545, #ff8c00);
+}
+
+.note-state-chord-note-scale-root {
+  background: linear-gradient(145deg, #9b59b6, #dc3545);
+}
+
+/* Preview note styles */
+.note-preview {
+  opacity: 0.4;
+  background: linear-gradient(145deg, #888, #666);
+}
+
+.note-preview:hover {
+  opacity: 0.6;
+}
+
+/* Fret markers - shared */
+.fret-marker-base {
+  position: absolute;
+  background: linear-gradient(145deg, #f0f0dc, #ccc);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.3),
+    0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Checkbox styles - shared */
+.instrument-checkbox {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.instrument-checkbox:hover {
+  opacity: 1;
+}
+
+.instrument-checkbox-label {
+  font-size: 11px;
+  color: #ddd;
+  margin-top: 2px;
+  user-select: none;
+  cursor: pointer;
+}
+
+/* Responsive styles - shared */
+@media (min-width: 481px) and (max-width: 768px) {
+  .instrument-container-base {
+    min-width: auto !important;
+    margin: 0 !important;
+    padding: 0px 20px 50px 45px !important;
+    justify-content: flex-start !important;
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .instrument-container-base {
+    min-width: auto !important;
+    margin: 0 !important;
+    padding: 0px 20px 50px 45px !important;
+    justify-content: flex-start !important;
+    overflow-x: scroll !important;
+    -webkit-overflow-scrolling: touch !important;
+    max-width: 100vw !important;
+    width: 100vw !important;
+  }
+}
+
+/* String styles - shared */
+.instrument-string {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: linear-gradient(90deg, #999 0%, #ccc 50%, #999 100%);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.2);
+}
+
+/* Fret wire styles - shared */
+.fret-wire-base {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(145deg, #d5d5d5, #999);
+  box-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.6),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+/* Interactive position styles */
+.fret-position-base {
+  position: absolute;
+  cursor: pointer;
+  z-index: 15;
+  transition: background-color 0.1s ease;
+}
+
+.fret-position-base:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}

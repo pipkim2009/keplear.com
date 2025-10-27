@@ -293,7 +293,7 @@
 
 /* Open string area styling for bass */
 .bass-open-string-position {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--white-alpha-30);
 }
 
 .bass-open-string-position:hover {
@@ -362,13 +362,13 @@
 
 /* Gold styling for currently playing bass notes */
 .bass-note-circle.currently-playing {
-  background: linear-gradient(145deg, #fbbf24, #f59e0b) !important;
-  border-color: #fef3c7 !important;
+  background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
+  border-color: var(--amber-200) !important;
   box-shadow:
-    0 0 20px rgba(251, 191, 36, 0.8),
-    0 0 40px rgba(245, 158, 11, 0.6),
-    inset 0 1px 2px rgba(255, 255, 255, 0.8),
-    inset 0 -1px 2px rgba(0, 0, 0, 0.1) !important;
+    0 0 20px var(--amber-alpha-80),
+    0 0 40px var(--amber-alpha-60),
+    inset 0 1px 2px var(--white-alpha-80),
+    inset 0 -1px 2px var(--black-alpha-10) !important;
   width: 22px !important;
   height: 22px !important;
   border-radius: 50% !important;
@@ -733,7 +733,7 @@
 .bass-position-toggle {
   margin: 10px 0;
   padding: 8px;
-  background: rgba(0, 0, 0, 0.1);
+  background: var(--black-alpha-10);
   border-radius: 4px;
 }
 

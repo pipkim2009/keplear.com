@@ -1,0 +1,811 @@
+/**
+ * ============================================
+ * KEYBOARD CONSOLIDATED STYLES
+ * ============================================
+ *
+ * This file consolidates all keyboard-related CSS for better performance
+ * and maintainability. Includes container, layout, highlighting, and controls.
+ *
+ * Original files merged:
+ * - keyboard/KeyboardContainer.css
+ * - keyboard/KeyboardLayout.css
+ * - keyboard/KeyboardControls.css
+ * - keyboard/KeyboardHighlighting.css
+ * - KeyboardModular.css
+ *
+ * Note: Keyboard.css remains separate due to its size and complexity
+ */
+
+
+/* ============================================
+ * KEYBOARD CONTAINER & HEADER
+ * Source: keyboard/KeyboardContainer.css
+ * ============================================ */
+
+.instrument-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(145deg, var(--gray-700), var(--dark-bg-secondary));
+  padding: 0;
+  margin-top: var(--space-4);
+  border-radius: var(--radius-3xl);
+  box-shadow: 0 20px 40px var(--black-alpha-30);
+  border: 4px solid var(--dark-border-primary);
+  width: auto;
+  max-width: 95vw;
+  min-width: auto;
+  min-height: 350px;
+  overflow-y: visible;
+}
+
+.light .instrument-container {
+  background: linear-gradient(145deg, var(--light-bg-tertiary), var(--light-bg-quaternary));
+  box-shadow: 0 20px 40px rgba(18, 18, 18, 0.15);
+  border-color: var(--light-border-primary);
+}
+
+.instrument-header-controls {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: var(--space-1);
+  border-bottom: 2px solid var(--dark-border-primary);
+  background: linear-gradient(145deg, var(--gray-700), var(--dark-bg-secondary));
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  min-height: 72px;
+}
+
+.light .instrument-header-controls {
+  background: linear-gradient(145deg, var(--light-bg-secondary), var(--light-bg-tertiary));
+  border-bottom-color: var(--light-border-primary);
+}
+
+/* Reduce height for guitar and bass */
+.instrument-container:has(.guitar-container) .instrument-header-controls,
+.instrument-container:has(.bass-container) .instrument-header-controls {
+  min-height: 50px;
+}
+
+.header-controls-left {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.header-controls-left .notes-toggle-row {
+  transform: translateY(5px);
+}
+
+.instrument-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  overflow-x: scroll;
+  overflow-y: visible;
+}
+
+.instrument-container > * {
+  box-sizing: border-box;
+}
+
+.instrument-controls-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: var(--space-4) auto 0 auto;
+  padding: 0 var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  justify-content: center;
+  text-align: center;
+}
+
+.instrument-controls-container.guitar-mode {
+  margin-top: 0;
+}
+
+.instrument-controls-container.bass-mode {
+  margin-top: 0;
+}
+
+/* Height Adjustments */
+
+/* Remove padding and reduce height when instrument container contains guitar or bass */
+.instrument-container:has(.guitar-container),
+.instrument-container:has(.bass-container) {
+  padding: 0;
+  min-height: 200px;
+}
+
+/* Reduce height when instrument container contains keyboard */
+.instrument-container:has(.keyboard-container) {
+  min-height: 300px;
+}
+
+
+/* ============================================
+ * KEYBOARD LAYOUT & KEYS
+ * Source: keyboard/KeyboardLayout.css
+ * ============================================ */
+
+.keyboard-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding-left: 0;
+}
+
+.keyboard {
+  position: relative;
+  display: flex;
+  width: auto;
+  min-width: fit-content;
+}
+
+.keyboard.default-mode {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* White Keys */
+.white-key {
+  width: 60px;
+  height: 280px;
+  background: linear-gradient(145deg, #ffffff, #f7fafc);
+  border: 2px solid #e2e8f0;
+  border-radius: 0 0 8px 8px;
+  margin-right: 2px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.dark .white-key {
+  box-shadow:
+    inset 0 2px 4px rgba(156, 163, 175, 0.3),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.1),
+    0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.white-key:active {
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.6),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.white-key.selected {
+  background: linear-gradient(145deg, #dbeafe, #bfdbfe);
+  border-color: #3b82f6;
+}
+
+.white-key.melody {
+  background: linear-gradient(145deg, #dcfce7, #bbf7d0);
+  border-color: #10b981;
+}
+
+.white-key:last-child {
+  margin-right: 0;
+}
+
+/* Black Keys Container */
+.black-keys {
+  position: absolute;
+  top: 0;
+  left: 40px;
+  pointer-events: none;
+}
+
+.keyboard.default-mode .black-keys {
+  left: 0px;
+}
+
+/* Black Keys */
+.black-key {
+  position: absolute;
+  width: 36px;
+  height: 180px;
+  background: linear-gradient(145deg, #374151, #111827);
+  border: 1px solid #4b5563;
+  border-radius: 0 0 6px 6px;
+  cursor: pointer;
+  pointer-events: all;
+  transition: all 0.1s ease;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+.black-key:active {
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.4),
+    0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.black-key.selected {
+  background: linear-gradient(145deg, #1e40af, #1d4ed8);
+}
+
+.black-key.melody {
+  background: linear-gradient(145deg, #22c55e, #16a34a);
+}
+
+
+/* ============================================
+ * KEYBOARD CONTROLS & SCROLLBARS
+ * Source: keyboard/KeyboardControls.css
+ * ============================================ */
+
+/* Octave control containers */
+.octave-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: absolute;
+  top: 20px;
+  z-index: 10;
+}
+
+.left-controls {
+  left: 10px;
+}
+
+.right-controls {
+  right: 10px;
+}
+
+/* Octave control buttons */
+.octave-button {
+  width: 40px;
+  height: 40px;
+  background: rgba(128, 0, 255, 0.1);
+  border: 2px solid #8000ff;
+  border-radius: 50%;
+  color: #d2d2f9;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.octave-button:hover {
+  background: rgba(128, 0, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.octave-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* Custom scrollbar for instrument wrapper (keyboard) - only show when needed */
+.instrument-wrapper {
+  overflow-x: auto;
+}
+
+.instrument-wrapper::-webkit-scrollbar {
+  height: 12px;
+}
+
+.instrument-wrapper::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.instrument-wrapper::-webkit-scrollbar-button:start:decrement,
+.instrument-wrapper::-webkit-scrollbar-button:end:increment {
+  display: none;
+}
+
+.instrument-wrapper::-webkit-scrollbar-button:horizontal:start:decrement,
+.instrument-wrapper::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none;
+  width: 0 !important;
+}
+
+.keyboard-container::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.instrument-wrapper::-webkit-scrollbar-track {
+  background: linear-gradient(145deg, #1a202c, #2d3748);
+  border-radius: 6px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.instrument-wrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+  border-radius: 6px;
+  border: 1px solid #60a5fa;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.3),
+    inset 0 1px 2px rgba(255, 255, 255, 0.1);
+}
+
+.instrument-wrapper::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(145deg, #2563eb, #1e40af);
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15);
+}
+
+.instrument-wrapper::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(145deg, #1e40af, #1e3a8a);
+}
+
+/* Firefox scrollbar - only show when needed */
+.instrument-wrapper {
+  scrollbar-width: auto;
+  scrollbar-color: #3b82f6 #1a202c;
+}
+
+
+/* ============================================
+ * KEYBOARD HIGHLIGHTING (SCALES & CHORDS)
+ * Source: keyboard/KeyboardHighlighting.css
+ * ============================================ */
+
+/* Scale highlighting for keyboard keys */
+.white-key.scale-note {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+  border-color: #d97706;
+}
+
+.black-key.scale-note {
+  background: linear-gradient(145deg, #d97706, #b45309);
+}
+
+.white-key.scale-root {
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+  border-color: #991b1b;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.black-key.scale-root {
+  background: linear-gradient(145deg, #b91c1c, #991b1b);
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Ensure scale styling takes precedence over selected when both are active */
+.white-key.selected.scale-note {
+  background: linear-gradient(145deg, #fbbf24, #f59e0b);
+}
+
+.black-key.selected.scale-note {
+  background: linear-gradient(145deg, #d97706, #b45309);
+}
+
+.white-key.selected.scale-root {
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+}
+
+.black-key.selected.scale-root {
+  background: linear-gradient(145deg, #b91c1c, #991b1b);
+}
+
+/* Chord highlighting for keyboard keys */
+.white-key.chord-note {
+  background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+  border-color: #a78bfa;
+}
+
+.black-key.chord-note {
+  background: linear-gradient(145deg, #7c3aed, #6d28d9);
+}
+
+/* Mixed chord/scale note highlighting - blend of orange (scale) and purple (chord) */
+.white-key.chord-scale-note {
+  background: linear-gradient(145deg, #f97316, #8b5cf6);
+  border-color: #d97706;
+}
+
+.black-key.chord-scale-note {
+  background: linear-gradient(145deg, #ea580c, #7c3aed);
+}
+
+.white-key.selected.chord-scale-note {
+  background: linear-gradient(145deg, #f97316, #8b5cf6);
+}
+
+.black-key.selected.chord-scale-note {
+  background: linear-gradient(145deg, #ea580c, #7c3aed);
+}
+
+/* Mixed chord note + scale root - blend of red (scale root) and purple (chord) */
+.white-key.chord-note-scale-root {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6);
+  border-color: #b91c1c;
+}
+
+.black-key.chord-note-scale-root {
+  background: linear-gradient(145deg, #b91c1c, #7c3aed);
+}
+
+.white-key.selected.chord-note-scale-root {
+  background: linear-gradient(145deg, #dc2626, #8b5cf6);
+}
+
+.black-key.selected.chord-note-scale-root {
+  background: linear-gradient(145deg, #b91c1c, #7c3aed);
+}
+
+/* Mixed chord root + scale note - blend of red (chord root) and orange (scale) */
+.white-key.chord-root-scale-note {
+  background: linear-gradient(145deg, #dc2626, #f97316);
+  border-color: #b91c1c;
+}
+
+.black-key.chord-root-scale-note {
+  background: linear-gradient(145deg, #b91c1c, #ea580c);
+}
+
+.white-key.selected.chord-root-scale-note {
+  background: linear-gradient(145deg, #dc2626, #f97316);
+}
+
+.black-key.selected.chord-root-scale-note {
+  background: linear-gradient(145deg, #b91c1c, #ea580c);
+}
+
+/* Both roots (chord root + scale root) - stays red since both are roots */
+.white-key.chord-root-scale-root {
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+  border-color: #b91c1b;
+}
+
+.black-key.chord-root-scale-root {
+  background: linear-gradient(145deg, #b91c1c, #991b1b);
+}
+
+.white-key.selected.chord-root-scale-root {
+  background: linear-gradient(145deg, #dc2626, #b91c1c);
+}
+
+.black-key.selected.chord-root-scale-root {
+  background: linear-gradient(145deg, #b91c1c, #991b1b);
+}
+
+/* Chord root notes should always be red */
+.white-key.chord-root,
+.white-key.chord-note.chord-root {
+  background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
+  border-color: #991b1b;
+  box-shadow:
+    inset 0 2px 4px rgba(255, 255, 255, 0.1),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.black-key.chord-root,
+.black-key.chord-note.chord-root {
+  background: linear-gradient(145deg, #b91c1c, #991b1b) !important;
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3),
+    0 0 8px rgba(220, 38, 38, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Ensure chord styling takes precedence when both chord and selected are active */
+.white-key.selected.chord-note {
+  background: linear-gradient(145deg, #8b5cf6, #7c3aed);
+}
+
+.black-key.selected.chord-note {
+  background: linear-gradient(145deg, #7c3aed, #6d28d9);
+}
+
+.white-key.selected.chord-root,
+.white-key.selected.chord-note.chord-root {
+  background: linear-gradient(145deg, #dc2626, #b91c1c) !important;
+}
+
+.black-key.selected.chord-root,
+.black-key.selected.chord-note.chord-root {
+  background: linear-gradient(145deg, #b91c1c, #991b1b) !important;
+}
+
+/* Key Labels */
+.key-label {
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: 600;
+  user-select: none;
+  pointer-events: none;
+  color: #374151;
+}
+
+.black-key .key-label {
+  color: #ffffff;
+  font-size: 10px;
+  bottom: 12px;
+}
+
+
+/* ============================================
+ * RESPONSIVE DESIGN
+ * ============================================ */
+
+/* Tablet Layout */
+@media (min-width: 481px) and (max-width: 768px) {
+  /* Container */
+  .instrument-container {
+    width: 100vw;
+    max-width: 100vw;
+    margin: var(--space-2) 0 0 0;
+    border-radius: 0;
+  }
+
+  .instrument-header-controls {
+    border-radius: 0;
+    padding: var(--space-1);
+  }
+
+  .instrument-wrapper {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .instrument-container:has(.keyboard-container) {
+    min-height: 305px !important;
+  }
+
+  .instrument-controls-container {
+    width: 700px;
+    max-width: 90vw;
+    margin: var(--space-4) auto 0 auto;
+    padding: 0 var(--space-lg);
+  }
+
+  /* Keyboard Layout */
+  .keyboard-container {
+    justify-content: flex-start !important;
+    padding-left: 0 !important;
+  }
+
+  .keyboard {
+    min-width: 320px !important;
+    margin: 0 0 0 0 !important;
+  }
+
+  .keyboard.default-mode {
+    margin: 0 !important;
+  }
+
+  .keyboard:not(.default-mode) .black-keys {
+    left: 39px;
+  }
+
+  .black-keys {
+    left: 5px;
+  }
+
+  .keyboard.default-mode .black-keys {
+    left: 5px;
+  }
+
+  /* Octave Controls */
+  .octave-controls {
+    gap: 8px;
+    top: 15px;
+  }
+
+  .left-controls {
+    left: 5px;
+  }
+
+  .right-controls {
+    right: 5px;
+  }
+
+  .octave-button {
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+  }
+}
+
+/* Mobile Layout */
+@media (max-width: 480px) {
+  /* Container */
+  .instrument-container {
+    width: 100vw;
+    max-width: 100vw;
+    margin: var(--space-1) 0 0 0;
+    border-radius: 0;
+    min-height: 280px;
+  }
+
+  .instrument-header-controls {
+    border-radius: 0;
+    padding: var(--space-1);
+  }
+
+  .instrument-wrapper {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .instrument-controls-container {
+    width: 100%;
+    max-width: 100%;
+    margin: var(--space-2) auto 0 auto;
+    padding: 0 var(--space-sm);
+  }
+
+  /* Keyboard Layout */
+  .keyboard-container {
+    justify-content: flex-start;
+    padding-left: 0;
+  }
+
+  .keyboard {
+    min-width: 320px;
+    margin: 0 0 0 0;
+  }
+
+  .keyboard.default-mode {
+    margin: 0;
+  }
+
+  .keyboard:not(.default-mode) .black-keys {
+    left: 39px;
+  }
+
+  .black-keys {
+    left: 5px;
+  }
+
+  .keyboard.default-mode .black-keys {
+    left: 5px;
+  }
+
+  /* Octave Controls */
+  .octave-controls {
+    gap: 8px;
+    top: 15px;
+  }
+
+  .left-controls {
+    left: 5px;
+  }
+
+  .right-controls {
+    right: 5px;
+  }
+
+  .octave-button {
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+  }
+}
+
+/* Very small screens - one button per row, centered */
+@media (max-width: 360px) {
+  /* Reduce height for guitar and bass on very small screens */
+  .instrument-container:has(.guitar-container) .instrument-header-controls,
+  .instrument-container:has(.bass-container) .instrument-header-controls {
+    min-height: 43px !important;
+  }
+
+  .header-controls-left {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: var(--gap-xs) !important;
+    width: 100% !important;
+  }
+
+  .header-controls-left .control-group {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Reset all child element margins/padding */
+  .header-controls-left .control-group > * {
+    margin: 0 !important;
+  }
+
+  /* Remove top margins on very small screens for vertical stacking */
+  body:has([data-instrument="keyboard"]) .control-group.scale-chord-options,
+  body:has([data-instrument="guitar"]) .control-group.scale-chord-options,
+  body:has([data-instrument="bass"]) .control-group.scale-chord-options {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  body:has([data-instrument="keyboard"]) .control-button.delete-selection,
+  body:has([data-instrument="guitar"]) .control-button.delete-selection,
+  body:has([data-instrument="bass"]) .control-button.delete-selection {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Ensure selection mode control group has no extra spacing */
+  .header-controls-left .control-group:has(.selection-mode-switch),
+  .header-controls-left .control-group.selection-mode-group {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Force deselect all button container to have no margins */
+  .header-controls-left .control-group:has(.delete-selection),
+  .header-controls-left > .control-group:has(.delete-selection) {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .control-button.delete-selection {
+    margin: 0 !important;
+  }
+
+  /* Force scale-chord-options to have no gap */
+  .control-group.scale-chord-options {
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .control-group.scale-chord-options > * {
+    margin: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Override any scale-chord-options child elements */
+  .control-group.scale-chord-options .scale-chord-container,
+  .control-group.scale-chord-options .scale-options-custom,
+  .control-group.scale-chord-options > div {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* Fix collapsed scale-options-container height */
+  .scale-options-container.collapsed {
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
