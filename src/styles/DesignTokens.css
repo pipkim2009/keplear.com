@@ -59,7 +59,8 @@
   --bg-elevated: var(--dark-bg-quaternary);
 
   /* Border Colors */
-  --border-primary: var(--dark-border);
+  --dark-border: var(--dark-border-primary);  /* Define missing border token */
+  --border-primary: var(--dark-border-primary);
   --border-secondary: var(--gray-600);
   --border-muted: var(--gray-700);
 
@@ -193,7 +194,8 @@
   --bg-tertiary: var(--light-bg-tertiary);
 
   /* Border Colors */
-  --border-primary: var(--light-border);
+  --light-border: var(--light-border-primary);  /* Define missing border token */
+  --border-primary: var(--light-border-primary);
   --border-secondary: var(--gray-300);
   --border-muted: var(--gray-200);
 

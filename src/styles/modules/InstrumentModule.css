@@ -65,6 +65,7 @@
   cursor: pointer;
   transition: var(--transition-button);
   overflow: hidden;
+  -webkit-backdrop-filter: var(--backdrop-blur-md);
   backdrop-filter: var(--backdrop-blur-md);
   box-shadow: var(--shadow-lg);
 }

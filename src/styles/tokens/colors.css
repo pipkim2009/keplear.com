@@ -144,6 +144,7 @@
   --green-700: #15803d;
   --green-800: #166534;
   --green-light: #86efac;
+  --green-border: #22c55e;  /* Semantic green border */
   --green-alpha-05: rgb(34, 197, 94, 0.05);
   --green-alpha-10: rgb(34, 197, 94, 0.1);
   --green-alpha-20: rgb(34, 197, 94, 0.2);
@@ -195,6 +196,8 @@
   --orange-700: #c2410c;
   --orange-ff7700: #ff7700;  /* Orange dark */
   --orange-ff8c00: #ff8c00;  /* Orange bright */
+  --orange-scale: #f97316;  /* Semantic scale note */
+  --orange-scale-dark: #ea580c;  /* Semantic scale note dark */
   --orange-alpha-40: rgb(249, 115, 22, 0.4);
   --orange-400-alpha-60: rgb(251, 146, 60, 0.6);
   --orange-600-alpha-60: rgb(217, 119, 6, 0.6);
@@ -210,6 +213,7 @@
   --amber-ffed4e: #ffed4e;  /* Gold light */
   --amber-alpha-60: rgb(245, 158, 11, 0.6);
   --amber-alpha-80: rgb(251, 191, 36, 0.8);
+  --yellow-400: #facc15;  /* Missing semantic token for warnings */
 
   /* ========================================
      SEMANTIC COLORS - PURPLE (CHORDS)
@@ -225,6 +229,8 @@
   --purple-8e44ad: #8e44ad;  /* Purple dark */
   --purple-9333ea: #9333ea;
   --purple-9b59b6: #9b59b6;  /* Purple medium */
+  --purple-chord: #8b5cf6;  /* Semantic chord note */
+  --purple-chord-dark: #7c3aed;  /* Semantic chord note dark */
   --purple-alpha-40: rgb(139, 92, 246, 0.4);
   --purple-600-alpha-60: rgb(167, 139, 250, 0.6);
 
@@ -286,6 +292,7 @@
      INSTRUMENT COLORS - KEYBOARD
      ======================================== */
   --keyboard-white-key: #ffffff;
+  --keyboard-white-key-secondary: #f9fafb;  /* Secondary white key color */
   --keyboard-white-key-hover: #f7fafc;
   --keyboard-white-key-border: #e2e8f0;
   --keyboard-black-key: #374151;

@@ -64,6 +64,7 @@
   box-shadow: 0 4px 12px rgb(0, 0, 0, 0.3);
   border: 2px solid var(--orange-500);
   pointer-events: auto !important;
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   transform: none !important;
 }

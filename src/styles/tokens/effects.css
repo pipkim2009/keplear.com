@@ -160,9 +160,12 @@
   --blur-md: blur(8px);
   --blur-lg: blur(16px);
   --blur-xl: blur(24px);
+
+  /* Backdrop Filter Presets */
   --backdrop-blur-sm: blur(4px);
-  --backdrop-blur-md: blur(8px);
-  --backdrop-blur-lg: blur(16px);
+  --backdrop-blur-md: blur(10px);
+  --backdrop-blur-lg: blur(15px);
+  --backdrop-blur-xl: blur(20px);
 
   /*
     ===========================================
