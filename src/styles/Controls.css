@@ -802,7 +802,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px var(--black-alpha-20);
+  box-shadow: none;
   outline: none;
   display: flex;
   align-items: center;
@@ -819,7 +819,7 @@
 
 .control-button.delete-selection:active {
   transform: translateY(0);
-  box-shadow: 0 2px 4px var(--black-alpha-20);
+  box-shadow: none;
 }
 
 @media (max-width: 480px) {
@@ -2742,19 +2742,19 @@ body.dark .modern-control-item.audio-player-section audio {
 
 /* Only apply these margins on devices larger than 480px (tablets and desktop) */
 @media (min-width: 481px) {
-  /* Keyboard mode: 23px margin on tablets/desktop */
+  /* Keyboard mode: 22px margin on tablets/desktop (moved up 1px) */
   body:has([data-instrument='keyboard']) .control-button.delete-selection {
-    margin-top: 23px !important;
+    margin-top: 22px !important;
   }
 
-  /* Guitar mode: 6px margin on tablets/desktop */
+  /* Guitar mode: 5px margin on tablets/desktop (moved up 1px) */
   body:has([data-instrument='guitar']) .control-button.delete-selection {
-    margin-top: 6px !important;
+    margin-top: 5px !important;
   }
 
-  /* Bass mode: 6px margin on tablets/desktop */
+  /* Bass mode: 5px margin on tablets/desktop (moved up 1px) */
   body:has([data-instrument='bass']) .control-button.delete-selection {
-    margin-top: 6px !important;
+    margin-top: 5px !important;
   }
 }
 
