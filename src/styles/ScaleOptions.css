@@ -385,13 +385,13 @@
 .toggle-slider::before {
   position: absolute;
   content: "";
-  height: 28px;
+  height: 29px;
   width: 58px;
-  left: 0;
+  left: -1px;
   top: 0;
   background-color: var(--orange-500);
   transition: all 0.3s ease;
-  border-radius: 0;
+  border-radius: 4px;
   z-index: 1;
   box-shadow: none;
 }
@@ -416,7 +416,7 @@ input:checked + .toggle-slider {
 }
 
 input:checked + .toggle-slider::before {
-  transform: translateX(58px);
+  transform: translateX(60px);
   background-color: var(--purple-600);
 }
 
@@ -574,10 +574,11 @@ input:checked + .toggle-slider:hover {
   }
 
   .toggle-slider::before {
-    height: 24px;
-    width: 52px;
-    top: 0;
-    border-radius: 0;
+    height: 25px;
+    width: 53px;
+    top: -1px;
+    left: 0;
+    border-radius: 4px;
   }
 
   input:checked + .toggle-slider::before {
