@@ -60,9 +60,9 @@
   justify-content: center;
   align-items: center;
   flex: 1;
-  overflow: scroll visible;
   overflow-x: auto;
-  scrollbar-width: auto;
+  overflow-y: visible;
+  scrollbar-width: thin;
   scrollbar-color: var(--blue-500) var(--dark-bg-secondary);
 }
 
@@ -80,7 +80,7 @@
   }
 
   .instrument-wrapper {
-    overflow-x: scroll;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -139,7 +139,7 @@
   }
 
   .instrument-wrapper {
-    overflow-x: scroll;
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -246,7 +246,7 @@
 /* Desktop/Laptop scrolling improvements */
 @media (min-width: 769px) {
   .instrument-wrapper {
-    overflow-x: scroll;
+    overflow-x: auto;
     scroll-behavior: smooth;
     justify-content: flex-start;
     padding-left: 0;

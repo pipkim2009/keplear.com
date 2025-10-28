@@ -55,8 +55,7 @@
 
 /* Custom scrollbar for instrument wrapper (keyboard) - only show when needed */
 .instrument-wrapper {
-  overflow-x: auto;
-  scrollbar-width: auto;
+  scrollbar-width: thin;
   scrollbar-color: var(--blue-500) var(--dark-bg-secondary);
 }
 
