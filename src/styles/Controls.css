@@ -25,7 +25,7 @@
     gap: 10px;
     justify-content: center;
   }
-  
+
   .control-group {
     flex: 0 0 auto;
     min-width: 100px;
@@ -119,7 +119,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, var(--primary-purple-alpha-10), var(--primary-purple-alpha-5));
+  background: linear-gradient(
+    145deg,
+    var(--primary-purple-alpha-10),
+    var(--primary-purple-alpha-5)
+  );
   border: 2px solid var(--primary-purple-alpha-30);
   border-radius: 16px;
   padding: 20px;
@@ -136,7 +140,9 @@
 .instrument-card:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow: var(--focus-ring-shadow), 0 8px 32px var(--black-alpha-20);
+  box-shadow:
+    var(--focus-ring-shadow),
+    0 8px 32px var(--black-alpha-20);
 }
 
 /* Keyboard - Blue theme */
@@ -355,7 +361,11 @@
 
   .instrument-dropdown {
     position: relative;
-    background: linear-gradient(145deg, var(--primary-purple-alpha-10), var(--primary-purple-alpha-5));
+    background: linear-gradient(
+      145deg,
+      var(--primary-purple-alpha-10),
+      var(--primary-purple-alpha-5)
+    );
     border: 2px solid var(--primary-purple-alpha-30);
     border-radius: 12px;
     padding: 12px 16px;
@@ -881,7 +891,6 @@
   opacity: 0.5;
 }
 
-
 /* Circular Play Button Styling */
 .play-melody-container {
   width: 100%;
@@ -1242,17 +1251,17 @@
 /* Mobile only: add top margins to match deselect all button */
 @media (max-width: 480px) {
   /* Keyboard mode: 23px margin on mobile */
-  body:has([data-instrument="keyboard"]) .control-group.scale-chord-options {
+  body:has([data-instrument='keyboard']) .control-group.scale-chord-options {
     margin-top: 23px !important;
   }
 
   /* Guitar mode: 6px margin on mobile */
-  body:has([data-instrument="guitar"]) .control-group.scale-chord-options {
+  body:has([data-instrument='guitar']) .control-group.scale-chord-options {
     margin-top: 6px !important;
   }
 
   /* Bass mode: 6px margin on mobile */
-  body:has([data-instrument="bass"]) .control-group.scale-chord-options {
+  body:has([data-instrument='bass']) .control-group.scale-chord-options {
     margin-top: 6px !important;
   }
 }
@@ -1282,16 +1291,16 @@
   }
 
   /* Remove top margins on very small screens for vertical stacking */
-  body:has([data-instrument="keyboard"]) .control-group.scale-chord-options,
-  body:has([data-instrument="guitar"]) .control-group.scale-chord-options,
-  body:has([data-instrument="bass"]) .control-group.scale-chord-options {
+  body:has([data-instrument='keyboard']) .control-group.scale-chord-options,
+  body:has([data-instrument='guitar']) .control-group.scale-chord-options,
+  body:has([data-instrument='bass']) .control-group.scale-chord-options {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
   }
 
-  body:has([data-instrument="keyboard"]) .control-button.delete-selection,
-  body:has([data-instrument="guitar"]) .control-button.delete-selection,
-  body:has([data-instrument="bass"]) .control-button.delete-selection {
+  body:has([data-instrument='keyboard']) .control-button.delete-selection,
+  body:has([data-instrument='guitar']) .control-button.delete-selection,
+  body:has([data-instrument='bass']) .control-button.delete-selection {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
   }
@@ -2048,7 +2057,6 @@ select.control-input.flashing {
   }
 }
 
-
 /* Recording Controls */
 .control-group.recording-controls {
   margin-top: 12px;
@@ -2426,7 +2434,6 @@ select.control-input.flashing {
   align-items: center;
 }
 
-
 /* Dark mode support for modern controls */
 @media (prefers-color-scheme: dark) {
   .control-group.modern-controls-row {
@@ -2461,8 +2468,6 @@ select.control-input.flashing {
     background: var(--green-550);
     color: var(--dark-bg-primary);
   }
-
-
 }
 
 /* Dark mode styling for native audio player - only when dark class is present */
@@ -2500,12 +2505,11 @@ body.dark .modern-control-item.audio-player-section audio {
   }
 }
 
-
 /* Medium screens - 3 columns on first row */
 @media (max-width: 768px) and (min-width: 601px) {
   .controls-container:not(.second-row):not(.third-row) {
     display: grid;
-    grid-template: "bpm notes chord" auto "generate generate generate" auto / 1fr 1fr 1fr;
+    grid-template: 'bpm notes chord' auto 'generate generate generate' auto / 1fr 1fr 1fr;
     gap: 12px 8px;
   }
 
@@ -2544,7 +2548,7 @@ body.dark .modern-control-item.audio-player-section audio {
 
   .controls-container:not(.second-row):not(.third-row) {
     display: grid;
-    grid-template: "bpm notes" auto "chord chord" auto "generate generate" auto / 1fr 1fr;
+    grid-template: 'bpm notes' auto 'chord chord' auto 'generate generate' auto / 1fr 1fr;
     gap: 12px 8px;
   }
 
@@ -2625,7 +2629,7 @@ body.dark .modern-control-item.audio-player-section audio {
   .modern-notes-toggle-button.expanded {
     min-width: 280px;
     max-width: 320px;
-    padding: 12px 15px;
+    padding: 0 15px 12px;
   }
 
   .modern-notes-toggle-button .expanded-melody-content .melody-notes {
@@ -2707,7 +2711,6 @@ body.dark .modern-control-item.audio-player-section audio {
   }
 }
 
-
 /* Mobile responsive design for recording controls */
 @media (max-width: 480px) {
   .recording-buttons {
@@ -2723,22 +2726,23 @@ body.dark .modern-control-item.audio-player-section audio {
 
 /* FINAL OVERRIDE: Ensure keyboard mode delete button has correct margin */
 
-/* Keyboard mode: 23px margin on tablets/desktop */
-body:has([data-instrument="keyboard"]) .control-button.delete-selection {
-  margin-top: 23px !important;
-}
+/* Only apply these margins on devices larger than 360px */
+@media (min-width: 361px) {
+  /* Keyboard mode: 23px margin on tablets/desktop */
+  body:has([data-instrument='keyboard']) .control-button.delete-selection {
+    margin-top: 23px !important;
+  }
 
-/* Guitar mode: 6px margin on tablets/desktop */
-body:has([data-instrument="guitar"]) .control-button.delete-selection {
-  margin-top: 6px !important;
-}
+  /* Guitar mode: 6px margin on tablets/desktop */
+  body:has([data-instrument='guitar']) .control-button.delete-selection {
+    margin-top: 6px !important;
+  }
 
-/* Bass mode: 6px margin on tablets/desktop */
-body:has([data-instrument="bass"]) .control-button.delete-selection {
-  margin-top: 6px !important;
+  /* Bass mode: 6px margin on tablets/desktop */
+  body:has([data-instrument='bass']) .control-button.delete-selection {
+    margin-top: 6px !important;
+  }
 }
-
-/* Mobile: keep the same margins as desktop */
 
 /* Generating indicator styles */
 .generating-indicator {
