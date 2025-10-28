@@ -16,10 +16,8 @@
 @import './enhanced-effects.css';
 
 /* Layout Components */
-@import './App.css';
 @import './Header.css';
 @import './Footer.css';
-@import './Home.css';
 
 /* Interactive Components */
 @import './Guitar.css';
@@ -34,10 +32,6 @@
 @import './NotesToggle.css';
 @import './ScaleOptions.css';
 @import './ThemeToggle.css';
-
-/* Authentication Components */
-@import '../components/auth/AuthForms.css';
-@import '../components/auth/UserMenu.css';
 
 /*
   ===========================================
