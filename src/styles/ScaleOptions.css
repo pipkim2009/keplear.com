@@ -30,7 +30,6 @@
   max-height: 32px;
 }
 
-
 .scale-options-container.expanded {
   width: auto;
   height: 32px;
@@ -129,7 +128,6 @@
   outline-offset: var(--focus-ring-offset);
   box-shadow: var(--focus-ring-shadow);
 }
-
 
 .scale-controls {
   margin: 0 auto;
@@ -307,8 +305,6 @@
   box-shadow: var(--focus-ring-shadow);
 }
 
-
-
 /* Mobile styles applied to all screen sizes - remove conflicting min-width */
 
 .scale-options-content {
@@ -384,7 +380,7 @@
 
 .toggle-slider::before {
   position: absolute;
-  content: "";
+  content: '';
   height: 29px;
   width: 58px;
   left: -1px;
@@ -489,63 +485,38 @@ input:checked + .toggle-slider:hover {
   }
 }
 
-/* Mobile responsive styles for scale options toggle */
-@media (max-width: 480px) {
+/* ============================================================
+   MOBILE SCALE OPTIONS LAYOUT
+   Complete responsive redesign aligned with Controls.css
+   ============================================================ */
+
+/* Small Devices (361px - 480px) */
+@media (max-width: 480px) and (min-width: 361px) {
+  /* Scale toggle button - no margins */
   .scale-options-toggle {
-    margin-top: 0 !important;
-  }
-}
-
-@media (max-width: 360px) {
-  .scale-options-toggle {
-    margin: 0 auto !important;
-    margin-top: 0 !important;
-  }
-
-  /* Center the popup on very small screens */
-  .scale-options-popup {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    top: 100% !important;
-  }
-
-  /* Vertically center guitar and bass container on very small screens */
-  .scale-options-container:has(.scale-options-toggle.instrument-guitar),
-  .scale-options-container:has(.scale-options-toggle.instrument-bass) {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+    margin: 0 !important;
   }
 
   .scale-options-toggle.instrument-guitar,
   .scale-options-toggle.instrument-bass {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
-}
-
-/* Very small devices - make scale options thinner */
-@media (max-width: 480px) and (min-width: 361px) {
-  .scale-options-content {
-    padding: 10px 8px !important;
+    margin: 0 !important;
   }
 
-  .scale-controls {
-    padding: 6px !important;
-    width: calc(100% - 20px) !important;
-  }
-
+  /* Container - no extra margins */
   .scale-options-container {
-    width: calc(100% - 20px) !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
   }
 
-  /* Popup extends to the left on small screens (not very small) */
+  .scale-options-container.collapsed {
+    margin: 0 !important;
+  }
+
+  /* Popup positioning */
   .scale-options-popup {
     left: auto !important;
     right: 0 !important;
     transform: none !important;
-    top: calc(100% - 15px) !important;
+    top: 100% !important;
   }
 
   .scale-options-popup.instrument-guitar,
@@ -557,9 +528,20 @@ input:checked + .toggle-slider:hover {
 
   .scale-options-popup.instrument-keyboard {
     top: 100% !important;
-    right: -20px !important;
+    right: 0 !important;
   }
 
+  /* Content sizing */
+  .scale-options-content {
+    padding: 10px 8px !important;
+  }
+
+  .scale-controls {
+    padding: 6px !important;
+    width: calc(100% - 16px) !important;
+  }
+
+  /* Toggle switch sizing */
   .toggle-switch {
     width: 110px;
     height: 28px;
@@ -583,6 +565,45 @@ input:checked + .toggle-slider:hover {
 
   input:checked + .toggle-slider::before {
     transform: translateX(54px);
+  }
+}
+
+/* Very Small Devices (≤360px) */
+@media (max-width: 360px) {
+  /* Scale toggle button - centered, no margins */
+  .scale-options-toggle {
+    margin: 0 !important;
+  }
+
+  .scale-options-toggle.instrument-guitar,
+  .scale-options-toggle.instrument-bass {
+    margin: 0 !important;
+  }
+
+  /* Container - centered */
+  .scale-options-container {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .scale-options-container.collapsed {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Popup - centered on screen */
+  .scale-options-popup {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    top: 100% !important;
+  }
+
+  /* Guitar/Bass containers - centered */
+  .scale-options-container:has(.scale-options-toggle.instrument-guitar),
+  .scale-options-container:has(.scale-options-toggle.instrument-bass) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 }
 
@@ -765,5 +786,3 @@ input:checked + .toggle-slider:hover {
 .applied-chords-list::-webkit-scrollbar-thumb:hover {
   background: rgb(139, 92, 246, 0.5);
 }
-
-

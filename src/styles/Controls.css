@@ -1248,110 +1248,124 @@
   flex: 0 0 auto !important;
 }
 
-/* Mobile only: add top margins to match deselect all button */
-@media (max-width: 480px) {
-  /* Keyboard mode: 23px margin on mobile */
-  body:has([data-instrument='keyboard']) .control-group.scale-chord-options {
-    margin-top: 23px !important;
-  }
+/* ============================================================
+   MOBILE INSTRUMENT HEADER CONTROLS LAYOUT
+   Complete responsive redesign for mobile devices
+   ============================================================ */
 
-  /* Guitar mode: 6px margin on mobile */
-  body:has([data-instrument='guitar']) .control-group.scale-chord-options {
-    margin-top: 6px !important;
-  }
-
-  /* Bass mode: 6px margin on mobile */
-  body:has([data-instrument='bass']) .control-group.scale-chord-options {
-    margin-top: 6px !important;
-  }
-}
-
-/* Very small screens - one button per row, centered */
-@media (max-width: 360px) {
+/* Small Devices (361px - 480px) */
+@media (max-width: 480px) and (min-width: 361px) {
   .header-controls-left {
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 5px !important;
-    width: 100% !important;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
   }
 
   .header-controls-left .control-group {
-    width: 100% !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Selection Mode (Keyboard only) - no margin */
+  .header-controls-left .control-group:has(.selection-mode-switch) {
+    margin: 0;
+  }
+
+  /* Scale/Chord Options - 22px top margin */
+  .control-group.scale-chord-options {
     margin: 0 !important;
+    margin-top: 22px !important;
     padding: 0 !important;
   }
 
-  /* Reset all child element margins/padding */
-  .header-controls-left .control-group > * {
+  /* Deselect All button - no margin by default */
+  .header-controls-left .control-group:has(.delete-selection) {
     margin: 0 !important;
-  }
-
-  /* Remove top margins on very small screens for vertical stacking */
-  body:has([data-instrument='keyboard']) .control-group.scale-chord-options,
-  body:has([data-instrument='guitar']) .control-group.scale-chord-options,
-  body:has([data-instrument='bass']) .control-group.scale-chord-options {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
-
-  body:has([data-instrument='keyboard']) .control-button.delete-selection,
-  body:has([data-instrument='guitar']) .control-button.delete-selection,
-  body:has([data-instrument='bass']) .control-button.delete-selection {
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-  }
-
-  /* Ensure selection mode control group has no extra spacing */
-  .header-controls-left .control-group:has(.selection-mode-switch),
-  .header-controls-left .control-group.selection-mode-group {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  /* Force deselect all button container to have no margins */
-  .header-controls-left .control-group:has(.delete-selection),
-  .header-controls-left > .control-group:has(.delete-selection) {
-    margin: 0 !important;
-    padding: 0 !important;
   }
 
   .control-button.delete-selection {
     margin: 0 !important;
   }
 
-  /* Force scale-chord-options to have no gap */
-  .control-group.scale-chord-options {
-    gap: 0 !important;
+  /* Guitar and Bass modes - move scales/chords and deselect all upwards */
+  body:has([data-instrument='guitar']) .control-group.scale-chord-options,
+  body:has([data-instrument='bass']) .control-group.scale-chord-options {
+    margin-top: 3px !important;
+  }
+
+  body:has([data-instrument='guitar']) .control-button.delete-selection,
+  body:has([data-instrument='bass']) .control-button.delete-selection {
+    margin-top: 3px !important;
+  }
+}
+
+/* Very Small Devices (≤360px) */
+@media (max-width: 360px) {
+  .header-controls-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .header-controls-left .control-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     margin: 0 !important;
     padding: 0 !important;
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
+  }
+
+  /* Reset all margins and padding */
+  .header-controls-left .control-group > * {
+    margin: 0 !important;
+  }
+
+  /* Selection Mode - centered */
+  .header-controls-left .control-group:has(.selection-mode-switch) {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Scale/Chord Options - centered, no margins */
+  .control-group.scale-chord-options {
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
   }
 
   .control-group.scale-chord-options > * {
     margin: 0 !important;
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
   }
 
-  /* Override any scale-chord-options child elements */
-  .control-group.scale-chord-options .scale-chord-container,
-  .control-group.scale-chord-options .scale-options-custom,
-  .control-group.scale-chord-options > div {
-    margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
+  .control-group.scale-chord-options .scale-options-container {
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
-  /* Fix collapsed scale-options-container height */
   .scale-options-container.collapsed {
     min-height: 0 !important;
     height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
+  }
+
+  /* Deselect All button - centered, no margins */
+  .header-controls-left .control-group:has(.delete-selection) {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .control-button.delete-selection {
+    margin: 0 !important;
   }
 }
 
@@ -2726,8 +2740,8 @@ body.dark .modern-control-item.audio-player-section audio {
 
 /* FINAL OVERRIDE: Ensure keyboard mode delete button has correct margin */
 
-/* Only apply these margins on devices larger than 360px */
-@media (min-width: 361px) {
+/* Only apply these margins on devices larger than 480px (tablets and desktop) */
+@media (min-width: 481px) {
   /* Keyboard mode: 23px margin on tablets/desktop */
   body:has([data-instrument='keyboard']) .control-button.delete-selection {
     margin-top: 23px !important;
