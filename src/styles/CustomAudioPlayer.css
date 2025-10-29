@@ -473,6 +473,16 @@
   max-width: 480px;
 }
 
+.feedback-stage-title {
+  text-align: center;
+  color: var(--primary-purple-light);
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .feedback-progress {
   text-align: center;
   color: var(--white);
@@ -481,6 +491,25 @@
   margin-bottom: 16px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--gray-800);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stage-hint {
+  font-size: 12px;
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* Stage 1 hint - green (positive message) */
+.stage-hint.stage-1 {
+  color: var(--green-400);
+}
+
+/* Stage 2 hint - orange (warning message) */
+.stage-hint.stage-2 {
+  color: var(--orange-400);
 }
 
 /* Feedback Checkboxes */
@@ -495,8 +524,17 @@
 
 .note-checkbox {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+}
+
+.checkbox-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-align: center;
 }
 
 .checkbox-box {

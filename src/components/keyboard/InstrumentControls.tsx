@@ -144,6 +144,11 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const [centsOffset, setCentsOffset] = useState<number>(0)
   const [feedbackStatus, setFeedbackStatus] = useState<'waiting' | 'correct' | 'wrong'>('waiting')
   const [isPausedForPlayback, setIsPausedForPlayback] = useState<boolean>(false)
+
+  // Two-stage feedback system
+  const [feedbackStage, setFeedbackStage] = useState<1 | 2>(1)
+  const [sequenceIndex, setSequenceIndex] = useState<number>(0)
+
   const audioCleanupRef = useRef<(() => void) | null>(null)
   const lastProcessedNoteRef = useRef<string | null>(null)
   const isProcessingRef = useRef<boolean>(false)
@@ -542,9 +547,9 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     }
   }, [isListening, isPausedForPlayback, micStream, generatedMelody, currentNoteIndex])
 
-  // Handle detected note comparison
+  // Handle detected note comparison - Two Stage System
   const handleNoteDetected = (detectedNoteName: string, frequency: number) => {
-    if (!generatedMelody || generatedMelody.length === 0 || currentNoteIndex >= generatedMelody.length) {
+    if (!generatedMelody || generatedMelody.length === 0) {
       return
     }
 
@@ -558,81 +563,162 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
       return
     }
 
-    const expectedNote = generatedMelody[currentNoteIndex]
-    // Extract just the note name without octave (e.g., "C4" -> "C")
-    const expectedNoteName = expectedNote.name.replace(/[0-9]/g, '')
-
-    // Calculate cents offset from expected note
-    const targetFrequency = noteNameToFrequency(expectedNote.name)
-    const cents = getCentsOffset(frequency, targetFrequency)
-    setCentsOffset(cents)
-
     // Normalize sharp/flat equivalents
     const normalizeNote = (note: string) => {
-      const equivalents: { [key: string]: string } = {
+      const equivalents: { [key: string]: string} = {
         'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#'
       }
       return equivalents[note] || note
     }
 
     const normalizedDetected = normalizeNote(detectedNoteName)
-    const normalizedExpected = normalizeNote(expectedNoteName)
 
-    // Mark this note as processed
-    lastProcessedNoteRef.current = detectedNoteName
+    // STAGE 1: Play notes in order, but wrong notes don't reset progress
+    if (feedbackStage === 1) {
+      if (sequenceIndex >= generatedMelody.length) {
+        return
+      }
 
-    // Check if note name matches AND cents offset is within acceptable range (±25 cents)
-    const ACCEPTABLE_CENTS = 25
-    const isInTune = Math.abs(cents) <= ACCEPTABLE_CENTS
+      const expectedNote = generatedMelody[sequenceIndex]
+      const expectedNoteName = normalizeNote(expectedNote.name.replace(/[0-9]/g, ''))
 
-    // Debug logging
-    console.log('Note Detection:', {
-      detected: normalizedDetected,
-      expected: normalizedExpected,
-      centsOffset: cents,
-      isInTune,
-      matches: normalizedDetected === normalizedExpected
-    })
+      // Calculate cents offset from expected note
+      const targetFrequency = noteNameToFrequency(expectedNote.name)
+      const cents = getCentsOffset(frequency, targetFrequency)
+      setCentsOffset(cents)
 
-    if (normalizedDetected === normalizedExpected && isInTune) {
-      // Correct note!
-      isProcessingRef.current = true
-      setFeedbackStatus('correct')
+      // Check if note name matches AND cents offset is within acceptable range
+      const ACCEPTABLE_CENTS = 25
+      const isInTune = Math.abs(cents) <= ACCEPTABLE_CENTS
 
-      // Move to next note after a brief delay
-      setTimeout(() => {
-        const nextIndex = currentNoteIndex + 1
-        setCurrentNoteIndex(nextIndex)
-        setFeedbackStatus('waiting')
-        setDetectedNote(null)
-        setDetectedFrequency(0)
-        setCentsOffset(0)
-        lastProcessedNoteRef.current = null
-        isProcessingRef.current = false
+      console.log('Stage 1 - Note Detection:', {
+        detected: normalizedDetected,
+        expected: expectedNoteName,
+        sequenceIndex,
+        centsOffset: cents,
+        isInTune,
+        matches: normalizedDetected === expectedNoteName
+      })
 
-        // Check if we've completed all notes
-        if (nextIndex >= generatedMelody.length) {
-          // Stop listening and reset button
-          if (audioCleanupRef.current) {
-            audioCleanupRef.current()
-            audioCleanupRef.current = null
+      if (normalizedDetected === expectedNoteName && isInTune) {
+        // Correct note in sequence!
+        isProcessingRef.current = true
+        lastProcessedNoteRef.current = detectedNoteName
+        setFeedbackStatus('correct')
+
+        setTimeout(() => {
+          const nextIndex = sequenceIndex + 1
+          setSequenceIndex(nextIndex)
+          setCurrentNoteIndex(nextIndex) // Keep in sync for visual display
+          setFeedbackStatus('waiting')
+          setDetectedNote(null)
+          setDetectedFrequency(0)
+          setCentsOffset(0)
+          lastProcessedNoteRef.current = null
+          isProcessingRef.current = false
+
+          // Check if we've completed Stage 1
+          if (nextIndex >= generatedMelody.length) {
+            // Move to Stage 2 after completing all notes
+            setTimeout(() => {
+              setFeedbackStage(2)
+              setSequenceIndex(0)
+              setCurrentNoteIndex(0)
+              setFeedbackStatus('waiting')
+              console.log('Stage 1 complete! Moving to Stage 2 - strict mode (wrong note resets)')
+            }, 800)
           }
-          if (micStream) {
-            micStream.getTracks().forEach(track => track.stop())
-            setMicStream(null)
-          }
-          setIsListening(false)
-        }
-      }, 500)
-    } else {
-      // Wrong note
-      setFeedbackStatus('wrong')
+        }, 500)
+      } else {
+        // Wrong note - just show feedback but DON'T reset
+        setFeedbackStatus('wrong')
+        lastProcessedNoteRef.current = detectedNoteName
 
-      // Reset feedback after brief display
-      setTimeout(() => {
-        setFeedbackStatus('waiting')
-        lastProcessedNoteRef.current = null
-      }, 300)
+        setTimeout(() => {
+          setFeedbackStatus('waiting')
+          setDetectedNote(null)
+          setDetectedFrequency(0)
+          setCentsOffset(0)
+          lastProcessedNoteRef.current = null
+        }, 300)
+      }
+    }
+
+    // STAGE 2: Play notes in correct order
+    else if (feedbackStage === 2) {
+      if (sequenceIndex >= generatedMelody.length) {
+        return
+      }
+
+      const expectedNote = generatedMelody[sequenceIndex]
+      const expectedNoteName = normalizeNote(expectedNote.name.replace(/[0-9]/g, ''))
+
+      // Calculate cents offset from expected note
+      const targetFrequency = noteNameToFrequency(expectedNote.name)
+      const cents = getCentsOffset(frequency, targetFrequency)
+      setCentsOffset(cents)
+
+      // Check if note name matches AND cents offset is within acceptable range
+      const ACCEPTABLE_CENTS = 25
+      const isInTune = Math.abs(cents) <= ACCEPTABLE_CENTS
+
+      console.log('Stage 2 - Note Detection:', {
+        detected: normalizedDetected,
+        expected: expectedNoteName,
+        sequenceIndex,
+        centsOffset: cents,
+        isInTune,
+        matches: normalizedDetected === expectedNoteName
+      })
+
+      if (normalizedDetected === expectedNoteName && isInTune) {
+        // Correct note in sequence!
+        isProcessingRef.current = true
+        lastProcessedNoteRef.current = detectedNoteName
+        setFeedbackStatus('correct')
+
+        setTimeout(() => {
+          const nextIndex = sequenceIndex + 1
+          setSequenceIndex(nextIndex)
+          setCurrentNoteIndex(nextIndex) // Keep in sync for visual display
+          setFeedbackStatus('waiting')
+          setDetectedNote(null)
+          setDetectedFrequency(0)
+          setCentsOffset(0)
+          lastProcessedNoteRef.current = null
+          isProcessingRef.current = false
+
+          // Check if we've completed the sequence
+          if (nextIndex >= generatedMelody.length) {
+            // Completed! Stop listening
+            if (audioCleanupRef.current) {
+              audioCleanupRef.current()
+              audioCleanupRef.current = null
+            }
+            if (micStream) {
+              micStream.getTracks().forEach(track => track.stop())
+              setMicStream(null)
+            }
+            setIsListening(false)
+            console.log('Stage 2 complete! All notes played in order')
+          }
+        }, 500)
+      } else {
+        // Wrong note - reset sequence back to start!
+        setFeedbackStatus('wrong')
+        lastProcessedNoteRef.current = detectedNoteName
+
+        setTimeout(() => {
+          setSequenceIndex(0)
+          setCurrentNoteIndex(0) // Keep in sync for visual display
+          setFeedbackStatus('waiting')
+          setDetectedNote(null)
+          setDetectedFrequency(0)
+          setCentsOffset(0)
+          lastProcessedNoteRef.current = null
+          console.log('Wrong note! Resetting sequence to start')
+        }, 500)
+      }
     }
   }
 
@@ -663,9 +749,11 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
         setMicStream(stream)
         setIsListening(true)
-        // Reset tracking
+        // Reset tracking for two-stage system
         setCurrentNoteIndex(0)
         setFeedbackStatus('waiting')
+        setFeedbackStage(1)
+        setSequenceIndex(0)
         lastProcessedNoteRef.current = null
         isProcessingRef.current = false
       } catch (error) {
@@ -1148,9 +1236,11 @@ Progression - Use entire chords"
               if (onClearRecordedAudio) {
                 onClearRecordedAudio()
               }
-              // Reset live feedback progress
+              // Reset live feedback progress and two-stage system
               setCurrentNoteIndex(0)
               setFeedbackStatus('waiting')
+              setFeedbackStage(1)
+              setSequenceIndex(0)
               if (onGenerateMelody) {
                 onGenerateMelody()
               }
@@ -1193,13 +1283,15 @@ Progression - Use entire chords"
                       {isPausedForPlayback ? 'Melody Playing' : isListening ? 'Listening...' : 'Live Feedback'}
                     </button>
 
-                    {/* Live Feedback Display */}
-                    {generatedMelody && generatedMelody.length > 0 && (isListening || isPausedForPlayback || currentNoteIndex >= generatedMelody.length) && (
+                    {/* Live Feedback Display - Two Stage System */}
+                    {generatedMelody && generatedMelody.length > 0 && (isListening || isPausedForPlayback || (feedbackStage === 2 && sequenceIndex >= generatedMelody.length)) && (
                       <div className="live-feedback-display">
-                        {currentNoteIndex < generatedMelody.length ? (
+                        {feedbackStage === 1 ? (
+                          /* STAGE 1: Play in order, wrong notes allowed */
                           <>
+                            <div className="feedback-stage-title">Stage 1: Practice Mode</div>
                             <div className="feedback-progress">
-                              {currentNoteIndex}/{generatedMelody.length}
+                              {sequenceIndex}/{generatedMelody.length}
                             </div>
 
                             <div className="feedback-checkboxes">
@@ -1207,13 +1299,13 @@ Progression - Use entire chords"
                                 <div
                                   key={index}
                                   className={`note-checkbox ${
-                                    index < currentNoteIndex ? 'completed' :
-                                    index === currentNoteIndex ? 'active' :
+                                    index < sequenceIndex ? 'completed' :
+                                    index === sequenceIndex ? 'active' :
                                     'pending'
                                   }`}
                                 >
                                   <div className="checkbox-box">
-                                    {index < currentNoteIndex && (
+                                    {index < sequenceIndex && (
                                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
                                         <polyline points="20 6 9 17 4 12"></polyline>
                                       </svg>
@@ -1223,7 +1315,60 @@ Progression - Use entire chords"
                               ))}
                             </div>
 
-                            {detectedFrequency > 0 && !isPausedForPlayback && (
+                            {!isPausedForPlayback && (
+                              <div className="feedback-tuner">
+                                <div className="tuner-scale">
+                                  <div className="tuner-marks">
+                                    <span className="tuner-mark">-50</span>
+                                    <span className="tuner-mark">-25</span>
+                                    <span className="tuner-mark center">0</span>
+                                    <span className="tuner-mark">25</span>
+                                    <span className="tuner-mark">50</span>
+                                  </div>
+                                  <div className="tuner-track">
+                                    <div className="tuner-acceptable-zone"></div>
+                                    <div className="tuner-center-line"></div>
+                                    <div
+                                      className={`tuner-indicator ${feedbackStatus}`}
+                                      style={{
+                                        left: `${Math.max(0, Math.min(100, 50 + centsOffset))}%`
+                                      }}
+                                    ></div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        ) : feedbackStage === 2 && sequenceIndex < generatedMelody.length ? (
+                          /* STAGE 2: Play notes in order */
+                          <>
+                            <div className="feedback-stage-title">Stage 2: Strict Mode</div>
+                            <div className="feedback-progress">
+                              {sequenceIndex}/{generatedMelody.length}
+                            </div>
+
+                            <div className="feedback-checkboxes">
+                              {generatedMelody.map((note, index) => (
+                                <div
+                                  key={index}
+                                  className={`note-checkbox ${
+                                    index < sequenceIndex ? 'completed' :
+                                    index === sequenceIndex ? 'active' :
+                                    'pending'
+                                  }`}
+                                >
+                                  <div className="checkbox-box">
+                                    {index < sequenceIndex && (
+                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                      </svg>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {!isPausedForPlayback && (
                               <div className="feedback-tuner">
                                 <div className="tuner-scale">
                                   <div className="tuner-marks">
@@ -1248,8 +1393,9 @@ Progression - Use entire chords"
                             )}
                           </>
                         ) : (
+                          /* COMPLETE */
                           <div className="feedback-complete">
-                            <div className="complete-message">🎉 Complete!</div>
+                            <div className="complete-message">🎉 All Stages Complete!</div>
                           </div>
                         )}
                       </div>
