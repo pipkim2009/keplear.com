@@ -6,6 +6,7 @@ interface CustomAudioPlayerProps {
   bpm?: number
   melodyLength?: number
   onNoteIndexChange?: (index: number | null) => void
+  audioRef?: React.RefObject<HTMLAudioElement>
 }
 
 const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
@@ -13,9 +14,11 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   preload = 'metadata',
   bpm,
   melodyLength,
-  onNoteIndexChange
+  onNoteIndexChange,
+  audioRef: externalAudioRef
 }) => {
-  const audioRef = useRef<HTMLAudioElement>(null)
+  const internalAudioRef = useRef<HTMLAudioElement>(null)
+  const audioRef = externalAudioRef || internalAudioRef
   const progressRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
