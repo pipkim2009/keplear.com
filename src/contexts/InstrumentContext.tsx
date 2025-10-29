@@ -208,8 +208,12 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     if (clearSelections) {
       clearSelection()
     }
+    // Clear all scales and chords when switching to range mode
+    if (mode === 'range') {
+      triggerClearChordsAndScales()
+    }
     triggerInputFlash('mode')
-  }, [setKeyboardSelectionMode, clearSelection, triggerInputFlash])
+  }, [setKeyboardSelectionMode, clearSelection, triggerInputFlash, triggerClearChordsAndScales])
 
   // Scale and chord management (must come before useMelodyChanges)
   const scaleChordManagement = useScaleChordManagement({
@@ -284,7 +288,9 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
           await playNote(note.name)
         }
       }
-      selectNote(note, keyboardSelectionMode as 'range' | 'multi')
+      // Only use keyboardSelectionMode for keyboard instrument
+      const selectionMode = instrument === 'keyboard' ? keyboardSelectionMode : 'multi'
+      selectNote(note, selectionMode as 'range' | 'multi')
     } catch (error) {
     }
   }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, keyboardSelectionMode, isGeneratingMelody, isAutoRecording])
