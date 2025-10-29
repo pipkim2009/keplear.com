@@ -1299,7 +1299,12 @@
 
   body:has([data-instrument='guitar']) .control-button.delete-selection,
   body:has([data-instrument='bass']) .control-button.delete-selection {
-    margin-top: 3px !important;
+    margin-top: 5px !important;
+  }
+
+  /* Keyboard mode - add 2px margin on small devices */
+  body:has([data-instrument='keyboard']) .control-button.delete-selection {
+    margin-top: 2px !important;
   }
 }
 
@@ -2742,19 +2747,19 @@ body.dark .modern-control-item.audio-player-section audio {
 
 /* Only apply these margins on devices larger than 480px (tablets and desktop) */
 @media (min-width: 481px) {
-  /* Keyboard mode: 22px margin on tablets/desktop (moved up 1px) */
+  /* Keyboard mode: 23px margin on tablets/desktop */
   body:has([data-instrument='keyboard']) .control-button.delete-selection {
-    margin-top: 22px !important;
+    margin-top: 23px !important;
   }
 
-  /* Guitar mode: 5px margin on tablets/desktop (moved up 1px) */
+  /* Guitar mode: 6px margin on tablets/desktop */
   body:has([data-instrument='guitar']) .control-button.delete-selection {
-    margin-top: 5px !important;
+    margin-top: 6px !important;
   }
 
-  /* Bass mode: 5px margin on tablets/desktop (moved up 1px) */
+  /* Bass mode: 6px margin on tablets/desktop */
   body:has([data-instrument='bass']) .control-button.delete-selection {
-    margin-top: 5px !important;
+    margin-top: 6px !important;
   }
 }
 
