@@ -143,6 +143,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const [detectedFrequency, setDetectedFrequency] = useState<number>(0)
   const [centsOffset, setCentsOffset] = useState<number>(0)
   const [feedbackStatus, setFeedbackStatus] = useState<'waiting' | 'correct' | 'wrong'>('waiting')
+  const [isPausedForPlayback, setIsPausedForPlayback] = useState<boolean>(false)
   const audioCleanupRef = useRef<(() => void) | null>(null)
   const lastProcessedNoteRef = useRef<string | null>(null)
   const isProcessingRef = useRef<boolean>(false)
@@ -486,9 +487,44 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     }
   }, [micStream])
 
+  // Monitor audio player and pause feedback when melody is playing
+  useEffect(() => {
+    const audioElement = audioPlayerRef.current
+    if (!audioElement) return
+
+    const handlePlay = () => {
+      if (isListening) {
+        // Pause microphone analysis
+        if (audioCleanupRef.current) {
+          audioCleanupRef.current()
+          audioCleanupRef.current = null
+        }
+        setIsPausedForPlayback(true)
+      }
+    }
+
+    const handlePause = () => {
+      setIsPausedForPlayback(false)
+    }
+
+    const handleEnded = () => {
+      setIsPausedForPlayback(false)
+    }
+
+    audioElement.addEventListener('play', handlePlay)
+    audioElement.addEventListener('pause', handlePause)
+    audioElement.addEventListener('ended', handleEnded)
+
+    return () => {
+      audioElement.removeEventListener('play', handlePlay)
+      audioElement.removeEventListener('pause', handlePause)
+      audioElement.removeEventListener('ended', handleEnded)
+    }
+  }, [isListening])
+
   // Setup audio analysis when listening starts
   useEffect(() => {
-    if (isListening && micStream && generatedMelody && generatedMelody.length > 0) {
+    if (isListening && !isPausedForPlayback && micStream && generatedMelody && generatedMelody.length > 0) {
       const cleanup = setupAudioAnalysis(micStream, (frequency, noteName) => {
         setDetectedNote(noteName)
         setDetectedFrequency(frequency)
@@ -504,7 +540,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         audioCleanupRef.current = null
       }
     }
-  }, [isListening, micStream, generatedMelody, currentNoteIndex])
+  }, [isListening, isPausedForPlayback, micStream, generatedMelody, currentNoteIndex])
 
   // Handle detected note comparison
   const handleNoteDetected = (detectedNoteName: string, frequency: number) => {
@@ -602,7 +638,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
   // Handle Live Feedback button click
   const handleLiveFeedbackClick = async () => {
-    if (isListening) {
+    if (isListening || isPausedForPlayback) {
       // Stop listening
       if (audioCleanupRef.current) {
         audioCleanupRef.current()
@@ -613,6 +649,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
         setMicStream(null)
       }
       setIsListening(false)
+      setIsPausedForPlayback(false)
       setDetectedNote(null)
       setFeedbackStatus('waiting')
     } else {
@@ -1050,7 +1087,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
 
           {/* Chord Mode Select */}
           {setChordMode && (
-            <div className="modern-control-item">
+            <div className={`modern-control-item ${appliedChordsCount === 0 ? 'with-unavailable-notice' : ''}`}>
               <div className="label-with-tooltip">
                 <label className="control-label">Chord Mode</label>
                 <Tooltip
@@ -1062,33 +1099,40 @@ Progression - Use entire chords"
                   <div className="tooltip-icon">?</div>
                 </Tooltip>
               </div>
-              <div className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''}`}>
-                <button
-                  className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (chordMode !== 'arpeggiator') {
-                      setChordMode('arpeggiator')
-                      setIsChordModeFlashing(true)
-                      setTimeout(() => setIsChordModeFlashing(false), 500)
-                    }
-                  }}
-                  title="Arpeggiator"
-                >
-                  Arpeggiator
-                </button>
-                <button
-                  className={`switch-option ${chordMode === 'progression' ? 'active' : ''}`}
-                  onClick={() => {
-                    if (chordMode !== 'progression') {
-                      setChordMode('progression')
-                      setIsChordModeFlashing(true)
-                      setTimeout(() => setIsChordModeFlashing(false), 500)
-                    }
-                  }}
-                  title="Progression"
-                >
-                  Progression
-                </button>
+              <div>
+                <div className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''} ${appliedChordsCount === 0 ? 'disabled' : ''}`}>
+                  <button
+                    className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
+                    onClick={() => {
+                      if (appliedChordsCount > 0 && chordMode !== 'arpeggiator') {
+                        setChordMode('arpeggiator')
+                        setIsChordModeFlashing(true)
+                        setTimeout(() => setIsChordModeFlashing(false), 500)
+                      }
+                    }}
+                    title={appliedChordsCount === 0 ? "Apply chords to enable" : "Arpeggiator"}
+                    disabled={appliedChordsCount === 0}
+                  >
+                    Arpeggiator
+                  </button>
+                  <button
+                    className={`switch-option ${chordMode === 'progression' ? 'active' : ''}`}
+                    onClick={() => {
+                      if (appliedChordsCount > 0 && chordMode !== 'progression') {
+                        setChordMode('progression')
+                        setIsChordModeFlashing(true)
+                        setTimeout(() => setIsChordModeFlashing(false), 500)
+                      }
+                    }}
+                    title={appliedChordsCount === 0 ? "Apply chords to enable" : "Progression"}
+                    disabled={appliedChordsCount === 0}
+                  >
+                    Progression
+                  </button>
+                </div>
+                {appliedChordsCount === 0 && (
+                  <div className="chord-mode-unavailable">Unavailable</div>
+                )}
               </div>
             </div>
           )}
@@ -1104,6 +1148,9 @@ Progression - Use entire chords"
               if (onClearRecordedAudio) {
                 onClearRecordedAudio()
               }
+              // Reset live feedback progress
+              setCurrentNoteIndex(0)
+              setFeedbackStatus('waiting')
               if (onGenerateMelody) {
                 onGenerateMelody()
               }
@@ -1140,19 +1187,19 @@ Progression - Use entire chords"
                       audioRef={audioPlayerRef}
                     />
                     <button
-                      className={`live-feedback-button ${isListening ? 'listening' : ''}`}
+                      className={`live-feedback-button ${isPausedForPlayback ? 'paused' : isListening ? 'listening' : ''}`}
                       onClick={handleLiveFeedbackClick}
                     >
-                      {isListening ? 'Listening...' : 'Live Feedback'}
+                      {isPausedForPlayback ? 'Melody Playing' : isListening ? 'Listening...' : 'Live Feedback'}
                     </button>
 
                     {/* Live Feedback Display */}
-                    {generatedMelody && generatedMelody.length > 0 && (isListening || currentNoteIndex >= generatedMelody.length) && (
+                    {generatedMelody && generatedMelody.length > 0 && (isListening || isPausedForPlayback || currentNoteIndex >= generatedMelody.length) && (
                       <div className="live-feedback-display">
                         {currentNoteIndex < generatedMelody.length ? (
                           <>
                             <div className="feedback-progress">
-                              Progress: {currentNoteIndex}/{generatedMelody.length} notes
+                              {currentNoteIndex}/{generatedMelody.length}
                             </div>
 
                             <div className="feedback-checkboxes">
@@ -1176,7 +1223,7 @@ Progression - Use entire chords"
                               ))}
                             </div>
 
-                            {detectedFrequency > 0 && (
+                            {detectedFrequency > 0 && !isPausedForPlayback && (
                               <div className="feedback-tuner">
                                 <div className="tuner-scale">
                                   <div className="tuner-marks">
@@ -1203,9 +1250,6 @@ Progression - Use entire chords"
                         ) : (
                           <div className="feedback-complete">
                             <div className="complete-message">🎉 Complete!</div>
-                            <div className="complete-stats">
-                              All notes played successfully!
-                            </div>
                           </div>
                         )}
                       </div>

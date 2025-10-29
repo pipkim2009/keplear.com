@@ -8,64 +8,80 @@
  * Works well for guitar and other harmonic instruments
  */
 export function autoCorrelate(buffer: Float32Array, sampleRate: number): number {
-  // Minimum frequency we care about (E2 = 82.41 Hz, lowest guitar string)
-  const minFrequency = 80
-  const maxFrequency = 1200 // Higher than highest guitar note we care about
+  const SIZE = buffer.length
+  const MAX_SAMPLES = Math.floor(SIZE / 2)
 
-  let size = buffer.length
-  let maxSamples = Math.floor(sampleRate / minFrequency)
-
-  // Find the buffer's amplitude range
-  let sum = 0
-  for (let i = 0; i < size; i++) {
-    sum += Math.abs(buffer[i])
+  // Calculate RMS (root mean square) for signal strength
+  let rms = 0
+  for (let i = 0; i < SIZE; i++) {
+    rms += buffer[i] * buffer[i]
   }
-  let average = sum / size
+  rms = Math.sqrt(rms / SIZE)
 
-  // Not enough signal (increased threshold for guitar)
-  if (average < 0.02) return -1
+  // Not enough signal
+  if (rms < 0.01) return -1
 
-  // Calculate all correlations first
-  let correlations = new Array(maxSamples)
-  for (let offset = 0; offset < maxSamples; offset++) {
-    let correlation = 0
-    for (let i = 0; i < size - offset; i++) {
-      correlation += Math.abs(buffer[i] - buffer[i + offset])
-    }
-    correlations[offset] = 1 - (correlation / size)
-  }
+  // Trim silence from edges (threshold at 0.2)
+  let r1 = 0
+  let r2 = SIZE - 1
+  const threshold = 0.2
 
-  // Find best correlation with minimum threshold
-  let bestOffset = -1
-  let bestCorrelation = 0
-
-  // Start from offset 1 to skip DC component
-  // Look for the first strong peak (bias towards fundamental)
-  for (let offset = Math.floor(sampleRate / maxFrequency); offset < maxSamples; offset++) {
-    const correlation = correlations[offset]
-
-    // Need strong correlation (>0.5 for guitar)
-    if (correlation > 0.5 && correlation > bestCorrelation) {
-      const frequency = sampleRate / offset
-
-      // Check if this is in valid range
-      if (frequency >= minFrequency && frequency <= maxFrequency) {
-        bestCorrelation = correlation
-        bestOffset = offset
-
-        // If we found a very strong correlation, use it
-        if (correlation > 0.9) {
-          break
-        }
-      }
+  for (let i = 0; i < SIZE / 2; i++) {
+    if (Math.abs(buffer[i]) < threshold) {
+      r1 = i
+      break
     }
   }
 
-  if (bestOffset > 0) {
-    return sampleRate / bestOffset
+  for (let i = 1; i < SIZE / 2; i++) {
+    if (Math.abs(buffer[SIZE - i]) < threshold) {
+      r2 = SIZE - i
+      break
+    }
   }
 
-  return -1
+  buffer = buffer.slice(r1, r2)
+  const newSize = buffer.length
+
+  // Autocorrelation - MULTIPLY samples (not subtract!)
+  const correlations = new Array(MAX_SAMPLES)
+  for (let i = 0; i < MAX_SAMPLES; i++) {
+    let sum = 0
+    for (let j = 0; j < newSize - i; j++) {
+      sum += buffer[j] * buffer[j + i]
+    }
+    correlations[i] = sum
+  }
+
+  // Find first dip below zero (after initial peak)
+  let d = 0
+  while (correlations[d] > correlations[d + 1]) d++
+
+  // Find peak after the dip
+  let maxVal = -1
+  let maxPos = -1
+  for (let i = d; i < MAX_SAMPLES; i++) {
+    if (correlations[i] > maxVal) {
+      maxVal = correlations[i]
+      maxPos = i
+    }
+  }
+
+  // No peak found
+  if (maxPos === -1) return -1
+
+  // Parabolic interpolation for sub-sample accuracy
+  let T0 = maxPos
+  const y1 = correlations[T0 - 1]
+  const y2 = correlations[T0]
+  const y3 = correlations[T0 + 1]
+
+  const a = (y1 + y3 - 2 * y2) / 2
+  const b = (y3 - y1) / 2
+
+  if (a) T0 = T0 - b / (2 * a)
+
+  return sampleRate / T0
 }
 
 /**
@@ -160,8 +176,8 @@ export function setupAudioAnalysis(
   const source = audioContext.createMediaStreamSource(stream)
   const analyser = audioContext.createAnalyser()
 
-  analyser.fftSize = 8192 // Larger FFT for better low frequency resolution (guitar needs this)
-  analyser.smoothingTimeConstant = 0.3 // Less smoothing for faster guitar response
+  analyser.fftSize = 2048 // Standard size for pitch detection
+  analyser.smoothingTimeConstant = 0.8 // Smoothing for stable detection
 
   source.connect(analyser)
 
@@ -171,7 +187,7 @@ export function setupAudioAnalysis(
   let animationId: number
   let lastDetectedNote: string | null = null
   let lastDetectionTime = 0
-  const DEBOUNCE_MS = 100 // Faster response for guitar
+  const DEBOUNCE_MS = 150 // Prevent rapid re-detection
 
   function detectPitch() {
     analyser.getFloatTimeDomainData(buffer)
