@@ -1,4 +1,5 @@
 import Home from './pages/Home'
+import Practice from './pages/Practice'
 import NotFound from './pages/NotFound'
 import InstrumentDisplay from './keyboard/InstrumentDisplay'
 import { useInstrument } from '../contexts/InstrumentContext'
@@ -120,15 +121,9 @@ function Router() {
 
     case 'practice':
       return (
-        <div className="practice-page">
-          <div className="coming-soon">
-            <h2>Practice Mode</h2>
-            <p>Coming soon! This will include structured exercises and progress tracking.</p>
-            <button className="button" onClick={navigateToSandbox}>
-              Try Sandbox Mode
-            </button>
-          </div>
-        </div>
+        <Practice
+          onNavigateToSandbox={navigateToSandbox}
+        />
       )
 
     case '404':
