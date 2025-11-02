@@ -61,10 +61,16 @@
   box-sizing: border-box !important;
 }
 
-.chord-mode-select:hover {
+.chord-mode-select:hover:not(:disabled) {
   background: rgb(0, 123, 255, 0.15) !important;
   border-color: var(--blue-007bff) !important;
   box-shadow: 0 2px 4px rgb(0, 0, 0, 0.05) !important;
+}
+
+.chord-mode-select:disabled:hover {
+  background: rgb(0, 123, 255, 0.1) !important;
+  border-color: var(--blue-007bff) !important;
+  box-shadow: none !important;
 }
 
 .chord-mode-select:focus {
@@ -85,9 +91,14 @@
   color: var(--blue-003d7a) !important;
 }
 
-.light .chord-mode-select:hover {
+.light .chord-mode-select:hover:not(:disabled) {
   background: rgb(0, 128, 255, 0.2) !important;
   border-color: rgb(0, 128, 255, 0.6) !important;
+}
+
+.light .chord-mode-select:disabled:hover {
+  background: rgb(0, 128, 255, 0.12) !important;
+  border-color: rgb(0, 128, 255, 0.4) !important;
 }
 
 .light .chord-mode-select:focus {
@@ -122,11 +133,18 @@
   display: block;
 }
 
-.chord-mode-toggle:hover {
+.chord-mode-toggle:hover:not(:disabled) {
   background: rgb(0, 123, 255, 0.15);
   border-color: var(--blue-007bff);
   transform: translateY(-1px);
   box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
+}
+
+.chord-mode-toggle:disabled:hover {
+  background: rgb(0, 123, 255, 0.1);
+  border-color: var(--blue-007bff);
+  transform: none;
+  box-shadow: none;
 }
 
 .chord-mode-toggle:focus {
@@ -164,9 +182,14 @@
   color: var(--blue-003d7a);
 }
 
-.light .chord-mode-toggle:hover {
+.light .chord-mode-toggle:hover:not(:disabled) {
   background: rgb(0, 128, 255, 0.2);
   border-color: rgb(0, 128, 255, 0.6);
+}
+
+.light .chord-mode-toggle:disabled:hover {
+  background: rgb(0, 128, 255, 0.12);
+  border-color: rgb(0, 128, 255, 0.4);
 }
 
 .light .chord-mode-toggle:focus {

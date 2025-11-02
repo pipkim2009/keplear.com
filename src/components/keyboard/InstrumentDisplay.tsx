@@ -59,6 +59,10 @@ interface InstrumentDisplayProps {
   hideGenerateButton?: boolean
   hideDeselectAll?: boolean
   showOnlyAppliedList?: boolean
+  disableBpmInput?: boolean
+  disableBeatsInput?: boolean
+  disableChordMode?: boolean
+  disableSelectionMode?: boolean
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -111,7 +115,11 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   hideBeatsButtons = false,
   hideGenerateButton = false,
   hideDeselectAll = false,
-  showOnlyAppliedList = false
+  showOnlyAppliedList = false,
+  disableBpmInput = false,
+  disableBeatsInput = false,
+  disableChordMode = false,
+  disableSelectionMode = false
 }) => {
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
   const [higherOctaves, setHigherOctaves] = useState<number>(0)
@@ -332,6 +340,9 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           hideBpmButtons={hideBpmButtons}
           hideBeatsButtons={hideBeatsButtons}
           hideGenerateButton={hideGenerateButton}
+          disableBpmInput={disableBpmInput}
+          disableBeatsInput={disableBeatsInput}
+          disableChordMode={disableChordMode}
         />
       </div>
 
@@ -365,6 +376,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           higherOctaves={higherOctaves}
           hideDeselectAll={hideDeselectAll}
           showOnlyAppliedList={showOnlyAppliedList}
+          disableSelectionMode={disableSelectionMode}
         />
 
         <InstrumentRenderer

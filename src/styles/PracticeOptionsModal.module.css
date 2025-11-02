@@ -1,0 +1,345 @@
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Content */
+.modalContent {
+  background: linear-gradient(
+    145deg,
+    rgba(45, 27, 105, 0.98),
+    rgba(26, 13, 46, 0.98)
+  );
+  border: 2px solid rgba(210, 210, 249, 0.3);
+  border-radius: 24px;
+  padding: 40px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Light Mode */
+:global(.light) .modalContent {
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.98),
+    rgba(245, 243, 255, 0.98)
+  );
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* Modal Title */
+.modalTitle {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--dark-text-primary);
+  margin: 0 0 12px 0;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+:global(.light) .modalTitle {
+  color: var(--light-text-primary);
+  text-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+}
+
+/* Modal Subtitle */
+.modalSubtitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(210, 210, 249, 0.8);
+  margin: 0 0 32px 0;
+  text-align: center;
+}
+
+:global(.light) .modalSubtitle {
+  color: rgba(45, 27, 105, 0.7);
+}
+
+/* Options List */
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+/* Option Item */
+.optionItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(210, 210, 249, 0.15);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.optionItem:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(210, 210, 249, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.optionItem.selected {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.2),
+    rgba(139, 92, 246, 0.15)
+  );
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+:global(.light) .optionItem {
+  background: rgba(99, 102, 241, 0.05);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+:global(.light) .optionItem:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+:global(.light) .optionItem.selected {
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.15),
+    rgba(139, 92, 246, 0.1)
+  );
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+/* Radio Button */
+.radio {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(210, 210, 249, 0.4);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.radio:checked {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-color: #6366f1;
+}
+
+.radio:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: white;
+  border-radius: 50%;
+}
+
+:global(.light) .radio {
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+:global(.light) .radio:checked {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border-color: #6366f1;
+}
+
+/* Option Content */
+.optionContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.optionLabel {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--dark-text-primary);
+}
+
+:global(.light) .optionLabel {
+  color: var(--light-text-primary);
+}
+
+.optionDescription {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgba(210, 210, 249, 0.7);
+}
+
+:global(.light) .optionDescription {
+  color: rgba(45, 27, 105, 0.6);
+}
+
+/* Checkmark */
+.checkmark {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: #6366f1;
+}
+
+/* Modal Actions */
+.modalActions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* Cancel Button */
+.cancelButton {
+  padding: 14px 28px;
+  background: transparent;
+  border: 2px solid rgba(210, 210, 249, 0.3);
+  border-radius: 12px;
+  color: var(--dark-text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(210, 210, 249, 0.5);
+  transform: translateY(-1px);
+}
+
+:global(.light) .cancelButton {
+  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--light-text-primary);
+}
+
+:global(.light) .cancelButton:hover {
+  background: rgba(99, 102, 241, 0.05);
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+/* Start Button */
+.startButton {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.startButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.5);
+}
+
+.startButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .modalContent {
+    padding: 28px 20px;
+    border-radius: 20px;
+  }
+
+  .modalTitle {
+    font-size: 24px;
+  }
+
+  .modalSubtitle {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .optionItem {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .optionLabel {
+    font-size: 15px;
+  }
+
+  .optionDescription {
+    font-size: 12px;
+  }
+
+  .modalActions {
+    flex-direction: column-reverse;
+  }
+
+  .cancelButton,
+  .startButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

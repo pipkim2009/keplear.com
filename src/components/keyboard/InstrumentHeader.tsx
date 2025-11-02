@@ -37,6 +37,7 @@ interface InstrumentHeaderProps {
   higherOctaves?: number
   hideDeselectAll?: boolean
   showOnlyAppliedList?: boolean
+  disableSelectionMode?: boolean
 }
 
 const InstrumentHeader: React.FC<InstrumentHeaderProps> = ({
@@ -67,7 +68,8 @@ const InstrumentHeader: React.FC<InstrumentHeaderProps> = ({
   lowerOctaves = 0,
   higherOctaves = 0,
   hideDeselectAll = false,
-  showOnlyAppliedList = false
+  showOnlyAppliedList = false,
+  disableSelectionMode = false
 }) => {
   return (
     <div className="instrument-header-controls">
@@ -85,26 +87,28 @@ Multi Select - Select the specific notes to use"
                 <div className="tooltip-icon">?</div>
               </Tooltip>
             </div>
-            <div className={`selection-mode-switch ${flashingInputs.mode ? 'flashing' : ''}`}>
+            <div className={`selection-mode-switch ${flashingInputs.mode ? 'flashing' : ''} ${disableSelectionMode ? 'disabled' : ''}`}>
               <button
                 className={`switch-option ${keyboardSelectionMode === 'range' ? 'active' : ''}`}
                 onClick={() => {
-                  if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'range') {
+                  if (!disableSelectionMode && onKeyboardSelectionModeChange && keyboardSelectionMode !== 'range') {
                     onKeyboardSelectionModeChange('range')
                   }
                 }}
                 title="Range Select"
+                disabled={disableSelectionMode}
               >
                 Range
               </button>
               <button
                 className={`switch-option ${keyboardSelectionMode === 'multi' ? 'active' : ''}`}
                 onClick={() => {
-                  if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
+                  if (!disableSelectionMode && onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
                     onKeyboardSelectionModeChange('multi')
                   }
                 }}
                 title="Multi Select"
+                disabled={disableSelectionMode}
               >
                 Multi
               </button>

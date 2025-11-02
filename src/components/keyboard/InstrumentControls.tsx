@@ -72,6 +72,9 @@ interface InstrumentControlsProps {
   hideBpmButtons?: boolean
   hideBeatsButtons?: boolean
   hideGenerateButton?: boolean
+  disableBpmInput?: boolean
+  disableBeatsInput?: boolean
+  disableChordMode?: boolean
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -127,7 +130,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   hideOctaveRange = false,
   hideBpmButtons = false,
   hideBeatsButtons = false,
-  hideGenerateButton = false
+  hideGenerateButton = false,
+  disableBpmInput = false,
+  disableBeatsInput = false,
+  disableChordMode = false
 }) => {
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
@@ -1106,10 +1112,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               <input
                 type="text"
                 value={bpmDisplay}
-                onChange={(e) => handleBpmChange(e.target.value)}
-                onKeyPress={handleBpmKeyPress}
-                onBlur={handleBpmBlur}
+                onChange={(e) => !disableBpmInput && handleBpmChange(e.target.value)}
+                onKeyPress={(e) => !disableBpmInput && handleBpmKeyPress(e)}
+                onBlur={(e) => !disableBpmInput && handleBpmBlur(e)}
                 className={`control-input ${hideBpmButtons ? '' : 'with-internal-buttons'} ${flashingInputs.bpm ? 'flashing' : ''}`}
+                disabled={disableBpmInput}
+                readOnly={disableBpmInput}
               />
               {!hideBpmButtons && (
                 <>
@@ -1155,10 +1163,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
               <input
                 type="text"
                 value={beatsDisplay}
-                onChange={(e) => handleNotesChange(e.target.value)}
-                onKeyPress={handleNotesKeyPress}
-                onBlur={handleNotesBlur}
+                onChange={(e) => !disableBeatsInput && handleNotesChange(e.target.value)}
+                onKeyPress={(e) => !disableBeatsInput && handleNotesKeyPress(e)}
+                onBlur={(e) => !disableBeatsInput && handleNotesBlur(e)}
                 className={`control-input ${hideBeatsButtons ? '' : 'with-internal-buttons'} ${flashingInputs.beats ? 'flashing' : ''}`}
+                disabled={disableBeatsInput}
+                readOnly={disableBeatsInput}
               />
               {!hideBeatsButtons && (
                 <>
@@ -1208,32 +1218,32 @@ Progression - Use entire chords"
                 </Tooltip>
               </div>
               <div>
-                <div className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''} ${appliedChordsCount === 0 ? 'disabled' : ''}`}>
+                <div className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''} ${appliedChordsCount === 0 || disableChordMode ? 'disabled' : ''}`}>
                   <button
                     className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
                     onClick={() => {
-                      if (appliedChordsCount > 0 && chordMode !== 'arpeggiator') {
+                      if (!disableChordMode && appliedChordsCount > 0 && chordMode !== 'arpeggiator') {
                         setChordMode('arpeggiator')
                         setIsChordModeFlashing(true)
                         setTimeout(() => setIsChordModeFlashing(false), 500)
                       }
                     }}
                     title={appliedChordsCount === 0 ? "Apply chords to enable" : "Arpeggiator"}
-                    disabled={appliedChordsCount === 0}
+                    disabled={appliedChordsCount === 0 || disableChordMode}
                   >
                     Arpeggiator
                   </button>
                   <button
                     className={`switch-option ${chordMode === 'progression' ? 'active' : ''}`}
                     onClick={() => {
-                      if (appliedChordsCount > 0 && chordMode !== 'progression') {
+                      if (!disableChordMode && appliedChordsCount > 0 && chordMode !== 'progression') {
                         setChordMode('progression')
                         setIsChordModeFlashing(true)
                         setTimeout(() => setIsChordModeFlashing(false), 500)
                       }
                     }}
                     title={appliedChordsCount === 0 ? "Apply chords to enable" : "Progression"}
-                    disabled={appliedChordsCount === 0}
+                    disabled={appliedChordsCount === 0 || disableChordMode}
                   >
                     Progression
                   </button>

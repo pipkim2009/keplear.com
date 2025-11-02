@@ -4,6 +4,7 @@ import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import type { IconType } from 'react-icons'
 import InstrumentDisplay from '../keyboard/InstrumentDisplay'
+import PracticeOptionsModal from './PracticeOptionsModal'
 import { useInstrument } from '../../contexts/InstrumentContext'
 
 interface PracticeProps {
@@ -40,6 +41,9 @@ const instrumentLessons: InstrumentLesson[] = [
 
 function Practice({ onNavigateToSandbox }: PracticeProps) {
   const [selectedInstrument, setSelectedInstrument] = useState<string | null>(null)
+  const [showOptionsModal, setShowOptionsModal] = useState(false)
+  const [practiceOptions, setPracticeOptions] = useState<string[]>([])
+  const [sessionStarted, setSessionStarted] = useState(false)
 
   const {
     handleNoteClick,
@@ -87,17 +91,44 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   } = useInstrument()
 
   const handleStartLesson = (instrumentId: string) => {
-    console.log(`Starting ${instrumentId} lesson`)
     setSelectedInstrument(instrumentId)
     handleInstrumentChange(instrumentId)
+    setShowOptionsModal(true)
+  }
+
+  const handleOptionsStart = (selectedOptions: string[]) => {
+    setPracticeOptions(selectedOptions)
+    setShowOptionsModal(false)
+    setSessionStarted(true)
+    console.log('Starting practice session with options:', selectedOptions)
+  }
+
+  const handleOptionsCancel = () => {
+    setShowOptionsModal(false)
+    setSelectedInstrument(null)
   }
 
   const handleBackToSelection = () => {
     setSelectedInstrument(null)
+    setShowOptionsModal(false)
+    setPracticeOptions([])
+    setSessionStarted(false)
   }
 
-  // If an instrument is selected, show the instrument display
-  if (selectedInstrument) {
+  // Show practice options modal
+  if (showOptionsModal && selectedInstrument) {
+    const instrumentName = instrumentLessons.find(i => i.id === selectedInstrument)?.name || 'Instrument'
+    return (
+      <PracticeOptionsModal
+        instrumentName={instrumentName}
+        onStart={handleOptionsStart}
+        onCancel={handleOptionsCancel}
+      />
+    )
+  }
+
+  // If an instrument is selected and session started, show the instrument display
+  if (selectedInstrument && sessionStarted) {
     return (
       <>
         <div className={styles.backButtonContainer}>
@@ -163,6 +194,10 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           hideGenerateButton={true}
           hideDeselectAll={true}
           showOnlyAppliedList={true}
+          disableBpmInput={true}
+          disableBeatsInput={true}
+          disableChordMode={true}
+          disableSelectionMode={true}
         />
       </>
     )
