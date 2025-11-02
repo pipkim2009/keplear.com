@@ -67,6 +67,11 @@ interface InstrumentControlsProps {
   isAutoRecording?: boolean
   onCurrentlyPlayingNoteChange?: (index: number | null) => void
   currentlyPlayingNoteIndex?: number | null
+  hideInstrumentSelector?: boolean
+  hideOctaveRange?: boolean
+  hideBpmButtons?: boolean
+  hideBeatsButtons?: boolean
+  hideGenerateButton?: boolean
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -117,7 +122,12 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   isGeneratingMelody = false,
   isAutoRecording = false,
   onCurrentlyPlayingNoteChange,
-  currentlyPlayingNoteIndex
+  currentlyPlayingNoteIndex,
+  hideInstrumentSelector = false,
+  hideOctaveRange = false,
+  hideBpmButtons = false,
+  hideBeatsButtons = false,
+  hideGenerateButton = false
 }) => {
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
@@ -816,6 +826,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   return (
     <div className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
       {/* Top row: Instrument selector */}
+      {!hideInstrumentSelector && (
       <div className="control-group instrument-selector-group">
         {/* Desktop/Tablet view - Cards */}
         <div className="instrument-selector desktop-selector">
@@ -970,9 +981,10 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
         </div>
       </div>
+      )}
 
       {/* Second row: Octave range (keyboard only) */}
-      {instrument === 'keyboard' && (
+      {!hideOctaveRange && instrument === 'keyboard' && (
         <div className="control-group octave-range-control">
           <div className="label-with-tooltip">
             <label className="control-label">Octave Range</label>
@@ -1097,34 +1109,38 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                 onChange={(e) => handleBpmChange(e.target.value)}
                 onKeyPress={handleBpmKeyPress}
                 onBlur={handleBpmBlur}
-                className={`control-input with-internal-buttons ${flashingInputs.bpm ? 'flashing' : ''}`}
+                className={`control-input ${hideBpmButtons ? '' : 'with-internal-buttons'} ${flashingInputs.bpm ? 'flashing' : ''}`}
               />
-              <button
-                className="control-button-internal minus"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  startBpmDecrement();
-                }}
-                onMouseUp={stopBpmInterval}
-                onMouseLeave={stopBpmInterval}
-                style={{ userSelect: 'none', touchAction: 'none' }}
-              >
-                −
-              </button>
-              <button
-                className="control-button-internal plus"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  startBpmIncrement();
-                }}
-                onMouseUp={stopBpmInterval}
-                onMouseLeave={stopBpmInterval}
-                style={{ userSelect: 'none', touchAction: 'none' }}
-              >
-                +
-              </button>
+              {!hideBpmButtons && (
+                <>
+                  <button
+                    className="control-button-internal minus"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      startBpmDecrement();
+                    }}
+                    onMouseUp={stopBpmInterval}
+                    onMouseLeave={stopBpmInterval}
+                    style={{ userSelect: 'none', touchAction: 'none' }}
+                  >
+                    −
+                  </button>
+                  <button
+                    className="control-button-internal plus"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      startBpmIncrement();
+                    }}
+                    onMouseUp={stopBpmInterval}
+                    onMouseLeave={stopBpmInterval}
+                    style={{ userSelect: 'none', touchAction: 'none' }}
+                  >
+                    +
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -1142,34 +1158,38 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
                 onChange={(e) => handleNotesChange(e.target.value)}
                 onKeyPress={handleNotesKeyPress}
                 onBlur={handleNotesBlur}
-                className={`control-input with-internal-buttons ${flashingInputs.beats ? 'flashing' : ''}`}
+                className={`control-input ${hideBeatsButtons ? '' : 'with-internal-buttons'} ${flashingInputs.beats ? 'flashing' : ''}`}
               />
-              <button
-                className="control-button-internal minus"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  startNotesDecrement();
-                }}
-                onMouseUp={stopNotesInterval}
-                onMouseLeave={stopNotesInterval}
-                style={{ userSelect: 'none', touchAction: 'none' }}
-              >
-                −
-              </button>
-              <button
-                className="control-button-internal plus"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  startNotesIncrement();
-                }}
-                onMouseUp={stopNotesInterval}
-                onMouseLeave={stopNotesInterval}
-                style={{ userSelect: 'none', touchAction: 'none' }}
-              >
-                +
-              </button>
+              {!hideBeatsButtons && (
+                <>
+                  <button
+                    className="control-button-internal minus"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      startNotesDecrement();
+                    }}
+                    onMouseUp={stopNotesInterval}
+                    onMouseLeave={stopNotesInterval}
+                    style={{ userSelect: 'none', touchAction: 'none' }}
+                  >
+                    −
+                  </button>
+                  <button
+                    className="control-button-internal plus"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      startNotesIncrement();
+                    }}
+                    onMouseUp={stopNotesInterval}
+                    onMouseLeave={stopNotesInterval}
+                    style={{ userSelect: 'none', touchAction: 'none' }}
+                  >
+                    +
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -1225,34 +1245,36 @@ Progression - Use entire chords"
             </div>
           )}
 
-          <button
-            onClick={() => {
-              // Clear recorded audio when generating new melody
-              if (audioFileUrl) {
-                URL.revokeObjectURL(audioFileUrl)
-                setAudioFileUrl(null)
-              }
-              setAudioFileBlob(null)
-              if (onClearRecordedAudio) {
-                onClearRecordedAudio()
-              }
-              // Reset live feedback progress and two-stage system
-              setCurrentNoteIndex(0)
-              setFeedbackStatus('waiting')
-              setFeedbackStage(1)
-              setSequenceIndex(0)
-              if (onGenerateMelody) {
-                onGenerateMelody()
-              }
-            }}
-            disabled={!canGenerateMelody}
-            className={`modern-generate-button ${hasChanges ? 'has-changes' : ''}`}
-            title="Generate a melody from selected notes"
-            style={{ position: 'relative' }}
-          >
-            Generate Melody
-            {hasChanges && <span className="change-badge">●</span>}
-          </button>
+          {!hideGenerateButton && (
+            <button
+              onClick={() => {
+                // Clear recorded audio when generating new melody
+                if (audioFileUrl) {
+                  URL.revokeObjectURL(audioFileUrl)
+                  setAudioFileUrl(null)
+                }
+                setAudioFileBlob(null)
+                if (onClearRecordedAudio) {
+                  onClearRecordedAudio()
+                }
+                // Reset live feedback progress and two-stage system
+                setCurrentNoteIndex(0)
+                setFeedbackStatus('waiting')
+                setFeedbackStage(1)
+                setSequenceIndex(0)
+                if (onGenerateMelody) {
+                  onGenerateMelody()
+                }
+              }}
+              disabled={!canGenerateMelody}
+              className={`modern-generate-button ${hasChanges ? 'has-changes' : ''}`}
+              title="Generate a melody from selected notes"
+              style={{ position: 'relative' }}
+            >
+              Generate Melody
+              {hasChanges && <span className="change-badge">●</span>}
+            </button>
+          )}
 
         </div>
 

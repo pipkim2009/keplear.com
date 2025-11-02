@@ -1,7 +1,10 @@
+import { useState } from 'react'
 import styles from '../../styles/Practice.module.css'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import type { IconType } from 'react-icons'
+import InstrumentDisplay from '../keyboard/InstrumentDisplay'
+import { useInstrument } from '../../contexts/InstrumentContext'
 
 interface PracticeProps {
   onNavigateToSandbox: () => void
@@ -36,11 +39,136 @@ const instrumentLessons: InstrumentLesson[] = [
 ]
 
 function Practice({ onNavigateToSandbox }: PracticeProps) {
+  const [selectedInstrument, setSelectedInstrument] = useState<string | null>(null)
+
+  const {
+    handleNoteClick,
+    isSelected,
+    isInMelody,
+    showNotes,
+    bpm,
+    setBpm,
+    numberOfBeats,
+    setNumberOfBeats,
+    chordMode,
+    setChordMode,
+    instrument,
+    handleInstrumentChange,
+    setGuitarNotes,
+    clearSelection,
+    clearTrigger,
+    selectedNotes,
+    selectNote,
+    handleOctaveRangeChange,
+    keyboardSelectionMode,
+    handleKeyboardSelectionModeChange,
+    flashingInputs,
+    activeInputs,
+    triggerInputFlash,
+    setInputActive,
+    clearChordsAndScalesTrigger,
+    handleGenerateMelody,
+    handlePlayMelody,
+    handleRecordMelody,
+    isPlaying,
+    isRecording,
+    generatedMelody,
+    toggleShowNotes,
+    playbackProgress,
+    melodyDuration,
+    setPlaybackProgress,
+    handleClearRecordedAudio,
+    recordedAudioBlob,
+    hasChanges,
+    isGeneratingMelody,
+    isAutoRecording,
+    currentlyPlayingNoteIndex,
+    handleCurrentlyPlayingNoteChange
+  } = useInstrument()
+
   const handleStartLesson = (instrumentId: string) => {
     console.log(`Starting ${instrumentId} lesson`)
-    onNavigateToSandbox()
+    setSelectedInstrument(instrumentId)
+    handleInstrumentChange(instrumentId)
   }
 
+  const handleBackToSelection = () => {
+    setSelectedInstrument(null)
+  }
+
+  // If an instrument is selected, show the instrument display
+  if (selectedInstrument) {
+    return (
+      <>
+        <div className={styles.backButtonContainer}>
+          <button
+            className={styles.backButton}
+            onClick={handleBackToSelection}
+            aria-label="End practice session"
+          >
+            End Session
+          </button>
+        </div>
+        <InstrumentDisplay
+          onNoteClick={handleNoteClick}
+          isSelected={isSelected}
+          isInMelody={isInMelody}
+          showNotes={showNotes}
+          bpm={bpm}
+          setBpm={setBpm}
+          numberOfBeats={numberOfBeats}
+          setNumberOfBeats={setNumberOfBeats}
+          chordMode={chordMode}
+          setChordMode={setChordMode}
+          instrument={instrument}
+          setInstrument={handleInstrumentChange}
+          setGuitarNotes={setGuitarNotes}
+          clearSelection={clearSelection}
+          clearTrigger={clearTrigger}
+          selectedNotes={selectedNotes}
+          selectNote={selectNote}
+          onOctaveRangeChange={handleOctaveRangeChange}
+          keyboardSelectionMode={keyboardSelectionMode}
+          onKeyboardSelectionModeChange={handleKeyboardSelectionModeChange}
+          flashingInputs={{
+            bpm: flashingInputs.bpm || activeInputs.bpm,
+            beats: flashingInputs.beats || activeInputs.beats,
+            mode: flashingInputs.mode || activeInputs.mode
+          }}
+          triggerInputFlash={triggerInputFlash}
+          setInputActive={setInputActive}
+          clearChordsAndScales={clearChordsAndScalesTrigger}
+          onGenerateMelody={handleGenerateMelody}
+          onPlayMelody={handlePlayMelody}
+          onRecordMelody={handleRecordMelody}
+          isPlaying={isPlaying}
+          isRecording={isRecording}
+          hasGeneratedMelody={generatedMelody.length > 0}
+          onToggleNotes={toggleShowNotes}
+          playbackProgress={playbackProgress}
+          melodyDuration={melodyDuration}
+          onProgressChange={setPlaybackProgress}
+          onClearRecordedAudio={handleClearRecordedAudio}
+          recordedAudioBlob={recordedAudioBlob}
+          generatedMelody={generatedMelody}
+          hasChanges={hasChanges}
+          isGeneratingMelody={isGeneratingMelody}
+          isAutoRecording={isAutoRecording}
+          currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
+          onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
+          hideInstrumentSelector={true}
+          hideOctaveRange={true}
+          hideBpmButtons={true}
+          hideBeatsButtons={true}
+          hideGenerateButton={true}
+          hideDeselectAll={true}
+          showOnlyAppliedList={true}
+        />
+      </>
+    )
+  }
+
+  // Otherwise, show the instrument selection
   return (
     <div className={styles.practiceContainer}>
       {/* Header Section */}

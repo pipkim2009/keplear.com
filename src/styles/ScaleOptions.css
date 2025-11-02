@@ -786,3 +786,17 @@ input:checked + .toggle-slider:hover {
 .applied-chords-list::-webkit-scrollbar-thumb:hover {
   background: rgb(139, 92, 246, 0.5);
 }
+
+/* Empty List Message */
+.empty-list-message {
+  padding: 8px;
+  text-align: center;
+  color: var(--gray-400);
+  font-size: 0.875rem;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+:global(.dark) .empty-list-message {
+  color: var(--gray-500);
+}

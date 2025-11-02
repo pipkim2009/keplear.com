@@ -52,6 +52,13 @@ interface InstrumentDisplayProps {
   isAutoRecording?: boolean
   currentlyPlayingNoteIndex?: number | null
   onCurrentlyPlayingNoteChange?: (index: number | null) => void
+  hideInstrumentSelector?: boolean
+  hideOctaveRange?: boolean
+  hideBpmButtons?: boolean
+  hideBeatsButtons?: boolean
+  hideGenerateButton?: boolean
+  hideDeselectAll?: boolean
+  showOnlyAppliedList?: boolean
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -97,7 +104,14 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   isGeneratingMelody = false,
   isAutoRecording = false,
   currentlyPlayingNoteIndex,
-  onCurrentlyPlayingNoteChange
+  onCurrentlyPlayingNoteChange,
+  hideInstrumentSelector = false,
+  hideOctaveRange = false,
+  hideBpmButtons = false,
+  hideBeatsButtons = false,
+  hideGenerateButton = false,
+  hideDeselectAll = false,
+  showOnlyAppliedList = false
 }) => {
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
   const [higherOctaves, setHigherOctaves] = useState<number>(0)
@@ -313,6 +327,11 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           isAutoRecording={isAutoRecording}
           onCurrentlyPlayingNoteChange={onCurrentlyPlayingNoteChange}
           currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
+          hideInstrumentSelector={hideInstrumentSelector}
+          hideOctaveRange={hideOctaveRange}
+          hideBpmButtons={hideBpmButtons}
+          hideBeatsButtons={hideBeatsButtons}
+          hideGenerateButton={hideGenerateButton}
         />
       </div>
 
@@ -344,6 +363,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           onClearAllSelections={handleClearAllSelections}
           lowerOctaves={lowerOctaves}
           higherOctaves={higherOctaves}
+          hideDeselectAll={hideDeselectAll}
+          showOnlyAppliedList={showOnlyAppliedList}
         />
 
         <InstrumentRenderer

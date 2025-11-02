@@ -35,6 +35,8 @@ interface InstrumentHeaderProps {
   onClearAllSelections: () => void
   lowerOctaves?: number
   higherOctaves?: number
+  hideDeselectAll?: boolean
+  showOnlyAppliedList?: boolean
 }
 
 const InstrumentHeader: React.FC<InstrumentHeaderProps> = ({
@@ -63,7 +65,9 @@ const InstrumentHeader: React.FC<InstrumentHeaderProps> = ({
   onScaleDelete,
   onClearAllSelections,
   lowerOctaves = 0,
-  higherOctaves = 0
+  higherOctaves = 0,
+  hideDeselectAll = false,
+  showOnlyAppliedList = false
 }) => {
   return (
     <div className="instrument-header-controls">
@@ -132,11 +136,12 @@ Multi Select - Select the specific notes to use"
             onScaleDelete={onScaleDelete}
             lowerOctaves={lowerOctaves}
             higherOctaves={higherOctaves}
+            showOnlyAppliedList={showOnlyAppliedList}
           />
         </div>
 
         {/* Deselect All button */}
-        {(selectedNotes.length > 0 || appliedChords.length > 0 || appliedScales.length > 0) && (
+        {!hideDeselectAll && (selectedNotes.length > 0 || appliedChords.length > 0 || appliedScales.length > 0) && (
           <div className="control-group">
             <button
               onClick={onClearAllSelections}

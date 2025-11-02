@@ -20,7 +20,7 @@
   box-shadow: 0 4px 12px rgb(45, 27, 105, 0.15);
 }
 
-.user-menu-trigger:hover {
+.userMenuTrigger:hover {
   background: rgb(255, 255, 255, 1);
   border-color: rgb(210, 210, 249, 0.5);
   transform: translateY(-1px);
@@ -28,14 +28,14 @@
 }
 
 /* Dark mode overrides */
-.dark .userMenuTrigger {
+:global(.dark) .userMenuTrigger {
   background: rgb(45, 27, 105, 0.9);
   border-color: rgb(210, 210, 249, 0.3);
   color: #d2d2f9;
   box-shadow: 0 4px 12px rgb(0, 0, 0, 0.3);
 }
 
-.dark .user-menu-trigger:hover {
+:global(.dark) .userMenuTrigger:hover {
   background: rgb(45, 27, 105, 1);
   border-color: rgb(210, 210, 249, 0.5);
   box-shadow: 0 6px 20px rgb(0, 0, 0, 0.4);
@@ -50,7 +50,7 @@
   flex-shrink: 0;
 }
 
-.user-avatar img {
+.userAvatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -85,7 +85,7 @@
 }
 
 /* Dropdown Menu */
-.user-menu-dropdown {
+.userMenuDropdown {
   position: absolute;
   top: 100%;
   right: 0;
@@ -101,58 +101,58 @@
   animation: dropdownFadeIn 0.2s ease-out;
 }
 
-.dark .user-menu-dropdown {
+:global(.dark) .userMenuDropdown {
   background: rgb(45, 27, 105, 0.95);
   border-color: rgb(210, 210, 249, 0.3);
   box-shadow: 0 20px 60px rgb(0, 0, 0, 0.4);
 }
 
-.user-menu-header {
+.userMenuHeader {
   padding: 20px;
   background: linear-gradient(135deg, rgb(232, 228, 255, 0.8), rgb(210, 210, 249, 0.6));
   border-bottom: 1px solid rgb(210, 210, 249, 0.3);
 }
 
-.dark .user-menu-header {
+:global(.dark) .userMenuHeader {
   background: linear-gradient(135deg, rgb(45, 27, 105, 0.8), rgb(26, 13, 46, 0.6));
   border-bottom-color: rgb(210, 210, 249, 0.2);
 }
 
-.user-info {
+.userInfo {
   text-align: left;
 }
 
-.user-name-large {
+.userNameLarge {
   font-weight: 700;
   color: #2d1b69;
   font-size: 16px;
   margin-bottom: 4px;
 }
 
-.dark .user-name-large {
+:global(.dark) .userNameLarge {
   color: #d2d2f9;
 }
 
-.user-email {
+.userEmail {
   color: #6366f1;
   font-size: 13px;
   font-weight: 500;
 }
 
-.dark .user-email {
+:global(.dark) .userEmail {
   color: #a5b4fc;
 }
 
-.user-menu-divider {
+.userMenuDivider {
   height: 1px;
   background: #e1e5e9;
 }
 
-.user-menu-actions {
+.userMenuActions {
   padding: 8px 0;
 }
 
-.menu-item {
+.menuItem {
   width: 100%;
   display: flex;
   align-items: center;
@@ -168,36 +168,36 @@
   text-align: left;
 }
 
-.dark .menu-item {
+:global(.dark) .menuItem {
   color: #d2d2f9;
 }
 
-.menu-item:hover {
+.menuItem:hover {
   background: rgb(232, 228, 255, 0.8);
   transform: translateX(4px);
 }
 
-.dark .menu-item:hover {
+:global(.dark) .menuItem:hover {
   background: rgb(45, 27, 105, 0.8);
 }
 
-.menu-item.danger {
+.menuItem.danger {
   color: #dc2626;
 }
 
-.dark .menu-item.danger {
+:global(.dark) .menuItem.danger {
   color: #fca5a5;
 }
 
-.menu-item.danger:hover {
+.menuItem.danger:hover {
   background: rgb(220, 38, 38, 0.1);
 }
 
-.dark .menu-item.danger:hover {
+:global(.dark) .menuItem.danger:hover {
   background: rgb(220, 38, 38, 0.2);
 }
 
-.menu-item svg {
+.menuItem svg {
   flex-shrink: 0;
   opacity: 0.7;
 }
@@ -220,12 +220,12 @@
   .userName {
     display: none;
   }
-  
+
   .userMenuTrigger {
     padding: 6px;
   }
-  
-  .user-menu-dropdown {
+
+  .userMenuDropdown {
     right: -8px;
     min-width: 220px;
   }
