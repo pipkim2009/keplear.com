@@ -1,71 +1,43 @@
 import styles from '../../styles/Practice.module.css'
+import { PiPianoKeysFill } from 'react-icons/pi'
+import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
+import type { IconType } from 'react-icons'
 
 interface PracticeProps {
   onNavigateToSandbox: () => void
 }
 
-interface Lesson {
+interface InstrumentLesson {
   id: string
-  icon: string
-  title: string
+  name: string
+  icon: IconType
   description: string
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced'
-  duration: string
-  topics: string[]
 }
 
-const lessons: Lesson[] = [
+const instrumentLessons: InstrumentLesson[] = [
   {
-    id: 'simple-melody',
-    icon: '🎵',
-    title: 'Simple Melody Recognition',
-    description: 'Build your foundation by recognizing and playing back simple melodies. Perfect for beginners starting their ear training journey.',
-    difficulty: 'Beginner',
-    duration: '10-15 min',
-    topics: ['Basic Melodies', 'Step-wise Motion', 'Simple Patterns']
+    id: 'keyboard',
+    name: 'Keyboard',
+    icon: PiPianoKeysFill,
+    description: 'Start a keyboard ear training session'
   },
   {
-    id: 'scale-recognition',
-    icon: '🎹',
-    title: 'Scale Recognition',
-    description: 'Train your ear to identify different scale types. Learn to recognize major, minor, and modal scale patterns by ear.',
-    difficulty: 'Beginner',
-    duration: '15-20 min',
-    topics: ['Major Scales', 'Minor Scales', 'Modal Scales']
+    id: 'guitar',
+    name: 'Guitar',
+    icon: GiGuitarHead,
+    description: 'Start a guitar ear training session'
   },
   {
-    id: 'chord-progression-recognition',
-    icon: '🎸',
-    title: 'Chord Progression Recognition',
-    description: 'Develop your ability to hear and identify common chord progressions. Recognize the harmonic patterns that drive music.',
-    difficulty: 'Intermediate',
-    duration: '20-25 min',
-    topics: ['I-IV-V Progressions', 'ii-V-I Patterns', 'Common Sequences']
-  },
-  {
-    id: 'chord-arpeggio-recognition',
-    icon: '🎼',
-    title: 'Chord Arpeggio Recognition',
-    description: 'Master the art of hearing arpeggiated chords. Learn to identify chord qualities through their broken chord patterns.',
-    difficulty: 'Intermediate',
-    duration: '15-20 min',
-    topics: ['Major Arpeggios', 'Minor Arpeggios', 'Extended Chords']
-  },
-  {
-    id: 'mixed-melody-recognition',
-    icon: '⚡',
-    title: 'Mixed Melody Recognition',
-    description: 'Challenge yourself with complex melodies combining scales, arpeggios, and progressions. The ultimate ear training test.',
-    difficulty: 'Advanced',
-    duration: '20-30 min',
-    topics: ['Complex Melodies', 'Mixed Patterns', 'Advanced Recognition']
+    id: 'bass',
+    name: 'Bass',
+    icon: GiGuitarBassHead,
+    description: 'Start a bass ear training session'
   }
 ]
 
 function Practice({ onNavigateToSandbox }: PracticeProps) {
-  const handleStartLesson = (lessonId: string) => {
-    // TODO: Navigate to specific lesson when functionality is implemented
-    console.log(`Starting lesson: ${lessonId}`)
+  const handleStartLesson = (instrumentId: string) => {
+    console.log(`Starting ${instrumentId} lesson`)
     onNavigateToSandbox()
   }
 
@@ -73,47 +45,28 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     <div className={styles.practiceContainer}>
       {/* Header Section */}
       <section className={styles.headerSection}>
-        <h1 className={styles.pageTitle}>Practice Lessons</h1>
+        <h1 className={styles.pageTitle}>Practice Mode</h1>
         <p className={styles.pageSubtitle}>
-          Structured exercises designed to improve your ear training and musical skills
+          Choose your instrument and start improving your ear training skills
         </p>
       </section>
 
-      {/* Lessons Grid */}
-      <section className={styles.lessonsSection}>
-        <div className={styles.lessonsGrid}>
-          {/* Reorder lessons: Featured ones first (1 & 5), then regular ones (2, 3, 4) */}
-          {[lessons[0], lessons[4], lessons[1], lessons[2], lessons[3]].map((lesson, index) => {
-            const isFeatured = index === 0 || index === 1
+      {/* Instruments Grid */}
+      <section className={styles.instrumentsSection}>
+        <div className={styles.instrumentsGrid}>
+          {instrumentLessons.map((instrument) => {
+            const Icon = instrument.icon
             return (
-              <div key={lesson.id} className={isFeatured ? styles.featuredLessonCard : styles.lessonCard}>
-                <div className={styles.lessonHeader}>
-                  <div className={styles.lessonIcon}>{lesson.icon}</div>
-                  <div className={styles.lessonMeta}>
-                    <span className={styles.durationBadge}>{lesson.duration}</span>
-                  </div>
+              <div key={instrument.id} className={styles.instrumentCard}>
+                <div className={styles.instrumentIcon}>
+                  <Icon />
                 </div>
-
-                <div className={styles.lessonContent}>
-                  <h3 className={styles.lessonTitle}>{lesson.title}</h3>
-                  <p className={styles.lessonDescription}>{lesson.description}</p>
-
-                  <div className={styles.topicsContainer}>
-                    <p className={styles.topicsLabel}>You'll learn:</p>
-                    <ul className={styles.topicsList}>
-                      {lesson.topics.map((topic, topicIndex) => (
-                        <li key={topicIndex} className={styles.topicItem}>
-                          {topic}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
+                <h3 className={styles.instrumentName}>{instrument.name}</h3>
+                <p className={styles.instrumentDescription}>{instrument.description}</p>
                 <button
-                  className={styles.startButton}
-                  onClick={() => handleStartLesson(lesson.id)}
-                  aria-label={`Start ${lesson.title} lesson`}
+                  className={styles.instrumentButton}
+                  onClick={() => handleStartLesson(instrument.id)}
+                  aria-label={`Start ${instrument.name} lesson`}
                 >
                   Start Lesson
                 </button>

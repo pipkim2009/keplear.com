@@ -60,7 +60,150 @@
 }
 
 /* ========================================
-   LESSONS SECTION
+   INSTRUMENTS SECTION
+   ======================================== */
+
+.instrumentsSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.instrumentsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  width: 100%;
+}
+
+.instrumentCard {
+  background: var(--white-alpha-80);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgb(210, 210, 249, 0.3);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px var(--primary-purple-alpha-10);
+  text-align: center;
+}
+
+:global(.dark) .instrumentCard {
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(45, 27, 105, 0.4) 100%);
+  border: 1px solid rgb(210, 210, 249, 0.2);
+  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(168, 85, 247, 0.1) inset;
+}
+
+.instrumentCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px var(--primary-purple-alpha-25);
+  border-color: var(--primary-purple-alpha-50);
+}
+
+:global(.dark) .instrumentCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgb(0, 0, 0, 0.6), 0 0 50px var(--primary-purple-alpha-40), 0 0 0 1px var(--primary-purple-alpha-40) inset;
+  border-color: var(--primary-purple-alpha-70);
+}
+
+.instrumentIcon {
+  font-size: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, var(--primary-purple-alpha-15) 0%, var(--primary-purple-alpha-25) 100%);
+  transition: all 0.3s ease;
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .instrumentIcon {
+  background: linear-gradient(135deg, var(--primary-purple-alpha-30) 0%, var(--primary-purple-alpha-50) 100%);
+  box-shadow: 0 0 30px var(--primary-purple-alpha-25), 0 0 0 1px var(--primary-purple-alpha-40) inset;
+  color: var(--white);
+}
+
+.instrumentCard:hover .instrumentIcon {
+  transform: scale(1.05);
+}
+
+.instrumentName {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .instrumentName {
+  color: var(--dark-text-primary);
+}
+
+.instrumentDescription {
+  font-size: 0.9375rem;
+  color: var(--light-text-tertiary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+:global(.dark) .instrumentDescription {
+  color: var(--dark-text-tertiary);
+}
+
+.instrumentButton {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: var(--primary-purple);
+  color: var(--white);
+  border: 2px solid var(--primary-purple);
+  box-shadow: 0 4px 15px var(--primary-purple-alpha-30);
+}
+
+:global(.dark) .instrumentButton {
+  background: var(--primary-purple-light);
+  border-color: var(--primary-purple-light);
+  box-shadow: 0 4px 20px var(--primary-purple-alpha-40), 0 0 30px var(--primary-purple-alpha-20);
+}
+
+.instrumentButton:hover {
+  background: var(--primary-purple-dark);
+  border-color: var(--primary-purple-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--primary-purple-alpha-50);
+}
+
+:global(.dark) .instrumentButton:hover {
+  background: var(--primary-purple-lighter);
+  border-color: var(--primary-purple-lighter);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--primary-purple-alpha-60), 0 0 40px var(--primary-purple-alpha-30);
+}
+
+.instrumentButton:focus-visible {
+  outline: 3px solid var(--primary-purple);
+  outline-offset: 2px;
+}
+
+:global(.dark) .instrumentButton:focus-visible {
+  outline-color: var(--primary-purple-lighter);
+}
+
+/* ========================================
+   LESSONS SECTION (Legacy - can be removed if not used)
    ======================================== */
 
 .lessonsSection {
@@ -516,6 +659,25 @@
     font-size: 1.125rem;
   }
 
+  .instrumentsGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .instrumentCard {
+    padding: 2rem 1.5rem;
+  }
+
+  .instrumentIcon {
+    width: 90px;
+    height: 90px;
+    font-size: 3.5rem;
+  }
+
+  .instrumentName {
+    font-size: 1.5rem;
+  }
+
   .lessonsGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
@@ -543,6 +705,33 @@
 
   .pageSubtitle {
     font-size: 1rem;
+  }
+
+  .instrumentsGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .instrumentCard {
+    padding: 2rem 1.5rem;
+  }
+
+  .instrumentIcon {
+    width: 80px;
+    height: 80px;
+    font-size: 3rem;
+  }
+
+  .instrumentName {
+    font-size: 1.5rem;
+  }
+
+  .instrumentDescription {
+    font-size: 0.875rem;
+  }
+
+  .instrumentButton {
+    padding: 0.875rem 1.25rem;
   }
 
   .lessonsGrid {
@@ -584,6 +773,9 @@
    ======================================== */
 
 @media (prefers-reduced-motion: reduce) {
+  .instrumentCard,
+  .instrumentIcon,
+  .instrumentButton,
   .lessonCard,
   .featuredLessonCard,
   .startButton,
@@ -591,6 +783,9 @@
     transition-duration: 0.01ms !important;
   }
 
+  .instrumentCard:hover,
+  .instrumentIcon:hover,
+  .instrumentButton:hover,
   .lessonCard:hover,
   .featuredLessonCard:hover,
   .startButton:hover,
