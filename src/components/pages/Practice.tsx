@@ -50,6 +50,7 @@ interface WelcomeSubtitleProps {
 const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd }) => {
   const [isVisible, setIsVisible] = useState(true)
   const hasSpoken = useRef(false)
+  const speechFinished = useRef(false)
 
   useEffect(() => {
     // Text-to-speech functionality - only speak once
@@ -63,6 +64,7 @@ const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd 
 
       // Call onSpeechEnd when speech finishes
       utterance.onend = () => {
+        speechFinished.current = true
         if (onSpeechEnd) {
           onSpeechEnd()
         }
@@ -81,10 +83,6 @@ const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd 
 
     return () => {
       clearTimeout(timer)
-      // Cancel any ongoing speech
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel()
-      }
     }
   }, [message, onSpeechEnd])
 
@@ -104,10 +102,10 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   const [sessionStarted, setSessionStarted] = useState(false)
 
   // Simple Melodies Lesson State
-  const [melodyLength, setMelodyLength] = useState(4)
-  const [targetMelody, setTargetMelody] = useState<Note[]>([])
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
   const [welcomeSpeechDone, setWelcomeSpeechDone] = useState(false)
+  const [hasGeneratedMelody, setHasGeneratedMelody] = useState(false)
+  const hasAnnouncedMelody = useRef(false)
 
   const {
     handleNoteClick,
@@ -164,7 +162,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setPracticeOptions(selectedOptions)
     setShowOptionsModal(false)
     setSessionStarted(true)
-    console.log('Starting practice session with options:', selectedOptions)
   }
 
   const handleOptionsCancel = () => {
@@ -177,28 +174,38 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setShowOptionsModal(false)
     setPracticeOptions([])
     setSessionStarted(false)
-    setTargetMelody([])
     setFeedbackMessage('')
     setWelcomeSpeechDone(false)
+    setHasGeneratedMelody(false)
+    hasAnnouncedMelody.current = false
+    setBpm(120) // Reset BPM to default
   }
 
-  // Auto-select notes when session starts for Simple Melodies
+  // Auto-select notes and BPM when session starts for Simple Melodies
   useEffect(() => {
     if (sessionStarted && practiceOptions.includes('simple-melodies') && selectedNotes.length === 0) {
-      console.log('Auto-selecting notes for Simple Melodies...')
+      // Switch to multi-selection mode for keyboard (needed for 3-6 notes)
+      if (instrument === 'keyboard') {
+        handleKeyboardSelectionModeChange('multi', false)
+      }
+
+      // Randomly select BPM (30 to 480 in 30 BPM increments)
+      const bpmOptions = Array.from({ length: 16 }, (_, i) => (i + 1) * 30)
+      const randomBPM = bpmOptions[Math.floor(Math.random() * bpmOptions.length)]
+      setBpm(randomBPM)
 
       // Generate all notes for full keyboard range (octaves 1-8)
       const allNotes = generateNotesWithSeparateOctaves(3, 3)
 
       // Randomly select a range of notes from all octaves
-      const octaves = [1, 2, 3, 4, 5, 6, 7, 8] // Full octave range
+      const octaves = [1, 2, 3, 4, 5, 6, 7, 8]
       const randomOctave = octaves[Math.floor(Math.random() * octaves.length)]
 
       // All notes in chromatic scale
       const chromaticNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
       // Randomly choose 3-6 notes from the chromatic scale
-      const noteCount = Math.floor(Math.random() * 4) + 3 // 3 to 6 notes
+      const noteCount = Math.floor(Math.random() * 4) + 3
 
       // Shuffle and pick random notes
       const shuffledNotes = [...chromaticNotes].sort(() => Math.random() - 0.5)
@@ -207,97 +214,62 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       // Create full note names with the octave (e.g., "C4", "E4")
       const autoNoteNames = selectedNoteNames.map(noteName => `${noteName}${randomOctave}`)
 
-      console.log('Looking for notes:', autoNoteNames)
-
       // Find the actual Note objects from the full notes array
       const autoNotes = autoNoteNames
-        .map(noteName => {
-          const found = allNotes.find(n => n.name === noteName)
-          if (!found) {
-            console.log('Could not find note:', noteName)
-          }
-          return found
-        })
+        .map(noteName => allNotes.find(n => n.name === noteName))
         .filter((note): note is Note => note !== undefined)
-
-      console.log('Selected notes:', autoNotes.map(n => n.name))
 
       // Use setGuitarNotes to set all notes at once (works for all instruments)
       setGuitarNotes(autoNotes)
-      console.log('Notes set via setGuitarNotes')
     }
-  }, [sessionStarted, practiceOptions, selectedNotes.length, setGuitarNotes, instrument])
+  }, [sessionStarted, practiceOptions, selectedNotes.length, setGuitarNotes, setBpm, instrument, handleKeyboardSelectionModeChange])
 
-  // Generate melody after welcome speech is done
+  // Trigger melody generation once notes are selected
   useEffect(() => {
-    if (welcomeSpeechDone && practiceOptions.includes('simple-melodies') && targetMelody.length === 0 && selectedNotes.length > 0) {
-      handleGenerateTargetMelody()
+    if (sessionStarted && practiceOptions.includes('simple-melodies') && selectedNotes.length > 0 && !hasGeneratedMelody) {
+      handleGenerateMelody()
+      setHasGeneratedMelody(true)
     }
-  }, [welcomeSpeechDone, practiceOptions, targetMelody.length, selectedNotes.length])
+  }, [sessionStarted, practiceOptions, selectedNotes.length, hasGeneratedMelody, handleGenerateMelody])
 
-  // Simple Melodies Lesson Functions
-  const handleGenerateTargetMelody = () => {
-    if (selectedNotes.length === 0) {
-      setFeedbackMessage('Please select some notes first!')
-      return
-    }
+  // Announce and play when welcome speech is done and melody is ready
+  useEffect(() => {
+    if (welcomeSpeechDone && practiceOptions.includes('simple-melodies') && generatedMelody.length > 0 && recordedAudioBlob && !hasAnnouncedMelody.current) {
+      hasAnnouncedMelody.current = true
 
-    // Generate random melody from selected notes
-    const melody: Note[] = []
-    for (let i = 0; i < melodyLength; i++) {
-      const randomIndex = Math.floor(Math.random() * selectedNotes.length)
-      melody.push(selectedNotes[randomIndex])
-    }
+      // Text-to-speech announcement
+      // Extract octave number from first note (all notes are in same octave)
+      const firstNoteName = generatedMelody[0].name
+      const octaveNumber = firstNoteName.match(/\d+$/)?.[0] || '4'
 
-    setTargetMelody(melody)
-    setFeedbackMessage('')
+      // Convert octave number to ordinal
+      const octaveOrdinals: { [key: string]: string } = {
+        '1': 'first', '2': 'second', '3': 'third', '4': 'fourth',
+        '5': 'fifth', '6': 'sixth', '7': 'seventh', '8': 'eighth'
+      }
+      const octaveOrdinal = octaveOrdinals[octaveNumber] || 'fourth'
 
-    // Text-to-speech announcement
-    const noteNames = melody.map(note => note.name).join(', ')
-    const announcement = `I have set up a ${melodyLength} note melody containing ${noteNames} at ${bpm} BPM`
+      const announcement = `I have set up a ${generatedMelody.length} note melody on the ${octaveOrdinal} octave at ${bpm} BPM`
 
-    if ('speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance(announcement)
-      utterance.rate = 0.9
-      utterance.pitch = 1
-      utterance.volume = 1
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(announcement)
+        utterance.rate = 0.9
+        utterance.pitch = 1
+        utterance.volume = 1
 
-      // Auto-play melody after announcement
-      utterance.onend = () => {
+        // Auto-play melody after announcement
+        utterance.onend = () => {
+          handlePlayMelody()
+        }
+
+        window.speechSynthesis.speak(utterance)
+      } else {
+        // Fallback: just play melody if no TTS
         handlePlayMelody()
       }
-
-      window.speechSynthesis.speak(utterance)
-    } else {
-      // Fallback: just play melody if no TTS
-      handlePlayMelody()
     }
+  }, [welcomeSpeechDone, practiceOptions, generatedMelody, recordedAudioBlob, bpm, handlePlayMelody])
 
-    console.log('Target melody:', melody.map(n => n.name))
-  }
-
-  const handleCheckAnswer = () => {
-    if (targetMelody.length === 0) {
-      setFeedbackMessage('Generate a melody first!')
-      return
-    }
-
-    if (generatedMelody.length === 0) {
-      setFeedbackMessage('Please recreate the melody by clicking notes!')
-      return
-    }
-
-    // Check if user's melody matches target (compare by note names)
-    const isCorrect =
-      generatedMelody.length === targetMelody.length &&
-      generatedMelody.every((note, index) => note.name === targetMelody[index].name)
-
-    if (isCorrect) {
-      setFeedbackMessage('✓ Correct! Well done!')
-    } else {
-      setFeedbackMessage('✗ Not quite right. Listen again and try!')
-    }
-  }
 
   // Show practice options modal
   if (showOptionsModal && selectedInstrument) {
@@ -396,7 +368,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           hideBeatsButtons={true}
           hideGenerateButton={true}
           hideDeselectAll={true}
-          showOnlyAppliedList={true}
+          showOnlyAppliedList={false}
+          hideChordMode={true}
           disableBpmInput={true}
           disableBeatsInput={true}
           disableChordMode={true}

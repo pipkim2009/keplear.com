@@ -72,6 +72,7 @@ interface InstrumentControlsProps {
   hideBpmButtons?: boolean
   hideBeatsButtons?: boolean
   hideGenerateButton?: boolean
+  hideChordMode?: boolean
   disableBpmInput?: boolean
   disableBeatsInput?: boolean
   disableChordMode?: boolean
@@ -131,6 +132,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   hideBpmButtons = false,
   hideBeatsButtons = false,
   hideGenerateButton = false,
+  hideChordMode = false,
   disableBpmInput = false,
   disableBeatsInput = false,
   disableChordMode = false
@@ -1204,7 +1206,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
           </div>
 
           {/* Chord Mode Select */}
-          {setChordMode && (
+          {setChordMode && !hideChordMode && (
             <div className={`modern-control-item ${appliedChordsCount === 0 ? 'with-unavailable-notice' : ''}`}>
               <div className="label-with-tooltip">
                 <label className="control-label">Chord Mode</label>

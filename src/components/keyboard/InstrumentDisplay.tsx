@@ -62,6 +62,7 @@ interface InstrumentDisplayProps {
   hideGenerateButton?: boolean
   hideDeselectAll?: boolean
   showOnlyAppliedList?: boolean
+  hideChordMode?: boolean
   disableBpmInput?: boolean
   disableBeatsInput?: boolean
   disableChordMode?: boolean
@@ -122,6 +123,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   hideGenerateButton = false,
   hideDeselectAll = false,
   showOnlyAppliedList = false,
+  hideChordMode = false,
   disableBpmInput = false,
   disableBeatsInput = false,
   disableChordMode = false,
@@ -346,6 +348,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           hideBpmButtons={hideBpmButtons}
           hideBeatsButtons={hideBeatsButtons}
           hideGenerateButton={hideGenerateButton}
+          hideChordMode={hideChordMode}
           disableBpmInput={disableBpmInput}
           disableBeatsInput={disableBeatsInput}
           disableChordMode={disableChordMode}
