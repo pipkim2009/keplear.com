@@ -72,6 +72,291 @@
 }
 
 /* ========================================
+   WELCOME SUBTITLE - FIXED BOTTOM OVERLAY
+   ======================================== */
+
+.welcomeSubtitle {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  max-width: 90%;
+  padding: 1.25rem 2.5rem;
+  background: var(--black);
+  color: var(--white);
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgb(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: welcomeSlideUp 0.6s ease-out;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  pointer-events: none;
+}
+
+:global(.dark) .welcomeSubtitle {
+  box-shadow: 0 8px 40px rgb(0, 0, 0, 0.7), 0 0 40px var(--primary-purple-alpha-30);
+}
+
+@keyframes welcomeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ========================================
+   LESSON CONTROLS (SIMPLE MELODIES)
+   ======================================== */
+
+.lessonControls {
+  width: 100%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: var(--white-alpha-80);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgb(210, 210, 249, 0.3);
+  border-radius: 20px;
+  box-shadow: 0 4px 15px var(--primary-purple-alpha-10);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+:global(.dark) .lessonControls {
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(45, 27, 105, 0.4) 100%);
+  border: 1px solid rgb(210, 210, 249, 0.2);
+  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4);
+}
+
+.lessonInstructions {
+  padding: 1rem 1.5rem;
+  background: var(--primary-purple-alpha-10);
+  border-radius: 12px;
+  border-left: 4px solid var(--primary-purple);
+}
+
+:global(.dark) .lessonInstructions {
+  background: var(--primary-purple-alpha-20);
+  border-left-color: var(--primary-purple-light);
+}
+
+.lessonInstructions h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .lessonInstructions h3 {
+  color: var(--dark-text-primary);
+}
+
+.lessonInstructions ol {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: var(--light-text-secondary);
+  line-height: 1.8;
+}
+
+:global(.dark) .lessonInstructions ol {
+  color: var(--dark-text-secondary);
+}
+
+.lessonControlsRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.controlGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.controlGroup label {
+  font-weight: 600;
+  color: var(--light-text-primary);
+  font-size: 0.9375rem;
+}
+
+:global(.dark) .controlGroup label {
+  color: var(--dark-text-primary);
+}
+
+.numberInput {
+  width: 80px;
+  padding: 0.625rem 0.75rem;
+  border: 2px solid rgb(210, 210, 249, 0.3);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  background: var(--white);
+  color: var(--light-text-primary);
+  transition: all 0.3s ease;
+}
+
+:global(.dark) .numberInput {
+  background: rgb(26, 32, 44, 0.8);
+  color: var(--dark-text-primary);
+  border-color: rgb(210, 210, 249, 0.2);
+}
+
+.numberInput:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3px var(--primary-purple-alpha-20);
+}
+
+.generateButton,
+.playButton,
+.checkButton {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgb(0, 0, 0, 0.1);
+}
+
+.generateButton {
+  background: var(--primary-purple);
+  color: var(--white);
+}
+
+:global(.dark) .generateButton {
+  background: var(--primary-purple-light);
+}
+
+.generateButton:hover:not(:disabled) {
+  background: var(--primary-purple-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px var(--primary-purple-alpha-40);
+}
+
+:global(.dark) .generateButton:hover:not(:disabled) {
+  background: var(--primary-purple-lighter);
+}
+
+.generateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.playButton {
+  background: rgb(34, 197, 94);
+  color: var(--white);
+}
+
+.playButton:hover:not(:disabled) {
+  background: rgb(22, 163, 74);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgb(34, 197, 94, 0.4);
+}
+
+.playButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkButton {
+  background: rgb(59, 130, 246);
+  color: var(--white);
+}
+
+.checkButton:hover:not(:disabled) {
+  background: rgb(37, 99, 235);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgb(59, 130, 246, 0.4);
+}
+
+.checkButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.feedbackMessage {
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  text-align: center;
+  animation: feedbackFadeIn 0.3s ease-out;
+}
+
+.feedbackMessage.correct {
+  background: rgb(34, 197, 94, 0.15);
+  color: rgb(22, 163, 74);
+  border: 2px solid rgb(34, 197, 94, 0.4);
+}
+
+:global(.dark) .feedbackMessage.correct {
+  background: rgb(34, 197, 94, 0.2);
+  color: rgb(74, 222, 128);
+  border-color: rgb(34, 197, 94, 0.5);
+}
+
+.feedbackMessage.incorrect {
+  background: rgb(239, 68, 68, 0.15);
+  color: rgb(220, 38, 38);
+  border: 2px solid rgb(239, 68, 68, 0.4);
+}
+
+:global(.dark) .feedbackMessage.incorrect {
+  background: rgb(239, 68, 68, 0.2);
+  color: rgb(252, 165, 165);
+  border-color: rgb(239, 68, 68, 0.5);
+}
+
+@keyframes feedbackFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.melodyInfo {
+  padding: 1rem;
+  background: rgb(148, 163, 184, 0.1);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+:global(.dark) .melodyInfo {
+  background: rgb(148, 163, 184, 0.15);
+}
+
+.melodyInfo p {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--light-text-secondary);
+  font-weight: 500;
+}
+
+:global(.dark) .melodyInfo p {
+  color: var(--dark-text-secondary);
+}
+
+/* ========================================
    HEADER SECTION
    ======================================== */
 
@@ -774,6 +1059,13 @@
     padding: 0.625rem 1rem;
   }
 
+  .welcomeSubtitle {
+    font-size: 1rem;
+    padding: 1rem 1.5rem;
+    bottom: 1rem;
+    max-width: 95%;
+  }
+
   .pageTitle {
     font-size: 2rem;
   }
@@ -807,6 +1099,22 @@
 
   .instrumentButton {
     padding: 0.875rem 1.25rem;
+  }
+
+  .lessonControls {
+    margin: 1.5rem 1rem;
+    padding: 1.5rem;
+  }
+
+  .lessonControlsRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .generateButton,
+  .playButton,
+  .checkButton {
+    width: 100%;
   }
 
   .lessonsGrid {
@@ -849,14 +1157,25 @@
 
 @media (prefers-reduced-motion: reduce) {
   .backButton,
+  .welcomeSubtitle,
   .instrumentCard,
   .instrumentIcon,
   .instrumentButton,
   .lessonCard,
   .featuredLessonCard,
   .startButton,
-  .sandboxButton {
+  .sandboxButton,
+  .generateButton,
+  .playButton,
+  .checkButton,
+  .feedbackMessage {
     transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  .welcomeSubtitle,
+  .feedbackMessage {
+    animation: none !important;
   }
 
   .backButton:hover,
@@ -866,7 +1185,10 @@
   .lessonCard:hover,
   .featuredLessonCard:hover,
   .startButton:hover,
-  .sandboxButton:hover {
+  .sandboxButton:hover,
+  .generateButton:hover,
+  .playButton:hover,
+  .checkButton:hover {
     transform: none !important;
   }
 }

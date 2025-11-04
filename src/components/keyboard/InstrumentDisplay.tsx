@@ -30,6 +30,9 @@ interface InstrumentDisplayProps {
   onOctaveRangeChange?: (lowerOctaves: number, higherOctaves: number) => void
   keyboardSelectionMode?: KeyboardSelectionMode
   onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
+  initialLowerOctaves?: number
+  initialHigherOctaves?: number
+  disableOctaveCleanup?: boolean
   flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
   triggerInputFlash: (inputType: 'bpm' | 'beats' | 'mode') => void
   setInputActive: (inputType: 'bpm' | 'beats' | 'mode', active: boolean) => void
@@ -87,6 +90,9 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   onOctaveRangeChange,
   keyboardSelectionMode = 'range',
   onKeyboardSelectionModeChange,
+  initialLowerOctaves = 0,
+  initialHigherOctaves = 0,
+  disableOctaveCleanup = false,
   flashingInputs,
   triggerInputFlash,
   setInputActive,
@@ -121,8 +127,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   disableChordMode = false,
   disableSelectionMode = false
 }) => {
-  const [lowerOctaves, setLowerOctaves] = useState<number>(0)
-  const [higherOctaves, setHigherOctaves] = useState<number>(0)
+  const [lowerOctaves, setLowerOctaves] = useState<number>(initialLowerOctaves)
+  const [higherOctaves, setHigherOctaves] = useState<number>(initialHigherOctaves)
 
   // Calculate the currently playing note(s) from the index
   // For chords (progression mode), this will be multiple notes
@@ -235,7 +241,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
 
   // Clean up notes, chords, and scales when octave range changes (keyboard only)
   useEffect(() => {
-    if (instrument !== 'keyboard') return
+    if (instrument !== 'keyboard' || disableOctaveCleanup) return
 
     // Calculate visible octave range (base is 4-5, can be expanded)
     const minVisibleOctave = Math.max(1, 4 - lowerOctaves)
