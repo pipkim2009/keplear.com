@@ -179,6 +179,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setHasGeneratedMelody(false)
     hasAnnouncedMelody.current = false
     setBpm(120) // Reset BPM to default
+    setNumberOfBeats(4) // Reset beats to default
   }
 
   // Auto-select notes and BPM when session starts for Simple Melodies
@@ -189,10 +190,14 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         handleKeyboardSelectionModeChange('multi', false)
       }
 
-      // Randomly select BPM (30 to 480 in 30 BPM increments)
-      const bpmOptions = Array.from({ length: 16 }, (_, i) => (i + 1) * 30)
+      // Randomly select BPM (30 to 240 in 30 BPM increments)
+      const bpmOptions = Array.from({ length: 8 }, (_, i) => (i + 1) * 30)
       const randomBPM = bpmOptions[Math.floor(Math.random() * bpmOptions.length)]
       setBpm(randomBPM)
+
+      // Randomly select number of beats (3 to 8)
+      const randomBeats = Math.floor(Math.random() * 6) + 3
+      setNumberOfBeats(randomBeats)
 
       // Generate all notes for full keyboard range (octaves 1-8)
       const allNotes = generateNotesWithSeparateOctaves(3, 3)
@@ -374,6 +379,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           disableBeatsInput={true}
           disableChordMode={true}
           disableSelectionMode={true}
+          hideSelectionMode={true}
+          practiceMode={true}
         />
 
         {/* Welcome Subtitle Overlay */}

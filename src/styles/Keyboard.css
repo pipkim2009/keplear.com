@@ -32,7 +32,8 @@
 
 /* Reduce height for guitar and bass */
 .instrument-container:has(.guitar-container) .instrument-header-controls,
-.instrument-container:has(.bass-container) .instrument-header-controls {
+.instrument-container:has(.bass-container) .instrument-header-controls,
+.instrument-container[data-practice-mode="true"] .instrument-header-controls {
   min-height: 50px;
 }
 
@@ -151,7 +152,8 @@
 @media (max-width: 360px) {
   /* Reduce height for guitar and bass on very small screens */
   .instrument-container:has(.guitar-container) .instrument-header-controls,
-  .instrument-container:has(.bass-container) .instrument-header-controls {
+  .instrument-container:has(.bass-container) .instrument-header-controls,
+  .instrument-container[data-practice-mode="true"] .instrument-header-controls {
     min-height: 43px;
   }
 

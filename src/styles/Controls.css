@@ -1306,12 +1306,14 @@
 
   /* Guitar and Bass modes - move scales/chords and deselect all upwards */
   body:has([data-instrument='guitar']) .control-group.scale-chord-options,
-  body:has([data-instrument='bass']) .control-group.scale-chord-options {
+  body:has([data-instrument='bass']) .control-group.scale-chord-options,
+  body:has(.instrument-container[data-practice-mode="true"]) .control-group.scale-chord-options {
     margin-top: 3px !important;
   }
 
   body:has([data-instrument='guitar']) .control-button.delete-selection,
-  body:has([data-instrument='bass']) .control-button.delete-selection {
+  body:has([data-instrument='bass']) .control-button.delete-selection,
+  body:has(.instrument-container[data-practice-mode="true"]) .control-button.delete-selection {
     margin-top: 4px !important;
   }
 
@@ -2765,13 +2767,10 @@ body.dark .modern-control-item.audio-player-section audio {
     margin-top: 23px !important;
   }
 
-  /* Guitar mode: 5px margin on tablets/desktop (added 1px) */
-  body:has([data-instrument='guitar']) .control-button.delete-selection {
-    margin-top: 5px !important;
-  }
-
-  /* Bass mode: 5px margin on tablets/desktop (added 1px) */
-  body:has([data-instrument='bass']) .control-button.delete-selection {
+  /* Guitar/Bass/Practice mode: 5px margin on tablets/desktop (added 1px) */
+  body:has([data-instrument='guitar']) .control-button.delete-selection,
+  body:has([data-instrument='bass']) .control-button.delete-selection,
+  body:has(.instrument-container[data-practice-mode="true"]) .control-button.delete-selection {
     margin-top: 5px !important;
   }
 }

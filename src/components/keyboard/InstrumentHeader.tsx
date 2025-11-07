@@ -38,6 +38,7 @@ interface InstrumentHeaderProps {
   hideDeselectAll?: boolean
   showOnlyAppliedList?: boolean
   disableSelectionMode?: boolean
+  hideSelectionMode?: boolean
 }
 
 const InstrumentHeader: React.FC<InstrumentHeaderProps> = ({
@@ -69,12 +70,13 @@ const InstrumentHeader: React.FC<InstrumentHeaderProps> = ({
   higherOctaves = 0,
   hideDeselectAll = false,
   showOnlyAppliedList = false,
-  disableSelectionMode = false
+  disableSelectionMode = false,
+  hideSelectionMode = false
 }) => {
   return (
     <div className="instrument-header-controls">
       <div className="header-controls-left">
-        {instrument === 'keyboard' && (
+        {instrument === 'keyboard' && !hideSelectionMode && (
           <div className="control-group">
             <div className="label-with-tooltip">
               <label className="control-label">Selection Mode</label>

@@ -24,7 +24,8 @@
 
 /* Set container height to exactly match button height for guitar and bass */
 .scale-options-container.collapsed:has(.scale-options-toggle.instrument-guitar),
-.scale-options-container.collapsed:has(.scale-options-toggle.instrument-bass) {
+.scale-options-container.collapsed:has(.scale-options-toggle.instrument-bass),
+body:has(.instrument-container[data-practice-mode="true"]) .scale-options-container.collapsed {
   height: 32px;
   min-height: 32px;
   max-height: 32px;
@@ -39,7 +40,8 @@
 
 /* Keep expanded container height same as button for guitar/bass */
 .scale-options-container.expanded:has(.scale-options-toggle.instrument-guitar),
-.scale-options-container.expanded:has(.scale-options-toggle.instrument-bass) {
+.scale-options-container.expanded:has(.scale-options-toggle.instrument-bass),
+body:has(.instrument-container[data-practice-mode="true"]) .scale-options-container.expanded {
   height: 32px;
   min-height: 32px;
   max-height: 32px;
@@ -111,7 +113,8 @@
 }
 
 .scale-options-toggle.instrument-guitar,
-.scale-options-toggle.instrument-bass {
+.scale-options-toggle.instrument-bass,
+body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle {
   margin-top: 5px;
 }
 
@@ -453,7 +456,8 @@ input:checked + .toggle-slider:hover {
   }
 
   .scale-options-popup.instrument-guitar,
-  .scale-options-popup.instrument-bass {
+  .scale-options-popup.instrument-bass,
+  body:has(.instrument-container[data-practice-mode="true"]) .scale-options-popup {
     top: calc(100% + 5px) !important;
   }
 }
@@ -468,7 +472,8 @@ input:checked + .toggle-slider:hover {
   }
 
   .scale-options-popup.instrument-guitar,
-  .scale-options-popup.instrument-bass {
+  .scale-options-popup.instrument-bass,
+  body:has(.instrument-container[data-practice-mode="true"]) .scale-options-popup {
     left: 0 !important;
     right: auto !important;
     top: calc(100% + 5px) !important;
@@ -478,7 +483,8 @@ input:checked + .toggle-slider:hover {
 /* Guitar and bass - expand to the right on non-very-small devices */
 @media (min-width: 361px) {
   .scale-options-popup.instrument-guitar,
-  .scale-options-popup.instrument-bass {
+  .scale-options-popup.instrument-bass,
+  body:has(.instrument-container[data-practice-mode="true"]) .scale-options-popup {
     left: 0 !important;
     right: auto !important;
     top: calc(100% + 5px) !important;
@@ -498,7 +504,8 @@ input:checked + .toggle-slider:hover {
   }
 
   .scale-options-toggle.instrument-guitar,
-  .scale-options-toggle.instrument-bass {
+  .scale-options-toggle.instrument-bass,
+  body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle {
     margin: 0 !important;
   }
 
@@ -520,7 +527,8 @@ input:checked + .toggle-slider:hover {
   }
 
   .scale-options-popup.instrument-guitar,
-  .scale-options-popup.instrument-bass {
+  .scale-options-popup.instrument-bass,
+  body:has(.instrument-container[data-practice-mode="true"]) .scale-options-popup {
     left: 0 !important;
     right: auto !important;
     top: 100% !important;
@@ -576,7 +584,8 @@ input:checked + .toggle-slider:hover {
   }
 
   .scale-options-toggle.instrument-guitar,
-  .scale-options-toggle.instrument-bass {
+  .scale-options-toggle.instrument-bass,
+  body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle {
     margin: 0 !important;
   }
 
@@ -600,7 +609,8 @@ input:checked + .toggle-slider:hover {
 
   /* Guitar/Bass containers - centered */
   .scale-options-container:has(.scale-options-toggle.instrument-guitar),
-  .scale-options-container:has(.scale-options-toggle.instrument-bass) {
+  .scale-options-container:has(.scale-options-toggle.instrument-bass),
+  body:has(.instrument-container[data-practice-mode="true"]) .scale-options-container {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
