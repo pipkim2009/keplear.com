@@ -76,6 +76,7 @@ interface InstrumentControlsProps {
   disableBpmInput?: boolean
   disableBeatsInput?: boolean
   disableChordMode?: boolean
+  onLessonComplete?: () => void
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -135,7 +136,8 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   hideChordMode = false,
   disableBpmInput = false,
   disableBeatsInput = false,
-  disableChordMode = false
+  disableChordMode = false,
+  onLessonComplete
 }) => {
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
@@ -719,6 +721,11 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
             }
             setIsListening(false)
             console.log('Stage 2 complete! All notes played in order')
+
+            // Notify parent component that lesson is complete
+            if (onLessonComplete) {
+              onLessonComplete()
+            }
           }
         }, 500)
       } else {

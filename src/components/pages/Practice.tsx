@@ -106,6 +106,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   const [welcomeSpeechDone, setWelcomeSpeechDone] = useState(false)
   const [hasGeneratedMelody, setHasGeneratedMelody] = useState(false)
   const hasAnnouncedMelody = useRef(false)
+  const [melodySetupMessage, setMelodySetupMessage] = useState<string>('')
+  const [congratulationsMessage, setCongratulationsMessage] = useState<string>('')
 
   const {
     handleNoteClick,
@@ -178,8 +180,15 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setWelcomeSpeechDone(false)
     setHasGeneratedMelody(false)
     hasAnnouncedMelody.current = false
+    setMelodySetupMessage('')
+    setCongratulationsMessage('')
     setBpm(120) // Reset BPM to default
     setNumberOfBeats(4) // Reset beats to default
+  }
+
+  const handleLessonComplete = () => {
+    const message = "Congratulations on completing today's lesson!"
+    setCongratulationsMessage(message)
   }
 
   // Auto-select notes and BPM when session starts for Simple Melodies
@@ -242,7 +251,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     if (welcomeSpeechDone && practiceOptions.includes('simple-melodies') && generatedMelody.length > 0 && recordedAudioBlob && !hasAnnouncedMelody.current) {
       hasAnnouncedMelody.current = true
 
-      // Text-to-speech announcement
       // Extract octave number from first note (all notes are in same octave)
       const firstNoteName = generatedMelody[0].name
       const octaveNumber = firstNoteName.match(/\d+$/)?.[0] || '4'
@@ -256,24 +264,10 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
       const announcement = `I have set up a ${generatedMelody.length} note melody on the ${octaveOrdinal} octave at ${bpm} BPM`
 
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(announcement)
-        utterance.rate = 0.9
-        utterance.pitch = 1
-        utterance.volume = 1
-
-        // Auto-play melody after announcement
-        utterance.onend = () => {
-          handlePlayMelody()
-        }
-
-        window.speechSynthesis.speak(utterance)
-      } else {
-        // Fallback: just play melody if no TTS
-        handlePlayMelody()
-      }
+      // Set the message for subtitle display (WelcomeSubtitle component will handle TTS and subtitle)
+      setMelodySetupMessage(announcement)
     }
-  }, [welcomeSpeechDone, practiceOptions, generatedMelody, recordedAudioBlob, bpm, handlePlayMelody])
+  }, [welcomeSpeechDone, practiceOptions, generatedMelody, recordedAudioBlob, bpm])
 
 
   // Show practice options modal
@@ -381,6 +375,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           disableSelectionMode={true}
           hideSelectionMode={true}
           practiceMode={true}
+          onLessonComplete={handleLessonComplete}
         />
 
         {/* Welcome Subtitle Overlay */}
@@ -388,6 +383,22 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           message={welcomeMessage}
           onSpeechEnd={() => setWelcomeSpeechDone(true)}
         />
+
+        {/* Melody Setup Subtitle Overlay */}
+        {melodySetupMessage && (
+          <WelcomeSubtitle
+            message={melodySetupMessage}
+            onSpeechEnd={handlePlayMelody}
+          />
+        )}
+
+        {/* Congratulations Subtitle Overlay */}
+        {congratulationsMessage && (
+          <WelcomeSubtitle
+            message={congratulationsMessage}
+            onSpeechEnd={handleBackToSelection}
+          />
+        )}
       </>
     )
   }

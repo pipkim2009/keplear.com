@@ -143,14 +143,15 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     flashingInputs,
     activeInputs,
     navigateToHome,
-    navigateToSandbox,
+    navigateToSandbox: navigateToSandboxOriginal,
     navigateToPractice,
     setBpm,
     setNumberOfBeats,
     setChordMode,
     triggerInputFlash,
     setInputActive,
-    setCurrentPage
+    setCurrentPage,
+    resetSettings
   } = useUIState()
 
   const {
@@ -368,6 +369,55 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
   const handleCurrentlyPlayingNoteChange = useCallback((index: number | null): void => {
     setCurrentlyPlayingNoteIndex(index)
   }, [setCurrentlyPlayingNoteIndex])
+
+  // Custom navigateToSandbox that resets all state for a fresh sandbox environment
+  const navigateToSandbox = useCallback((): void => {
+    // Stop any playing melody
+    if (isPlaying) {
+      stopMelody()
+    }
+
+    // Clear all melody-related state
+    clearSelection()
+    clearMelody()
+    handleClearRecordedAudio()
+    clearChanges()
+    triggerClearChordsAndScales()
+    setShowNotes(false)
+    setPlaybackProgress(0)
+    setMelodyDuration(0)
+
+    // Reset settings to defaults (BPM, beats, etc.)
+    resetSettings()
+
+    // Reset instrument to default (keyboard)
+    setInstrument('keyboard')
+
+    // Reset octave ranges to default (0, 0)
+    setLowerOctaves(0)
+    setHigherOctaves(0)
+
+    // Reset keyboard selection mode to default (range)
+    setKeyboardSelectionMode('range')
+
+    // Finally navigate to sandbox
+    navigateToSandboxOriginal()
+  }, [
+    isPlaying,
+    stopMelody,
+    clearSelection,
+    clearMelody,
+    handleClearRecordedAudio,
+    clearChanges,
+    triggerClearChordsAndScales,
+    setShowNotes,
+    setPlaybackProgress,
+    setMelodyDuration,
+    resetSettings,
+    setInstrument,
+    setKeyboardSelectionMode,
+    navigateToSandboxOriginal
+  ])
 
   const value: InstrumentContextType = {
     // Audio functions

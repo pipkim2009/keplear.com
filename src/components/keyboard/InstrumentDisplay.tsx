@@ -69,6 +69,7 @@ interface InstrumentDisplayProps {
   disableSelectionMode?: boolean
   hideSelectionMode?: boolean
   practiceMode?: boolean
+  onLessonComplete?: () => void
 }
 
 const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
@@ -131,7 +132,8 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   disableChordMode = false,
   disableSelectionMode = false,
   hideSelectionMode = false,
-  practiceMode = false
+  practiceMode = false,
+  onLessonComplete
 }) => {
   const [lowerOctaves, setLowerOctaves] = useState<number>(initialLowerOctaves)
   const [higherOctaves, setHigherOctaves] = useState<number>(initialHigherOctaves)
@@ -356,6 +358,7 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           disableBpmInput={disableBpmInput}
           disableBeatsInput={disableBeatsInput}
           disableChordMode={disableChordMode}
+          onLessonComplete={onLessonComplete}
         />
       </div>
 
