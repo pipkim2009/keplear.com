@@ -100,7 +100,7 @@ const UserMenu = () => {
           boxSizing: 'border-box'
         }}>
           <div style={{
-            background: isDarkMode ? '#2d1b69' : 'white',
+            background: isDarkMode ? '#1b6940' : 'white',
             padding: '30px',
             borderRadius: '12px',
             maxWidth: '400px',
@@ -109,7 +109,7 @@ const UserMenu = () => {
             overflow: 'auto',
             textAlign: 'center',
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-            color: isDarkMode ? '#d2d2f9' : '#2d1b69',
+            color: isDarkMode ? '#d2f9d2' : '#1b6940',
             position: 'relative',
             margin: 'auto'
           }}>
@@ -125,15 +125,15 @@ const UserMenu = () => {
                 style={{
                   padding: '12px 24px',
                   borderRadius: '8px',
-                  border: `2px solid ${isDarkMode ? '#6366f1' : '#d1d5db'}`,
+                  border: `2px solid ${isDarkMode ? '#00d96f' : '#d1d5db'}`,
                   background: isDarkMode ? 'transparent' : 'white',
-                  color: isDarkMode ? '#d2d2f9' : '#374151',
+                  color: isDarkMode ? '#d2f9d2' : '#374151',
                   cursor: 'pointer',
                   fontWeight: '600',
                   transition: 'all 0.2s ease'
                 }}
                 onMouseOver={(e) => {
-                  e.currentTarget.style.background = isDarkMode ? 'rgba(99, 102, 241, 0.1)' : '#f9fafb'
+                  e.currentTarget.style.background = isDarkMode ? 'rgba(0, 217, 111, 0.1)' : '#f9fafb'
                 }}
                 onMouseOut={(e) => {
                   e.currentTarget.style.background = isDarkMode ? 'transparent' : 'white'

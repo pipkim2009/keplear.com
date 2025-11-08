@@ -42,7 +42,7 @@
 }
 
 :global(.dark) .backButton {
-  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(45, 27, 105, 0.4) 100%);
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
   color: var(--dark-text-primary);
   border: 2px solid rgb(210, 210, 249, 0.2);
   box-shadow: 0 2px 10px rgb(0, 0, 0, 0.3);
@@ -56,7 +56,7 @@
 }
 
 :global(.dark) .backButton:hover {
-  background: linear-gradient(135deg, rgb(26, 32, 44, 1) 0%, rgb(45, 27, 105, 0.6) 100%);
+  background: linear-gradient(135deg, rgb(26, 32, 44, 1) 0%, rgb(27, 105, 64, 0.6) 100%);
   border-color: var(--primary-purple-alpha-70);
   transform: translateX(-3px);
   box-shadow: 0 4px 20px var(--primary-purple-alpha-30);
@@ -133,7 +133,7 @@
 }
 
 :global(.dark) .lessonControls {
-  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(45, 27, 105, 0.4) 100%);
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
   border: 1px solid rgb(210, 210, 249, 0.2);
   box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4);
 }
@@ -436,9 +436,9 @@
 }
 
 :global(.dark) .instrumentCard {
-  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(45, 27, 105, 0.4) 100%);
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
   border: 1px solid rgb(210, 210, 249, 0.2);
-  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(168, 85, 247, 0.1) inset;
+  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(46, 232, 141, 0.1) inset;
 }
 
 .instrumentCard:hover {
@@ -584,9 +584,9 @@
 }
 
 :global(.dark) .featuredLessonCard {
-  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(45, 27, 105, 0.4) 100%);
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
   border: 1px solid rgb(210, 210, 249, 0.2);
-  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(168, 85, 247, 0.1) inset;
+  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(46, 232, 141, 0.1) inset;
 }
 
 .featuredLessonCard:hover {
@@ -623,9 +623,9 @@
 }
 
 :global(.dark) .lessonCard {
-  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(45, 27, 105, 0.4) 100%);
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
   border: 1px solid rgb(210, 210, 249, 0.2);
-  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(168, 85, 247, 0.1) inset;
+  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(46, 232, 141, 0.1) inset;
 }
 
 .lessonCard:hover {
@@ -913,7 +913,7 @@
 }
 
 :global(.dark) .comingSoonSection {
-  background: linear-gradient(135deg, rgb(45, 27, 105, 0.6) 0%, rgb(128, 0, 255, 0.3) 50%, rgb(45, 27, 105, 0.6) 100%);
+  background: linear-gradient(135deg, rgb(27, 105, 64, 0.6) 0%, rgb(0, 217, 111, 0.3) 50%, rgb(27, 105, 64, 0.6) 100%);
   border: 1px solid var(--primary-purple-alpha-50);
   box-shadow: 0 4px 30px var(--primary-purple-alpha-20), 0 0 60px var(--primary-purple-alpha-15), 0 0 0 1px var(--primary-purple-alpha-30) inset;
 }
@@ -972,7 +972,7 @@
 }
 
 :global(.dark) .sandboxButton:hover {
-  background: rgb(45, 27, 105, 1);
+  background: rgb(27, 105, 64, 1);
   border-color: rgb(210, 210, 249, 0.5);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px var(--shadow-hover-dark);

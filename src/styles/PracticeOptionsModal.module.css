@@ -28,8 +28,8 @@
 .modalContent {
   background: linear-gradient(
     145deg,
-    rgba(45, 27, 105, 0.98),
-    rgba(26, 13, 46, 0.98)
+    rgba(27, 105, 64, 0.98),
+    rgba(20, 82, 50, 0.98)
   );
   border: 2px solid rgba(210, 210, 249, 0.3);
   border-radius: 24px;
@@ -58,9 +58,9 @@
   background: linear-gradient(
     145deg,
     rgba(255, 255, 255, 0.98),
-    rgba(245, 243, 255, 0.98)
+    rgba(228, 255, 232, 0.98)
   );
-  border-color: rgba(99, 102, 241, 0.3);
+  border-color: rgba(0, 217, 111, 0.3);
 }
 
 /* Modal Title */
@@ -70,12 +70,12 @@
   color: var(--dark-text-primary);
   margin: 0 0 12px 0;
   text-align: center;
-  text-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  text-shadow: 0 2px 8px rgba(0, 217, 111, 0.3);
 }
 
 :global(.light) .modalTitle {
   color: var(--light-text-primary);
-  text-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+  text-shadow: 0 2px 8px rgba(0, 217, 111, 0.2);
 }
 
 /* Modal Subtitle */
@@ -88,7 +88,7 @@
 }
 
 :global(.light) .modalSubtitle {
-  color: rgba(45, 27, 105, 0.7);
+  color: rgba(27, 105, 64, 0.7);
 }
 
 /* Options List */
@@ -123,31 +123,31 @@
 .optionItem.selected {
   background: linear-gradient(
     135deg,
-    rgba(99, 102, 241, 0.2),
-    rgba(139, 92, 246, 0.15)
+    rgba(0, 217, 111, 0.2),
+    rgba(46, 232, 141, 0.15)
   );
-  border-color: rgba(99, 102, 241, 0.5);
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+  border-color: rgba(0, 217, 111, 0.5);
+  box-shadow: 0 0 20px rgba(0, 217, 111, 0.3);
 }
 
 :global(.light) .optionItem {
-  background: rgba(99, 102, 241, 0.05);
-  border-color: rgba(99, 102, 241, 0.2);
+  background: rgba(0, 217, 111, 0.05);
+  border-color: rgba(0, 217, 111, 0.2);
 }
 
 :global(.light) .optionItem:hover {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.3);
+  background: rgba(0, 217, 111, 0.1);
+  border-color: rgba(0, 217, 111, 0.3);
 }
 
 :global(.light) .optionItem.selected {
   background: linear-gradient(
     135deg,
-    rgba(99, 102, 241, 0.15),
-    rgba(139, 92, 246, 0.1)
+    rgba(0, 217, 111, 0.15),
+    rgba(46, 232, 141, 0.1)
   );
-  border-color: rgba(99, 102, 241, 0.5);
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+  border-color: rgba(0, 217, 111, 0.5);
+  box-shadow: 0 0 20px rgba(0, 217, 111, 0.2);
 }
 
 /* Radio Button */
@@ -165,8 +165,8 @@
 }
 
 .radio:checked {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  border-color: #6366f1;
+  background: linear-gradient(135deg, #00d96f, #2ee88d);
+  border-color: #00d96f;
 }
 
 .radio:checked::after {
@@ -182,13 +182,13 @@
 }
 
 :global(.light) .radio {
-  border-color: rgba(99, 102, 241, 0.4);
+  border-color: rgba(0, 217, 111, 0.4);
   background: rgba(255, 255, 255, 0.8);
 }
 
 :global(.light) .radio:checked {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  border-color: #6366f1;
+  background: linear-gradient(135deg, #00d96f, #2ee88d);
+  border-color: #00d96f;
 }
 
 /* Option Content */
@@ -216,7 +216,7 @@
 }
 
 :global(.light) .optionDescription {
-  color: rgba(45, 27, 105, 0.6);
+  color: rgba(27, 105, 64, 0.6);
 }
 
 /* Checkmark */
@@ -224,7 +224,7 @@
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-  color: #6366f1;
+  color: #00d96f;
 }
 
 /* Modal Actions */
@@ -254,19 +254,19 @@
 }
 
 :global(.light) .cancelButton {
-  border-color: rgba(99, 102, 241, 0.3);
+  border-color: rgba(0, 217, 111, 0.3);
   color: var(--light-text-primary);
 }
 
 :global(.light) .cancelButton:hover {
-  background: rgba(99, 102, 241, 0.05);
-  border-color: rgba(99, 102, 241, 0.5);
+  background: rgba(0, 217, 111, 0.05);
+  border-color: rgba(0, 217, 111, 0.5);
 }
 
 /* Start Button */
 .startButton {
   padding: 14px 28px;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: linear-gradient(135deg, #00d96f, #2ee88d);
   border: none;
   border-radius: 12px;
   color: white;
@@ -274,16 +274,16 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 217, 111, 0.4);
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
 .startButton:hover:not(:disabled) {
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  background: linear-gradient(135deg, #00b359, #00b359);
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.5);
+  box-shadow: 0 8px 24px rgba(0, 217, 111, 0.5);
 }
 
 .startButton:disabled {

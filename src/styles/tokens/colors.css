@@ -33,35 +33,35 @@
   /* ========================================
      PRIMARY BRAND COLORS
      ======================================== */
-  --primary-purple: #8000ff;
-  --primary-purple-dark: #6b00cc;
-  --primary-purple-6600cc: #6600cc;
-  --primary-purple-light: #a855f7;
-  --primary-purple-lighter: #c77dff;
+  --primary-purple: #00d96f;
+  --primary-purple-dark: #00b359;
+  --primary-purple-6600cc: #00a04d;
+  --primary-purple-light: #2ee88d;
+  --primary-purple-lighter: #66ffb2;
 
   /* Primary Purple Alpha Variations */
-  --primary-purple-alpha-5: rgb(128, 0, 255, 0.05);
-  --primary-purple-alpha-10: rgb(128, 0, 255, 0.1);
-  --primary-purple-alpha-15: rgb(128, 0, 255, 0.15);
-  --primary-purple-alpha-20: rgb(128, 0, 255, 0.2);
-  --primary-purple-alpha-25: rgb(128, 0, 255, 0.25);
-  --primary-purple-alpha-30: rgb(128, 0, 255, 0.3);
-  --primary-purple-alpha-40: rgb(128, 0, 255, 0.4);
-  --primary-purple-alpha-50: rgb(128, 0, 255, 0.5);
-  --primary-purple-alpha-60: rgb(128, 0, 255, 0.6);
-  --primary-purple-alpha-80: rgb(128, 0, 255, 0.8);
+  --primary-purple-alpha-5: rgb(0, 217, 111, 0.05);
+  --primary-purple-alpha-10: rgb(0, 217, 111, 0.1);
+  --primary-purple-alpha-15: rgb(0, 217, 111, 0.15);
+  --primary-purple-alpha-20: rgb(0, 217, 111, 0.2);
+  --primary-purple-alpha-25: rgb(0, 217, 111, 0.25);
+  --primary-purple-alpha-30: rgb(0, 217, 111, 0.3);
+  --primary-purple-alpha-40: rgb(0, 217, 111, 0.4);
+  --primary-purple-alpha-50: rgb(0, 217, 111, 0.5);
+  --primary-purple-alpha-60: rgb(0, 217, 111, 0.6);
+  --primary-purple-alpha-80: rgb(0, 217, 111, 0.8);
 
   /* ========================================
      THEME COLORS - LIGHT MODE
      ======================================== */
   --light-bg-primary: #ffffff;
   --light-bg-secondary: #f8f9fa;
-  --light-bg-tertiary: #e8e4ff;
-  --light-bg-quaternary: #f0f0ff;
-  --light-bg-gradient-1: #e8e4ff;
-  --light-bg-gradient-2: #d2d2f9;
-  --light-bg-gradient-3: #f0f0ff;
-  --light-bg-gradient-4: #e1d8ff;
+  --light-bg-tertiary: #e4ffe8;
+  --light-bg-quaternary: #f0fff0;
+  --light-bg-gradient-1: #e4ffe8;
+  --light-bg-gradient-2: #d2f9d2;
+  --light-bg-gradient-3: #f0fff0;
+  --light-bg-gradient-4: #d8ffe1;
   --light-text-primary: #121212;
   --light-text-secondary: #374151;
   --light-text-tertiary: #6b7280;
@@ -73,10 +73,10 @@
      ======================================== */
   --dark-bg-primary: #121212;
   --dark-bg-secondary: #1a202c;
-  --dark-bg-tertiary: #2d1b69;
-  --dark-bg-quaternary: #1a0d2e;
+  --dark-bg-tertiary: #1b6940;
+  --dark-bg-quaternary: #0d2e1a;
   --dark-bg-surface: #0a0a0a;
-  --dark-text-primary: #d2d2f9;
+  --dark-text-primary: #d2f9d2;
   --dark-text-secondary: #ffffff;
   --dark-text-tertiary: #e9ecef;
   --dark-border-primary: #4a5568;
@@ -218,21 +218,21 @@
   /* ========================================
      SEMANTIC COLORS - PURPLE (CHORDS)
      ======================================== */
-  --purple-300: #c4b5fd;
-  --purple-400: #a78bfa;
-  --purple-500: #a855f7;
-  --purple-600: #8b5cf6;
-  --purple-6366f1: #6366f1;  /* Indigo */
-  --purple-6d28d9: #6d28d9;
-  --purple-700: #7c3aed;
-  --purple-800: #6b46c1;
-  --purple-8e44ad: #8e44ad;  /* Purple dark */
-  --purple-9333ea: #9333ea;
-  --purple-9b59b6: #9b59b6;  /* Purple medium */
-  --purple-chord: #8b5cf6;  /* Semantic chord note */
-  --purple-chord-dark: #7c3aed;  /* Semantic chord note dark */
-  --purple-alpha-40: rgb(139, 92, 246, 0.4);
-  --purple-600-alpha-60: rgb(167, 139, 250, 0.6);
+  --purple-300: #b3ffda;
+  --purple-400: #7fffc3;
+  --purple-500: #66ffb2;
+  --purple-600: #2ee88d;
+  --purple-6366f1: #00d96f;  /* Primary Green */
+  --purple-6d28d9: #00a851;
+  --purple-700: #00b359;
+  --purple-800: #00b359;
+  --purple-8e44ad: #009945;  /* Green dark */
+  --purple-9333ea: #00b359;
+  --purple-9b59b6: #2ee88d;  /* Green medium */
+  --purple-chord: #2ee88d;  /* Semantic chord note */
+  --purple-chord-dark: #00b359;  /* Semantic chord note dark */
+  --purple-alpha-40: rgb(46, 232, 141, 0.4);
+  --purple-600-alpha-60: rgb(127, 255, 195, 0.6);
 
   /* ========================================
      NEUTRAL GRAYS
@@ -348,8 +348,8 @@
   --note-scale-root-dark: #b91c1c;
 
   /* Chord Notes */
-  --note-chord: #8b5cf6;
-  --note-chord-dark: #7c3aed;
+  --note-chord: #2ee88d;
+  --note-chord-dark: #00b359;
   --note-chord-root: #dc2626;
   --note-chord-root-dark: #b91c1c;
 
@@ -357,12 +357,12 @@
      SCROLLBAR COLORS
      ======================================== */
   --scrollbar-track: #1a1a1a;
-  --scrollbar-thumb-primary: #6b46c1;
-  --scrollbar-thumb-secondary: #8b5cf6;
-  --scrollbar-thumb-hover-primary: #7c3aed;
-  --scrollbar-thumb-hover-secondary: #a855f7;
-  --scrollbar-thumb-active-primary: #5b21b6;
-  --scrollbar-thumb-active-secondary: #7c3aed;
+  --scrollbar-thumb-primary: #00b359;
+  --scrollbar-thumb-secondary: #00d96f;
+  --scrollbar-thumb-hover-primary: #2ee88d;
+  --scrollbar-thumb-hover-secondary: #66ffb2;
+  --scrollbar-thumb-active-primary: #00a04d;
+  --scrollbar-thumb-active-secondary: #00b359;
 
   /* Guitar Scrollbar (Green theme) */
   --scrollbar-guitar-track: #2d2d2d;
@@ -405,18 +405,18 @@
   --btn-primary-border: #3b82f6;
   --btn-primary-text: #ffffff;
   --btn-secondary-bg-light: rgb(255, 255, 255, 0.9);
-  --btn-secondary-bg-dark: rgb(45, 27, 105, 0.8);
-  --btn-secondary-border-light: rgb(210, 210, 249, 0.4);
-  --btn-secondary-border-dark: rgb(210, 210, 249, 0.3);
-  --btn-secondary-text-light: #2d1b69;
-  --btn-secondary-text-dark: #d2d2f9;
+  --btn-secondary-bg-dark: rgb(27, 105, 64, 0.8);
+  --btn-secondary-border-light: rgb(210, 249, 210, 0.4);
+  --btn-secondary-border-dark: rgb(210, 249, 210, 0.3);
+  --btn-secondary-text-light: #1b6940;
+  --btn-secondary-text-dark: #d2f9d2;
 
   /* ========================================
      SHADOW COLORS
      ======================================== */
-  --shadow-primary-light: rgb(45, 27, 105, 0.1);
+  --shadow-primary-light: rgb(27, 105, 64, 0.1);
   --shadow-primary-dark: rgb(0, 0, 0, 0.2);
-  --shadow-hover-light: rgb(45, 27, 105, 0.2);
+  --shadow-hover-light: rgb(27, 105, 64, 0.2);
   --shadow-hover-dark: rgb(0, 0, 0, 0.3);
   --shadow-button: rgb(59, 130, 246, 0.2);
   --shadow-button-hover: rgb(59, 130, 246, 0.3);

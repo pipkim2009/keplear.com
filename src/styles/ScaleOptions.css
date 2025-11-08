@@ -90,7 +90,7 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-contai
 }
 
 .scale-options-toggle {
-  background: rgb(139, 92, 246, 0.1);
+  background: rgb(46, 232, 141, 0.1);
   border: 2px solid var(--purple-600);
   color: var(--purple-300);
   padding: 6px 12px;
@@ -119,11 +119,11 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 }
 
 .scale-options-toggle:hover {
-  background: rgb(139, 92, 246, 0.2);
+  background: rgb(46, 232, 141, 0.2);
 }
 
 .scale-options-toggle:active {
-  background: rgb(139, 92, 246, 0.15);
+  background: rgb(46, 232, 141, 0.15);
 }
 
 .scale-options-toggle:focus-visible {
@@ -146,8 +146,8 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 
 /* Purple styling for chord mode */
 .scale-controls.chord-mode {
-  background: rgb(139, 92, 246, 0.05);
-  border: 1px solid rgb(139, 92, 246, 0.3);
+  background: rgb(46, 232, 141, 0.05);
+  border: 1px solid rgb(46, 232, 141, 0.3);
 }
 
 .dark .scale-controls {
@@ -156,8 +156,8 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 }
 
 .dark .scale-controls.chord-mode {
-  background: rgb(139, 92, 246, 0.05);
-  border-color: rgb(139, 92, 246, 0.3);
+  background: rgb(46, 232, 141, 0.05);
+  border-color: rgb(46, 232, 141, 0.3);
 }
 
 .control-section {
@@ -218,7 +218,7 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 /* Purple styling for chord mode */
 .control-select.chord-mode {
   border: 2px solid var(--purple-600);
-  background: rgb(139, 92, 246, 0.1);
+  background: rgb(46, 232, 141, 0.1);
   color: var(--purple-600);
 }
 
@@ -229,7 +229,7 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 }
 
 .dark .control-select.chord-mode {
-  background: rgb(139, 92, 246, 0.1);
+  background: rgb(46, 232, 141, 0.1);
   border-color: var(--purple-600);
   color: var(--purple-600);
 }
@@ -241,7 +241,7 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 }
 
 .control-select.chord-mode:hover {
-  background: rgb(139, 92, 246, 0.3);
+  background: rgb(46, 232, 141, 0.3);
 }
 
 .control-select:focus {
@@ -250,7 +250,7 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 }
 
 .control-select.chord-mode:focus {
-  box-shadow: 0 0 0 2px rgb(139, 92, 246, 0.4);
+  box-shadow: 0 0 0 2px rgb(46, 232, 141, 0.4);
 }
 
 /* Custom dropdown options styling */
@@ -410,7 +410,7 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 
 /* Chords mode (checked) */
 input:checked + .toggle-slider {
-  background-color: rgb(139, 92, 246, 0.1);
+  background-color: rgb(46, 232, 141, 0.1);
   border-color: var(--purple-600);
 }
 
@@ -437,7 +437,7 @@ input:checked + .toggle-slider .toggle-text.right {
 }
 
 input:checked + .toggle-slider:hover {
-  background-color: rgb(139, 92, 246, 0.2);
+  background-color: rgb(46, 232, 141, 0.2);
 }
 
 /* Green flash for toggle slider when mode changes */
@@ -725,15 +725,15 @@ input:checked + .toggle-slider:hover {
   align-items: center;
   justify-content: space-between;
   padding: 4px 8px;
-  background: rgb(139, 92, 246, 0.1);
-  border: 1px solid rgb(139, 92, 246, 0.3);
+  background: rgb(46, 232, 141, 0.1);
+  border: 1px solid rgb(46, 232, 141, 0.3);
   border-radius: 4px;
   transition: all 0.2s ease;
 }
 
 .applied-chord-item:hover {
-  background: rgb(139, 92, 246, 0.2);
-  border-color: rgb(139, 92, 246, 0.5);
+  background: rgb(46, 232, 141, 0.2);
+  border-color: rgb(46, 232, 141, 0.5);
 }
 
 .chord-name {
@@ -789,12 +789,12 @@ input:checked + .toggle-slider:hover {
 }
 
 .applied-chords-list::-webkit-scrollbar-thumb {
-  background: rgb(139, 92, 246, 0.3);
+  background: rgb(46, 232, 141, 0.3);
   border-radius: 2px;
 }
 
 .applied-chords-list::-webkit-scrollbar-thumb:hover {
-  background: rgb(139, 92, 246, 0.5);
+  background: rgb(46, 232, 141, 0.5);
 }
 
 /* Empty List Message */

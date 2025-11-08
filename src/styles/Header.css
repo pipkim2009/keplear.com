@@ -178,7 +178,7 @@
 }
 
 .dark .login-btn:hover {
-  background: rgb(45, 27, 105, 1);
+  background: rgb(27, 105, 64, 1);
   border-color: rgb(210, 210, 249, 0.5);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px var(--shadow-hover-dark);

@@ -407,7 +407,7 @@
   outline: var(--focus-ring-width) solid var(--focus-ring-color-dark);
   outline-offset: var(--focus-ring-offset);
   box-shadow:
-    0 0 0 4px rgb(168, 85, 247, 0.3),
+    0 0 0 4px rgb(46, 232, 141, 0.3),
     inset 0 2px 4px var(--gray-400-alpha-30),
     inset 0 -2px 4px var(--black-alpha-10),
     0 4px 8px var(--black-alpha-40);
@@ -548,7 +548,7 @@
   outline: var(--focus-ring-width) solid var(--focus-ring-color-dark);
   outline-offset: var(--focus-ring-offset);
   box-shadow:
-    0 0 0 4px rgb(168, 85, 247, 0.3),
+    0 0 0 4px rgb(46, 232, 141, 0.3),
     inset 0 1px 2px var(--white-alpha-10),
     inset 0 -1px 2px var(--black-alpha-30),
     0 4px 8px var(--black-alpha-50);

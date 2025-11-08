@@ -487,10 +487,10 @@
   background: var(--black);
   border-color: var(--purple-500);
   box-shadow:
-    0 0 20px rgb(168, 85, 247, 0.8),
-    0 0 40px rgb(168, 85, 247, 0.5),
+    0 0 20px rgb(46, 232, 141, 0.8),
+    0 0 40px rgb(46, 232, 141, 0.5),
     0 4px 12px rgb(0, 0, 0, 0.8);
-  text-shadow: 0 0 10px rgb(168, 85, 247, 0.5);
+  text-shadow: 0 0 10px rgb(46, 232, 141, 0.5);
 }
 
 .dark .tooltip-box::after {

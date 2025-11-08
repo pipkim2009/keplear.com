@@ -17,7 +17,7 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
     }}>
       <div style={{
         background: 'linear-gradient(145deg, #2d3748, #1a202c)',
-        border: '2px solid #6b46c1',
+        border: '2px solid #00b359',
         borderRadius: '20px',
         padding: '60px 40px',
         maxWidth: '600px',
@@ -28,7 +28,7 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
         <div style={{
           fontSize: '8rem',
           fontWeight: 'bold',
-          background: 'linear-gradient(145deg, #6b46c1, #8b5cf6)',
+          background: 'linear-gradient(145deg, #00b359, #2ee88d)',
           backgroundClip: 'text',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
@@ -42,7 +42,7 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
           fontSize: '2.5rem',
           fontWeight: 'bold',
           marginBottom: '1rem',
-          background: 'linear-gradient(145deg, #6b46c1, #8b5cf6)',
+          background: 'linear-gradient(145deg, #00b359, #2ee88d)',
           backgroundClip: 'text',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
@@ -67,7 +67,7 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
             onClick={onNavigateToHome}
             style={{
               padding: '15px 30px',
-              background: 'linear-gradient(145deg, #6b46c1, #8b5cf6)',
+              background: 'linear-gradient(145deg, #00b359, #2ee88d)',
               color: 'white',
               border: 'none',
               borderRadius: '12px',

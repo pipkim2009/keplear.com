@@ -155,7 +155,7 @@
 }
 
 :global(.dark) .secondaryBtn:hover {
-  background: rgb(45, 27, 105, 1);
+  background: rgb(27, 105, 64, 1);
   border-color: rgb(210, 210, 249, 0.5);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px var(--shadow-hover-dark);
@@ -211,9 +211,9 @@
 }
 
 :global(.dark) .featureCard {
-  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(45, 27, 105, 0.4) 100%);
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
   border: 1px solid rgb(210, 210, 249, 0.2);
-  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(168, 85, 247, 0.1) inset;
+  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(46, 232, 141, 0.1) inset;
 }
 
 .featureCard:hover {
@@ -363,7 +363,7 @@
 }
 
 :global(.dark) .ctaSection {
-  background: linear-gradient(135deg, rgb(45, 27, 105, 0.6) 0%, rgb(128, 0, 255, 0.3) 50%, rgb(45, 27, 105, 0.6) 100%);
+  background: linear-gradient(135deg, rgb(27, 105, 64, 0.6) 0%, rgb(0, 217, 111, 0.3) 50%, rgb(27, 105, 64, 0.6) 100%);
   border: 1px solid var(--primary-purple-alpha-50);
   box-shadow: 0 4px 30px var(--primary-purple-alpha-20), 0 0 60px var(--primary-purple-alpha-15), 0 0 0 1px var(--primary-purple-alpha-30) inset;
 }

@@ -155,14 +155,14 @@
 }
 
 .input:hover {
-  background: rgb(128, 0, 255, 0.25);
+  background: rgb(0, 217, 111, 0.25);
   border-color: var(--input-border-hover);
 }
 
 .input:focus {
-  background: rgb(128, 0, 255, 0.3);
+  background: rgb(0, 217, 111, 0.3);
   border-color: var(--input-border-focus);
-  box-shadow: 0 0 8px rgb(139, 92, 246, 0.4);
+  box-shadow: 0 0 8px rgb(46, 232, 141, 0.4);
 }
 
 .inputFlashing {
