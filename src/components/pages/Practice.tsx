@@ -8,6 +8,8 @@ import PracticeOptionsModal from './PracticeOptionsModal'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import { generateNotesWithSeparateOctaves } from '../../utils/notes'
 import type { Note } from '../../utils/notes'
+import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
+import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
 
 interface PracticeProps {
   onNavigateToSandbox: () => void
@@ -108,6 +110,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   const hasAnnouncedMelody = useRef(false)
   const [melodySetupMessage, setMelodySetupMessage] = useState<string>('')
   const [congratulationsMessage, setCongratulationsMessage] = useState<string>('')
+  const [setupDetails, setSetupDetails] = useState<{ type: string; details: any } | null>(null)
 
   const {
     handleNoteClick,
@@ -151,7 +154,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     isGeneratingMelody,
     isAutoRecording,
     currentlyPlayingNoteIndex,
-    handleCurrentlyPlayingNoteChange
+    handleCurrentlyPlayingNoteChange,
+    scaleChordManagement
   } = useInstrument()
 
   const handleStartLesson = (instrumentId: string) => {
@@ -182,8 +186,11 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     hasAnnouncedMelody.current = false
     setMelodySetupMessage('')
     setCongratulationsMessage('')
+    setSetupDetails(null)
     setBpm(120) // Reset BPM to default
     setNumberOfBeats(4) // Reset beats to default
+    setChordMode('arpeggiator') // Reset chord mode to default
+    handleOctaveRangeChange(0, 0) // Reset octave range to default (show only middle octave)
   }
 
   const handleLessonComplete = () => {
@@ -191,14 +198,13 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setCongratulationsMessage(message)
   }
 
-  // Auto-select notes and BPM when session starts for Simple Melodies
+  // Auto-select notes/scales/chords and BPM when session starts
   useEffect(() => {
-    if (sessionStarted && practiceOptions.includes('simple-melodies') && selectedNotes.length === 0) {
-      // Switch to multi-selection mode for keyboard (needed for 3-6 notes)
-      if (instrument === 'keyboard') {
-        handleKeyboardSelectionModeChange('multi', false)
-      }
+    const hasNoContent = selectedNotes.length === 0 &&
+                         scaleChordManagement.appliedScales.length === 0 &&
+                         scaleChordManagement.appliedChords.length === 0
 
+    if (sessionStarted && hasNoContent && instrument === 'keyboard') {
       // Randomly select BPM (30 to 240 in 30 BPM increments)
       const bpmOptions = Array.from({ length: 8 }, (_, i) => (i + 1) * 30)
       const randomBPM = bpmOptions[Math.floor(Math.random() * bpmOptions.length)]
@@ -208,66 +214,141 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       const randomBeats = Math.floor(Math.random() * 6) + 3
       setNumberOfBeats(randomBeats)
 
-      // Generate all notes for full keyboard range (octaves 1-8)
-      const allNotes = generateNotesWithSeparateOctaves(3, 3)
-
-      // Randomly select a range of notes from all octaves
+      // Randomly select octave (1-8)
       const octaves = [1, 2, 3, 4, 5, 6, 7, 8]
       const randomOctave = octaves[Math.floor(Math.random() * octaves.length)]
 
-      // All notes in chromatic scale
-      const chromaticNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+      // Set octave range to show only the selected octave
+      // Formula: to show octave N, set lowerOctaves = 4 - N, higherOctaves = N - 4
+      const lowerOctavesForRange = 4 - randomOctave
+      const higherOctavesForRange = randomOctave - 4
+      handleOctaveRangeChange(lowerOctavesForRange, higherOctavesForRange)
 
-      // Randomly choose 3-6 notes from the chromatic scale
-      const noteCount = Math.floor(Math.random() * 4) + 3
+      // Generate all notes for the selected octave
+      const allNotesInOctave = generateNotesWithSeparateOctaves(3, 3).filter(note => {
+        const noteOctave = note.name.match(/\d+$/)?.[0]
+        return noteOctave === randomOctave.toString()
+      })
 
-      // Shuffle and pick random notes
-      const shuffledNotes = [...chromaticNotes].sort(() => Math.random() - 0.5)
-      const selectedNoteNames = shuffledNotes.slice(0, noteCount)
+      // SIMPLE MELODIES: 3-6 random notes on single octave
+      if (practiceOptions.includes('simple-melodies')) {
+        handleKeyboardSelectionModeChange('multi', false)
 
-      // Create full note names with the octave (e.g., "C4", "E4")
-      const autoNoteNames = selectedNoteNames.map(noteName => `${noteName}${randomOctave}`)
+        const chromaticNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+        const noteCount = Math.floor(Math.random() * 4) + 3
+        const shuffledNotes = [...chromaticNotes].sort(() => Math.random() - 0.5)
+        const selectedNoteNames = shuffledNotes.slice(0, noteCount)
+        const autoNoteNames = selectedNoteNames.map(noteName => `${noteName}${randomOctave}`)
+        const autoNotes = autoNoteNames
+          .map(noteName => allNotesInOctave.find(n => n.name === noteName))
+          .filter((note): note is Note => note !== undefined)
 
-      // Find the actual Note objects from the full notes array
-      const autoNotes = autoNoteNames
-        .map(noteName => allNotes.find(n => n.name === noteName))
-        .filter((note): note is Note => note !== undefined)
+        setGuitarNotes(autoNotes)
+        setSetupDetails({ type: 'simple-melodies', details: { noteCount: autoNotes.length, octave: randomOctave } })
+      }
 
-      // Use setGuitarNotes to set all notes at once (works for all instruments)
-      setGuitarNotes(autoNotes)
+      // SCALES: Single random scale on single octave
+      else if (practiceOptions.includes('scales')) {
+        const randomScale = KEYBOARD_SCALES[Math.floor(Math.random() * KEYBOARD_SCALES.length)]
+        const randomRoot = ROOT_NOTES[Math.floor(Math.random() * ROOT_NOTES.length)]
+
+        // Use the scale chord management system to apply the scale
+        scaleChordManagement.handleKeyboardScaleApply(randomRoot, randomScale, randomOctave)
+
+        setSetupDetails({ type: 'scales', details: { scaleName: randomScale.name, root: randomRoot, octave: randomOctave } })
+      }
+
+      // CHORD PROGRESSIONS: 3-6 random chords with progression mode
+      else if (practiceOptions.includes('chord-progressions')) {
+        setChordMode('progression')
+
+        const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
+        const chordDetails: { root: string; chord: string }[] = []
+
+        for (let i = 0; i < chordCount; i++) {
+          const randomChord = KEYBOARD_CHORDS[Math.floor(Math.random() * KEYBOARD_CHORDS.length)]
+          const randomRoot = KEYBOARD_CHORD_ROOT_NOTES[Math.floor(Math.random() * KEYBOARD_CHORD_ROOT_NOTES.length)]
+
+          // Use the scale chord management system to apply each chord
+          scaleChordManagement.handleKeyboardChordApply(randomRoot, randomChord, randomOctave)
+
+          chordDetails.push({ root: randomRoot, chord: randomChord.name })
+        }
+
+        setSetupDetails({ type: 'chord-progressions', details: { chordCount, chords: chordDetails, octave: randomOctave } })
+      }
+
+      // CHORD ARPEGGIOS: 3-6 random chords with arpeggiator mode
+      else if (practiceOptions.includes('chord-arpeggios')) {
+        setChordMode('arpeggiator')
+
+        const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
+        const chordDetails: { root: string; chord: string }[] = []
+
+        for (let i = 0; i < chordCount; i++) {
+          const randomChord = KEYBOARD_CHORDS[Math.floor(Math.random() * KEYBOARD_CHORDS.length)]
+          const randomRoot = KEYBOARD_CHORD_ROOT_NOTES[Math.floor(Math.random() * KEYBOARD_CHORD_ROOT_NOTES.length)]
+
+          // Use the scale chord management system to apply each chord
+          scaleChordManagement.handleKeyboardChordApply(randomRoot, randomChord, randomOctave)
+
+          chordDetails.push({ root: randomRoot, chord: randomChord.name })
+        }
+
+        setSetupDetails({ type: 'chord-arpeggios', details: { chordCount, chords: chordDetails, octave: randomOctave } })
+      }
     }
-  }, [sessionStarted, practiceOptions, selectedNotes.length, setGuitarNotes, setBpm, instrument, handleKeyboardSelectionModeChange])
+  }, [sessionStarted, practiceOptions, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, setGuitarNotes, setBpm, setNumberOfBeats, instrument, handleKeyboardSelectionModeChange, setChordMode, handleOctaveRangeChange, scaleChordManagement])
 
-  // Trigger melody generation once notes are selected
+  // Trigger melody generation once notes/scales/chords are selected (for all lesson types)
   useEffect(() => {
-    if (sessionStarted && practiceOptions.includes('simple-melodies') && selectedNotes.length > 0 && !hasGeneratedMelody) {
+    const hasContent = selectedNotes.length > 0 ||
+                       scaleChordManagement.appliedScales.length > 0 ||
+                       scaleChordManagement.appliedChords.length > 0
+
+    if (sessionStarted && hasContent && !hasGeneratedMelody) {
       handleGenerateMelody()
       setHasGeneratedMelody(true)
     }
-  }, [sessionStarted, practiceOptions, selectedNotes.length, hasGeneratedMelody, handleGenerateMelody])
+  }, [sessionStarted, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, hasGeneratedMelody, handleGenerateMelody])
 
-  // Announce and play when welcome speech is done and melody is ready
+  // Announce and play when welcome speech is done and melody is ready (for all lesson types)
   useEffect(() => {
-    if (welcomeSpeechDone && practiceOptions.includes('simple-melodies') && generatedMelody.length > 0 && recordedAudioBlob && !hasAnnouncedMelody.current) {
+    if (welcomeSpeechDone && generatedMelody.length > 0 && recordedAudioBlob && !hasAnnouncedMelody.current && setupDetails) {
       hasAnnouncedMelody.current = true
-
-      // Extract octave number from first note (all notes are in same octave)
-      const firstNoteName = generatedMelody[0].name
-      const octaveNumber = firstNoteName.match(/\d+$/)?.[0] || '4'
 
       // Convert octave number to ordinal
       const octaveOrdinals: { [key: string]: string } = {
         '1': 'first', '2': 'second', '3': 'third', '4': 'fourth',
         '5': 'fifth', '6': 'sixth', '7': 'seventh', '8': 'eighth'
       }
-      const octaveOrdinal = octaveOrdinals[octaveNumber] || 'fourth'
 
-      const announcement = `I have set up a ${generatedMelody.length} note melody on the ${octaveOrdinal} octave at ${bpm} BPM`
+      let announcement = ''
+
+      // Create announcement based on lesson type
+      if (setupDetails.type === 'simple-melodies') {
+        const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
+        announcement = `I have set up a ${generatedMelody.length} note melody on the ${octaveOrdinal} octave at ${bpm} BPM`
+      }
+      else if (setupDetails.type === 'scales') {
+        const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
+        announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.scaleName} scale on the ${octaveOrdinal} octave at ${bpm} BPM`
+      }
+      else if (setupDetails.type === 'chord-progressions') {
+        const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
+        const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
+        announcement = `I have set up a ${setupDetails.details.chordCount} chord progression on the ${octaveOrdinal} octave at ${bpm} BPM with progression mode`
+      }
+      else if (setupDetails.type === 'chord-arpeggios') {
+        const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
+        const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
+        announcement = `I have set up ${setupDetails.details.chordCount} chord arpeggios on the ${octaveOrdinal} octave at ${bpm} BPM with arpeggiator mode`
+      }
 
       // Set the message for subtitle display (WelcomeSubtitle component will handle TTS and subtitle)
       setMelodySetupMessage(announcement)
     }
-  }, [welcomeSpeechDone, practiceOptions, generatedMelody, recordedAudioBlob, bpm])
+  }, [welcomeSpeechDone, generatedMelody, recordedAudioBlob, bpm, setupDetails])
 
 
   // Show practice options modal
