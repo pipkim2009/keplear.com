@@ -10,6 +10,14 @@ import { generateNotesWithSeparateOctaves } from '../../utils/notes'
 import type { Note } from '../../utils/notes'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
+import { GUITAR_SCALES, ROOT_NOTES as GUITAR_ROOT_NOTES, getScaleBoxes } from '../../utils/instruments/guitar/guitarScales'
+import { GUITAR_CHORDS, CHORD_ROOT_NOTES as GUITAR_CHORD_ROOT_NOTES } from '../../utils/instruments/guitar/guitarChords'
+import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
+import type { GuitarNote } from '../../utils/instruments/guitar/guitarNotes'
+import { BASS_SCALES, BASS_ROOT_NOTES, getBassScaleBoxes } from '../../utils/instruments/bass/bassScales'
+import { BASS_CHORDS, BASS_CHORD_ROOT_NOTES } from '../../utils/instruments/bass/bassChords'
+import { bassNotes } from '../../utils/instruments/bass/bassNotes'
+import type { BassNote } from '../../utils/instruments/bass/bassNotes'
 
 interface PracticeProps {
   onNavigateToSandbox: () => void
@@ -278,24 +286,259 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         setSetupDetails({ type: 'chord-progressions', details: { chordCount, chords: chordDetails, octave: randomOctave } })
       }
 
-      // CHORD ARPEGGIOS: 3-6 random chords with arpeggiator mode
+      // CHORD ARPEGGIOS: Single random chord with arpeggiator mode
       else if (practiceOptions.includes('chord-arpeggios')) {
         setChordMode('arpeggiator')
+
+        const randomChord = KEYBOARD_CHORDS[Math.floor(Math.random() * KEYBOARD_CHORDS.length)]
+        const randomRoot = KEYBOARD_CHORD_ROOT_NOTES[Math.floor(Math.random() * KEYBOARD_CHORD_ROOT_NOTES.length)]
+
+        // Use the scale chord management system to apply the chord
+        scaleChordManagement.handleKeyboardChordApply(randomRoot, randomChord, randomOctave)
+
+        setSetupDetails({ type: 'chord-arpeggios', details: { root: randomRoot, chord: randomChord.name, octave: randomOctave } })
+      }
+    }
+
+    // GUITAR LESSONS
+    if (sessionStarted && hasNoContent && instrument === 'guitar') {
+      // Randomly select BPM (30 to 240 in 30 BPM increments)
+      const bpmOptions = Array.from({ length: 8 }, (_, i) => (i + 1) * 30)
+      const randomBPM = bpmOptions[Math.floor(Math.random() * bpmOptions.length)]
+      setBpm(randomBPM)
+
+      // Randomly select number of beats (3 to 8)
+      const randomBeats = Math.floor(Math.random() * 6) + 3
+      setNumberOfBeats(randomBeats)
+
+      // SIMPLE MELODIES: 3-6 random notes on a single string
+      if (practiceOptions.includes('simple-melodies')) {
+        // Randomly select one string (1-6 for guitar)
+        const randomString = Math.floor(Math.random() * 6) + 1
+
+        // Get all notes on that string
+        const notesOnString = guitarNotes.filter(note => note.string === randomString)
+
+        // Randomly select 3-6 frets from that string
+        const noteCount = Math.floor(Math.random() * 4) + 3
+        const shuffledNotes = [...notesOnString].sort(() => Math.random() - 0.5)
+        const selectedGuitarNotes = shuffledNotes.slice(0, noteCount)
+
+        // Convert GuitarNote[] to Note[] format
+        const convertedNotes: Note[] = selectedGuitarNotes.map(gNote => ({
+          name: gNote.name,
+          frequency: gNote.frequency
+        }))
+
+        setGuitarNotes(convertedNotes)
+        setSetupDetails({ type: 'simple-melodies', details: { noteCount: selectedGuitarNotes.length, string: randomString } })
+      }
+
+      // SCALES: Single random scale in a specific position
+      else if (practiceOptions.includes('scales')) {
+        const randomScale = GUITAR_SCALES[Math.floor(Math.random() * GUITAR_SCALES.length)]
+        const randomRoot = GUITAR_ROOT_NOTES[Math.floor(Math.random() * GUITAR_ROOT_NOTES.length)]
+
+        // Get all scale boxes for this scale and root
+        const scaleBoxes = getScaleBoxes(randomRoot, randomScale, guitarNotes)
+
+        // Pick a random box position
+        if (scaleBoxes.length > 0) {
+          const randomBox = scaleBoxes[Math.floor(Math.random() * scaleBoxes.length)]
+
+          // Apply the scale box for visual selection
+          scaleChordManagement.handleScaleBoxSelect(randomBox)
+
+          // Convert scale box positions to Note objects for melody generation
+          const scaleNotes: Note[] = randomBox.positions.map(pos => {
+            // Find the guitar note for this position
+            const guitarNote = guitarNotes.find(gn => gn.string === pos.string && gn.fret === pos.fret)
+            return {
+              name: pos.note,
+              frequency: guitarNote?.frequency || 0
+            }
+          })
+
+          // ALSO set the notes directly for melody generation
+          setGuitarNotes(scaleNotes)
+
+          setSetupDetails({ type: 'scales', details: { scaleName: randomScale.name, root: randomRoot, position: randomBox.name } })
+        }
+      }
+
+      // CHORD PROGRESSIONS: 3-6 random chords with progression mode
+      else if (practiceOptions.includes('chord-progressions')) {
+        setChordMode('progression')
 
         const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
         const chordDetails: { root: string; chord: string }[] = []
 
         for (let i = 0; i < chordCount; i++) {
-          const randomChord = KEYBOARD_CHORDS[Math.floor(Math.random() * KEYBOARD_CHORDS.length)]
-          const randomRoot = KEYBOARD_CHORD_ROOT_NOTES[Math.floor(Math.random() * KEYBOARD_CHORD_ROOT_NOTES.length)]
+          const randomChord = GUITAR_CHORDS[Math.floor(Math.random() * GUITAR_CHORDS.length)]
+          const randomRoot = GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
 
-          // Use the scale chord management system to apply each chord
-          scaleChordManagement.handleKeyboardChordApply(randomRoot, randomChord, randomOctave)
+          // Apply the chord - this adds to appliedChords for progression mode
+          scaleChordManagement.handleChordSelect(randomRoot, randomChord)
 
           chordDetails.push({ root: randomRoot, chord: randomChord.name })
         }
 
-        setSetupDetails({ type: 'chord-arpeggios', details: { chordCount, chords: chordDetails, octave: randomOctave } })
+        // Don't call setGuitarNotes - let appliedChords handle it in progression mode
+        setSetupDetails({ type: 'chord-progressions', details: { chordCount, chords: chordDetails } })
+      }
+
+      // CHORD ARPEGGIOS: Single random chord with arpeggiator mode
+      else if (practiceOptions.includes('chord-arpeggios')) {
+        setChordMode('arpeggiator')
+
+        const randomChord = GUITAR_CHORDS[Math.floor(Math.random() * GUITAR_CHORDS.length)]
+        const randomRoot = GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
+
+        // Apply the chord for visual selection
+        scaleChordManagement.handleChordSelect(randomRoot, randomChord)
+
+        // Get chord notes for melody generation
+        const chordNoteNames = randomChord.intervals.map(interval => {
+          const rootIndex = GUITAR_CHORD_ROOT_NOTES.indexOf(randomRoot)
+          const noteIndex = (rootIndex + interval) % 12
+          return GUITAR_CHORD_ROOT_NOTES[noteIndex]
+        })
+
+        // Find guitar notes that match these chord notes
+        const chordNotes: Note[] = []
+        chordNoteNames.forEach(noteName => {
+          const matchingNotes = guitarNotes.filter(gn => gn.name.startsWith(noteName))
+          matchingNotes.forEach(gn => {
+            if (!chordNotes.some(n => n.name === gn.name)) {
+              chordNotes.push({ name: gn.name, frequency: gn.frequency })
+            }
+          })
+        })
+
+        // Set chord notes for melody generation
+        setGuitarNotes(chordNotes)
+        setSetupDetails({ type: 'chord-arpeggios', details: { root: randomRoot, chord: randomChord.name } })
+      }
+    }
+
+    // BASS LESSONS
+    if (sessionStarted && hasNoContent && instrument === 'bass') {
+      // Randomly select BPM (30 to 240 in 30 BPM increments)
+      const bpmOptions = Array.from({ length: 8 }, (_, i) => (i + 1) * 30)
+      const randomBPM = bpmOptions[Math.floor(Math.random() * bpmOptions.length)]
+      setBpm(randomBPM)
+
+      // Randomly select number of beats (3 to 8)
+      const randomBeats = Math.floor(Math.random() * 6) + 3
+      setNumberOfBeats(randomBeats)
+
+      // SIMPLE MELODIES: 3-6 random notes on a single string
+      if (practiceOptions.includes('simple-melodies')) {
+        // Randomly select one string (1-4 for bass)
+        const randomString = Math.floor(Math.random() * 4) + 1
+
+        // Get all notes on that string
+        const notesOnString = bassNotes.filter(note => note.string === randomString)
+
+        // Randomly select 3-6 frets from that string
+        const noteCount = Math.floor(Math.random() * 4) + 3
+        const shuffledNotes = [...notesOnString].sort(() => Math.random() - 0.5)
+        const selectedBassNotes = shuffledNotes.slice(0, noteCount)
+
+        // Convert BassNote[] to Note[] format
+        const convertedNotes: Note[] = selectedBassNotes.map(bNote => ({
+          name: bNote.name,
+          frequency: bNote.frequency
+        }))
+
+        setGuitarNotes(convertedNotes)
+        setSetupDetails({ type: 'simple-melodies', details: { noteCount: selectedBassNotes.length, string: randomString } })
+      }
+
+      // SCALES: Single random scale in a specific position
+      else if (practiceOptions.includes('scales')) {
+        const randomScale = BASS_SCALES[Math.floor(Math.random() * BASS_SCALES.length)]
+        const randomRoot = BASS_ROOT_NOTES[Math.floor(Math.random() * BASS_ROOT_NOTES.length)]
+
+        // Get all scale boxes for this scale and root
+        const scaleBoxes = getBassScaleBoxes(randomRoot, randomScale, bassNotes)
+
+        // Pick a random box position
+        if (scaleBoxes.length > 0) {
+          const randomBox = scaleBoxes[Math.floor(Math.random() * scaleBoxes.length)]
+
+          // Apply the scale box for visual selection
+          scaleChordManagement.handleScaleBoxSelect(randomBox as any)
+
+          // Convert scale box positions to Note objects for melody generation
+          const scaleNotes: Note[] = randomBox.positions.map(pos => {
+            // Find the bass note for this position
+            const bassNote = bassNotes.find(bn => bn.string === pos.string && bn.fret === pos.fret)
+            return {
+              name: pos.note,
+              frequency: bassNote?.frequency || 0
+            }
+          })
+
+          // ALSO set the notes directly for melody generation
+          setGuitarNotes(scaleNotes)
+
+          setSetupDetails({ type: 'scales', details: { scaleName: randomScale.name, root: randomRoot, position: randomBox.name } })
+        }
+      }
+
+      // CHORD PROGRESSIONS: 3-6 random chords with progression mode
+      else if (practiceOptions.includes('chord-progressions')) {
+        setChordMode('progression')
+
+        const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
+        const chordDetails: { root: string; chord: string }[] = []
+
+        for (let i = 0; i < chordCount; i++) {
+          const randomChord = BASS_CHORDS[Math.floor(Math.random() * BASS_CHORDS.length)]
+          const randomRoot = BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
+
+          // Apply the chord - this adds to appliedChords for progression mode
+          scaleChordManagement.handleChordSelect(randomRoot, randomChord as any)
+
+          chordDetails.push({ root: randomRoot, chord: randomChord.name })
+        }
+
+        // Don't call setGuitarNotes - let appliedChords handle it in progression mode
+        setSetupDetails({ type: 'chord-progressions', details: { chordCount, chords: chordDetails } })
+      }
+
+      // CHORD ARPEGGIOS: Single random chord with arpeggiator mode
+      else if (practiceOptions.includes('chord-arpeggios')) {
+        setChordMode('arpeggiator')
+
+        const randomChord = BASS_CHORDS[Math.floor(Math.random() * BASS_CHORDS.length)]
+        const randomRoot = BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
+
+        // Apply the chord for visual selection
+        scaleChordManagement.handleChordSelect(randomRoot, randomChord as any)
+
+        // Get chord notes for melody generation
+        const chordNoteNames = randomChord.intervals.map(interval => {
+          const rootIndex = BASS_CHORD_ROOT_NOTES.indexOf(randomRoot)
+          const noteIndex = (rootIndex + interval) % 12
+          return BASS_CHORD_ROOT_NOTES[noteIndex]
+        })
+
+        // Find bass notes that match these chord notes
+        const chordNotes: Note[] = []
+        chordNoteNames.forEach(noteName => {
+          const matchingNotes = bassNotes.filter(bn => bn.name.startsWith(noteName))
+          matchingNotes.forEach(bn => {
+            if (!chordNotes.some(n => n.name === bn.name)) {
+              chordNotes.push({ name: bn.name, frequency: bn.frequency })
+            }
+          })
+        })
+
+        // Set chord notes for melody generation
+        setGuitarNotes(chordNotes)
+        setSetupDetails({ type: 'chord-arpeggios', details: { root: randomRoot, chord: randomChord.name } })
       }
     }
   }, [sessionStarted, practiceOptions, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, setGuitarNotes, setBpm, setNumberOfBeats, instrument, handleKeyboardSelectionModeChange, setChordMode, handleOctaveRangeChange, scaleChordManagement])
@@ -325,24 +568,53 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
       let announcement = ''
 
+      // Convert string number to ordinal (for guitar/bass)
+      const stringOrdinals: { [key: string]: string } = {
+        '1': 'first', '2': 'second', '3': 'third', '4': 'fourth',
+        '5': 'fifth', '6': 'sixth'
+      }
+
       // Create announcement based on lesson type
       if (setupDetails.type === 'simple-melodies') {
-        const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-        announcement = `I have set up a ${generatedMelody.length} note melody on the ${octaveOrdinal} octave at ${bpm} BPM`
+        // Check if it's keyboard (has octave) or guitar/bass (has string)
+        if (setupDetails.details.octave) {
+          const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
+          announcement = `I have set up a ${generatedMelody.length} note melody on the ${octaveOrdinal} octave at ${bpm} BPM`
+        } else if (setupDetails.details.string) {
+          const stringOrdinal = stringOrdinals[setupDetails.details.string.toString()] || 'first'
+          announcement = `I have set up a ${generatedMelody.length} note melody on the ${stringOrdinal} string at ${bpm} BPM`
+        }
       }
       else if (setupDetails.type === 'scales') {
-        const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-        announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.scaleName} scale on the ${octaveOrdinal} octave at ${bpm} BPM`
+        // Check if it's keyboard (has octave) or guitar/bass (has position)
+        if (setupDetails.details.octave) {
+          const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
+          announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.scaleName} scale on the ${octaveOrdinal} octave at ${bpm} BPM`
+        } else if (setupDetails.details.position) {
+          announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.scaleName} scale in ${setupDetails.details.position} at ${bpm} BPM`
+        } else {
+          announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.scaleName} scale at ${bpm} BPM`
+        }
       }
       else if (setupDetails.type === 'chord-progressions') {
-        const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-        const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
-        announcement = `I have set up a ${setupDetails.details.chordCount} chord progression on the ${octaveOrdinal} octave at ${bpm} BPM with progression mode`
+        // Check if it's keyboard (has octave) or guitar/bass (no octave specified)
+        if (setupDetails.details.octave) {
+          const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
+          const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
+          announcement = `I have set up a ${setupDetails.details.chordCount} chord progression on the ${octaveOrdinal} octave at ${bpm} BPM with progression mode`
+        } else {
+          const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
+          announcement = `I have set up a ${setupDetails.details.chordCount} chord progression at ${bpm} BPM with progression mode`
+        }
       }
       else if (setupDetails.type === 'chord-arpeggios') {
-        const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-        const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
-        announcement = `I have set up ${setupDetails.details.chordCount} chord arpeggios on the ${octaveOrdinal} octave at ${bpm} BPM with arpeggiator mode`
+        // Check if it's keyboard (has octave) or guitar/bass (no octave specified)
+        if (setupDetails.details.octave) {
+          const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
+          announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.chord} arpeggio on the ${octaveOrdinal} octave at ${bpm} BPM`
+        } else {
+          announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.chord} arpeggio at ${bpm} BPM`
+        }
       }
 
       // Set the message for subtitle display (WelcomeSubtitle component will handle TTS and subtitle)
