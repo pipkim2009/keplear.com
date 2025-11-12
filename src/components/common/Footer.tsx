@@ -8,10 +8,10 @@ function Footer() {
       <div className="footer-content">
         <div className="footer-main">
           <div className="footer-brand">
-            <h3 className="footer-logo">Keplear™</h3>
+            <img src="/Keplear-logo.png" alt="Keplear" className="footer-logo" />
             <p className="footer-slogan">Learn music like the greats</p>
           </div>
-          
+
           <div className="footer-info">
             <div className="footer-contact">
               <a href="mailto:e4ellis09@gmail.com" className="footer-email">

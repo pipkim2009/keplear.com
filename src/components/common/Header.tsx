@@ -44,7 +44,7 @@ const Header = memo(function Header({
       <div className="header-content">
         <div className="header-left">
           <div className="header-brand">
-            <h1 className="header-title">Keplear™</h1>
+            <img src="/Keplear-logo.png" alt="Keplear" className="header-logo" />
             <p className="header-slogan">Learn music like the greats</p>
           </div>
         </div>

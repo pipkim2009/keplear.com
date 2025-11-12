@@ -26,10 +26,10 @@
 .octave-button {
   width: 40px;
   height: 40px;
-  background: var(--primary-purple-alpha-10);
-  border: 2px solid var(--primary-purple);
+  background: var(--white-alpha-10);
+  border: 2px solid var(--white);
   border-radius: 50%;
-  color: var(--dark-text-primary);
+  color: var(--white);
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
@@ -43,7 +43,7 @@
 }
 
 .octave-button:hover {
-  background: var(--primary-purple-alpha-20);
+  background: var(--white-alpha-20);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px var(--black-alpha-30);
 }

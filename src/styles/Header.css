@@ -37,7 +37,20 @@
 .header-brand {
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  align-items: center;
+  gap: 0;
+}
+
+.header-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.header-logo:hover {
+  transform: scale(1.05);
 }
 
 .header-title {
@@ -57,13 +70,9 @@
   font-size: 0.75rem;
   font-weight: 400;
   margin: 0;
-  color: var(--light-text-primary);
-  opacity: 0.7;
+  color: #00d96f;
+  opacity: 1;
   font-style: italic;
-}
-
-.dark .header-slogan {
-  color: var(--dark-text-primary);
 }
 
 .header-nav {
@@ -157,31 +166,31 @@
 }
 
 .login-btn {
-  background: var(--white-alpha-90);
-  color: var(--dark-bg-tertiary);
-  border: 2px solid var(--btn-secondary-border-light);
-  box-shadow: 0 4px 15px var(--shadow-primary-light);
-}
-
-.dark .login-btn {
-  background: var(--btn-secondary-bg-dark);
-  color: var(--dark-text-primary);
-  border-color: var(--btn-secondary-border-dark);
-  box-shadow: 0 4px 15px var(--shadow-primary-dark);
+  background: var(--white);
+  color: var(--gray-900);
+  border: 2px solid var(--white);
+  box-shadow: 0 4px 15px var(--white-alpha-30);
 }
 
 .login-btn:hover {
-  background: rgb(255, 255, 255, 1);
-  border-color: rgb(210, 210, 249, 0.6);
+  background: var(--gray-200);
+  border-color: var(--gray-200);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--shadow-hover-light);
+  box-shadow: 0 6px 20px var(--white-alpha-40);
+}
+
+.dark .login-btn {
+  background: var(--gray-800);
+  color: var(--white);
+  border-color: var(--gray-800);
+  box-shadow: 0 4px 15px var(--gray-800-alpha-30);
 }
 
 .dark .login-btn:hover {
-  background: rgb(27, 105, 64, 1);
-  border-color: rgb(210, 210, 249, 0.5);
+  background: var(--gray-700);
+  border-color: var(--gray-700);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--shadow-hover-dark);
+  box-shadow: 0 6px 20px var(--gray-800-alpha-40);
 }
 
 .signup-btn {
@@ -215,6 +224,14 @@
     padding: 1rem;
     flex-wrap: wrap;
     gap: 1rem;
+  }
+
+  .header-logo {
+    height: 35px;
+  }
+
+  .header-slogan {
+    font-size: 0.75rem;
   }
 
   .header-title {

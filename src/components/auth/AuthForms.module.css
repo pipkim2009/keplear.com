@@ -108,6 +108,33 @@
   padding-top: 60px;
 }
 
+.authBrand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 24px;
+}
+
+.authLogo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.authLogo:hover {
+  transform: scale(1.05);
+}
+
+.authSlogan {
+  font-size: 0.875rem;
+  font-style: italic;
+  color: #00d96f;
+  opacity: 1;
+  margin: 0;
+}
+
 .authForm h2 {
   margin: 0 0 12px;
   color: #1b6940;
@@ -120,17 +147,17 @@
   color: #f8f9fa;
 }
 
-.form-description {
-  color: #00d96f;
-  font-size: 15px;
-  font-weight: 500;
+.formDescription {
+  color: #1b6940;
+  font-size: 18px;
+  font-weight: 600;
   text-align: center;
   margin: 0 0 32px;
   line-height: 1.5;
 }
 
-:global(.dark) .form-description {
-  color: #7fffc3;
+:global(.dark) .formDescription {
+  color: #f8f9fa;
 }
 
 .formGroup {
@@ -180,16 +207,16 @@
 
 .formGroup input:focus {
   outline: none;
-  border-color: #00d96f;
+  border-color: #3b82f6;
   background: rgb(255, 255, 255, 0.95);
-  box-shadow: 0 0 0 4px rgb(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 4px rgb(59, 130, 246, 0.15);
   transform: translateY(-2px);
 }
 
 :global(.dark) .formGroup input:focus {
-  border-color: #00d96f;
+  border-color: #3b82f6;
   background: rgb(70, 70, 70, 0.9);
-  box-shadow: 0 0 0 4px rgb(99, 102, 241, 0.15);
+  box-shadow: 0 0 0 4px rgb(59, 130, 246, 0.15);
 }
 
 .formGroup input:disabled {
@@ -303,7 +330,7 @@
 }
 
 :global(.dark) .linkButton {
-  color: #7fffc3;
+  color: #60a5fa;
 }
 
 .linkButton:hover {
@@ -312,7 +339,7 @@
 }
 
 :global(.dark) .linkButton:hover {
-  color: #c7d2fe;
+  color: #93c5fd;
 }
 
 /* Message Styles */
@@ -378,19 +405,27 @@
     align-items: flex-start;
     padding-top: 60px;
   }
-  
+
   .authModal {
     width: 100%;
     max-width: 100%;
     margin: 0;
     max-height: calc(100vh - 80px);
   }
-  
+
   .authForm {
     padding: 24px 20px;
     padding-top: 40px;
   }
-  
+
+  .authLogo {
+    height: 35px;
+  }
+
+  .authSlogan {
+    font-size: 0.75rem;
+  }
+
   .authForm h2 {
     font-size: 20px;
   }

@@ -137,7 +137,6 @@
 
 .theme-toggle-simple:hover {
   background: var(--black-alpha-10);
-  transform: scale(1.05);
 }
 
 .dark .theme-toggle-simple:hover {

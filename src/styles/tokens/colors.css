@@ -218,21 +218,21 @@
   /* ========================================
      SEMANTIC COLORS - PURPLE (CHORDS)
      ======================================== */
-  --purple-300: #b3ffda;
-  --purple-400: #7fffc3;
-  --purple-500: #66ffb2;
-  --purple-600: #2ee88d;
-  --purple-6366f1: #00d96f;  /* Primary Green */
-  --purple-6d28d9: #00a851;
-  --purple-700: #00b359;
-  --purple-800: #00b359;
-  --purple-8e44ad: #009945;  /* Green dark */
-  --purple-9333ea: #00b359;
-  --purple-9b59b6: #2ee88d;  /* Green medium */
-  --purple-chord: #2ee88d;  /* Semantic chord note */
-  --purple-chord-dark: #00b359;  /* Semantic chord note dark */
-  --purple-alpha-40: rgb(46, 232, 141, 0.4);
-  --purple-600-alpha-60: rgb(127, 255, 195, 0.6);
+  --purple-300: #d8b4fe;
+  --purple-400: #c084fc;
+  --purple-500: #a855f7;
+  --purple-600: #a855f7;
+  --purple-6366f1: #6366f1;
+  --purple-6d28d9: #6d28d9;
+  --purple-700: #9333ea;
+  --purple-800: #7e22ce;
+  --purple-8e44ad: #8e44ad;
+  --purple-9333ea: #9333ea;
+  --purple-9b59b6: #9b59b6;
+  --purple-chord: #a855f7;  /* Semantic chord note */
+  --purple-chord-dark: #9333ea;  /* Semantic chord note dark */
+  --purple-alpha-40: rgb(168, 85, 247, 0.4);
+  --purple-600-alpha-60: rgb(168, 85, 247, 0.6);
 
   /* ========================================
      NEUTRAL GRAYS
@@ -348,8 +348,8 @@
   --note-scale-root-dark: #b91c1c;
 
   /* Chord Notes */
-  --note-chord: #2ee88d;
-  --note-chord-dark: #00b359;
+  --note-chord: #a855f7;
+  --note-chord-dark: #9333ea;
   --note-chord-root: #dc2626;
   --note-chord-root-dark: #b91c1c;
 

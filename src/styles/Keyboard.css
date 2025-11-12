@@ -866,10 +866,10 @@
 .octave-button {
   width: 40px;
   height: 40px;
-  background: var(--primary-purple-alpha-10);
-  border: 2px solid var(--primary-purple);
+  background: var(--white-alpha-10);
+  border: 2px solid var(--white);
   border-radius: 50%;
-  color: var(--dark-text-primary);
+  color: var(--white);
   font-size: 24px;
   font-weight: bold;
   cursor: pointer;
@@ -883,7 +883,7 @@
 }
 
 .octave-button:hover {
-  background: var(--primary-purple-alpha-20);
+  background: var(--white-alpha-20);
   transform: translateY(-1px);
   box-shadow: 0 4px 8px var(--black-alpha-30);
 }
@@ -1339,14 +1339,14 @@
 */
 
 .light .octave-button {
-  background: var(--light-bg-primary);
-  border-color: var(--primary-purple);
-  color: var(--light-text-primary);
+  background: var(--white);
+  border-color: var(--gray-400);
+  color: var(--gray-800);
   box-shadow: 0 2px 4px var(--black-alpha-10);
 }
 
 .light .octave-button:hover {
-  background: var(--light-bg-tertiary);
+  background: var(--gray-100);
   box-shadow: 0 4px 8px var(--black-alpha-20);
 }
 

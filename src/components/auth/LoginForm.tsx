@@ -41,7 +41,11 @@ const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
 
   return (
     <div className={styles.authForm}>
-      <h2>Sign In</h2>
+      <div className={styles.authBrand}>
+        <img src="/Keplear-logo.png" alt="Keplear" className={styles.authLogo} />
+        <p className={styles.authSlogan}>Learn music like the greats</p>
+      </div>
+      <p className={styles.formDescription}>Sign in to your account</p>
 
       {error && (
         <div className={styles.errorMessage}>
