@@ -9,7 +9,6 @@ function Footer() {
         <div className="footer-main">
           <div className="footer-brand">
             <img src="/Keplear-logo.png" alt="Keplear" className="footer-logo" />
-            <p className="footer-slogan">Learn music like the greats</p>
           </div>
 
           <div className="footer-info">

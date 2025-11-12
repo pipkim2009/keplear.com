@@ -579,21 +579,21 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         // Check if it's keyboard (has octave) or guitar/bass (has string)
         if (setupDetails.details.octave) {
           const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-          announcement = `I have set up a ${generatedMelody.length} note melody on the ${octaveOrdinal} octave at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody on the ${octaveOrdinal} octave at ${bpm} BPM`
         } else if (setupDetails.details.string) {
           const stringOrdinal = stringOrdinals[setupDetails.details.string.toString()] || 'first'
-          announcement = `I have set up a ${generatedMelody.length} note melody on the ${stringOrdinal} string at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody on the ${stringOrdinal} string at ${bpm} BPM`
         }
       }
       else if (setupDetails.type === 'scales') {
         // Check if it's keyboard (has octave) or guitar/bass (has position)
         if (setupDetails.details.octave) {
           const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-          announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.scaleName} scale on the ${octaveOrdinal} octave at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale on the ${octaveOrdinal} octave at ${bpm} BPM`
         } else if (setupDetails.details.position) {
-          announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.scaleName} scale in ${setupDetails.details.position} at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale in ${setupDetails.details.position} at ${bpm} BPM`
         } else {
-          announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.scaleName} scale at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale at ${bpm} BPM`
         }
       }
       else if (setupDetails.type === 'chord-progressions') {
@@ -601,19 +601,19 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         if (setupDetails.details.octave) {
           const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
           const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
-          announcement = `I have set up a ${setupDetails.details.chordCount} chord progression on the ${octaveOrdinal} octave at ${bpm} BPM with progression mode`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using a chord progression on the ${octaveOrdinal} octave at ${bpm} BPM`
         } else {
           const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
-          announcement = `I have set up a ${setupDetails.details.chordCount} chord progression at ${bpm} BPM with progression mode`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using a chord progression at ${bpm} BPM`
         }
       }
       else if (setupDetails.type === 'chord-arpeggios') {
         // Check if it's keyboard (has octave) or guitar/bass (no octave specified)
         if (setupDetails.details.octave) {
           const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-          announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.chord} arpeggio on the ${octaveOrdinal} octave at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.chord} arpeggio on the ${octaveOrdinal} octave at ${bpm} BPM`
         } else {
-          announcement = `I have set up a ${setupDetails.details.root} ${setupDetails.details.chord} arpeggio at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.chord} arpeggio at ${bpm} BPM`
         }
       }
 
