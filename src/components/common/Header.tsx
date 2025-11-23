@@ -4,6 +4,7 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import ThemeToggle from './ThemeToggle'
 import AuthModal from '../auth/AuthModal'
 import UserMenu from '../auth/UserMenu'
+import logo from '/Keplear-logo.png'
 import '../../styles/Header.css'
 
 interface HeaderProps {
@@ -39,7 +40,7 @@ const Header = memo(function Header({
       <div className="header-content">
         <div className="header-left">
           <div className="header-brand">
-            <img src="/Keplear-logo.png" alt="Keplear" className="header-logo" />
+            <img src={logo} alt="Keplear" className="header-logo" />
           </div>
         </div>
 
