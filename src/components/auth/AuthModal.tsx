@@ -8,9 +8,10 @@ interface AuthModalProps {
   isOpen: boolean
   onClose: () => void
   initialForm?: 'login' | 'signup'
+  disableSignup?: boolean
 }
 
-const AuthModal = ({ isOpen, onClose, initialForm = 'login' }: AuthModalProps) => {
+const AuthModal = ({ isOpen, onClose, initialForm = 'login', disableSignup = false }: AuthModalProps) => {
   const [currentForm, setCurrentForm] = useState<'login' | 'signup'>(initialForm)
   const [isDarkMode, setIsDarkMode] = useState(false)
 
@@ -42,6 +43,10 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login' }: AuthModalProps) =
   if (!isOpen) return null
 
   const handleToggleForm = (formType: 'login' | 'signup') => {
+    // Don't allow switching to signup if it's disabled
+    if (disableSignup && formType === 'signup') {
+      return
+    }
     setCurrentForm(formType)
   }
 
@@ -61,7 +66,7 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login' }: AuthModalProps) =
       case 'signup':
         return <SignupForm onToggleForm={handleToggleForm} onClose={handleClose} />
       default:
-        return <LoginForm onToggleForm={handleToggleForm} onClose={handleClose} />
+        return <LoginForm onToggleForm={handleToggleForm} onClose={handleClose} disableSignup={disableSignup} />
     }
   }
 

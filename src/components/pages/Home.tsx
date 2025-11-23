@@ -1,6 +1,4 @@
-import { useState } from 'react'
 import styles from '../../styles/Home.module.css'
-import AuthModal from '../auth/AuthModal'
 
 interface HomeProps {
   onNavigateToSandbox: () => void
@@ -8,15 +6,6 @@ interface HomeProps {
 }
 
 function Home({ onNavigateToSandbox, onNavigateToPractice }: HomeProps) {
-  const [showAuthModal, setShowAuthModal] = useState(false)
-
-  const handleShowSignup = () => {
-    setShowAuthModal(true)
-  }
-
-  const handleCloseModal = () => {
-    setShowAuthModal(false)
-  }
 
   return (
     <div className={styles.homeContainer}>
@@ -36,13 +25,6 @@ function Home({ onNavigateToSandbox, onNavigateToPractice }: HomeProps) {
             aria-label="Start practicing in the Sandbox"
           >
             Start Practicing
-          </button>
-          <button
-            className={styles.secondaryBtn}
-            onClick={handleShowSignup}
-            aria-label="Create account to save progress"
-          >
-            Create Account
           </button>
         </div>
       </section>
@@ -158,12 +140,6 @@ function Home({ onNavigateToSandbox, onNavigateToPractice }: HomeProps) {
           Start Practicing
         </button>
       </section>
-
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={handleCloseModal}
-        initialForm="signup"
-      />
     </div>
   )
 }

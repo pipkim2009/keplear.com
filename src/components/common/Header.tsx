@@ -30,11 +30,6 @@ const Header = memo(function Header({
     setShowAuthModal(true)
   }, [])
 
-  const handleShowSignup = useCallback(() => {
-    setAuthForm('signup')
-    setShowAuthModal(true)
-  }, [])
-
   const handleCloseModal = useCallback(() => {
     setShowAuthModal(false)
   }, [])
@@ -79,17 +74,11 @@ const Header = memo(function Header({
                 <UserMenu />
               ) : (
                 <div className="auth-buttons">
-                  <button 
+                  <button
                     className="auth-btn login-btn"
                     onClick={handleShowLogin}
                   >
                     Sign In
-                  </button>
-                  <button 
-                    className="auth-btn signup-btn"
-                    onClick={handleShowSignup}
-                  >
-                    Sign Up
                   </button>
                 </div>
               )}
@@ -102,6 +91,7 @@ const Header = memo(function Header({
         isOpen={showAuthModal}
         onClose={handleCloseModal}
         initialForm={authForm}
+        disableSignup={true}
       />
     </header>
   )

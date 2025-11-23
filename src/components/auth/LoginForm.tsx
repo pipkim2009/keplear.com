@@ -5,9 +5,10 @@ import styles from './AuthForms.module.css'
 interface LoginFormProps {
   onToggleForm: (formType: 'login' | 'signup') => void
   onClose: () => void
+  disableSignup?: boolean
 }
 
-const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
+const LoginForm = ({ onToggleForm, onClose, disableSignup = false }: LoginFormProps) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -93,18 +94,20 @@ const LoginForm = ({ onToggleForm, onClose }: LoginFormProps) => {
         </button>
       </form>
 
-      <div className={styles.authFooter}>
-        <p>
-          Don't have an account?{' '}
-          <button
-            type="button"
-            className={styles.linkButton}
-            onClick={() => onToggleForm('signup')}
-          >
-            Sign up
-          </button>
-        </p>
-      </div>
+      {!disableSignup && (
+        <div className={styles.authFooter}>
+          <p>
+            Don't have an account?{' '}
+            <button
+              type="button"
+              className={styles.linkButton}
+              onClick={() => onToggleForm('signup')}
+            >
+              Sign up
+            </button>
+          </p>
+        </div>
+      )}
     </div>
   )
 }

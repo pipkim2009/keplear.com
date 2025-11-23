@@ -4,6 +4,7 @@ import { InstrumentProvider } from './contexts/InstrumentContext'
 import Header from './components/common/Header'
 import Footer from './components/common/Footer'
 import Router from './components/Router'
+import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import { useTheme } from './hooks/useTheme'
 import styles from './styles/App.module.css'
@@ -111,7 +112,9 @@ const App = memo(function App() {
                 </div>
               </div>
             }>
-              <Router />
+              <ProtectedRoute>
+                <Router />
+              </ProtectedRoute>
             </ErrorBoundary>
 
             <Footer />
