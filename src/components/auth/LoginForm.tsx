@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
+import logo from '/Keplear-logo.png'
 import styles from './AuthForms.module.css'
 
 interface LoginFormProps {
@@ -43,7 +44,7 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false }: LoginFormPr
   return (
     <div className={styles.authForm}>
       <div className={styles.authBrand}>
-        <img src="/Keplear-logo.png" alt="Keplear" className={styles.authLogo} />
+        <img src={logo} alt="Keplear" className={styles.authLogo} />
         <p className={styles.authSlogan}>Learn music like the greats</p>
       </div>
       <p className={styles.formDescription}>Sign in to your account</p>

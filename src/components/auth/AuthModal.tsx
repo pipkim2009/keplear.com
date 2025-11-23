@@ -56,7 +56,8 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login', disableSignup = fal
   }
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
+    // Don't allow closing via backdrop if signup is disabled (forced login)
+    if (e.target === e.currentTarget && !disableSignup) {
       handleClose()
     }
   }
@@ -73,13 +74,15 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login', disableSignup = fal
   const modalContent = (
     <div className={`${styles.authModalOverlay} ${isDarkMode ? 'dark' : ''}`} onClick={handleBackdropClick}>
       <div className={`${styles.authModal} ${isDarkMode ? 'dark' : ''}`}>
-        <button
-          className={styles.closeButton}
-          onClick={handleClose}
-          aria-label="Close"
-        >
-          ×
-        </button>
+        {!disableSignup && (
+          <button
+            className={styles.closeButton}
+            onClick={handleClose}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        )}
         <div className={isDarkMode ? 'dark' : ''}>
           {renderCurrentForm()}
         </div>

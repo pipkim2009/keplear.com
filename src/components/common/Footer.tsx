@@ -1,3 +1,4 @@
+import logo from '/Keplear-logo.png'
 import '../../styles/Footer.css'
 
 function Footer() {
@@ -8,7 +9,7 @@ function Footer() {
       <div className="footer-content">
         <div className="footer-main">
           <div className="footer-brand">
-            <img src="/Keplear-logo.png" alt="Keplear" className="footer-logo" />
+            <img src={logo} alt="Keplear" className="footer-logo" />
           </div>
 
           <div className="footer-info">

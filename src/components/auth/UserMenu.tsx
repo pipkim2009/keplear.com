@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useTheme } from '../../hooks/useTheme'
+import logo from '/Keplear-logo.png'
 import styles from './UserMenu.module.css'
 import authStyles from './AuthForms.module.css'
 
@@ -100,7 +101,7 @@ const UserMenu = () => {
         </button>
         <div className={authStyles.authForm}>
           <div className={authStyles.authBrand}>
-            <img src="/Keplear-logo.png" alt="Keplear" className={authStyles.authLogo} />
+            <img src={logo} alt="Keplear" className={authStyles.authLogo} />
             <p className={authStyles.authSlogan}>Learn music like the greats</p>
           </div>
           <h2 style={{ color: '#dc2626', marginBottom: '20px' }}>Delete Account</h2>
