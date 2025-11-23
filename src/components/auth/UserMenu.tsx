@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useTheme } from '../../hooks/useTheme'
 import styles from './UserMenu.module.css'
+import authStyles from './AuthForms.module.css'
 
 interface UserProfile {
   username: string
@@ -82,90 +84,74 @@ const UserMenu = () => {
       .slice(0, 2)
   }
 
-  return (
-    <>
-      {showDeleteConfirm && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '20px',
-          boxSizing: 'border-box'
-        }}>
-          <div style={{
-            background: isDarkMode ? '#1b6940' : 'white',
-            padding: '30px',
-            borderRadius: '12px',
-            maxWidth: '400px',
-            width: '100%',
-            maxHeight: '90vh',
-            overflow: 'auto',
-            textAlign: 'center',
-            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
-            color: isDarkMode ? '#d2f9d2' : '#1b6940',
-            position: 'relative',
-            margin: 'auto'
-          }}>
-            <h3 style={{ marginBottom: '20px', color: '#dc2626' }}>Delete Account</h3>
-            <p style={{ marginBottom: '20px', lineHeight: '1.5' }}>
-              Are you absolutely sure you want to delete your account?
-              <br /><br />
-              <strong>This action cannot be undone.</strong> All your data will be permanently deleted.
-            </p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => setShowDeleteConfirm(false)}
-                style={{
-                  padding: '12px 24px',
-                  borderRadius: '8px',
-                  border: `2px solid ${isDarkMode ? '#00d96f' : '#d1d5db'}`,
-                  background: isDarkMode ? 'transparent' : 'white',
-                  color: isDarkMode ? '#d2f9d2' : '#374151',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = isDarkMode ? 'rgba(0, 217, 111, 0.1)' : '#f9fafb'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = isDarkMode ? 'transparent' : 'white'
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmAccountDeletion}
-                style={{
-                  padding: '12px 24px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: '#dc2626',
-                  color: 'white',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.background = '#b91c1c'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.background = '#dc2626'
-                }}
-              >
-                Delete Account
-              </button>
-            </div>
+  const deleteConfirmModal = showDeleteConfirm ? (
+    <div className={`${authStyles.authModalOverlay} ${isDarkMode ? 'dark' : ''}`} onClick={(e) => {
+      if (e.target === e.currentTarget) {
+        setShowDeleteConfirm(false)
+      }
+    }}>
+      <div className={`${authStyles.authModal} ${isDarkMode ? 'dark' : ''}`}>
+        <button
+          className={authStyles.closeButton}
+          onClick={() => setShowDeleteConfirm(false)}
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <div className={authStyles.authForm}>
+          <div className={authStyles.authBrand}>
+            <img src="/Keplear-logo.png" alt="Keplear" className={authStyles.authLogo} />
+            <p className={authStyles.authSlogan}>Learn music like the greats</p>
+          </div>
+          <h2 style={{ color: '#dc2626', marginBottom: '20px' }}>Delete Account</h2>
+          <p className={authStyles.formDescription} style={{ marginBottom: '32px' }}>
+            <strong>This action cannot be undone.</strong> All your data will be permanently deleted.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => setShowDeleteConfirm(false)}
+              className={authStyles.authButton}
+              style={{
+                width: 'auto',
+                minWidth: '120px',
+                background: 'transparent',
+                color: isDarkMode ? '#f8f9fa' : '#1b6940',
+                border: `2px solid ${isDarkMode ? '#f8f9fa' : '#1b6940'}`,
+                marginTop: 0
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={confirmAccountDeletion}
+              className={authStyles.authButton}
+              style={{
+                width: 'auto',
+                minWidth: '120px',
+                background: '#dc2626',
+                border: '2px solid #dc2626',
+                marginTop: 0
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = '#b91c1c'
+                e.currentTarget.style.borderColor = '#b91c1c'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = '#dc2626'
+                e.currentTarget.style.borderColor = '#dc2626'
+              }}
+            >
+              Delete Account
+            </button>
           </div>
         </div>
-      )}
+      </div>
+    </div>
+  ) : null
+
+  return (
+    <>
+      {deleteConfirmModal && createPortal(deleteConfirmModal, document.body)}
       
       <div className={styles.userMenu} ref={menuRef}>
         <button 
