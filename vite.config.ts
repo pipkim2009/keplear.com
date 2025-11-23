@@ -4,6 +4,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: '/', // For custom domain keplear.com
   plugins: [
     react(),
     // Bundle analyzer for development builds
