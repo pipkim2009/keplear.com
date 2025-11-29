@@ -8,8 +8,6 @@ export { default as Footer } from './common/Footer'
 export { default as ThemeToggle } from './common/ThemeToggle'
 export { default as NotesToggle } from './common/NotesToggle'
 export { default as CustomAudioPlayer } from './common/CustomAudioPlayer'
-export { default as ScaleOptions } from './common/ScaleOptions'
-export { default as ChordOptions } from './common/ChordOptions'
 
 // Keyboard components
 export { default as Keyboard } from './keyboard/Keyboard'
