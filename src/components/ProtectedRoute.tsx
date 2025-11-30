@@ -1,31 +1,42 @@
 import { ReactNode, useState, useEffect } from 'react'
-import { useAuth } from '../hooks/useAuth'
 import AuthModal from './auth/AuthModal'
+
+const SITE_ACCESS_KEY = 'keplear_site_access'
 
 interface ProtectedRouteProps {
   children: ReactNode
 }
 
 /**
- * ProtectedRoute component that requires authentication
- * Shows a login-only modal if user is not authenticated
- * Does not offer signup - users must sign up from the home page
+ * ProtectedRoute component that requires site access gate
+ * Shows a login modal as a gate - but only grants site access, not actual login
+ * After passing the gate, user can browse the site in logged-out state
+ * and test the real login/signup flow
  */
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth()
-  const [showLoginModal, setShowLoginModal] = useState(false)
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null)
+  const [showGateModal, setShowGateModal] = useState(false)
 
   useEffect(() => {
-    // If not loading and no user, show login modal
-    if (!loading && !user) {
-      setShowLoginModal(true)
-    } else if (user) {
-      setShowLoginModal(false)
+    // Check if user has already passed the gate
+    const accessGranted = localStorage.getItem(SITE_ACCESS_KEY)
+    if (accessGranted === 'true') {
+      setHasAccess(true)
+    } else {
+      setHasAccess(false)
+      setShowGateModal(true)
     }
-  }, [user, loading])
+  }, [])
 
-  // Show loading state while checking authentication
-  if (loading) {
+  // Grant site access (called when user "logs in" at the gate)
+  const grantAccess = () => {
+    localStorage.setItem(SITE_ACCESS_KEY, 'true')
+    setHasAccess(true)
+    setShowGateModal(false)
+  }
+
+  // Show loading state while checking access
+  if (hasAccess === null) {
     return (
       <div style={{
         display: 'flex',
@@ -40,12 +51,12 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
     )
   }
 
-  // If user is authenticated, render the protected content
-  if (user) {
+  // If user has site access, render the content
+  if (hasAccess) {
     return <>{children}</>
   }
 
-  // If not authenticated, show login modal and a message
+  // If no access, show gate modal
   return (
     <>
       <div style={{
@@ -62,7 +73,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
           marginBottom: '1rem',
           color: 'var(--text-primary)'
         }}>
-          Authentication Required
+          Access Required
         </h2>
         <p style={{
           fontSize: '1.1rem',
@@ -70,18 +81,18 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
           color: 'var(--text-secondary)',
           maxWidth: '500px'
         }}>
-          Please sign in to access this page. This content is restricted to authenticated users only.
+          Please sign in to access the site.
         </p>
       </div>
 
       <AuthModal
-        isOpen={showLoginModal}
+        isOpen={showGateModal}
         onClose={() => {
-          // Don't allow closing the modal - user must login or go back to home
-          // Optionally, you could navigate them back to home here
+          // Don't allow closing the modal - user must pass the gate
         }}
         initialForm="login"
         disableSignup={true}
+        onAuthSuccess={grantAccess}
       />
     </>
   )

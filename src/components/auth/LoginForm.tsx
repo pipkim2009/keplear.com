@@ -7,14 +7,15 @@ interface LoginFormProps {
   onToggleForm: (formType: 'login' | 'signup') => void
   onClose: () => void
   disableSignup?: boolean
+  onAuthSuccess?: () => void
 }
 
-const LoginForm = ({ onToggleForm, onClose, disableSignup = false }: LoginFormProps) => {
+const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess }: LoginFormProps) => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const { signIn } = useAuth()
+  const { signIn, signOut } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,7 +33,13 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false }: LoginFormPr
       if (error) {
         setError(typeof error === 'object' && error && 'message' in error ? String((error as { message: string }).message) : 'An error occurred')
       } else {
-        onClose()
+        // If this is a gate login (onAuthSuccess provided), sign out and grant site access
+        if (onAuthSuccess) {
+          await signOut()
+          onAuthSuccess()
+        } else {
+          onClose()
+        }
       }
     } catch {
       setError('An unexpected error occurred')
@@ -45,7 +52,6 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false }: LoginFormPr
     <div className={styles.authForm}>
       <div className={styles.authBrand}>
         <img src={logo} alt="Keplear" className={styles.authLogo} />
-        <p className={styles.authSlogan}>Learn music like the greats</p>
       </div>
       <p className={styles.formDescription}>Sign in to your account</p>
 

@@ -96,7 +96,6 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
     <div className={styles.authForm}>
       <div className={styles.authBrand}>
         <img src={logo} alt="Keplear" className={styles.authLogo} />
-        <p className={styles.authSlogan}>Learn music like the greats</p>
       </div>
       <p className={styles.formDescription}>Create your account</p>
 

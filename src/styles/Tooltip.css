@@ -64,10 +64,6 @@
   pointer-events: none;
   z-index: 1000;
   border: 2px solid var(--purple-700);
-  box-shadow:
-    0 0 20px var(--purple-alpha-40),
-    0 0 40px var(--purple-alpha-40),
-    0 4px 12px var(--black-alpha-50);
   min-width: 280px;
   max-width: 400px;
   white-space: normal;
@@ -130,21 +126,19 @@
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(-12px);
+  pointer-events: auto;
 }
 
 .tooltip-container:hover .tooltip-box {
   opacity: 1;
   visibility: visible;
   transform: translateX(-50%) translateY(-12px);
+  pointer-events: auto;
 }
 
 .dark .tooltip-box {
   background: var(--dark-bg-primary);
   border-color: var(--purple-500);
-  box-shadow:
-    0 0 20px var(--purple-alpha-40),
-    0 0 40px var(--purple-alpha-40),
-    0 4px 12px var(--black-alpha-50);
   text-shadow: 0 0 10px var(--purple-alpha-40);
 }
 
@@ -177,10 +171,6 @@
   background: var(--white);
   color: var(--light-text-primary);
   border-color: var(--primary-purple);
-  box-shadow:
-    0 0 20px var(--primary-purple-alpha-40),
-    0 0 40px var(--primary-purple-alpha-30),
-    0 4px 12px var(--black-alpha-20);
 }
 
 .light .tooltip-title {

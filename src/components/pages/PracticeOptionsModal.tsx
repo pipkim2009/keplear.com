@@ -57,6 +57,14 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
+        <button
+          className={styles.closeButton}
+          onClick={onCancel}
+          aria-label="Close"
+        >
+          ×
+        </button>
+
         <h2 className={styles.modalTitle}>
           {instrumentName} Practice Session
         </h2>
@@ -97,17 +105,11 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
 
         <div className={styles.modalActions}>
           <button
-            onClick={onCancel}
-            className={styles.cancelButton}
-          >
-            Cancel
-          </button>
-          <button
             onClick={handleStart}
             className={styles.startButton}
             disabled={!selectedOption}
           >
-            Start Practice
+            Start Lesson
           </button>
         </div>
       </div>

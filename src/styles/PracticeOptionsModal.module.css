@@ -7,7 +7,7 @@
   bottom: 0;
   background: linear-gradient(135deg,
     rgb(88, 28, 135, 0.8) 0%,
-    rgb(45, 21, 102, 0.9) 50%,
+    rgb(59, 29, 110, 0.9) 50%,
     rgb(18, 18, 18, 0.8) 100%);
   backdrop-filter: blur(10px);
   display: flex;
@@ -18,11 +18,12 @@
   animation: fadeIn 0.2s ease-out;
 }
 
-:global(.light) .modalOverlay {
+:global(.dark) .modalOverlay {
   background: linear-gradient(135deg,
-    rgb(117, 26, 255, 0.3) 0%,
-    rgb(157, 92, 255, 0.2) 50%,
-    rgb(240, 240, 255, 0.9) 100%);
+    rgb(18, 18, 18, 0.9) 0%,
+    rgb(30, 30, 30, 0.8) 30%,
+    rgb(40, 40, 40, 0.9) 70%,
+    rgb(18, 18, 18, 0.9) 100%);
 }
 
 @keyframes fadeIn {
@@ -36,11 +37,12 @@
 
 /* Modal Content - matching auth modal */
 .modalContent {
+  position: relative;
   background: linear-gradient(145deg,
     rgb(40, 40, 40, 0.95) 0%,
     rgb(30, 30, 30, 0.98) 100%);
   backdrop-filter: blur(20px);
-  border: 2px solid rgb(117, 26, 255, 0.3);
+  border: 2px solid rgb(80, 80, 80, 0.3);
   border-radius: 20px;
   padding: 40px;
   max-width: 500px;
@@ -48,7 +50,7 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow:
-    0 20px 60px rgb(117, 26, 255, 0.3),
+    0 20px 60px rgb(0, 0, 0, 0.5),
     inset 0 1px 0 rgb(255, 255, 255, 0.05);
   animation: slideIn 0.3s ease-out;
 }
@@ -57,10 +59,58 @@
   background: linear-gradient(145deg,
     rgb(255, 255, 255, 0.95) 0%,
     rgb(240, 240, 255, 0.98) 100%);
-  border: 2px solid rgb(117, 26, 255, 0.2);
+  border: 2px solid rgb(210, 210, 249, 0.3);
   box-shadow:
-    0 20px 60px rgb(117, 26, 255, 0.2),
+    0 20px 60px rgb(168, 85, 247, 0.3),
     inset 0 1px 0 rgb(255, 255, 255, 0.7);
+}
+
+/* Close Button */
+.closeButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgb(0, 0, 0, 0.3);
+  border: 2px solid rgb(255, 255, 255, 0.3);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pointer;
+  color: #f8f9fa;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  padding: 0;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgb(0, 0, 0, 0.4);
+}
+
+.closeButton:hover {
+  background: rgb(0, 0, 0, 0.5);
+  border-color: rgb(255, 255, 255, 0.5);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.6);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
+}
+
+:global(.light) .closeButton {
+  background: rgb(255, 255, 255, 0.1);
+  border: 2px solid rgb(168, 85, 247, 0.3);
+  color: #7c3aed;
+  box-shadow: 0 2px 8px rgb(168, 85, 247, 0.2);
+}
+
+:global(.light) .closeButton:hover {
+  background: rgb(255, 255, 255, 0.2);
+  border-color: rgb(168, 85, 247, 0.5);
+  box-shadow: 0 4px 12px rgb(168, 85, 247, 0.3);
 }
 
 @keyframes slideIn {
@@ -248,35 +298,6 @@
   justify-content: flex-end;
 }
 
-/* Cancel Button */
-.cancelButton {
-  padding: 14px 28px;
-  background: transparent;
-  border: 2px solid rgb(117, 26, 255, 0.3);
-  border-radius: 12px;
-  color: #f8f9fa;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.cancelButton:hover {
-  background: rgb(255, 255, 255, 0.05);
-  border-color: rgb(117, 26, 255, 0.5);
-  transform: translateY(-1px);
-}
-
-:global(.light) .cancelButton {
-  border-color: rgb(117, 26, 255, 0.3);
-  color: #121212;
-}
-
-:global(.light) .cancelButton:hover {
-  background: rgb(117, 26, 255, 0.05);
-  border-color: rgb(117, 26, 255, 0.5);
-}
-
 /* Start Button */
 .startButton {
   padding: 14px 28px;
@@ -341,7 +362,6 @@
     flex-direction: column-reverse;
   }
 
-  .cancelButton,
   .startButton {
     width: 100%;
     justify-content: center;

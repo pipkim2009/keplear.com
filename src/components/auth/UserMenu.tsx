@@ -103,7 +103,6 @@ const UserMenu = () => {
         <div className={authStyles.authForm}>
           <div className={authStyles.authBrand}>
             <img src={logo} alt="Keplear" className={authStyles.authLogo} />
-            <p className={authStyles.authSlogan}>Learn music like the greats</p>
           </div>
           <h2 style={{ color: '#dc2626', marginBottom: '20px' }}>Delete Account</h2>
           <p className={authStyles.formDescription} style={{ marginBottom: '32px' }}>
