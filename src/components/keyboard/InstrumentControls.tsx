@@ -14,7 +14,6 @@ import '../../styles/CustomAudioPlayer.css'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import { IoMdArrowDropdown } from 'react-icons/io'
-import { setupAudioAnalysis, getCentsOffset, noteNameToFrequency } from '../../utils/audioAnalysis'
 
 export type KeyboardSelectionMode = 'range' | 'multi'
 
@@ -76,7 +75,6 @@ interface InstrumentControlsProps {
   disableBpmInput?: boolean
   disableBeatsInput?: boolean
   disableChordMode?: boolean
-  onLessonComplete?: () => void
 }
 
 const InstrumentControls: React.FC<InstrumentControlsProps> = ({
@@ -136,8 +134,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   hideChordMode = false,
   disableBpmInput = false,
   disableBeatsInput = false,
-  disableChordMode = false,
-  onLessonComplete
+  disableChordMode = false
 }) => {
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
@@ -156,22 +153,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   const [audioFileUrl, setAudioFileUrl] = useState<string | null>(null)
   const [isInstrumentDropdownOpen, setIsInstrumentDropdownOpen] = useState<boolean>(false)
   const [isChordModeFlashing, setIsChordModeFlashing] = useState<boolean>(false)
-  const [isListening, setIsListening] = useState<boolean>(false)
-  const [micStream, setMicStream] = useState<MediaStream | null>(null)
-  const [currentNoteIndex, setCurrentNoteIndex] = useState<number>(0)
-  const [detectedNote, setDetectedNote] = useState<string | null>(null)
-  const [detectedFrequency, setDetectedFrequency] = useState<number>(0)
-  const [centsOffset, setCentsOffset] = useState<number>(0)
-  const [feedbackStatus, setFeedbackStatus] = useState<'waiting' | 'correct' | 'wrong'>('waiting')
-  const [isPausedForPlayback, setIsPausedForPlayback] = useState<boolean>(false)
 
-  // Two-stage feedback system
-  const [feedbackStage, setFeedbackStage] = useState<1 | 2>(1)
-  const [sequenceIndex, setSequenceIndex] = useState<number>(0)
-
-  const audioCleanupRef = useRef<(() => void) | null>(null)
-  const lastProcessedNoteRef = useRef<string | null>(null)
-  const isProcessingRef = useRef<boolean>(false)
   const audioPlayerRef = useRef<HTMLAudioElement>(null)
 
   // Original default values
@@ -499,294 +481,6 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
       stopNotesInterval()
     }
   }, [])
-
-  // Cleanup microphone stream on unmount
-  useEffect(() => {
-    return () => {
-      if (micStream) {
-        micStream.getTracks().forEach(track => track.stop())
-      }
-      if (audioCleanupRef.current) {
-        audioCleanupRef.current()
-      }
-    }
-  }, [micStream])
-
-  // Monitor audio player and pause feedback when melody is playing
-  useEffect(() => {
-    const audioElement = audioPlayerRef.current
-    if (!audioElement) return
-
-    const handlePlay = () => {
-      if (isListening) {
-        // Pause microphone analysis
-        if (audioCleanupRef.current) {
-          audioCleanupRef.current()
-          audioCleanupRef.current = null
-        }
-        setIsPausedForPlayback(true)
-      }
-    }
-
-    const handlePause = () => {
-      setIsPausedForPlayback(false)
-    }
-
-    const handleEnded = () => {
-      setIsPausedForPlayback(false)
-    }
-
-    audioElement.addEventListener('play', handlePlay)
-    audioElement.addEventListener('pause', handlePause)
-    audioElement.addEventListener('ended', handleEnded)
-
-    return () => {
-      audioElement.removeEventListener('play', handlePlay)
-      audioElement.removeEventListener('pause', handlePause)
-      audioElement.removeEventListener('ended', handleEnded)
-    }
-  }, [isListening])
-
-  // Setup audio analysis when listening starts
-  useEffect(() => {
-    if (isListening && !isPausedForPlayback && micStream && generatedMelody && generatedMelody.length > 0) {
-      const cleanup = setupAudioAnalysis(micStream, (frequency, noteName) => {
-        setDetectedNote(noteName)
-        setDetectedFrequency(frequency)
-
-        // Calculate cents offset from expected note - pass frequency to handler
-        handleNoteDetected(noteName, frequency)
-      })
-
-      audioCleanupRef.current = cleanup
-
-      return () => {
-        cleanup()
-        audioCleanupRef.current = null
-      }
-    }
-  }, [isListening, isPausedForPlayback, micStream, generatedMelody, currentNoteIndex])
-
-  // Handle detected note comparison - Two Stage System
-  const handleNoteDetected = (detectedNoteName: string, frequency: number) => {
-    if (!generatedMelody || generatedMelody.length === 0) {
-      return
-    }
-
-    // Prevent processing if we're already handling a note
-    if (isProcessingRef.current) {
-      return
-    }
-
-    // Prevent same note from triggering multiple times
-    if (lastProcessedNoteRef.current === detectedNoteName) {
-      return
-    }
-
-    // Normalize sharp/flat equivalents
-    const normalizeNote = (note: string) => {
-      const equivalents: { [key: string]: string} = {
-        'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#'
-      }
-      return equivalents[note] || note
-    }
-
-    const normalizedDetected = normalizeNote(detectedNoteName)
-
-    // STAGE 1: Play notes in order, but wrong notes don't reset progress
-    if (feedbackStage === 1) {
-      if (sequenceIndex >= generatedMelody.length) {
-        return
-      }
-
-      const expectedNote = generatedMelody[sequenceIndex]
-      const expectedNoteName = normalizeNote(expectedNote.name.replace(/[0-9]/g, ''))
-
-      // Calculate cents offset from expected note
-      const targetFrequency = noteNameToFrequency(expectedNote.name)
-      const cents = getCentsOffset(frequency, targetFrequency)
-      setCentsOffset(cents)
-
-      // Check if note name matches AND cents offset is within acceptable range
-      const ACCEPTABLE_CENTS = 25
-      const isInTune = Math.abs(cents) <= ACCEPTABLE_CENTS
-
-      console.log('Stage 1 - Note Detection:', {
-        detected: normalizedDetected,
-        expected: expectedNoteName,
-        sequenceIndex,
-        centsOffset: cents,
-        isInTune,
-        matches: normalizedDetected === expectedNoteName
-      })
-
-      if (normalizedDetected === expectedNoteName && isInTune) {
-        // Correct note in sequence!
-        isProcessingRef.current = true
-        lastProcessedNoteRef.current = detectedNoteName
-        setFeedbackStatus('correct')
-
-        setTimeout(() => {
-          const nextIndex = sequenceIndex + 1
-          setSequenceIndex(nextIndex)
-          setCurrentNoteIndex(nextIndex) // Keep in sync for visual display
-          setFeedbackStatus('waiting')
-          setDetectedNote(null)
-          setDetectedFrequency(0)
-          setCentsOffset(0)
-          lastProcessedNoteRef.current = null
-          isProcessingRef.current = false
-
-          // Check if we've completed Stage 1
-          if (nextIndex >= generatedMelody.length) {
-            // Move to Stage 2 after completing all notes
-            setTimeout(() => {
-              setFeedbackStage(2)
-              setSequenceIndex(0)
-              setCurrentNoteIndex(0)
-              setFeedbackStatus('waiting')
-              console.log('Stage 1 complete! Moving to Stage 2 - strict mode (wrong note resets)')
-            }, 800)
-          }
-        }, 500)
-      } else {
-        // Wrong note - just show feedback but DON'T reset
-        setFeedbackStatus('wrong')
-        lastProcessedNoteRef.current = detectedNoteName
-
-        setTimeout(() => {
-          setFeedbackStatus('waiting')
-          setDetectedNote(null)
-          setDetectedFrequency(0)
-          setCentsOffset(0)
-          lastProcessedNoteRef.current = null
-        }, 300)
-      }
-    }
-
-    // STAGE 2: Play notes in correct order
-    else if (feedbackStage === 2) {
-      if (sequenceIndex >= generatedMelody.length) {
-        return
-      }
-
-      const expectedNote = generatedMelody[sequenceIndex]
-      const expectedNoteName = normalizeNote(expectedNote.name.replace(/[0-9]/g, ''))
-
-      // Calculate cents offset from expected note
-      const targetFrequency = noteNameToFrequency(expectedNote.name)
-      const cents = getCentsOffset(frequency, targetFrequency)
-      setCentsOffset(cents)
-
-      // Check if note name matches AND cents offset is within acceptable range
-      const ACCEPTABLE_CENTS = 25
-      const isInTune = Math.abs(cents) <= ACCEPTABLE_CENTS
-
-      console.log('Stage 2 - Note Detection:', {
-        detected: normalizedDetected,
-        expected: expectedNoteName,
-        sequenceIndex,
-        centsOffset: cents,
-        isInTune,
-        matches: normalizedDetected === expectedNoteName
-      })
-
-      if (normalizedDetected === expectedNoteName && isInTune) {
-        // Correct note in sequence!
-        isProcessingRef.current = true
-        lastProcessedNoteRef.current = detectedNoteName
-        setFeedbackStatus('correct')
-
-        setTimeout(() => {
-          const nextIndex = sequenceIndex + 1
-          setSequenceIndex(nextIndex)
-          setCurrentNoteIndex(nextIndex) // Keep in sync for visual display
-          setFeedbackStatus('waiting')
-          setDetectedNote(null)
-          setDetectedFrequency(0)
-          setCentsOffset(0)
-          lastProcessedNoteRef.current = null
-          isProcessingRef.current = false
-
-          // Check if we've completed the sequence
-          if (nextIndex >= generatedMelody.length) {
-            // Completed! Stop listening
-            if (audioCleanupRef.current) {
-              audioCleanupRef.current()
-              audioCleanupRef.current = null
-            }
-            if (micStream) {
-              micStream.getTracks().forEach(track => track.stop())
-              setMicStream(null)
-            }
-            setIsListening(false)
-            console.log('Stage 2 complete! All notes played in order')
-
-            // Notify parent component that lesson is complete
-            if (onLessonComplete) {
-              onLessonComplete()
-            }
-          }
-        }, 500)
-      } else {
-        // Wrong note - reset sequence back to start!
-        setFeedbackStatus('wrong')
-        lastProcessedNoteRef.current = detectedNoteName
-
-        setTimeout(() => {
-          setSequenceIndex(0)
-          setCurrentNoteIndex(0) // Keep in sync for visual display
-          setFeedbackStatus('waiting')
-          setDetectedNote(null)
-          setDetectedFrequency(0)
-          setCentsOffset(0)
-          lastProcessedNoteRef.current = null
-          console.log('Wrong note! Resetting sequence to start')
-        }, 500)
-      }
-    }
-  }
-
-  // Handle Live Feedback button click
-  const handleLiveFeedbackClick = async () => {
-    if (isListening || isPausedForPlayback) {
-      // Stop listening
-      if (audioCleanupRef.current) {
-        audioCleanupRef.current()
-        audioCleanupRef.current = null
-      }
-      if (micStream) {
-        micStream.getTracks().forEach(track => track.stop())
-        setMicStream(null)
-      }
-      setIsListening(false)
-      setIsPausedForPlayback(false)
-      setDetectedNote(null)
-      setFeedbackStatus('waiting')
-    } else {
-      // Start listening
-      try {
-        // Pause the audio player to prevent feedback loop
-        if (audioPlayerRef.current) {
-          audioPlayerRef.current.pause()
-        }
-
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-        setMicStream(stream)
-        setIsListening(true)
-        // Reset tracking for two-stage system
-        setCurrentNoteIndex(0)
-        setFeedbackStatus('waiting')
-        setFeedbackStage(1)
-        setSequenceIndex(0)
-        lastProcessedNoteRef.current = null
-        isProcessingRef.current = false
-      } catch (error) {
-        console.error('Failed to access microphone:', error)
-        alert('Failed to access microphone. Please check your permissions.')
-      }
-    }
-  }
 
   // Recording handlers
   const handleRecordForPlayback = async () => {
@@ -1276,11 +970,6 @@ Progression - Use entire chords"
                 if (onClearRecordedAudio) {
                   onClearRecordedAudio()
                 }
-                // Reset live feedback progress and two-stage system
-                setCurrentNoteIndex(0)
-                setFeedbackStatus('waiting')
-                setFeedbackStage(1)
-                setSequenceIndex(0)
                 if (onGenerateMelody) {
                   onGenerateMelody()
                 }
@@ -1308,140 +997,14 @@ Progression - Use entire chords"
                 </div>
               ) : (
                 audioFileUrl && (
-                  <>
-                    <CustomAudioPlayer
-                      src={audioFileUrl}
-                      preload="metadata"
-                      bpm={bpm}
-                      melodyLength={generatedMelody?.length || 0}
-                      onNoteIndexChange={onCurrentlyPlayingNoteChange}
-                      audioRef={audioPlayerRef}
-                    />
-                    <button
-                      className={`live-feedback-button ${isPausedForPlayback ? 'paused' : isListening ? 'listening' : ''}`}
-                      onClick={handleLiveFeedbackClick}
-                    >
-                      {isPausedForPlayback ? 'Melody Playing' : isListening ? 'Listening...' : 'Live Feedback'}
-                    </button>
-
-                    {/* Live Feedback Display - Two Stage System */}
-                    {generatedMelody && generatedMelody.length > 0 && (isListening || isPausedForPlayback || (feedbackStage === 2 && sequenceIndex >= generatedMelody.length)) && (
-                      <div className="live-feedback-display">
-                        {feedbackStage === 1 ? (
-                          /* STAGE 1: Play in order, wrong notes allowed */
-                          <>
-                            <div className="feedback-stage-title">Stage 1: Practice Mode</div>
-                            <div className="feedback-progress">
-                              {sequenceIndex}/{generatedMelody.length}
-                            </div>
-
-                            <div className="feedback-checkboxes">
-                              {generatedMelody.map((note, index) => (
-                                <div
-                                  key={index}
-                                  className={`note-checkbox ${
-                                    index < sequenceIndex ? 'completed' :
-                                    index === sequenceIndex ? 'active' :
-                                    'pending'
-                                  }`}
-                                >
-                                  <div className="checkbox-box">
-                                    {index < sequenceIndex && (
-                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                      </svg>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-
-                            {!isPausedForPlayback && (
-                              <div className="feedback-tuner">
-                                <div className="tuner-scale">
-                                  <div className="tuner-marks">
-                                    <span className="tuner-mark">-50</span>
-                                    <span className="tuner-mark">-25</span>
-                                    <span className="tuner-mark center">0</span>
-                                    <span className="tuner-mark">25</span>
-                                    <span className="tuner-mark">50</span>
-                                  </div>
-                                  <div className="tuner-track">
-                                    <div className="tuner-acceptable-zone"></div>
-                                    <div className="tuner-center-line"></div>
-                                    <div
-                                      className={`tuner-indicator ${feedbackStatus}`}
-                                      style={{
-                                        left: `${Math.max(0, Math.min(100, 50 + centsOffset))}%`
-                                      }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        ) : feedbackStage === 2 && sequenceIndex < generatedMelody.length ? (
-                          /* STAGE 2: Play notes in order */
-                          <>
-                            <div className="feedback-stage-title">Stage 2: Strict Mode</div>
-                            <div className="feedback-progress">
-                              {sequenceIndex}/{generatedMelody.length}
-                            </div>
-
-                            <div className="feedback-checkboxes">
-                              {generatedMelody.map((note, index) => (
-                                <div
-                                  key={index}
-                                  className={`note-checkbox ${
-                                    index < sequenceIndex ? 'completed' :
-                                    index === sequenceIndex ? 'active' :
-                                    'pending'
-                                  }`}
-                                >
-                                  <div className="checkbox-box">
-                                    {index < sequenceIndex && (
-                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                      </svg>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-
-                            {!isPausedForPlayback && (
-                              <div className="feedback-tuner">
-                                <div className="tuner-scale">
-                                  <div className="tuner-marks">
-                                    <span className="tuner-mark">-50</span>
-                                    <span className="tuner-mark">-25</span>
-                                    <span className="tuner-mark center">0</span>
-                                    <span className="tuner-mark">25</span>
-                                    <span className="tuner-mark">50</span>
-                                  </div>
-                                  <div className="tuner-track">
-                                    <div className="tuner-acceptable-zone"></div>
-                                    <div className="tuner-center-line"></div>
-                                    <div
-                                      className={`tuner-indicator ${feedbackStatus}`}
-                                      style={{
-                                        left: `${Math.max(0, Math.min(100, 50 + centsOffset))}%`
-                                      }}
-                                    ></div>
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </>
-                        ) : (
-                          /* COMPLETE */
-                          <div className="feedback-complete">
-                            <div className="complete-message">🎉 All Stages Complete!</div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </>
+                  <CustomAudioPlayer
+                    src={audioFileUrl}
+                    preload="metadata"
+                    bpm={bpm}
+                    melodyLength={generatedMelody?.length || 0}
+                    onNoteIndexChange={onCurrentlyPlayingNoteChange}
+                    audioRef={audioPlayerRef}
+                  />
                 )
               )}
             </div>
