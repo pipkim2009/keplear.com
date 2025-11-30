@@ -378,6 +378,7 @@
      ======================================== */
 
   /* Black Alpha */
+  --black-alpha-05: rgb(0, 0, 0, 0.05);
   --black-alpha-10: rgb(0, 0, 0, 0.1);
   --black-alpha-20: rgb(0, 0, 0, 0.2);
   --black-alpha-30: rgb(0, 0, 0, 0.3);
@@ -387,6 +388,7 @@
   --black-alpha-90: rgb(0, 0, 0, 0.9);
 
   /* White Alpha */
+  --white-alpha-05: rgb(255, 255, 255, 0.05);
   --white-alpha-10: rgb(255, 255, 255, 0.1);
   --white-alpha-15: rgb(255, 255, 255, 0.15);
   --white-alpha-20: rgb(255, 255, 255, 0.2);

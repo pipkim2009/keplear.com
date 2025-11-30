@@ -1,225 +1,212 @@
+import { useState, useEffect } from 'react'
 import styles from '../../styles/Home.module.css'
-import { PiPianoKeysFill, PiMicrophoneFill, PiBookOpenFill, PiClockFill, PiChartBarFill } from 'react-icons/pi'
+import { PiPianoKeysFill, PiMicrophoneFill, PiMusicNotesFill, PiLightningFill, PiTargetFill, PiTrendUpFill, PiPlayFill, PiArrowRightBold } from 'react-icons/pi'
 import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
-import { IoMusicalNotes } from 'react-icons/io5'
 
 interface HomeProps {
   onNavigateToSandbox: () => void
   onNavigateToPractice: () => void
 }
 
+const ROTATING_WORDS = ['Perfect Pitch', 'Any Scale', 'Every Chord', 'Your Sound']
+
 function Home({ onNavigateToSandbox }: HomeProps) {
+  const [wordIndex, setWordIndex] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true)
+      setTimeout(() => {
+        setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length)
+        setIsAnimating(false)
+      }, 300)
+    }, 2500)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
-    <div className={styles.homeContainer}>
+    <div className={styles.home}>
       {/* Hero Section */}
-      <section className={styles.heroSection}>
+      <section className={styles.hero}>
+        <div className={styles.heroBackground}>
+          <div className={styles.gradientOrb1}></div>
+          <div className={styles.gradientOrb2}></div>
+          <div className={styles.gradientOrb3}></div>
+        </div>
+
         <div className={styles.heroContent}>
+          <div className={styles.badge}>
+            <PiLightningFill />
+            <span>Free to use</span>
+          </div>
+
           <h1 className={styles.heroTitle}>
-            Train Your Musical Ear
+            Train Your Ear.<br />
+            Master{' '}
+            <span className={`${styles.rotatingWord} ${isAnimating ? styles.fadeOut : styles.fadeIn}`}>
+              {ROTATING_WORDS[wordIndex]}
+            </span>
           </h1>
-          <p className={styles.heroTagline}>Like the Greats</p>
-          <p className={styles.heroDescription}>
-            Interactive ear training for keyboard, guitar, and bass. Generate custom melodies,
-            practice with real-time feedback, and master any note, scale, or chord.
+
+          <p className={styles.heroSubtitle}>
+            The ear training app for serious musicians. Practice on keyboard, guitar, or bass with instant feedback.
           </p>
+
           <div className={styles.heroCta}>
-            <button
-              className={styles.primaryBtn}
-              onClick={onNavigateToSandbox}
-              aria-label="Start practicing in the Sandbox"
-            >
-              Start Training Free
+            <button className={styles.primaryButton} onClick={onNavigateToSandbox}>
+              <PiPlayFill />
+              Start Training Now
             </button>
+            <span className={styles.ctaNote}>No signup required</span>
           </div>
-        </div>
-        <div className={styles.heroVisual}>
-          <div className={styles.floatingNote} style={{ '--delay': '0s' } as React.CSSProperties}>
-            <span>C</span>
-          </div>
-          <div className={styles.floatingNote} style={{ '--delay': '0.5s' } as React.CSSProperties}>
-            <span>E</span>
-          </div>
-          <div className={styles.floatingNote} style={{ '--delay': '1s' } as React.CSSProperties}>
-            <span>G</span>
-          </div>
-          <div className={styles.floatingNote} style={{ '--delay': '1.5s' } as React.CSSProperties}>
-            <span>B</span>
-          </div>
-        </div>
-      </section>
 
-      {/* Stats Section */}
-      <section className={styles.statsSection}>
-        <div className={styles.statItem}>
-          <span className={styles.statNumber}>3</span>
-          <span className={styles.statLabel}>Instruments</span>
-        </div>
-        <div className={styles.statDivider}></div>
-        <div className={styles.statItem}>
-          <span className={styles.statNumber}>50+</span>
-          <span className={styles.statLabel}>Scales & Modes</span>
-        </div>
-        <div className={styles.statDivider}></div>
-        <div className={styles.statItem}>
-          <span className={styles.statNumber}>100+</span>
-          <span className={styles.statLabel}>Chord Types</span>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className={styles.featuresSection}>
-        <h2 className={styles.sectionTitle}>Everything You Need</h2>
-        <p className={styles.sectionSubtitle}>
-          A complete toolkit for developing perfect pitch and musical intuition
-        </p>
-        <div className={styles.featuresGrid}>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>
+          <div className={styles.heroInstruments}>
+            <div className={styles.instrumentPill}>
               <PiPianoKeysFill />
+              <span>Keyboard</span>
             </div>
-            <h3 className={styles.featureTitle}>Virtual Instruments</h3>
-            <p className={styles.featureDescription}>
-              Practice on realistic keyboard, guitar, and bass interfaces with high-quality sampled sounds.
-            </p>
+            <div className={styles.instrumentPill}>
+              <GiGuitarHead />
+              <span>Guitar</span>
+            </div>
+            <div className={styles.instrumentPill}>
+              <GiGuitarBassHead />
+              <span>Bass</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What You Get Section */}
+      <section className={styles.features}>
+        <div className={styles.sectionHeader}>
+          <h2>Everything you need to level up</h2>
+        </div>
+
+        <div className={styles.featureGrid}>
+          <div className={styles.featureCard}>
+            <div className={styles.featureIconWrapper}>
+              <PiMusicNotesFill />
+            </div>
+            <h3>50+ Scales & Modes</h3>
+            <p>From major scales to exotic modes. All visualized on your instrument.</p>
           </div>
 
           <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>
-              <IoMusicalNotes />
+            <div className={styles.featureIconWrapper}>
+              <PiTargetFill />
             </div>
-            <h3 className={styles.featureTitle}>Smart Melody Generation</h3>
-            <p className={styles.featureDescription}>
-              Create custom practice melodies from any combination of notes, scales, and chord progressions.
-            </p>
+            <h3>100+ Chord Types</h3>
+            <p>Triads, sevenths, extensions, alterations. Every voicing you need.</p>
           </div>
 
           <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>
+            <div className={styles.featureIconWrapper}>
               <PiMicrophoneFill />
             </div>
-            <h3 className={styles.featureTitle}>Live Feedback</h3>
-            <p className={styles.featureDescription}>
-              Connect your instrument and receive instant feedback on pitch accuracy and timing.
-            </p>
+            <h3>Live Feedback</h3>
+            <p>Connect your mic and get real-time pitch detection as you play.</p>
           </div>
 
           <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>
-              <PiBookOpenFill />
+            <div className={styles.featureIconWrapper}>
+              <PiTrendUpFill />
             </div>
-            <h3 className={styles.featureTitle}>Music Theory Library</h3>
-            <p className={styles.featureDescription}>
-              Explore an interactive visual library of scales, modes, and chord voicings.
-            </p>
-          </div>
-
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>
-              <PiClockFill />
-            </div>
-            <h3 className={styles.featureTitle}>Tempo Control</h3>
-            <p className={styles.featureDescription}>
-              Adjust BPM from slow practice speeds to performance tempo as your skills improve.
-            </p>
-          </div>
-
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>
-              <PiChartBarFill />
-            </div>
-            <h3 className={styles.featureTitle}>Progress Tracking</h3>
-            <p className={styles.featureDescription}>
-              Two-stage learning system that guides you from exploration to mastery.
-            </p>
+            <h3>Smart Practice</h3>
+            <p>Custom melody generation to target exactly what you want to learn.</p>
           </div>
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className={styles.howItWorksSection}>
-        <h2 className={styles.sectionTitle}>How It Works</h2>
-        <p className={styles.sectionSubtitle}>
-          Three simple steps to better ears
-        </p>
-        <div className={styles.stepsContainer}>
-          <div className={styles.stepCard}>
+      {/* How It Works */}
+      <section className={styles.howItWorks}>
+        <div className={styles.sectionHeader}>
+          <h2>Three steps to better ears</h2>
+        </div>
+
+        <div className={styles.stepsGrid}>
+          <div className={styles.step}>
             <div className={styles.stepNumber}>1</div>
-            <div className={styles.stepContent}>
-              <h3 className={styles.stepTitle}>Choose Your Focus</h3>
-              <p className={styles.stepDescription}>
-                Select your instrument and pick any notes, scales, or chords you want to practice.
-              </p>
-            </div>
+            <h3>Pick Your Notes</h3>
+            <p>Select any notes, scales, or chords you want to practice</p>
           </div>
 
-          <div className={styles.stepConnector}></div>
+          <div className={styles.stepArrow}>
+            <PiArrowRightBold />
+          </div>
 
-          <div className={styles.stepCard}>
+          <div className={styles.step}>
             <div className={styles.stepNumber}>2</div>
-            <div className={styles.stepContent}>
-              <h3 className={styles.stepTitle}>Generate & Listen</h3>
-              <p className={styles.stepDescription}>
-                Create a unique practice melody and train your ear to recognize each note.
-              </p>
-            </div>
+            <h3>Generate & Listen</h3>
+            <p>Create a melody and train your ear to recognize each note</p>
           </div>
 
-          <div className={styles.stepConnector}></div>
+          <div className={styles.stepArrow}>
+            <PiArrowRightBold />
+          </div>
 
-          <div className={styles.stepCard}>
+          <div className={styles.step}>
             <div className={styles.stepNumber}>3</div>
-            <div className={styles.stepContent}>
-              <h3 className={styles.stepTitle}>Play & Improve</h3>
-              <p className={styles.stepDescription}>
-                Play along on your instrument and receive real-time feedback on your accuracy.
-              </p>
-            </div>
+            <h3>Play It Back</h3>
+            <p>Play along on your instrument with real-time feedback</p>
           </div>
         </div>
       </section>
 
-      {/* Instruments Section */}
-      <section className={styles.instrumentsSection}>
-        <h2 className={styles.sectionTitle}>Pick Your Instrument</h2>
-        <div className={styles.instrumentsGrid}>
-          <div className={styles.instrumentCard}>
-            <div className={styles.instrumentIcon}>
+      {/* Instruments Showcase */}
+      <section className={styles.instruments}>
+        <div className={styles.sectionHeader}>
+          <h2>Your instrument. Your way.</h2>
+        </div>
+
+        <div className={styles.instrumentCards}>
+          <div className={`${styles.instrumentCard} ${styles.keyboard}`}>
+            <div className={styles.instrumentCardIcon}>
               <PiPianoKeysFill />
             </div>
             <h3>Keyboard</h3>
-            <p>Full 88-key range with realistic piano samples</p>
+            <p>Full 88-key range with realistic samples. Range selection for focused practice.</p>
+            <button className={styles.instrumentButton} onClick={onNavigateToSandbox}>
+              Try Keyboard
+              <PiArrowRightBold />
+            </button>
           </div>
-          <div className={styles.instrumentCard}>
-            <div className={styles.instrumentIcon}>
+
+          <div className={`${styles.instrumentCard} ${styles.guitar}`}>
+            <div className={styles.instrumentCardIcon}>
               <GiGuitarHead />
             </div>
             <h3>Guitar</h3>
-            <p>Complete fretboard visualization with multiple positions</p>
+            <p>Complete fretboard visualization. Practice by position with scale boxes.</p>
+            <button className={styles.instrumentButton} onClick={onNavigateToSandbox}>
+              Try Guitar
+              <PiArrowRightBold />
+            </button>
           </div>
-          <div className={styles.instrumentCard}>
-            <div className={styles.instrumentIcon}>
+
+          <div className={`${styles.instrumentCard} ${styles.bass}`}>
+            <div className={styles.instrumentCardIcon}>
               <GiGuitarBassHead />
             </div>
             <h3>Bass</h3>
-            <p>4-string bass with position-based practice modes</p>
+            <p>4-string bass with all positions. Build your groove foundation.</p>
+            <button className={styles.instrumentButton} onClick={onNavigateToSandbox}>
+              Try Bass
+              <PiArrowRightBold />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className={styles.ctaSection}>
+      {/* Final CTA */}
+      <section className={styles.finalCta}>
         <div className={styles.ctaContent}>
-          <h2 className={styles.ctaTitle}>Ready to Transform Your Ear?</h2>
-          <p className={styles.ctaDescription}>
-            Join musicians who are developing perfect pitch and musical intuition with Keplear.
-          </p>
-          <button
-            className={styles.primaryBtn}
-            onClick={onNavigateToSandbox}
-            aria-label="Start practicing with Keplear"
-          >
-            Start Training Now
+          <h2>Ready to transform your ears?</h2>
+          <p>Join musicians developing perfect pitch with Keplear</p>
+          <button className={styles.primaryButton} onClick={onNavigateToSandbox}>
+            <PiPlayFill />
+            Start Training Free
           </button>
         </div>
       </section>
