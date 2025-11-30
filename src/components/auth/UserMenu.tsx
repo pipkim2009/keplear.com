@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useTheme } from '../../hooks/useTheme'
+import { PiCaretUpFill, PiSignOutFill, PiTrashFill } from 'react-icons/pi'
 import logo from '/Keplear-logo.png'
 import styles from './UserMenu.module.css'
 import authStyles from './AuthForms.module.css'
@@ -184,17 +185,10 @@ const UserMenu = () => {
         <span className={styles.userName}>
           {userProfile.username}
         </span>
-        <svg
+        <PiCaretUpFill
           className={`${styles.chevron} ${isOpen ? styles.open : ''}`}
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-        >
-          <path
-            fill="currentColor"
-            d="M4.427 9.573l3.396-3.396a.25.25 0 01.354 0l3.396 3.396a.25.25 0 01-.177.427H4.604a.25.25 0 01-.177-.427z"
-          />
-        </svg>
+          size={16}
+        />
       </button>
 
       {isOpen && (
@@ -212,24 +206,14 @@ const UserMenu = () => {
               className={`${styles.menuItem} ${styles.danger}`}
               onClick={handleSignOut}
             >
-              <svg width="16" height="16" viewBox="0 0 16 16">
-                <path
-                  fill="currentColor"
-                  d="M2 2a2 2 0 00-2 2v8a2 2 0 002 2h4.5a.5.5 0 000-1H2a1 1 0 01-1-1V4a1 1 0 011-1h4.5a.5.5 0 000-1H2z M10.146 4.146a.5.5 0 01.708 0l3 3a.5.5 0 010 .708l-3 3a.5.5 0 01-.708-.708L12.293 8.5H6.5a.5.5 0 010-1h5.793l-2.147-2.146a.5.5 0 010-.708z"
-                />
-              </svg>
+              <PiSignOutFill size={16} />
               Sign Out
             </button>
             <button
               className={`${styles.menuItem} ${styles.danger}`}
               onClick={handleDeleteAccount}
             >
-              <svg width="16" height="16" viewBox="0 0 16 16">
-                <path
-                  fill="currentColor"
-                  d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 1.152l.557 6.977A2.5 2.5 0 0 0 5.53 13h4.94a2.5 2.5 0 0 0 2.477-2.371l.557-6.977a.58.58 0 0 0-.01-1.152H11ZM4.682 3.5h6.636l-.54 6.771A1.5 1.5 0 0 1 9.29 12H6.71a1.5 1.5 0 0 1-1.487-1.729L4.682 3.5Z"
-                />
-              </svg>
+              <PiTrashFill size={16} />
               Delete Account
             </button>
           </div>

@@ -93,7 +93,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       return (
         <div style={{
           minHeight: '100vh',
-          background: 'linear-gradient(135deg, #0a0a0a 0%, #121212 25%, #145238 50%, #1b6940 75%, #121212 100%)',
+          background: 'linear-gradient(135deg, #0a0a0a 0%, #121212 25%, #2d1b4e 50%, #3b1d6e 75%, #121212 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -102,7 +102,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
         }}>
           <div style={{
             padding: '40px 20px',
-            border: '2px solid #00b359',
+            border: '2px solid #9333ea',
             borderRadius: '16px',
             background: 'linear-gradient(145deg, #2d3748, #1a202c)',
             color: '#e2e8f0',
@@ -112,7 +112,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
             boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)'
           }}>
             <h2 style={{
-              background: 'linear-gradient(145deg, #00b359, #2ee88d)',
+              background: 'linear-gradient(145deg, #9333ea, #c084fc)',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
@@ -125,7 +125,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               gap: '0.5rem'
             }}>
               <span style={{
-                background: 'linear-gradient(145deg, #00b359, #2ee88d)',
+                background: 'linear-gradient(145deg, #9333ea, #c084fc)',
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent'
@@ -192,7 +192,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                 onClick={this.handleReload}
                 style={{
                   padding: '12px 24px',
-                  background: 'linear-gradient(145deg, #00b359, #2ee88d)',
+                  background: 'linear-gradient(145deg, #9333ea, #c084fc)',
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',

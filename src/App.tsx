@@ -52,7 +52,7 @@ const App = memo(function App() {
               }}>
                 <div style={{
                   background: `linear-gradient(145deg, ${document.body.classList.contains('dark') ? '#2d3748, #1a202c' : '#f7fafc, #edf2f7'})`,
-                  border: `2px solid ${document.body.classList.contains('dark') ? '#00b359' : '#2ee88d'}`,
+                  border: `2px solid ${document.body.classList.contains('dark') ? '#9333ea' : '#c084fc'}`,
                   borderRadius: '20px',
                   padding: '40px 30px',
                   maxWidth: '500px',
@@ -70,7 +70,7 @@ const App = memo(function App() {
                     fontSize: '1.8rem',
                     fontWeight: 'bold',
                     marginBottom: '1rem',
-                    background: 'linear-gradient(145deg, #00b359, #2ee88d)',
+                    background: 'linear-gradient(145deg, #9333ea, #c084fc)',
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent'
@@ -88,7 +88,7 @@ const App = memo(function App() {
                     onClick={() => window.location.reload()}
                     style={{
                       padding: '12px 24px',
-                      background: 'linear-gradient(145deg, #00b359, #2ee88d)',
+                      background: 'linear-gradient(145deg, #9333ea, #c084fc)',
                       color: 'white',
                       border: 'none',
                       borderRadius: '8px',

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { IoMusicalNotes } from 'react-icons/io5'
 import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/instruments/guitar/guitarScales'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
 import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, type BassScale, type BassScaleBox } from '../../utils/instruments/bass/bassScales'
@@ -278,11 +279,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         onClick={toggleExpanded}
         title={isExpanded ? 'Close Scales/Chords' : 'Open Scales/Chords'}
       >
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M9 13c0 1.105-1.12 2-2.5 2S4 14.105 4 13s1.12-2 2.5-2 2.5.895 2.5 2z"/>
-          <path fillRule="evenodd" d="M9 3v10H8V3h1z"/>
-          <path d="M8 2.82a1 1 0 0 1 .804-.98l3-.6A1 1 0 0 1 13 2.22V4L8 5V2.82z"/>
-        </svg>
+        <IoMusicalNotes size={16} />
         Scales/Chords
       </button>
 

@@ -33,35 +33,35 @@
   /* ========================================
      PRIMARY BRAND COLORS
      ======================================== */
-  --primary-purple: #00d96f;
-  --primary-purple-dark: #00b359;
-  --primary-purple-6600cc: #00a04d;
-  --primary-purple-light: #2ee88d;
-  --primary-purple-lighter: #66ffb2;
+  --primary-purple: #751aff;
+  --primary-purple-dark: #5a0fd6;
+  --primary-purple-6600cc: #6600cc;
+  --primary-purple-light: #9d5cff;
+  --primary-purple-lighter: #c49dff;
 
   /* Primary Purple Alpha Variations */
-  --primary-purple-alpha-5: rgb(0, 217, 111, 0.05);
-  --primary-purple-alpha-10: rgb(0, 217, 111, 0.1);
-  --primary-purple-alpha-15: rgb(0, 217, 111, 0.15);
-  --primary-purple-alpha-20: rgb(0, 217, 111, 0.2);
-  --primary-purple-alpha-25: rgb(0, 217, 111, 0.25);
-  --primary-purple-alpha-30: rgb(0, 217, 111, 0.3);
-  --primary-purple-alpha-40: rgb(0, 217, 111, 0.4);
-  --primary-purple-alpha-50: rgb(0, 217, 111, 0.5);
-  --primary-purple-alpha-60: rgb(0, 217, 111, 0.6);
-  --primary-purple-alpha-80: rgb(0, 217, 111, 0.8);
+  --primary-purple-alpha-5: rgb(117, 26, 255, 0.05);
+  --primary-purple-alpha-10: rgb(117, 26, 255, 0.1);
+  --primary-purple-alpha-15: rgb(117, 26, 255, 0.15);
+  --primary-purple-alpha-20: rgb(117, 26, 255, 0.2);
+  --primary-purple-alpha-25: rgb(117, 26, 255, 0.25);
+  --primary-purple-alpha-30: rgb(117, 26, 255, 0.3);
+  --primary-purple-alpha-40: rgb(117, 26, 255, 0.4);
+  --primary-purple-alpha-50: rgb(117, 26, 255, 0.5);
+  --primary-purple-alpha-60: rgb(117, 26, 255, 0.6);
+  --primary-purple-alpha-80: rgb(117, 26, 255, 0.8);
 
   /* ========================================
      THEME COLORS - LIGHT MODE
      ======================================== */
   --light-bg-primary: #ffffff;
   --light-bg-secondary: #f8f9fa;
-  --light-bg-tertiary: #e4ffe8;
-  --light-bg-quaternary: #f0fff0;
-  --light-bg-gradient-1: #e4ffe8;
-  --light-bg-gradient-2: #d2f9d2;
-  --light-bg-gradient-3: #f0fff0;
-  --light-bg-gradient-4: #d8ffe1;
+  --light-bg-tertiary: #f3e8ff;
+  --light-bg-quaternary: #faf5ff;
+  --light-bg-gradient-1: #f3e8ff;
+  --light-bg-gradient-2: #e9d5ff;
+  --light-bg-gradient-3: #faf5ff;
+  --light-bg-gradient-4: #ede9fe;
   --light-text-primary: #121212;
   --light-text-secondary: #374151;
   --light-text-tertiary: #6b7280;
@@ -73,10 +73,10 @@
      ======================================== */
   --dark-bg-primary: #121212;
   --dark-bg-secondary: #1a202c;
-  --dark-bg-tertiary: #1b6940;
-  --dark-bg-quaternary: #0d2e1a;
+  --dark-bg-tertiary: #2d1566;
+  --dark-bg-quaternary: #1a0d40;
   --dark-bg-surface: #0a0a0a;
-  --dark-text-primary: #d2f9d2;
+  --dark-text-primary: #d4c4ff;
   --dark-text-secondary: #ffffff;
   --dark-text-tertiary: #e9ecef;
   --dark-border-primary: #4a5568;
@@ -357,21 +357,21 @@
      SCROLLBAR COLORS
      ======================================== */
   --scrollbar-track: #1a1a1a;
-  --scrollbar-thumb-primary: #00b359;
-  --scrollbar-thumb-secondary: #00d96f;
-  --scrollbar-thumb-hover-primary: #2ee88d;
-  --scrollbar-thumb-hover-secondary: #66ffb2;
-  --scrollbar-thumb-active-primary: #00a04d;
-  --scrollbar-thumb-active-secondary: #00b359;
+  --scrollbar-thumb-primary: #5a0fd6;
+  --scrollbar-thumb-secondary: #751aff;
+  --scrollbar-thumb-hover-primary: #9d5cff;
+  --scrollbar-thumb-hover-secondary: #c49dff;
+  --scrollbar-thumb-active-primary: #6600cc;
+  --scrollbar-thumb-active-secondary: #5a0fd6;
 
-  /* Guitar Scrollbar (Green theme) */
+  /* Guitar Scrollbar (Purple theme) */
   --scrollbar-guitar-track: #2d2d2d;
   --scrollbar-guitar-track-secondary: #1a1a1a;
-  --scrollbar-guitar-thumb-primary: #22c55e;
-  --scrollbar-guitar-thumb-secondary: #16a34a;
-  --scrollbar-guitar-thumb-border: #4ade80;
-  --scrollbar-guitar-thumb-hover-primary: #16a34a;
-  --scrollbar-guitar-thumb-hover-secondary: #15803d;
+  --scrollbar-guitar-thumb-primary: #751aff;
+  --scrollbar-guitar-thumb-secondary: #5a0fd6;
+  --scrollbar-guitar-thumb-border: #9d5cff;
+  --scrollbar-guitar-thumb-hover-primary: #5a0fd6;
+  --scrollbar-guitar-thumb-hover-secondary: #6600cc;
 
   /* ========================================
      ALPHA COLORS (TRANSPARENCY)
@@ -400,26 +400,26 @@
   /* ========================================
      BUTTON COLORS
      ======================================== */
-  --btn-primary-bg: #3b82f6;
-  --btn-primary-bg-hover: #1d4ed8;
-  --btn-primary-border: #3b82f6;
+  --btn-primary-bg: #751aff;
+  --btn-primary-bg-hover: #5a0fd6;
+  --btn-primary-border: #751aff;
   --btn-primary-text: #ffffff;
   --btn-secondary-bg-light: rgb(255, 255, 255, 0.9);
-  --btn-secondary-bg-dark: rgb(27, 105, 64, 0.8);
-  --btn-secondary-border-light: rgb(210, 249, 210, 0.4);
-  --btn-secondary-border-dark: rgb(210, 249, 210, 0.3);
-  --btn-secondary-text-light: #1b6940;
-  --btn-secondary-text-dark: #d2f9d2;
+  --btn-secondary-bg-dark: rgb(45, 21, 102, 0.8);
+  --btn-secondary-border-light: rgb(212, 196, 255, 0.4);
+  --btn-secondary-border-dark: rgb(212, 196, 255, 0.3);
+  --btn-secondary-text-light: #6600cc;
+  --btn-secondary-text-dark: #d4c4ff;
 
   /* ========================================
      SHADOW COLORS
      ======================================== */
-  --shadow-primary-light: rgb(27, 105, 64, 0.1);
+  --shadow-primary-light: rgb(117, 26, 255, 0.1);
   --shadow-primary-dark: rgb(0, 0, 0, 0.2);
-  --shadow-hover-light: rgb(27, 105, 64, 0.2);
+  --shadow-hover-light: rgb(117, 26, 255, 0.2);
   --shadow-hover-dark: rgb(0, 0, 0, 0.3);
-  --shadow-button: rgb(59, 130, 246, 0.2);
-  --shadow-button-hover: rgb(59, 130, 246, 0.3);
+  --shadow-button: rgb(117, 26, 255, 0.2);
+  --shadow-button-hover: rgb(117, 26, 255, 0.3);
   --shadow-note: rgb(0, 0, 0, 0.3);
   --shadow-scale-root: rgb(220, 38, 38, 0.6);
 }

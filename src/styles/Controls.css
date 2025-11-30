@@ -2379,14 +2379,14 @@ select.control-input.flashing {
 .modern-control-item .input-with-buttons {
   position: relative;
   background: var(--blue-alpha-10) !important;
-  border: 2px solid var(--btn-primary-bg) !important;
+  border: 2px solid var(--blue-007bff) !important;
   border-radius: 8px;
   overflow: visible;
   transition: all 0.2s ease;
 }
 
 .modern-control-item .input-with-buttons:focus-within {
-  border-color: var(--btn-primary-bg);
+  border-color: var(--blue-007bff);
   box-shadow: 0 0 0 3px var(--blue-alpha-10);
 }
 
@@ -2397,7 +2397,7 @@ select.control-input.flashing {
   text-align: center;
   font-size: 16px;
   font-weight: 600;
-  color: var(--btn-primary-bg) !important;
+  color: var(--blue-007bff) !important;
   width: 80px;
 }
 
@@ -2423,11 +2423,11 @@ select.control-input.flashing {
   font-weight: bold;
   z-index: 10;
   pointer-events: auto;
-  color: var(--btn-primary-bg);
+  color: var(--blue-007bff);
 }
 
 .modern-control-item .control-button-internal:hover {
-  background: var(--btn-primary-bg);
+  background: var(--blue-007bff);
   color: var(--white);
   transform: translateY(-50%);
 }

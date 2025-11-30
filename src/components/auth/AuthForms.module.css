@@ -2,9 +2,9 @@
 .authModalOverlay {
   position: fixed !important;
   inset: 0 !important;
-  background: linear-gradient(135deg, 
-    rgb(27, 105, 64, 0.8) 0%, 
-    rgb(20, 82, 50, 0.9) 50%, 
+  background: linear-gradient(135deg,
+    rgb(88, 28, 135, 0.8) 0%,
+    rgb(59, 29, 110, 0.9) 50%,
     rgb(18, 18, 18, 0.8) 100%);
   backdrop-filter: blur(10px);
   display: flex;
@@ -38,8 +38,8 @@
   max-height: calc(100vh - 40px);
   overflow-y: auto;
   position: relative;
-  box-shadow: 
-    0 20px 60px rgb(27, 105, 64, 0.3),
+  box-shadow:
+    0 20px 60px rgb(168, 85, 247, 0.3),
     inset 0 1px 0 rgb(255, 255, 255, 0.7);
   animation: slideIn 0.3s ease-out;
   margin: auto;
@@ -60,13 +60,13 @@
   top: 20px;
   right: 20px;
   background: rgb(255, 255, 255, 0.1);
-  border: 2px solid rgb(27, 105, 64, 0.3);
+  border: 2px solid rgb(168, 85, 247, 0.3);
   border-radius: 50%;
   width: 40px;
   height: 40px;
   font-size: 20px;
   cursor: pointer;
-  color: #1b6940;
+  color: #7c3aed;
   z-index: 10;
   display: flex;
   align-items: center;
@@ -75,14 +75,14 @@
   padding: 0;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgb(27, 105, 64, 0.2);
+  box-shadow: 0 2px 8px rgb(168, 85, 247, 0.2);
 }
 
 .closeButton:hover {
   background: rgb(255, 255, 255, 0.2);
-  border-color: rgb(27, 105, 64, 0.5);
+  border-color: rgb(168, 85, 247, 0.5);
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgb(27, 105, 64, 0.3);
+  box-shadow: 0 4px 12px rgb(168, 85, 247, 0.3);
 }
 
 .closeButton:active {
@@ -130,14 +130,14 @@
 .authSlogan {
   font-size: 0.875rem;
   font-style: italic;
-  color: #00d96f;
+  color: #a855f7;
   opacity: 1;
   margin: 0;
 }
 
 .authForm h2 {
   margin: 0 0 12px;
-  color: #1b6940;
+  color: #7c3aed;
   font-size: 28px;
   font-weight: 700;
   text-align: center;
@@ -148,7 +148,7 @@
 }
 
 .formDescription {
-  color: #1b6940;
+  color: #7c3aed;
   font-size: 18px;
   font-weight: 600;
   text-align: center;
@@ -168,7 +168,7 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 700;
-  color: #1b6940;
+  color: #7c3aed;
   font-size: 15px;
 }
 
@@ -187,7 +187,7 @@
   background: rgb(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   box-sizing: border-box;
-  color: #1b6940;
+  color: #7c3aed;
 }
 
 :global(.dark) .formGroup input {
@@ -197,7 +197,7 @@
 }
 
 .formGroup input::placeholder {
-  color: rgb(27, 105, 64, 0.6);
+  color: rgb(124, 58, 237, 0.6);
   font-weight: 500;
 }
 
@@ -245,10 +245,10 @@
 
 
 .authButton.primary {
-  background: #1b6940;
+  background: #7c3aed;
   color: white;
-  border: 2px solid #1b6940;
-  box-shadow: 0 4px 15px rgb(27, 105, 64, 0.2);
+  border: 2px solid #7c3aed;
+  box-shadow: 0 4px 15px rgb(124, 58, 237, 0.2);
 }
 
 :global(.dark) .authButton.primary {
@@ -258,10 +258,10 @@
 }
 
 .authButton.primary:hover:not(:disabled) {
-  background: #1e1557;
-  border-color: #1e1557;
+  background: #6d28d9;
+  border-color: #6d28d9;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgb(27, 105, 64, 0.3);
+  box-shadow: 0 6px 20px rgb(124, 58, 237, 0.3);
 }
 
 :global(.dark) .authButton.primary:hover:not(:disabled) {
