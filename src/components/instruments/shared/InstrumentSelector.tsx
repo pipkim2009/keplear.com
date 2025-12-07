@@ -1,6 +1,6 @@
 import { memo, useMemo, useCallback } from 'react'
-import { useInstrument } from '../../contexts/InstrumentContext'
-import type { InstrumentType } from '../../types/instrument'
+import { useInstrument } from '../../../contexts/InstrumentContext'
+import type { InstrumentType } from '../../../types/instrument'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import { IoMusicalNotes } from 'react-icons/io5'

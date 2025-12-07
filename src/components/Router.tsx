@@ -1,7 +1,7 @@
 import Home from './pages/Home'
 import Practice from './pages/Practice'
 import NotFound from './pages/NotFound'
-import InstrumentDisplay from './keyboard/InstrumentDisplay'
+import InstrumentDisplay from './instruments/shared/InstrumentDisplay'
 import { useInstrument } from '../contexts/InstrumentContext'
 
 /**

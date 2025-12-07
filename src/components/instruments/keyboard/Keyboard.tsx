@@ -1,8 +1,8 @@
 import { memo, useMemo, useCallback } from 'react'
 import KeyboardKey from './KeyboardKey'
-import { whiteKeys, blackKeys, getBlackKeyLeft, getBlackKeyLeftDynamic, generateWhiteKeysWithSeparateOctaves, generateBlackKeysWithSeparateOctaves, type Note } from '../../utils/notes'
-import type { KeyboardSelectionMode } from './InstrumentControls'
-import '../../styles/Keyboard.css'
+import { whiteKeys, blackKeys, getBlackKeyLeft, getBlackKeyLeftDynamic, generateWhiteKeysWithSeparateOctaves, generateBlackKeysWithSeparateOctaves, type Note } from '../../../utils/notes'
+import type { KeyboardSelectionMode } from '../shared/InstrumentControls'
+import '../../../styles/Keyboard.css'
 
 interface KeyboardProps {
   onNoteClick: (note: Note) => void

@@ -2,11 +2,11 @@ import InstrumentControls from './InstrumentControls'
 import InstrumentHeader from './InstrumentHeader'
 import InstrumentRenderer from './InstrumentRenderer'
 import { useState, useEffect } from 'react'
-import type { Note } from '../../utils/notes'
+import type { Note } from '../../../utils/notes'
 import type { KeyboardSelectionMode } from './InstrumentControls'
-import type { ChordMode } from '../../reducers/uiReducer'
-import { useInstrument } from '../../contexts/InstrumentContext'
-import { useKeyboardHighlighting } from '../../hooks/useKeyboardHighlighting'
+import type { ChordMode } from '../../../reducers/uiReducer'
+import { useInstrument } from '../../../contexts/InstrumentContext'
+import { useKeyboardHighlighting } from '../../../hooks/useKeyboardHighlighting'
 
 interface InstrumentDisplayProps {
   onNoteClick: (note: Note) => void

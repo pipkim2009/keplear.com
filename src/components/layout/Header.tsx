@@ -1,7 +1,7 @@
 import { useState, useCallback, memo } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useInstrument } from '../../contexts/InstrumentContext'
-import ThemeToggle from './ThemeToggle'
+import ThemeToggle from '../common/ThemeToggle'
 import AuthModal from '../auth/AuthModal'
 import UserMenu from '../auth/UserMenu'
 import logo from '/Keplear-logo.png'

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { vi, describe, it, expect } from 'vitest'
-import Header from '../common/Header'
+import Header from '../layout/Header'
 
 // Mock the auth context
 const mockAuthContext = {

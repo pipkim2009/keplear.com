@@ -1,13 +1,13 @@
-import Keyboard from './Keyboard'
+import Keyboard from '../keyboard/Keyboard'
 import Guitar from '../guitar/Guitar'
 import Bass from '../bass/Bass'
-import type { Note } from '../../utils/notes'
-import type { GuitarScale, ScaleBox } from '../../utils/instruments/guitar/guitarScales'
-import type { BassScale, BassScaleBox } from '../../utils/instruments/bass/bassScales'
-import type { GuitarChord, ChordShape } from '../../utils/instruments/guitar/guitarChords'
-import type { BassChord, BassChordShape } from '../../utils/instruments/bass/bassChords'
+import type { Note } from '../../../utils/notes'
+import type { GuitarScale, ScaleBox } from '../../../utils/instruments/guitar/guitarScales'
+import type { BassScale, BassScaleBox } from '../../../utils/instruments/bass/bassScales'
+import type { GuitarChord, ChordShape } from '../../../utils/instruments/guitar/guitarChords'
+import type { BassChord, BassChordShape } from '../../../utils/instruments/bass/bassChords'
 import type { KeyboardSelectionMode } from './InstrumentControls'
-import type { AppliedChord, AppliedScale } from '../common/ScaleChordOptions'
+import type { AppliedChord, AppliedScale } from '../../common/ScaleChordOptions'
 
 interface InstrumentRendererProps {
   instrument: string

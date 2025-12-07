@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useMemo } from 'react'
-import type { Note } from '../../utils/notes'
+import type { Note } from '../../../utils/notes'
 
 interface KeyboardKeyProps {
   note: Note

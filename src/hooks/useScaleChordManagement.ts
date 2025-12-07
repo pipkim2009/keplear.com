@@ -10,7 +10,7 @@ import type { AppliedChord, AppliedScale } from '../components/common/ScaleChord
 import { applyScaleToKeyboard } from '../utils/instruments/keyboard/keyboardScales'
 import { applyChordToKeyboard } from '../utils/instruments/keyboard/keyboardChords'
 import { generateNotesWithSeparateOctaves } from '../utils/notes'
-import type { KeyboardSelectionMode } from '../components/keyboard/InstrumentControls'
+import type { KeyboardSelectionMode } from '../components/instruments/shared/InstrumentControls'
 import { applyScaleToGuitar, applyScaleBoxToGuitar } from '../utils/instruments/guitar/guitarScales'
 import { applyScaleToBass, applyScaleBoxToBass } from '../utils/instruments/bass/bassScales'
 import { applyChordToGuitar, applyChordShapeToGuitar } from '../utils/instruments/guitar/guitarChords'
