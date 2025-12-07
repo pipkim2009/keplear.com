@@ -166,34 +166,30 @@
 .login-btn {
   background: var(--white);
   color: var(--gray-900);
-  border: 2px solid var(--white);
+  border: none;
 }
 
 .login-btn:hover {
   background: var(--gray-200);
-  border-color: var(--gray-200);
 }
 
 .dark .login-btn {
   background: var(--gray-800);
   color: var(--white);
-  border-color: var(--gray-800);
 }
 
 .dark .login-btn:hover {
   background: var(--gray-700);
-  border-color: var(--gray-700);
 }
 
 .signup-btn {
   background: var(--blue-500);
   color: var(--white);
-  border: 2px solid var(--blue-500);
+  border: none;
 }
 
 .signup-btn:hover {
   background: var(--blue-700);
-  border-color: var(--blue-700);
 }
 
 @media (min-width: 1024px) {

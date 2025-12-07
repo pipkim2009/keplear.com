@@ -377,6 +377,7 @@
   cursor: pointer;
   transition: all 0.1s ease;
   flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .white-key:focus-visible {
@@ -391,7 +392,6 @@
 .dark .white-key:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color-dark);
   outline-offset: var(--focus-ring-offset);
-    0 0 0 4px rgb(46, 232, 141, 0.3),
 }
 
 .white-key:active {
@@ -494,6 +494,7 @@
   cursor: pointer;
   pointer-events: all;
   transition: all 0.1s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .black-key:focus-visible {
@@ -505,7 +506,6 @@
 .dark .black-key:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color-dark);
   outline-offset: var(--focus-ring-offset);
-    0 0 0 4px rgb(46, 232, 141, 0.3),
 }
 
 .black-key:active {
@@ -1106,17 +1106,6 @@
   border-color: var(--gray-666);
 }
 
-.modern-control-item.with-unavailable-notice {
-  margin-top: 20px;
-}
-
-.chord-mode-unavailable {
-  color: var(--red-600);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-align: center;
-  margin-top: 4px;
-}
 
 .chord-mode-switch.flashing {
   border-color: var(--green-550) !important;
@@ -1227,10 +1216,6 @@
 .light .chord-mode-switch.disabled {
   opacity: 0.5;
   border-color: var(--gray-666);
-}
-
-.light .chord-mode-unavailable {
-  color: var(--red-600);
 }
 
 .light .chord-mode-switch .switch-option {

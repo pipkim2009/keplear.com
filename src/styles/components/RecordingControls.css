@@ -52,9 +52,7 @@
 }
 
 .control-button.download-button:hover:not(:disabled) {
-  background: var(--gray-f5f5f5);
-  border-color: var(--blue-007bff);
-  color: var(--blue-007bff);
+  background: var(--gray-e0e0e0);
 }
 
 /* Modern Controls Row Styling */
@@ -77,7 +75,7 @@
 .modern-generate-button {
   background: var(--blue-007bff);
   color: var(--white);
-  border: 1px solid var(--blue-007bff);
+  border: none;
   border-radius: 6px;
   padding: 10px 20px;
   font-size: 14px;
@@ -85,19 +83,15 @@
   transition: all 0.2s ease;
   cursor: pointer;
   min-width: 140px;
-  transform: translateY(10px);
 }
 
 .modern-generate-button:hover:not(:disabled) {
   background: var(--blue-0056b3);
-  border-color: var(--blue-0056b3);
 }
 
 .modern-generate-button:disabled {
   background: var(--gray-6c757d);
-  border-color: var(--gray-6c757d);
   cursor: not-allowed;
-  transform: translateY(10px);
 }
 
 /* Modern Notes Toggle Button - Same green as melody container border */
@@ -123,7 +117,7 @@
 .modern-notes-toggle-button .toggle-content {
   background: var(--green-20c997);
   color: black !important;
-  border: 2px solid var(--green-20c997);
+  border: none;
   border-radius: 6px;
   padding: 10px 20px;
   font-size: 14px;
@@ -141,15 +135,10 @@
 
 .modern-notes-toggle-button .toggle-content:hover {
   background: var(--green-1ba085);
-  border-color: var(--green-1ba085);
-  color: black !important;
 }
 
 .modern-notes-toggle-button .toggle-content:active {
   background: var(--green-1ba085);
-  border-color: var(--green-1ba085);
-  color: black !important;
-  transform: none;
 }
 
 .modern-notes-toggle-button.expanded .toggle-content {
@@ -218,9 +207,7 @@
   }
 
   .control-button.download-button:hover:not(:disabled) {
-    background: var(--gray-343a40);
-    border-color: var(--green-20c997);
-    color: var(--green-20c997);
+    background: var(--gray-404040);
   }
 
   .control-group.modern-controls-row {

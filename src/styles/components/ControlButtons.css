@@ -34,7 +34,6 @@
 
 .control-input:hover {
   background: var(--primary-purple-alpha-25);
-  border-color: var(--purple-700);
 }
 
 .control-input:focus {
@@ -126,7 +125,7 @@
 
 .control-button-internal:active {
   background: var(--primary-purple-alpha-20);
-  transform: translateY(-50%) scale(0.95);
+  transform: translateY(-50%);
 }
 
 .control-button-internal.minus {

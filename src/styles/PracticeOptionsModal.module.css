@@ -49,7 +49,6 @@
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
-    inset 0 1px 0 rgb(255, 255, 255, 0.05);
   animation: slideIn 0.3s ease-out;
 }
 
@@ -58,7 +57,6 @@
     rgb(255, 255, 255, 0.95) 0%,
     rgb(240, 240, 255, 0.98) 100%);
   border: 2px solid rgb(210, 210, 249, 0.3);
-    inset 0 1px 0 rgb(255, 255, 255, 0.7);
 }
 
 /* Close Button */
@@ -86,12 +84,9 @@
 
 .closeButton:hover {
   background: rgb(0, 0, 0, 0.5);
-  border-color: rgb(255, 255, 255, 0.5);
-  transform: scale(1.1);
 }
 
 .closeButton:active {
-  transform: scale(0.95);
 }
 
 :global(.light) .closeButton {
@@ -102,7 +97,6 @@
 
 :global(.light) .closeButton:hover {
   background: rgb(255, 255, 255, 0.2);
-  border-color: rgb(168, 85, 247, 0.5);
 }
 
 @keyframes slideIn {
@@ -166,8 +160,6 @@
 
 .optionItem:hover {
   background: rgb(255, 255, 255, 0.08);
-  border-color: rgb(117, 26, 255, 0.4);
-  transform: translateY(-2px);
 }
 
 .optionItem.selected {
@@ -186,7 +178,6 @@
 
 :global(.light) .optionItem:hover {
   background: rgb(117, 26, 255, 0.1);
-  border-color: rgb(117, 26, 255, 0.3);
 }
 
 :global(.light) .optionItem.selected {
@@ -290,7 +281,7 @@
 .startButton {
   padding: 14px 28px;
   background: #6600cc;
-  border: 2px solid #6600cc;
+  border: none;
   border-radius: 12px;
   color: white;
   font-size: 15px;
@@ -304,8 +295,6 @@
 
 .startButton:hover:not(:disabled) {
   background: #5a0fd6;
-  border-color: #5a0fd6;
-  transform: translateY(-2px);
 }
 
 .startButton:disabled {

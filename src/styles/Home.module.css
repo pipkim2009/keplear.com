@@ -180,9 +180,11 @@
 }
 
 .primaryButton:hover {
+  background: linear-gradient(135deg, var(--primary-purple-dark) 0%, #4a0ba8 100%);
 }
 
 .primaryButton:active {
+  background: linear-gradient(135deg, var(--primary-purple-dark) 0%, #4a0ba8 100%);
 }
 
 .primaryButton svg {
@@ -221,9 +223,7 @@
 }
 
 .instrumentPill:hover {
-  background: var(--white-alpha-10);
-  border-color: var(--primary-purple-alpha-30);
-  color: var(--dark-text-primary);
+  background: var(--white-alpha-20);
 }
 
 .instrumentPill svg {
@@ -238,8 +238,7 @@
 }
 
 :global(.light) .instrumentPill:hover {
-  background: var(--black-alpha-10);
-  color: var(--light-text-primary);
+  background: var(--black-alpha-20);
 }
 
 :global(.light) .instrumentPill svg {
@@ -292,8 +291,7 @@
 }
 
 .featureCard:hover {
-  background: var(--white-alpha-10);
-  border-color: var(--primary-purple-alpha-30);
+  background: var(--white-alpha-15);
 }
 
 :global(.light) .featureCard {
@@ -302,7 +300,7 @@
 }
 
 :global(.light) .featureCard:hover {
-  border-color: var(--primary-purple-alpha-30);
+  background: var(--gray-100);
 }
 
 .featureIconWrapper {
@@ -464,11 +462,9 @@
 }
 
 .instrumentCard:hover {
-  border-color: var(--card-border);
 }
 
 .instrumentCard:hover::before {
-  opacity: 1;
 }
 
 .instrumentCard.keyboard {

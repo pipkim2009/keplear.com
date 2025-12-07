@@ -43,47 +43,6 @@
 
   /*
     ===========================================
-    TRANSFORM SYSTEM
-    ===========================================
-  */
-
-  /* Scale */
-  --scale-0: scale(0);
-  --scale-50: scale(0.5);
-  --scale-75: scale(0.75);
-  --scale-90: scale(0.9);
-  --scale-95: scale(0.95);
-  --scale-100: scale(1);
-  --scale-105: scale(1.05);
-  --scale-110: scale(1.1);
-  --scale-125: scale(1.25);
-  --scale-150: scale(1.5);
-
-  /* Translate */
-  --translate-y-0: translateY(0);
-  --translate-y-1: translateY(-1px);
-  --translate-y-2: translateY(-2px);
-  --translate-y-3: translateY(-3px);
-  --translate-y-5: translateY(-5px);
-
-  /* Rotate */
-  --rotate-0: rotate(0deg);
-  --rotate-1: rotate(1deg);
-  --rotate-2: rotate(2deg);
-  --rotate-3: rotate(3deg);
-  --rotate-5: rotate(5deg);
-  --rotate-45: rotate(45deg);
-  --rotate-90: rotate(90deg);
-  --rotate-180: rotate(180deg);
-
-  /* Combined Transforms */
-  --transform-button-hover: translateY(-1px) scale(1.02);
-  --transform-button-active: translateY(0) scale(0.98);
-  --transform-key-hover: scale(1.02);
-  --transform-key-active: scale(0.98);
-
-  /*
-    ===========================================
     BLUR & BACKDROP EFFECTS
     ===========================================
   */

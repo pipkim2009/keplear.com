@@ -20,8 +20,7 @@
 }
 
 .userMenuTrigger:hover {
-  background: rgb(255, 255, 255, 1);
-  border-color: rgb(210, 210, 249, 0.5);
+  background: rgb(230, 230, 230, 1);
 }
 
 /* Dark mode overrides */
@@ -32,8 +31,7 @@
 }
 
 :global(.dark) .userMenuTrigger:hover {
-  background: rgb(50, 50, 50, 1);
-  border-color: rgb(117, 26, 255, 0.5);
+  background: rgb(55, 55, 55, 1);
 }
 
 .userAvatar {

@@ -87,7 +87,6 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(145deg, var(--fret-wire-primary), var(--fret-wire-secondary));
-  border-radius: 1.5px;
 }
 
 .bass-fret-marker {
@@ -223,8 +222,6 @@
 
 .bass-fret-checkbox.disabled:hover {
   background: transparent;
-  transform: none;
-  border-color: var(--red-alpha-20);
 }
 
 .bass-fret-checkbox-label.disabled {

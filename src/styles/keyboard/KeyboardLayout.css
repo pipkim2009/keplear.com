@@ -37,15 +37,13 @@
   cursor: pointer;
   transition: all 0.1s ease;
   flex-shrink: 0;
-    inset 0 -2px 4px rgb(0, 0, 0, 0.1),
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .dark .white-key {
-    inset 0 -2px 4px rgb(0, 0, 0, 0.1),
 }
 
 .white-key:active {
-    inset 0 -1px 2px rgb(0, 0, 0, 0.2),
 }
 
 .white-key.selected {
@@ -85,11 +83,10 @@
   cursor: pointer;
   pointer-events: all;
   transition: all 0.1s ease;
-    inset 0 -1px 2px rgb(0, 0, 0, 0.3),
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .black-key:active {
-    inset 0 -1px 1px rgb(0, 0, 0, 0.4),
 }
 
 .black-key.selected {

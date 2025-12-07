@@ -97,29 +97,6 @@ html {
   100% { transform: rotate(360deg); }
 }
 
-/* Floating animation for interactive elements */
-.floating {
-  animation: float 6s ease-in-out infinite;
-}
-
-.floating:nth-child(2n) {
-  animation-delay: -2s;
-}
-
-.floating:nth-child(3n) {
-  animation-delay: -4s;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
 /* Pulse effect for important elements */
 .pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -177,15 +154,11 @@ html {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid rgb(255, 255, 255, 0.2);
-    inset 0 1px 0 rgb(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgb(0, 0, 0, 0.1);
 }
 
 .dark .glass {
   background: rgb(0, 0, 0, 0.2);
   border-color: rgb(255, 255, 255, 0.1);
-    inset 0 1px 0 rgb(255, 255, 255, 0.1),
-    inset 0 -1px 0 rgb(0, 0, 0, 0.3);
 }
 
 /* Loading spinner for dynamic content */
@@ -268,20 +241,17 @@ html {
 
 /* Enhanced focus ring for accessibility */
 .focus-ring:focus {
-  outline: none;
-    0 0 0 2px white,
-    0 0 0 4px var(--primary-purple),
+  outline: 3px solid var(--primary-purple);
+  outline-offset: 2px;
 }
 
 .dark .focus-ring:focus {
-    0 0 0 2px var(--bg-primary-dark),
-    0 0 0 4px var(--primary-purple-light),
+  outline-color: var(--primary-purple-light);
 }
 
-/* Staggered animation for lists */
+/* Staggered animation for lists - opacity only */
 .stagger-in > * {
   opacity: 0;
-  transform: translateY(20px);
   animation: stagger-in 0.6s ease forwards;
 }
 
@@ -294,7 +264,6 @@ html {
 @keyframes stagger-in {
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -418,49 +387,6 @@ html {
 @keyframes gradient-shift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
-}
-
-/* ========================================
-   INSTRUMENT-SPECIFIC ANIMATIONS
-   Consolidated from individual instrument files
-   ======================================== */
-
-/* Pulse animation for currently playing notes on keyboard */
-@keyframes pulse-playing-keyboard {
-  0%, 100% { transform: scale(1.05); }
-  50% { transform: scale(1.08); }
-}
-
-/* Pulse animation for currently playing notes on guitar/bass */
-@keyframes pulse-playing-fretboard {
-  0%, 100% { transform: scale(1.15); }
-  50% { transform: scale(1.2); }
-}
-
-/* Generic pulse-playing for backward compatibility */
-@keyframes pulse-playing {
-  0%, 100% { transform: scale(1.1); }
-  50% { transform: scale(1.15); }
-}
-
-/* Recording pulse animation */
-@keyframes record-pulse {
-  0%, 100% {
-  }
-
-  50% {
-  }
-}
-
-/* Pulse glow animation for instrument indicators */
-@keyframes pulse-glow {
-  0%, 100% {
-    opacity: 0.3;
-  }
-
-  50% {
-    opacity: 0.6;
-  }
 }
 
 /* Performance optimizations */

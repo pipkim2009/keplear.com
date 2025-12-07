@@ -75,15 +75,12 @@
 }
 
 .keyboardCard:hover {
-  transform: var(--transform-button-hover);
-  border-color: var(--blue-alpha-60);
 }
 
 .keyboardCardActive {
   composes: keyboardcard;
   background: linear-gradient(145deg, var(--blue-alpha-30), var(--blue-alpha-20));
   border-color: var(--blue-500);
-  transform: translateY(-3px) scale(1.02);
 }
 
 .guitarCard {
@@ -93,15 +90,12 @@
 }
 
 .guitarCard:hover {
-  transform: var(--transform-button-hover);
-  border-color: rgb(34, 197, 94, 0.6);
 }
 
 .guitarCardActive {
   composes: guitarcard;
   background: linear-gradient(145deg, rgb(34, 197, 94, 0.3), rgb(34, 197, 94, 0.2));
   border-color: var(--green-500);
-  transform: translateY(-3px) scale(1.02);
 }
 
 .bassCard {
@@ -111,15 +105,12 @@
 }
 
 .bassCard:hover {
-  transform: var(--transform-button-hover);
-  border-color: rgb(239, 68, 68, 0.6);
 }
 
 .bassCardActive {
   composes: basscard;
   background: linear-gradient(145deg, rgb(239, 68, 68, 0.3), rgb(239, 68, 68, 0.2));
   border-color: var(--red-500);
-  transform: translateY(-3px) scale(1.02);
 }
 
 /*
@@ -265,11 +256,9 @@
 
 @keyframes bounce-icon {
   0%, 100% {
-    transform: scale(1.1) translateY(0);
   }
 
   50% {
-    transform: scale(1.1) translateY(-5px);
   }
 }
 

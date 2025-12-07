@@ -48,14 +48,10 @@
 
 .backButton:hover {
   background: var(--white);
-  border-color: var(--primary-purple-alpha-50);
-  transform: translateX(-3px);
 }
 
 :global(.dark) .backButton:hover {
   background: linear-gradient(135deg, rgb(26, 32, 44, 1) 0%, rgb(27, 105, 64, 0.6) 100%);
-  border-color: var(--primary-purple-alpha-70);
-  transform: translateX(-3px);
 }
 
 .backButton:focus-visible {
@@ -233,11 +229,10 @@
 
 .generateButton:hover:not(:disabled) {
   background: var(--primary-purple-dark);
-  transform: translateY(-2px);
 }
 
 :global(.dark) .generateButton:hover:not(:disabled) {
-  background: var(--primary-purple-lighter);
+  background: var(--primary-purple);
 }
 
 .generateButton:disabled {
@@ -252,7 +247,6 @@
 
 .playButton:hover:not(:disabled) {
   background: rgb(22, 163, 74);
-  transform: translateY(-2px);
 }
 
 .playButton:disabled {
@@ -267,7 +261,6 @@
 
 .checkButton:hover:not(:disabled) {
   background: rgb(37, 99, 235);
-  transform: translateY(-2px);
 }
 
 .checkButton:disabled {
@@ -427,13 +420,9 @@
 }
 
 .instrumentCard:hover {
-  transform: translateY(-6px);
-  border-color: var(--primary-purple-alpha-50);
 }
 
 :global(.dark) .instrumentCard:hover {
-  transform: translateY(-6px);
-  border-color: var(--primary-purple-alpha-70);
 }
 
 .instrumentIcon {
@@ -455,7 +444,6 @@
 }
 
 .instrumentCard:hover .instrumentIcon {
-  transform: scale(1.05);
 }
 
 .instrumentName {
@@ -493,24 +481,19 @@
   -webkit-backdrop-filter: blur(10px);
   background: var(--primary-purple);
   color: var(--white);
-  border: 2px solid var(--primary-purple);
+  border: none;
 }
 
 :global(.dark) .instrumentButton {
   background: var(--primary-purple-light);
-  border-color: var(--primary-purple-light);
 }
 
 .instrumentButton:hover {
   background: var(--primary-purple-dark);
-  border-color: var(--primary-purple-dark);
-  transform: translateY(-2px);
 }
 
 :global(.dark) .instrumentButton:hover {
-  background: var(--primary-purple-lighter);
-  border-color: var(--primary-purple-lighter);
-  transform: translateY(-2px);
+  background: var(--primary-purple);
 }
 
 .instrumentButton:focus-visible {
@@ -566,13 +549,9 @@
 }
 
 .featuredLessonCard:hover {
-  transform: translateY(-6px);
-  border-color: var(--primary-purple-alpha-50);
 }
 
 :global(.dark) .featuredLessonCard:hover {
-  transform: translateY(-6px);
-  border-color: var(--primary-purple-alpha-70);
 }
 
 /* ========================================
@@ -601,13 +580,9 @@
 }
 
 .lessonCard:hover {
-  transform: translateY(-6px);
-  border-color: var(--primary-purple-alpha-50);
 }
 
 :global(.dark) .lessonCard:hover {
-  transform: translateY(-6px);
-  border-color: var(--primary-purple-alpha-70);
 }
 
 /* ========================================
@@ -639,11 +614,9 @@
 }
 
 .lessonCard:hover .lessonIcon {
-  transform: scale(1.05);
 }
 
 :global(.dark) .lessonCard:hover .lessonIcon {
-  transform: scale(1.05);
 }
 
 .lessonMeta {
@@ -826,24 +799,19 @@
   -webkit-backdrop-filter: blur(10px);
   background: var(--primary-purple);
   color: var(--white);
-  border: 2px solid var(--primary-purple);
+  border: none;
 }
 
 :global(.dark) .startButton {
   background: var(--primary-purple-light);
-  border-color: var(--primary-purple-light);
 }
 
 .startButton:hover {
   background: var(--primary-purple-dark);
-  border-color: var(--primary-purple-dark);
-  transform: translateY(-2px);
 }
 
 :global(.dark) .startButton:hover {
-  background: var(--primary-purple-lighter);
-  border-color: var(--primary-purple-lighter);
-  transform: translateY(-2px);
+  background: var(--primary-purple);
 }
 
 .startButton:focus-visible {
@@ -926,13 +894,11 @@
 .sandboxButton:hover {
   background: rgb(255, 255, 255, 1);
   border-color: rgb(210, 210, 249, 0.6);
-  transform: translateY(-2px);
 }
 
 :global(.dark) .sandboxButton:hover {
   background: rgb(27, 105, 64, 1);
   border-color: rgb(210, 210, 249, 0.5);
-  transform: translateY(-2px);
 }
 
 .sandboxButton:focus-visible {

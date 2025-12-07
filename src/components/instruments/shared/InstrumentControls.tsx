@@ -889,7 +889,7 @@ const InstrumentControls = memo(function InstrumentControls({
 
           {/* Chord Mode Select */}
           {setChordMode && !hideChordMode && (
-            <div className={`modern-control-item ${appliedChordsCount === 0 ? 'with-unavailable-notice' : ''}`}>
+            <div className="modern-control-item">
               <div className="label-with-tooltip">
                 <label className="control-label">Chord Mode</label>
                 <Tooltip
@@ -932,9 +932,6 @@ Progression - Use entire chords"
                     Progression
                   </button>
                 </div>
-                {appliedChordsCount === 0 && (
-                  <div className="chord-mode-unavailable">Unavailable</div>
-                )}
               </div>
             </div>
           )}

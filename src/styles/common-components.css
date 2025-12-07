@@ -30,12 +30,11 @@
 .btn-primary {
   background: var(--primary-purple);
   color: var(--white);
-  border: 2px solid var(--primary-purple);
+  border: none;
 }
 
 .btn-primary:hover {
   background: var(--primary-purple-dark);
-  border-color: var(--primary-purple-dark);
 }
 
 .btn-primary:focus-visible {
