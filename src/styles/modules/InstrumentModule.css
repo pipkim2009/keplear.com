@@ -16,7 +16,6 @@
   flex-direction: column;
   transition: var(--transition-slow);
   border-radius: var(--radius-3xl);
-  box-shadow: var(--shadow-instrument);
   width: auto;
   max-width: var(--max-width-screen);
   overflow-y: visible;
@@ -67,7 +66,6 @@
   overflow: hidden;
   -webkit-backdrop-filter: var(--backdrop-blur-md);
   backdrop-filter: var(--backdrop-blur-md);
-  box-shadow: var(--shadow-lg);
 }
 
 .keyboardCard {
@@ -79,7 +77,6 @@
 .keyboardCard:hover {
   transform: var(--transform-button-hover);
   border-color: var(--blue-alpha-60);
-  box-shadow: 0 15px 40px var(--blue-alpha-30);
 }
 
 .keyboardCardActive {
@@ -87,7 +84,6 @@
   background: linear-gradient(145deg, var(--blue-alpha-30), var(--blue-alpha-20));
   border-color: var(--blue-500);
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 12px 35px var(--blue-alpha-40);
 }
 
 .guitarCard {
@@ -99,7 +95,6 @@
 .guitarCard:hover {
   transform: var(--transform-button-hover);
   border-color: rgb(34, 197, 94, 0.6);
-  box-shadow: 0 15px 40px rgb(34, 197, 94, 0.3);
 }
 
 .guitarCardActive {
@@ -107,7 +102,6 @@
   background: linear-gradient(145deg, rgb(34, 197, 94, 0.3), rgb(34, 197, 94, 0.2));
   border-color: var(--green-500);
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 12px 35px rgb(34, 197, 94, 0.4);
 }
 
 .bassCard {
@@ -119,7 +113,6 @@
 .bassCard:hover {
   transform: var(--transform-button-hover);
   border-color: rgb(239, 68, 68, 0.6);
-  box-shadow: 0 15px 40px rgb(239, 68, 68, 0.3);
 }
 
 .bassCardActive {
@@ -127,7 +120,6 @@
   background: linear-gradient(145deg, rgb(239, 68, 68, 0.3), rgb(239, 68, 68, 0.2));
   border-color: var(--red-500);
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 12px 35px rgb(239, 68, 68, 0.4);
 }
 
 /*
@@ -147,13 +139,11 @@
   background: linear-gradient(145deg, var(--key-white-bg), var(--key-white-bg-secondary));
   border: 2px solid var(--key-white-border);
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-  box-shadow: var(--shadow-white-key);
   color: var(--key-white-text);
 }
 
 .whiteKeyActive {
   composes: whitekey;
-  box-shadow: var(--shadow-white-key-active);
   transform: var(--transform-key-active);
 }
 
@@ -174,14 +164,12 @@
   background: linear-gradient(145deg, var(--key-black-bg), var(--key-black-bg-secondary));
   border: 1px solid var(--key-black-border);
   border-radius: 0 0 var(--radius-md) var(--radius-md);
-  box-shadow: var(--shadow-black-key);
   color: var(--key-black-text);
   pointer-events: all;
 }
 
 .blackKeyActive {
   composes: blackkey;
-  box-shadow: var(--shadow-black-key-active);
   transform: var(--transform-key-active);
 }
 
@@ -209,7 +197,6 @@
 .scaleRoot {
   background: linear-gradient(145deg, var(--scale-root-bg), var(--red-700)) !important;
   border-color: var(--scale-root-border) !important;
-  box-shadow: var(--shadow-root-white) !important;
 }
 
 .chordNote {
@@ -220,7 +207,6 @@
 .chordRoot {
   background: linear-gradient(145deg, var(--chord-root-bg), var(--red-700)) !important;
   border-color: var(--chord-root-border) !important;
-  box-shadow: var(--shadow-root-white) !important;
 }
 
 .chordScaleNote {

@@ -64,7 +64,6 @@
 
 .inputLight:focus {
   border-color: var(--blue-500);
-  box-shadow: 0 0 0 3px var(--blue-alpha-20);
 }
 
 .inputDark {
@@ -75,7 +74,6 @@
 
 .inputDark:focus {
   border-color: var(--purple-500);
-  box-shadow: 0 0 8px var(--purple-glow);
 }
 
 /*
@@ -87,25 +85,21 @@
 .surfaceLight {
   background: var(--light-bg-secondary);
   border: 1px solid var(--gray-200);
-  box-shadow: var(--shadow-sm);
 }
 
 .surfaceDark {
   background: var(--dark-bg-secondary);
   border: 1px solid var(--gray-700);
-  box-shadow: var(--shadow-lg);
 }
 
 .surfaceElevatedLight {
   background: var(--light-bg-primary);
   border: 1px solid var(--gray-200);
-  box-shadow: var(--shadow-md);
 }
 
 .surfaceElevatedDark {
   background: var(--dark-bg-tertiary);
   border: 1px solid var(--gray-600);
-  box-shadow: var(--shadow-xl);
 }
 
 /*

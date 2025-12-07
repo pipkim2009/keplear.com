@@ -6,7 +6,6 @@
   padding: 0;
   margin-top: 1rem;
   border-radius: 20px 20px 0 0;
-  box-shadow: 0 20px 40px var(--black-alpha-30);
   border: 4px solid var(--dark-border-primary);
   width: auto;
   max-width: 95vw;
@@ -276,7 +275,6 @@
   padding: 0 30px;
   margin-top: 0;
   border-radius: 20px;
-  box-shadow: 0 20px 40px var(--black-alpha-30);
   border: 4px solid var(--dark-border-primary);
   width: 700px;
   min-height: 80px;
@@ -379,45 +377,24 @@
   cursor: pointer;
   transition: all 0.1s ease;
   flex-shrink: 0;
-  box-shadow:
-    inset 0 2px 4px var(--white-alpha-80),
-    inset 0 -2px 4px var(--black-alpha-10),
-    0 4px 8px var(--black-alpha-20);
 }
 
 .white-key:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow:
-    var(--focus-ring-shadow),
-    inset 0 2px 4px var(--white-alpha-80),
-    inset 0 -2px 4px var(--black-alpha-10),
-    0 4px 8px var(--black-alpha-20);
   z-index: 5;
 }
 
 .dark .white-key {
-  box-shadow:
-    inset 0 2px 4px var(--gray-400-alpha-30),
-    inset 0 -2px 4px var(--black-alpha-10),
-    0 4px 8px var(--black-alpha-40);
 }
 
 .dark .white-key:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color-dark);
   outline-offset: var(--focus-ring-offset);
-  box-shadow:
     0 0 0 4px rgb(46, 232, 141, 0.3),
-    inset 0 2px 4px var(--gray-400-alpha-30),
-    inset 0 -2px 4px var(--black-alpha-10),
-    0 4px 8px var(--black-alpha-40);
 }
 
 .white-key:active {
-  box-shadow:
-    inset 0 2px 4px rgb(255, 255, 255, 0.6),
-    inset 0 -1px 2px var(--black-alpha-20),
-    0 1px 2px var(--black-alpha-20);
 }
 
 .white-key.selected {
@@ -434,11 +411,6 @@
 .white-key.currently-playing {
   background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
   border-color: var(--amber-200) !important;
-  box-shadow:
-    0 0 20px var(--amber-alpha-80),
-    0 0 40px var(--amber-alpha-60),
-    inset 0 2px 4px var(--white-alpha-80),
-    inset 0 -2px 4px var(--black-alpha-10) !important;
 }
 
 /* Note: @keyframes pulse-playing-keyboard is defined in enhanced-effects.css */
@@ -481,11 +453,6 @@
 .white-key.currently-playing.selected.melody {
   background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
   border-color: var(--amber-200) !important;
-  box-shadow:
-    0 0 20px var(--amber-alpha-80),
-    0 0 40px var(--amber-alpha-60),
-    inset 0 2px 4px var(--white-alpha-80),
-    inset 0 -2px 4px var(--black-alpha-10) !important;
 }
 
 .white-key:last-child {
@@ -527,38 +494,21 @@
   cursor: pointer;
   pointer-events: all;
   transition: all 0.1s ease;
-  box-shadow:
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30),
-    0 4px 8px var(--black-alpha-50);
 }
 
 .black-key:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow:
-    var(--focus-ring-shadow),
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30),
-    0 4px 8px var(--black-alpha-50);
   z-index: 10;
 }
 
 .dark .black-key:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color-dark);
   outline-offset: var(--focus-ring-offset);
-  box-shadow:
     0 0 0 4px rgb(46, 232, 141, 0.3),
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30),
-    0 4px 8px var(--black-alpha-50);
 }
 
 .black-key:active {
-  box-shadow:
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 1px var(--black-alpha-40),
-    0 1px 2px var(--black-alpha-50);
 }
 
 .black-key.selected {
@@ -575,11 +525,6 @@
 .black-key.currently-playing {
   background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
   border-color: var(--amber-200) !important;
-  box-shadow:
-    0 0 20px var(--amber-alpha-80),
-    0 0 40px var(--amber-alpha-60),
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30) !important;
 }
 
 /* Ensure melody (green) takes precedence over all other states EXCEPT currently-playing */
@@ -618,11 +563,6 @@
 .black-key.currently-playing.selected.melody {
   background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
   border-color: var(--amber-200) !important;
-  box-shadow:
-    0 0 20px var(--amber-alpha-80),
-    0 0 40px var(--amber-alpha-60),
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30) !important;
 }
 
 /* Dim all non-melody notes when melody is active */
@@ -647,21 +587,11 @@
 .white-key.scale-root {
   background: linear-gradient(145deg, var(--note-scale-root), var(--note-scale-root-dark));
   border-color: var(--white);
-  box-shadow:
-    inset 0 2px 4px var(--white-alpha-10),
-    inset 0 -2px 4px var(--black-alpha-20),
-    0 0 8px var(--shadow-scale-root),
-    0 6px 16px var(--black-alpha-30);
 }
 
 .black-key.scale-root {
   background: linear-gradient(145deg, var(--note-scale-root), var(--note-scale-root-dark));
   border-color: var(--white);
-  box-shadow:
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30),
-    0 0 8px var(--shadow-scale-root),
-    0 4px 8px var(--black-alpha-50);
 }
 
 /* Ensure scale styling takes precedence over selected when both are active */
@@ -785,22 +715,12 @@
 .white-key.chord-note.chord-root {
   background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord-root-dark));
   border-color: var(--white);
-  box-shadow:
-    inset 0 2px 4px var(--white-alpha-10),
-    inset 0 -2px 4px var(--black-alpha-20),
-    0 0 8px var(--shadow-scale-root),
-    0 6px 16px var(--black-alpha-30);
 }
 
 .black-key.chord-root,
 .black-key.chord-note.chord-root {
   background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord-root-dark));
   border-color: var(--white);
-  box-shadow:
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30),
-    0 0 8px var(--shadow-scale-root),
-    0 4px 8px var(--black-alpha-50);
 }
 
 /* Ensure chord styling takes precedence when both chord and selected are active */
@@ -879,26 +799,18 @@
   justify-content: center;
   user-select: none;
   outline: none;
-  box-shadow: 0 2px 4px var(--black-alpha-20);
 }
 
 .octave-button:hover {
   background: var(--white-alpha-20);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px var(--black-alpha-30);
 }
 
 .octave-button:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 2px var(--black-alpha-20);
 }
 
 .octave-button:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow:
-    var(--focus-ring-shadow),
-    0 2px 4px var(--black-alpha-20);
 }
 
 /* Mobile adjustments for octave controls */
@@ -951,23 +863,16 @@
 .instrument-wrapper::-webkit-scrollbar-track {
   background: linear-gradient(145deg, var(--dark-bg-secondary), var(--gray-850));
   border-radius: 6px;
-  box-shadow: inset 0 2px 4px var(--black-alpha-30);
 }
 
 .instrument-wrapper::-webkit-scrollbar-thumb {
   background: linear-gradient(145deg, var(--blue-500), var(--blue-700));
   border-radius: 6px;
   border: 1px solid var(--blue-400);
-  box-shadow:
-    0 2px 4px var(--black-alpha-30),
-    inset 0 1px 2px var(--white-alpha-10);
 }
 
 .instrument-wrapper::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(145deg, var(--blue-600), var(--blue-800));
-  box-shadow:
-    0 3px 6px var(--black-alpha-40),
-    inset 0 1px 2px var(--white-alpha-15);
 }
 
 .instrument-wrapper::-webkit-scrollbar-thumb:active {
@@ -1020,57 +925,33 @@
 .white-key.manual-scale-note {
   background: linear-gradient(145deg, var(--note-scale), var(--note-selected));
   border-color: var(--white);
-  box-shadow:
-    inset 0 2px 4px var(--white-alpha-10),
-    inset 0 -2px 4px var(--black-alpha-20),
-    0 4px 8px var(--black-alpha-30);
 }
 
 .black-key.manual-scale-note {
   background: linear-gradient(145deg, var(--note-scale), var(--note-selected));
   border-color: var(--white);
-  box-shadow:
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30),
-    0 4px 8px var(--black-alpha-50);
 }
 
 /* Manual + Chord Note - purple + blue gradient */
 .white-key.manual-chord-note {
   background: linear-gradient(90deg, var(--note-chord), var(--note-selected));
   border-color: var(--white);
-  box-shadow:
-    inset 0 2px 4px var(--white-alpha-10),
-    inset 0 -2px 4px var(--black-alpha-20),
-    0 4px 8px var(--black-alpha-30);
 }
 
 .black-key.manual-chord-note {
   background: linear-gradient(90deg, var(--note-chord), var(--note-selected));
   border-color: var(--white);
-  box-shadow:
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30),
-    0 4px 8px var(--black-alpha-50);
 }
 
 /* Manual + Scale Note + Chord Note - purple + orange + blue gradient */
 .white-key.manual-scale-chord-note {
   background: linear-gradient(90deg, var(--note-chord), var(--note-scale), var(--note-selected));
   border-color: var(--white);
-  box-shadow:
-    inset 0 2px 4px var(--white-alpha-10),
-    inset 0 -2px 4px var(--black-alpha-20),
-    0 4px 8px var(--black-alpha-30);
 }
 
 .black-key.manual-scale-chord-note {
   background: linear-gradient(90deg, var(--note-chord), var(--note-scale), var(--note-selected));
   border-color: var(--white);
-  box-shadow:
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30),
-    0 4px 8px var(--black-alpha-50);
 }
 
 /* Manual + Scale Root - red + blue gradient */
@@ -1078,22 +959,12 @@
 .white-key.manual-chord-root {
   background: linear-gradient(145deg, var(--note-scale-root), var(--note-selected));
   border-color: var(--white);
-  box-shadow:
-    inset 0 2px 4px var(--white-alpha-10),
-    inset 0 -2px 4px var(--black-alpha-20),
-    0 0 8px var(--shadow-scale-root),
-    0 6px 16px var(--black-alpha-30);
 }
 
 .black-key.manual-scale-root,
 .black-key.manual-chord-root {
   background: linear-gradient(145deg, var(--note-scale-root), var(--note-selected));
   border-color: var(--white);
-  box-shadow:
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30),
-    0 0 8px var(--shadow-scale-root),
-    0 4px 8px var(--black-alpha-50);
 }
 
 /* Manual + Chord Root Note - red + purple + blue gradient */
@@ -1105,11 +976,6 @@
     var(--note-selected)
   );
   border-color: var(--white);
-  box-shadow:
-    inset 0 2px 4px var(--white-alpha-10),
-    inset 0 -2px 4px var(--black-alpha-20),
-    0 0 8px var(--shadow-scale-root),
-    0 6px 16px var(--black-alpha-30);
 }
 
 .black-key.manual-chord-root-note {
@@ -1120,11 +986,6 @@
     var(--note-selected)
   );
   border-color: var(--white);
-  box-shadow:
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30),
-    0 0 8px var(--shadow-scale-root),
-    0 4px 8px var(--black-alpha-50);
 }
 
 /* Manual + Scale Note + Chord Note + Root - all 4 colors gradient */
@@ -1137,11 +998,6 @@
     var(--note-selected)
   );
   border-color: var(--white);
-  box-shadow:
-    inset 0 2px 4px var(--white-alpha-10),
-    inset 0 -2px 4px var(--black-alpha-20),
-    0 0 8px var(--shadow-scale-root),
-    0 6px 16px var(--black-alpha-30);
 }
 
 .black-key.manual-scale-chord-root-note {
@@ -1153,11 +1009,6 @@
     var(--note-selected)
   );
   border-color: var(--white);
-  box-shadow:
-    inset 0 1px 2px var(--white-alpha-10),
-    inset 0 -1px 2px var(--black-alpha-30),
-    0 0 8px var(--shadow-scale-root),
-    0 4px 8px var(--black-alpha-50);
 }
 
 /* Selection Mode Vertical Switch */
@@ -1175,7 +1026,6 @@
 
 .selection-mode-switch.flashing {
   border-color: var(--green-550) !important;
-  box-shadow: 0 0 8px var(--green-alpha-40) !important;
 }
 
 .selection-mode-switch .switch-option {
@@ -1216,14 +1066,12 @@
 .selection-mode-switch .switch-option:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: -2px;
-  box-shadow: var(--focus-ring-shadow);
   z-index: 1;
 }
 
 .selection-mode-switch .switch-option.active {
   background: linear-gradient(145deg, var(--white), var(--gray-200));
   color: var(--gray-800);
-  box-shadow: 0 2px 4px var(--black-alpha-10);
 }
 
 .selection-mode-switch .switch-option.active:hover:not(:disabled) {
@@ -1272,7 +1120,6 @@
 
 .chord-mode-switch.flashing {
   border-color: var(--green-550) !important;
-  box-shadow: 0 0 8px var(--green-alpha-40) !important;
 }
 
 .chord-mode-switch .switch-option {
@@ -1309,7 +1156,6 @@
 .chord-mode-switch .switch-option:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: -2px;
-  box-shadow: var(--focus-ring-shadow);
   z-index: 1;
 }
 
@@ -1342,16 +1188,13 @@
   background: var(--white);
   border-color: var(--gray-400);
   color: var(--gray-800);
-  box-shadow: 0 2px 4px var(--black-alpha-10);
 }
 
 .light .octave-button:hover {
   background: var(--gray-100);
-  box-shadow: 0 4px 8px var(--black-alpha-20);
 }
 
 .light .octave-button:active {
-  box-shadow: 0 1px 2px var(--black-alpha-10);
 }
 
 .light .selection-mode-switch {
@@ -1370,7 +1213,6 @@
 .light .selection-mode-switch .switch-option.active {
   background: linear-gradient(145deg, var(--white), var(--gray-200));
   color: var(--gray-800);
-  box-shadow: 0 2px 4px var(--black-alpha-10);
 }
 
 .light .selection-mode-switch .switch-option.active:hover {

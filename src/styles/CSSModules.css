@@ -39,7 +39,6 @@
 */
 
 .elevated {
-  box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-secondary);
   background: var(--bg-elevated);
 }
@@ -51,13 +50,9 @@
 }
 
 .interactive:hover {
-  transform: var(--translate-y-1);
-  box-shadow: var(--shadow-md);
 }
 
 .interactive:active {
-  transform: var(--translate-y-0);
-  box-shadow: var(--shadow-sm);
 }
 
 .disabled {

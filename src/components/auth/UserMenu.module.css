@@ -17,14 +17,11 @@
   transition: all 0.2s ease;
   font-size: 14px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgb(124, 58, 237, 0.15);
 }
 
 .userMenuTrigger:hover {
   background: rgb(255, 255, 255, 1);
   border-color: rgb(210, 210, 249, 0.5);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgb(124, 58, 237, 0.2);
 }
 
 /* Dark mode overrides */
@@ -32,13 +29,11 @@
   background: rgb(40, 40, 40, 0.95);
   border-color: rgb(117, 26, 255, 0.3);
   color: #f8f9fa;
-  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.3);
 }
 
 :global(.dark) .userMenuTrigger:hover {
   background: rgb(50, 50, 50, 1);
   border-color: rgb(117, 26, 255, 0.5);
-  box-shadow: 0 6px 20px rgb(0, 0, 0, 0.4);
 }
 
 .userAvatar {
@@ -94,7 +89,6 @@
   backdrop-filter: blur(10px);
   border: 2px solid rgb(210, 210, 249, 0.3);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgb(124, 58, 237, 0.2);
   min-width: 240px;
   overflow: hidden;
   z-index: 200;
@@ -104,7 +98,6 @@
 :global(.dark) .userMenuDropdown {
   background: rgb(40, 40, 40, 0.98);
   border-color: rgb(117, 26, 255, 0.3);
-  box-shadow: 0 20px 60px rgb(0, 0, 0, 0.5);
 }
 
 .userMenuHeader {
@@ -174,7 +167,6 @@
 
 .menuItem:hover {
   background: rgb(232, 228, 255, 0.8);
-  transform: translateX(4px);
 }
 
 :global(.dark) .menuItem:hover {

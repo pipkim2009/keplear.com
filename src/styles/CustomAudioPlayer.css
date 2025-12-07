@@ -5,7 +5,6 @@
   background: var(--gray-1a1a1a-alpha-90);
   border-radius: 8px;
   padding: 12px;
-  box-shadow: 0 4px 12px var(--black-alpha-30);
   border: 1px solid var(--gray-800);
   position: relative;
   overflow: visible;
@@ -39,12 +38,9 @@
 
 .play-pause-btn:hover {
   background: linear-gradient(145deg, var(--blue-590), var(--blue-580));
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px var(--black-alpha-30);
 }
 
 .play-pause-btn:active {
-  transform: translateY(0);
 }
 
 .play-pause-btn svg {
@@ -75,7 +71,6 @@
   position: relative;
   overflow: visible;
   border: 1px solid var(--gray-555);
-  box-shadow: inset 0 1px 2px var(--black-alpha-30);
   z-index: 1;
 }
 
@@ -85,10 +80,6 @@
   border-radius: 6px;
   transition: width 0.1s ease;
   position: relative;
-  box-shadow:
-    0 1px 3px var(--blue-450-alpha-30),
-    0 0 10px var(--blue-450-alpha-40),
-    0 0 20px var(--blue-450-alpha-30),
     inset 0 1px 0 var(--white-alpha-30);
 }
 
@@ -102,9 +93,6 @@
   height: 16px;
   background: linear-gradient(145deg, var(--blue-450), var(--blue-550));
   border-radius: 50%;
-  box-shadow:
-    0 2px 4px var(--black-alpha-30),
-    0 0 6px var(--blue-450-alpha-40);
   opacity: 0;
   transition: all 0.2s ease;
   border: 2px solid var(--white);
@@ -117,20 +105,12 @@
 }
 
 .progress-bar:hover .progress-fill {
-  box-shadow:
-    0 1px 3px var(--blue-450-alpha-40),
-    0 0 15px var(--blue-450-alpha-60),
-    0 0 30px var(--blue-450-alpha-30),
     inset 0 1px 0 var(--white-alpha-40);
 }
 
 .progress-bar:hover .progress-fill::after,
 .progress-bar.dragging .progress-fill::after {
   opacity: 1;
-  box-shadow:
-    0 2px 4px var(--black-alpha-30),
-    0 0 8px var(--blue-450-alpha-60),
-    0 0 16px var(--blue-450-alpha-40);
 }
 
 .progress-bar.dragging {
@@ -143,10 +123,6 @@
 }
 
 .progress-bar.dragging .progress-fill {
-  box-shadow:
-    0 1px 3px var(--blue-450-alpha-50),
-    0 0 20px var(--blue-450-alpha-80),
-    0 0 40px var(--blue-450-alpha-40),
     inset 0 1px 0 var(--white-alpha-50);
 }
 
@@ -170,7 +146,6 @@
   font-weight: 600;
   white-space: nowrap;
   pointer-events: none;
-  box-shadow: 0 2px 8px var(--black-alpha-40);
   z-index: 10;
 }
 
@@ -226,7 +201,6 @@
   border: 1px solid var(--gray-800);
   border-radius: 4px;
   padding: 8px;
-  box-shadow: 0 4px 12px var(--black-alpha-40);
   z-index: 1000;
   min-width: 40px;
   display: flex;
@@ -254,7 +228,6 @@
   background: linear-gradient(145deg, var(--blue-450), var(--blue-550));
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 2px 4px var(--black-alpha-30);
 }
 
 .volume-slider input[type="range"]::-moz-range-thumb {
@@ -264,7 +237,6 @@
   border-radius: 50%;
   cursor: pointer;
   border: none;
-  box-shadow: 0 2px 4px var(--black-alpha-30);
 }
 
 /* Responsive adjustments */
@@ -409,24 +381,18 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px var(--black-alpha-20);
 }
 
 .live-feedback-button:hover {
   background: linear-gradient(145deg, var(--purple-500), var(--purple-600));
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--black-alpha-30);
 }
 
 .live-feedback-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 6px var(--black-alpha-20);
 }
 
 .live-feedback-button:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow: var(--focus-ring-shadow);
 }
 
 .live-feedback-button.listening {
@@ -449,10 +415,8 @@
 
 @keyframes pulse-listening {
   0%, 100% {
-    box-shadow: 0 2px 8px var(--black-alpha-20), 0 0 0 0 var(--red-dc3545-alpha-70);
   }
   50% {
-    box-shadow: 0 4px 12px var(--black-alpha-30), 0 0 0 8px var(--red-dc3545-alpha-0);
   }
 }
 
@@ -563,16 +527,13 @@
 .note-checkbox.active .checkbox-box {
   border-color: var(--blue-450);
   background: var(--blue-900);
-  box-shadow: 0 0 12px var(--blue-450-alpha-40);
   animation: pulse-checkbox 1.5s ease-in-out infinite;
 }
 
 @keyframes pulse-checkbox {
   0%, 100% {
-    box-shadow: 0 0 12px var(--blue-450-alpha-40);
   }
   50% {
-    box-shadow: 0 0 20px var(--blue-450-alpha-60);
   }
 }
 
@@ -953,12 +914,10 @@
 
 .light .live-feedback-button {
   background: linear-gradient(145deg, var(--purple-600), var(--purple-700));
-  box-shadow: 0 2px 8px var(--black-alpha-15);
 }
 
 .light .live-feedback-button:hover {
   background: linear-gradient(145deg, var(--purple-500), var(--purple-600));
-  box-shadow: 0 4px 12px var(--black-alpha-25);
 }
 
 .light .live-feedback-button.listening {
@@ -1004,7 +963,6 @@
 .light .note-checkbox.active .checkbox-box {
   border-color: var(--blue-500);
   background: var(--blue-100);
-  box-shadow: 0 0 12px var(--blue-450-alpha-40);
 }
 
 .light .note-checkbox.pending .checkbox-box {

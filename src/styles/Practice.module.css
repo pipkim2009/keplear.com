@@ -38,28 +38,24 @@
   border: 2px solid rgb(210, 210, 249, 0.3);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 2px 10px var(--primary-purple-alpha-10);
 }
 
 :global(.dark) .backButton {
   background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
   color: var(--dark-text-primary);
   border: 2px solid rgb(210, 210, 249, 0.2);
-  box-shadow: 0 2px 10px rgb(0, 0, 0, 0.3);
 }
 
 .backButton:hover {
   background: var(--white);
   border-color: var(--primary-purple-alpha-50);
   transform: translateX(-3px);
-  box-shadow: 0 4px 15px var(--primary-purple-alpha-20);
 }
 
 :global(.dark) .backButton:hover {
   background: linear-gradient(135deg, rgb(26, 32, 44, 1) 0%, rgb(27, 105, 64, 0.6) 100%);
   border-color: var(--primary-purple-alpha-70);
   transform: translateX(-3px);
-  box-shadow: 0 4px 20px var(--primary-purple-alpha-30);
 }
 
 .backButton:focus-visible {
@@ -89,7 +85,6 @@
   font-size: 1.25rem;
   font-weight: 600;
   border-radius: 16px;
-  box-shadow: 0 8px 30px rgb(0, 0, 0, 0.5);
   z-index: 1000;
   animation: welcomeSlideUp 0.6s ease-out;
   backdrop-filter: blur(10px);
@@ -98,7 +93,6 @@
 }
 
 :global(.dark) .welcomeSubtitle {
-  box-shadow: 0 8px 40px rgb(0, 0, 0, 0.7), 0 0 40px var(--primary-purple-alpha-30);
 }
 
 @keyframes welcomeSlideUp {
@@ -126,7 +120,6 @@
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgb(210, 210, 249, 0.3);
   border-radius: 20px;
-  box-shadow: 0 4px 15px var(--primary-purple-alpha-10);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -135,7 +128,6 @@
 :global(.dark) .lessonControls {
   background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
   border: 1px solid rgb(210, 210, 249, 0.2);
-  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4);
 }
 
 .lessonInstructions {
@@ -216,7 +208,6 @@
 .numberInput:focus {
   outline: none;
   border-color: var(--primary-purple);
-  box-shadow: 0 0 0 3px var(--primary-purple-alpha-20);
 }
 
 .generateButton,
@@ -229,7 +220,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 10px rgb(0, 0, 0, 0.1);
 }
 
 .generateButton {
@@ -244,7 +234,6 @@
 .generateButton:hover:not(:disabled) {
   background: var(--primary-purple-dark);
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px var(--primary-purple-alpha-40);
 }
 
 :global(.dark) .generateButton:hover:not(:disabled) {
@@ -264,7 +253,6 @@
 .playButton:hover:not(:disabled) {
   background: rgb(22, 163, 74);
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgb(34, 197, 94, 0.4);
 }
 
 .playButton:disabled {
@@ -280,7 +268,6 @@
 .checkButton:hover:not(:disabled) {
   background: rgb(37, 99, 235);
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgb(59, 130, 246, 0.4);
 }
 
 .checkButton:disabled {
@@ -431,25 +418,21 @@
   align-items: center;
   gap: 1.5rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px var(--primary-purple-alpha-10);
   text-align: center;
 }
 
 :global(.dark) .instrumentCard {
   background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
   border: 1px solid rgb(210, 210, 249, 0.2);
-  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(46, 232, 141, 0.1) inset;
 }
 
 .instrumentCard:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 30px var(--primary-purple-alpha-25);
   border-color: var(--primary-purple-alpha-50);
 }
 
 :global(.dark) .instrumentCard:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 40px rgb(0, 0, 0, 0.6), 0 0 50px var(--primary-purple-alpha-40), 0 0 0 1px var(--primary-purple-alpha-40) inset;
   border-color: var(--primary-purple-alpha-70);
 }
 
@@ -468,7 +451,6 @@
 
 :global(.dark) .instrumentIcon {
   background: linear-gradient(135deg, var(--primary-purple-alpha-30) 0%, var(--primary-purple-alpha-50) 100%);
-  box-shadow: 0 0 30px var(--primary-purple-alpha-25), 0 0 0 1px var(--primary-purple-alpha-40) inset;
   color: var(--white);
 }
 
@@ -512,27 +494,23 @@
   background: var(--primary-purple);
   color: var(--white);
   border: 2px solid var(--primary-purple);
-  box-shadow: 0 4px 15px var(--primary-purple-alpha-30);
 }
 
 :global(.dark) .instrumentButton {
   background: var(--primary-purple-light);
   border-color: var(--primary-purple-light);
-  box-shadow: 0 4px 20px var(--primary-purple-alpha-40), 0 0 30px var(--primary-purple-alpha-20);
 }
 
 .instrumentButton:hover {
   background: var(--primary-purple-dark);
   border-color: var(--primary-purple-dark);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--primary-purple-alpha-50);
 }
 
 :global(.dark) .instrumentButton:hover {
   background: var(--primary-purple-lighter);
   border-color: var(--primary-purple-lighter);
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px var(--primary-purple-alpha-60), 0 0 40px var(--primary-purple-alpha-30);
 }
 
 .instrumentButton:focus-visible {
@@ -578,7 +556,6 @@
   flex-direction: column;
   gap: 1.5rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px var(--primary-purple-alpha-10);
   position: relative;
   overflow: hidden;
 }
@@ -586,18 +563,15 @@
 :global(.dark) .featuredLessonCard {
   background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
   border: 1px solid rgb(210, 210, 249, 0.2);
-  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(46, 232, 141, 0.1) inset;
 }
 
 .featuredLessonCard:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 30px var(--primary-purple-alpha-25);
   border-color: var(--primary-purple-alpha-50);
 }
 
 :global(.dark) .featuredLessonCard:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 40px rgb(0, 0, 0, 0.6), 0 0 50px var(--primary-purple-alpha-40), 0 0 0 1px var(--primary-purple-alpha-40) inset;
   border-color: var(--primary-purple-alpha-70);
 }
 
@@ -617,7 +591,6 @@
   flex-direction: column;
   gap: 1.5rem;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px var(--primary-purple-alpha-10);
   position: relative;
   overflow: hidden;
 }
@@ -625,18 +598,15 @@
 :global(.dark) .lessonCard {
   background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
   border: 1px solid rgb(210, 210, 249, 0.2);
-  box-shadow: 0 4px 20px rgb(0, 0, 0, 0.4), 0 0 0 1px rgb(46, 232, 141, 0.1) inset;
 }
 
 .lessonCard:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 30px var(--primary-purple-alpha-25);
   border-color: var(--primary-purple-alpha-50);
 }
 
 :global(.dark) .lessonCard:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 40px rgb(0, 0, 0, 0.6), 0 0 50px var(--primary-purple-alpha-40), 0 0 0 1px var(--primary-purple-alpha-40) inset;
   border-color: var(--primary-purple-alpha-70);
 }
 
@@ -666,7 +636,6 @@
 
 :global(.dark) .lessonIcon {
   background: linear-gradient(135deg, var(--primary-purple-alpha-30) 0%, var(--primary-purple-alpha-50) 100%);
-  box-shadow: 0 0 25px var(--primary-purple-alpha-25), 0 0 0 1px var(--primary-purple-alpha-40) inset;
 }
 
 .lessonCard:hover .lessonIcon {
@@ -709,7 +678,6 @@
   background: linear-gradient(135deg, rgb(34, 197, 94, 0.3) 0%, rgb(34, 197, 94, 0.4) 100%);
   color: rgb(74, 222, 128);
   border: 1px solid rgb(34, 197, 94, 0.5);
-  box-shadow: 0 0 15px rgb(34, 197, 94, 0.2);
 }
 
 .intermediateBadge {
@@ -722,7 +690,6 @@
   background: linear-gradient(135deg, rgb(245, 158, 11, 0.3) 0%, rgb(245, 158, 11, 0.4) 100%);
   color: rgb(251, 191, 36);
   border: 1px solid rgb(245, 158, 11, 0.5);
-  box-shadow: 0 0 15px rgb(245, 158, 11, 0.2);
 }
 
 .advancedBadge {
@@ -735,7 +702,6 @@
   background: linear-gradient(135deg, rgb(239, 68, 68, 0.3) 0%, rgb(239, 68, 68, 0.4) 100%);
   color: rgb(252, 165, 165);
   border: 1px solid rgb(239, 68, 68, 0.5);
-  box-shadow: 0 0 15px rgb(239, 68, 68, 0.2);
 }
 
 .durationBadge {
@@ -861,27 +827,23 @@
   background: var(--primary-purple);
   color: var(--white);
   border: 2px solid var(--primary-purple);
-  box-shadow: 0 4px 15px var(--primary-purple-alpha-30);
 }
 
 :global(.dark) .startButton {
   background: var(--primary-purple-light);
   border-color: var(--primary-purple-light);
-  box-shadow: 0 4px 20px var(--primary-purple-alpha-40), 0 0 30px var(--primary-purple-alpha-20);
 }
 
 .startButton:hover {
   background: var(--primary-purple-dark);
   border-color: var(--primary-purple-dark);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--primary-purple-alpha-50);
 }
 
 :global(.dark) .startButton:hover {
   background: var(--primary-purple-lighter);
   border-color: var(--primary-purple-lighter);
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px var(--primary-purple-alpha-60), 0 0 40px var(--primary-purple-alpha-30);
 }
 
 .startButton:focus-visible {
@@ -915,7 +877,6 @@
 :global(.dark) .comingSoonSection {
   background: linear-gradient(135deg, rgb(27, 105, 64, 0.6) 0%, rgb(0, 217, 111, 0.3) 50%, rgb(27, 105, 64, 0.6) 100%);
   border: 1px solid var(--primary-purple-alpha-50);
-  box-shadow: 0 4px 30px var(--primary-purple-alpha-20), 0 0 60px var(--primary-purple-alpha-15), 0 0 0 1px var(--primary-purple-alpha-30) inset;
 }
 
 .comingSoonTitle {
@@ -954,28 +915,24 @@
   background: var(--white-alpha-90);
   color: var(--dark-bg-tertiary);
   border: 2px solid var(--btn-secondary-border-light);
-  box-shadow: 0 4px 15px var(--shadow-primary-light);
 }
 
 :global(.dark) .sandboxButton {
   background: var(--btn-secondary-bg-dark);
   color: var(--dark-text-primary);
   border-color: var(--btn-secondary-border-dark);
-  box-shadow: 0 4px 15px var(--shadow-primary-dark);
 }
 
 .sandboxButton:hover {
   background: rgb(255, 255, 255, 1);
   border-color: rgb(210, 210, 249, 0.6);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--shadow-hover-light);
 }
 
 :global(.dark) .sandboxButton:hover {
   background: rgb(27, 105, 64, 1);
   border-color: rgb(210, 210, 249, 0.5);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--shadow-hover-dark);
 }
 
 .sandboxButton:focus-visible {

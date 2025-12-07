@@ -12,7 +12,6 @@
   cursor: pointer;
   font-size: 20px;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 8px var(--shadow-primary-dark);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,13 +19,11 @@
 
 .theme-toggle:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px var(--shadow-hover-dark);
 }
 
 .theme-toggle:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow: var(--focus-ring-shadow), 0 4px 8px var(--shadow-primary-dark);
 }
 
 /* New navigation bar theme toggle */
@@ -58,7 +55,6 @@
 .theme-toggle-nav:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow: var(--focus-ring-shadow);
 }
 
 .toggle-track {
@@ -85,7 +81,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 4px var(--black-alpha-10);
 }
 
 .toggle-thumb.light {
@@ -146,5 +141,4 @@
 .theme-toggle-simple:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow: var(--focus-ring-shadow);
 }

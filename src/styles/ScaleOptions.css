@@ -62,7 +62,6 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-contai
   z-index: 102 !important;
   background: rgb(0, 0, 0, 0.95);
   border-radius: 6px;
-  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.3);
   border: 2px solid var(--orange-500);
   pointer-events: auto !important;
   -webkit-backdrop-filter: blur(8px);
@@ -82,7 +81,6 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-contai
 .dark .scale-options-popup {
   background: rgb(0, 0, 0, 0.95);
   border: 2px solid var(--orange-500);
-  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.4);
 }
 
 .dark .scale-options-popup.chord-mode {
@@ -129,7 +127,6 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 .scale-options-toggle:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow: var(--focus-ring-shadow);
 }
 
 .scale-controls {
@@ -211,7 +208,6 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
   outline: none;
 }
 
@@ -236,8 +232,6 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 
 .control-select:hover {
   background: rgb(249, 115, 22, 0.3);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
 .control-select.chord-mode:hover {
@@ -246,11 +240,9 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 
 .control-select:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgb(249, 115, 22, 0.4);
 }
 
 .control-select.chord-mode:focus {
-  box-shadow: 0 0 0 2px rgb(168, 85, 247, 0.4);
 }
 
 /* Custom dropdown options styling */
@@ -286,26 +278,20 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px var(--black-alpha-20);
   outline: none;
   height: 28px;
 }
 
 .apply-button:hover {
   background: rgb(76, 175, 80, 0.2);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
 .apply-button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 4px rgb(0, 0, 0, 0.2);
 }
 
 .apply-button:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow: var(--focus-ring-shadow);
 }
 
 /* Mobile styles applied to all screen sizes - remove conflicting min-width */
@@ -346,7 +332,6 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 .toggle-switch input:focus-visible + .toggle-slider {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow: var(--focus-ring-shadow);
 }
 
 .toggle-slider {
@@ -392,7 +377,6 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
   transition: all 0.3s ease;
   border-radius: 4px;
   z-index: 1;
-  box-shadow: none;
 }
 
 /* Scales mode (default) */
@@ -443,7 +427,6 @@ input:checked + .toggle-slider:hover {
 /* Green flash for toggle slider when mode changes */
 .toggle-slider.flashing {
   border-color: var(--green-550) !important;
-  box-shadow: none !important;
 }
 
 /* Tablet and above - popup extends to the right */
@@ -675,17 +658,14 @@ input:checked + .toggle-slider:hover {
   background: rgb(220, 38, 38, 0.2);
   border-color: rgb(220, 38, 38, 0.6);
   color: var(--red-600);
-  transform: scale(1.1);
 }
 
 .delete-scale-button:active {
-  transform: scale(0.95);
 }
 
 .delete-scale-button:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: 1px;
-  box-shadow: var(--focus-ring-shadow);
 }
 
 /* Scrollbar styling for applied scales list - Orange */
@@ -775,7 +755,6 @@ input:checked + .toggle-slider:hover {
 .delete-chord-button:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: 1px;
-  box-shadow: var(--focus-ring-shadow);
 }
 
 /* Scrollbar styling for applied chords list - Purple */

@@ -38,7 +38,6 @@
   max-height: calc(100vh - 40px);
   overflow-y: auto;
   position: relative;
-  box-shadow:
     0 20px 60px rgb(168, 85, 247, 0.3),
     inset 0 1px 0 rgb(255, 255, 255, 0.7);
   animation: slideIn 0.3s ease-out;
@@ -50,7 +49,6 @@
     rgb(40, 40, 40, 0.95) 0%,
     rgb(30, 30, 30, 0.98) 100%);
   border: 2px solid rgb(80, 80, 80, 0.3);
-  box-shadow:
     0 20px 60px rgb(0, 0, 0, 0.5),
     inset 0 1px 0 rgb(255, 255, 255, 0.05);
 }
@@ -75,31 +73,25 @@
   padding: 0;
   transition: all 0.3s ease;
   backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgb(168, 85, 247, 0.2);
 }
 
 .closeButton:hover {
   background: rgb(255, 255, 255, 0.2);
   border-color: rgb(168, 85, 247, 0.5);
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgb(168, 85, 247, 0.3);
 }
 
 .closeButton:active {
-  transform: scale(0.95);
 }
 
 :global(.dark) .closeButton {
   background: rgb(0, 0, 0, 0.3);
   border-color: rgb(255, 255, 255, 0.3);
   color: #f8f9fa;
-  box-shadow: 0 2px 8px rgb(0, 0, 0, 0.4);
 }
 
 :global(.dark) .closeButton:hover {
   background: rgb(0, 0, 0, 0.5);
   border-color: rgb(255, 255, 255, 0.5);
-  box-shadow: 0 4px 12px rgb(0, 0, 0, 0.6);
 }
 
 /* Auth Form Styles */
@@ -124,7 +116,6 @@
 }
 
 .authLogo:hover {
-  transform: scale(1.05);
 }
 
 .authSlogan {
@@ -209,14 +200,12 @@
   outline: none;
   border-color: #3b82f6;
   background: rgb(255, 255, 255, 0.95);
-  box-shadow: 0 0 0 4px rgb(59, 130, 246, 0.15);
   transform: translateY(-2px);
 }
 
 :global(.dark) .formGroup input:focus {
   border-color: #3b82f6;
   background: rgb(70, 70, 70, 0.9);
-  box-shadow: 0 0 0 4px rgb(59, 130, 246, 0.15);
 }
 
 .formGroup input:disabled {
@@ -248,58 +237,48 @@
   background: #7c3aed;
   color: white;
   border: 2px solid #7c3aed;
-  box-shadow: 0 4px 15px rgb(124, 58, 237, 0.2);
 }
 
 :global(.dark) .authButton.primary {
   background: #4c1d95;
   border-color: #4c1d95;
-  box-shadow: 0 4px 15px rgb(76, 29, 149, 0.3);
 }
 
 .authButton.primary:hover:not(:disabled) {
   background: #6d28d9;
   border-color: #6d28d9;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgb(124, 58, 237, 0.3);
 }
 
 :global(.dark) .authButton.primary:hover:not(:disabled) {
   background: #3730a3;
   border-color: #3730a3;
-  box-shadow: 0 6px 20px rgb(76, 29, 149, 0.4);
 }
 
 /* Special styling for Create Account button only */
 .authButton.primary.createAccount {
   background: #3b82f6;
   border-color: #3b82f6;
-  box-shadow: 0 4px 15px rgb(59, 130, 246, 0.2);
 }
 
 :global(.dark) .authButton.primary.createAccount {
   background: #2563eb;
   border-color: #2563eb;
-  box-shadow: 0 4px 15px rgb(37, 99, 235, 0.3);
 }
 
 .authButton.primary.createAccount:hover:not(:disabled) {
   background: #1d4ed8;
   border-color: #1d4ed8;
-  box-shadow: 0 6px 20px rgb(59, 130, 246, 0.3);
 }
 
 :global(.dark) .authButton.primary.createAccount:hover:not(:disabled) {
   background: #1e40af;
   border-color: #1e40af;
-  box-shadow: 0 6px 20px rgb(37, 99, 235, 0.4);
 }
 
 .authButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none !important;
-  box-shadow: none !important;
 }
 
 .authFooter {

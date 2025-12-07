@@ -18,7 +18,6 @@
   font-weight: 700;
   cursor: help;
   transition: all 0.2s ease;
-  box-shadow: 0 0 8px var(--white-alpha-50);
   flex-shrink: 0;
 }
 
@@ -27,12 +26,10 @@
   background: var(--white);
   color: var(--dark-bg-primary);
   border-color: var(--white);
-  box-shadow: 0 0 12px var(--white-alpha-80);
 }
 
 .dark .tooltip-icon {
   border-color: var(--white);
-  box-shadow: 0 0 8px var(--white-alpha-40);
 }
 
 .dark .tooltip-icon:hover,
@@ -40,7 +37,6 @@
   background: var(--white);
   color: var(--dark-bg-primary);
   border-color: var(--white);
-  box-shadow: 0 0 12px var(--white-alpha-60);
 }
 
 .tooltip-container {
@@ -79,27 +75,6 @@
   letter-spacing: 1.5px;
   margin-bottom: 0.4rem;
   text-align: left;
-  text-shadow:
-    0 0 10px var(--blue-alpha-80),
-    0 0 20px var(--blue-alpha-60),
-    0 0 30px var(--blue-alpha-40);
-  animation: title-glow 1.5s ease-in-out infinite;
-}
-
-@keyframes title-glow {
-  0%, 100% {
-    text-shadow:
-      0 0 10px var(--blue-alpha-80),
-      0 0 20px var(--blue-alpha-60),
-      0 0 30px var(--blue-alpha-40);
-  }
-
-  50% {
-    text-shadow:
-      0 0 15px var(--blue-500),
-      0 0 30px var(--blue-alpha-80),
-      0 0 45px var(--blue-alpha-60);
-  }
 }
 
 .tooltip-text {
@@ -139,7 +114,6 @@
 .dark .tooltip-box {
   background: var(--dark-bg-primary);
   border-color: var(--purple-500);
-  text-shadow: 0 0 10px var(--purple-alpha-40);
 }
 
 .dark .tooltip-box::after {
@@ -156,7 +130,6 @@
 .light .tooltip-icon {
   border-color: var(--white);
   color: var(--white);
-  box-shadow: 0 0 8px var(--white-alpha-50);
 }
 
 .light .tooltip-icon:hover,
@@ -164,7 +137,6 @@
   background: var(--white);
   color: var(--dark-bg-primary);
   border-color: var(--white);
-  box-shadow: 0 0 12px var(--white-alpha-80);
 }
 
 .light .tooltip-box {
@@ -175,27 +147,6 @@
 
 .light .tooltip-title {
   color: var(--blue-400);
-  text-shadow:
-    0 0 10px var(--blue-alpha-80),
-    0 0 20px var(--blue-alpha-60),
-    0 0 30px var(--blue-alpha-40);
-  animation: light-title-glow 1.5s ease-in-out infinite;
-}
-
-@keyframes light-title-glow {
-  0%, 100% {
-    text-shadow:
-      0 0 10px var(--blue-alpha-80),
-      0 0 20px var(--blue-alpha-60),
-      0 0 30px var(--blue-alpha-40);
-  }
-
-  50% {
-    text-shadow:
-      0 0 15px var(--blue-500),
-      0 0 30px var(--blue-alpha-80),
-      0 0 45px var(--blue-alpha-60);
-  }
 }
 
 .light .tooltip-text {

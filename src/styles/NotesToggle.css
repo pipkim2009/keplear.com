@@ -12,7 +12,6 @@
   cursor: pointer;
   font-size: 20px;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 8px rgb(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,13 +19,11 @@
 
 .notes-visibility-toggle:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgb(0, 0, 0, 0.3);
 }
 
 .notes-visibility-toggle:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow: var(--focus-ring-shadow), 0 4px 8px rgb(0, 0, 0, 0.2);
 }
 
 /* Notes toggle content */

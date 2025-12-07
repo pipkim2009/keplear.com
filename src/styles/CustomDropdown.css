@@ -19,7 +19,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 4px var(--black-alpha-20);
   outline: none;
   min-width: 120px;
   width: 120px;
@@ -33,18 +32,14 @@
 
 .custom-dropbtn:hover {
   background: var(--primary-purple-alpha-20);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px var(--black-alpha-30);
 }
 
 .custom-dropbtn:focus {
-  box-shadow: 0 0 0 2px var(--primary-purple-alpha-30);
 }
 
 .custom-dropbtn:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  box-shadow: var(--focus-ring-shadow);
 }
 
 /* Dropdown arrow */
@@ -66,7 +61,6 @@
   position: absolute;
   background: var(--black);
   min-width: 100%;
-  box-shadow: 0 8px 16px 0 var(--black-alpha-40);
   z-index: 100;
   border-radius: 8px;
   border: 2px solid var(--gray-800);
@@ -102,7 +96,6 @@
 .custom-dropdown-item:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: -2px;
-  box-shadow: var(--focus-ring-shadow);
 }
 
 .custom-dropdown-item.selected {
@@ -122,13 +115,10 @@
 
 .scale-dropdown .custom-dropbtn:hover {
   background: rgb(255, 204, 2, 0.3);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px var(--black-alpha-30);
 }
 
 .scale-dropdown .custom-dropbtn:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgb(255, 204, 2, 0.4);
 }
 
 /* Guitar mode styling */
@@ -143,7 +133,6 @@
 }
 
 .guitar-mode .custom-dropdown .custom-dropbtn:focus {
-  box-shadow: 0 0 0 2px var(--green-alpha-30);
 }
 
 /* Bass mode styling */
@@ -158,7 +147,6 @@
 }
 
 .bass-mode .custom-dropdown .custom-dropbtn:focus {
-  box-shadow: 0 0 0 2px var(--red-alpha-30);
 }
 
 /* Responsive adjustments */

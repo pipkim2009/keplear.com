@@ -7,74 +7,6 @@
 :root {
   /*
     ===========================================
-    BOX SHADOW SYSTEM
-    ===========================================
-  */
-
-  /* Basic Shadows */
-  --shadow-none: none;
-  --shadow-xs: 0 1px 2px rgb(0, 0, 0, 0.05);
-  --shadow-sm: 0 1px 2px rgb(0, 0, 0, 0.1);
-  --shadow-md: 0 2px 4px rgb(0, 0, 0, 0.2);
-  --shadow-lg: 0 4px 8px rgb(0, 0, 0, 0.15);
-  --shadow-xl: 0 8px 16px rgb(0, 0, 0, 0.3);
-  --shadow-2xl: 0 20px 40px rgb(0, 0, 0, 0.3);
-
-  /* Inset Shadows */
-  --shadow-inset-sm: inset 0 1px 2px rgb(0, 0, 0, 0.1);
-  --shadow-inset-md: inset 0 2px 4px rgb(0, 0, 0, 0.2);
-  --shadow-inset-lg: inset 0 4px 8px rgb(0, 0, 0, 0.3);
-
-  /* Component-specific Shadows */
-  --shadow-button: 0 2px 4px rgb(0, 0, 0, 0.2);
-  --shadow-button-hover: 0 6px 12px rgb(0, 0, 0, 0.3);
-  --shadow-button-active: 0 1px 2px rgb(0, 0, 0, 0.2);
-  --shadow-control: 0 2px 4px rgb(0, 0, 0, 0.2);
-  --shadow-control-hover: 0 4px 8px rgb(0, 0, 0, 0.3);
-  --shadow-instrument: 0 20px 40px rgb(0, 0, 0, 0.3);
-
-  /* Key Shadows */
-  --shadow-white-key:
-    inset 0 2px 4px rgb(255, 255, 255, 0.8),
-    inset 0 -2px 4px rgb(0, 0, 0, 0.1),
-    0 4px 8px rgb(0, 0, 0, 0.2);
-  --shadow-white-key-dark:
-    inset 0 2px 4px rgb(156, 163, 175, 0.3),
-    inset 0 -2px 4px rgb(0, 0, 0, 0.1),
-    0 4px 8px rgb(0, 0, 0, 0.4);
-  --shadow-white-key-active:
-    inset 0 2px 4px rgb(255, 255, 255, 0.6),
-    inset 0 -1px 2px rgb(0, 0, 0, 0.2),
-    0 1px 2px rgb(0, 0, 0, 0.2);
-  --shadow-black-key:
-    inset 0 1px 2px rgb(255, 255, 255, 0.1),
-    inset 0 -1px 2px rgb(0, 0, 0, 0.3),
-    0 4px 8px rgb(0, 0, 0, 0.5);
-  --shadow-black-key-active:
-    inset 0 1px 2px rgb(255, 255, 255, 0.1),
-    inset 0 -1px 1px rgb(0, 0, 0, 0.4),
-    0 1px 2px rgb(0, 0, 0, 0.5);
-
-  /* Root Note Shadows (with glow) */
-  --shadow-root-white:
-    inset 0 2px 4px rgb(255, 255, 255, 0.1),
-    inset 0 -2px 4px rgb(0, 0, 0, 0.2),
-    0 0 8px rgb(220, 38, 38, 0.6),
-    0 6px 16px rgb(0, 0, 0, 0.3);
-  --shadow-root-black:
-    inset 0 1px 2px rgb(255, 255, 255, 0.1),
-    inset 0 -1px 2px rgb(0, 0, 0, 0.3),
-    0 0 8px rgb(220, 38, 38, 0.6),
-    0 4px 8px rgb(0, 0, 0, 0.5);
-
-  /* Colored Glows */
-  --shadow-blue-glow: 0 0 6px rgb(59, 130, 246, 0.6);
-  --shadow-green-glow: 0 0 8px rgb(0, 217, 111, 0.5);
-  --shadow-red-glow: 0 0 8px rgb(220, 38, 38, 0.6);
-  --shadow-purple-glow: 0 0 8px rgb(0, 217, 111, 0.5);
-
-  /*
-    ===========================================
     TRANSITION SYSTEM
     ===========================================
   */
@@ -219,17 +151,6 @@
   --filter-brightness: brightness(110%);
   --filter-contrast: contrast(110%);
 
-  /* Drop Shadow Filters */
-  --filter-drop-shadow-sm: drop-shadow(0 1px 2px rgb(0, 0, 0, 0.1));
-  --filter-drop-shadow-md: drop-shadow(0 4px 6px rgb(0, 0, 0, 0.1));
-  --filter-drop-shadow-lg: drop-shadow(0 10px 15px rgb(0, 0, 0, 0.1));
-
-  /* Glow Filters */
-  --filter-glow-blue: drop-shadow(0 0 8px rgb(59, 130, 246, 0.5));
-  --filter-glow-green: drop-shadow(0 0 8px rgb(0, 217, 111, 0.5));
-  --filter-glow-red: drop-shadow(0 0 8px rgb(239, 68, 68, 0.5));
-  --filter-glow-purple: drop-shadow(0 0 10px rgb(0, 217, 111, 0.5));
-
   /*
     ===========================================
     FOCUS RING SYSTEM (WCAG-COMPLIANT)
@@ -240,7 +161,6 @@
   --focus-ring-color: var(--primary-purple);
   --focus-ring-width: 3px;
   --focus-ring-offset: 2px;
-  --focus-ring-shadow: 0 0 0 4px var(--primary-purple-alpha-20);
 
   /* Alternative Focus Colors for Different Contexts */
   --focus-ring-color-light: rgb(0, 217, 111);

@@ -23,17 +23,14 @@
   transition: var(--transition-button);
   outline: none;
   user-select: var(--user-select-none);
-  box-shadow: var(--shadow-button);
 }
 
 .button:hover:not(:disabled) {
   transform: var(--transform-button-hover);
-  box-shadow: var(--shadow-button-hover);
 }
 
 .button:active:not(:disabled) {
   transform: var(--transform-button-active);
-  box-shadow: var(--shadow-button-active);
 }
 
 .button:disabled {
@@ -162,25 +159,21 @@
 .input:focus {
   background: rgb(0, 217, 111, 0.3);
   border-color: var(--input-border-focus);
-  box-shadow: 0 0 8px rgb(46, 232, 141, 0.4);
 }
 
 .inputFlashing {
   composes: input;
   border-color: var(--green-border) !important;
-  box-shadow: var(--shadow-green-glow) !important;
   animation: input-flash 1s ease;
 }
 
 @keyframes input-flash {
   0%, 100% {
     border-color: var(--input-border);
-    box-shadow: none;
   }
 
   50% {
     border-color: var(--green-border);
-    box-shadow: var(--shadow-green-glow);
   }
 }
 
@@ -323,7 +316,6 @@
   background: var(--blue-500);
   cursor: pointer;
   border: 2px solid var(--white);
-  box-shadow: var(--shadow-sm);
   transition: var(--transition-normal);
 }
 
@@ -339,7 +331,6 @@
   background: var(--blue-500);
   cursor: pointer;
   border: 2px solid var(--white);
-  box-shadow: var(--shadow-sm);
 }
 
 /*
@@ -355,7 +346,6 @@
   border: 1px solid var(--blue-500);
   border-radius: var(--radius-sm);
   overflow: visible;
-  box-shadow: inset 0 1px 3px var(--black-alpha-30);
   position: relative;
   cursor: pointer;
 }
@@ -365,7 +355,6 @@
   background: linear-gradient(90deg, var(--blue-500), var(--blue-300));
   transition: width 0.15s ease-out;
   border-radius: var(--radius-xs);
-  box-shadow: var(--shadow-blue-glow);
 }
 
 .progressHead {
@@ -378,7 +367,6 @@
   border: 2px solid var(--blue-500);
   border-radius: var(--radius-full);
   cursor: grab;
-  box-shadow: var(--shadow-sm);
   transition: var(--transition-normal);
   z-index: 2;
 }
@@ -387,7 +375,6 @@
   width: 14px;
   height: 14px;
   border-color: var(--blue-300);
-  box-shadow: 0 3px 6px var(--blue-alpha-40);
 }
 
 .progressHead:active {

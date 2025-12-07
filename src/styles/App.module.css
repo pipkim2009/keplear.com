@@ -61,7 +61,6 @@
   padding: 40px 30px;
   max-width: 500px;
   width: 100%;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   color: #2d3748;
 }
 
@@ -106,13 +105,10 @@
   font-weight: 600;
   font-size: 14px;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
   display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
 .errorButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(107, 70, 193, 0.4);
 }

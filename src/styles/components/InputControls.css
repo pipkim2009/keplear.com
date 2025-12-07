@@ -7,7 +7,6 @@
 /* Green border for input changes */
 .control-input.flashing {
   border-color: var(--green-550) !important;
-  box-shadow: 0 0 8px var(--green-alpha-40) !important;
 }
 
 /* Notes toggle row styling */

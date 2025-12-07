@@ -35,7 +35,6 @@ html, body, #root {
 
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(145deg, var(--scrollbar-thumb-hover-primary), var(--scrollbar-thumb-hover-secondary));
-  box-shadow: 0 0 8px var(--purple-alpha-40);
 }
 
 ::-webkit-scrollbar-thumb:active {
