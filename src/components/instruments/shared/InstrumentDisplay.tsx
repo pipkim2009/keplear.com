@@ -2,11 +2,12 @@ import InstrumentControls from './InstrumentControls'
 import InstrumentHeader from './InstrumentHeader'
 import InstrumentRenderer from './InstrumentRenderer'
 import { useState, useEffect, useMemo, useCallback, memo } from 'react'
-import type { Note } from '../../../utils/notes'
+import { generateNotesWithSeparateOctaves, type Note } from '../../../utils/notes'
 import type { KeyboardSelectionMode } from './InstrumentControls'
 import type { ChordMode } from '../../../reducers/uiReducer'
 import { useInstrument } from '../../../contexts/InstrumentContext'
 import { useKeyboardHighlighting } from '../../../hooks/useKeyboardHighlighting'
+import type { FretboardPreview, KeyboardPreview } from '../../common/ScaleChordOptions'
 
 interface InstrumentDisplayProps {
   onNoteClick: (note: Note) => void
@@ -137,6 +138,16 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
 }: InstrumentDisplayProps) {
   const [lowerOctaves, setLowerOctaves] = useState<number>(initialLowerOctaves)
   const [higherOctaves, setHigherOctaves] = useState<number>(initialHigherOctaves)
+
+  // Preview state for scale/chord menu
+  const [fretboardPreview, setFretboardPreview] = useState<FretboardPreview | null>(null)
+  const [keyboardPreview, setKeyboardPreview] = useState<KeyboardPreview | null>(null)
+
+  // Calculate available keyboard notes for preview
+  const availableKeyboardNotes = useMemo(() => {
+    if (instrument !== 'keyboard') return []
+    return generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+  }, [instrument, lowerOctaves, higherOctaves])
 
   // Memoize the currently playing note(s) calculation
   const currentlyPlayingNoteNames = useMemo<string[]>(() => {
@@ -400,6 +411,9 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           showOnlyAppliedList={showOnlyAppliedList}
           disableSelectionMode={disableSelectionMode}
           hideSelectionMode={hideSelectionMode}
+          onFretboardPreviewChange={setFretboardPreview}
+          onKeyboardPreviewChange={setKeyboardPreview}
+          availableKeyboardNotes={availableKeyboardNotes}
         />
 
         <InstrumentRenderer
@@ -427,6 +441,8 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           onBassChordHandlersReady={setBassChordHandlers}
           appliedScales={appliedScales}
           appliedChords={appliedChords}
+          fretboardPreview={fretboardPreview}
+          keyboardPreview={keyboardPreview}
         />
       </div>
     </>

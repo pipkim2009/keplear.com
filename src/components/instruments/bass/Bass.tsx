@@ -4,7 +4,7 @@ import { bassNotes } from '../../../utils/instruments/bass/bassNotes'
 import { applyScaleToBass, applyScaleBoxToBass, BASS_SCALES, type BassScale, type BassScaleBox } from '../../../utils/instruments/bass/bassScales'
 import { applyChordToBass, applyBassChordShapeToBass, type BassChord, type BassChordShape } from '../../../utils/instruments/bass/bassChords'
 import type { Note } from '../../../utils/notes'
-import type { AppliedChord, AppliedScale } from '../../common/ScaleChordOptions'
+import type { AppliedChord, AppliedScale, FretboardPreview } from '../../common/ScaleChordOptions'
 
 interface BassProps {
   setBassNotes: (notes: Note[]) => void
@@ -29,9 +29,10 @@ interface BassProps {
   currentlyPlayingNote?: Note | null
   currentlyPlayingNoteNames?: string[]
   currentlyPlayingChordId?: string | null
+  previewPositions?: FretboardPreview | null
 }
 
-const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingChordId = null }) => {
+const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingChordId = null, previewPositions = null }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(4).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -1096,6 +1097,49 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             )
           })
         )}
+
+        {/* Scale/Chord menu preview circles */}
+        {previewPositions?.positions?.map((pos, idx) => {
+          // Check if this position is already selected (don't show preview for already selected notes)
+          const noteKey = pos.fretIndex === 0 ? `${pos.stringIndex}-open` : `${pos.stringIndex}-${pos.fretIndex}`
+          const isAlreadySelected = selectedNotes.has(noteKey) || scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
+          if (isAlreadySelected) return null
+
+          // Determine preview type class
+          const isRoot = previewPositions.rootPositions?.some(
+            rp => rp.stringIndex === pos.stringIndex && rp.fretIndex === pos.fretIndex
+          ) ?? false
+          const previewClass = previewPositions.isChord
+            ? (isRoot ? 'chord-root-note' : 'chord-note')
+            : (isRoot ? 'scale-root' : 'scale-note')
+
+          const noteName = pos.fretIndex === 0
+            ? getNoteForStringAndFret(pos.stringIndex, -1)
+            : getNoteForStringAndFret(pos.stringIndex, pos.fretIndex - 1)
+
+          // Calculate position - fretIndex from preview is the actual fret (0 = open, 1-24 = frets)
+          // Open string: -3px, Fret 1: 27px, Frets 2+: fret * 54 - 35
+          const leftPosition = pos.fretIndex === 0
+            ? -3
+            : pos.fretIndex === 1
+            ? 27
+            : pos.fretIndex * 54 - 35
+
+          return (
+            <div
+              key={`bass-menu-preview-${pos.stringIndex}-${pos.fretIndex}-${idx}`}
+              className={`bass-note-circle preview ${previewClass}`}
+              style={{
+                left: `${leftPosition}px`,
+                top: `${22 + pos.stringIndex * 30 - 11}px`,
+              }}
+            >
+              <span className="bass-note-name">
+                {noteName}
+              </span>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

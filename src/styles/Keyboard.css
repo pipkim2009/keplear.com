@@ -407,6 +407,27 @@
   border-color: var(--white);
 }
 
+/* Preview styles for scale/chord menu */
+.white-key.preview {
+  background: rgb(59, 130, 246, 0.4);
+}
+
+.white-key.preview.preview-scale {
+  background: linear-gradient(145deg, var(--orange-alpha-40), var(--orange-alpha-40));
+}
+
+.white-key.preview.preview-scale-root {
+  background: linear-gradient(145deg, var(--red-alpha-40), var(--red-alpha-40));
+}
+
+.white-key.preview.preview-chord {
+  background: linear-gradient(145deg, var(--purple-alpha-40), var(--purple-alpha-40));
+}
+
+.white-key.preview.preview-chord-root {
+  background: linear-gradient(145deg, var(--red-alpha-40), var(--red-alpha-40));
+}
+
 /* Currently playing note - highest priority */
 .white-key.currently-playing {
   background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
@@ -519,6 +540,27 @@
 .black-key.melody {
   background: linear-gradient(145deg, var(--note-melody), var(--note-melody-dark));
   border-color: var(--white);
+}
+
+/* Preview styles for scale/chord menu */
+.black-key.preview {
+  background: rgb(59, 130, 246, 0.5);
+}
+
+.black-key.preview.preview-scale {
+  background: rgb(249, 115, 22, 0.5);
+}
+
+.black-key.preview.preview-scale-root {
+  background: var(--red-alpha-50);
+}
+
+.black-key.preview.preview-chord {
+  background: rgb(168, 85, 247, 0.5);
+}
+
+.black-key.preview.preview-chord-root {
+  background: var(--red-alpha-50);
 }
 
 /* Currently playing note - highest priority */

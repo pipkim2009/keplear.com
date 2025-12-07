@@ -14,6 +14,10 @@ interface KeyboardKeyProps {
   isInChord?: boolean
   isChordRoot?: boolean
   isCurrentlyPlaying?: boolean
+  // Preview props for scale/chord menu
+  isInPreview?: boolean
+  isPreviewRoot?: boolean
+  isPreviewChord?: boolean
 }
 
 const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
@@ -28,12 +32,25 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
   isRoot = false,
   isInChord = false,
   isChordRoot = false,
-  isCurrentlyPlaying = false
+  isCurrentlyPlaying = false,
+  isInPreview = false,
+  isPreviewRoot = false,
+  isPreviewChord = false
 }) => {
   const baseClass = useMemo(() => note.isBlack ? 'black-key' : 'white-key', [note.isBlack])
   const selectedClass = isSelected ? 'selected' : ''
   const melodyClass = isInMelody ? 'melody' : ''
   const playingClass = isCurrentlyPlaying ? 'currently-playing' : ''
+
+  // Calculate preview class (only if note is in preview and not already selected/visible)
+  const previewClass = useMemo(() => {
+    if (!isInPreview || isSelected || isInMelody || isInScale || isInChord) return ''
+    if (isPreviewChord) {
+      return isPreviewRoot ? 'preview preview-chord-root' : 'preview preview-chord'
+    } else {
+      return isPreviewRoot ? 'preview preview-scale-root' : 'preview preview-scale'
+    }
+  }, [isInPreview, isSelected, isInMelody, isInScale, isInChord, isPreviewRoot, isPreviewChord])
 
   // Memoize the note type class calculation
   const noteTypeClass = useMemo(() => {
@@ -86,8 +103,8 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
   }, [onClick, note])
 
   const classNames = useMemo(() => {
-    return `${baseClass} ${selectedClass} ${melodyClass} ${playingClass} ${noteTypeClass} ${className}`.trim()
-  }, [baseClass, selectedClass, melodyClass, playingClass, noteTypeClass, className])
+    return `${baseClass} ${selectedClass} ${melodyClass} ${playingClass} ${noteTypeClass} ${previewClass} ${className}`.trim()
+  }, [baseClass, selectedClass, melodyClass, playingClass, noteTypeClass, previewClass, className])
 
   return (
     <button
@@ -113,6 +130,9 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
     prevProps.isInChord === nextProps.isInChord &&
     prevProps.isChordRoot === nextProps.isChordRoot &&
     prevProps.isCurrentlyPlaying === nextProps.isCurrentlyPlaying &&
+    prevProps.isInPreview === nextProps.isInPreview &&
+    prevProps.isPreviewRoot === nextProps.isPreviewRoot &&
+    prevProps.isPreviewChord === nextProps.isPreviewChord &&
     prevProps.className === nextProps.className
   )
 })

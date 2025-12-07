@@ -4,7 +4,7 @@ import { guitarNotes } from '../../../utils/instruments/guitar/guitarNotes'
 import { applyScaleToGuitar, applyScaleBoxToGuitar, GUITAR_SCALES, type GuitarScale, type ScaleBox } from '../../../utils/instruments/guitar/guitarScales'
 import { applyChordToGuitar, applyChordShapeToGuitar, type GuitarChord, type ChordShape } from '../../../utils/instruments/guitar/guitarChords'
 import type { Note } from '../../../utils/notes'
-import type { AppliedChord, AppliedScale } from '../../common/ScaleChordOptions'
+import type { AppliedChord, AppliedScale, FretboardPreview } from '../../common/ScaleChordOptions'
 
 interface GuitarProps {
   setGuitarNotes: (notes: Note[]) => void
@@ -29,9 +29,10 @@ interface GuitarProps {
   currentlyPlayingNote?: Note | null
   currentlyPlayingNoteNames?: string[]
   currentlyPlayingChordId?: string | null
+  previewPositions?: FretboardPreview | null
 }
 
-const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingChordId = null }) => {
+const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingChordId = null, previewPositions = null }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -1243,6 +1244,49 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             )
           })
         )}
+
+        {/* Scale/Chord menu preview circles */}
+        {previewPositions?.positions?.map((pos, idx) => {
+          // Check if this position is already selected (don't show preview for already selected notes)
+          const noteKey = pos.fretIndex === 0 ? `${pos.stringIndex}-open` : `${pos.stringIndex}-${pos.fretIndex}`
+          const isAlreadySelected = selectedNotes.has(noteKey) || scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
+          if (isAlreadySelected) return null
+
+          // Determine preview type class
+          const isRoot = previewPositions.rootPositions?.some(
+            rp => rp.stringIndex === pos.stringIndex && rp.fretIndex === pos.fretIndex
+          ) ?? false
+          const previewClass = previewPositions.isChord
+            ? (isRoot ? 'chord-root-note' : 'chord-note')
+            : (isRoot ? 'scale-root' : 'scale-note')
+
+          const noteName = pos.fretIndex === 0
+            ? getNoteForStringAndFret(pos.stringIndex, -1)
+            : getNoteForStringAndFret(pos.stringIndex, pos.fretIndex - 1)
+
+          // Calculate position - fretIndex from preview is the actual fret (0 = open, 1-24 = frets)
+          // Open string: -2.5px, Fret 1: 27px, Frets 2+: fret * 54 - 34
+          const leftPosition = pos.fretIndex === 0
+            ? -2.5
+            : pos.fretIndex === 1
+            ? 27
+            : pos.fretIndex * 54 - 34
+
+          return (
+            <div
+              key={`menu-preview-${pos.stringIndex}-${pos.fretIndex}-${idx}`}
+              className={`note-circle preview ${previewClass}`}
+              style={{
+                left: `${leftPosition}px`,
+                top: `${15 + pos.stringIndex * 28 - 10}px`,
+              }}
+            >
+              <span className="note-name">
+                {noteName}
+              </span>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

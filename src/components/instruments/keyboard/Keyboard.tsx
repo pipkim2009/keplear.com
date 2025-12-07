@@ -2,6 +2,7 @@ import { memo, useMemo, useCallback } from 'react'
 import KeyboardKey from './KeyboardKey'
 import { whiteKeys, blackKeys, getBlackKeyLeft, getBlackKeyLeftDynamic, generateWhiteKeysWithSeparateOctaves, generateBlackKeysWithSeparateOctaves, type Note } from '../../../utils/notes'
 import type { KeyboardSelectionMode } from '../shared/InstrumentControls'
+import type { KeyboardPreview } from '../../common/ScaleChordOptions'
 import '../../../styles/Keyboard.css'
 
 interface KeyboardProps {
@@ -18,6 +19,7 @@ interface KeyboardProps {
   isNoteChordRoot?: (note: Note) => boolean
   currentlyPlayingNote?: Note | null
   currentlyPlayingNoteNames?: string[]
+  previewNotes?: KeyboardPreview | null
 }
 
 const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
@@ -33,7 +35,8 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   isNoteInChord,
   isNoteChordRoot,
   currentlyPlayingNote = null,
-  currentlyPlayingNoteNames = []
+  currentlyPlayingNoteNames = [],
+  previewNotes = null
 }) {
   const hasExtendedRange = lowerOctaves !== 0 || higherOctaves !== 0
 
@@ -61,6 +64,21 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   const isNoteCurrentlyPlaying = useCallback((note: Note): boolean => {
     return showNotes && currentlyPlayingNoteNames.length > 0 && currentlyPlayingNoteNames.includes(note.name)
   }, [currentlyPlayingNoteNames, showNotes])
+
+  // Check if a note is in the scale/chord preview from the menu
+  const isNoteInPreview = useCallback((note: Note): boolean => {
+    if (!previewNotes) return false
+    return previewNotes.notes.some(n => n.name === note.name)
+  }, [previewNotes])
+
+  // Check if a note is a root note in the preview
+  const isNotePreviewRoot = useCallback((note: Note): boolean => {
+    if (!previewNotes) return false
+    return previewNotes.rootNotes.some(n => n.name === note.name)
+  }, [previewNotes])
+
+  // Check if the preview is showing a chord (vs scale)
+  const isPreviewChord = previewNotes?.isChord ?? false
 
   // Memoize expensive key generation
   const currentWhiteKeys = useMemo(
@@ -90,6 +108,9 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
             isInChord={isNoteInChord ? isNoteInChord(note) : false}
             isChordRoot={isNoteChordRoot ? isNoteChordRoot(note) : false}
             isCurrentlyPlaying={isNoteCurrentlyPlaying(note)}
+            isInPreview={isNoteInPreview(note)}
+            isPreviewRoot={isNotePreviewRoot(note)}
+            isPreviewChord={isPreviewChord}
           />
         ))}
 
@@ -113,6 +134,9 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
                 isInChord={isNoteInChord ? isNoteInChord(note) : false}
                 isChordRoot={isNoteChordRoot ? isNoteChordRoot(note) : false}
                 isCurrentlyPlaying={isNoteCurrentlyPlaying(note)}
+                isInPreview={isNoteInPreview(note)}
+                isPreviewRoot={isNotePreviewRoot(note)}
+                isPreviewChord={isPreviewChord}
               />
             )
           })}

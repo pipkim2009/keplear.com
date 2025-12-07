@@ -7,7 +7,7 @@ import type { BassScale, BassScaleBox } from '../../../utils/instruments/bass/ba
 import type { GuitarChord, ChordShape } from '../../../utils/instruments/guitar/guitarChords'
 import type { BassChord, BassChordShape } from '../../../utils/instruments/bass/bassChords'
 import type { KeyboardSelectionMode } from './InstrumentControls'
-import type { AppliedChord, AppliedScale } from '../../common/ScaleChordOptions'
+import type { AppliedChord, AppliedScale, FretboardPreview, KeyboardPreview } from '../../common/ScaleChordOptions'
 
 interface InstrumentRendererProps {
   instrument: string
@@ -54,6 +54,8 @@ interface InstrumentRendererProps {
   } | null) => void
   appliedScales?: AppliedScale[]
   appliedChords?: AppliedChord[]
+  fretboardPreview?: FretboardPreview | null
+  keyboardPreview?: KeyboardPreview | null
 }
 
 const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
@@ -80,7 +82,9 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
   onChordHandlersReady,
   onBassChordHandlersReady,
   appliedScales,
-  appliedChords
+  appliedChords,
+  fretboardPreview,
+  keyboardPreview
 }) => {
   return (
     <div className="instrument-wrapper">
@@ -99,6 +103,7 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           isNoteChordRoot={isNoteKeyboardChordRoot}
           currentlyPlayingNote={currentlyPlayingNote}
           currentlyPlayingNoteNames={currentlyPlayingNoteNames}
+          previewNotes={keyboardPreview}
         />
       ) : instrument === 'guitar' ? (
         <Guitar
@@ -114,6 +119,7 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           currentlyPlayingNote={currentlyPlayingNote}
           currentlyPlayingNoteNames={currentlyPlayingNoteNames}
           currentlyPlayingChordId={currentlyPlayingChordId}
+          previewPositions={fretboardPreview}
         />
       ) : (
         <Bass
@@ -129,6 +135,7 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           currentlyPlayingNote={currentlyPlayingNote}
           currentlyPlayingNoteNames={currentlyPlayingNoteNames}
           currentlyPlayingChordId={currentlyPlayingChordId}
+          previewPositions={fretboardPreview}
         />
       )}
     </div>

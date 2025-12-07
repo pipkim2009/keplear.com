@@ -43,6 +43,10 @@
 .dark .white-key {
 }
 
+.white-key:hover:not(.selected):not(.melody) {
+  background: linear-gradient(145deg, var(--blue-alpha-15), var(--blue-alpha-10));
+}
+
 .white-key:active {
 }
 
@@ -84,6 +88,10 @@
   pointer-events: all;
   transition: all 0.1s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.black-key:hover:not(.selected):not(.melody) {
+  background: linear-gradient(145deg, var(--blue-alpha-40), var(--blue-alpha-30));
 }
 
 .black-key:active {

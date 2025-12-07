@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo } from 'react'
-import ScaleChordOptions, { type AppliedChord, type AppliedScale } from '../../common/ScaleChordOptions'
+import ScaleChordOptions, { type AppliedChord, type AppliedScale, type FretboardPreview, type KeyboardPreview } from '../../common/ScaleChordOptions'
 import Tooltip from '../../common/Tooltip'
 import { PiTrashFill } from 'react-icons/pi'
 import type { Note } from '../../../utils/notes'
@@ -41,6 +41,10 @@ interface InstrumentHeaderProps {
   showOnlyAppliedList?: boolean
   disableSelectionMode?: boolean
   hideSelectionMode?: boolean
+  // Preview callbacks
+  onFretboardPreviewChange?: (preview: FretboardPreview | null) => void
+  onKeyboardPreviewChange?: (preview: KeyboardPreview | null) => void
+  availableKeyboardNotes?: readonly Note[]
 }
 
 const InstrumentHeader = memo(function InstrumentHeader({
@@ -73,7 +77,10 @@ const InstrumentHeader = memo(function InstrumentHeader({
   hideDeselectAll = false,
   showOnlyAppliedList = false,
   disableSelectionMode = false,
-  hideSelectionMode = false
+  hideSelectionMode = false,
+  onFretboardPreviewChange,
+  onKeyboardPreviewChange,
+  availableKeyboardNotes = []
 }: InstrumentHeaderProps) {
   // Memoize selection mode handlers
   const handleRangeClick = useCallback(() => {
@@ -159,6 +166,9 @@ Multi Select - Select the specific notes to use"
             lowerOctaves={lowerOctaves}
             higherOctaves={higherOctaves}
             showOnlyAppliedList={showOnlyAppliedList}
+            onFretboardPreviewChange={onFretboardPreviewChange}
+            onKeyboardPreviewChange={onKeyboardPreviewChange}
+            availableKeyboardNotes={availableKeyboardNotes}
           />
         </div>
 

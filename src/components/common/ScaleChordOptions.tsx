@@ -1,15 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { IoMusicalNotes } from 'react-icons/io5'
-import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../utils/instruments/guitar/guitarScales'
+import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, applyScaleToGuitar, applyScaleBoxToGuitar, type GuitarScale, type ScaleBox } from '../../utils/instruments/guitar/guitarScales'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
-import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, type BassScale, type BassScaleBox } from '../../utils/instruments/bass/bassScales'
+import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, applyScaleToBass, applyScaleBoxToBass, type BassScale, type BassScaleBox } from '../../utils/instruments/bass/bassScales'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
-import { KEYBOARD_SCALES, type KeyboardScale } from '../../utils/instruments/keyboard/keyboardScales'
-import { CHORD_ROOT_NOTES, GUITAR_CHORDS, getChordShapes, type GuitarChord, type ChordShape } from '../../utils/instruments/guitar/guitarChords'
-import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, type BassChord, type BassChordShape } from '../../utils/instruments/bass/bassChords'
-import { KEYBOARD_CHORDS, type KeyboardChord } from '../../utils/instruments/keyboard/keyboardChords'
+import { KEYBOARD_SCALES, type KeyboardScale, applyScaleToKeyboard } from '../../utils/instruments/keyboard/keyboardScales'
+import { CHORD_ROOT_NOTES, GUITAR_CHORDS, getChordShapes, applyChordToGuitar, applyChordShapeToGuitar, type GuitarChord, type ChordShape } from '../../utils/instruments/guitar/guitarChords'
+import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, applyChordToBass, applyBassChordShapeToBass, type BassChord, type BassChordShape } from '../../utils/instruments/bass/bassChords'
+import { KEYBOARD_CHORDS, type KeyboardChord, applyChordToKeyboard } from '../../utils/instruments/keyboard/keyboardChords'
+import type { Note } from '../../utils/notes'
 import '../../styles/ScaleOptions.css'
+
+// Preview data for guitar/bass (fret positions)
+export interface FretboardPreview {
+  positions: { stringIndex: number; fretIndex: number }[]
+  rootPositions: { stringIndex: number; fretIndex: number }[]
+  isChord: boolean
+}
+
+// Preview data for keyboard (note objects)
+export interface KeyboardPreview {
+  notes: Note[]
+  rootNotes: Note[]
+  isChord: boolean
+}
 
 export interface AppliedChord {
   id: string
@@ -54,6 +69,11 @@ interface ScaleChordOptionsProps {
   lowerOctaves?: number
   higherOctaves?: number
   showOnlyAppliedList?: boolean
+  // Preview callbacks
+  onFretboardPreviewChange?: (preview: FretboardPreview | null) => void
+  onKeyboardPreviewChange?: (preview: KeyboardPreview | null) => void
+  // Available keyboard notes for preview calculation
+  availableKeyboardNotes?: readonly Note[]
 }
 
 const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
@@ -78,7 +98,10 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   onScaleDelete,
   lowerOctaves = 0,
   higherOctaves = 0,
-  showOnlyAppliedList = false
+  showOnlyAppliedList = false,
+  onFretboardPreviewChange,
+  onKeyboardPreviewChange,
+  availableKeyboardNotes = []
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isScaleMode, setIsScaleMode] = useState(true) // true for scales, false for chords
@@ -148,6 +171,167 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isExpanded])
+
+  // Calculate and send preview data when popup is open and selections change
+  useEffect(() => {
+    // Clear preview when popup closes
+    if (!isExpanded) {
+      onFretboardPreviewChange?.(null)
+      onKeyboardPreviewChange?.(null)
+      return
+    }
+
+    // Skip if callbacks aren't provided
+    if (!onFretboardPreviewChange && !onKeyboardPreviewChange) {
+      return
+    }
+
+    try {
+    // Calculate preview based on current selections
+    if (instrument === 'guitar') {
+      let positions: { stringIndex: number; fretIndex: number }[] = []
+      const rootPositions: { stringIndex: number; fretIndex: number }[] = []
+
+      if (isScaleMode) {
+        // Scale preview for guitar
+        if (showPositions && availableBoxes.length > 0 && selectedBoxIndex < availableBoxes.length) {
+          positions = applyScaleBoxToGuitar(availableBoxes[selectedBoxIndex])
+        } else {
+          positions = applyScaleToGuitar(selectedRoot, selectedScale, guitarNotes)
+        }
+        // Find root positions
+        positions.forEach(pos => {
+          const note = guitarNotes.find((n: any) => {
+            const stringIdx = 6 - n.string
+            return stringIdx === pos.stringIndex && n.fret === pos.fretIndex
+          })
+          if (note && note.name.replace(/\d+$/, '') === selectedRoot) {
+            rootPositions.push(pos)
+          }
+        })
+      } else {
+        // Chord preview for guitar
+        if (showShapes && availableShapes.length > 0 && selectedShapeIndex < availableShapes.length) {
+          positions = applyChordShapeToGuitar(availableShapes[selectedShapeIndex])
+        } else {
+          positions = applyChordToGuitar(selectedChordRoot, selectedChord, guitarNotes)
+        }
+        // Find root positions
+        positions.forEach(pos => {
+          const note = guitarNotes.find((n: any) => {
+            const stringIdx = 6 - n.string
+            return stringIdx === pos.stringIndex && n.fret === pos.fretIndex
+          })
+          if (note && note.name.replace(/\d+$/, '') === selectedChordRoot) {
+            rootPositions.push(pos)
+          }
+        })
+      }
+
+      onFretboardPreviewChange?.({ positions, rootPositions, isChord: !isScaleMode })
+    } else if (instrument === 'bass') {
+      let positions: { stringIndex: number; fretIndex: number }[] = []
+      const rootPositions: { stringIndex: number; fretIndex: number }[] = []
+
+      if (isScaleMode) {
+        // Scale preview for bass
+        if (showPositions && availableBassBoxes.length > 0 && selectedBoxIndex < availableBassBoxes.length) {
+          positions = applyScaleBoxToBass(availableBassBoxes[selectedBoxIndex])
+        } else {
+          positions = applyScaleToBass(selectedRoot, selectedBassScale as any, bassNotes)
+        }
+        // Find root positions
+        positions.forEach(pos => {
+          const note = bassNotes.find((n: any) => {
+            // Bass mapping: visual stringIndex 0-3 maps to n.string 4-1 (top G to bottom E)
+            // So n.string 4 → stringIndex 0, n.string 1 → stringIndex 3
+            // Therefore: stringIndex = 4 - n.string
+            return (4 - n.string) === pos.stringIndex && n.fret === pos.fretIndex
+          })
+          if (note && note.name.replace(/\d+$/, '') === selectedRoot) {
+            rootPositions.push(pos)
+          }
+        })
+      } else {
+        // Chord preview for bass
+        if (showShapes && availableBassShapes.length > 0 && selectedShapeIndex < availableBassShapes.length) {
+          positions = applyBassChordShapeToBass(availableBassShapes[selectedShapeIndex])
+        } else {
+          positions = applyChordToBass(selectedChordRoot, selectedBassChord, bassNotes)
+        }
+        // Find root positions
+        positions.forEach(pos => {
+          const note = bassNotes.find((n: any) => {
+            // Bass mapping: visual stringIndex 0-3 maps to n.string 4-1 (top G to bottom E)
+            return (4 - n.string) === pos.stringIndex && n.fret === pos.fretIndex
+          })
+          if (note && note.name.replace(/\d+$/, '') === selectedChordRoot) {
+            rootPositions.push(pos)
+          }
+        })
+      }
+
+      onFretboardPreviewChange?.({ positions, rootPositions, isChord: !isScaleMode })
+    } else if (instrument === 'keyboard' && availableKeyboardNotes.length > 0) {
+      let notes: Note[] = []
+      const rootNotes: Note[] = []
+      const currentRoot = isScaleMode ? selectedRoot : selectedChordRoot
+      const currentOctave = isScaleMode ? selectedScaleOctave : selectedChordOctave
+
+      if (isScaleMode) {
+        // Scale preview for keyboard
+        notes = applyScaleToKeyboard(selectedRoot, keyboardSelectedScale, availableKeyboardNotes)
+      } else {
+        // Chord preview for keyboard
+        notes = applyChordToKeyboard(selectedChordRoot, keyboardSelectedChord, availableKeyboardNotes)
+      }
+
+      // Filter by selected octave (same logic as handleKeyboardScaleApply)
+      notes = notes.filter(note => {
+        const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
+        return noteOctave === currentOctave
+      })
+
+      // Find root notes
+      notes.forEach(note => {
+        const noteName = note.name.replace(/\d+$/, '')
+        if (noteName === currentRoot) {
+          rootNotes.push(note)
+        }
+      })
+
+      onKeyboardPreviewChange?.({ notes, rootNotes, isChord: !isScaleMode })
+    }
+    } catch (error) {
+      // Silently handle preview calculation errors
+      console.error('Preview calculation error:', error)
+    }
+  }, [
+    isExpanded,
+    instrument,
+    isScaleMode,
+    selectedRoot,
+    selectedChordRoot,
+    selectedScale,
+    selectedBassScale,
+    keyboardSelectedScale,
+    selectedChord,
+    selectedBassChord,
+    keyboardSelectedChord,
+    selectedBoxIndex,
+    selectedShapeIndex,
+    showPositions,
+    showShapes,
+    availableBoxes,
+    availableBassBoxes,
+    availableShapes,
+    availableBassShapes,
+    availableKeyboardNotes,
+    selectedScaleOctave,
+    selectedChordOctave,
+    onFretboardPreviewChange,
+    onKeyboardPreviewChange
+  ])
 
   // Update available boxes when root or scale changes (Scale mode)
   useEffect(() => {
