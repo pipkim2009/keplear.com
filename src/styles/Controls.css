@@ -2193,11 +2193,11 @@ select.control-input.flashing {
 }
 
 .modern-generate-button {
-  background: var(--btn-primary-bg);
+  background: var(--primary-purple);
   color: var(--white);
-  border: 2px solid var(--blue-700);
+  border: none;
   border-radius: 6px;
-  padding: 7.5px 24px;
+  padding: 9.5px 24px;
   font-size: 15px;
   font-weight: 600;
   transition: all 0.2s ease;
@@ -2208,13 +2208,15 @@ select.control-input.flashing {
 }
 
 .modern-generate-button:hover:not(:disabled) {
-  background: var(--blue-700);
-  border-color: var(--blue-700);
+  background: var(--primary-purple-6600cc);
+}
+
+.modern-generate-button:active:not(:disabled) {
+  background: var(--primary-purple-dark);
 }
 
 .modern-generate-button:disabled {
   background: var(--gray-500);
-  border: 2px solid var(--gray-600);
   cursor: not-allowed;
 }
 

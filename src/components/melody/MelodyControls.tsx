@@ -31,7 +31,7 @@ const MelodyControls = memo(function MelodyControls() {
           onClick={handleGenerateMelody}
           disabled={isPlaying || isRecording}
         >
-          <IoMusicalNotes /> Generate Melody
+          <IoMusicalNotes /> Generate
           {hasChanges && <span className="change-badge">●</span>}
         </button>
 

@@ -1,3 +1,4 @@
+import { memo, useCallback, useMemo } from 'react'
 import ScaleChordOptions, { type AppliedChord, type AppliedScale } from '../../common/ScaleChordOptions'
 import Tooltip from '../../common/Tooltip'
 import { PiTrashFill } from 'react-icons/pi'
@@ -42,7 +43,7 @@ interface InstrumentHeaderProps {
   hideSelectionMode?: boolean
 }
 
-const InstrumentHeader: React.FC<InstrumentHeaderProps> = ({
+const InstrumentHeader = memo(function InstrumentHeader({
   instrument,
   keyboardSelectionMode,
   onKeyboardSelectionModeChange,
@@ -73,7 +74,29 @@ const InstrumentHeader: React.FC<InstrumentHeaderProps> = ({
   showOnlyAppliedList = false,
   disableSelectionMode = false,
   hideSelectionMode = false
-}) => {
+}: InstrumentHeaderProps) {
+  // Memoize selection mode handlers
+  const handleRangeClick = useCallback(() => {
+    if (!disableSelectionMode && onKeyboardSelectionModeChange && keyboardSelectionMode !== 'range') {
+      onKeyboardSelectionModeChange('range')
+    }
+  }, [disableSelectionMode, onKeyboardSelectionModeChange, keyboardSelectionMode])
+
+  const handleMultiClick = useCallback(() => {
+    if (!disableSelectionMode && onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
+      onKeyboardSelectionModeChange('multi')
+    }
+  }, [disableSelectionMode, onKeyboardSelectionModeChange, keyboardSelectionMode])
+
+  // Memoize computed values
+  const showDeselectButton = useMemo(() => {
+    return !hideDeselectAll && (selectedNotes.length > 0 || appliedChords.length > 0 || appliedScales.length > 0)
+  }, [hideDeselectAll, selectedNotes.length, appliedChords.length, appliedScales.length])
+
+  const selectionModeClass = useMemo(() => {
+    return `selection-mode-switch ${flashingInputs.mode ? 'flashing' : ''} ${disableSelectionMode ? 'disabled' : ''}`
+  }, [flashingInputs.mode, disableSelectionMode])
+
   return (
     <div className="instrument-header-controls">
       <div className="header-controls-left">
@@ -90,14 +113,10 @@ Multi Select - Select the specific notes to use"
                 <div className="tooltip-icon">?</div>
               </Tooltip>
             </div>
-            <div className={`selection-mode-switch ${flashingInputs.mode ? 'flashing' : ''} ${disableSelectionMode ? 'disabled' : ''}`}>
+            <div className={selectionModeClass}>
               <button
                 className={`switch-option ${keyboardSelectionMode === 'range' ? 'active' : ''}`}
-                onClick={() => {
-                  if (!disableSelectionMode && onKeyboardSelectionModeChange && keyboardSelectionMode !== 'range') {
-                    onKeyboardSelectionModeChange('range')
-                  }
-                }}
+                onClick={handleRangeClick}
                 title="Range Select"
                 disabled={disableSelectionMode}
               >
@@ -105,11 +124,7 @@ Multi Select - Select the specific notes to use"
               </button>
               <button
                 className={`switch-option ${keyboardSelectionMode === 'multi' ? 'active' : ''}`}
-                onClick={() => {
-                  if (!disableSelectionMode && onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
-                    onKeyboardSelectionModeChange('multi')
-                  }
-                }}
+                onClick={handleMultiClick}
                 title="Multi Select"
                 disabled={disableSelectionMode}
               >
@@ -148,7 +163,7 @@ Multi Select - Select the specific notes to use"
         </div>
 
         {/* Deselect All button */}
-        {!hideDeselectAll && (selectedNotes.length > 0 || appliedChords.length > 0 || appliedScales.length > 0) && (
+        {showDeselectButton && (
           <div className="control-group">
             <button
               onClick={onClearAllSelections}
@@ -163,6 +178,6 @@ Multi Select - Select the specific notes to use"
       </div>
     </div>
   )
-}
+})
 
 export default InstrumentHeader

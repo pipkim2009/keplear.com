@@ -910,11 +910,6 @@
   the fretboard dark (guitars look better dark)
 */
 
-.light .fret-checkbox-label,
-.light .string-checkbox-label {
-  color: var(--light-text-primary);
-}
-
 .light .scale-selector {
   background: var(--light-bg-tertiary);
   border-color: var(--primary-purple-alpha-30);

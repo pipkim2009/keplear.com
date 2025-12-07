@@ -895,11 +895,6 @@
   the fretboard dark (bass looks better dark)
 */
 
-.light .bass-fret-checkbox-label,
-.light .bass-string-checkbox-label {
-  color: var(--light-text-primary);
-}
-
 .light .bass-scale-selector {
   background: var(--light-bg-tertiary);
   border-color: var(--primary-purple-alpha-30);

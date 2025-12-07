@@ -17,3 +17,4 @@ export * from './instruments/keyboard/keyboardChords'
 
 // Core utilities
 export { CircuitBreaker } from './errorHandler'
+export * from './inputValidation'

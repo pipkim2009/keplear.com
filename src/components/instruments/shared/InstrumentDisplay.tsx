@@ -1,7 +1,7 @@
 import InstrumentControls from './InstrumentControls'
 import InstrumentHeader from './InstrumentHeader'
 import InstrumentRenderer from './InstrumentRenderer'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback, memo } from 'react'
 import type { Note } from '../../../utils/notes'
 import type { KeyboardSelectionMode } from './InstrumentControls'
 import type { ChordMode } from '../../../reducers/uiReducer'
@@ -72,7 +72,7 @@ interface InstrumentDisplayProps {
   onLessonComplete?: () => void
 }
 
-const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
+const InstrumentDisplay = memo(function InstrumentDisplay({
   onNoteClick,
   isSelected,
   isInMelody,
@@ -134,13 +134,12 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
   hideSelectionMode = false,
   practiceMode = false,
   onLessonComplete
-}) => {
+}: InstrumentDisplayProps) {
   const [lowerOctaves, setLowerOctaves] = useState<number>(initialLowerOctaves)
   const [higherOctaves, setHigherOctaves] = useState<number>(initialHigherOctaves)
 
-  // Calculate the currently playing note(s) from the index
-  // For chords (progression mode), this will be multiple notes
-  const currentlyPlayingNoteNames: string[] = (() => {
+  // Memoize the currently playing note(s) calculation
+  const currentlyPlayingNoteNames = useMemo<string[]>(() => {
     if (currentlyPlayingNoteIndex === null || currentlyPlayingNoteIndex === undefined || !generatedMelody) {
       return []
     }
@@ -151,38 +150,31 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     }
 
     // If this note has chord information, return all chord notes
-    if (currentNote.chordGroup && currentNote.chordGroup.allNotes && currentNote.chordGroup.allNotes.length > 0) {
+    if (currentNote.chordGroup?.allNotes?.length) {
       return [...currentNote.chordGroup.allNotes]
     }
 
     // Otherwise, just return the single note
     return [currentNote.name]
-  })()
+  }, [currentlyPlayingNoteIndex, generatedMelody])
 
-  // Get chord ID for guitar/bass (to match against specific applied chord)
-  const currentlyPlayingChordId: string | null = (() => {
+  // Memoize chord ID calculation for guitar/bass
+  const currentlyPlayingChordId = useMemo<string | null>(() => {
     if (currentlyPlayingNoteIndex === null || currentlyPlayingNoteIndex === undefined || !generatedMelody) {
       return null
     }
 
     const currentNote = generatedMelody[currentlyPlayingNoteIndex]
-    if (!currentNote) {
+    return currentNote?.chordGroup?.id ?? null
+  }, [currentlyPlayingNoteIndex, generatedMelody])
+
+  // Memoize the single note for backward compatibility
+  const currentlyPlayingNote = useMemo(() => {
+    if (currentlyPlayingNoteIndex === null || currentlyPlayingNoteIndex === undefined || !generatedMelody) {
       return null
     }
-
-    // If this note has chord group information, return the chord ID
-    if (currentNote.chordGroup && currentNote.chordGroup.id) {
-      return currentNote.chordGroup.id
-    }
-
-    // Otherwise, return null (not a chord)
-    return null
-  })()
-
-  // Keep the single note for backward compatibility (used by some components)
-  const currentlyPlayingNote = currentlyPlayingNoteIndex !== null && currentlyPlayingNoteIndex !== undefined && generatedMelody
-    ? generatedMelody[currentlyPlayingNoteIndex] || null
-    : null
+    return generatedMelody[currentlyPlayingNoteIndex] ?? null
+  }, [currentlyPlayingNoteIndex, generatedMelody])
 
   // Get scale/chord management from context
   const { appliedChords, appliedScales, scaleChordManagement } = useInstrument()
@@ -226,19 +218,33 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
     higherOctaves
   })
 
-  // Handle clear all selections
-  const handleClearAllSelections = () => {
-    // Clear all selections
+  // Memoize clear all selections handler
+  const handleClearAllSelections = useCallback(() => {
     clearSelection()
-    // Clear chord and scale state for keyboard
     if (instrument === 'keyboard') {
       handleKeyboardChordClear()
       handleKeyboardScaleClear()
     }
-    // Clear applied chords and scales lists
     handleClearChord()
     handleClearScale()
-  }
+  }, [clearSelection, instrument, handleKeyboardChordClear, handleKeyboardScaleClear, handleClearChord, handleClearScale])
+
+  // Memoize octave change handlers
+  const handleAddLowerOctave = useCallback(() => {
+    setLowerOctaves(prev => Math.min(prev + 1, 7))
+  }, [])
+
+  const handleRemoveLowerOctave = useCallback(() => {
+    setLowerOctaves(prev => Math.max(prev - 1, -4))
+  }, [])
+
+  const handleAddHigherOctave = useCallback(() => {
+    setHigherOctaves(prev => Math.min(prev + 1, 7))
+  }, [])
+
+  const handleRemoveHigherOctave = useCallback(() => {
+    setHigherOctaves(prev => Math.max(prev - 1, -4))
+  }, [])
 
   // Notify parent when octave range changes
   useEffect(() => {
@@ -316,10 +322,10 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
           onClearScale={handleClearScale}
           lowerOctaves={lowerOctaves}
           higherOctaves={higherOctaves}
-          onAddLowerOctave={() => setLowerOctaves(Math.min(lowerOctaves + 1, 7))}
-          onRemoveLowerOctave={() => setLowerOctaves(Math.max(lowerOctaves - 1, -4))}
-          onAddHigherOctave={() => setHigherOctaves(Math.min(higherOctaves + 1, 7))}
-          onRemoveHigherOctave={() => setHigherOctaves(Math.max(higherOctaves - 1, -4))}
+          onAddLowerOctave={handleAddLowerOctave}
+          onRemoveLowerOctave={handleRemoveLowerOctave}
+          onAddHigherOctave={handleAddHigherOctave}
+          onRemoveHigherOctave={handleRemoveHigherOctave}
           keyboardSelectionMode={keyboardSelectionMode}
           onKeyboardSelectionModeChange={onKeyboardSelectionModeChange}
           onKeyboardScaleApply={handleKeyboardScaleApply}
@@ -425,6 +431,6 @@ const InstrumentDisplay: React.FC<InstrumentDisplayProps> = ({
       </div>
     </>
   )
-}
+})
 
 export default InstrumentDisplay

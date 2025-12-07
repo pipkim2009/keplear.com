@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react'
 import '../../../styles/Controls.css'
 import '../../../styles/MelodyControls.css'
 import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../../utils/instruments/guitar/guitarScales'
@@ -14,6 +14,8 @@ import '../../../styles/CustomAudioPlayer.css'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import { IoMdArrowDropdown } from 'react-icons/io'
+import { useIncrementDecrement } from '../../../hooks/useHoldButton'
+import { sanitizeNumericInput } from '../../../utils/inputValidation'
 
 export type KeyboardSelectionMode = 'range' | 'multi'
 
@@ -77,7 +79,7 @@ interface InstrumentControlsProps {
   disableChordMode?: boolean
 }
 
-const InstrumentControls: React.FC<InstrumentControlsProps> = ({
+const InstrumentControls = memo(function InstrumentControls({
   bpm,
   setBpm,
   numberOfBeats,
@@ -135,7 +137,7 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
   disableBpmInput = false,
   disableBeatsInput = false,
   disableChordMode = false
-}) => {
+}: InstrumentControlsProps) {
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [beatsDisplay, setBeatsDisplay] = useState(numberOfBeats.toString())
@@ -179,35 +181,14 @@ const InstrumentControls: React.FC<InstrumentControlsProps> = ({
     currentNotesRef.current = numberOfBeats
   }, [numberOfBeats])
   
-  const handleBpmChange = (value: string) => {
-    // Only allow numbers and empty string
-    let numericValue = value.replace(/[^0-9]/g, '')
-    // Remove leading zeros but keep single zero
-    if (numericValue.length > 1) {
-      numericValue = numericValue.replace(/^0+/, '') || '0'
-    }
-    // Limit to max 999
-    if (numericValue !== '' && Number(numericValue) > 999) {
-      numericValue = '999'
-    }
-    setBpmDisplay(numericValue)
-    // Don't update actual value while typing - only on blur/enter
-  }
-  
-  const handleNotesChange = (value: string) => {
-    // Only allow numbers and empty string
-    let numericValue = value.replace(/[^0-9]/g, '')
-    // Remove leading zeros but keep single zero
-    if (numericValue.length > 1) {
-      numericValue = numericValue.replace(/^0+/, '') || '0'
-    }
-    // Limit to max 999
-    if (numericValue !== '' && Number(numericValue) > 999) {
-      numericValue = '999'
-    }
-    setBeatsDisplay(numericValue)
-    // Don't update actual value while typing - only on blur/enter
-  }
+  // Use centralized input validation
+  const handleBpmChange = useCallback((value: string) => {
+    setBpmDisplay(sanitizeNumericInput(value, { max: 999 }))
+  }, [])
+
+  const handleNotesChange = useCallback((value: string) => {
+    setBeatsDisplay(sanitizeNumericInput(value, { max: 999 }))
+  }, [])
   
   const handleBpmKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -979,7 +960,7 @@ Progression - Use entire chords"
               title="Generate a melody from selected notes"
               style={{ position: 'relative' }}
             >
-              Generate Melody
+              Generate
               {hasChanges && <span className="change-badge">●</span>}
             </button>
           )}
@@ -1043,6 +1024,6 @@ Progression - Use entire chords"
 
     </div>
   )
-}
+})
 
 export default InstrumentControls

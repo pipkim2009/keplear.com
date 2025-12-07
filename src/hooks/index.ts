@@ -5,6 +5,7 @@
 export { useAudio } from './useAudio'
 export { useAuth } from './useAuth'
 export { useCustomDropdown } from './useCustomDropdown'
+export { useHoldButton, useIncrementDecrement } from './useHoldButton'
 export { useInstrumentConfig } from './useInstrumentConfig'
 export { useInstrumentNotes } from './useInstrumentNotes'
 export { useInstrumentState } from './useInstrumentState'
