@@ -1,11 +1,20 @@
 .header {
   width: 100%;
+  min-width: 100%;
   position: relative;
   z-index: 1000;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgb(255, 255, 255, 0.1);
   transition: all 0.3s ease;
+}
+
+/* Ensure full width on mobile landscape */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  .header {
+    width: 100vw;
+    min-width: 100vw;
+  }
 }
 
 .light .header {
