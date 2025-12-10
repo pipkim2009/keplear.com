@@ -60,9 +60,7 @@
   justify-content: center;
   align-items: center;
   flex: 1;
-  overflow: auto visible;
-  scrollbar-width: thin;
-  scrollbar-color: var(--blue-500) var(--dark-bg-secondary);
+  overflow: visible;
 }
 
 @media (min-width: 481px) and (max-width: 768px) {
@@ -76,11 +74,6 @@
   .instrument-header-controls {
     border-radius: 0;
     padding: 4px;
-  }
-
-  .instrument-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
 
   .instrument-container:has(.keyboard-container) {
@@ -135,11 +128,6 @@
     border-radius: 0;
     padding: 4px;
     gap: 0.5rem;
-  }
-
-  .instrument-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
 
   .instrument-container:has(.keyboard-container) {
@@ -245,15 +233,9 @@
 
 /* Desktop/Laptop scrolling improvements */
 @media (min-width: 769px) {
-  .instrument-wrapper {
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    justify-content: flex-start;
-    padding-left: 0;
-  }
-
   .keyboard-container {
     padding-left: 0;
+    scroll-behavior: smooth;
   }
 
   .keyboard {
@@ -330,6 +312,53 @@
   justify-content: flex-start;
   width: 100%;
   padding-left: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  /* Firefox scrollbar */
+  scrollbar-width: auto;
+  scrollbar-color: var(--blue-500) var(--dark-bg-secondary);
+}
+
+/* Custom scrollbar for keyboard container - matches guitar/bass pattern */
+.keyboard-container::-webkit-scrollbar {
+  height: 12px;
+}
+
+.keyboard-container::-webkit-scrollbar-button {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.keyboard-container::-webkit-scrollbar-button:start:decrement,
+.keyboard-container::-webkit-scrollbar-button:end:increment {
+  display: none;
+}
+
+.keyboard-container::-webkit-scrollbar-button:horizontal:start:decrement,
+.keyboard-container::-webkit-scrollbar-button:horizontal:end:increment {
+  display: none;
+  width: 0;
+}
+
+.keyboard-container::-webkit-scrollbar-track {
+  background: linear-gradient(145deg, var(--dark-bg-secondary), var(--gray-850));
+  border-radius: 6px;
+}
+
+.keyboard-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(145deg, var(--blue-500), var(--blue-700));
+  border-radius: 6px;
+  border: 1px solid var(--blue-400);
+}
+
+.keyboard-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(145deg, var(--blue-600), var(--blue-800));
+}
+
+.keyboard-container::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(145deg, var(--blue-800), var(--blue-900));
 }
 
 @media (max-width: 480px) {
@@ -875,50 +904,6 @@
     height: 35px;
     font-size: 20px;
   }
-}
-
-/* Custom scrollbar for instrument wrapper (keyboard) - only show when needed */
-.instrument-wrapper::-webkit-scrollbar {
-  height: 12px;
-}
-
-.instrument-wrapper::-webkit-scrollbar-button {
-  display: none;
-  width: 0;
-  height: 0;
-}
-
-.instrument-wrapper::-webkit-scrollbar-button:start:decrement,
-.instrument-wrapper::-webkit-scrollbar-button:end:increment {
-  display: none;
-}
-
-.instrument-wrapper::-webkit-scrollbar-button:horizontal:start:decrement,
-.instrument-wrapper::-webkit-scrollbar-button:horizontal:end:increment {
-  display: none;
-}
-
-.keyboard-container::-webkit-scrollbar-button {
-  display: none;
-}
-
-.instrument-wrapper::-webkit-scrollbar-track {
-  background: linear-gradient(145deg, var(--dark-bg-secondary), var(--gray-850));
-  border-radius: 6px;
-}
-
-.instrument-wrapper::-webkit-scrollbar-thumb {
-  background: linear-gradient(145deg, var(--blue-500), var(--blue-700));
-  border-radius: 6px;
-  border: 1px solid var(--blue-400);
-}
-
-.instrument-wrapper::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(145deg, var(--blue-600), var(--blue-800));
-}
-
-.instrument-wrapper::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(145deg, var(--blue-800), var(--blue-900));
 }
 
 /* Remove padding and reduce height when instrument container contains guitar or bass */

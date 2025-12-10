@@ -41,7 +41,7 @@
 }
 
 :global(.dark) .backButton {
-  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
+  background: var(--dark-bg-secondary);
   color: var(--dark-text-primary);
   border: 2px solid rgb(210, 210, 249, 0.2);
 }
@@ -51,7 +51,7 @@
 }
 
 :global(.dark) .backButton:hover {
-  background: linear-gradient(135deg, rgb(26, 32, 44, 1) 0%, rgb(27, 105, 64, 0.6) 100%);
+  background: var(--dark-bg-tertiary);
 }
 
 .backButton:focus-visible {
@@ -241,12 +241,20 @@
 }
 
 .playButton {
-  background: rgb(34, 197, 94);
+  background: var(--primary-purple);
   color: var(--white);
 }
 
+:global(.dark) .playButton {
+  background: var(--primary-purple-light);
+}
+
 .playButton:hover:not(:disabled) {
-  background: rgb(22, 163, 74);
+  background: var(--primary-purple-dark);
+}
+
+:global(.dark) .playButton:hover:not(:disabled) {
+  background: var(--primary-purple);
 }
 
 .playButton:disabled {
