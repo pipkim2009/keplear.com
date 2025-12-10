@@ -768,7 +768,7 @@ const InstrumentControls = memo(function InstrumentControls({
                     className={`octave-mini ${isSelected ? 'highlight' : 'dim'}`}
                   >
                     <img
-                      src="https://openclipart.org/download/304838/1533631532.svg"
+                      src="/Octave-icon.png"
                       alt={`Octave ${octaveNumber}`}
                       className="octave-icon"
                     />
