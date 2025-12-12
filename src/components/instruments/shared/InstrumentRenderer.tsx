@@ -63,6 +63,7 @@ interface InstrumentRendererProps {
   appliedChords?: AppliedChord[]
   fretboardPreview?: FretboardPreview | null
   keyboardPreview?: KeyboardPreview | null
+  disableNoteSelection?: boolean
 }
 
 const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
@@ -94,7 +95,8 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
   appliedScales,
   appliedChords,
   fretboardPreview,
-  keyboardPreview
+  keyboardPreview,
+  disableNoteSelection = false
 }) => {
   return (
     <div className="instrument-wrapper">
@@ -114,6 +116,7 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           currentlyPlayingNote={currentlyPlayingNote}
           currentlyPlayingNoteNames={currentlyPlayingNoteNames}
           previewNotes={keyboardPreview}
+          disableNoteSelection={disableNoteSelection}
         />
       ) : instrument === 'guitar' ? (
         <Guitar
@@ -132,6 +135,7 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           currentlyPlayingNoteIds={currentlyPlayingNoteIds}
           currentlyPlayingChordId={currentlyPlayingChordId}
           previewPositions={fretboardPreview}
+          disableNoteSelection={disableNoteSelection}
         />
       ) : (
         <Bass
@@ -150,6 +154,7 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           currentlyPlayingNoteIds={currentlyPlayingNoteIds}
           currentlyPlayingChordId={currentlyPlayingChordId}
           previewPositions={fretboardPreview}
+          disableNoteSelection={disableNoteSelection}
         />
       )}
     </div>

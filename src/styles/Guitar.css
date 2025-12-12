@@ -879,3 +879,15 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Practice mode - remove padding and disable hover effects */
+.guitar-container.practice-mode {
+  padding-left: 0;
+  padding-bottom: 0;
+}
+
+.guitar-container.practice-mode .fret-position,
+.guitar-container.practice-mode .open-string-position {
+  cursor: default;
+  pointer-events: none;
+}

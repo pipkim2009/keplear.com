@@ -20,6 +20,7 @@ interface KeyboardProps {
   currentlyPlayingNote?: Note | null
   currentlyPlayingNoteNames?: string[]
   previewNotes?: KeyboardPreview | null
+  disableNoteSelection?: boolean
 }
 
 const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
@@ -36,7 +37,8 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   isNoteChordRoot,
   currentlyPlayingNote = null,
   currentlyPlayingNoteNames = [],
-  previewNotes = null
+  previewNotes = null,
+  disableNoteSelection = false
 }) {
   const hasExtendedRange = lowerOctaves !== 0 || higherOctaves !== 0
 
@@ -58,6 +60,12 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   const isNoteVisible = useCallback((note: Note): boolean => {
     return isManuallySelected(note) || isInScaleChordLayer(note)
   }, [isManuallySelected, isInScaleChordLayer])
+
+  // Wrapped click handler that respects disableNoteSelection
+  const handleNoteClick = useCallback((note: Note) => {
+    if (disableNoteSelection) return
+    onNoteClick(note)
+  }, [onNoteClick, disableNoteSelection])
 
   // Check if a note is currently playing (only highlight when notes are shown)
   // Supports both single notes and chords (multiple notes playing simultaneously)
@@ -102,7 +110,7 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
             isSelected={isManuallySelected(note)}
             isVisible={isNoteVisible(note)}
             isInMelody={isInMelody(note, showNotes)}
-            onClick={onNoteClick}
+            onClick={handleNoteClick}
             isInScale={isNoteInScale ? isNoteInScale(note) : false}
             isRoot={isNoteRoot ? isNoteRoot(note) : false}
             isInChord={isNoteInChord ? isNoteInChord(note) : false}
@@ -127,7 +135,7 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
                 isSelected={isManuallySelected(note)}
                 isVisible={isNoteVisible(note)}
                 isInMelody={isInMelody(note, showNotes)}
-                onClick={onNoteClick}
+                onClick={handleNoteClick}
                 style={{ left: `${leftPosition}px` }}
                 isInScale={isNoteInScale ? isNoteInScale(note) : false}
                 isRoot={isNoteRoot ? isNoteRoot(note) : false}

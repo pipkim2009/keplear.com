@@ -34,9 +34,10 @@ interface BassProps {
   currentlyPlayingNoteIds?: string[]
   currentlyPlayingChordId?: string | null
   previewPositions?: FretboardPreview | null
+  disableNoteSelection?: boolean
 }
 
-const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null }) => {
+const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(4).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -81,6 +82,9 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   }, [STRING_MAPPING])
 
   const handleOpenStringClick = async (stringIndex: number) => {
+    // Don't allow selection changes in practice mode
+    if (disableNoteSelection) return
+
     const noteKey = `${stringIndex}-open`
     const newSelectedNotes = new Set(selectedNotes)
 
@@ -169,6 +173,9 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   }
 
   const handleNoteClick = async (stringIndex: number, fretIndex: number) => {
+    // Don't allow selection changes in practice mode
+    if (disableNoteSelection) return
+
     const noteKey = `${stringIndex}-${fretIndex}`
     const newSelectedNotes = new Set(selectedNotes)
 
@@ -752,21 +759,23 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   }, [clearTrigger])
 
   return (
-    <div className="bass-container">
+    <div className={`bass-container ${disableNoteSelection ? 'practice-mode' : ''}`}>
       <div className={`bass-fretboard ${showNotes ? 'melody-active' : ''}`}>
         {/* Open fret checkbox */}
-        <div className="bass-fret-checkbox-container" style={{ left: '4.5px', bottom: '-40px' }}>
-          <input
-            type="checkbox"
-            id="bass-fret-open"
-            className="bass-fret-checkbox"
-            checked={fretCheckboxes[0] || false}
-            onChange={() => handleFretCheckboxChange(0)}
-            onMouseEnter={() => setHoveredFret(0)}
-            onMouseLeave={() => setHoveredFret(null)}
-          />
-          <label htmlFor="bass-fret-open" className="bass-fret-checkbox-label">0</label>
-        </div>
+        {!disableNoteSelection && (
+          <div className="bass-fret-checkbox-container" style={{ left: '4.5px', bottom: '-40px' }}>
+            <input
+              type="checkbox"
+              id="bass-fret-open"
+              className="bass-fret-checkbox"
+              checked={fretCheckboxes[0] || false}
+              onChange={() => handleFretCheckboxChange(0)}
+              onMouseEnter={() => setHoveredFret(0)}
+              onMouseLeave={() => setHoveredFret(null)}
+            />
+            <label htmlFor="bass-fret-open" className="bass-fret-checkbox-label">0</label>
+          </div>
+        )}
 
         {/* Frets */}
         {[...Array(24)].map((_, index) => (
@@ -781,18 +790,20 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                 <div className="bass-fret-marker bass-double-marker-2"></div>
               </>
             )}
-            <div className="bass-fret-checkbox-container">
-              <input
-                type="checkbox"
-                id={`bass-fret-${index + 1}`}
-                className="bass-fret-checkbox"
-                checked={fretCheckboxes[index + 1] || false}
-                onChange={() => handleFretCheckboxChange(index + 1)}
-                onMouseEnter={() => setHoveredFret(index + 1)}
-                onMouseLeave={() => setHoveredFret(null)}
-              />
-              <label htmlFor={`bass-fret-${index + 1}`} className="bass-fret-checkbox-label">{index + 1}</label>
-            </div>
+            {!disableNoteSelection && (
+              <div className="bass-fret-checkbox-container">
+                <input
+                  type="checkbox"
+                  id={`bass-fret-${index + 1}`}
+                  className="bass-fret-checkbox"
+                  checked={fretCheckboxes[index + 1] || false}
+                  onChange={() => handleFretCheckboxChange(index + 1)}
+                  onMouseEnter={() => setHoveredFret(index + 1)}
+                  onMouseLeave={() => setHoveredFret(null)}
+                />
+                <label htmlFor={`bass-fret-${index + 1}`} className="bass-fret-checkbox-label">{index + 1}</label>
+              </div>
+            )}
           </div>
         ))}
 
@@ -851,7 +862,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         ))}
 
         {/* String checkboxes */}
-        {[...Array(4)].map((_, index) => (
+        {!disableNoteSelection && [...Array(4)].map((_, index) => (
           <div
             key={`bass-string-checkbox-${index}`}
             className="bass-string-checkbox-container"

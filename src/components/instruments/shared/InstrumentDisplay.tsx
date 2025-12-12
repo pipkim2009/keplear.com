@@ -471,6 +471,7 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           appliedChords={appliedChords}
           fretboardPreview={fretboardPreview}
           keyboardPreview={keyboardPreview}
+          disableNoteSelection={practiceMode}
         />
       </div>
     </>

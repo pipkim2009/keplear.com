@@ -861,3 +861,15 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Practice mode - remove padding and disable hover effects */
+.bass-container.practice-mode {
+  padding-left: 0;
+  padding-bottom: 0;
+}
+
+.bass-container.practice-mode .bass-fret-position,
+.bass-container.practice-mode .bass-open-string-position {
+  cursor: default;
+  pointer-events: none;
+}
