@@ -27,6 +27,7 @@ interface InstrumentRendererProps {
   isNoteKeyboardChordRoot: (note: Note) => boolean
   currentlyPlayingNote?: Note | null
   currentlyPlayingNoteNames?: string[]
+  currentlyPlayingNoteIds?: string[]
   currentlyPlayingChordId?: string | null
   onScaleHandlersReady: (handlers: {
     handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
@@ -52,6 +53,12 @@ interface InstrumentRendererProps {
     handleClearChord: () => void;
     handleRemoveChordNotes: (noteKeys: string[]) => void;
   } | null) => void
+  onNoteHandlersReady?: (handlers: {
+    handleSetManualNotes: (noteIds: string[]) => void;
+  } | null) => void
+  onBassNoteHandlersReady?: (handlers: {
+    handleSetManualNotes: (noteIds: string[]) => void;
+  } | null) => void
   appliedScales?: AppliedScale[]
   appliedChords?: AppliedChord[]
   fretboardPreview?: FretboardPreview | null
@@ -76,11 +83,14 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
   isNoteKeyboardChordRoot,
   currentlyPlayingNote,
   currentlyPlayingNoteNames,
+  currentlyPlayingNoteIds,
   currentlyPlayingChordId,
   onScaleHandlersReady,
   onBassScaleHandlersReady,
   onChordHandlersReady,
   onBassChordHandlersReady,
+  onNoteHandlersReady,
+  onBassNoteHandlersReady,
   appliedScales,
   appliedChords,
   fretboardPreview,
@@ -114,10 +124,12 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           clearTrigger={clearTrigger}
           onScaleHandlersReady={onScaleHandlersReady}
           onChordHandlersReady={onChordHandlersReady}
+          onNoteHandlersReady={onNoteHandlersReady}
           appliedScales={appliedScales}
           appliedChords={appliedChords}
           currentlyPlayingNote={currentlyPlayingNote}
           currentlyPlayingNoteNames={currentlyPlayingNoteNames}
+          currentlyPlayingNoteIds={currentlyPlayingNoteIds}
           currentlyPlayingChordId={currentlyPlayingChordId}
           previewPositions={fretboardPreview}
         />
@@ -130,10 +142,12 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           clearTrigger={clearTrigger}
           onScaleHandlersReady={onBassScaleHandlersReady}
           onChordHandlersReady={onBassChordHandlersReady}
+          onNoteHandlersReady={onBassNoteHandlersReady}
           appliedScales={appliedScales}
           appliedChords={appliedChords}
           currentlyPlayingNote={currentlyPlayingNote}
           currentlyPlayingNoteNames={currentlyPlayingNoteNames}
+          currentlyPlayingNoteIds={currentlyPlayingNoteIds}
           currentlyPlayingChordId={currentlyPlayingChordId}
           previewPositions={fretboardPreview}
         />

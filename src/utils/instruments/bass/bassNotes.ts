@@ -1,4 +1,5 @@
 export type BassNote = {
+  id: string // unique identifier e.g., "b-s1-f3"
   name: string
   frequency: number
   string: number // 1-4 (low E to high G)
@@ -30,10 +31,12 @@ export const generateBassNotes = (): BassNote[] => {
       const octave = Math.floor((baseNoteIndex + semitoneOffset + parseInt(openString.name.slice(1)) * 12) / 12)
       const noteName = `${noteNames[noteIndex]}${octave}`
 
+      const stringNum = stringIndex + 1
       bassNotes.push({
+        id: `b-s${stringNum}-f${fret}`,
         name: noteName,
         frequency: Math.round(frequency * 100) / 100,
-        string: stringIndex + 1, // 1-indexed for display
+        string: stringNum, // 1-indexed for display
         fret: fret,
         position: openString.basePosition + semitoneOffset
       })

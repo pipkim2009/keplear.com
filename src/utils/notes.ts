@@ -20,6 +20,8 @@ export interface ChordGroupInfo {
  * Represents a musical note with its properties
  */
 export interface Note {
+  /** Unique identifier e.g., "k-C4", "k-F#5" */
+  readonly id: string
   /** The note name including octave (e.g., "C4", "F#5") */
   readonly name: string
   /** The frequency in Hz */
@@ -61,15 +63,17 @@ export const generateNotes = (): readonly Note[] => {
       const position = octaveOffset + index
       const frequency = C4_FREQUENCY * Math.pow(2, position / SEMITONES_PER_OCTAVE)
       
+      const fullName = `${noteName}${octave}`
       notes.push({
-        name: `${noteName}${octave}`,
+        id: `k-${fullName}`,
+        name: fullName,
         frequency: Math.round(frequency * 100) / 100,
         isBlack: noteName.includes('#'),
         position
       })
     })
   }
-  
+
   return Object.freeze(notes)
 }
 
@@ -92,15 +96,17 @@ export const generateNotesWithOffset = (octaveOffset: number = 0): readonly Note
       const position = relativeOctavePosition + index
       const frequency = C4_FREQUENCY * Math.pow(2, ((octave - 4) * SEMITONES_PER_OCTAVE + index) / SEMITONES_PER_OCTAVE)
       
+      const fullName = `${noteName}${octave}`
       notes.push({
-        name: `${noteName}${octave}`,
+        id: `k-${fullName}`,
+        name: fullName,
         frequency: Math.round(frequency * 100) / 100,
         isBlack: noteName.includes('#'),
         position
       })
     })
   }
-  
+
   return Object.freeze(notes)
 }
 
@@ -157,15 +163,17 @@ export const generateNotesWithSeparateOctaves = (lowerOctaves: number = 0, highe
       const position = relativeOctavePosition + index
       const frequency = C4_FREQUENCY * Math.pow(2, ((octave - 4) * SEMITONES_PER_OCTAVE + index) / SEMITONES_PER_OCTAVE)
       
+      const fullName = `${noteName}${octave}`
       notes.push({
-        name: `${noteName}${octave}`,
+        id: `k-${fullName}`,
+        name: fullName,
         frequency: Math.round(frequency * 100) / 100,
         isBlack: noteName.includes('#'),
         position
       })
     })
   }
-  
+
   return Object.freeze(notes)
 }
 

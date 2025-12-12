@@ -169,6 +169,26 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
     return [currentNote.name]
   }, [currentlyPlayingNoteIndex, generatedMelody])
 
+  // Memoize the currently playing note IDs for position-accurate highlighting (guitar/bass)
+  const currentlyPlayingNoteIds = useMemo<string[]>(() => {
+    if (currentlyPlayingNoteIndex === null || currentlyPlayingNoteIndex === undefined || !generatedMelody) {
+      return []
+    }
+
+    const currentNote = generatedMelody[currentlyPlayingNoteIndex]
+    if (!currentNote || !currentNote.id) {
+      return []
+    }
+
+    // If this note has chord positions, return those IDs
+    if (currentNote.chordGroup?.chordPositions?.length) {
+      return [...currentNote.chordGroup.chordPositions]
+    }
+
+    // Otherwise, just return the single note ID
+    return [currentNote.id]
+  }, [currentlyPlayingNoteIndex, generatedMelody])
+
   // Memoize chord ID calculation for guitar/bass
   const currentlyPlayingChordId = useMemo<string | null>(() => {
     if (currentlyPlayingNoteIndex === null || currentlyPlayingNoteIndex === undefined || !generatedMelody) {
@@ -198,6 +218,8 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
     setBassScaleHandlers,
     setChordHandlers,
     setBassChordHandlers,
+    setNoteHandlers,
+    setBassNoteHandlers,
     handleScaleSelect,
     handleScaleBoxSelect,
     handleClearScale,
@@ -434,11 +456,14 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           isNoteKeyboardChordRoot={isNoteKeyboardChordRoot}
           currentlyPlayingNote={currentlyPlayingNote}
           currentlyPlayingNoteNames={currentlyPlayingNoteNames}
+          currentlyPlayingNoteIds={currentlyPlayingNoteIds}
           currentlyPlayingChordId={currentlyPlayingChordId}
           onScaleHandlersReady={setScaleHandlers}
           onBassScaleHandlersReady={setBassScaleHandlers}
           onChordHandlersReady={setChordHandlers}
           onBassChordHandlersReady={setBassChordHandlers}
+          onNoteHandlersReady={setNoteHandlers}
+          onBassNoteHandlersReady={setBassNoteHandlers}
           appliedScales={appliedScales}
           appliedChords={appliedChords}
           fretboardPreview={fretboardPreview}

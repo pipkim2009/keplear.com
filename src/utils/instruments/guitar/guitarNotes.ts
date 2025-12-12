@@ -1,4 +1,5 @@
 export type GuitarNote = {
+  id: string // unique identifier e.g., "g-s1-f3"
   name: string
   frequency: number
   string: number // 1-6 (low E to high E)
@@ -32,10 +33,12 @@ export const generateGuitarNotes = (): GuitarNote[] => {
       const octave = Math.floor((baseNoteIndex + semitoneOffset + parseInt(openString.name.slice(1)) * 12) / 12)
       const noteName = `${noteNames[noteIndex]}${octave}`
       
+      const stringNum = stringIndex + 1
       guitarNotes.push({
+        id: `g-s${stringNum}-f${fret}`,
         name: noteName,
         frequency: Math.round(frequency * 100) / 100,
-        string: stringIndex + 1, // 1-indexed for display
+        string: stringNum, // 1-indexed for display
         fret: fret,
         position: openString.basePosition + semitoneOffset
       })

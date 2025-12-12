@@ -114,7 +114,7 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
       aria-label={`${note.name} key`}
       aria-pressed={isSelected}
     >
-      {/* <span className="key-label">{note.name}</span> */}
+      <span className="key-label">{note.name}</span>
     </button>
   )
 }, (prevProps, nextProps) => {

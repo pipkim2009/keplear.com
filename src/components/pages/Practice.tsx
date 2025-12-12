@@ -18,6 +18,14 @@ import { BASS_SCALES, BASS_ROOT_NOTES, getBassScaleBoxes } from '../../utils/ins
 import { BASS_CHORDS, BASS_CHORD_ROOT_NOTES } from '../../utils/instruments/bass/bassChords'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
 import type { BassNote } from '../../utils/instruments/bass/bassNotes'
+import {
+  getRandomGuitarNotesOnString,
+  getRandomBassNotesOnString,
+  getRandomKeyboardNotesInOctave,
+  convertToNoteFormat,
+  getGuitarNoteById,
+  getBassNoteById
+} from '../../utils/practice/practiceNotes'
 
 interface PracticeProps {
   onNavigateToSandbox: () => void
@@ -238,21 +246,22 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         return noteOctave === randomOctave.toString()
       })
 
-      // SIMPLE MELODIES: 3-6 random notes on single octave
+      // SIMPLE MELODIES: 3-6 random notes on single octave (using ID-based selection)
       if (practiceOptions.includes('simple-melodies')) {
         handleKeyboardSelectionModeChange('multi', false)
 
-        const chromaticNotes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
         const noteCount = Math.floor(Math.random() * 4) + 3
-        const shuffledNotes = [...chromaticNotes].sort(() => Math.random() - 0.5)
-        const selectedNoteNames = shuffledNotes.slice(0, noteCount)
-        const autoNoteNames = selectedNoteNames.map(noteName => `${noteName}${randomOctave}`)
-        const autoNotes = autoNoteNames
-          .map(noteName => allNotesInOctave.find(n => n.name === noteName))
-          .filter((note): note is Note => note !== undefined)
+        const autoNotes = getRandomKeyboardNotesInOctave(randomOctave, noteCount, 3, 3)
 
         setGuitarNotes(autoNotes)
-        setSetupDetails({ type: 'simple-melodies', details: { noteCount: autoNotes.length, octave: randomOctave } })
+        setSetupDetails({
+          type: 'simple-melodies',
+          details: {
+            noteCount: autoNotes.length,
+            octave: randomOctave,
+            noteIds: autoNotes.map(n => n.id) // Store IDs for scene reference
+          }
+        })
       }
 
       // SCALES: Single random scale on single octave
@@ -311,27 +320,30 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       const randomBeats = Math.floor(Math.random() * 6) + 3
       setNumberOfBeats(randomBeats)
 
-      // SIMPLE MELODIES: 3-6 random notes on a single string
+      // SIMPLE MELODIES: 3-6 random notes on a single string (using ID-based selection)
       if (practiceOptions.includes('simple-melodies')) {
         // Randomly select one string (1-6 for guitar)
         const randomString = Math.floor(Math.random() * 6) + 1
 
-        // Get all notes on that string
-        const notesOnString = guitarNotes.filter(note => note.string === randomString)
-
-        // Randomly select 3-6 frets from that string
+        // Randomly select 3-6 notes from that string using ID-based utility
         const noteCount = Math.floor(Math.random() * 4) + 3
-        const shuffledNotes = [...notesOnString].sort(() => Math.random() - 0.5)
-        const selectedGuitarNotes = shuffledNotes.slice(0, noteCount)
+        const selectedGuitarNotes = getRandomGuitarNotesOnString(randomString, noteCount)
 
-        // Convert GuitarNote[] to Note[] format
-        const convertedNotes: Note[] = selectedGuitarNotes.map(gNote => ({
-          name: gNote.name,
-          frequency: gNote.frequency
-        }))
+        // Convert to Note format for melody generation
+        const convertedNotes = convertToNoteFormat(selectedGuitarNotes)
 
         setGuitarNotes(convertedNotes)
-        setSetupDetails({ type: 'simple-melodies', details: { noteCount: selectedGuitarNotes.length, string: randomString } })
+        setSetupDetails({
+          type: 'simple-melodies',
+          details: {
+            noteCount: selectedGuitarNotes.length,
+            string: randomString,
+            noteIds: selectedGuitarNotes.map(n => n.id) // Store IDs for scene reference
+          }
+        })
+
+        // Set visual display on fretboard
+        scaleChordManagement.noteHandlers?.handleSetManualNotes(selectedGuitarNotes.map(n => n.id))
       }
 
       // SCALES: Single random scale in a specific position
@@ -349,20 +361,31 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           // Apply the scale box for visual selection
           scaleChordManagement.handleScaleBoxSelect(randomBox)
 
-          // Convert scale box positions to Note objects for melody generation
+          // Convert scale box positions to Note objects using IDs
           const scaleNotes: Note[] = randomBox.positions.map(pos => {
-            // Find the guitar note for this position
-            const guitarNote = guitarNotes.find(gn => gn.string === pos.string && gn.fret === pos.fret)
+            const noteId = `g-s${pos.string}-f${pos.fret}`
+            const guitarNote = getGuitarNoteById(noteId)
             return {
+              id: noteId,
               name: pos.note,
-              frequency: guitarNote?.frequency || 0
+              frequency: guitarNote?.frequency || 0,
+              isBlack: pos.note.includes('#'),
+              position: guitarNote?.position || 0
             }
           })
 
           // ALSO set the notes directly for melody generation
           setGuitarNotes(scaleNotes)
 
-          setSetupDetails({ type: 'scales', details: { scaleName: randomScale.name, root: randomRoot, position: randomBox.name } })
+          setSetupDetails({
+            type: 'scales',
+            details: {
+              scaleName: randomScale.name,
+              root: randomRoot,
+              position: randomBox.name,
+              noteIds: scaleNotes.map(n => n.id) // Store IDs for scene reference
+            }
+          })
         }
       }
 
@@ -432,27 +455,30 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       const randomBeats = Math.floor(Math.random() * 6) + 3
       setNumberOfBeats(randomBeats)
 
-      // SIMPLE MELODIES: 3-6 random notes on a single string
+      // SIMPLE MELODIES: 3-6 random notes on a single string (using ID-based selection)
       if (practiceOptions.includes('simple-melodies')) {
         // Randomly select one string (1-4 for bass)
         const randomString = Math.floor(Math.random() * 4) + 1
 
-        // Get all notes on that string
-        const notesOnString = bassNotes.filter(note => note.string === randomString)
-
-        // Randomly select 3-6 frets from that string
+        // Randomly select 3-6 notes from that string using ID-based utility
         const noteCount = Math.floor(Math.random() * 4) + 3
-        const shuffledNotes = [...notesOnString].sort(() => Math.random() - 0.5)
-        const selectedBassNotes = shuffledNotes.slice(0, noteCount)
+        const selectedBassNotes = getRandomBassNotesOnString(randomString, noteCount)
 
-        // Convert BassNote[] to Note[] format
-        const convertedNotes: Note[] = selectedBassNotes.map(bNote => ({
-          name: bNote.name,
-          frequency: bNote.frequency
-        }))
+        // Convert to Note format for melody generation
+        const convertedNotes = convertToNoteFormat(selectedBassNotes)
 
         setGuitarNotes(convertedNotes)
-        setSetupDetails({ type: 'simple-melodies', details: { noteCount: selectedBassNotes.length, string: randomString } })
+        setSetupDetails({
+          type: 'simple-melodies',
+          details: {
+            noteCount: selectedBassNotes.length,
+            string: randomString,
+            noteIds: selectedBassNotes.map(n => n.id) // Store IDs for scene reference
+          }
+        })
+
+        // Set visual display on fretboard
+        scaleChordManagement.bassNoteHandlers?.handleSetManualNotes(selectedBassNotes.map(n => n.id))
       }
 
       // SCALES: Single random scale in a specific position
@@ -470,20 +496,31 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           // Apply the scale box for visual selection
           scaleChordManagement.handleScaleBoxSelect(randomBox as any)
 
-          // Convert scale box positions to Note objects for melody generation
+          // Convert scale box positions to Note objects using IDs
           const scaleNotes: Note[] = randomBox.positions.map(pos => {
-            // Find the bass note for this position
-            const bassNote = bassNotes.find(bn => bn.string === pos.string && bn.fret === pos.fret)
+            const noteId = `b-s${pos.string}-f${pos.fret}`
+            const bassNote = getBassNoteById(noteId)
             return {
+              id: noteId,
               name: pos.note,
-              frequency: bassNote?.frequency || 0
+              frequency: bassNote?.frequency || 0,
+              isBlack: pos.note.includes('#'),
+              position: bassNote?.position || 0
             }
           })
 
           // ALSO set the notes directly for melody generation
           setGuitarNotes(scaleNotes)
 
-          setSetupDetails({ type: 'scales', details: { scaleName: randomScale.name, root: randomRoot, position: randomBox.name } })
+          setSetupDetails({
+            type: 'scales',
+            details: {
+              scaleName: randomScale.name,
+              root: randomRoot,
+              position: randomBox.name,
+              noteIds: scaleNotes.map(n => n.id) // Store IDs for scene reference
+            }
+          })
         }
       }
 

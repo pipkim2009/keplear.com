@@ -24,15 +24,19 @@ interface BassProps {
     handleClearChord: () => void;
     handleRemoveChordNotes: (noteKeys: string[]) => void;
   }) => void
+  onNoteHandlersReady?: (handlers: {
+    handleSetManualNotes: (noteIds: string[]) => void;
+  }) => void
   appliedScales?: AppliedScale[]
   appliedChords?: AppliedChord[]
   currentlyPlayingNote?: Note | null
   currentlyPlayingNoteNames?: string[]
+  currentlyPlayingNoteIds?: string[]
   currentlyPlayingChordId?: string | null
   previewPositions?: FretboardPreview | null
 }
 
-const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingChordId = null, previewPositions = null }) => {
+const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(4).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -573,6 +577,33 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     })
   }, [])
 
+  // Handle setting manual notes from external source (e.g., auto-generated simple melodies)
+  // Takes note IDs like "b-s1-f3" and converts to internal noteKey format
+  const handleSetManualNotes = useCallback((noteIds: string[]) => {
+    const noteKeys: string[] = []
+
+    noteIds.forEach(noteId => {
+      // Parse note ID format: "b-s{string}-f{fret}" e.g., "b-s1-f3"
+      const match = noteId.match(/^b-s(\d+)-f(\d+)$/)
+      if (match) {
+        const bassString = parseInt(match[1]) // 1-4
+        const fret = parseInt(match[2]) // 0-24
+
+        // Convert bass string number to visual stringIndex
+        // STRING_MAPPING = [4, 3, 2, 1], so stringIndex = 4 - bassString
+        const stringIndex = 4 - bassString
+
+        // Convert fret to visual fretIndex (open = "open", others = fret - 1)
+        const noteKey = fret === 0 ? `${stringIndex}-open` : `${stringIndex}-${fret - 1}`
+        noteKeys.push(noteKey)
+      }
+    })
+
+    // Set the manual notes
+    setManualSelectedNotes(new Set(noteKeys))
+    setSelectedNotes(new Set(noteKeys))
+  }, [])
+
   const isNoteInCurrentScale = useCallback((stringIndex: number, fretIndex: number): boolean => {
     const noteKey = `${stringIndex}-${fretIndex}`
     return scaleSelectedNotes.has(noteKey)
@@ -697,6 +728,15 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleChordSelect, handleChordShapeSelect, handleClearChord, handleRemoveChordNotes])
+
+  // Provide note handlers to parent component (for simple melodies)
+  useEffect(() => {
+    if (onNoteHandlersReady) {
+      onNoteHandlersReady({
+        handleSetManualNotes
+      })
+    }
+  }, [onNoteHandlersReady, handleSetManualNotes])
 
   useEffect(() => {
     if (clearTrigger !== undefined && clearTrigger > 0) {
@@ -826,7 +866,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               onMouseEnter={() => setHoveredString(index)}
               onMouseLeave={() => setHoveredString(null)}
             />
-            <label htmlFor={`bass-string-${index}`} className="bass-string-checkbox-label">{index + 1}</label>
+            <label htmlFor={`bass-string-${index}`} className="bass-string-checkbox-label">{4 - index}</label>
           </div>
         ))}
 
@@ -851,12 +891,16 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
           const isInChord = isOpenStringInCurrentChord(stringIndex)
           const isInManual = isOpenStringInManualLayer(stringIndex)
 
-          // For chords, match by chord ID to get specific shape; otherwise check note names
+          // For chords, match by chord ID to get specific shape; otherwise check note IDs then names
           const noteKey = `${stringIndex}-open`
+          const noteId = `b-s${stringIndex + 1}-f0` // Bass note ID format for open string
           let isCurrentlyPlaying = false
           if (showNotes) {
-            if (currentlyPlayingChordId && appliedChords && appliedChords.length > 0) {
-              // Find the specific chord being played by ID
+            // First priority: check by note ID for position-accurate matching
+            if (currentlyPlayingNoteIds.length > 0 && currentlyPlayingNoteIds.includes(noteId)) {
+              isCurrentlyPlaying = true
+            } else if (currentlyPlayingChordId && appliedChords && appliedChords.length > 0) {
+              // Second: check by chord ID to get specific shape
               const playingChord = appliedChords.find(c => c.id === currentlyPlayingChordId)
               if (playingChord && playingChord.noteKeys && playingChord.noteKeys.length > 0) {
                 isCurrentlyPlaying = playingChord.noteKeys.includes(noteKey)
@@ -865,7 +909,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                 isCurrentlyPlaying = currentlyPlayingNoteNames.includes(noteObj.name)
               }
             } else if (currentlyPlayingNoteNames.length > 0) {
-              // Not a chord - use note name matching
+              // Fallback: use note name matching (highlights all instances)
               isCurrentlyPlaying = currentlyPlayingNoteNames.includes(noteObj.name)
             }
           }
@@ -963,12 +1007,16 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             const isInChord = isNoteInCurrentChord(stringIndex, fretIndex)
             const isInManual = isNoteInManualLayer(stringIndex, fretIndex)
 
-            // For chords, match by chord ID to get specific shape; otherwise check note names
+            // For chords, match by chord ID to get specific shape; otherwise check note IDs then names
             const noteKey = `${stringIndex}-${fretIndex}`
+            const noteId = `b-s${stringIndex + 1}-f${fretIndex}` // Bass note ID format
             let isCurrentlyPlaying = false
             if (showNotes) {
-              if (currentlyPlayingChordId && appliedChords && appliedChords.length > 0) {
-                // Find the specific chord being played by ID
+              // First priority: check by note ID for position-accurate matching
+              if (currentlyPlayingNoteIds.length > 0 && currentlyPlayingNoteIds.includes(noteId)) {
+                isCurrentlyPlaying = true
+              } else if (currentlyPlayingChordId && appliedChords && appliedChords.length > 0) {
+                // Second: check by chord ID to get specific shape
                 const playingChord = appliedChords.find(c => c.id === currentlyPlayingChordId)
                 if (playingChord && playingChord.noteKeys && playingChord.noteKeys.length > 0) {
                   isCurrentlyPlaying = playingChord.noteKeys.includes(noteKey)
@@ -977,7 +1025,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                   isCurrentlyPlaying = currentlyPlayingNoteNames.includes(noteObj.name)
                 }
               } else if (currentlyPlayingNoteNames.length > 0) {
-                // Not a chord - use note name matching
+                // Fallback: use note name matching (highlights all instances)
                 isCurrentlyPlaying = currentlyPlayingNoteNames.includes(noteObj.name)
               }
             }

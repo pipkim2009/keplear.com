@@ -92,6 +92,8 @@ export const useScaleChordManagement = ({
   const [bassScaleHandlers, setBassScaleHandlers] = useState<ScaleChordHandlers['bassScaleHandlers']>(null)
   const [chordHandlers, setChordHandlers] = useState<ScaleChordHandlers['chordHandlers']>(null)
   const [bassChordHandlers, setBassChordHandlers] = useState<ScaleChordHandlers['bassChordHandlers']>(null)
+  const [noteHandlers, setNoteHandlers] = useState<{ handleSetManualNotes: (noteIds: string[]) => void } | null>(null)
+  const [bassNoteHandlers, setBassNoteHandlers] = useState<{ handleSetManualNotes: (noteIds: string[]) => void } | null>(null)
 
   // Clear all chords and scales when instrument changes
   useEffect(() => {
@@ -818,6 +820,12 @@ export const useScaleChordManagement = ({
     setBassScaleHandlers,
     setChordHandlers,
     setBassChordHandlers,
+    setNoteHandlers,
+    setBassNoteHandlers,
+
+    // Note handlers (for simple melodies)
+    noteHandlers,
+    bassNoteHandlers,
 
     // Event handlers
     handleScaleSelect,
