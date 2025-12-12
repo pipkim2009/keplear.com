@@ -127,6 +127,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   const [melodySetupMessage, setMelodySetupMessage] = useState<string>('')
   const [congratulationsMessage, setCongratulationsMessage] = useState<string>('')
   const [setupDetails, setSetupDetails] = useState<{ type: string; details: any } | null>(null)
+  const [autoPlayAudio, setAutoPlayAudio] = useState(false)
 
   const {
     handleNoteClick,
@@ -203,6 +204,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setMelodySetupMessage('')
     setCongratulationsMessage('')
     setSetupDetails(null)
+    setAutoPlayAudio(false)
     setBpm(120) // Reset BPM to default
     setNumberOfBeats(4) // Reset beats to default
     setChordMode('arpeggiator') // Reset chord mode to default
@@ -766,6 +768,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           hideSelectionMode={true}
           practiceMode={true}
           onLessonComplete={handleLessonComplete}
+          autoPlayAudio={autoPlayAudio}
         />
 
         {/* Welcome Subtitle Overlay */}
@@ -778,7 +781,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         {melodySetupMessage && (
           <WelcomeSubtitle
             message={melodySetupMessage}
-            onSpeechEnd={handlePlayMelody}
+            onSpeechEnd={() => setAutoPlayAudio(true)}
           />
         )}
 

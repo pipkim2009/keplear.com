@@ -8,6 +8,7 @@ interface CustomAudioPlayerProps {
   melodyLength?: number
   onNoteIndexChange?: (index: number | null) => void
   audioRef?: React.RefObject<HTMLAudioElement>
+  autoPlayAudio?: boolean
 }
 
 const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
@@ -16,7 +17,8 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   bpm,
   melodyLength,
   onNoteIndexChange,
-  audioRef: externalAudioRef
+  audioRef: externalAudioRef,
+  autoPlayAudio = false
 }) => {
   const internalAudioRef = useRef<HTMLAudioElement>(null)
   const audioRef = externalAudioRef || internalAudioRef
@@ -113,6 +115,31 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [showVolumeSlider])
+
+  // Auto-play effect - triggers when autoPlayAudio becomes true
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio || !autoPlayAudio) return
+
+    // Wait for audio to be ready, then play
+    const playWhenReady = () => {
+      audio.currentTime = 0
+      audio.play().catch(err => {
+        console.warn('Auto-play failed:', err)
+      })
+    }
+
+    if (audio.readyState >= 2) {
+      // Audio is ready (HAVE_CURRENT_DATA or higher)
+      playWhenReady()
+    } else {
+      // Wait for audio to load
+      audio.addEventListener('canplay', playWhenReady, { once: true })
+      return () => {
+        audio.removeEventListener('canplay', playWhenReady)
+      }
+    }
+  }, [autoPlayAudio])
 
   const togglePlay = () => {
     const audio = audioRef.current

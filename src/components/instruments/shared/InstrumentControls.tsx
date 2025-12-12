@@ -77,6 +77,7 @@ interface InstrumentControlsProps {
   disableBpmInput?: boolean
   disableBeatsInput?: boolean
   disableChordMode?: boolean
+  autoPlayAudio?: boolean
 }
 
 const InstrumentControls = memo(function InstrumentControls({
@@ -136,7 +137,8 @@ const InstrumentControls = memo(function InstrumentControls({
   hideChordMode = false,
   disableBpmInput = false,
   disableBeatsInput = false,
-  disableChordMode = false
+  disableChordMode = false,
+  autoPlayAudio = false
 }: InstrumentControlsProps) {
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
@@ -982,6 +984,7 @@ Progression - Use entire chords"
                     melodyLength={generatedMelody?.length || 0}
                     onNoteIndexChange={onCurrentlyPlayingNoteChange}
                     audioRef={audioPlayerRef}
+                    autoPlayAudio={autoPlayAudio}
                   />
                 )
               )}
