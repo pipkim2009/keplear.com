@@ -585,14 +585,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
     const { type, details } = setupDetails
 
-    console.log('[Practice Visual Display]', {
-      type,
-      instrument,
-      hasScaleHandlers: !!scaleChordManagement.scaleHandlers,
-      hasChordHandlers: !!scaleChordManagement.chordHandlers,
-      hasAppliedVisualDisplay: hasAppliedVisualDisplay.current
-    })
-
     // Simple melodies - use manual note handlers
     if (type === 'simple-melodies' && details.noteIds) {
       if (instrument === 'guitar' && scaleChordManagement.noteHandlers) {
@@ -605,50 +597,43 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       }
     }
 
-    // Scales - use scale box handlers
-    if (type === 'scales' && details.scaleBox) {
-      if (instrument === 'guitar' && scaleChordManagement.scaleHandlers) {
-        scaleChordManagement.scaleHandlers.handleScaleBoxSelect(details.scaleBox)
-        hasAppliedVisualDisplay.current = true
+    // Delay handler calls to let React Strict Mode stabilize
+    // This ensures the Guitar/Bass component state is ready to receive updates
+    const timeoutId = setTimeout(() => {
+      // Scales - use wrapper functions that add to appliedScales AND update visual display
+      if (type === 'scales' && details.scaleBox) {
+        if ((instrument === 'guitar' && scaleChordManagement.scaleHandlers) ||
+            (instrument === 'bass' && scaleChordManagement.bassScaleHandlers)) {
+          scaleChordManagement.handleScaleBoxSelect(details.scaleBox)
+          hasAppliedVisualDisplay.current = true
+        }
       }
-      if (instrument === 'bass' && scaleChordManagement.bassScaleHandlers) {
-        scaleChordManagement.bassScaleHandlers.handleScaleBoxSelect(details.scaleBox)
-        hasAppliedVisualDisplay.current = true
-      }
-    }
 
-    // Chord progressions - apply each chord
-    if (type === 'chord-progressions' && details.chords) {
-      if (instrument === 'guitar' && scaleChordManagement.chordHandlers) {
-        details.chords.forEach((c: any) => {
-          if (c.chordObj) {
-            scaleChordManagement.chordHandlers!.handleChordSelect(c.root, c.chordObj)
-          }
-        })
-        hasAppliedVisualDisplay.current = true
+      // Chord progressions - use wrapper functions that add to appliedChords AND update visual display
+      if (type === 'chord-progressions' && details.chords) {
+        if ((instrument === 'guitar' && scaleChordManagement.chordHandlers) ||
+            (instrument === 'bass' && scaleChordManagement.bassChordHandlers)) {
+          details.chords.forEach((c: any) => {
+            if (c.chordObj) {
+              scaleChordManagement.handleChordSelect(c.root, c.chordObj)
+            }
+          })
+          hasAppliedVisualDisplay.current = true
+        }
       }
-      if (instrument === 'bass' && scaleChordManagement.bassChordHandlers) {
-        details.chords.forEach((c: any) => {
-          if (c.chordObj) {
-            scaleChordManagement.bassChordHandlers!.handleChordSelect(c.root, c.chordObj)
-          }
-        })
-        hasAppliedVisualDisplay.current = true
-      }
-    }
 
-    // Chord arpeggios - apply single chord
-    if (type === 'chord-arpeggios' && details.chordObj) {
-      if (instrument === 'guitar' && scaleChordManagement.chordHandlers) {
-        scaleChordManagement.chordHandlers.handleChordSelect(details.root, details.chordObj)
-        hasAppliedVisualDisplay.current = true
+      // Chord arpeggios - use wrapper functions that add to appliedChords AND update visual display
+      if (type === 'chord-arpeggios' && details.chordObj) {
+        if ((instrument === 'guitar' && scaleChordManagement.chordHandlers) ||
+            (instrument === 'bass' && scaleChordManagement.bassChordHandlers)) {
+          scaleChordManagement.handleChordSelect(details.root, details.chordObj)
+          hasAppliedVisualDisplay.current = true
+        }
       }
-      if (instrument === 'bass' && scaleChordManagement.bassChordHandlers) {
-        scaleChordManagement.bassChordHandlers.handleChordSelect(details.root, details.chordObj)
-        hasAppliedVisualDisplay.current = true
-      }
-    }
-  }, [setupDetails, instrument, scaleChordManagement.noteHandlers, scaleChordManagement.bassNoteHandlers, scaleChordManagement.scaleHandlers, scaleChordManagement.bassScaleHandlers, scaleChordManagement.chordHandlers, scaleChordManagement.bassChordHandlers])
+    }, 100)
+
+    return () => clearTimeout(timeoutId)
+  }, [setupDetails, instrument, scaleChordManagement.noteHandlers, scaleChordManagement.bassNoteHandlers, scaleChordManagement.scaleHandlers, scaleChordManagement.bassScaleHandlers, scaleChordManagement.chordHandlers, scaleChordManagement.bassChordHandlers, scaleChordManagement.handleScaleBoxSelect, scaleChordManagement.handleChordSelect])
 
   // Trigger melody generation once notes/scales/chords are selected (for all lesson types)
   useEffect(() => {

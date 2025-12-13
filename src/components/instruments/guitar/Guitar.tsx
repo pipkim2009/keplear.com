@@ -41,11 +41,14 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
+  const selectedNotesRef = useRef<Set<string>>(new Set())
   const [manualSelectedNotes, setManualSelectedNotes] = useState<Set<string>>(() => new Set()) // Track manual selections separately
   const [currentScale, setCurrentScale] = useState<{ root: string; scale: GuitarScale } | null>(null)
   const [scaleSelectedNotes, setScaleSelectedNotes] = useState<Set<string>>(() => new Set())
+  const scaleSelectedNotesRef = useRef<Set<string>>(new Set())
   const [currentChord, setCurrentChord] = useState<{ root: string; chord: GuitarChord } | null>(null)
   const [chordSelectedNotes, setChordSelectedNotes] = useState<Set<string>>(() => new Set())
+  const chordSelectedNotesRef = useRef<Set<string>>(new Set())
   const [hoveredString, setHoveredString] = useState<number | null>(null)
   const [hoveredFret, setHoveredFret] = useState<number | null>(null)
   const [hoveredNote, setHoveredNote] = useState<{ string: number; fret: number } | null>(null)
@@ -283,7 +286,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     const noteKey = `${stringIndex}-${fretIndex}`
 
     // A note is selected if it's in any layer: scale/chord layer OR manual layer
-    const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
+    // Also check refs as fallback for practice mode state sync issues
+    const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey) ||
+                                 scaleSelectedNotesRef.current.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)
     const isInManualLayer = manualSelectedNotes.has(noteKey) || stringCheckboxes[stringIndex] || fretCheckboxes[fretIndex + 1]
 
     return isInScaleChordLayer || isInManualLayer
@@ -294,7 +299,9 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     const openKey = `${stringIndex}-open`
 
     // A note is selected if it's in any layer: scale/chord layer OR manual layer
-    const isInScaleChordLayer = scaleSelectedNotes.has(openKey) || chordSelectedNotes.has(openKey)
+    // Also check refs as fallback for practice mode state sync issues
+    const isInScaleChordLayer = scaleSelectedNotes.has(openKey) || chordSelectedNotes.has(openKey) ||
+                                 scaleSelectedNotesRef.current.has(openKey) || chordSelectedNotesRef.current.has(openKey)
     const isInManualLayer = manualSelectedNotes.has(openKey) || stringCheckboxes[stringIndex] || fretCheckboxes[0]
 
     return isInScaleChordLayer || isInManualLayer
@@ -409,6 +416,13 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   const handleScaleSelect = useCallback((rootNote: string, scale: GuitarScale) => {
     // Apply scale to guitar
     const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes)
+
+    // Update refs for practice mode (state updates don't work reliably)
+    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      scaleSelectedNotesRef.current.add(noteKey)
+      selectedNotesRef.current.add(noteKey)
+    })
 
     // Use functional updates to avoid dependencies on current state (SAME AS CHORDS)
     setSelectedNotes(prev => {
@@ -531,6 +545,13 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       return newSelectedNotes
     })
 
+    // Also update refs for practice mode (state updates don't work reliably)
+    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      scaleSelectedNotesRef.current.add(noteKey)
+      selectedNotesRef.current.add(noteKey)
+    })
+
     setScaleSelectedNotes(prev => {
       const newScaleSelectedNotes = new Set(prev)
       scaleSelections.forEach(({ stringIndex, fretIndex }) => {
@@ -598,6 +619,12 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     // Apply chord to guitar
     const chordSelections = applyChordToGuitar(rootNote, chord, guitarNotes)
 
+    // Update refs for practice mode (state updates don't work reliably)
+    chordSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      chordSelectedNotesRef.current.add(noteKey)
+    })
+
     // Only add to chordSelectedNotes, NOT to selectedNotes
     // This way selectedNotes only contains manually selected notes/scales
     // and can be used for mixing with chords in progression mode
@@ -619,6 +646,12 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   const handleChordShapeSelect = useCallback((chordShape: ChordShape & { root?: string }) => {
     // Apply chord shape to guitar
     const chordSelections = applyChordShapeToGuitar(chordShape)
+
+    // Update refs for practice mode (state updates don't work reliably)
+    chordSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      chordSelectedNotesRef.current.add(noteKey)
+    })
 
     // Only add to chordSelectedNotes, NOT to selectedNotes
     // This way selectedNotes only contains manually selected notes/scales
@@ -716,13 +749,13 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   // Check if a note was selected as part of the current scale application
   const isNoteInCurrentScale = useCallback((stringIndex: number, fretIndex: number): boolean => {
     const noteKey = `${stringIndex}-${fretIndex}`
-    return scaleSelectedNotes.has(noteKey)
+    return scaleSelectedNotes.has(noteKey) || scaleSelectedNotesRef.current.has(noteKey)
   }, [scaleSelectedNotes])
 
   // Check if an open string was selected as part of the current scale application
   const isOpenStringInCurrentScale = useCallback((stringIndex: number): boolean => {
     const noteKey = `${stringIndex}-open`
-    return scaleSelectedNotes.has(noteKey)
+    return scaleSelectedNotes.has(noteKey) || scaleSelectedNotesRef.current.has(noteKey)
   }, [scaleSelectedNotes])
 
   // Check if a note is the root note of its applied scale (only if it's actually part of that scale)
@@ -734,7 +767,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       const noteKey = fretIndex === -1 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex}`
 
       // Only return true if this note is part of a scale AND this note's name matches that scale's root
-      if (scaleSelectedNotes.has(noteKey)) {
+      if (scaleSelectedNotes.has(noteKey) || scaleSelectedNotesRef.current.has(noteKey)) {
         // Check against all applied scales to see if any contains this note and has this note as root
         if (appliedScales && appliedScales.length > 0) {
           return appliedScales.some(appliedScale => {
@@ -811,13 +844,13 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   // Check if a note was selected as part of the current chord application
   const isNoteInCurrentChord = useCallback((stringIndex: number, fretIndex: number): boolean => {
     const noteKey = `${stringIndex}-${fretIndex}`
-    return chordSelectedNotes.has(noteKey)
+    return chordSelectedNotes.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)
   }, [chordSelectedNotes])
 
   // Check if an open string was selected as part of the current chord application
   const isOpenStringInCurrentChord = useCallback((stringIndex: number): boolean => {
     const noteKey = `${stringIndex}-open`
-    return chordSelectedNotes.has(noteKey)
+    return chordSelectedNotes.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)
   }, [chordSelectedNotes])
 
   // Check if a note should show preview on string hover
@@ -869,18 +902,24 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     }
   }, [onNoteHandlersReady, handleSetManualNotes])
 
-  // Clear all selections when clearTrigger changes
+  // Track previous clearTrigger to only clear on actual changes
+  const prevClearTrigger = useRef(clearTrigger)
+
+  // Clear all selections when clearTrigger changes (not on initial mount)
   useEffect(() => {
-    if (clearTrigger !== undefined && clearTrigger > 0) {
+    if (clearTrigger !== undefined && clearTrigger > 0 && clearTrigger !== prevClearTrigger.current) {
       setStringCheckboxes(new Array(6).fill(false))
       setFretCheckboxes(new Array(25).fill(false))
       setSelectedNotes(new Set())
       setManualSelectedNotes(new Set()) // Clear manual blue notes
       setScaleSelectedNotes(new Set())
+      scaleSelectedNotesRef.current = new Set()
       setCurrentScale(null)
       setChordSelectedNotes(new Set())
+      chordSelectedNotesRef.current = new Set()
       setCurrentChord(null)
     }
+    prevClearTrigger.current = clearTrigger
   }, [clearTrigger])
 
   return (

@@ -44,8 +44,10 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const [manualSelectedNotes, setManualSelectedNotes] = useState<Set<string>>(() => new Set())
   const [currentScale, setCurrentScale] = useState<{ root: string; scale: BassScale } | null>(null)
   const [scaleSelectedNotes, setScaleSelectedNotes] = useState<Set<string>>(() => new Set())
+  const scaleSelectedNotesRef = useRef<Set<string>>(new Set())
   const [currentChord, setCurrentChord] = useState<{ root: string; chord: BassChord } | null>(null)
   const [chordSelectedNotes, setChordSelectedNotes] = useState<Set<string>>(() => new Set())
+  const chordSelectedNotesRef = useRef<Set<string>>(new Set())
   const [hoveredString, setHoveredString] = useState<number | null>(null)
   const [hoveredFret, setHoveredFret] = useState<number | null>(null)
   const [hoveredNote, setHoveredNote] = useState<{ string: number; fret: number } | null>(null)
@@ -264,14 +266,18 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
   const isNoteSelected = useCallback((stringIndex: number, fretIndex: number): boolean => {
     const noteKey = `${stringIndex}-${fretIndex}`
-    const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
+    // Also check refs as fallback for practice mode state sync issues
+    const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey) ||
+                                 scaleSelectedNotesRef.current.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)
     const isInManualLayer = manualSelectedNotes.has(noteKey) || stringCheckboxes[stringIndex] || fretCheckboxes[fretIndex + 1]
     return isInScaleChordLayer || isInManualLayer
   }, [scaleSelectedNotes, chordSelectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes])
 
   const isOpenStringSelected = useCallback((stringIndex: number): boolean => {
     const openKey = `${stringIndex}-open`
-    const isInScaleChordLayer = scaleSelectedNotes.has(openKey) || chordSelectedNotes.has(openKey)
+    // Also check refs as fallback for practice mode state sync issues
+    const isInScaleChordLayer = scaleSelectedNotes.has(openKey) || chordSelectedNotes.has(openKey) ||
+                                 scaleSelectedNotesRef.current.has(openKey) || chordSelectedNotesRef.current.has(openKey)
     const isInManualLayer = manualSelectedNotes.has(openKey) || stringCheckboxes[stringIndex] || fretCheckboxes[0]
     return isInScaleChordLayer || isInManualLayer
   }, [scaleSelectedNotes, chordSelectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes])
@@ -370,6 +376,12 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const handleScaleSelect = useCallback((rootNote: string, scale: BassScale) => {
     const scaleSelections = applyScaleToBass(rootNote, scale, bassNotes)
 
+    // Update refs for practice mode (state updates don't work reliably)
+    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      scaleSelectedNotesRef.current.add(noteKey)
+    })
+
     setSelectedNotes(prev => {
       const newSelectedNotes = new Set(prev)
       scaleSelections.forEach(({ stringIndex, fretIndex }) => {
@@ -446,6 +458,12 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const handleScaleBoxSelect = useCallback((scaleBox: BassScaleBox) => {
     const scaleSelections = applyScaleBoxToBass(scaleBox)
 
+    // Update refs for practice mode (state updates don't work reliably)
+    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      scaleSelectedNotesRef.current.add(noteKey)
+    })
+
     setSelectedNotes(prev => {
       const newSelectedNotes = new Set(prev)
       scaleSelections.forEach(({ stringIndex, fretIndex }) => {
@@ -509,6 +527,12 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const handleChordSelect = useCallback((rootNote: string, chord: BassChord) => {
     const chordSelections = applyChordToBass(rootNote, chord, bassNotes)
 
+    // Update refs for practice mode (state updates don't work reliably)
+    chordSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      chordSelectedNotesRef.current.add(noteKey)
+    })
+
     // Only add to chordSelectedNotes, NOT to selectedNotes
     // This way selectedNotes only contains manually selected notes/scales
     // and can be used for mixing with chords in progression mode
@@ -526,6 +550,12 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
   const handleChordShapeSelect = useCallback((chordShape: BassChordShape & { root?: string }) => {
     const chordSelections = applyBassChordShapeToBass(chordShape)
+
+    // Update refs for practice mode (state updates don't work reliably)
+    chordSelections.forEach(({ stringIndex, fretIndex }) => {
+      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      chordSelectedNotesRef.current.add(noteKey)
+    })
 
     // Only add to chordSelectedNotes, NOT to selectedNotes
     // This way selectedNotes only contains manually selected notes/scales
@@ -613,12 +643,12 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
   const isNoteInCurrentScale = useCallback((stringIndex: number, fretIndex: number): boolean => {
     const noteKey = `${stringIndex}-${fretIndex}`
-    return scaleSelectedNotes.has(noteKey)
+    return scaleSelectedNotes.has(noteKey) || scaleSelectedNotesRef.current.has(noteKey)
   }, [scaleSelectedNotes])
 
   const isOpenStringInCurrentScale = useCallback((stringIndex: number): boolean => {
     const noteKey = `${stringIndex}-open`
-    return scaleSelectedNotes.has(noteKey)
+    return scaleSelectedNotes.has(noteKey) || scaleSelectedNotesRef.current.has(noteKey)
   }, [scaleSelectedNotes])
 
   const isScaleRootNote = (noteName: string, stringIndex?: number, fretIndex?: number): boolean => {
@@ -627,7 +657,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     if (stringIndex !== undefined && fretIndex !== undefined) {
       const noteKey = fretIndex === -1 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex}`
 
-      if (scaleSelectedNotes.has(noteKey)) {
+      if (scaleSelectedNotes.has(noteKey) || scaleSelectedNotesRef.current.has(noteKey)) {
         if (appliedScales && appliedScales.length > 0) {
           return appliedScales.some(appliedScale => {
             return noteNameWithoutOctave === appliedScale.root &&
@@ -661,7 +691,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     if (stringIndex !== undefined && fretIndex !== undefined) {
       const noteKey = fretIndex === -1 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex}`
 
-      if (chordSelectedNotes.has(noteKey)) {
+      if (chordSelectedNotes.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)) {
         if (appliedChords && appliedChords.length > 0) {
           return appliedChords.some(appliedChord => {
             return noteNameWithoutOctave === appliedChord.root &&
@@ -691,12 +721,12 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
   const isNoteInCurrentChord = useCallback((stringIndex: number, fretIndex: number): boolean => {
     const noteKey = `${stringIndex}-${fretIndex}`
-    return chordSelectedNotes.has(noteKey)
+    return chordSelectedNotes.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)
   }, [chordSelectedNotes])
 
   const isOpenStringInCurrentChord = useCallback((stringIndex: number): boolean => {
     const noteKey = `${stringIndex}-open`
-    return chordSelectedNotes.has(noteKey)
+    return chordSelectedNotes.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)
   }, [chordSelectedNotes])
 
   const shouldShowStringPreview = useCallback((stringIndex: number): boolean => {
@@ -743,17 +773,23 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     }
   }, [onNoteHandlersReady, handleSetManualNotes])
 
+  // Track previous clearTrigger to only clear on actual changes
+  const prevClearTrigger = useRef(clearTrigger)
+
   useEffect(() => {
-    if (clearTrigger !== undefined && clearTrigger > 0) {
+    if (clearTrigger !== undefined && clearTrigger > 0 && clearTrigger !== prevClearTrigger.current) {
       setStringCheckboxes(new Array(4).fill(false))
       setFretCheckboxes(new Array(25).fill(false))
       setSelectedNotes(new Set())
       setManualSelectedNotes(new Set())
       setScaleSelectedNotes(new Set())
+      scaleSelectedNotesRef.current = new Set()
       setCurrentScale(null)
       setChordSelectedNotes(new Set())
+      chordSelectedNotesRef.current = new Set()
       setCurrentChord(null)
     }
+    prevClearTrigger.current = clearTrigger
   }, [clearTrigger])
 
   return (
