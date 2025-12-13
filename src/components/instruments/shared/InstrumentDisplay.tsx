@@ -434,6 +434,7 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           higherOctaves={higherOctaves}
           hideDeselectAll={hideDeselectAll}
           showOnlyAppliedList={showOnlyAppliedList}
+          disableDelete={practiceMode}
           disableSelectionMode={disableSelectionMode}
           hideSelectionMode={hideSelectionMode}
           onFretboardPreviewChange={setFretboardPreview}

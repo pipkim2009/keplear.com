@@ -125,28 +125,14 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
 
     const prev = prevSelectionRef.current
 
-    console.log('Selection change effect:', {
-      currentNoteCount,
-      currentChordCount,
-      currentScaleCount,
-      prevNoteCount: prev.noteCount,
-      prevChordCount: prev.chordCount,
-      prevScaleCount: prev.scaleCount,
-      showNotes: melodyPlayer.showNotes,
-      hasMelody: melodyGen.generatedMelody.length > 0
-    })
-
     // Check if selection has changed
     const selectionChanged =
       currentNoteCount !== prev.noteCount ||
       currentChordCount !== prev.chordCount ||
       currentScaleCount !== prev.scaleCount
 
-    console.log('Selection changed:', selectionChanged)
-
     // Hide melody if it's visible and selection changed
     if (melodyPlayer.showNotes && selectionChanged && melodyGen.generatedMelody.length > 0) {
-      console.log('HIDING MELODY NOW!')
       melodyPlayer.setShowNotes(false)
     }
 

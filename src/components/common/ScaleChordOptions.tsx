@@ -69,6 +69,7 @@ interface ScaleChordOptionsProps {
   lowerOctaves?: number
   higherOctaves?: number
   showOnlyAppliedList?: boolean
+  disableDelete?: boolean
   // Preview callbacks
   onFretboardPreviewChange?: (preview: FretboardPreview | null) => void
   onKeyboardPreviewChange?: (preview: KeyboardPreview | null) => void
@@ -99,6 +100,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   lowerOctaves = 0,
   higherOctaves = 0,
   showOnlyAppliedList = false,
+  disableDelete = false,
   onFretboardPreviewChange,
   onKeyboardPreviewChange,
   availableKeyboardNotes = []
@@ -176,6 +178,13 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   useEffect(() => {
     // Clear preview when popup closes
     if (!isExpanded) {
+      onFretboardPreviewChange?.(null)
+      onKeyboardPreviewChange?.(null)
+      return
+    }
+
+    // Skip previews in showOnlyAppliedList mode (practice mode)
+    if (showOnlyAppliedList) {
       onFretboardPreviewChange?.(null)
       onKeyboardPreviewChange?.(null)
       return
@@ -330,7 +339,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
     selectedScaleOctave,
     selectedChordOctave,
     onFretboardPreviewChange,
-    onKeyboardPreviewChange
+    onKeyboardPreviewChange,
+    showOnlyAppliedList
   ])
 
   // Update available boxes when root or scale changes (Scale mode)
@@ -469,37 +479,20 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
       {isExpanded && (
         <div
-          className={`scale-options-popup ${!isScaleMode ? 'chord-mode' : ''} instrument-${instrument}`}
+          className={`scale-options-popup ${showOnlyAppliedList ? (appliedChords.length > 0 && appliedScales.length === 0 ? 'chord-mode' : '') : (!isScaleMode ? 'chord-mode' : '')} instrument-${instrument}`}
         >
-          <div className={`scale-options-content ${!isScaleMode ? 'chord-mode' : ''}`}>
+          <div className={`scale-options-content ${showOnlyAppliedList ? (appliedChords.length > 0 && appliedScales.length === 0 ? 'chord-mode' : '') : (!isScaleMode ? 'chord-mode' : '')}`}>
             {showOnlyAppliedList ? (
               <>
-                {/* Mode Toggle Slider */}
-                <div className="control-section">
-                  <div className="mode-toggle">
-                    <label className="toggle-switch">
-                      <input
-                        type="checkbox"
-                        checked={!isScaleMode}
-                        onChange={(e) => setIsScaleMode(!e.target.checked)}
-                      />
-                      <span className="toggle-slider">
-                        <span className="toggle-text left">Scales</span>
-                        <span className="toggle-text right">Chords</span>
-                      </span>
-                    </label>
-                  </div>
-                </div>
-
-                {isScaleMode ? (
-                  /* Applied Scales List */
-                  <div className="control-section">
-                    <label className="control-label">Applied Scales</label>
+                {/* Applied Scales List */}
+                {appliedScales.length > 0 && (
+                  <div className="control-section scale-theme">
+                    <label className="control-label scale-label">Applied Scales</label>
                     <div className="applied-scales-list">
-                      {appliedScales.length > 0 ? (
-                        appliedScales.map((appliedScale) => (
-                          <div key={appliedScale.id} className="applied-scale-item">
-                            <span className="scale-name">{appliedScale.displayName}</span>
+                      {appliedScales.map((appliedScale) => (
+                        <div key={appliedScale.id} className="applied-scale-item">
+                          <span className="scale-name">{appliedScale.displayName}</span>
+                          {!disableDelete && (
                             <button
                               onClick={() => onScaleDelete?.(appliedScale.id)}
                               className="delete-scale-button"
@@ -507,22 +500,22 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                             >
                               ×
                             </button>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="empty-list-message">Empty</div>
-                      )}
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ) : (
-                  /* Applied Chords List */
-                  <div className="control-section">
-                    <label className="control-label">Applied Chords</label>
+                )}
+
+                {/* Applied Chords List */}
+                {appliedChords.length > 0 && (
+                  <div className="control-section chord-theme">
+                    <label className="control-label chord-label">Applied Chords</label>
                     <div className="applied-chords-list">
-                      {appliedChords.length > 0 ? (
-                        appliedChords.map((appliedChord) => (
-                          <div key={appliedChord.id} className="applied-chord-item">
-                            <span className="chord-name">{appliedChord.displayName}</span>
+                      {appliedChords.map((appliedChord) => (
+                        <div key={appliedChord.id} className="applied-chord-item">
+                          <span className="chord-name">{appliedChord.displayName}</span>
+                          {!disableDelete && (
                             <button
                               onClick={() => onChordDelete?.(appliedChord.id)}
                               className="delete-chord-button"
@@ -530,12 +523,17 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                             >
                               ×
                             </button>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="empty-list-message">Empty</div>
-                      )}
+                          )}
+                        </div>
+                      ))}
                     </div>
+                  </div>
+                )}
+
+                {/* Show message if nothing applied */}
+                {appliedScales.length === 0 && appliedChords.length === 0 && (
+                  <div className="control-section">
+                    <div className="empty-list-message">No scales or chords applied</div>
                   </div>
                 )}
               </>

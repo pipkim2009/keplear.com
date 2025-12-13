@@ -394,7 +394,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
             details: {
               scaleName: randomScale.name,
               root: randomRoot,
-              position: randomBox.name,
+              position: `frets ${randomBox.minFret} to ${randomBox.maxFret}`,
               noteIds: scaleNotes.map(n => n.id),
               scaleBox: randomBox // Store for visual display when handlers ready
             }
@@ -519,7 +519,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
             details: {
               scaleName: randomScale.name,
               root: randomRoot,
-              position: randomBox.name,
+              position: `frets ${randomBox.minFret} to ${randomBox.maxFret}`,
               noteIds: scaleNotes.map(n => n.id),
               scaleBox: randomBox // Store for visual display when handlers ready
             }
@@ -642,8 +642,12 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
                        scaleChordManagement.appliedChords.length > 0
 
     if (sessionStarted && hasContent && !hasGeneratedMelody) {
-      handleGenerateMelody()
-      setHasGeneratedMelody(true)
+      // Delay to let React update handleGenerateMelody callback with new appliedScales/appliedChords
+      const timeoutId = setTimeout(() => {
+        handleGenerateMelody()
+        setHasGeneratedMelody(true)
+      }, 150)
+      return () => clearTimeout(timeoutId)
     }
   }, [sessionStarted, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, hasGeneratedMelody, handleGenerateMelody])
 
@@ -683,7 +687,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
           announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale on the ${octaveOrdinal} octave at ${bpm} BPM`
         } else if (setupDetails.details.position) {
-          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale in ${setupDetails.details.position} at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale on ${setupDetails.details.position} at ${bpm} BPM`
         } else {
           announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale at ${bpm} BPM`
         }
@@ -812,7 +816,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           hideBeatsButtons={true}
           hideGenerateButton={true}
           hideDeselectAll={true}
-          showOnlyAppliedList={false}
+          showOnlyAppliedList={true}
           hideChordMode={true}
           disableBpmInput={true}
           disableBeatsInput={true}

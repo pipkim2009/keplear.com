@@ -39,6 +39,7 @@ interface InstrumentHeaderProps {
   higherOctaves?: number
   hideDeselectAll?: boolean
   showOnlyAppliedList?: boolean
+  disableDelete?: boolean
   disableSelectionMode?: boolean
   hideSelectionMode?: boolean
   // Preview callbacks
@@ -76,6 +77,7 @@ const InstrumentHeader = memo(function InstrumentHeader({
   higherOctaves = 0,
   hideDeselectAll = false,
   showOnlyAppliedList = false,
+  disableDelete = false,
   disableSelectionMode = false,
   hideSelectionMode = false,
   onFretboardPreviewChange,
@@ -166,6 +168,7 @@ Multi Select - Select the specific notes to use"
             lowerOctaves={lowerOctaves}
             higherOctaves={higherOctaves}
             showOnlyAppliedList={showOnlyAppliedList}
+            disableDelete={disableDelete}
             onFretboardPreviewChange={onFretboardPreviewChange}
             onKeyboardPreviewChange={onKeyboardPreviewChange}
             availableKeyboardNotes={availableKeyboardNotes}

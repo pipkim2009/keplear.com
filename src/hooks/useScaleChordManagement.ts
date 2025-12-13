@@ -364,29 +364,18 @@ export const useScaleChordManagement = ({
   }, [instrument, scaleHandlers, bassScaleHandlers, appliedScales, convertSelectionsToNotes])
 
   const handleScaleBoxSelect = useCallback((scaleBox: ScaleBox) => {
-    console.log('[handleScaleBoxSelect] Called with:', {
-      instrument,
-      hasScaleHandlers: !!scaleHandlers,
-      hasBassScaleHandlers: !!bassScaleHandlers,
-      scaleBox: scaleBox?.name
-    })
     if (instrument === 'guitar' && scaleHandlers) {
-      console.log('[handleScaleBoxSelect] Inside guitar block')
       // Get the scale box selections first to store as notes
       const scaleSelections = applyScaleBoxToGuitar(scaleBox)
-      console.log('[handleScaleBoxSelect] Scale selections:', scaleSelections?.length)
 
       // Apply to guitar component
       scaleHandlers.handleScaleBoxSelect(scaleBox)
-      console.log('[handleScaleBoxSelect] Called component handler')
 
       // Convert selections to Note objects for storage
       const scaleNotes = convertSelectionsToNotes(scaleSelections, 'guitar')
-      console.log('[handleScaleBoxSelect] Converted notes:', scaleNotes?.length)
 
       // Also add to applied scales list like handleScaleSelect does
       const rootPosition = scaleBox.positions.find(pos => pos.isRoot)
-      console.log('[handleScaleBoxSelect] Root position:', rootPosition)
       if (rootPosition) {
         const rootNote = rootPosition.note.replace(/\d+$/, '') // Remove octave
         // Create a scale object from the box info
@@ -411,10 +400,7 @@ export const useScaleChordManagement = ({
         )
 
         if (!isDuplicate) {
-          console.log('[handleScaleBoxSelect] Adding to appliedScales:', newAppliedScale.displayName)
           setAppliedScales(prev => [...prev, newAppliedScale])
-        } else {
-          console.log('[handleScaleBoxSelect] Duplicate scale, not adding')
         }
       }
     } else if (instrument === 'bass' && bassScaleHandlers) {
@@ -471,16 +457,8 @@ export const useScaleChordManagement = ({
 
   // Chord selection handlers
   const handleChordSelect = useCallback((rootNote: string, chord: GuitarChord) => {
-    console.log('[handleChordSelect] Called with:', {
-      instrument,
-      hasChordHandlers: !!chordHandlers,
-      hasBassChordHandlers: !!bassChordHandlers,
-      rootNote,
-      chordName: chord?.name
-    })
     // Check if this chord is already applied
     if (isChordAlreadyApplied(rootNote, chord.name)) {
-      console.log('[handleChordSelect] Chord already applied, skipping')
       return
     }
 

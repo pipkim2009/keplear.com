@@ -197,6 +197,15 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
   color: var(--purple-600) !important;
 }
 
+/* Explicit theme labels for mixed lists (showOnlyAppliedList mode) */
+.scale-label {
+  color: var(--orange-500) !important;
+}
+
+.chord-label {
+  color: var(--purple-600) !important;
+}
+
 .control-select {
   width: 100%;
   padding: 5px 8px;
