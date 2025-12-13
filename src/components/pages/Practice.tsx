@@ -193,6 +193,11 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   }
 
   const handleBackToSelection = () => {
+    // Stop any ongoing text-to-speech
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel()
+    }
+
     setSelectedInstrument(null)
     setShowOptionsModal(false)
     setPracticeOptions([])
