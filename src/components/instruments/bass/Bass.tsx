@@ -720,8 +720,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         handleScaleDelete
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleScaleSelect, handleScaleBoxSelect, handleClearScale, handleScaleDelete])
+  }, [onScaleHandlersReady, handleScaleSelect, handleScaleBoxSelect, handleClearScale, handleScaleDelete])
 
   useEffect(() => {
     if (onChordHandlersReady) {
@@ -733,8 +732,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         handleRemoveChordNotesOnly
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleChordSelect, handleChordShapeSelect, handleClearChord, handleRemoveChordNotes])
+  }, [onChordHandlersReady, handleChordSelect, handleChordShapeSelect, handleClearChord, handleRemoveChordNotes, handleRemoveChordNotesOnly])
 
   // Provide note handlers to parent component (for simple melodies)
   useEffect(() => {

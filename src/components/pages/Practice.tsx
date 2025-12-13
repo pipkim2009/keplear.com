@@ -124,6 +124,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   const [welcomeSpeechDone, setWelcomeSpeechDone] = useState(false)
   const [hasGeneratedMelody, setHasGeneratedMelody] = useState(false)
   const hasAnnouncedMelody = useRef(false)
+  const hasInitializedNotes = useRef(false)
+  const hasAppliedVisualDisplay = useRef(false)
   const [melodySetupMessage, setMelodySetupMessage] = useState<string>('')
   const [congratulationsMessage, setCongratulationsMessage] = useState<string>('')
   const [setupDetails, setSetupDetails] = useState<{ type: string; details: any } | null>(null)
@@ -206,6 +208,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setWelcomeSpeechDone(false)
     setHasGeneratedMelody(false)
     hasAnnouncedMelody.current = false
+    hasInitializedNotes.current = false
+    hasAppliedVisualDisplay.current = false
     setMelodySetupMessage('')
     setCongratulationsMessage('')
     setSetupDetails(null)
@@ -223,11 +227,17 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
   // Auto-select notes/scales/chords and BPM when session starts
   useEffect(() => {
+    // Use ref to prevent double initialization (React Strict Mode or async timing)
+    if (!sessionStarted || hasInitializedNotes.current) {
+      return
+    }
+
     const hasNoContent = selectedNotes.length === 0 &&
                          scaleChordManagement.appliedScales.length === 0 &&
                          scaleChordManagement.appliedChords.length === 0
 
-    if (sessionStarted && hasNoContent && instrument === 'keyboard') {
+    if (hasNoContent && instrument === 'keyboard') {
+      hasInitializedNotes.current = true
       // Randomly select BPM (30 to 240 in 30 BPM increments)
       const bpmOptions = Array.from({ length: 8 }, (_, i) => (i + 1) * 30)
       const randomBPM = bpmOptions[Math.floor(Math.random() * bpmOptions.length)]
@@ -317,7 +327,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     }
 
     // GUITAR LESSONS
-    if (sessionStarted && hasNoContent && instrument === 'guitar') {
+    if (hasNoContent && instrument === 'guitar') {
+      hasInitializedNotes.current = true
       // Randomly select BPM (30 to 240 in 30 BPM increments)
       const bpmOptions = Array.from({ length: 8 }, (_, i) => (i + 1) * 30)
       const randomBPM = bpmOptions[Math.floor(Math.random() * bpmOptions.length)]
@@ -345,12 +356,9 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           details: {
             noteCount: selectedGuitarNotes.length,
             string: randomString,
-            noteIds: selectedGuitarNotes.map(n => n.id) // Store IDs for scene reference
+            noteIds: selectedGuitarNotes.map(n => n.id) // Store IDs for visual display
           }
         })
-
-        // Set visual display on fretboard
-        scaleChordManagement.noteHandlers?.handleSetManualNotes(selectedGuitarNotes.map(n => n.id))
       }
 
       // SCALES: Single random scale in a specific position
@@ -365,9 +373,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         if (scaleBoxes.length > 0) {
           const randomBox = scaleBoxes[Math.floor(Math.random() * scaleBoxes.length)]
 
-          // Apply the scale box for visual selection
-          scaleChordManagement.handleScaleBoxSelect(randomBox)
-
           // Convert scale box positions to Note objects using IDs
           const scaleNotes: Note[] = randomBox.positions.map(pos => {
             const noteId = `g-s${pos.string}-f${pos.fret}`
@@ -381,7 +386,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
             }
           })
 
-          // ALSO set the notes directly for melody generation
+          // Set the notes directly for melody generation
           setGuitarNotes(scaleNotes)
 
           setSetupDetails({
@@ -390,7 +395,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
               scaleName: randomScale.name,
               root: randomRoot,
               position: randomBox.name,
-              noteIds: scaleNotes.map(n => n.id) // Store IDs for scene reference
+              noteIds: scaleNotes.map(n => n.id),
+              scaleBox: randomBox // Store for visual display when handlers ready
             }
           })
         }
@@ -401,16 +407,13 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         setChordMode('progression')
 
         const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
-        const chordDetails: { root: string; chord: string }[] = []
+        const chordDetails: { root: string; chord: string; chordObj: typeof GUITAR_CHORDS[0] }[] = []
 
         for (let i = 0; i < chordCount; i++) {
           const randomChord = GUITAR_CHORDS[Math.floor(Math.random() * GUITAR_CHORDS.length)]
           const randomRoot = GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
 
-          // Apply the chord - this adds to appliedChords for progression mode
-          scaleChordManagement.handleChordSelect(randomRoot, randomChord)
-
-          chordDetails.push({ root: randomRoot, chord: randomChord.name })
+          chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord })
         }
 
         // Don't call setGuitarNotes - let appliedChords handle it in progression mode
@@ -423,9 +426,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
         const randomChord = GUITAR_CHORDS[Math.floor(Math.random() * GUITAR_CHORDS.length)]
         const randomRoot = GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
-
-        // Apply the chord for visual selection
-        scaleChordManagement.handleChordSelect(randomRoot, randomChord)
 
         // Get chord notes for melody generation
         const chordNoteNames = randomChord.intervals.map(interval => {
@@ -447,12 +447,13 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
         // Set chord notes for melody generation
         setGuitarNotes(chordNotes)
-        setSetupDetails({ type: 'chord-arpeggios', details: { root: randomRoot, chord: randomChord.name } })
+        setSetupDetails({ type: 'chord-arpeggios', details: { root: randomRoot, chord: randomChord.name, chordObj: randomChord } })
       }
     }
 
     // BASS LESSONS
-    if (sessionStarted && hasNoContent && instrument === 'bass') {
+    if (hasNoContent && instrument === 'bass') {
+      hasInitializedNotes.current = true
       // Randomly select BPM (30 to 240 in 30 BPM increments)
       const bpmOptions = Array.from({ length: 8 }, (_, i) => (i + 1) * 30)
       const randomBPM = bpmOptions[Math.floor(Math.random() * bpmOptions.length)]
@@ -480,12 +481,9 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           details: {
             noteCount: selectedBassNotes.length,
             string: randomString,
-            noteIds: selectedBassNotes.map(n => n.id) // Store IDs for scene reference
+            noteIds: selectedBassNotes.map(n => n.id) // Store IDs for visual display
           }
         })
-
-        // Set visual display on fretboard
-        scaleChordManagement.bassNoteHandlers?.handleSetManualNotes(selectedBassNotes.map(n => n.id))
       }
 
       // SCALES: Single random scale in a specific position
@@ -500,9 +498,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         if (scaleBoxes.length > 0) {
           const randomBox = scaleBoxes[Math.floor(Math.random() * scaleBoxes.length)]
 
-          // Apply the scale box for visual selection
-          scaleChordManagement.handleScaleBoxSelect(randomBox as any)
-
           // Convert scale box positions to Note objects using IDs
           const scaleNotes: Note[] = randomBox.positions.map(pos => {
             const noteId = `b-s${pos.string}-f${pos.fret}`
@@ -516,7 +511,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
             }
           })
 
-          // ALSO set the notes directly for melody generation
+          // Set the notes directly for melody generation
           setGuitarNotes(scaleNotes)
 
           setSetupDetails({
@@ -525,7 +520,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
               scaleName: randomScale.name,
               root: randomRoot,
               position: randomBox.name,
-              noteIds: scaleNotes.map(n => n.id) // Store IDs for scene reference
+              noteIds: scaleNotes.map(n => n.id),
+              scaleBox: randomBox // Store for visual display when handlers ready
             }
           })
         }
@@ -536,16 +532,13 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         setChordMode('progression')
 
         const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
-        const chordDetails: { root: string; chord: string }[] = []
+        const chordDetails: { root: string; chord: string; chordObj: typeof BASS_CHORDS[0] }[] = []
 
         for (let i = 0; i < chordCount; i++) {
           const randomChord = BASS_CHORDS[Math.floor(Math.random() * BASS_CHORDS.length)]
           const randomRoot = BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
 
-          // Apply the chord - this adds to appliedChords for progression mode
-          scaleChordManagement.handleChordSelect(randomRoot, randomChord as any)
-
-          chordDetails.push({ root: randomRoot, chord: randomChord.name })
+          chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord })
         }
 
         // Don't call setGuitarNotes - let appliedChords handle it in progression mode
@@ -558,9 +551,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
         const randomChord = BASS_CHORDS[Math.floor(Math.random() * BASS_CHORDS.length)]
         const randomRoot = BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
-
-        // Apply the chord for visual selection
-        scaleChordManagement.handleChordSelect(randomRoot, randomChord as any)
 
         // Get chord notes for melody generation
         const chordNoteNames = randomChord.intervals.map(interval => {
@@ -582,10 +572,83 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
         // Set chord notes for melody generation
         setGuitarNotes(chordNotes)
-        setSetupDetails({ type: 'chord-arpeggios', details: { root: randomRoot, chord: randomChord.name } })
+        setSetupDetails({ type: 'chord-arpeggios', details: { root: randomRoot, chord: randomChord.name, chordObj: randomChord } })
       }
     }
   }, [sessionStarted, practiceOptions, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, setGuitarNotes, setBpm, setNumberOfBeats, instrument, handleKeyboardSelectionModeChange, setChordMode, handleOctaveRangeChange, scaleChordManagement])
+
+  // Set visual display on fretboard once handlers become available
+  useEffect(() => {
+    if (!setupDetails || hasAppliedVisualDisplay.current) {
+      return
+    }
+
+    const { type, details } = setupDetails
+
+    console.log('[Practice Visual Display]', {
+      type,
+      instrument,
+      hasScaleHandlers: !!scaleChordManagement.scaleHandlers,
+      hasChordHandlers: !!scaleChordManagement.chordHandlers,
+      hasAppliedVisualDisplay: hasAppliedVisualDisplay.current
+    })
+
+    // Simple melodies - use manual note handlers
+    if (type === 'simple-melodies' && details.noteIds) {
+      if (instrument === 'guitar' && scaleChordManagement.noteHandlers) {
+        scaleChordManagement.noteHandlers.handleSetManualNotes(details.noteIds)
+        hasAppliedVisualDisplay.current = true
+      }
+      if (instrument === 'bass' && scaleChordManagement.bassNoteHandlers) {
+        scaleChordManagement.bassNoteHandlers.handleSetManualNotes(details.noteIds)
+        hasAppliedVisualDisplay.current = true
+      }
+    }
+
+    // Scales - use scale box handlers
+    if (type === 'scales' && details.scaleBox) {
+      if (instrument === 'guitar' && scaleChordManagement.scaleHandlers) {
+        scaleChordManagement.scaleHandlers.handleScaleBoxSelect(details.scaleBox)
+        hasAppliedVisualDisplay.current = true
+      }
+      if (instrument === 'bass' && scaleChordManagement.bassScaleHandlers) {
+        scaleChordManagement.bassScaleHandlers.handleScaleBoxSelect(details.scaleBox)
+        hasAppliedVisualDisplay.current = true
+      }
+    }
+
+    // Chord progressions - apply each chord
+    if (type === 'chord-progressions' && details.chords) {
+      if (instrument === 'guitar' && scaleChordManagement.chordHandlers) {
+        details.chords.forEach((c: any) => {
+          if (c.chordObj) {
+            scaleChordManagement.chordHandlers!.handleChordSelect(c.root, c.chordObj)
+          }
+        })
+        hasAppliedVisualDisplay.current = true
+      }
+      if (instrument === 'bass' && scaleChordManagement.bassChordHandlers) {
+        details.chords.forEach((c: any) => {
+          if (c.chordObj) {
+            scaleChordManagement.bassChordHandlers!.handleChordSelect(c.root, c.chordObj)
+          }
+        })
+        hasAppliedVisualDisplay.current = true
+      }
+    }
+
+    // Chord arpeggios - apply single chord
+    if (type === 'chord-arpeggios' && details.chordObj) {
+      if (instrument === 'guitar' && scaleChordManagement.chordHandlers) {
+        scaleChordManagement.chordHandlers.handleChordSelect(details.root, details.chordObj)
+        hasAppliedVisualDisplay.current = true
+      }
+      if (instrument === 'bass' && scaleChordManagement.bassChordHandlers) {
+        scaleChordManagement.bassChordHandlers.handleChordSelect(details.root, details.chordObj)
+        hasAppliedVisualDisplay.current = true
+      }
+    }
+  }, [setupDetails, instrument, scaleChordManagement.noteHandlers, scaleChordManagement.bassNoteHandlers, scaleChordManagement.scaleHandlers, scaleChordManagement.bassScaleHandlers, scaleChordManagement.chordHandlers, scaleChordManagement.bassChordHandlers])
 
   // Trigger melody generation once notes/scales/chords are selected (for all lesson types)
   useEffect(() => {

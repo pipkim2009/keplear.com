@@ -845,8 +845,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         handleScaleDelete
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleScaleSelect, handleScaleBoxSelect, handleClearScale, handleScaleDelete])
+  }, [onScaleHandlersReady, handleScaleSelect, handleScaleBoxSelect, handleClearScale, handleScaleDelete])
 
   // Provide chord handlers to parent component
   useEffect(() => {
@@ -859,8 +858,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         handleRemoveChordNotesOnly
       })
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleChordSelect, handleChordShapeSelect, handleClearChord, handleRemoveChordNotes])
+  }, [onChordHandlersReady, handleChordSelect, handleChordShapeSelect, handleClearChord, handleRemoveChordNotes, handleRemoveChordNotesOnly])
 
   // Provide note handlers to parent component (for simple melodies)
   useEffect(() => {
