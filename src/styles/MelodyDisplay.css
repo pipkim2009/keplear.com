@@ -68,21 +68,21 @@
   ===========================================
   LIGHT THEME SUPPORT
   ===========================================
-  Override colors for light mode
+  Keep green theme consistent across all modes
 */
 
 .light .melody-display {
-  background: var(--blue-alpha-05);
-  border-color: var(--blue-500);
+  background: rgb(32, 201, 151, 0.1);
+  border-color: var(--green-20c997);
 }
 
 .light .melody-title {
-  color: var(--blue-500);
+  color: var(--green-20c997);
 }
 
 .light .melody-note {
-  background: var(--blue-500) !important;
-  color: var(--white) !important;
+  background: var(--green-20c997) !important;
+  color: var(--gray-212529) !important;
 }
 
 /* Golden highlight stays the same in light mode */

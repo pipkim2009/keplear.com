@@ -707,9 +707,9 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         // Check if it's keyboard (has octave) or guitar/bass (no octave specified)
         if (setupDetails.details.octave) {
           const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.chord} arpeggio on the ${octaveOrdinal} octave at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.chord} chord arpeggio on the ${octaveOrdinal} octave at ${bpm} BPM`
         } else {
-          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.chord} arpeggio at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.chord} chord arpeggio at ${bpm} BPM`
         }
       }
 

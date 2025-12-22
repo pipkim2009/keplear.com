@@ -850,64 +850,9 @@
   ===========================================
   LIGHT THEME SUPPORT
   ===========================================
-  Override colors for light mode
+  Audio player keeps dark theme in all modes.
+  Only live feedback components have light theme overrides.
 */
-
-.light .custom-audio-player {
-  background: var(--light-bg-secondary);
-  border-color: var(--light-border-primary);
-}
-
-.light .audio-controls {
-  color: var(--light-text-primary);
-}
-
-.light .time-display {
-  color: var(--light-text-secondary);
-}
-
-.light .progress-track {
-  background: var(--light-bg-tertiary);
-  border-color: var(--light-border-secondary);
-}
-
-.light .progress-track:hover {
-  background: var(--light-bg-primary);
-  border-color: var(--light-border-primary);
-}
-
-.light .progress-bar.dragging .progress-track {
-  background: var(--light-bg-primary);
-  border-color: var(--light-border-primary);
-}
-
-.light .progress-hover-time {
-  background: var(--light-bg-primary);
-  color: var(--light-text-primary);
-  border: 1px solid var(--light-border-primary);
-}
-
-.light .progress-hover-time::after {
-  border-top-color: var(--light-bg-primary);
-}
-
-.light .volume-btn {
-  color: var(--light-text-secondary);
-}
-
-.light .volume-btn:hover {
-  background: var(--black-alpha-10);
-  color: var(--light-text-primary);
-}
-
-.light .volume-slider {
-  background: var(--light-bg-secondary);
-  border-color: var(--light-border-primary);
-}
-
-.light .volume-slider input[type="range"] {
-  background: linear-gradient(to top, var(--blue-450) 0%, var(--blue-450) var(--volume-percentage, 100%), var(--light-border-secondary) var(--volume-percentage, 100%), var(--light-border-secondary) 100%);
-}
 
 .light .live-feedback-button {
   background: linear-gradient(145deg, var(--purple-600), var(--purple-700));

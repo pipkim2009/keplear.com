@@ -22,7 +22,7 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1.5rem 2rem 0;
+  padding: 20px 2rem 20px;
 }
 
 .backButton {
@@ -925,7 +925,7 @@
   }
 
   .backButtonContainer {
-    padding: 1rem 1.5rem 0;
+    padding: 20px 1.5rem 20px;
   }
 
   .backButton {
@@ -982,7 +982,7 @@
   }
 
   .backButtonContainer {
-    padding: 1rem 1rem 0;
+    padding: 20px 1rem 20px;
   }
 
   .backButton {
