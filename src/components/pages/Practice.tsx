@@ -3,23 +3,16 @@ import styles from '../../styles/Practice.module.css'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import PracticeOptionsModal, { type LessonSettings } from './PracticeOptionsModal'
 import { useInstrument } from '../../contexts/InstrumentContext'
-import { generateNotesWithSeparateOctaves } from '../../utils/notes'
 import type { Note } from '../../utils/notes'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
 import { GUITAR_SCALES, ROOT_NOTES as GUITAR_ROOT_NOTES, getScaleBoxes } from '../../utils/instruments/guitar/guitarScales'
 import { GUITAR_CHORDS, CHORD_ROOT_NOTES as GUITAR_CHORD_ROOT_NOTES } from '../../utils/instruments/guitar/guitarChords'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
-import type { GuitarNote } from '../../utils/instruments/guitar/guitarNotes'
 import { BASS_SCALES, BASS_ROOT_NOTES, getBassScaleBoxes } from '../../utils/instruments/bass/bassScales'
 import { BASS_CHORDS, BASS_CHORD_ROOT_NOTES } from '../../utils/instruments/bass/bassChords'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
-import type { BassNote } from '../../utils/instruments/bass/bassNotes'
 import {
-  getRandomGuitarNotesOnString,
-  getRandomBassNotesOnString,
-  getRandomKeyboardNotesInOctave,
-  convertToNoteFormat,
   getGuitarNoteById,
   getBassNoteById
 } from '../../utils/practice/practiceNotes'
@@ -94,7 +87,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   const [practiceOptions, setPracticeOptions] = useState<string[]>([])
   const [sessionStarted, setSessionStarted] = useState(false)
 
-  // Simple Melodies Lesson State
+  // Lesson State
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
   const [welcomeSpeechDone, setWelcomeSpeechDone] = useState(false)
   const [hasGeneratedMelody, setHasGeneratedMelody] = useState(false)
@@ -119,6 +112,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setChordMode,
     instrument,
     handleInstrumentChange,
+    setInstrument,
     setGuitarNotes,
     clearSelection,
     clearTrigger,
@@ -161,7 +155,9 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
   const handleOptionsStart = (instrumentId: string, selectedOptions: string[], selectedDifficulty: number, settings: LessonSettings) => {
     setSelectedInstrument(instrumentId)
-    handleInstrumentChange(instrumentId)
+    // Use setInstrument directly instead of handleInstrumentChange to avoid
+    // triggering clearChordsAndScales which would clear scales added by initialization
+    setInstrument(instrumentId as 'keyboard' | 'guitar' | 'bass')
     setPracticeOptions(selectedOptions)
     setDifficulty(selectedDifficulty)
     setLessonSettings(settings)
@@ -262,39 +258,18 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       const octaveRange = Array.from({ length: octaveHigh - octaveLow + 1 }, (_, i) => octaveLow + i)
       const selectedOctave = octaveRange[Math.floor(Math.random() * octaveRange.length)]
 
-      // Generate all notes for the selected octave
-      const allNotesInOctave = generateNotesWithSeparateOctaves(3, 3).filter(note => {
-        const noteOctave = note.name.match(/\d+$/)?.[0]
-        return noteOctave === selectedOctave.toString()
-      })
-
-      // SIMPLE MELODIES: random notes on single octave (using ID-based selection)
-      if (practiceOptions.includes('simple-melodies')) {
-        handleKeyboardSelectionModeChange('multi', false)
-
-        const autoNotes = getRandomKeyboardNotesInOctave(selectedOctave, selectedNoteCount, 3, 3)
-
-        setGuitarNotes(autoNotes)
-        setSetupDetails({
-          type: 'simple-melodies',
-          details: {
-            noteCount: autoNotes.length,
-            octave: selectedOctave,
-            noteIds: autoNotes.map(n => n.id) // Store IDs for scene reference
-          }
-        })
-      }
-
       // SCALES: Single scale on single octave (filtered by user selection)
-      else if (practiceOptions.includes('scales')) {
+      if (practiceOptions.includes('melodies')) {
         const filteredScales = getFilteredScales(KEYBOARD_SCALES, lessonSettings.scale)
         const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = ROOT_NOTES[Math.floor(Math.random() * ROOT_NOTES.length)]
 
-        // Use the scale chord management system to apply the scale
-        scaleChordManagement.handleKeyboardScaleApply(randomRoot, randomScale, selectedOctave)
+        // Delay scale application to run after any clearing effects complete
+        setTimeout(() => {
+          scaleChordManagement.handleKeyboardScaleApply(randomRoot, randomScale, selectedOctave)
+        }, 50)
 
-        setSetupDetails({ type: 'scales', details: { scaleName: randomScale.name, root: randomRoot, octave: selectedOctave } })
+        setSetupDetails({ type: 'melodies', details: { scaleName: randomScale.name, root: randomRoot, octave: selectedOctave } })
       }
 
       // CHORDS: chords with progression mode (filtered by user selection)
@@ -328,30 +303,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       // Use note count from settings
       setNumberOfBeats(selectedNoteCount)
 
-      // SIMPLE MELODIES: random notes on a single string (using ID-based selection)
-      if (practiceOptions.includes('simple-melodies')) {
-        // Randomly select one string (1-6 for guitar)
-        const randomString = Math.floor(Math.random() * 6) + 1
-
-        // Use note count from settings
-        const selectedGuitarNotes = getRandomGuitarNotesOnString(randomString, selectedNoteCount)
-
-        // Convert to Note format for melody generation
-        const convertedNotes = convertToNoteFormat(selectedGuitarNotes)
-
-        setGuitarNotes(convertedNotes)
-        setSetupDetails({
-          type: 'simple-melodies',
-          details: {
-            noteCount: selectedGuitarNotes.length,
-            string: randomString,
-            noteIds: selectedGuitarNotes.map(n => n.id) // Store IDs for visual display
-          }
-        })
-      }
-
       // SCALES: Single scale in a specific position (filtered by user selection)
-      else if (practiceOptions.includes('scales')) {
+      if (practiceOptions.includes('melodies')) {
         const filteredScales = getFilteredScales(GUITAR_SCALES, lessonSettings.scale)
         const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = GUITAR_ROOT_NOTES[Math.floor(Math.random() * GUITAR_ROOT_NOTES.length)]
@@ -380,7 +333,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           setGuitarNotes(scaleNotes)
 
           setSetupDetails({
-            type: 'scales',
+            type: 'melodies',
             details: {
               scaleName: randomScale.name,
               root: randomRoot,
@@ -421,30 +374,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       // Use note count from settings
       setNumberOfBeats(selectedNoteCount)
 
-      // SIMPLE MELODIES: random notes on a single string (using ID-based selection)
-      if (practiceOptions.includes('simple-melodies')) {
-        // Randomly select one string (1-4 for bass)
-        const randomString = Math.floor(Math.random() * 4) + 1
-
-        // Use note count from settings
-        const selectedBassNotes = getRandomBassNotesOnString(randomString, selectedNoteCount)
-
-        // Convert to Note format for melody generation
-        const convertedNotes = convertToNoteFormat(selectedBassNotes)
-
-        setGuitarNotes(convertedNotes)
-        setSetupDetails({
-          type: 'simple-melodies',
-          details: {
-            noteCount: selectedBassNotes.length,
-            string: randomString,
-            noteIds: selectedBassNotes.map(n => n.id) // Store IDs for visual display
-          }
-        })
-      }
-
       // SCALES: Single scale in a specific position (filtered by user selection)
-      else if (practiceOptions.includes('scales')) {
+      if (practiceOptions.includes('melodies')) {
         const filteredScales = getFilteredScales(BASS_SCALES, lessonSettings.scale)
         const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = BASS_ROOT_NOTES[Math.floor(Math.random() * BASS_ROOT_NOTES.length)]
@@ -473,7 +404,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           setGuitarNotes(scaleNotes)
 
           setSetupDetails({
-            type: 'scales',
+            type: 'melodies',
             details: {
               scaleName: randomScale.name,
               root: randomRoot,
@@ -514,23 +445,11 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
     const { type, details } = setupDetails
 
-    // Simple melodies - use manual note handlers
-    if (type === 'simple-melodies' && details.noteIds) {
-      if (instrument === 'guitar' && scaleChordManagement.noteHandlers) {
-        scaleChordManagement.noteHandlers.handleSetManualNotes(details.noteIds)
-        hasAppliedVisualDisplay.current = true
-      }
-      if (instrument === 'bass' && scaleChordManagement.bassNoteHandlers) {
-        scaleChordManagement.bassNoteHandlers.handleSetManualNotes(details.noteIds)
-        hasAppliedVisualDisplay.current = true
-      }
-    }
-
     // Delay handler calls to let React Strict Mode stabilize
     // This ensures the Guitar/Bass component state is ready to receive updates
     const timeoutId = setTimeout(() => {
       // Scales - use wrapper functions that add to appliedScales AND update visual display
-      if (type === 'scales' && details.scaleBox) {
+      if (type === 'melodies' && details.scaleBox) {
         if ((instrument === 'guitar' && scaleChordManagement.scaleHandlers) ||
             (instrument === 'bass' && scaleChordManagement.bassScaleHandlers)) {
           scaleChordManagement.handleScaleBoxSelect(details.scaleBox)
@@ -584,24 +503,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
       let announcement = ''
 
-      // Convert string number to ordinal (for guitar/bass)
-      const stringOrdinals: { [key: string]: string } = {
-        '1': 'first', '2': 'second', '3': 'third', '4': 'fourth',
-        '5': 'fifth', '6': 'sixth'
-      }
-
       // Create announcement based on lesson type
-      if (setupDetails.type === 'simple-melodies') {
-        // Check if it's keyboard (has octave) or guitar/bass (has string)
-        if (setupDetails.details.octave) {
-          const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-          announcement = `I have set up a ${generatedMelody.length} beat melody on the ${octaveOrdinal} octave at ${bpm} BPM`
-        } else if (setupDetails.details.string) {
-          const stringOrdinal = stringOrdinals[setupDetails.details.string.toString()] || 'first'
-          announcement = `I have set up a ${generatedMelody.length} beat melody on the ${stringOrdinal} string at ${bpm} BPM`
-        }
-      }
-      else if (setupDetails.type === 'scales') {
+      if (setupDetails.type === 'melodies') {
         // Check if it's keyboard (has octave) or guitar/bass (has position)
         if (setupDetails.details.octave) {
           const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
@@ -645,8 +548,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
     // Get the practice topic label
     const practiceTopics = [
-      { id: 'simple-melodies', label: 'Simple Melodies' },
-      { id: 'scales', label: 'Scales' },
+      { id: 'melodies', label: 'Melodies' },
       { id: 'chords', label: 'Chords' }
     ]
     const practiceTopicLabel = practiceOptions.map(opt =>

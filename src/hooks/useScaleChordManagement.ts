@@ -607,10 +607,13 @@ export const useScaleChordManagement = ({
       onKeyboardSelectionModeChange('multi', false) // false = don't clear selections
     }
 
-    // Generate current keyboard notes based on octave range
-    const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
-      ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
-      : generateNotesWithSeparateOctaves(0, 0) // Default range
+    // Generate keyboard notes - use full range if specific octave is requested
+    // This ensures notes are found even if octave range state hasn't updated yet
+    const currentNotes = octave !== undefined
+      ? generateNotesWithSeparateOctaves(3, 3) // Full range (octaves 1-8) when filtering by octave
+      : (lowerOctaves !== 0 || higherOctaves !== 0)
+        ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+        : generateNotesWithSeparateOctaves(0, 0) // Default range
 
     // Apply scale to get scale notes
     let scaleNotes = applyScaleToKeyboard(rootNote, scale, currentNotes)
@@ -712,10 +715,13 @@ export const useScaleChordManagement = ({
       onKeyboardSelectionModeChange('multi', false) // false = don't clear selections
     }
 
-    // Generate current keyboard notes based on octave range
-    const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
-      ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
-      : generateNotesWithSeparateOctaves(0, 0) // Default range
+    // Generate keyboard notes - use full range if specific octave is requested
+    // This ensures notes are found even if octave range state hasn't updated yet
+    const currentNotes = octave !== undefined
+      ? generateNotesWithSeparateOctaves(3, 3) // Full range (octaves 1-8) when filtering by octave
+      : (lowerOctaves !== 0 || higherOctaves !== 0)
+        ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+        : generateNotesWithSeparateOctaves(0, 0) // Default range
 
     // Apply chord to get chord notes
     let chordNotes = applyChordToKeyboard(rootNote, chord, currentNotes)

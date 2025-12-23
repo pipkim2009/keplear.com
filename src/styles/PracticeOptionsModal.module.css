@@ -223,6 +223,69 @@
   color: rgb(102, 0, 204, 0.7);
 }
 
+/* Lesson Type Switch */
+.lessonTypeSwitch {
+  display: flex;
+  background: rgb(255, 255, 255, 0.08);
+  border: 2px solid rgb(117, 26, 255, 0.3);
+  border-radius: 12px;
+  padding: 4px;
+  gap: 4px;
+}
+
+:global(.light) .lessonTypeSwitch {
+  background: rgb(255, 255, 255, 0.9);
+  border-color: rgb(117, 26, 255, 0.3);
+}
+
+.switchOption {
+  flex: 1;
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: rgb(212, 196, 255, 0.7);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.switchOption:hover {
+  color: rgb(212, 196, 255, 1);
+  background: rgb(255, 255, 255, 0.05);
+}
+
+.switchOptionActive {
+  background: linear-gradient(135deg, #751aff, #9d5cff);
+  color: white;
+  font-weight: 600;
+}
+
+.switchOptionActive:hover {
+  background: linear-gradient(135deg, #8533ff, #a66dff);
+  color: white;
+}
+
+:global(.light) .switchOption {
+  color: rgb(102, 0, 204, 0.6);
+}
+
+:global(.light) .switchOption:hover {
+  color: rgb(102, 0, 204, 0.9);
+  background: rgb(117, 26, 255, 0.08);
+}
+
+:global(.light) .switchOptionActive {
+  background: linear-gradient(135deg, #751aff, #9d5cff);
+  color: white;
+}
+
+:global(.light) .switchOptionActive:hover {
+  background: linear-gradient(135deg, #8533ff, #a66dff);
+  color: white;
+}
+
 /* Option Description */
 .optionDescription {
   font-size: 13px;

@@ -719,7 +719,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     // Do NOT remove from scaleSelectedNotes to preserve scale highlighting
   }, [])
 
-  // Handle setting manual notes from external source (e.g., auto-generated simple melodies)
+  // Handle setting manual notes from external source
   // Takes note IDs like "g-s1-f3" and converts to internal noteKey format
   const handleSetManualNotes = useCallback((noteIds: string[]) => {
     const noteKeys: string[] = []
@@ -893,7 +893,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     }
   }, [onChordHandlersReady, handleChordSelect, handleChordShapeSelect, handleClearChord, handleRemoveChordNotes, handleRemoveChordNotesOnly])
 
-  // Provide note handlers to parent component (for simple melodies)
+  // Provide note handlers to parent component
   useEffect(() => {
     if (onNoteHandlersReady) {
       onNoteHandlersReady({

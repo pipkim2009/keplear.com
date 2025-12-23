@@ -614,7 +614,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     })
   }, [])
 
-  // Handle setting manual notes from external source (e.g., auto-generated simple melodies)
+  // Handle setting manual notes from external source
   // Takes note IDs like "b-s1-f3" and converts to internal noteKey format
   const handleSetManualNotes = useCallback((noteIds: string[]) => {
     const noteKeys: string[] = []
@@ -764,7 +764,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     }
   }, [onChordHandlersReady, handleChordSelect, handleChordShapeSelect, handleClearChord, handleRemoveChordNotes, handleRemoveChordNotesOnly])
 
-  // Provide note handlers to parent component (for simple melodies)
+  // Provide note handlers to parent component
   useEffect(() => {
     if (onNoteHandlersReady) {
       onNoteHandlersReady({

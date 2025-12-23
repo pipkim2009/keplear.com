@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import styles from '../../styles/PracticeOptionsModal.module.css'
 import '../../styles/Controls.css'
+import '../../styles/Tooltip.css'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import { IoMdArrowDropdown } from 'react-icons/io'
+import Tooltip from '../common/Tooltip'
 
 interface PracticeOption {
   id: string
@@ -11,12 +13,11 @@ interface PracticeOption {
 }
 
 const practiceOptions: PracticeOption[] = [
-  { id: 'simple-melodies', label: 'Simple Melodies' },
-  { id: 'scales', label: 'Scales' },
+  { id: 'melodies', label: 'Melodies' },
   { id: 'chords', label: 'Chords' }
 ]
 
-const difficultyLabels = ['Beginner', 'Intermediate', 'Hard', 'Advanced', 'Expert']
+const difficultyLabels = ['Beginner', 'Intermediate', 'Advanced', 'Professional', 'Custom']
 
 const scaleOptions = [
   { id: 'major', label: 'Major' },
@@ -53,16 +54,44 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   onCancel
 }) => {
   const [selectedInstrument, setSelectedInstrument] = useState<string>('keyboard')
-  const [selectedOption, setSelectedOption] = useState<string>('simple-melodies')
-  const [difficulty, setDifficulty] = useState<number>(2)
+  const [selectedOption, setSelectedOption] = useState<string>('melodies')
+  const [difficulty, setDifficulty] = useState<number>(1)
   const [bpm, setBpm] = useState<number>(120)
   const [beats, setBeats] = useState<number>(4)
   const [notes, setNotes] = useState<number>(4)
-  const [selectedScale, setSelectedScale] = useState<string>('major')
-  const [selectedChord, setSelectedChord] = useState<string>('major')
+  const [selectedScale, setSelectedScale] = useState<string>('major-minor')
+  const [selectedChord, setSelectedChord] = useState<string>('major-minor')
   const [octaveLow, setOctaveLow] = useState<number>(4)
   const [octaveHigh, setOctaveHigh] = useState<number>(5)
   const [isInstrumentDropdownOpen, setIsInstrumentDropdownOpen] = useState<boolean>(false)
+
+  // Difficulty presets
+  const difficultyPresets = [
+    { bpm: 60, notes: 3, beats: 3, scale: 'major', chord: 'major' },           // Beginner
+    { bpm: 120, notes: 4, beats: 4, scale: 'major-minor', chord: 'major-minor' }, // Intermediate
+    { bpm: 180, notes: 6, beats: 6, scale: 'modes', chord: 'all' },            // Advanced
+    { bpm: 240, notes: 8, beats: 8, scale: 'all', chord: 'all' }               // Professional
+  ]
+
+  const handleDifficultyChange = (newDifficulty: number) => {
+    setDifficulty(newDifficulty)
+    // Custom mode (4) doesn't apply presets - user controls all settings
+    const preset = difficultyPresets[newDifficulty]
+    if (preset) {
+      setBpm(preset.bpm)
+      setNotes(preset.notes)
+      setBeats(preset.beats)
+      setSelectedScale(preset.scale)
+      setSelectedChord(preset.chord)
+    }
+  }
+
+  // Switch to Custom mode when user manually changes any setting
+  const handleManualChange = () => {
+    if (difficulty !== 4) {
+      setDifficulty(4)
+    }
+  }
 
   const isKeyboard = selectedInstrument === 'keyboard'
 
@@ -74,7 +103,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         bpm,
         beats,
         notes,
-        scale: selectedOption === 'scales' ? selectedScale : undefined,
+        scale: selectedOption === 'melodies' ? selectedScale : undefined,
         chord: selectedOption === 'chords' ? selectedChord : undefined,
         octaveLow: isKeyboard ? octaveLow : undefined,
         octaveHigh: isKeyboard ? octaveHigh : undefined
@@ -195,23 +224,21 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
 
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>Lesson Type</label>
-          <div className={styles.selectWrapper}>
-            <select
-              className={styles.select}
-              value={selectedOption}
-              onChange={(e) => setSelectedOption(e.target.value)}
+          <div className={styles.lessonTypeSwitch}>
+            <button
+              type="button"
+              className={`${styles.switchOption} ${selectedOption === 'melodies' ? styles.switchOptionActive : ''}`}
+              onClick={() => setSelectedOption('melodies')}
             >
-              {practiceOptions.map(option => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <div className={styles.selectArrow}>
-              <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </div>
+              Melodies
+            </button>
+            <button
+              type="button"
+              className={`${styles.switchOption} ${selectedOption === 'chords' ? styles.switchOptionActive : ''}`}
+              onClick={() => setSelectedOption('chords')}
+            >
+              Chords
+            </button>
           </div>
         </div>
 
@@ -225,7 +252,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
               min="0"
               max="4"
               value={difficulty}
-              onChange={(e) => setDifficulty(Number(e.target.value))}
+              onChange={(e) => handleDifficultyChange(Number(e.target.value))}
               className={styles.slider}
             />
             <div className={styles.sliderLabels}>
@@ -247,6 +274,9 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
             <div className="control-group octave-range-control">
               <div className="label-with-tooltip">
                 <label className="control-label">Octave Range</label>
+                <Tooltip title="Octave Range" text="Select which octaves are visible in the keyboard interface">
+                  <div className="tooltip-icon">?</div>
+                </Tooltip>
               </div>
               <div className="octave-range-slider">
               <div className="range-labels-center">
@@ -269,7 +299,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                   value={octaveLow}
                   onChange={(e) => {
                     const val = Number(e.target.value)
-                    if (val <= octaveHigh) setOctaveLow(val)
+                    if (val <= octaveHigh) { setOctaveLow(val); handleManualChange() }
                   }}
                   className={`range-slider range-low ${octaveLow === octaveHigh ? 'same-position' : ''}`}
                   title="Set lowest octave"
@@ -281,7 +311,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                   value={octaveHigh}
                   onChange={(e) => {
                     const val = Number(e.target.value)
-                    if (val >= octaveLow) setOctaveHigh(val)
+                    if (val >= octaveLow) { setOctaveHigh(val); handleManualChange() }
                   }}
                   className={`range-slider range-high ${octaveLow === octaveHigh ? 'same-position' : ''}`}
                   title="Set highest octave"
@@ -311,14 +341,14 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         )}
 
         {/* Scales dropdown - only for scales lesson */}
-        {selectedOption === 'scales' && (
+        {selectedOption === 'melodies' && (
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Scale</label>
             <div className={styles.selectWrapper}>
               <select
                 className={styles.select}
                 value={selectedScale}
-                onChange={(e) => setSelectedScale(e.target.value)}
+                onChange={(e) => { setSelectedScale(e.target.value); handleManualChange() }}
               >
                 {scaleOptions.map(option => (
                   <option key={option.id} value={option.id}>
@@ -343,7 +373,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
               <select
                 className={styles.select}
                 value={selectedChord}
-                onChange={(e) => setSelectedChord(e.target.value)}
+                onChange={(e) => { setSelectedChord(e.target.value); handleManualChange() }}
               >
                 {chordOptions.map(option => (
                   <option key={option.id} value={option.id}>
@@ -366,6 +396,9 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
           <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
             <div className="label-with-tooltip">
               <label className="control-label">BPM</label>
+              <Tooltip title="BPM" text="Specify the speed of the melody (BEATS PER MINUTE)">
+                <div className="tooltip-icon">?</div>
+              </Tooltip>
             </div>
             <div className="input-with-buttons">
               <input
@@ -373,19 +406,19 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                 value={bpm}
                 onChange={(e) => {
                   const val = Number(e.target.value)
-                  if (!isNaN(val) && val > 0) setBpm(val)
+                  if (!isNaN(val) && val > 0) { setBpm(val); handleManualChange() }
                 }}
                 className="control-input with-internal-buttons"
               />
               <button
                 className="control-button-internal minus"
-                onClick={() => setBpm(Math.max(30, bpm - 10))}
+                onClick={() => { setBpm(Math.max(30, bpm - 10)); handleManualChange() }}
               >
                 −
               </button>
               <button
                 className="control-button-internal plus"
-                onClick={() => setBpm(Math.min(300, bpm + 10))}
+                onClick={() => { setBpm(Math.min(300, bpm + 10)); handleManualChange() }}
               >
                 +
               </button>
@@ -396,6 +429,9 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
           <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
             <div className="label-with-tooltip">
               <label className="control-label">Beats</label>
+              <Tooltip title="Beats" text="Specify the number of beats within the melody">
+                <div className="tooltip-icon">?</div>
+              </Tooltip>
             </div>
             <div className="input-with-buttons">
               <input
@@ -403,19 +439,19 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                 value={beats}
                 onChange={(e) => {
                   const val = Number(e.target.value)
-                  if (!isNaN(val) && val > 0) setBeats(val)
+                  if (!isNaN(val) && val > 0) { setBeats(val); handleManualChange() }
                 }}
                 className="control-input with-internal-buttons"
               />
               <button
                 className="control-button-internal minus"
-                onClick={() => setBeats(Math.max(1, beats - 1))}
+                onClick={() => { setBeats(Math.max(1, beats - 1)); handleManualChange() }}
               >
                 −
               </button>
               <button
                 className="control-button-internal plus"
-                onClick={() => setBeats(Math.min(16, beats + 1))}
+                onClick={() => { setBeats(Math.min(16, beats + 1)); handleManualChange() }}
               >
                 +
               </button>
@@ -426,6 +462,12 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
           <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
             <div className="label-with-tooltip">
               <label className="control-label">{selectedOption === 'chords' ? 'Chords' : 'Notes'}</label>
+              <Tooltip
+                title={selectedOption === 'chords' ? 'Chords' : 'Notes'}
+                text={selectedOption === 'chords' ? 'Specify the number of chords in the lesson' : 'Specify the number of notes in the melody'}
+              >
+                <div className="tooltip-icon">?</div>
+              </Tooltip>
             </div>
             <div className="input-with-buttons">
               <input
@@ -433,19 +475,19 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                 value={notes}
                 onChange={(e) => {
                   const val = Number(e.target.value)
-                  if (!isNaN(val) && val > 0) setNotes(val)
+                  if (!isNaN(val) && val > 0) { setNotes(val); handleManualChange() }
                 }}
                 className="control-input with-internal-buttons"
               />
               <button
                 className="control-button-internal minus"
-                onClick={() => setNotes(Math.max(1, notes - 1))}
+                onClick={() => { setNotes(Math.max(1, notes - 1)); handleManualChange() }}
               >
                 −
               </button>
               <button
                 className="control-button-internal plus"
-                onClick={() => setNotes(Math.min(16, notes + 1))}
+                onClick={() => { setNotes(Math.min(16, notes + 1)); handleManualChange() }}
               >
                 +
               </button>
