@@ -1,8 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
 import styles from '../../styles/Practice.module.css'
-import { PiPianoKeysFill } from 'react-icons/pi'
-import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
-import type { IconType } from 'react-icons'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import PracticeOptionsModal, { type LessonSettings } from './PracticeOptionsModal'
 import { useInstrument } from '../../contexts/InstrumentContext'
@@ -31,33 +28,11 @@ interface PracticeProps {
   onNavigateToSandbox: () => void
 }
 
-interface InstrumentLesson {
-  id: string
-  name: string
-  icon: IconType
-  description: string
+const instrumentNames: Record<string, string> = {
+  keyboard: 'Keyboard',
+  guitar: 'Guitar',
+  bass: 'Bass'
 }
-
-const instrumentLessons: InstrumentLesson[] = [
-  {
-    id: 'keyboard',
-    name: 'Keyboard',
-    icon: PiPianoKeysFill,
-    description: 'Start a keyboard ear training session'
-  },
-  {
-    id: 'guitar',
-    name: 'Guitar',
-    icon: GiGuitarHead,
-    description: 'Start a guitar ear training session'
-  },
-  {
-    id: 'bass',
-    name: 'Bass',
-    icon: GiGuitarBassHead,
-    description: 'Start a bass ear training session'
-  }
-]
 
 // Welcome Subtitle Component with Text-to-Speech
 interface WelcomeSubtitleProps {
@@ -177,16 +152,16 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     scaleChordManagement
   } = useInstrument()
 
-  const handleStartLesson = (instrumentId: string) => {
-    setSelectedInstrument(instrumentId)
-    handleInstrumentChange(instrumentId)
+  const handleStartLesson = () => {
     setShowOptionsModal(true)
   }
 
   const [difficulty, setDifficulty] = useState<number>(2) // 0-4: Beginner to Expert
   const [lessonSettings, setLessonSettings] = useState<LessonSettings | null>(null)
 
-  const handleOptionsStart = (selectedOptions: string[], selectedDifficulty: number, settings: LessonSettings) => {
+  const handleOptionsStart = (instrumentId: string, selectedOptions: string[], selectedDifficulty: number, settings: LessonSettings) => {
+    setSelectedInstrument(instrumentId)
+    handleInstrumentChange(instrumentId)
     setPracticeOptions(selectedOptions)
     setDifficulty(selectedDifficulty)
     setLessonSettings(settings)
@@ -265,7 +240,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     const selectedBpm = lessonSettings.bpm
     const selectedNoteCount = lessonSettings.notes
 
-    if (hasNoContent && instrument === 'keyboard') {
+    if (hasNoContent && selectedInstrument === 'keyboard') {
       hasInitializedNotes.current = true
       // Use BPM from settings
       setBpm(selectedBpm)
@@ -345,7 +320,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     }
 
     // GUITAR LESSONS
-    if (hasNoContent && instrument === 'guitar') {
+    if (hasNoContent && selectedInstrument === 'guitar') {
       hasInitializedNotes.current = true
       // Use BPM from settings
       setBpm(selectedBpm)
@@ -438,7 +413,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     }
 
     // BASS LESSONS
-    if (hasNoContent && instrument === 'bass') {
+    if (hasNoContent && selectedInstrument === 'bass') {
       hasInitializedNotes.current = true
       // Use BPM from settings
       setBpm(selectedBpm)
@@ -529,7 +504,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       }
 
     }
-  }, [sessionStarted, practiceOptions, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, setGuitarNotes, setBpm, setNumberOfBeats, instrument, handleKeyboardSelectionModeChange, setChordMode, handleOctaveRangeChange, scaleChordManagement, lessonSettings])
+  }, [sessionStarted, practiceOptions, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, setGuitarNotes, setBpm, setNumberOfBeats, selectedInstrument, handleKeyboardSelectionModeChange, setChordMode, handleOctaveRangeChange, scaleChordManagement, lessonSettings])
 
   // Set visual display on fretboard once handlers become available
   useEffect(() => {
@@ -655,11 +630,9 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
 
   // Show practice options modal
-  if (showOptionsModal && selectedInstrument) {
-    const instrumentName = instrumentLessons.find(i => i.id === selectedInstrument)?.name || 'Instrument'
+  if (showOptionsModal) {
     return (
       <PracticeOptionsModal
-        instrumentName={instrumentName}
         onStart={handleOptionsStart}
         onCancel={handleOptionsCancel}
       />
@@ -668,7 +641,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
   // If an instrument is selected and session started, show the instrument display
   if (selectedInstrument && sessionStarted) {
-    const instrumentName = instrumentLessons.find(i => i.id === selectedInstrument)?.name || 'Instrument'
+    const instrumentName = instrumentNames[selectedInstrument] || 'Instrument'
 
     // Get the practice topic label
     const practiceTopics = [
@@ -787,40 +760,26 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     )
   }
 
-  // Otherwise, show the instrument selection
+  // Otherwise, show the start session page
   return (
     <div className={styles.practiceContainer}>
       {/* Header Section */}
       <section className={styles.headerSection}>
         <h1 className={styles.pageTitle}>Practice Mode</h1>
         <p className={styles.pageSubtitle}>
-          Choose your instrument and start improving your ear training skills
+          Train your ear with guided lessons for keyboard, guitar, and bass
         </p>
       </section>
 
-      {/* Instruments Grid */}
-      <section className={styles.instrumentsSection}>
-        <div className={styles.instrumentsGrid}>
-          {instrumentLessons.map((instrument) => {
-            const Icon = instrument.icon
-            return (
-              <div key={instrument.id} className={styles.instrumentCard}>
-                <div className={styles.instrumentIcon}>
-                  <Icon />
-                </div>
-                <h3 className={styles.instrumentName}>{instrument.name}</h3>
-                <p className={styles.instrumentDescription}>{instrument.description}</p>
-                <button
-                  className={styles.instrumentButton}
-                  onClick={() => handleStartLesson(instrument.id)}
-                  aria-label={`Start ${instrument.name} lesson`}
-                >
-                  Begin
-                </button>
-              </div>
-            )
-          })}
-        </div>
+      {/* Start Button Section */}
+      <section className={styles.startSection}>
+        <button
+          className={styles.startSessionButton}
+          onClick={handleStartLesson}
+          aria-label="Start practice session"
+        >
+          Begin Session
+        </button>
       </section>
     </div>
   )

@@ -2,28 +2,26 @@ import { useState } from 'react'
 import styles from '../../styles/PracticeOptionsModal.module.css'
 import '../../styles/Controls.css'
 
+interface InstrumentOption {
+  id: string
+  label: string
+}
+
+const instrumentOptions: InstrumentOption[] = [
+  { id: 'keyboard', label: 'Keyboard' },
+  { id: 'guitar', label: 'Guitar' },
+  { id: 'bass', label: 'Bass' }
+]
+
 interface PracticeOption {
   id: string
   label: string
-  description: string
 }
 
 const practiceOptions: PracticeOption[] = [
-  {
-    id: 'simple-melodies',
-    label: 'Simple Melodies',
-    description: 'Practice creating basic melodic phrases'
-  },
-  {
-    id: 'scales',
-    label: 'Scales',
-    description: 'Master scale patterns and fingerings'
-  },
-  {
-    id: 'chords',
-    label: 'Chords',
-    description: 'Practice chords and transitions'
-  }
+  { id: 'simple-melodies', label: 'Simple Melodies' },
+  { id: 'scales', label: 'Scales' },
+  { id: 'chords', label: 'Chords' }
 ]
 
 const difficultyLabels = ['Beginner', 'Intermediate', 'Hard', 'Advanced', 'Expert']
@@ -55,16 +53,15 @@ export interface LessonSettings {
 }
 
 interface PracticeOptionsModalProps {
-  instrumentName: string
-  onStart: (selectedOptions: string[], difficulty: number, settings: LessonSettings) => void
+  onStart: (instrument: string, selectedOptions: string[], difficulty: number, settings: LessonSettings) => void
   onCancel: () => void
 }
 
 const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
-  instrumentName,
   onStart,
   onCancel
 }) => {
+  const [selectedInstrument, setSelectedInstrument] = useState<string>('keyboard')
   const [selectedOption, setSelectedOption] = useState<string>('simple-melodies')
   const [difficulty, setDifficulty] = useState<number>(2)
   const [bpm, setBpm] = useState<number>(120)
@@ -74,10 +71,10 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   const [octaveLow, setOctaveLow] = useState<number>(3)
   const [octaveHigh, setOctaveHigh] = useState<number>(5)
 
-  const isKeyboard = instrumentName.toLowerCase() === 'keyboard'
+  const isKeyboard = selectedInstrument === 'keyboard'
 
   const handleStart = () => {
-    if (selectedOption) {
+    if (selectedOption && selectedInstrument) {
       const settings: LessonSettings = {
         lessonType: selectedOption,
         difficulty,
@@ -88,11 +85,9 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         octaveLow: isKeyboard ? octaveLow : undefined,
         octaveHigh: isKeyboard ? octaveHigh : undefined
       }
-      onStart([selectedOption], difficulty, settings)
+      onStart(selectedInstrument, [selectedOption], difficulty, settings)
     }
   }
-
-  const selectedDescription = practiceOptions.find(opt => opt.id === selectedOption)?.description || ''
 
   return (
     <div className={styles.modalOverlay}>
@@ -106,8 +101,30 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         </button>
 
         <h2 className={styles.modalTitle}>
-          {instrumentName} Session
+          Practice Session
         </h2>
+
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>Instrument</label>
+          <div className={styles.selectWrapper}>
+            <select
+              className={styles.select}
+              value={selectedInstrument}
+              onChange={(e) => setSelectedInstrument(e.target.value)}
+            >
+              {instrumentOptions.map(option => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <div className={styles.selectArrow}>
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
+                <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
 
         <div className={styles.formGroup}>
           <label className={styles.formLabel}>Lesson Type</label>
@@ -129,9 +146,6 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
               </svg>
             </div>
           </div>
-          {selectedDescription && (
-            <p className={styles.optionDescription}>{selectedDescription}</p>
-          )}
         </div>
 
         <div className={styles.formGroup}>
