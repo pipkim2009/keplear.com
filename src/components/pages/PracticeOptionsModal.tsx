@@ -1,17 +1,9 @@
 import { useState } from 'react'
 import styles from '../../styles/PracticeOptionsModal.module.css'
 import '../../styles/Controls.css'
-
-interface InstrumentOption {
-  id: string
-  label: string
-}
-
-const instrumentOptions: InstrumentOption[] = [
-  { id: 'keyboard', label: 'Keyboard' },
-  { id: 'guitar', label: 'Guitar' },
-  { id: 'bass', label: 'Bass' }
-]
+import { PiPianoKeysFill } from 'react-icons/pi'
+import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
+import { IoMdArrowDropdown } from 'react-icons/io'
 
 interface PracticeOption {
   id: string
@@ -39,12 +31,11 @@ const chordOptions = [
   { id: 'all', label: 'All' }
 ]
 
-const bpmOptions = [30, 60, 90, 120, 150, 180, 210, 240]
-
 export interface LessonSettings {
   lessonType: string
   difficulty: number
   bpm: number
+  beats: number
   notes: number
   scale?: string
   chord?: string
@@ -65,11 +56,13 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   const [selectedOption, setSelectedOption] = useState<string>('simple-melodies')
   const [difficulty, setDifficulty] = useState<number>(2)
   const [bpm, setBpm] = useState<number>(120)
+  const [beats, setBeats] = useState<number>(4)
   const [notes, setNotes] = useState<number>(4)
   const [selectedScale, setSelectedScale] = useState<string>('major')
   const [selectedChord, setSelectedChord] = useState<string>('major')
-  const [octaveLow, setOctaveLow] = useState<number>(3)
+  const [octaveLow, setOctaveLow] = useState<number>(4)
   const [octaveHigh, setOctaveHigh] = useState<number>(5)
+  const [isInstrumentDropdownOpen, setIsInstrumentDropdownOpen] = useState<boolean>(false)
 
   const isKeyboard = selectedInstrument === 'keyboard'
 
@@ -79,6 +72,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         lessonType: selectedOption,
         difficulty,
         bpm,
+        beats,
         notes,
         scale: selectedOption === 'scales' ? selectedScale : undefined,
         chord: selectedOption === 'chords' ? selectedChord : undefined,
@@ -104,24 +98,97 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
           Practice Session
         </h2>
 
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>Instrument</label>
-          <div className={styles.selectWrapper}>
-            <select
-              className={styles.select}
-              value={selectedInstrument}
-              onChange={(e) => setSelectedInstrument(e.target.value)}
+        <div className="control-group instrument-selector-group" style={{ marginBottom: 20 }}>
+          {/* Desktop view - Cards */}
+          <div className="instrument-selector desktop-selector" style={{ justifyContent: 'center' }}>
+            <div
+              className={`instrument-card ${selectedInstrument === 'keyboard' ? 'active' : ''}`}
+              onClick={() => setSelectedInstrument('keyboard')}
             >
-              {instrumentOptions.map(option => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <div className={styles.selectArrow}>
-              <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <div className="instrument-icon"><PiPianoKeysFill /></div>
+              <div className="instrument-name">Keyboard</div>
+              <div className="instrument-glow"></div>
+            </div>
+            <div
+              className={`instrument-card ${selectedInstrument === 'guitar' ? 'active' : ''}`}
+              onClick={() => setSelectedInstrument('guitar')}
+            >
+              <div className="instrument-icon"><GiGuitarHead /></div>
+              <div className="instrument-name">Guitar</div>
+              <div className="instrument-glow"></div>
+            </div>
+            <div
+              className={`instrument-card ${selectedInstrument === 'bass' ? 'active' : ''}`}
+              onClick={() => setSelectedInstrument('bass')}
+            >
+              <div className="instrument-icon"><GiGuitarBassHead /></div>
+              <div className="instrument-name">Bass</div>
+              <div className="instrument-glow"></div>
+            </div>
+          </div>
+
+          {/* Mobile view - Dropdown */}
+          <div className="instrument-selector mobile-selector">
+            <div
+              className={`instrument-dropdown ${isInstrumentDropdownOpen ? 'open' : ''} ${selectedInstrument}-active`}
+              onClick={() => setIsInstrumentDropdownOpen(!isInstrumentDropdownOpen)}
+            >
+              <div className="current-instrument">
+                <div className="instrument-icon">
+                  {selectedInstrument === 'keyboard' && <PiPianoKeysFill />}
+                  {selectedInstrument === 'guitar' && <GiGuitarHead />}
+                  {selectedInstrument === 'bass' && <GiGuitarBassHead />}
+                </div>
+                <div className="instrument-name">
+                  {selectedInstrument === 'keyboard' && 'Keyboard'}
+                  {selectedInstrument === 'guitar' && 'Guitar'}
+                  {selectedInstrument === 'bass' && 'Bass'}
+                </div>
+                <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}><IoMdArrowDropdown /></div>
+              </div>
+              {isInstrumentDropdownOpen && (
+                <div className="dropdown-options">
+                  {selectedInstrument !== 'keyboard' && (
+                    <div
+                      className="dropdown-option keyboard-option"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedInstrument('keyboard');
+                        setIsInstrumentDropdownOpen(false);
+                      }}
+                    >
+                      <div className="instrument-icon"><PiPianoKeysFill /></div>
+                      <div className="instrument-name">Keyboard</div>
+                    </div>
+                  )}
+                  {selectedInstrument !== 'guitar' && (
+                    <div
+                      className="dropdown-option guitar-option"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedInstrument('guitar');
+                        setIsInstrumentDropdownOpen(false);
+                      }}
+                    >
+                      <div className="instrument-icon"><GiGuitarHead /></div>
+                      <div className="instrument-name">Guitar</div>
+                    </div>
+                  )}
+                  {selectedInstrument !== 'bass' && (
+                    <div
+                      className="dropdown-option bass-option"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedInstrument('bass');
+                        setIsInstrumentDropdownOpen(false);
+                      }}
+                    >
+                      <div className="instrument-icon"><GiGuitarBassHead /></div>
+                      <div className="instrument-name">Bass</div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -176,11 +243,12 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
 
         {/* Octave range slider - only for keyboard (using sandbox mode UI) */}
         {isKeyboard && (
-          <div className="control-group octave-range-control">
-            <div className="label-with-tooltip">
-              <label className="control-label">Octave Range</label>
-            </div>
-            <div className="octave-range-slider">
+          <div style={{ marginBottom: 20 }}>
+            <div className="control-group octave-range-control">
+              <div className="label-with-tooltip">
+                <label className="control-label">Octave Range</label>
+              </div>
+              <div className="octave-range-slider">
               <div className="range-labels-center">
                 <span className="range-label-center">
                   {octaveLow} - {octaveHigh}
@@ -238,73 +306,23 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                 })}
               </div>
             </div>
+            </div>
           </div>
         )}
 
-        {/* Lesson-specific fields */}
-        <div className={styles.settingsGrid}>
-          {/* Scales dropdown - only for scales lesson */}
-          {selectedOption === 'scales' && (
-            <div className={styles.formGroupFull}>
-              <label className={styles.formLabel}>Scale</label>
-              <div className={styles.selectWrapper}>
-                <select
-                  className={styles.select}
-                  value={selectedScale}
-                  onChange={(e) => setSelectedScale(e.target.value)}
-                >
-                  {scaleOptions.map(option => (
-                    <option key={option.id} value={option.id}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <div className={styles.selectArrow}>
-                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                    <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Chords dropdown - only for chords lesson */}
-          {selectedOption === 'chords' && (
-            <div className={styles.formGroupFull}>
-              <label className={styles.formLabel}>Chord</label>
-              <div className={styles.selectWrapper}>
-                <select
-                  className={styles.select}
-                  value={selectedChord}
-                  onChange={(e) => setSelectedChord(e.target.value)}
-                >
-                  {chordOptions.map(option => (
-                    <option key={option.id} value={option.id}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                <div className={styles.selectArrow}>
-                  <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                    <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* BPM dropdown - all lesson types */}
-          <div className={styles.formGroupSmall}>
-            <label className={styles.formLabel}>BPM</label>
+        {/* Scales dropdown - only for scales lesson */}
+        {selectedOption === 'scales' && (
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Scale</label>
             <div className={styles.selectWrapper}>
               <select
                 className={styles.select}
-                value={bpm}
-                onChange={(e) => setBpm(Number(e.target.value))}
+                value={selectedScale}
+                onChange={(e) => setSelectedScale(e.target.value)}
               >
-                {bpmOptions.map(option => (
-                  <option key={option} value={option}>
-                    {option}
+                {scaleOptions.map(option => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
                   </option>
                 ))}
               </select>
@@ -315,19 +333,21 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
               </div>
             </div>
           </div>
+        )}
 
-          {/* Notes/Chords dropdown - all lesson types */}
-          <div className={styles.formGroupSmall}>
-            <label className={styles.formLabel}>{selectedOption === 'chords' ? 'Chords' : 'Notes'}</label>
+        {/* Chords dropdown - only for chords lesson */}
+        {selectedOption === 'chords' && (
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Chord</label>
             <div className={styles.selectWrapper}>
               <select
                 className={styles.select}
-                value={notes}
-                onChange={(e) => setNotes(Number(e.target.value))}
+                value={selectedChord}
+                onChange={(e) => setSelectedChord(e.target.value)}
               >
-                {[3, 4, 5, 6, 7, 8].map(option => (
-                  <option key={option} value={option}>
-                    {option}
+                {chordOptions.map(option => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
                   </option>
                 ))}
               </select>
@@ -336,6 +356,99 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                   <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* BPM, Beats, and Notes - Single row that wraps on small screens */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 20, flexWrap: 'wrap' }}>
+          {/* BPM control */}
+          <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
+            <div className="label-with-tooltip">
+              <label className="control-label">BPM</label>
+            </div>
+            <div className="input-with-buttons">
+              <input
+                type="text"
+                value={bpm}
+                onChange={(e) => {
+                  const val = Number(e.target.value)
+                  if (!isNaN(val) && val > 0) setBpm(val)
+                }}
+                className="control-input with-internal-buttons"
+              />
+              <button
+                className="control-button-internal minus"
+                onClick={() => setBpm(Math.max(30, bpm - 10))}
+              >
+                −
+              </button>
+              <button
+                className="control-button-internal plus"
+                onClick={() => setBpm(Math.min(300, bpm + 10))}
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          {/* Beats control */}
+          <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
+            <div className="label-with-tooltip">
+              <label className="control-label">Beats</label>
+            </div>
+            <div className="input-with-buttons">
+              <input
+                type="text"
+                value={beats}
+                onChange={(e) => {
+                  const val = Number(e.target.value)
+                  if (!isNaN(val) && val > 0) setBeats(val)
+                }}
+                className="control-input with-internal-buttons"
+              />
+              <button
+                className="control-button-internal minus"
+                onClick={() => setBeats(Math.max(1, beats - 1))}
+              >
+                −
+              </button>
+              <button
+                className="control-button-internal plus"
+                onClick={() => setBeats(Math.min(16, beats + 1))}
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          {/* Notes/Chords control */}
+          <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
+            <div className="label-with-tooltip">
+              <label className="control-label">{selectedOption === 'chords' ? 'Chords' : 'Notes'}</label>
+            </div>
+            <div className="input-with-buttons">
+              <input
+                type="text"
+                value={notes}
+                onChange={(e) => {
+                  const val = Number(e.target.value)
+                  if (!isNaN(val) && val > 0) setNotes(val)
+                }}
+                className="control-input with-internal-buttons"
+              />
+              <button
+                className="control-button-internal minus"
+                onClick={() => setNotes(Math.max(1, notes - 1))}
+              >
+                −
+              </button>
+              <button
+                className="control-button-internal plus"
+                onClick={() => setNotes(Math.min(16, notes + 1))}
+              >
+                +
+              </button>
             </div>
           </div>
         </div>

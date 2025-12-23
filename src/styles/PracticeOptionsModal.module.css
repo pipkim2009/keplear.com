@@ -45,7 +45,7 @@
   border: 2px solid rgb(80, 80, 80, 0.3);
   border-radius: 20px;
   padding: 40px;
-  max-width: 460px;
+  max-width: 580px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
@@ -430,7 +430,7 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 }
 
 .formGroupSmall {
