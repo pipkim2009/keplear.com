@@ -231,10 +231,29 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setCongratulationsMessage(message)
   }
 
+  // Helper function to filter scales based on user selection
+  const getFilteredScales = (scales: typeof KEYBOARD_SCALES, scaleFilter: string | undefined) => {
+    if (!scaleFilter || scaleFilter === 'all') return scales
+    if (scaleFilter === 'major') return scales.filter(s => s.name === 'Major')
+    if (scaleFilter === 'major-minor') return scales.filter(s => s.name === 'Major' || s.name === 'Minor')
+    if (scaleFilter === 'modes') return scales.filter(s =>
+      ['Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Locrian'].includes(s.name)
+    )
+    return scales
+  }
+
+  // Helper function to filter chords based on user selection
+  const getFilteredChords = (chords: typeof KEYBOARD_CHORDS, chordFilter: string | undefined) => {
+    if (!chordFilter || chordFilter === 'all') return chords
+    if (chordFilter === 'major') return chords.filter(c => c.name === 'Major')
+    if (chordFilter === 'major-minor') return chords.filter(c => c.name === 'Major' || c.name === 'Minor')
+    return chords
+  }
+
   // Auto-select notes/scales/chords and BPM when session starts
   useEffect(() => {
     // Use ref to prevent double initialization (React Strict Mode or async timing)
-    if (!sessionStarted || hasInitializedNotes.current) {
+    if (!sessionStarted || hasInitializedNotes.current || !lessonSettings) {
       return
     }
 
@@ -242,80 +261,85 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
                          scaleChordManagement.appliedScales.length === 0 &&
                          scaleChordManagement.appliedChords.length === 0
 
+    // Use settings from the modal
+    const selectedBpm = lessonSettings.bpm
+    const selectedNoteCount = lessonSettings.notes
+
     if (hasNoContent && instrument === 'keyboard') {
       hasInitializedNotes.current = true
-      // Randomly select BPM (30 to 240 in 30 BPM increments)
-      const bpmOptions = Array.from({ length: 8 }, (_, i) => (i + 1) * 30)
-      const randomBPM = bpmOptions[Math.floor(Math.random() * bpmOptions.length)]
-      setBpm(randomBPM)
+      // Use BPM from settings
+      setBpm(selectedBpm)
 
-      // Randomly select number of beats (3 to 8)
-      const randomBeats = Math.floor(Math.random() * 6) + 3
-      setNumberOfBeats(randomBeats)
+      // Use note count from settings
+      setNumberOfBeats(selectedNoteCount)
 
-      // Randomly select octave (1-8)
-      const octaves = [1, 2, 3, 4, 5, 6, 7, 8]
-      const randomOctave = octaves[Math.floor(Math.random() * octaves.length)]
+      // Use octave range from settings (default to 3-5 if not set)
+      const octaveLow = lessonSettings.octaveLow || 3
+      const octaveHigh = lessonSettings.octaveHigh || 5
 
-      // Set octave range to show only the selected octave
+      // Set octave range to show the selected range
       // Formula: to show octave N, set lowerOctaves = 4 - N, higherOctaves = N - 4
-      const lowerOctavesForRange = 4 - randomOctave
-      const higherOctavesForRange = randomOctave - 4
+      const lowerOctavesForRange = 4 - octaveLow
+      const higherOctavesForRange = octaveHigh - 4
       handleOctaveRangeChange(lowerOctavesForRange, higherOctavesForRange)
+
+      // Pick a random octave within the selected range for the lesson
+      const octaveRange = Array.from({ length: octaveHigh - octaveLow + 1 }, (_, i) => octaveLow + i)
+      const selectedOctave = octaveRange[Math.floor(Math.random() * octaveRange.length)]
 
       // Generate all notes for the selected octave
       const allNotesInOctave = generateNotesWithSeparateOctaves(3, 3).filter(note => {
         const noteOctave = note.name.match(/\d+$/)?.[0]
-        return noteOctave === randomOctave.toString()
+        return noteOctave === selectedOctave.toString()
       })
 
-      // SIMPLE MELODIES: 3-6 random notes on single octave (using ID-based selection)
+      // SIMPLE MELODIES: random notes on single octave (using ID-based selection)
       if (practiceOptions.includes('simple-melodies')) {
         handleKeyboardSelectionModeChange('multi', false)
 
-        const noteCount = Math.floor(Math.random() * 4) + 3
-        const autoNotes = getRandomKeyboardNotesInOctave(randomOctave, noteCount, 3, 3)
+        const autoNotes = getRandomKeyboardNotesInOctave(selectedOctave, selectedNoteCount, 3, 3)
 
         setGuitarNotes(autoNotes)
         setSetupDetails({
           type: 'simple-melodies',
           details: {
             noteCount: autoNotes.length,
-            octave: randomOctave,
+            octave: selectedOctave,
             noteIds: autoNotes.map(n => n.id) // Store IDs for scene reference
           }
         })
       }
 
-      // SCALES: Single random scale on single octave
+      // SCALES: Single scale on single octave (filtered by user selection)
       else if (practiceOptions.includes('scales')) {
-        const randomScale = KEYBOARD_SCALES[Math.floor(Math.random() * KEYBOARD_SCALES.length)]
+        const filteredScales = getFilteredScales(KEYBOARD_SCALES, lessonSettings.scale)
+        const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = ROOT_NOTES[Math.floor(Math.random() * ROOT_NOTES.length)]
 
         // Use the scale chord management system to apply the scale
-        scaleChordManagement.handleKeyboardScaleApply(randomRoot, randomScale, randomOctave)
+        scaleChordManagement.handleKeyboardScaleApply(randomRoot, randomScale, selectedOctave)
 
-        setSetupDetails({ type: 'scales', details: { scaleName: randomScale.name, root: randomRoot, octave: randomOctave } })
+        setSetupDetails({ type: 'scales', details: { scaleName: randomScale.name, root: randomRoot, octave: selectedOctave } })
       }
 
-      // CHORD PROGRESSIONS: 3-6 random chords with progression mode
+      // CHORDS: chords with progression mode (filtered by user selection)
       else if (practiceOptions.includes('chords')) {
         setChordMode('progression')
 
-        const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
+        const filteredChords = getFilteredChords(KEYBOARD_CHORDS, lessonSettings.chord)
         const chordDetails: { root: string; chord: string }[] = []
 
-        for (let i = 0; i < chordCount; i++) {
-          const randomChord = KEYBOARD_CHORDS[Math.floor(Math.random() * KEYBOARD_CHORDS.length)]
+        for (let i = 0; i < selectedNoteCount; i++) {
+          const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = KEYBOARD_CHORD_ROOT_NOTES[Math.floor(Math.random() * KEYBOARD_CHORD_ROOT_NOTES.length)]
 
           // Use the scale chord management system to apply each chord
-          scaleChordManagement.handleKeyboardChordApply(randomRoot, randomChord, randomOctave)
+          scaleChordManagement.handleKeyboardChordApply(randomRoot, randomChord, selectedOctave)
 
           chordDetails.push({ root: randomRoot, chord: randomChord.name })
         }
 
-        setSetupDetails({ type: 'chords', details: { chordCount, chords: chordDetails, octave: randomOctave } })
+        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails, octave: selectedOctave } })
       }
 
     }
@@ -323,23 +347,19 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     // GUITAR LESSONS
     if (hasNoContent && instrument === 'guitar') {
       hasInitializedNotes.current = true
-      // Randomly select BPM (30 to 240 in 30 BPM increments)
-      const bpmOptions = Array.from({ length: 8 }, (_, i) => (i + 1) * 30)
-      const randomBPM = bpmOptions[Math.floor(Math.random() * bpmOptions.length)]
-      setBpm(randomBPM)
+      // Use BPM from settings
+      setBpm(selectedBpm)
 
-      // Randomly select number of beats (3 to 8)
-      const randomBeats = Math.floor(Math.random() * 6) + 3
-      setNumberOfBeats(randomBeats)
+      // Use note count from settings
+      setNumberOfBeats(selectedNoteCount)
 
-      // SIMPLE MELODIES: 3-6 random notes on a single string (using ID-based selection)
+      // SIMPLE MELODIES: random notes on a single string (using ID-based selection)
       if (practiceOptions.includes('simple-melodies')) {
         // Randomly select one string (1-6 for guitar)
         const randomString = Math.floor(Math.random() * 6) + 1
 
-        // Randomly select 3-6 notes from that string using ID-based utility
-        const noteCount = Math.floor(Math.random() * 4) + 3
-        const selectedGuitarNotes = getRandomGuitarNotesOnString(randomString, noteCount)
+        // Use note count from settings
+        const selectedGuitarNotes = getRandomGuitarNotesOnString(randomString, selectedNoteCount)
 
         // Convert to Note format for melody generation
         const convertedNotes = convertToNoteFormat(selectedGuitarNotes)
@@ -355,9 +375,10 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         })
       }
 
-      // SCALES: Single random scale in a specific position
+      // SCALES: Single scale in a specific position (filtered by user selection)
       else if (practiceOptions.includes('scales')) {
-        const randomScale = GUITAR_SCALES[Math.floor(Math.random() * GUITAR_SCALES.length)]
+        const filteredScales = getFilteredScales(GUITAR_SCALES, lessonSettings.scale)
+        const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = GUITAR_ROOT_NOTES[Math.floor(Math.random() * GUITAR_ROOT_NOTES.length)]
 
         // Get all scale boxes for this scale and root
@@ -396,22 +417,22 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         }
       }
 
-      // CHORD PROGRESSIONS: 3-6 random chords with progression mode
+      // CHORDS: chords with progression mode (filtered by user selection)
       else if (practiceOptions.includes('chords')) {
         setChordMode('progression')
 
-        const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
+        const filteredChords = getFilteredChords(GUITAR_CHORDS, lessonSettings.chord)
         const chordDetails: { root: string; chord: string; chordObj: typeof GUITAR_CHORDS[0] }[] = []
 
-        for (let i = 0; i < chordCount; i++) {
-          const randomChord = GUITAR_CHORDS[Math.floor(Math.random() * GUITAR_CHORDS.length)]
+        for (let i = 0; i < selectedNoteCount; i++) {
+          const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
 
           chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord })
         }
 
         // Don't call setGuitarNotes - let appliedChords handle it in progression mode
-        setSetupDetails({ type: 'chords', details: { chordCount, chords: chordDetails } })
+        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails } })
       }
 
     }
@@ -419,23 +440,19 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     // BASS LESSONS
     if (hasNoContent && instrument === 'bass') {
       hasInitializedNotes.current = true
-      // Randomly select BPM (30 to 240 in 30 BPM increments)
-      const bpmOptions = Array.from({ length: 8 }, (_, i) => (i + 1) * 30)
-      const randomBPM = bpmOptions[Math.floor(Math.random() * bpmOptions.length)]
-      setBpm(randomBPM)
+      // Use BPM from settings
+      setBpm(selectedBpm)
 
-      // Randomly select number of beats (3 to 8)
-      const randomBeats = Math.floor(Math.random() * 6) + 3
-      setNumberOfBeats(randomBeats)
+      // Use note count from settings
+      setNumberOfBeats(selectedNoteCount)
 
-      // SIMPLE MELODIES: 3-6 random notes on a single string (using ID-based selection)
+      // SIMPLE MELODIES: random notes on a single string (using ID-based selection)
       if (practiceOptions.includes('simple-melodies')) {
         // Randomly select one string (1-4 for bass)
         const randomString = Math.floor(Math.random() * 4) + 1
 
-        // Randomly select 3-6 notes from that string using ID-based utility
-        const noteCount = Math.floor(Math.random() * 4) + 3
-        const selectedBassNotes = getRandomBassNotesOnString(randomString, noteCount)
+        // Use note count from settings
+        const selectedBassNotes = getRandomBassNotesOnString(randomString, selectedNoteCount)
 
         // Convert to Note format for melody generation
         const convertedNotes = convertToNoteFormat(selectedBassNotes)
@@ -451,9 +468,10 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         })
       }
 
-      // SCALES: Single random scale in a specific position
+      // SCALES: Single scale in a specific position (filtered by user selection)
       else if (practiceOptions.includes('scales')) {
-        const randomScale = BASS_SCALES[Math.floor(Math.random() * BASS_SCALES.length)]
+        const filteredScales = getFilteredScales(BASS_SCALES, lessonSettings.scale)
+        const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = BASS_ROOT_NOTES[Math.floor(Math.random() * BASS_ROOT_NOTES.length)]
 
         // Get all scale boxes for this scale and root
@@ -492,26 +510,26 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         }
       }
 
-      // CHORD PROGRESSIONS: 3-6 random chords with progression mode
+      // CHORDS: chords with progression mode (filtered by user selection)
       else if (practiceOptions.includes('chords')) {
         setChordMode('progression')
 
-        const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
+        const filteredChords = getFilteredChords(BASS_CHORDS, lessonSettings.chord)
         const chordDetails: { root: string; chord: string; chordObj: typeof BASS_CHORDS[0] }[] = []
 
-        for (let i = 0; i < chordCount; i++) {
-          const randomChord = BASS_CHORDS[Math.floor(Math.random() * BASS_CHORDS.length)]
+        for (let i = 0; i < selectedNoteCount; i++) {
+          const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
 
           chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord })
         }
 
         // Don't call setGuitarNotes - let appliedChords handle it in progression mode
-        setSetupDetails({ type: 'chords', details: { chordCount, chords: chordDetails } })
+        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails } })
       }
 
     }
-  }, [sessionStarted, practiceOptions, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, setGuitarNotes, setBpm, setNumberOfBeats, instrument, handleKeyboardSelectionModeChange, setChordMode, handleOctaveRangeChange, scaleChordManagement])
+  }, [sessionStarted, practiceOptions, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, setGuitarNotes, setBpm, setNumberOfBeats, instrument, handleKeyboardSelectionModeChange, setChordMode, handleOctaveRangeChange, scaleChordManagement, lessonSettings])
 
   // Set visual display on fretboard once handlers become available
   useEffect(() => {

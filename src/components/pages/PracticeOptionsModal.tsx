@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import styles from '../../styles/PracticeOptionsModal.module.css'
+import '../../styles/Controls.css'
 
 interface PracticeOption {
   id: string
@@ -49,6 +50,8 @@ export interface LessonSettings {
   notes: number
   scale?: string
   chord?: string
+  octaveLow?: number
+  octaveHigh?: number
 }
 
 interface PracticeOptionsModalProps {
@@ -66,8 +69,12 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   const [difficulty, setDifficulty] = useState<number>(2)
   const [bpm, setBpm] = useState<number>(120)
   const [notes, setNotes] = useState<number>(4)
-  const [selectedScale, setSelectedScale] = useState<string>('random')
-  const [selectedChord, setSelectedChord] = useState<string>('random')
+  const [selectedScale, setSelectedScale] = useState<string>('major')
+  const [selectedChord, setSelectedChord] = useState<string>('major')
+  const [octaveLow, setOctaveLow] = useState<number>(3)
+  const [octaveHigh, setOctaveHigh] = useState<number>(5)
+
+  const isKeyboard = instrumentName.toLowerCase() === 'keyboard'
 
   const handleStart = () => {
     if (selectedOption) {
@@ -77,7 +84,9 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         bpm,
         notes,
         scale: selectedOption === 'scales' ? selectedScale : undefined,
-        chord: selectedOption === 'chords' ? selectedChord : undefined
+        chord: selectedOption === 'chords' ? selectedChord : undefined,
+        octaveLow: isKeyboard ? octaveLow : undefined,
+        octaveHigh: isKeyboard ? octaveHigh : undefined
       }
       onStart([selectedOption], difficulty, settings)
     }
@@ -150,6 +159,73 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Octave range slider - only for keyboard (using sandbox mode UI) */}
+        {isKeyboard && (
+          <div className="control-group octave-range-control">
+            <div className="label-with-tooltip">
+              <label className="control-label">Octave Range</label>
+            </div>
+            <div className="octave-range-slider">
+              <div className="range-labels-center">
+                <span className="range-label-center">
+                  {octaveLow} - {octaveHigh}
+                </span>
+              </div>
+              <div className="dual-range-container">
+                <div
+                  className="range-fill"
+                  style={{
+                    left: `${((octaveLow - 1) / 7) * 100}%`,
+                    right: `${((8 - octaveHigh) / 7) * 100}%`
+                  }}
+                />
+                <input
+                  type="range"
+                  min="1"
+                  max="8"
+                  value={octaveLow}
+                  onChange={(e) => {
+                    const val = Number(e.target.value)
+                    if (val <= octaveHigh) setOctaveLow(val)
+                  }}
+                  className={`range-slider range-low ${octaveLow === octaveHigh ? 'same-position' : ''}`}
+                  title="Set lowest octave"
+                />
+                <input
+                  type="range"
+                  min="1"
+                  max="8"
+                  value={octaveHigh}
+                  onChange={(e) => {
+                    const val = Number(e.target.value)
+                    if (val >= octaveLow) setOctaveHigh(val)
+                  }}
+                  className={`range-slider range-high ${octaveLow === octaveHigh ? 'same-position' : ''}`}
+                  title="Set highest octave"
+                />
+              </div>
+              <div className="octave-visual">
+                {Array.from({ length: 8 }, (_, i) => {
+                  const octaveNumber = i + 1
+                  const isSelected = octaveNumber >= octaveLow && octaveNumber <= octaveHigh
+                  return (
+                    <div
+                      key={octaveNumber}
+                      className={`octave-mini ${isSelected ? 'highlight' : 'dim'}`}
+                    >
+                      <img
+                        src="/Octave-icon.png"
+                        alt={`Octave ${octaveNumber}`}
+                        className="octave-icon"
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Lesson-specific fields */}
         <div className={styles.settingsGrid}>
@@ -226,9 +302,9 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
             </div>
           </div>
 
-          {/* Notes dropdown - all lesson types */}
+          {/* Notes/Chords dropdown - all lesson types */}
           <div className={styles.formGroupSmall}>
-            <label className={styles.formLabel}>Notes</label>
+            <label className={styles.formLabel}>{selectedOption === 'chords' ? 'Chords' : 'Notes'}</label>
             <div className={styles.selectWrapper}>
               <select
                 className={styles.select}
