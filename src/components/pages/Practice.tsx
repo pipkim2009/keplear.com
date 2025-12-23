@@ -4,7 +4,7 @@ import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import type { IconType } from 'react-icons'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
-import PracticeOptionsModal from './PracticeOptionsModal'
+import PracticeOptionsModal, { type LessonSettings } from './PracticeOptionsModal'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import { generateNotesWithSeparateOctaves } from '../../utils/notes'
 import type { Note } from '../../utils/notes'
@@ -183,8 +183,13 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setShowOptionsModal(true)
   }
 
-  const handleOptionsStart = (selectedOptions: string[]) => {
+  const [difficulty, setDifficulty] = useState<number>(2) // 0-4: Beginner to Expert
+  const [lessonSettings, setLessonSettings] = useState<LessonSettings | null>(null)
+
+  const handleOptionsStart = (selectedOptions: string[], selectedDifficulty: number, settings: LessonSettings) => {
     setPracticeOptions(selectedOptions)
+    setDifficulty(selectedDifficulty)
+    setLessonSettings(settings)
     setShowOptionsModal(false)
     setSessionStarted(true)
   }
@@ -214,6 +219,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setCongratulationsMessage('')
     setSetupDetails(null)
     setAutoPlayAudio(false)
+    setLessonSettings(null)
     setBpm(120) // Reset BPM to default
     setNumberOfBeats(4) // Reset beats to default
     setChordMode('arpeggiator') // Reset chord mode to default
@@ -293,7 +299,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       }
 
       // CHORD PROGRESSIONS: 3-6 random chords with progression mode
-      else if (practiceOptions.includes('chord-progressions')) {
+      else if (practiceOptions.includes('chords')) {
         setChordMode('progression')
 
         const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
@@ -309,21 +315,9 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           chordDetails.push({ root: randomRoot, chord: randomChord.name })
         }
 
-        setSetupDetails({ type: 'chord-progressions', details: { chordCount, chords: chordDetails, octave: randomOctave } })
+        setSetupDetails({ type: 'chords', details: { chordCount, chords: chordDetails, octave: randomOctave } })
       }
 
-      // CHORD ARPEGGIOS: Single random chord with arpeggiator mode
-      else if (practiceOptions.includes('chord-arpeggios')) {
-        setChordMode('arpeggiator')
-
-        const randomChord = KEYBOARD_CHORDS[Math.floor(Math.random() * KEYBOARD_CHORDS.length)]
-        const randomRoot = KEYBOARD_CHORD_ROOT_NOTES[Math.floor(Math.random() * KEYBOARD_CHORD_ROOT_NOTES.length)]
-
-        // Use the scale chord management system to apply the chord
-        scaleChordManagement.handleKeyboardChordApply(randomRoot, randomChord, randomOctave)
-
-        setSetupDetails({ type: 'chord-arpeggios', details: { root: randomRoot, chord: randomChord.name, octave: randomOctave } })
-      }
     }
 
     // GUITAR LESSONS
@@ -403,7 +397,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       }
 
       // CHORD PROGRESSIONS: 3-6 random chords with progression mode
-      else if (practiceOptions.includes('chord-progressions')) {
+      else if (practiceOptions.includes('chords')) {
         setChordMode('progression')
 
         const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
@@ -417,38 +411,9 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         }
 
         // Don't call setGuitarNotes - let appliedChords handle it in progression mode
-        setSetupDetails({ type: 'chord-progressions', details: { chordCount, chords: chordDetails } })
+        setSetupDetails({ type: 'chords', details: { chordCount, chords: chordDetails } })
       }
 
-      // CHORD ARPEGGIOS: Single random chord with arpeggiator mode
-      else if (practiceOptions.includes('chord-arpeggios')) {
-        setChordMode('arpeggiator')
-
-        const randomChord = GUITAR_CHORDS[Math.floor(Math.random() * GUITAR_CHORDS.length)]
-        const randomRoot = GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
-
-        // Get chord notes for melody generation
-        const chordNoteNames = randomChord.intervals.map(interval => {
-          const rootIndex = GUITAR_CHORD_ROOT_NOTES.indexOf(randomRoot)
-          const noteIndex = (rootIndex + interval) % 12
-          return GUITAR_CHORD_ROOT_NOTES[noteIndex]
-        })
-
-        // Find guitar notes that match these chord notes
-        const chordNotes: Note[] = []
-        chordNoteNames.forEach(noteName => {
-          const matchingNotes = guitarNotes.filter(gn => gn.name.startsWith(noteName))
-          matchingNotes.forEach(gn => {
-            if (!chordNotes.some(n => n.name === gn.name)) {
-              chordNotes.push({ name: gn.name, frequency: gn.frequency })
-            }
-          })
-        })
-
-        // Set chord notes for melody generation
-        setGuitarNotes(chordNotes)
-        setSetupDetails({ type: 'chord-arpeggios', details: { root: randomRoot, chord: randomChord.name, chordObj: randomChord } })
-      }
     }
 
     // BASS LESSONS
@@ -528,7 +493,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       }
 
       // CHORD PROGRESSIONS: 3-6 random chords with progression mode
-      else if (practiceOptions.includes('chord-progressions')) {
+      else if (practiceOptions.includes('chords')) {
         setChordMode('progression')
 
         const chordCount = Math.floor(Math.random() * 4) + 3 // 3-6 chords
@@ -542,38 +507,9 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         }
 
         // Don't call setGuitarNotes - let appliedChords handle it in progression mode
-        setSetupDetails({ type: 'chord-progressions', details: { chordCount, chords: chordDetails } })
+        setSetupDetails({ type: 'chords', details: { chordCount, chords: chordDetails } })
       }
 
-      // CHORD ARPEGGIOS: Single random chord with arpeggiator mode
-      else if (practiceOptions.includes('chord-arpeggios')) {
-        setChordMode('arpeggiator')
-
-        const randomChord = BASS_CHORDS[Math.floor(Math.random() * BASS_CHORDS.length)]
-        const randomRoot = BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
-
-        // Get chord notes for melody generation
-        const chordNoteNames = randomChord.intervals.map(interval => {
-          const rootIndex = BASS_CHORD_ROOT_NOTES.indexOf(randomRoot)
-          const noteIndex = (rootIndex + interval) % 12
-          return BASS_CHORD_ROOT_NOTES[noteIndex]
-        })
-
-        // Find bass notes that match these chord notes
-        const chordNotes: Note[] = []
-        chordNoteNames.forEach(noteName => {
-          const matchingNotes = bassNotes.filter(bn => bn.name.startsWith(noteName))
-          matchingNotes.forEach(bn => {
-            if (!chordNotes.some(n => n.name === bn.name)) {
-              chordNotes.push({ name: bn.name, frequency: bn.frequency })
-            }
-          })
-        })
-
-        // Set chord notes for melody generation
-        setGuitarNotes(chordNotes)
-        setSetupDetails({ type: 'chord-arpeggios', details: { root: randomRoot, chord: randomChord.name, chordObj: randomChord } })
-      }
     }
   }, [sessionStarted, practiceOptions, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, setGuitarNotes, setBpm, setNumberOfBeats, instrument, handleKeyboardSelectionModeChange, setChordMode, handleOctaveRangeChange, scaleChordManagement])
 
@@ -610,7 +546,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       }
 
       // Chord progressions - use wrapper functions that add to appliedChords AND update visual display
-      if (type === 'chord-progressions' && details.chords) {
+      if (type === 'chords' && details.chords) {
         if ((instrument === 'guitar' && scaleChordManagement.chordHandlers) ||
             (instrument === 'bass' && scaleChordManagement.bassChordHandlers)) {
           details.chords.forEach((c: any) => {
@@ -618,15 +554,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
               scaleChordManagement.handleChordSelect(c.root, c.chordObj)
             }
           })
-          hasAppliedVisualDisplay.current = true
-        }
-      }
-
-      // Chord arpeggios - use wrapper functions that add to appliedChords AND update visual display
-      if (type === 'chord-arpeggios' && details.chordObj) {
-        if ((instrument === 'guitar' && scaleChordManagement.chordHandlers) ||
-            (instrument === 'bass' && scaleChordManagement.bassChordHandlers)) {
-          scaleChordManagement.handleChordSelect(details.root, details.chordObj)
           hasAppliedVisualDisplay.current = true
         }
       }
@@ -692,27 +619,17 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale at ${bpm} BPM`
         }
       }
-      else if (setupDetails.type === 'chord-progressions') {
+      else if (setupDetails.type === 'chords') {
         // Check if it's keyboard (has octave) or guitar/bass (no octave specified)
         if (setupDetails.details.octave) {
           const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
           const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
-          announcement = `I have set up a ${generatedMelody.length} beat melody using a chord progression on the ${octaveOrdinal} octave at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using chords on the ${octaveOrdinal} octave at ${bpm} BPM`
         } else {
           const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
-          announcement = `I have set up a ${generatedMelody.length} beat melody using a chord progression at ${bpm} BPM`
+          announcement = `I have set up a ${generatedMelody.length} beat melody using chords at ${bpm} BPM`
         }
       }
-      else if (setupDetails.type === 'chord-arpeggios') {
-        // Check if it's keyboard (has octave) or guitar/bass (no octave specified)
-        if (setupDetails.details.octave) {
-          const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.chord} chord arpeggio on the ${octaveOrdinal} octave at ${bpm} BPM`
-        } else {
-          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.chord} chord arpeggio at ${bpm} BPM`
-        }
-      }
-
       // Set the message for subtitle display (WelcomeSubtitle component will handle TTS and subtitle)
       setMelodySetupMessage(announcement)
     }
@@ -739,8 +656,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     const practiceTopics = [
       { id: 'simple-melodies', label: 'Simple Melodies' },
       { id: 'scales', label: 'Scales' },
-      { id: 'chord-progressions', label: 'Chord Progressions' },
-      { id: 'chord-arpeggios', label: 'Chord Arpeggios' }
+      { id: 'chords', label: 'Chords' }
     ]
     const practiceTopicLabel = practiceOptions.map(opt =>
       practiceTopics.find(t => t.id === opt)?.label || opt
@@ -881,7 +797,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
                   onClick={() => handleStartLesson(instrument.id)}
                   aria-label={`Start ${instrument.name} lesson`}
                 >
-                  Start Lesson
+                  Begin
                 </button>
               </div>
             )

@@ -45,7 +45,7 @@
   border: 2px solid rgb(80, 80, 80, 0.3);
   border-radius: 20px;
   padding: 40px;
-  max-width: 500px;
+  max-width: 460px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
@@ -84,9 +84,6 @@
 
 .closeButton:hover {
   background: rgb(0, 0, 0, 0.5);
-}
-
-.closeButton:active {
 }
 
 :global(.light) .closeButton {
@@ -136,138 +133,237 @@
   color: rgb(102, 0, 204, 0.7);
 }
 
-/* Options List */
-.optionsList {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 32px;
+/* Form Group */
+.formGroup {
+  margin-bottom: 28px;
 }
 
-/* Option Item */
-.optionItem {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  background: rgb(255, 255, 255, 0.05);
-  border: 2px solid rgb(117, 26, 255, 0.2);
-  border-radius: 16px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  user-select: none;
+.formLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgb(212, 196, 255, 0.9);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.optionItem:hover {
+:global(.light) .formLabel {
+  color: rgb(102, 0, 204, 0.8);
+}
+
+/* Select Dropdown */
+.selectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select {
+  width: 100%;
+  padding: 14px 48px 14px 16px;
   background: rgb(255, 255, 255, 0.08);
+  border: 2px solid rgb(117, 26, 255, 0.3);
+  border-radius: 12px;
+  color: #f8f9fa;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  transition: all 0.2s ease;
 }
 
-.optionItem.selected {
-  background: linear-gradient(
-    135deg,
-    rgb(117, 26, 255, 0.25),
-    rgb(157, 92, 255, 0.2)
-  );
-  border-color: rgb(117, 26, 255, 0.6);
-}
-
-:global(.light) .optionItem {
-  background: rgb(117, 26, 255, 0.05);
-  border-color: rgb(117, 26, 255, 0.15);
-}
-
-:global(.light) .optionItem:hover {
-  background: rgb(117, 26, 255, 0.1);
-}
-
-:global(.light) .optionItem.selected {
-  background: linear-gradient(
-    135deg,
-    rgb(117, 26, 255, 0.15),
-    rgb(157, 92, 255, 0.1)
-  );
+.select:hover {
+  background: rgb(255, 255, 255, 0.12);
   border-color: rgb(117, 26, 255, 0.5);
 }
 
-/* Radio Button */
-.radio {
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgb(117, 26, 255, 0.4);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  background: rgb(255, 255, 255, 0.05);
-  position: relative;
-}
-
-.radio:checked {
-  background: linear-gradient(135deg, #751aff, #9d5cff);
+.select:focus {
+  outline: none;
   border-color: #751aff;
+  box-shadow: 0 0 0 3px rgb(117, 26, 255, 0.2);
 }
 
-.radio:checked::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 8px;
-  height: 8px;
-  background: white;
-  border-radius: 50%;
-}
-
-:global(.light) .radio {
-  border-color: rgb(117, 26, 255, 0.4);
-  background: rgb(255, 255, 255, 0.8);
-}
-
-:global(.light) .radio:checked {
-  background: linear-gradient(135deg, #751aff, #9d5cff);
-  border-color: #751aff;
-}
-
-/* Option Content */
-.optionContent {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.optionLabel {
-  font-size: 16px;
-  font-weight: 600;
+.select option {
+  background: #2a2a2a;
   color: #f8f9fa;
+  padding: 12px;
 }
 
-:global(.light) .optionLabel {
+:global(.light) .select {
+  background: rgb(255, 255, 255, 0.9);
+  border-color: rgb(117, 26, 255, 0.3);
   color: #121212;
 }
 
-.optionDescription {
-  font-size: 13px;
-  font-weight: 400;
+:global(.light) .select:hover {
+  background: rgb(255, 255, 255, 1);
+  border-color: rgb(117, 26, 255, 0.5);
+}
+
+:global(.light) .select:focus {
+  border-color: #751aff;
+  box-shadow: 0 0 0 3px rgb(117, 26, 255, 0.15);
+}
+
+:global(.light) .select option {
+  background: #ffffff;
+  color: #121212;
+}
+
+.selectArrow {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
   color: rgb(212, 196, 255, 0.7);
 }
 
+:global(.light) .selectArrow {
+  color: rgb(102, 0, 204, 0.7);
+}
+
+/* Option Description */
+.optionDescription {
+  font-size: 13px;
+  font-weight: 400;
+  color: rgb(212, 196, 255, 0.6);
+  margin: 10px 0 0 0;
+  padding-left: 2px;
+}
+
 :global(.light) .optionDescription {
-  color: rgb(102, 0, 204, 0.6);
+  color: rgb(102, 0, 204, 0.5);
 }
 
-/* Checkmark */
-.checkmark {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  color: #751aff;
+/* Difficulty Slider */
+.difficultyValue {
+  color: #a78bfa;
+  font-weight: 700;
 }
 
-:global(.light) .checkmark {
-  color: #751aff;
+:global(.light) .difficultyValue {
+  color: #7c3aed;
+}
+
+.sliderContainer {
+  padding: 0 4px;
+}
+
+.slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: rgb(255, 255, 255, 0.1);
+  appearance: none;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #751aff, #9d5cff);
+  border: 3px solid #f8f9fa;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgb(117, 26, 255, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgb(117, 26, 255, 0.5);
+}
+
+.slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #751aff, #9d5cff);
+  border: 3px solid #f8f9fa;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgb(117, 26, 255, 0.4);
+}
+
+.slider::-moz-range-track {
+  height: 8px;
+  border-radius: 4px;
+  background: rgb(255, 255, 255, 0.1);
+}
+
+:global(.light) .slider {
+  background: rgb(117, 26, 255, 0.15);
+}
+
+:global(.light) .slider::-webkit-slider-thumb {
+  border-color: #ffffff;
+  box-shadow: 0 2px 8px rgb(117, 26, 255, 0.3);
+}
+
+:global(.light) .slider::-moz-range-thumb {
+  border-color: #ffffff;
+  box-shadow: 0 2px 8px rgb(117, 26, 255, 0.3);
+}
+
+:global(.light) .slider::-moz-range-track {
+  background: rgb(117, 26, 255, 0.15);
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.sliderLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgb(212, 196, 255, 0.4);
+  transition: color 0.2s ease;
+}
+
+.sliderLabel.activeLabel {
+  color: #a78bfa;
+  font-weight: 600;
+}
+
+:global(.light) .sliderLabel {
+  color: rgb(102, 0, 204, 0.35);
+}
+
+:global(.light) .sliderLabel.activeLabel {
+  color: #7c3aed;
+}
+
+/* Settings Grid */
+.settingsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.formGroupSmall {
+  margin-bottom: 0;
+}
+
+.formGroupFull {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+.formGroupSmall .formLabel,
+.formGroupFull .formLabel {
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.formGroupSmall .select,
+.formGroupFull .select {
+  padding: 12px 40px 12px 14px;
+  font-size: 14px;
 }
 
 /* Modal Actions */
@@ -275,6 +371,7 @@
   display: flex;
   gap: 12px;
   justify-content: flex-end;
+  margin-top: 8px;
 }
 
 /* Start Button */
@@ -291,6 +388,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
+  justify-content: center;
 }
 
 .startButton:hover:not(:disabled) {
@@ -319,26 +418,25 @@
     margin-bottom: 24px;
   }
 
-  .optionItem {
-    padding: 16px;
-    gap: 12px;
+  .formGroup {
+    margin-bottom: 24px;
   }
 
-  .optionLabel {
+  .formLabel {
+    font-size: 13px;
+  }
+
+  .select {
+    padding: 12px 44px 12px 14px;
     font-size: 15px;
   }
 
-  .optionDescription {
-    font-size: 12px;
-  }
-
-  .modalActions {
-    flex-direction: column-reverse;
+  .sliderLabel {
+    font-size: 10px;
   }
 
   .startButton {
-    width: 100%;
-    justify-content: center;
+    padding: 14px 24px;
   }
 }
 
