@@ -234,7 +234,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
     // Use settings from the modal
     const selectedBpm = lessonSettings.bpm
-    const selectedNoteCount = lessonSettings.notes
+    const selectedNoteCount = lessonSettings.beats
 
     if (hasNoContent && selectedInstrument === 'keyboard') {
       hasInitializedNotes.current = true
@@ -277,19 +277,40 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         setChordMode('progression')
 
         const filteredChords = getFilteredChords(KEYBOARD_CHORDS, lessonSettings.chord)
-        const chordDetails: { root: string; chord: string }[] = []
+        const chordDetails: { root: string; chord: string; octave: number }[] = []
+
+        // Distribute chords across octaves - ensure each octave gets at least one chord
+        const octavesToUse: number[] = []
+
+        // First, ensure each octave in range gets at least one chord
+        for (let i = 0; i < selectedNoteCount; i++) {
+          if (i < octaveRange.length) {
+            // Assign one chord to each octave first
+            octavesToUse.push(octaveRange[i])
+          } else {
+            // Remaining chords get random octaves from the range
+            octavesToUse.push(octaveRange[Math.floor(Math.random() * octaveRange.length)])
+          }
+        }
+
+        // Shuffle the octave assignments so it's not predictable (low to high)
+        for (let i = octavesToUse.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1))
+          ;[octavesToUse[i], octavesToUse[j]] = [octavesToUse[j], octavesToUse[i]]
+        }
 
         for (let i = 0; i < selectedNoteCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = KEYBOARD_CHORD_ROOT_NOTES[Math.floor(Math.random() * KEYBOARD_CHORD_ROOT_NOTES.length)]
+          const chordOctave = octavesToUse[i]
 
           // Use the scale chord management system to apply each chord
-          scaleChordManagement.handleKeyboardChordApply(randomRoot, randomChord, selectedOctave)
+          scaleChordManagement.handleKeyboardChordApply(randomRoot, randomChord, chordOctave)
 
-          chordDetails.push({ root: randomRoot, chord: randomChord.name })
+          chordDetails.push({ root: randomRoot, chord: randomChord.name, octave: chordOctave })
         }
 
-        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails, octave: selectedOctave } })
+        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails, octaveRange: `${octaveLow}-${octaveHigh}` } })
       }
 
     }

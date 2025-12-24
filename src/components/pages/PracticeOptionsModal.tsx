@@ -37,7 +37,6 @@ export interface LessonSettings {
   difficulty: number
   bpm: number
   beats: number
-  notes: number
   scale?: string
   chord?: string
   octaveLow?: number
@@ -58,7 +57,6 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   const [difficulty, setDifficulty] = useState<number>(1)
   const [bpm, setBpm] = useState<number>(120)
   const [beats, setBeats] = useState<number>(4)
-  const [notes, setNotes] = useState<number>(4)
   const [selectedScale, setSelectedScale] = useState<string>('major-minor')
   const [selectedChord, setSelectedChord] = useState<string>('major-minor')
   const [octaveLow, setOctaveLow] = useState<number>(4)
@@ -67,10 +65,10 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
 
   // Difficulty presets
   const difficultyPresets = [
-    { bpm: 60, notes: 3, beats: 3, scale: 'major', chord: 'major' },           // Beginner
-    { bpm: 120, notes: 4, beats: 4, scale: 'major-minor', chord: 'major-minor' }, // Intermediate
-    { bpm: 180, notes: 6, beats: 6, scale: 'modes', chord: 'all' },            // Advanced
-    { bpm: 240, notes: 8, beats: 8, scale: 'all', chord: 'all' }               // Professional
+    { bpm: 60, beats: 3, scale: 'major', chord: 'major' },           // Beginner
+    { bpm: 120, beats: 4, scale: 'major-minor', chord: 'major-minor' }, // Intermediate
+    { bpm: 180, beats: 6, scale: 'modes', chord: 'all' },            // Advanced
+    { bpm: 240, beats: 8, scale: 'all', chord: 'all' }               // Professional
   ]
 
   const handleDifficultyChange = (newDifficulty: number) => {
@@ -79,7 +77,6 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
     const preset = difficultyPresets[newDifficulty]
     if (preset) {
       setBpm(preset.bpm)
-      setNotes(preset.notes)
       setBeats(preset.beats)
       setSelectedScale(preset.scale)
       setSelectedChord(preset.chord)
@@ -102,7 +99,6 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         difficulty,
         bpm,
         beats,
-        notes,
         scale: selectedOption === 'melodies' ? selectedScale : undefined,
         chord: selectedOption === 'chords' ? selectedChord : undefined,
         octaveLow: isKeyboard ? octaveLow : undefined,
@@ -390,7 +386,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
           </div>
         )}
 
-        {/* BPM, Beats, and Notes - Single row that wraps on small screens */}
+        {/* BPM and Beats - Single row that wraps on small screens */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 20, flexWrap: 'wrap' }}>
           {/* BPM control */}
           <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
@@ -429,7 +425,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
           <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
             <div className="label-with-tooltip">
               <label className="control-label">Beats</label>
-              <Tooltip title="Beats" text="Specify the number of beats within the melody">
+              <Tooltip title="Beats" text="Specify the number of beats in the melody">
                 <div className="tooltip-icon">?</div>
               </Tooltip>
             </div>
@@ -452,42 +448,6 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
               <button
                 className="control-button-internal plus"
                 onClick={() => { setBeats(Math.min(16, beats + 1)); handleManualChange() }}
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          {/* Notes/Chords control */}
-          <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
-            <div className="label-with-tooltip">
-              <label className="control-label">{selectedOption === 'chords' ? 'Chords' : 'Notes'}</label>
-              <Tooltip
-                title={selectedOption === 'chords' ? 'Chords' : 'Notes'}
-                text={selectedOption === 'chords' ? 'Specify the number of chords in the lesson' : 'Specify the number of notes in the melody'}
-              >
-                <div className="tooltip-icon">?</div>
-              </Tooltip>
-            </div>
-            <div className="input-with-buttons">
-              <input
-                type="text"
-                value={notes}
-                onChange={(e) => {
-                  const val = Number(e.target.value)
-                  if (!isNaN(val) && val > 0) { setNotes(val); handleManualChange() }
-                }}
-                className="control-input with-internal-buttons"
-              />
-              <button
-                className="control-button-internal minus"
-                onClick={() => { setNotes(Math.max(1, notes - 1)); handleManualChange() }}
-              >
-                −
-              </button>
-              <button
-                className="control-button-internal plus"
-                onClick={() => { setNotes(Math.min(16, notes + 1)); handleManualChange() }}
               >
                 +
               </button>
