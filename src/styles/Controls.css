@@ -2254,6 +2254,13 @@ select.control-input.flashing {
   color: var(--green-550) !important;
 }
 
+.label-with-tooltip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
 .modern-control-item {
   display: flex;
   flex-direction: column;
