@@ -694,8 +694,8 @@ const InstrumentControls = memo(function InstrumentControls({
               <div
                 className="range-fill"
                 style={{
-                  left: `${((Math.max(1, 4 - lowerOctaves) - 1) / 7) * 100}%`,
-                  right: `${(1 - (Math.min(8, 5 + higherOctaves) - 1) / 7) * 100}%`
+                  left: `${((Math.max(1, 4 - lowerOctaves) - 1) / 8) * 100}%`,
+                  right: `${((8 - Math.min(8, 5 + higherOctaves)) / 8) * 100}%`
                 }}
               />
               <input
@@ -725,7 +725,7 @@ const InstrumentControls = memo(function InstrumentControls({
                     }
                   }
                 }}
-                className={`range-slider range-low ${Math.max(1, 4 - lowerOctaves) === Math.min(8, 5 + higherOctaves) ? 'same-position' : ''}`}
+                className="range-slider range-low"
                 title="Set lowest octave"
               />
               <input
@@ -753,30 +753,35 @@ const InstrumentControls = memo(function InstrumentControls({
                     }
                   }
                 }}
-                className={`range-slider range-high ${Math.max(1, 4 - lowerOctaves) === Math.min(8, 5 + higherOctaves) ? 'same-position' : ''}`}
+                className="range-slider range-high"
                 title="Set highest octave"
               />
             </div>
             <div className="octave-visual">
-              {Array.from({ length: 8 }, (_, i) => {
-                const octaveNumber = i + 1
+              {(() => {
                 const currentLowOctave = Math.max(1, 4 - lowerOctaves)
                 const currentHighOctave = Math.min(8, 5 + higherOctaves)
-                const isSelected = octaveNumber >= currentLowOctave && octaveNumber <= currentHighOctave
+                const leftDimPercent = ((currentLowOctave - 1) / 8) * 100
+                const rightDimPercent = ((8 - currentHighOctave) / 8) * 100
 
                 return (
-                  <div
-                    key={octaveNumber}
-                    className={`octave-mini ${isSelected ? 'highlight' : 'dim'}`}
-                  >
+                  <div className="keyboard-range-container">
                     <img
-                      src="/Octave-icon.png"
-                      alt={`Octave ${octaveNumber}`}
-                      className="octave-icon"
+                      src="/Keyboard.png"
+                      alt="Keyboard octave range"
+                      className="keyboard-range-image"
+                    />
+                    <div
+                      className="keyboard-dim-overlay keyboard-dim-left"
+                      style={{ width: `${leftDimPercent}%` }}
+                    />
+                    <div
+                      className="keyboard-dim-overlay keyboard-dim-right"
+                      style={{ width: `${rightDimPercent}%` }}
                     />
                   </div>
                 )
-              })}
+              })()}
             </div>
           </div>
         </div>

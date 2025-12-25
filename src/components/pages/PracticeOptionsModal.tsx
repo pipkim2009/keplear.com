@@ -41,6 +41,8 @@ export interface LessonSettings {
   chord?: string
   octaveLow?: number
   octaveHigh?: number
+  fretLow?: number
+  fretHigh?: number
 }
 
 interface PracticeOptionsModalProps {
@@ -61,6 +63,8 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   const [selectedChord, setSelectedChord] = useState<string>('major-minor')
   const [octaveLow, setOctaveLow] = useState<number>(4)
   const [octaveHigh, setOctaveHigh] = useState<number>(5)
+  const [fretLow, setFretLow] = useState<number>(0)
+  const [fretHigh, setFretHigh] = useState<number>(12)
   const [isInstrumentDropdownOpen, setIsInstrumentDropdownOpen] = useState<boolean>(false)
 
   // Difficulty presets
@@ -91,6 +95,9 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   }
 
   const isKeyboard = selectedInstrument === 'keyboard'
+  const isGuitar = selectedInstrument === 'guitar'
+  const isBass = selectedInstrument === 'bass'
+  const isStringInstrument = isGuitar || isBass
 
   const handleStart = () => {
     if (selectedOption && selectedInstrument) {
@@ -102,7 +109,9 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         scale: selectedOption === 'melodies' ? selectedScale : undefined,
         chord: selectedOption === 'chords' ? selectedChord : undefined,
         octaveLow: isKeyboard ? octaveLow : undefined,
-        octaveHigh: isKeyboard ? octaveHigh : undefined
+        octaveHigh: isKeyboard ? octaveHigh : undefined,
+        fretLow: isStringInstrument ? fretLow : undefined,
+        fretHigh: isStringInstrument ? fretHigh : undefined
       }
       onStart(selectedInstrument, [selectedOption], difficulty, settings)
     }
@@ -284,8 +293,8 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                 <div
                   className="range-fill"
                   style={{
-                    left: `${((octaveLow - 1) / 7) * 100}%`,
-                    right: `${((8 - octaveHigh) / 7) * 100}%`
+                    left: `${((octaveLow - 1) / 8) * 100}%`,
+                    right: `${((8 - octaveHigh) / 8) * 100}%`
                   }}
                 />
                 <input
@@ -297,7 +306,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                     const val = Number(e.target.value)
                     if (val <= octaveHigh) { setOctaveLow(val); handleManualChange() }
                   }}
-                  className={`range-slider range-low ${octaveLow === octaveHigh ? 'same-position' : ''}`}
+                  className="range-slider range-low"
                   title="Set lowest octave"
                 />
                 <input
@@ -309,29 +318,115 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                     const val = Number(e.target.value)
                     if (val >= octaveLow) { setOctaveHigh(val); handleManualChange() }
                   }}
-                  className={`range-slider range-high ${octaveLow === octaveHigh ? 'same-position' : ''}`}
+                  className="range-slider range-high"
                   title="Set highest octave"
                 />
               </div>
               <div className="octave-visual">
-                {Array.from({ length: 8 }, (_, i) => {
-                  const octaveNumber = i + 1
-                  const isSelected = octaveNumber >= octaveLow && octaveNumber <= octaveHigh
+                {(() => {
+                  const leftDimPercent = ((octaveLow - 1) / 8) * 100
+                  const rightDimPercent = ((8 - octaveHigh) / 8) * 100
+
                   return (
-                    <div
-                      key={octaveNumber}
-                      className={`octave-mini ${isSelected ? 'highlight' : 'dim'}`}
-                    >
+                    <div className="keyboard-range-container">
                       <img
-                        src="/Octave-icon.png"
-                        alt={`Octave ${octaveNumber}`}
-                        className="octave-icon"
+                        src="/Keyboard.png"
+                        alt="Keyboard octave range"
+                        className="keyboard-range-image"
+                      />
+                      <div
+                        className="keyboard-dim-overlay keyboard-dim-left"
+                        style={{ width: `${leftDimPercent}%` }}
+                      />
+                      <div
+                        className="keyboard-dim-overlay keyboard-dim-right"
+                        style={{ width: `${rightDimPercent}%` }}
                       />
                     </div>
                   )
-                })}
+                })()}
               </div>
             </div>
+            </div>
+          </div>
+        )}
+
+        {/* Fretboard range slider - only for guitar/bass */}
+        {isStringInstrument && (
+          <div style={{ marginBottom: 20 }}>
+            <div className="control-group fret-range-control">
+              <div className="label-with-tooltip">
+                <label className="control-label">Fret Range</label>
+                <Tooltip title="Fret Range" text="Select the fret range for practice">
+                  <div className="tooltip-icon">?</div>
+                </Tooltip>
+              </div>
+              <div className="fret-range-slider">
+                <div className="range-labels-center">
+                  <span className="range-label-center">
+                    {fretLow} - {fretHigh}
+                  </span>
+                </div>
+                <div className="dual-range-container fret-range-container">
+                  <div
+                    className="range-fill"
+                    style={{
+                      left: `${(fretLow / 24) * 100}%`,
+                      right: `${((24 - fretHigh) / 24) * 100}%`
+                    }}
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="24"
+                    step="4"
+                    value={fretLow}
+                    onChange={(e) => {
+                      const val = Number(e.target.value)
+                      if (val < fretHigh) { setFretLow(val); handleManualChange() }
+                    }}
+                    className="range-slider range-low fret-slider-low"
+                    title="Set lowest fret"
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="24"
+                    step="4"
+                    value={fretHigh}
+                    onChange={(e) => {
+                      const val = Number(e.target.value)
+                      if (val > fretLow) { setFretHigh(val); handleManualChange() }
+                    }}
+                    className="range-slider range-high fret-slider-high"
+                    title="Set highest fret"
+                  />
+                </div>
+                <div className="fret-visual">
+                  {(() => {
+                    const leftDimPercent = (fretLow / 24) * 100
+                    const rightDimPercent = ((24 - fretHigh) / 24) * 100
+
+                    return (
+                      <div className="fretboard-range-container">
+                        <img
+                          src={isGuitar ? "/Guitar-fretboard.png" : "/Bass-fretboard.png"}
+                          alt={`${isGuitar ? 'Guitar' : 'Bass'} fretboard range`}
+                          className="fretboard-range-image"
+                        />
+                        <div
+                          className="fretboard-dim-overlay fretboard-dim-left"
+                          style={{ width: `${leftDimPercent}%` }}
+                        />
+                        <div
+                          className="fretboard-dim-overlay fretboard-dim-right"
+                          style={{ width: `${rightDimPercent}%` }}
+                        />
+                      </div>
+                    )
+                  })()}
+                </div>
+              </div>
             </div>
           </div>
         )}

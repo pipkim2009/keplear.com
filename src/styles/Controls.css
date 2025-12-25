@@ -1367,6 +1367,18 @@
   margin: 0 auto;
 }
 
+.dual-range-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--white-alpha-20);
+  z-index: 0;
+}
+
 .range-fill {
   position: absolute;
   top: 0;
@@ -1382,7 +1394,7 @@
   width: 100%;
   height: 6px;
   border-radius: 3px;
-  background: var(--white-alpha-20);
+  background: transparent;
   outline: none;
   appearance: none;
   cursor: pointer;
@@ -1412,11 +1424,15 @@
 
 .range-slider.range-low {
   z-index: 3;
+  width: 87.5%;
+  left: 0;
 }
 
 .range-slider.range-high {
   z-index: 2;
-  background: transparent;
+  width: 87.5%;
+  right: 0;
+  left: auto;
 }
 
 .range-slider.range-low::-webkit-slider-thumb {
@@ -1435,22 +1451,6 @@
   transform: translateX(0);
 }
 
-/* Offset thumbs when at same position */
-.range-slider.range-low.same-position::-webkit-slider-thumb {
-  margin-left: -10px;
-}
-
-.range-slider.range-high.same-position::-webkit-slider-thumb {
-  margin-left: 10px;
-}
-
-.range-slider.range-low.same-position::-moz-range-thumb {
-  transform: translateX(-10px);
-}
-
-.range-slider.range-high.same-position::-moz-range-thumb {
-  transform: translateX(10px);
-}
 
 .range-slider:hover::-webkit-slider-thumb {
 }
@@ -1472,49 +1472,120 @@
   width: 100%;
 }
 
-.octave-mini {
-  width: 12.5%;
+.keyboard-range-container {
+  position: relative;
+  width: 100%;
   height: 54px;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  outline: 0;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
-  display: block;
-  vertical-align: top;
+  overflow: hidden;
 }
 
-.octave-icon {
+.keyboard-range-image {
   width: 100%;
   height: 100%;
-  filter: brightness(1);
   display: block;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  vertical-align: top;
 }
 
-.octave-mini.highlight .octave-icon {
-  filter: brightness(1) saturate(1);
+.keyboard-dim-overlay {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: none;
 }
 
-.octave-mini.dim .octave-icon {
-  filter: brightness(0.4) saturate(0.5);
+.keyboard-dim-left {
+  left: 0;
 }
 
-/* Mobile octave range styling for smaller screens */
+.keyboard-dim-right {
+  right: 0;
+}
+
+/* Fretboard range control for guitar/bass */
+.fret-range-control {
+  width: 100% !important;
+  max-width: 500px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+}
+
+.fret-range-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.fret-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-top: -29px;
+  font-size: 0;
+  line-height: 0;
+  letter-spacing: 0;
+  word-spacing: 0;
+  width: 100%;
+}
+
+.fretboard-range-container {
+  position: relative;
+  width: 100%;
+  height: 54px;
+  overflow: hidden;
+}
+
+.fretboard-range-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fretboard-dim-overlay {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.fretboard-dim-left {
+  left: 0;
+}
+
+.fretboard-dim-right {
+  right: 0;
+}
+
+/* Fret sliders use full width since fret positions map directly */
+.fret-range-container .range-slider.range-low,
+.fret-range-container .range-slider.range-high {
+  width: 100%;
+  left: 0;
+  right: auto;
+}
+
+/* Mobile range styling for smaller screens */
 @media (max-width: 480px) {
-  .octave-mini {
+  .keyboard-range-container {
+    height: 40px;
+  }
+
+  .fretboard-range-container {
     height: 40px;
   }
 }
 
 @media (max-width: 360px) {
-  .octave-range-control .octave-mini {
+  .octave-range-control .keyboard-range-container {
     height: 32px !important;
-    width: 12.5% !important;
   }
 
   .octave-range-control .dual-range-container {
@@ -1535,6 +1606,32 @@
   }
 
   .octave-range-control .octave-visual {
+    width: 240px !important;
+    max-width: 240px !important;
+  }
+
+  .fret-range-control .fretboard-range-container {
+    height: 32px !important;
+  }
+
+  .fret-range-control .dual-range-container {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    height: 36px !important;
+  }
+
+  .fret-range-control .range-label-center {
+    font-size: 11px !important;
+    padding: 3px 10px !important;
+  }
+
+  .fret-range-control .fret-range-slider {
+    width: 240px !important;
+    max-width: 240px !important;
+  }
+
+  .fret-range-control .fret-visual {
     width: 240px !important;
     max-width: 240px !important;
   }
