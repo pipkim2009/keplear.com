@@ -27,6 +27,13 @@ export type BassChordShape = {
   difficulty: 'Easy' | 'Medium' | 'Hard' // Difficulty level
 }
 
+export type BassChordBox = {
+  name: string // Position 1, Position 2, etc.
+  minFret: number // Starting fret position
+  maxFret: number // Ending fret position
+  positions: BassChordPosition[] // All chord notes in this position
+}
+
 // Common bass chords with their interval patterns
 export const BASS_CHORDS: BassChord[] = [
   {
@@ -641,6 +648,61 @@ export const applyBassChordShapeToBass = (
   const selections: { stringIndex: number, fretIndex: number }[] = []
 
   chordShape.positions.forEach(position => {
+    // Convert bass string number (1-4) to visual string index (0-3)
+    const stringIndex = 4 - position.string
+    const fretIndex = position.fret
+
+    selections.push({ stringIndex, fretIndex })
+  })
+
+  return selections
+}
+
+// Function to get chord boxes/positions for a given chord and root (similar to scale boxes)
+export const getBassChordBoxes = (
+  rootNote: string,
+  chord: BassChord,
+  bassNotes: any[]
+): BassChordBox[] => {
+  const allPositions = getBassChordPositions(rootNote, chord, bassNotes)
+  const boxes: BassChordBox[] = []
+
+  // Define box ranges based on clean, non-overlapping positions (0-24 frets)
+  // Same ranges as scales for consistency
+  const boxRanges = [
+    { name: 'Open Position', minFret: 0, maxFret: 4 },
+    { name: 'Position 2', minFret: 5, maxFret: 8 },
+    { name: 'Position 3', minFret: 9, maxFret: 12 },
+    { name: 'Position 4', minFret: 13, maxFret: 16 },
+    { name: 'Position 5', minFret: 17, maxFret: 20 },
+    { name: 'Position 6', minFret: 21, maxFret: 24 }
+  ]
+
+  boxRanges.forEach(range => {
+    const boxPositions = allPositions.filter(pos =>
+      pos.fret >= range.minFret && pos.fret <= range.maxFret
+    )
+
+    if (boxPositions.length > 0) {
+      boxes.push({
+        name: range.name,
+        minFret: range.minFret,
+        maxFret: range.maxFret,
+        positions: boxPositions
+      })
+    }
+  })
+
+  return boxes
+}
+
+// Function to apply a specific chord box to bass note selection
+export const applyBassChordBoxToBass = (
+  chordBox: BassChordBox
+): { stringIndex: number, fretIndex: number }[] => {
+  const selections: { stringIndex: number, fretIndex: number }[] = []
+
+  chordBox.positions.forEach(position => {
     // Convert bass string number (1-4) to visual string index (0-3)
     const stringIndex = 4 - position.string
     const fretIndex = position.fret

@@ -27,6 +27,13 @@ export type ChordShape = {
   difficulty: 'Easy' | 'Medium' | 'Hard' // Difficulty level
 }
 
+export type ChordBox = {
+  name: string // Position 1, Position 2, etc.
+  minFret: number // Starting fret position
+  maxFret: number // Ending fret position
+  positions: ChordPosition[] // All chord notes in this position
+}
+
 // Common guitar chords with their interval patterns
 export const GUITAR_CHORDS: GuitarChord[] = [
   {
@@ -584,6 +591,61 @@ export const applyChordShapeToGuitar = (
   const selections: { stringIndex: number, fretIndex: number }[] = []
 
   chordShape.positions.forEach(position => {
+    // Convert guitar string number (1-6) to visual string index (0-5)
+    const stringIndex = 6 - position.string
+    const fretIndex = position.fret
+
+    selections.push({ stringIndex, fretIndex })
+  })
+
+  return selections
+}
+
+// Function to get chord boxes/positions for a given chord and root (similar to scale boxes)
+export const getChordBoxes = (
+  rootNote: string,
+  chord: GuitarChord,
+  guitarNotes: any[]
+): ChordBox[] => {
+  const allPositions = getChordPositions(rootNote, chord, guitarNotes)
+  const boxes: ChordBox[] = []
+
+  // Define box ranges based on clean, non-overlapping positions (0-24 frets)
+  // Same ranges as scales for consistency
+  const boxRanges = [
+    { name: 'Open Position', minFret: 0, maxFret: 4 },
+    { name: 'Position 2', minFret: 5, maxFret: 8 },
+    { name: 'Position 3', minFret: 9, maxFret: 12 },
+    { name: 'Position 4', minFret: 13, maxFret: 16 },
+    { name: 'Position 5', minFret: 17, maxFret: 20 },
+    { name: 'Position 6', minFret: 21, maxFret: 24 }
+  ]
+
+  boxRanges.forEach(range => {
+    const boxPositions = allPositions.filter(pos =>
+      pos.fret >= range.minFret && pos.fret <= range.maxFret
+    )
+
+    if (boxPositions.length > 0) {
+      boxes.push({
+        name: range.name,
+        minFret: range.minFret,
+        maxFret: range.maxFret,
+        positions: boxPositions
+      })
+    }
+  })
+
+  return boxes
+}
+
+// Function to apply a specific chord box to guitar note selection
+export const applyChordBoxToGuitar = (
+  chordBox: ChordBox
+): { stringIndex: number, fretIndex: number }[] => {
+  const selections: { stringIndex: number, fretIndex: number }[] = []
+
+  chordBox.positions.forEach(position => {
     // Convert guitar string number (1-6) to visual string index (0-5)
     const stringIndex = 6 - position.string
     const fretIndex = position.fret

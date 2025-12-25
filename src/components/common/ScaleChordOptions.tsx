@@ -6,8 +6,8 @@ import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
 import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, applyScaleToBass, applyScaleBoxToBass, type BassScale, type BassScaleBox } from '../../utils/instruments/bass/bassScales'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
 import { KEYBOARD_SCALES, type KeyboardScale, applyScaleToKeyboard } from '../../utils/instruments/keyboard/keyboardScales'
-import { CHORD_ROOT_NOTES, GUITAR_CHORDS, getChordShapes, applyChordToGuitar, applyChordShapeToGuitar, type GuitarChord, type ChordShape } from '../../utils/instruments/guitar/guitarChords'
-import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, applyChordToBass, applyBassChordShapeToBass, type BassChord, type BassChordShape } from '../../utils/instruments/bass/bassChords'
+import { CHORD_ROOT_NOTES, GUITAR_CHORDS, getChordShapes, getChordBoxes, applyChordToGuitar, applyChordShapeToGuitar, applyChordBoxToGuitar, type GuitarChord, type ChordShape, type ChordBox } from '../../utils/instruments/guitar/guitarChords'
+import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, getBassChordBoxes, applyChordToBass, applyBassChordShapeToBass, applyBassChordBoxToBass, type BassChord, type BassChordShape, type BassChordBox } from '../../utils/instruments/bass/bassChords'
 import { KEYBOARD_CHORDS, type KeyboardChord, applyChordToKeyboard } from '../../utils/instruments/keyboard/keyboardChords'
 import type { Note } from '../../utils/notes'
 import '../../styles/ScaleOptions.css'
@@ -128,6 +128,12 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   const [selectedShapeIndex, setSelectedShapeIndex] = useState<number>(0)
   const [showShapes, setShowShapes] = useState<boolean>(true)
 
+  // Chord box states (fret-based positions like scales)
+  const [availableChordBoxes, setAvailableChordBoxes] = useState<ChordBox[]>([])
+  const [availableBassChordBoxes, setAvailableBassChordBoxes] = useState<BassChordBox[]>([])
+  const [selectedChordBoxIndex, setSelectedChordBoxIndex] = useState<number>(0)
+  const [showChordPositions, setShowChordPositions] = useState<boolean>(true)
+
   // Keyboard position (octave) states
   const [selectedScaleOctave, setSelectedScaleOctave] = useState<number>(4)
   const [selectedChordOctave, setSelectedChordOctave] = useState<number>(4)
@@ -220,8 +226,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         })
       } else {
         // Chord preview for guitar
-        if (showShapes && availableShapes.length > 0 && selectedShapeIndex < availableShapes.length) {
-          positions = applyChordShapeToGuitar(availableShapes[selectedShapeIndex])
+        if (showChordPositions && availableChordBoxes.length > 0 && selectedChordBoxIndex < availableChordBoxes.length) {
+          positions = applyChordBoxToGuitar(availableChordBoxes[selectedChordBoxIndex])
         } else {
           positions = applyChordToGuitar(selectedChordRoot, selectedChord, guitarNotes)
         }
@@ -263,8 +269,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         })
       } else {
         // Chord preview for bass
-        if (showShapes && availableBassShapes.length > 0 && selectedShapeIndex < availableBassShapes.length) {
-          positions = applyBassChordShapeToBass(availableBassShapes[selectedShapeIndex])
+        if (showChordPositions && availableBassChordBoxes.length > 0 && selectedChordBoxIndex < availableBassChordBoxes.length) {
+          positions = applyBassChordBoxToBass(availableBassChordBoxes[selectedChordBoxIndex])
         } else {
           positions = applyChordToBass(selectedChordRoot, selectedBassChord, bassNotes)
         }
@@ -329,12 +335,16 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
     keyboardSelectedChord,
     selectedBoxIndex,
     selectedShapeIndex,
+    selectedChordBoxIndex,
     showPositions,
     showShapes,
+    showChordPositions,
     availableBoxes,
     availableBassBoxes,
     availableShapes,
     availableBassShapes,
+    availableChordBoxes,
+    availableBassChordBoxes,
     availableKeyboardNotes,
     selectedScaleOctave,
     selectedChordOctave,
@@ -358,17 +368,25 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
     }
   }, [selectedRoot, selectedScale, selectedBassScale, instrument, isScaleMode])
 
-  // Update available shapes when root or chord changes (Chord mode)
+  // Update available shapes and chord boxes when root or chord changes (Chord mode)
   useEffect(() => {
     if (!isScaleMode) {
       if (instrument === 'guitar') {
         const shapes = getChordShapes(selectedChordRoot, selectedChord, guitarNotes)
         setAvailableShapes(shapes)
         setSelectedShapeIndex(0)
+        // Also update chord boxes (fret-based positions)
+        const boxes = getChordBoxes(selectedChordRoot, selectedChord, guitarNotes)
+        setAvailableChordBoxes(boxes)
+        setSelectedChordBoxIndex(0)
       } else if (instrument === 'bass') {
         const shapes = getBassChordShapes(selectedChordRoot, selectedBassChord, bassNotes)
         setAvailableBassShapes(shapes)
         setSelectedShapeIndex(0)
+        // Also update chord boxes (fret-based positions)
+        const boxes = getBassChordBoxes(selectedChordRoot, selectedBassChord, bassNotes)
+        setAvailableBassChordBoxes(boxes)
+        setSelectedChordBoxIndex(0)
       }
     }
   }, [selectedChordRoot, selectedChord, selectedBassChord, instrument, isScaleMode])
@@ -436,20 +454,46 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
     setShowShapes(true)
   }
 
+  const handleChordBoxChange = (boxIndex: number) => {
+    setSelectedChordBoxIndex(boxIndex)
+    const currentBoxes = instrument === 'bass' ? availableBassChordBoxes : availableChordBoxes
+    if (boxIndex >= currentBoxes.length) {
+      setShowChordPositions(false)
+    } else {
+      setShowChordPositions(true)
+    }
+  }
+
   const handleApplyChord = () => {
     if (instrument === 'guitar') {
-      if (showShapes && availableShapes.length > 0 && onChordShapeSelect) {
-        // Add root note context to chord shape
-        const chordShapeWithRoot = { ...availableShapes[selectedShapeIndex], root: selectedChordRoot }
-        onChordShapeSelect(chordShapeWithRoot as any)
+      if (showChordPositions && availableChordBoxes.length > 0 && selectedChordBoxIndex < availableChordBoxes.length && onChordShapeSelect) {
+        // Use chord box (fret-based position) - convert to ChordShape format for compatibility
+        const chordBox = availableChordBoxes[selectedChordBoxIndex]
+        const chordShapeFromBox = {
+          name: `${selectedChordRoot} ${selectedChord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
+          minFret: chordBox.minFret,
+          maxFret: chordBox.maxFret,
+          positions: chordBox.positions,
+          difficulty: 'Medium' as const,
+          root: selectedChordRoot
+        }
+        onChordShapeSelect(chordShapeFromBox as any)
       } else if (onChordSelect) {
         onChordSelect(selectedChordRoot, selectedChord)
       }
     } else if (instrument === 'bass') {
-      if (showShapes && availableBassShapes.length > 0 && onChordShapeSelect) {
-        // Add root note context to bass chord shape
-        const bassChordShapeWithRoot = { ...availableBassShapes[selectedShapeIndex], root: selectedChordRoot }
-        onChordShapeSelect(bassChordShapeWithRoot as any)
+      if (showChordPositions && availableBassChordBoxes.length > 0 && selectedChordBoxIndex < availableBassChordBoxes.length && onChordShapeSelect) {
+        // Use chord box (fret-based position) - convert to BassChordShape format for compatibility
+        const chordBox = availableBassChordBoxes[selectedChordBoxIndex]
+        const bassChordShapeFromBox = {
+          name: `${selectedChordRoot} ${selectedBassChord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
+          minFret: chordBox.minFret,
+          maxFret: chordBox.maxFret,
+          positions: chordBox.positions,
+          difficulty: 'Medium' as const,
+          root: selectedChordRoot
+        }
+        onChordShapeSelect(bassChordShapeFromBox as any)
       } else if (onChordSelect) {
         onChordSelect(selectedChordRoot, selectedBassChord as any)
       }
@@ -718,36 +762,42 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                   </select>
                 </div>
 
-                {instrument === 'guitar' && availableShapes.length > 0 && (
+                {instrument === 'guitar' && availableChordBoxes.length > 0 && (
                   <div className="control-section">
                     <label className="control-label">Position</label>
                     <select
-                      value={selectedShapeIndex}
-                      onChange={(e) => handleShapeChange(parseInt(e.target.value))}
+                      value={selectedChordBoxIndex}
+                      onChange={(e) => handleChordBoxChange(parseInt(e.target.value))}
                       className={`control-select ${!isScaleMode ? 'chord-mode' : ''}`}
                     >
-                      {availableShapes.map((shape, index) => (
+                      {availableChordBoxes.map((box, index) => (
                         <option key={index} value={index}>
-                          {shape.name}
+                          Frets {box.minFret}-{box.maxFret}
                         </option>
                       ))}
+                      <option key="entire" value={availableChordBoxes.length}>
+                        Entire Fretboard
+                      </option>
                     </select>
                   </div>
                 )}
 
-                {instrument === 'bass' && availableBassShapes.length > 0 && (
+                {instrument === 'bass' && availableBassChordBoxes.length > 0 && (
                   <div className="control-section">
                     <label className="control-label">Position</label>
                     <select
-                      value={selectedShapeIndex}
-                      onChange={(e) => handleShapeChange(parseInt(e.target.value))}
+                      value={selectedChordBoxIndex}
+                      onChange={(e) => handleChordBoxChange(parseInt(e.target.value))}
                       className={`control-select ${!isScaleMode ? 'chord-mode' : ''}`}
                     >
-                      {availableBassShapes.map((shape, index) => (
+                      {availableBassChordBoxes.map((box, index) => (
                         <option key={index} value={index}>
-                          {shape.name}
+                          Frets {box.minFret}-{box.maxFret}
                         </option>
                       ))}
+                      <option key="entire" value={availableBassChordBoxes.length}>
+                        Entire Fretboard
+                      </option>
                     </select>
                   </div>
                 )}
