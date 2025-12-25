@@ -258,18 +258,19 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       const octaveRange = Array.from({ length: octaveHigh - octaveLow + 1 }, (_, i) => octaveLow + i)
       const selectedOctave = octaveRange[Math.floor(Math.random() * octaveRange.length)]
 
-      // SCALES: Single scale on single octave (filtered by user selection)
+      // SCALES: Scale spanning all octaves in the selected range (filtered by user selection)
       if (practiceOptions.includes('melodies')) {
         const filteredScales = getFilteredScales(KEYBOARD_SCALES, lessonSettings.scale)
         const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = ROOT_NOTES[Math.floor(Math.random() * ROOT_NOTES.length)]
 
         // Delay scale application to run after any clearing effects complete
+        // Don't pass octave parameter so scale spans all octaves in range
         setTimeout(() => {
-          scaleChordManagement.handleKeyboardScaleApply(randomRoot, randomScale, selectedOctave)
+          scaleChordManagement.handleKeyboardScaleApply(randomRoot, randomScale)
         }, 50)
 
-        setSetupDetails({ type: 'melodies', details: { scaleName: randomScale.name, root: randomRoot, octave: selectedOctave } })
+        setSetupDetails({ type: 'melodies', details: { scaleName: randomScale.name, root: randomRoot, octaveRange: `${octaveLow}-${octaveHigh}` } })
       }
 
       // CHORDS: chords with progression mode (filtered by user selection)
@@ -526,10 +527,9 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
       // Create announcement based on lesson type
       if (setupDetails.type === 'melodies') {
-        // Check if it's keyboard (has octave) or guitar/bass (has position)
-        if (setupDetails.details.octave) {
-          const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale on the ${octaveOrdinal} octave at ${bpm} BPM`
+        // Check if it's keyboard (has octaveRange) or guitar/bass (has position)
+        if (setupDetails.details.octaveRange) {
+          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale across octaves ${setupDetails.details.octaveRange} at ${bpm} BPM`
         } else if (setupDetails.details.position) {
           announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale on ${setupDetails.details.position} at ${bpm} BPM`
         } else {
