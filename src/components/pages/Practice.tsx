@@ -6,10 +6,10 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import type { Note } from '../../utils/notes'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
-import { GUITAR_SCALES, ROOT_NOTES as GUITAR_ROOT_NOTES, getScaleBoxes } from '../../utils/instruments/guitar/guitarScales'
+import { GUITAR_SCALES, ROOT_NOTES as GUITAR_ROOT_NOTES, getScalePositions } from '../../utils/instruments/guitar/guitarScales'
 import { GUITAR_CHORDS, CHORD_ROOT_NOTES as GUITAR_CHORD_ROOT_NOTES } from '../../utils/instruments/guitar/guitarChords'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
-import { BASS_SCALES, BASS_ROOT_NOTES, getBassScaleBoxes } from '../../utils/instruments/bass/bassScales'
+import { BASS_SCALES, BASS_ROOT_NOTES, getBassScalePositions } from '../../utils/instruments/bass/bassScales'
 import { BASS_CHORDS, BASS_CHORD_ROOT_NOTES } from '../../utils/instruments/bass/bassChords'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
 import {
@@ -325,21 +325,27 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       // Use note count from settings
       setNumberOfBeats(selectedNoteCount)
 
-      // SCALES: Single scale in a specific position (filtered by user selection)
+      // SCALES: All scale positions within the fret range
       if (practiceOptions.includes('melodies')) {
         const filteredScales = getFilteredScales(GUITAR_SCALES, lessonSettings.scale)
         const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = GUITAR_ROOT_NOTES[Math.floor(Math.random() * GUITAR_ROOT_NOTES.length)]
 
-        // Get all scale boxes for this scale and root
-        const scaleBoxes = getScaleBoxes(randomRoot, randomScale, guitarNotes)
+        // Get fret range from settings (default 0-12)
+        const fretLow = lessonSettings.fretLow ?? 0
+        const fretHigh = lessonSettings.fretHigh ?? 12
 
-        // Pick a random box position
-        if (scaleBoxes.length > 0) {
-          const randomBox = scaleBoxes[Math.floor(Math.random() * scaleBoxes.length)]
+        // Get all scale positions for this scale and root
+        const allPositions = getScalePositions(randomRoot, randomScale, guitarNotes)
 
-          // Convert scale box positions to Note objects using IDs
-          const scaleNotes: Note[] = randomBox.positions.map(pos => {
+        // Filter positions to only those within the selected fret range
+        const filteredPositions = allPositions.filter(pos =>
+          pos.fret >= fretLow && pos.fret <= fretHigh
+        )
+
+        if (filteredPositions.length > 0) {
+          // Convert filtered positions to Note objects using IDs
+          const scaleNotes: Note[] = filteredPositions.map(pos => {
             const noteId = `g-s${pos.string}-f${pos.fret}`
             const guitarNote = getGuitarNoteById(noteId)
             return {
@@ -354,14 +360,23 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           // Set the notes directly for melody generation
           setGuitarNotes(scaleNotes)
 
+          // Create a scale box for visual display
+          const scaleBox = {
+            name: `Frets ${fretLow}-${fretHigh}`,
+            minFret: fretLow,
+            maxFret: fretHigh,
+            positions: filteredPositions
+          }
+
           setSetupDetails({
             type: 'melodies',
             details: {
               scaleName: randomScale.name,
               root: randomRoot,
-              position: `frets ${randomBox.minFret} to ${randomBox.maxFret}`,
+              position: `frets ${fretLow} to ${fretHigh}`,
+              fretRange: `${fretLow}-${fretHigh}`,
               noteIds: scaleNotes.map(n => n.id),
-              scaleBox: randomBox // Store for visual display when handlers ready
+              scaleBox: scaleBox // Store for visual display when handlers ready
             }
           })
         }
@@ -374,6 +389,10 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         const filteredChords = getFilteredChords(GUITAR_CHORDS, lessonSettings.chord)
         const chordDetails: { root: string; chord: string; chordObj: typeof GUITAR_CHORDS[0] }[] = []
 
+        // Get fret range from settings (default 0-12)
+        const fretLow = lessonSettings.fretLow ?? 0
+        const fretHigh = lessonSettings.fretHigh ?? 12
+
         for (let i = 0; i < selectedNoteCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
@@ -382,7 +401,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         }
 
         // Don't call setGuitarNotes - let appliedChords handle it in progression mode
-        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails } })
+        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails, fretRange: `${fretLow}-${fretHigh}` } })
       }
 
     }
@@ -396,21 +415,27 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       // Use note count from settings
       setNumberOfBeats(selectedNoteCount)
 
-      // SCALES: Single scale in a specific position (filtered by user selection)
+      // SCALES: All scale positions within the fret range
       if (practiceOptions.includes('melodies')) {
         const filteredScales = getFilteredScales(BASS_SCALES, lessonSettings.scale)
         const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = BASS_ROOT_NOTES[Math.floor(Math.random() * BASS_ROOT_NOTES.length)]
 
-        // Get all scale boxes for this scale and root
-        const scaleBoxes = getBassScaleBoxes(randomRoot, randomScale, bassNotes)
+        // Get fret range from settings (default 0-12)
+        const fretLow = lessonSettings.fretLow ?? 0
+        const fretHigh = lessonSettings.fretHigh ?? 12
 
-        // Pick a random box position
-        if (scaleBoxes.length > 0) {
-          const randomBox = scaleBoxes[Math.floor(Math.random() * scaleBoxes.length)]
+        // Get all scale positions for this scale and root
+        const allPositions = getBassScalePositions(randomRoot, randomScale, bassNotes)
 
-          // Convert scale box positions to Note objects using IDs
-          const scaleNotes: Note[] = randomBox.positions.map(pos => {
+        // Filter positions to only those within the selected fret range
+        const filteredPositions = allPositions.filter(pos =>
+          pos.fret >= fretLow && pos.fret <= fretHigh
+        )
+
+        if (filteredPositions.length > 0) {
+          // Convert filtered positions to Note objects using IDs
+          const scaleNotes: Note[] = filteredPositions.map(pos => {
             const noteId = `b-s${pos.string}-f${pos.fret}`
             const bassNote = getBassNoteById(noteId)
             return {
@@ -425,14 +450,23 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           // Set the notes directly for melody generation
           setGuitarNotes(scaleNotes)
 
+          // Create a scale box for visual display
+          const scaleBox = {
+            name: `Frets ${fretLow}-${fretHigh}`,
+            minFret: fretLow,
+            maxFret: fretHigh,
+            positions: filteredPositions
+          }
+
           setSetupDetails({
             type: 'melodies',
             details: {
               scaleName: randomScale.name,
               root: randomRoot,
-              position: `frets ${randomBox.minFret} to ${randomBox.maxFret}`,
+              position: `frets ${fretLow} to ${fretHigh}`,
+              fretRange: `${fretLow}-${fretHigh}`,
               noteIds: scaleNotes.map(n => n.id),
-              scaleBox: randomBox // Store for visual display when handlers ready
+              scaleBox: scaleBox // Store for visual display when handlers ready
             }
           })
         }
@@ -445,6 +479,10 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         const filteredChords = getFilteredChords(BASS_CHORDS, lessonSettings.chord)
         const chordDetails: { root: string; chord: string; chordObj: typeof BASS_CHORDS[0] }[] = []
 
+        // Get fret range from settings (default 0-12)
+        const fretLow = lessonSettings.fretLow ?? 0
+        const fretHigh = lessonSettings.fretHigh ?? 12
+
         for (let i = 0; i < selectedNoteCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
@@ -453,7 +491,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         }
 
         // Don't call setGuitarNotes - let appliedChords handle it in progression mode
-        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails } })
+        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails, fretRange: `${fretLow}-${fretHigh}` } })
       }
 
     }
