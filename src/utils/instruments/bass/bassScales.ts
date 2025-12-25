@@ -142,19 +142,14 @@ export const getBassScaleBoxes = (
   const allPositions = getBassScalePositions(rootNote, scale, bassNotes)
   const boxes: BassScaleBox[] = []
 
-  // Define box ranges based on common bass patterns (0-24 frets)
+  // Define box ranges based on clean, non-overlapping positions (0-24 frets)
   const boxRanges = [
     { name: 'Open Position', minFret: 0, maxFret: 4 },
-    { name: 'Position 2', minFret: 3, maxFret: 7 },
-    { name: 'Position 3', minFret: 5, maxFret: 9 },
-    { name: 'Position 4', minFret: 7, maxFret: 11 },
-    { name: 'Position 5', minFret: 8, maxFret: 12 },
-    { name: 'Position 6', minFret: 10, maxFret: 14 },
-    { name: 'Position 7', minFret: 12, maxFret: 16 },
-    { name: 'Position 8', minFret: 14, maxFret: 18 },
-    { name: 'Position 9', minFret: 16, maxFret: 20 },
-    { name: 'Position 10', minFret: 18, maxFret: 22 },
-    { name: 'Position 11', minFret: 20, maxFret: 24 }
+    { name: 'Position 2', minFret: 5, maxFret: 8 },
+    { name: 'Position 3', minFret: 9, maxFret: 12 },
+    { name: 'Position 4', minFret: 13, maxFret: 16 },
+    { name: 'Position 5', minFret: 17, maxFret: 20 },
+    { name: 'Position 6', minFret: 21, maxFret: 24 }
   ]
 
   boxRanges.forEach(range => {
