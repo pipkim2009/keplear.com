@@ -235,6 +235,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     // Use settings from the modal
     const selectedBpm = lessonSettings.bpm
     const selectedNoteCount = lessonSettings.beats
+    const selectedChordCount = lessonSettings.chordCount
 
     if (hasNoContent && selectedInstrument === 'keyboard') {
       hasInitializedNotes.current = true
@@ -282,38 +283,51 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         const filteredChords = getFilteredChords(KEYBOARD_CHORDS, lessonSettings.chord)
         const chordDetails: { root: string; chord: string; octave: number }[] = []
 
-        // Distribute chords across octaves - ensure each octave gets at least one chord
+        // Distribute chords across octaves randomly
         const octavesToUse: number[] = []
 
-        // First, ensure each octave in range gets at least one chord
-        for (let i = 0; i < selectedNoteCount; i++) {
-          if (i < octaveRange.length) {
-            // Assign one chord to each octave first
-            octavesToUse.push(octaveRange[i])
-          } else {
-            // Remaining chords get random octaves from the range
+        if (selectedChordCount >= octaveRange.length) {
+          // Enough chords to cover all octaves - ensure each gets at least one
+          // Shuffle octave range first for random assignment
+          const shuffledOctaves = [...octaveRange].sort(() => Math.random() - 0.5)
+          octavesToUse.push(...shuffledOctaves)
+
+          // Add random octaves for remaining chords
+          for (let i = octaveRange.length; i < selectedChordCount; i++) {
+            octavesToUse.push(octaveRange[Math.floor(Math.random() * octaveRange.length)])
+          }
+        } else {
+          // Fewer chords than octaves - assign randomly
+          for (let i = 0; i < selectedChordCount; i++) {
             octavesToUse.push(octaveRange[Math.floor(Math.random() * octaveRange.length)])
           }
         }
 
-        // Shuffle the octave assignments so it's not predictable (low to high)
+        // Final shuffle to randomize the order completely
         for (let i = octavesToUse.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1))
           ;[octavesToUse[i], octavesToUse[j]] = [octavesToUse[j], octavesToUse[i]]
         }
 
-        for (let i = 0; i < selectedNoteCount; i++) {
+        // Build chord details first
+        for (let i = 0; i < selectedChordCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = KEYBOARD_CHORD_ROOT_NOTES[Math.floor(Math.random() * KEYBOARD_CHORD_ROOT_NOTES.length)]
           const chordOctave = octavesToUse[i]
-
-          // Use the scale chord management system to apply each chord
-          scaleChordManagement.handleKeyboardChordApply(randomRoot, randomChord, chordOctave)
-
           chordDetails.push({ root: randomRoot, chord: randomChord.name, octave: chordOctave })
         }
 
-        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails, octaveRange: `${octaveLow}-${octaveHigh}` } })
+        // Delay chord application to run after any clearing effects complete
+        setTimeout(() => {
+          chordDetails.forEach(detail => {
+            const chordObj = filteredChords.find(c => c.name === detail.chord)
+            if (chordObj) {
+              scaleChordManagement.handleKeyboardChordApply(detail.root, chordObj, detail.octave)
+            }
+          })
+        }, 50)
+
+        setSetupDetails({ type: 'chords', details: { chordCount: selectedChordCount, chords: chordDetails, octaveRange: `${octaveLow}-${octaveHigh}` } })
       }
 
     }
@@ -395,7 +409,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         const fretLow = lessonSettings.fretLow ?? 0
         const fretHigh = lessonSettings.fretHigh ?? 12
 
-        for (let i = 0; i < selectedNoteCount; i++) {
+        for (let i = 0; i < selectedChordCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
 
@@ -403,7 +417,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         }
 
         // Don't call setGuitarNotes - let appliedChords handle it in progression mode
-        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails, fretRange: `${fretLow}-${fretHigh}` } })
+        setSetupDetails({ type: 'chords', details: { chordCount: selectedChordCount, chords: chordDetails, fretRange: `${fretLow}-${fretHigh}` } })
       }
 
     }
@@ -485,7 +499,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         const fretLow = lessonSettings.fretLow ?? 0
         const fretHigh = lessonSettings.fretHigh ?? 12
 
-        for (let i = 0; i < selectedNoteCount; i++) {
+        for (let i = 0; i < selectedChordCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
 
@@ -493,7 +507,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         }
 
         // Don't call setGuitarNotes - let appliedChords handle it in progression mode
-        setSetupDetails({ type: 'chords', details: { chordCount: selectedNoteCount, chords: chordDetails, fretRange: `${fretLow}-${fretHigh}` } })
+        setSetupDetails({ type: 'chords', details: { chordCount: selectedChordCount, chords: chordDetails, fretRange: `${fretLow}-${fretHigh}` } })
       }
 
     }
