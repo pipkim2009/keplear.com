@@ -7,10 +7,10 @@ import type { Note } from '../../utils/notes'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
 import { GUITAR_SCALES, ROOT_NOTES as GUITAR_ROOT_NOTES, getScalePositions } from '../../utils/instruments/guitar/guitarScales'
-import { GUITAR_CHORDS, CHORD_ROOT_NOTES as GUITAR_CHORD_ROOT_NOTES } from '../../utils/instruments/guitar/guitarChords'
+import { GUITAR_CHORDS, CHORD_ROOT_NOTES as GUITAR_CHORD_ROOT_NOTES, getChordBoxes } from '../../utils/instruments/guitar/guitarChords'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
 import { BASS_SCALES, BASS_ROOT_NOTES, getBassScalePositions } from '../../utils/instruments/bass/bassScales'
-import { BASS_CHORDS, BASS_CHORD_ROOT_NOTES } from '../../utils/instruments/bass/bassChords'
+import { BASS_CHORDS, BASS_CHORD_ROOT_NOTES, getBassChordBoxes } from '../../utils/instruments/bass/bassChords'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
 import {
   getGuitarNoteById,
@@ -409,13 +409,45 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         const fretLow = lessonSettings.fretLow ?? 0
         const fretHigh = lessonSettings.fretHigh ?? 12
 
-        // Build chord details with random box indices
+        // Track which box positions have been used (by fret range) to ensure coverage
+        const usedBoxPositions = new Set<string>()
+
+        // Build chord details - distribute across fret positions within range
         for (let i = 0; i < selectedChordCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
-          // Random box index (0, 1, or 2 typically) - the chord system will handle the actual positions
-          const boxIndex = Math.floor(Math.random() * 3)
-          chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord, boxIndex })
+
+          // Get actual chord boxes for this chord/root and filter to fret range
+          const chordBoxes = getChordBoxes(randomRoot, randomChord, guitarNotes)
+          const validBoxes = chordBoxes.filter(box =>
+            box.minFret <= fretHigh && box.maxFret >= fretLow
+          )
+
+          if (validBoxes.length > 0) {
+            // Prefer boxes that haven't been used yet to ensure each fret position gets coverage
+            const unusedBoxes = validBoxes.filter(box =>
+              !usedBoxPositions.has(`${box.minFret}-${box.maxFret}`)
+            )
+
+            // Pick from unused boxes if available, otherwise from all valid boxes
+            const targetBoxes = unusedBoxes.length > 0 ? unusedBoxes : validBoxes
+            const selectedBoxIndex = Math.floor(Math.random() * targetBoxes.length)
+            const selectedBox = targetBoxes[selectedBoxIndex]
+
+            // Find the actual index in the original chordBoxes array
+            const boxIndex = chordBoxes.findIndex(box =>
+              box.minFret === selectedBox.minFret && box.maxFret === selectedBox.maxFret
+            )
+
+            usedBoxPositions.add(`${selectedBox.minFret}-${selectedBox.maxFret}`)
+            chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord, boxIndex })
+          }
+        }
+
+        // Shuffle the chord details for random application order (not sequential)
+        for (let i = chordDetails.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [chordDetails[i], chordDetails[j]] = [chordDetails[j], chordDetails[i]]
         }
 
         // Delay chord application to run after any clearing effects complete
@@ -508,13 +540,45 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         const fretLow = lessonSettings.fretLow ?? 0
         const fretHigh = lessonSettings.fretHigh ?? 12
 
-        // Build chord details with random box indices
+        // Track which box positions have been used (by fret range) to ensure coverage
+        const usedBoxPositions = new Set<string>()
+
+        // Build chord details - distribute across fret positions within range
         for (let i = 0; i < selectedChordCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
-          // Random box index (0, 1, or 2 typically) - the chord system will handle the actual positions
-          const boxIndex = Math.floor(Math.random() * 3)
-          chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord, boxIndex })
+
+          // Get actual chord boxes for this chord/root and filter to fret range
+          const chordBoxes = getBassChordBoxes(randomRoot, randomChord, bassNotes)
+          const validBoxes = chordBoxes.filter(box =>
+            box.minFret <= fretHigh && box.maxFret >= fretLow
+          )
+
+          if (validBoxes.length > 0) {
+            // Prefer boxes that haven't been used yet to ensure each fret position gets coverage
+            const unusedBoxes = validBoxes.filter(box =>
+              !usedBoxPositions.has(`${box.minFret}-${box.maxFret}`)
+            )
+
+            // Pick from unused boxes if available, otherwise from all valid boxes
+            const targetBoxes = unusedBoxes.length > 0 ? unusedBoxes : validBoxes
+            const selectedBoxIndex = Math.floor(Math.random() * targetBoxes.length)
+            const selectedBox = targetBoxes[selectedBoxIndex]
+
+            // Find the actual index in the original chordBoxes array
+            const boxIndex = chordBoxes.findIndex(box =>
+              box.minFret === selectedBox.minFret && box.maxFret === selectedBox.maxFret
+            )
+
+            usedBoxPositions.add(`${selectedBox.minFret}-${selectedBox.maxFret}`)
+            chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord, boxIndex })
+          }
+        }
+
+        // Shuffle the chord details for random application order (not sequential)
+        for (let i = chordDetails.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [chordDetails[i], chordDetails[j]] = [chordDetails[j], chordDetails[i]]
         }
 
         // Delay chord application to run after any clearing effects complete
