@@ -159,7 +159,7 @@ export const getBassScaleBoxes = (
 
     if (boxPositions.length > 0) {
       boxes.push({
-        name: range.name,
+        name: `${scale.name} (Frets ${range.minFret}-${range.maxFret})`,
         minFret: range.minFret,
         maxFret: range.maxFret,
         positions: boxPositions

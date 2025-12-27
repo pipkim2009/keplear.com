@@ -374,29 +374,29 @@ export const useScaleChordManagement = ({
       // Convert selections to Note objects for storage
       const scaleNotes = convertSelectionsToNotes(scaleSelections, 'guitar')
 
-      // Also add to applied scales list like handleScaleSelect does
-      const rootPosition = scaleBox.positions.find(pos => pos.isRoot)
+      // Get root note - prefer isRoot position, fallback to first position
+      const rootPosition = scaleBox.positions.find(pos => pos.isRoot) || scaleBox.positions[0]
       if (rootPosition) {
         const rootNote = rootPosition.note.replace(/\d+$/, '') // Remove octave
-        // Create a scale object from the box info
+        // Create a scale object from the box info - use scaleBox.name which includes scale type
         const scaleFromBox = {
-          name: `${scaleBox.name || 'Scale'} (Frets ${scaleBox.minFret}-${scaleBox.maxFret})`,
+          name: scaleBox.name || `Frets ${scaleBox.minFret}-${scaleBox.maxFret}`,
           intervals: [], // Box selections don't need intervals
           modes: [],
           description: 'Scale box selection'
         }
 
         const newAppliedScale: AppliedScale = {
-          id: `${rootNote}-${scaleFromBox.name}-${Date.now()}`,
+          id: `${scaleFromBox.name}-${Date.now()}`,
           root: rootNote,
           scale: scaleFromBox,
           displayName: `${rootNote} ${scaleFromBox.name}`,
           notes: scaleNotes // Store the actual notes for removal
         }
 
-        // Check for duplicates
+        // Check for duplicates by scale name (fret range makes each unique)
         const isDuplicate = appliedScales.some(scale =>
-          scale.root === rootNote && scale.scale.name === scaleFromBox.name
+          scale.scale.name === scaleFromBox.name
         )
 
         if (!isDuplicate) {
@@ -413,29 +413,29 @@ export const useScaleChordManagement = ({
       // Convert selections to Note objects for storage
       const scaleNotes = convertSelectionsToNotes(scaleSelections, 'bass')
 
-      // Also add to applied scales list like handleScaleSelect does
-      const rootPosition = scaleBox.positions.find(pos => pos.isRoot)
+      // Get root note - prefer isRoot position, fallback to first position
+      const rootPosition = scaleBox.positions.find(pos => pos.isRoot) || scaleBox.positions[0]
       if (rootPosition) {
         const rootNote = rootPosition.note.replace(/\d+$/, '') // Remove octave
-        // Create a scale object from the box info
+        // Create a scale object from the box info - use scaleBox.name which includes scale type
         const scaleFromBox = {
-          name: `${scaleBox.name || 'Scale'} (Frets ${scaleBox.minFret}-${scaleBox.maxFret})`,
+          name: scaleBox.name || `Frets ${scaleBox.minFret}-${scaleBox.maxFret}`,
           intervals: [], // Box selections don't need intervals
           modes: [],
           description: 'Scale box selection'
         }
 
         const newAppliedScale: AppliedScale = {
-          id: `${rootNote}-${scaleFromBox.name}-${Date.now()}`,
+          id: `${scaleFromBox.name}-${Date.now()}`,
           root: rootNote,
           scale: scaleFromBox,
           displayName: `${rootNote} ${scaleFromBox.name}`,
           notes: scaleNotes // Store the actual notes for removal
         }
 
-        // Check for duplicates
+        // Check for duplicates by scale name (fret range makes each unique)
         const isDuplicate = appliedScales.some(scale =>
-          scale.root === rootNote && scale.scale.name === scaleFromBox.name
+          scale.scale.name === scaleFromBox.name
         )
 
         if (!isDuplicate) {
@@ -644,8 +644,8 @@ export const useScaleChordManagement = ({
   const handleKeyboardScaleApply = useCallback((rootNote: string, scale: KeyboardScale, octave?: number) => {
     // Check if this exact scale with this octave is already applied
     const displayName = octave !== undefined
-      ? `${rootNote}${scale.name}${octave}`
-      : `${rootNote}${scale.name}`
+      ? `${rootNote} ${scale.name} (Octave ${octave})`
+      : `${rootNote} ${scale.name}`
     const isScaleAlreadyApplied = appliedScales.some(appliedScale =>
       appliedScale.displayName === displayName
     )
@@ -752,8 +752,8 @@ export const useScaleChordManagement = ({
   const handleKeyboardChordApply = useCallback((rootNote: string, chord: KeyboardChord, octave?: number) => {
     // Check if this chord with this octave is already applied
     const displayName = octave !== undefined
-      ? `${rootNote}${chord.name}${octave}`
-      : `${rootNote}${chord.name}`
+      ? `${rootNote} ${chord.name} (Octave ${octave})`
+      : `${rootNote} ${chord.name}`
     const isAlreadyApplied = appliedChords.some(appliedChord =>
       appliedChord.displayName === displayName
     )

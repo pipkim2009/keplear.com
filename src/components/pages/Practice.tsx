@@ -6,10 +6,10 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import type { Note } from '../../utils/notes'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
-import { GUITAR_SCALES, ROOT_NOTES as GUITAR_ROOT_NOTES, getScalePositions } from '../../utils/instruments/guitar/guitarScales'
+import { GUITAR_SCALES, ROOT_NOTES as GUITAR_ROOT_NOTES, getScalePositions, getScaleBoxes } from '../../utils/instruments/guitar/guitarScales'
 import { GUITAR_CHORDS, CHORD_ROOT_NOTES as GUITAR_CHORD_ROOT_NOTES, getChordBoxes } from '../../utils/instruments/guitar/guitarChords'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
-import { BASS_SCALES, BASS_ROOT_NOTES, getBassScalePositions } from '../../utils/instruments/bass/bassScales'
+import { BASS_SCALES, BASS_ROOT_NOTES, getBassScalePositions, getBassScaleBoxes } from '../../utils/instruments/bass/bassScales'
 import { BASS_CHORDS, BASS_CHORD_ROOT_NOTES, getBassChordBoxes } from '../../utils/instruments/bass/bassChords'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
 import {
@@ -376,13 +376,11 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           // Set the notes directly for melody generation
           setGuitarNotes(scaleNotes)
 
-          // Create a scale box for visual display
-          const scaleBox = {
-            name: `Frets ${fretLow}-${fretHigh}`,
-            minFret: fretLow,
-            maxFret: fretHigh,
-            positions: filteredPositions
-          }
+          // Get individual scale boxes and filter to those within fret range
+          const allScaleBoxes = getScaleBoxes(randomRoot, randomScale, guitarNotes)
+          const scaleBoxes = allScaleBoxes.filter(box =>
+            box.minFret <= fretHigh && box.maxFret >= fretLow
+          )
 
           setSetupDetails({
             type: 'melodies',
@@ -392,7 +390,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
               position: `frets ${fretLow} to ${fretHigh}`,
               fretRange: `${fretLow}-${fretHigh}`,
               noteIds: scaleNotes.map(n => n.id),
-              scaleBox: scaleBox // Store for visual display when handlers ready
+              scaleBoxes: scaleBoxes // Store array of scale boxes for visual display
             }
           })
         }
@@ -507,13 +505,11 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           // Set the notes directly for melody generation
           setGuitarNotes(scaleNotes)
 
-          // Create a scale box for visual display
-          const scaleBox = {
-            name: `Frets ${fretLow}-${fretHigh}`,
-            minFret: fretLow,
-            maxFret: fretHigh,
-            positions: filteredPositions
-          }
+          // Get individual scale boxes and filter to those within fret range
+          const allScaleBoxes = getBassScaleBoxes(randomRoot, randomScale, bassNotes)
+          const scaleBoxes = allScaleBoxes.filter(box =>
+            box.minFret <= fretHigh && box.maxFret >= fretLow
+          )
 
           setSetupDetails({
             type: 'melodies',
@@ -523,7 +519,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
               position: `frets ${fretLow} to ${fretHigh}`,
               fretRange: `${fretLow}-${fretHigh}`,
               noteIds: scaleNotes.map(n => n.id),
-              scaleBox: scaleBox // Store for visual display when handlers ready
+              scaleBoxes: scaleBoxes // Store array of scale boxes for visual display
             }
           })
         }
@@ -606,11 +602,13 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     // Delay handler calls to let React Strict Mode stabilize
     // This ensures the Guitar/Bass component state is ready to receive updates
     const timeoutId = setTimeout(() => {
-      // Scales - use wrapper functions that add to appliedScales AND update visual display
-      if (type === 'melodies' && details.scaleBox) {
+      // Scales - apply each scale box individually for proper display
+      if (type === 'melodies' && details.scaleBoxes) {
         if ((instrument === 'guitar' && scaleChordManagement.scaleHandlers) ||
             (instrument === 'bass' && scaleChordManagement.bassScaleHandlers)) {
-          scaleChordManagement.handleScaleBoxSelect(details.scaleBox)
+          details.scaleBoxes.forEach((box: any) => {
+            scaleChordManagement.handleScaleBoxSelect(box)
+          })
           hasAppliedVisualDisplay.current = true
         }
       }
