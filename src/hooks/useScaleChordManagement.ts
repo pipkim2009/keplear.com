@@ -13,8 +13,8 @@ import { generateNotesWithSeparateOctaves } from '../utils/notes'
 import type { KeyboardSelectionMode } from '../components/instruments/shared/InstrumentControls'
 import { applyScaleToGuitar, applyScaleBoxToGuitar } from '../utils/instruments/guitar/guitarScales'
 import { applyScaleToBass, applyScaleBoxToBass } from '../utils/instruments/bass/bassScales'
-import { applyChordToGuitar, applyChordShapeToGuitar } from '../utils/instruments/guitar/guitarChords'
-import { applyChordToBass, applyBassChordShapeToBass } from '../utils/instruments/bass/bassChords'
+import { applyChordToGuitar, applyChordShapeToGuitar, getChordBoxes } from '../utils/instruments/guitar/guitarChords'
+import { applyChordToBass, applyBassChordShapeToBass, getBassChordBoxes } from '../utils/instruments/bass/bassChords'
 import { guitarNotes } from '../utils/instruments/guitar/guitarNotes'
 import { bassNotes } from '../utils/instruments/bass/bassNotes'
 
@@ -588,6 +588,58 @@ export const useScaleChordManagement = ({
     setAppliedChords([])
   }, [instrument, chordHandlers, bassChordHandlers])
 
+  // Guitar chord apply handler - uses the same chord box system as sandbox mode
+  const handleGuitarChordApply = useCallback((rootNote: string, chord: GuitarChord, boxIndex: number = 0) => {
+    // Get chord boxes (same as sandbox mode)
+    const chordBoxes = getChordBoxes(rootNote, chord, guitarNotes)
+
+    if (chordBoxes.length === 0) {
+      return
+    }
+
+    // Use specified box index or default to first
+    const chordBox = chordBoxes[Math.min(boxIndex, chordBoxes.length - 1)]
+
+    // Create chord shape from box - exactly like sandbox mode does
+    const chordShapeFromBox = {
+      name: `${rootNote} ${chord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
+      minFret: chordBox.minFret,
+      maxFret: chordBox.maxFret,
+      positions: chordBox.positions,
+      difficulty: 'Medium' as const,
+      root: rootNote
+    }
+
+    // Use handleChordShapeSelect - same as sandbox mode
+    handleChordShapeSelect(chordShapeFromBox as any)
+  }, [handleChordShapeSelect])
+
+  // Bass chord apply handler - uses the same chord box system as sandbox mode
+  const handleBassChordApply = useCallback((rootNote: string, chord: BassChord, boxIndex: number = 0) => {
+    // Get chord boxes (same as sandbox mode)
+    const chordBoxes = getBassChordBoxes(rootNote, chord, bassNotes)
+
+    if (chordBoxes.length === 0) {
+      return
+    }
+
+    // Use specified box index or default to first
+    const chordBox = chordBoxes[Math.min(boxIndex, chordBoxes.length - 1)]
+
+    // Create chord shape from box - exactly like sandbox mode does
+    const bassChordShapeFromBox = {
+      name: `${rootNote} ${chord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
+      minFret: chordBox.minFret,
+      maxFret: chordBox.maxFret,
+      positions: chordBox.positions,
+      difficulty: 'Medium' as const,
+      root: rootNote
+    }
+
+    // Use handleChordShapeSelect - same as sandbox mode
+    handleChordShapeSelect(bassChordShapeFromBox as any)
+  }, [handleChordShapeSelect])
+
   // Keyboard scale handlers
   const handleKeyboardScaleApply = useCallback((rootNote: string, scale: KeyboardScale, octave?: number) => {
     // Check if this exact scale with this octave is already applied
@@ -844,6 +896,8 @@ export const useScaleChordManagement = ({
     handleChordSelect,
     handleChordShapeSelect,
     handleClearChord,
+    handleGuitarChordApply,
+    handleBassChordApply,
     handleKeyboardScaleApply,
     handleKeyboardScaleClear,
     handleScaleDelete,

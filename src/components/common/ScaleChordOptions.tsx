@@ -34,6 +34,7 @@ export interface AppliedChord {
   noteKeys?: string[] // For guitar/bass: note keys like "0-open", "1-2" etc.
   notes?: any[] // For keyboard: actual Note objects
   octave?: number // For keyboard: specific octave position
+  fretZone?: number // For guitar/bass: fret zone position
 }
 
 export interface AppliedScale {

@@ -403,20 +403,29 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         setChordMode('progression')
 
         const filteredChords = getFilteredChords(GUITAR_CHORDS, lessonSettings.chord)
-        const chordDetails: { root: string; chord: string; chordObj: typeof GUITAR_CHORDS[0] }[] = []
+        const chordDetails: { root: string; chord: string; chordObj: typeof GUITAR_CHORDS[0]; boxIndex: number }[] = []
 
         // Get fret range from settings (default 0-12)
         const fretLow = lessonSettings.fretLow ?? 0
         const fretHigh = lessonSettings.fretHigh ?? 12
 
+        // Build chord details with random box indices
         for (let i = 0; i < selectedChordCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
-
-          chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord })
+          // Random box index (0, 1, or 2 typically) - the chord system will handle the actual positions
+          const boxIndex = Math.floor(Math.random() * 3)
+          chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord, boxIndex })
         }
 
-        // Don't call setGuitarNotes - let appliedChords handle it in progression mode
+        // Delay chord application to run after any clearing effects complete
+        // Uses the same chord box system as sandbox mode
+        setTimeout(() => {
+          chordDetails.forEach(detail => {
+            scaleChordManagement.handleGuitarChordApply(detail.root, detail.chordObj, detail.boxIndex)
+          })
+        }, 50)
+
         setSetupDetails({ type: 'chords', details: { chordCount: selectedChordCount, chords: chordDetails, fretRange: `${fretLow}-${fretHigh}` } })
       }
 
@@ -493,20 +502,29 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         setChordMode('progression')
 
         const filteredChords = getFilteredChords(BASS_CHORDS, lessonSettings.chord)
-        const chordDetails: { root: string; chord: string; chordObj: typeof BASS_CHORDS[0] }[] = []
+        const chordDetails: { root: string; chord: string; chordObj: typeof BASS_CHORDS[0]; boxIndex: number }[] = []
 
         // Get fret range from settings (default 0-12)
         const fretLow = lessonSettings.fretLow ?? 0
         const fretHigh = lessonSettings.fretHigh ?? 12
 
+        // Build chord details with random box indices
         for (let i = 0; i < selectedChordCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
           const randomRoot = BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
-
-          chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord })
+          // Random box index (0, 1, or 2 typically) - the chord system will handle the actual positions
+          const boxIndex = Math.floor(Math.random() * 3)
+          chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord, boxIndex })
         }
 
-        // Don't call setGuitarNotes - let appliedChords handle it in progression mode
+        // Delay chord application to run after any clearing effects complete
+        // Uses the same chord box system as sandbox mode
+        setTimeout(() => {
+          chordDetails.forEach(detail => {
+            scaleChordManagement.handleBassChordApply(detail.root, detail.chordObj, detail.boxIndex)
+          })
+        }, 50)
+
         setSetupDetails({ type: 'chords', details: { chordCount: selectedChordCount, chords: chordDetails, fretRange: `${fretLow}-${fretHigh}` } })
       }
 
@@ -533,13 +551,19 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         }
       }
 
-      // Chord progressions - use wrapper functions that add to appliedChords AND update visual display
+      // Chord progressions - use standard chord apply functions with fretZone
       if (type === 'chords' && details.chords) {
-        if ((instrument === 'guitar' && scaleChordManagement.chordHandlers) ||
-            (instrument === 'bass' && scaleChordManagement.bassChordHandlers)) {
+        if (instrument === 'guitar' && scaleChordManagement.chordHandlers) {
           details.chords.forEach((c: any) => {
             if (c.chordObj) {
-              scaleChordManagement.handleChordSelect(c.root, c.chordObj)
+              scaleChordManagement.handleGuitarChordApply(c.root, c.chordObj, c.boxIndex ?? 0)
+            }
+          })
+          hasAppliedVisualDisplay.current = true
+        } else if (instrument === 'bass' && scaleChordManagement.bassChordHandlers) {
+          details.chords.forEach((c: any) => {
+            if (c.chordObj) {
+              scaleChordManagement.handleBassChordApply(c.root, c.chordObj, c.boxIndex ?? 0)
             }
           })
           hasAppliedVisualDisplay.current = true
@@ -548,7 +572,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     }, 100)
 
     return () => clearTimeout(timeoutId)
-  }, [setupDetails, instrument, scaleChordManagement.noteHandlers, scaleChordManagement.bassNoteHandlers, scaleChordManagement.scaleHandlers, scaleChordManagement.bassScaleHandlers, scaleChordManagement.chordHandlers, scaleChordManagement.bassChordHandlers, scaleChordManagement.handleScaleBoxSelect, scaleChordManagement.handleChordSelect])
+  }, [setupDetails, instrument, scaleChordManagement.noteHandlers, scaleChordManagement.bassNoteHandlers, scaleChordManagement.scaleHandlers, scaleChordManagement.bassScaleHandlers, scaleChordManagement.chordHandlers, scaleChordManagement.bassChordHandlers, scaleChordManagement.handleScaleBoxSelect, scaleChordManagement.handleGuitarChordApply, scaleChordManagement.handleBassChordApply])
 
   // Trigger melody generation once notes/scales/chords are selected (for all lesson types)
   useEffect(() => {
