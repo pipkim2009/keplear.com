@@ -265,9 +265,11 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         const randomRoot = ROOT_NOTES[Math.floor(Math.random() * ROOT_NOTES.length)]
 
         // Delay scale application to run after any clearing effects complete
-        // Don't pass octave parameter so scale spans all octaves in range
+        // Apply scale to each octave individually using standard system
         setTimeout(() => {
-          scaleChordManagement.handleKeyboardScaleApply(randomRoot, randomScale)
+          octaveRange.forEach(octave => {
+            scaleChordManagement.handleKeyboardScaleApply(randomRoot, randomScale, octave)
+          })
         }, 50)
 
         setSetupDetails({ type: 'melodies', details: { scaleName: randomScale.name, root: randomRoot, octaveRange: `${octaveLow}-${octaveHigh}` } })
