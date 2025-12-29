@@ -69,12 +69,12 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   const [fretHigh, setFretHigh] = useState<number>(12)
   const [isInstrumentDropdownOpen, setIsInstrumentDropdownOpen] = useState<boolean>(false)
 
-  // Difficulty presets
+  // Difficulty presets with octave and fret ranges
   const difficultyPresets = [
-    { bpm: 60, beats: 3, chordCount: 2, scale: 'major', chord: 'major' },           // Beginner
-    { bpm: 120, beats: 4, chordCount: 4, scale: 'major-minor', chord: 'major-minor' }, // Intermediate
-    { bpm: 180, beats: 6, chordCount: 6, scale: 'modes', chord: 'all' },            // Advanced
-    { bpm: 240, beats: 8, chordCount: 8, scale: 'all', chord: 'all' }               // Professional
+    { bpm: 60, beats: 3, chordCount: 2, scale: 'major', chord: 'major', octaveLow: 4, octaveHigh: 4, fretLow: 0, fretHigh: 4 },           // Beginner
+    { bpm: 120, beats: 4, chordCount: 4, scale: 'major-minor', chord: 'major-minor', octaveLow: 4, octaveHigh: 5, fretLow: 0, fretHigh: 8 }, // Intermediate
+    { bpm: 180, beats: 6, chordCount: 6, scale: 'modes', chord: 'all', octaveLow: 4, octaveHigh: 6, fretLow: 0, fretHigh: 12 },            // Advanced
+    { bpm: 240, beats: 8, chordCount: 8, scale: 'all', chord: 'all', octaveLow: 1, octaveHigh: 8, fretLow: 0, fretHigh: 24 }               // Professional
   ]
 
   const handleDifficultyChange = (newDifficulty: number) => {
@@ -87,6 +87,10 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
       setChordCount(preset.chordCount)
       setSelectedScale(preset.scale)
       setSelectedChord(preset.chord)
+      setOctaveLow(preset.octaveLow)
+      setOctaveHigh(preset.octaveHigh)
+      setFretLow(preset.fretLow)
+      setFretHigh(preset.fretHigh)
     }
   }
 
@@ -507,13 +511,13 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
               />
               <button
                 className="control-button-internal minus"
-                onClick={() => { setBpm(Math.max(30, bpm - 10)); handleManualChange() }}
+                onClick={() => { setBpm(Math.max(30, bpm - 1)); handleManualChange() }}
               >
                 −
               </button>
               <button
                 className="control-button-internal plus"
-                onClick={() => { setBpm(Math.min(300, bpm + 10)); handleManualChange() }}
+                onClick={() => { setBpm(Math.min(300, bpm + 1)); handleManualChange() }}
               >
                 +
               </button>

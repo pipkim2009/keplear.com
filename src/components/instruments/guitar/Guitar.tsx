@@ -1355,7 +1355,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         {/* Scale/Chord menu preview circles */}
         {previewPositions?.positions?.map((pos, idx) => {
           // Check if this position is already selected (don't show preview for already selected notes)
-          const noteKey = pos.fretIndex === 0 ? `${pos.stringIndex}-open` : `${pos.stringIndex}-${pos.fretIndex}`
+          // Note: Applied scales/chords use fretIndex-1 for storage, so we must match that format
+          const noteKey = pos.fretIndex === 0 ? `${pos.stringIndex}-open` : `${pos.stringIndex}-${pos.fretIndex - 1}`
           const isAlreadySelected = selectedNotes.has(noteKey) || scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
           if (isAlreadySelected) return null
 
@@ -1365,7 +1366,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           ) ?? false
           const previewClass = previewPositions.isChord
             ? (isRoot ? 'chord-root-note' : 'chord-note')
-            : (isRoot ? 'scale-root' : 'scale-note')
+            : (isRoot ? 'scale-root-note' : 'scale-note')
 
           const noteName = pos.fretIndex === 0
             ? getNoteForStringAndFret(pos.stringIndex, -1)
