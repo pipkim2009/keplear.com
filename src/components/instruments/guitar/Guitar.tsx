@@ -702,6 +702,12 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       noteKeys.forEach(key => newSet.delete(key))
       return newSet
     })
+    // Also update refs to ensure visual removal
+    noteKeys.forEach(key => {
+      selectedNotesRef.current.delete(key)
+      chordSelectedNotesRef.current.delete(key)
+      scaleSelectedNotesRef.current.delete(key)
+    })
   }, [])
 
   // Handle removing chord notes only (preserves scale notes for individual chord deletion)
@@ -715,6 +721,11 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       const newSet = new Set(prev)
       noteKeys.forEach(key => newSet.delete(key))
       return newSet
+    })
+    // Also update refs to ensure visual removal (but NOT scaleSelectedNotesRef to preserve scale highlighting)
+    noteKeys.forEach(key => {
+      selectedNotesRef.current.delete(key)
+      chordSelectedNotesRef.current.delete(key)
     })
     // Do NOT remove from scaleSelectedNotes to preserve scale highlighting
   }, [])

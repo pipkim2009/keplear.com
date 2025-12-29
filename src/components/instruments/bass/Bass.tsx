@@ -599,6 +599,11 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       noteKeys.forEach(key => newSet.delete(key))
       return newSet
     })
+    // Also update refs to ensure visual removal
+    noteKeys.forEach(key => {
+      chordSelectedNotesRef.current.delete(key)
+      scaleSelectedNotesRef.current.delete(key)
+    })
   }, [])
 
   const handleRemoveChordNotesOnly = useCallback((noteKeys: string[]) => {
@@ -611,6 +616,10 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       const newSet = new Set(prev)
       noteKeys.forEach(key => newSet.delete(key))
       return newSet
+    })
+    // Also update refs to ensure visual removal (but NOT scaleSelectedNotesRef to preserve scale highlighting)
+    noteKeys.forEach(key => {
+      chordSelectedNotesRef.current.delete(key)
     })
   }, [])
 
