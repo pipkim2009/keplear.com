@@ -728,6 +728,13 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           >
             End Session
           </button>
+          <button
+            className={styles.doneButton}
+            onClick={handleBackToSelection}
+            aria-label="Done with lesson"
+          >
+            Done
+          </button>
         </div>
 
         <InstrumentDisplay

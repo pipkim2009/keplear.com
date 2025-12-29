@@ -23,6 +23,10 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px 2rem 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
 .backButton {
@@ -60,6 +64,42 @@
 }
 
 :global(.dark) .backButton:focus-visible {
+  outline-color: var(--primary-purple-lighter);
+}
+
+.doneButton {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-darker) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+:global(.dark) .doneButton {
+  background: linear-gradient(135deg, var(--primary-purple-lighter) 0%, var(--primary-purple) 100%);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.doneButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+:global(.dark) .doneButton:hover {
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+.doneButton:focus-visible {
+  outline: 3px solid var(--primary-purple);
+  outline-offset: 2px;
+}
+
+:global(.dark) .doneButton:focus-visible {
   outline-color: var(--primary-purple-lighter);
 }
 
@@ -980,6 +1020,11 @@
     padding: 0.625rem 1.25rem;
   }
 
+  .doneButton {
+    font-size: 0.875rem;
+    padding: 0.625rem 1.5rem;
+  }
+
   .pageTitle {
     font-size: 2.5rem;
   }
@@ -1040,6 +1085,11 @@
   .backButton {
     font-size: 0.875rem;
     padding: 0.625rem 1rem;
+  }
+
+  .doneButton {
+    font-size: 0.875rem;
+    padding: 0.625rem 1.25rem;
   }
 
   .welcomeSubtitle {
@@ -1147,6 +1197,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .backButton,
+  .doneButton,
   .welcomeSubtitle,
   .instrumentCard,
   .instrumentIcon,
@@ -1170,6 +1221,7 @@
   }
 
   .backButton:hover,
+  .doneButton:hover,
   .instrumentCard:hover,
   .instrumentIcon:hover,
   .instrumentButton:hover,
