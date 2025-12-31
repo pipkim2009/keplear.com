@@ -143,7 +143,10 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     isAutoRecording,
     currentlyPlayingNoteIndex,
     handleCurrentlyPlayingNoteChange,
-    scaleChordManagement
+    scaleChordManagement,
+    pendingSkillLesson,
+    clearPendingSkillLesson,
+    navigateToSkills
   } = useInstrument()
 
   const handleStartLesson = () => {
@@ -169,6 +172,35 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setShowOptionsModal(false)
     setSelectedInstrument(null)
   }
+
+  // Handle pending skill lesson from Skills page
+  useEffect(() => {
+    if (pendingSkillLesson) {
+      const { instrument, skillType, skillName, octaveLow, octaveHigh, fretLow, fretHigh, bpm, beats, chordCount } = pendingSkillLesson
+
+      // Create lesson settings for the specific skill
+      const settings: LessonSettings = {
+        lessonType: skillType === 'scales' ? 'melodies' : 'chords',
+        difficulty: 0, // Learn mode
+        bpm,
+        beats,
+        chordCount,
+        scales: skillType === 'scales' ? [skillName] : undefined,
+        chords: skillType === 'chords' ? [skillName] : undefined,
+        octaveLow,
+        octaveHigh,
+        fretLow,
+        fretHigh
+      }
+
+      // Start the lesson with these settings
+      const practiceOption = skillType === 'scales' ? 'melodies' : 'chords'
+      handleOptionsStart(instrument, [practiceOption], 0, settings)
+
+      // Clear the pending skill lesson
+      clearPendingSkillLesson()
+    }
+  }, [pendingSkillLesson, clearPendingSkillLesson])
 
   const handleBackToSelection = () => {
     // Stop any ongoing text-to-speech
@@ -202,23 +234,16 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     setCongratulationsMessage(message)
   }
 
-  // Helper function to filter scales based on user selection
-  const getFilteredScales = (scales: typeof KEYBOARD_SCALES, scaleFilter: string | undefined) => {
-    if (!scaleFilter || scaleFilter === 'all') return scales
-    if (scaleFilter === 'major') return scales.filter(s => s.name === 'Major')
-    if (scaleFilter === 'major-minor') return scales.filter(s => s.name === 'Major' || s.name === 'Minor')
-    if (scaleFilter === 'modes') return scales.filter(s =>
-      ['Dorian', 'Phrygian', 'Lydian', 'Mixolydian', 'Locrian'].includes(s.name)
-    )
-    return scales
+  // Helper function to filter scales based on user selection (now uses array of scale names)
+  const getFilteredScales = (scales: typeof KEYBOARD_SCALES, selectedScales: string[] | undefined) => {
+    if (!selectedScales || selectedScales.length === 0) return scales
+    return scales.filter(s => selectedScales.includes(s.name))
   }
 
-  // Helper function to filter chords based on user selection
-  const getFilteredChords = (chords: typeof KEYBOARD_CHORDS, chordFilter: string | undefined) => {
-    if (!chordFilter || chordFilter === 'all') return chords
-    if (chordFilter === 'major') return chords.filter(c => c.name === 'Major')
-    if (chordFilter === 'major-minor') return chords.filter(c => c.name === 'Major' || c.name === 'Minor')
-    return chords
+  // Helper function to filter chords based on user selection (now uses array of chord names)
+  const getFilteredChords = (chords: typeof KEYBOARD_CHORDS, selectedChords: string[] | undefined) => {
+    if (!selectedChords || selectedChords.length === 0) return chords
+    return chords.filter(c => selectedChords.includes(c.name))
   }
 
   // Auto-select notes/scales/chords and BPM when session starts
@@ -261,7 +286,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
       // SCALES: Scale spanning all octaves in the selected range (filtered by user selection)
       if (practiceOptions.includes('melodies')) {
-        const filteredScales = getFilteredScales(KEYBOARD_SCALES, lessonSettings.scale)
+        const filteredScales = getFilteredScales(KEYBOARD_SCALES, lessonSettings.scales)
         const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = ROOT_NOTES[Math.floor(Math.random() * ROOT_NOTES.length)]
 
@@ -280,7 +305,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       else if (practiceOptions.includes('chords')) {
         setChordMode('progression')
 
-        const filteredChords = getFilteredChords(KEYBOARD_CHORDS, lessonSettings.chord)
+        const filteredChords = getFilteredChords(KEYBOARD_CHORDS, lessonSettings.chords)
         const chordDetails: { root: string; chord: string; octave: number }[] = []
 
         // Distribute chords across octaves randomly
@@ -343,7 +368,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
       // SCALES: All scale positions within the fret range
       if (practiceOptions.includes('melodies')) {
-        const filteredScales = getFilteredScales(GUITAR_SCALES, lessonSettings.scale)
+        const filteredScales = getFilteredScales(GUITAR_SCALES, lessonSettings.scales)
         const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = GUITAR_ROOT_NOTES[Math.floor(Math.random() * GUITAR_ROOT_NOTES.length)]
 
@@ -400,7 +425,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       else if (practiceOptions.includes('chords')) {
         setChordMode('progression')
 
-        const filteredChords = getFilteredChords(GUITAR_CHORDS, lessonSettings.chord)
+        const filteredChords = getFilteredChords(GUITAR_CHORDS, lessonSettings.chords)
         const chordDetails: { root: string; chord: string; chordObj: typeof GUITAR_CHORDS[0]; boxIndex: number }[] = []
 
         // Get fret range from settings (default 0-12)
@@ -472,7 +497,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
       // SCALES: All scale positions within the fret range
       if (practiceOptions.includes('melodies')) {
-        const filteredScales = getFilteredScales(BASS_SCALES, lessonSettings.scale)
+        const filteredScales = getFilteredScales(BASS_SCALES, lessonSettings.scales)
         const randomScale = filteredScales[Math.floor(Math.random() * filteredScales.length)]
         const randomRoot = BASS_ROOT_NOTES[Math.floor(Math.random() * BASS_ROOT_NOTES.length)]
 
@@ -529,7 +554,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       else if (practiceOptions.includes('chords')) {
         setChordMode('progression')
 
-        const filteredChords = getFilteredChords(BASS_CHORDS, lessonSettings.chord)
+        const filteredChords = getFilteredChords(BASS_CHORDS, lessonSettings.chords)
         const chordDetails: { root: string; chord: string; chordObj: typeof BASS_CHORDS[0]; boxIndex: number }[] = []
 
         // Get fret range from settings (default 0-12)
@@ -841,14 +866,21 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         </p>
       </section>
 
-      {/* Start Button Section */}
-      <section className={styles.startSection}>
+      {/* Buttons Section */}
+      <section className={styles.buttonsSection}>
         <button
           className={styles.startSessionButton}
           onClick={handleStartLesson}
           aria-label="Start practice session"
         >
           Begin Session
+        </button>
+        <button
+          className={styles.skillsButton}
+          onClick={navigateToSkills}
+          aria-label="View skills"
+        >
+          Skills
         </button>
       </section>
     </div>

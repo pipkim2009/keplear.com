@@ -6,31 +6,14 @@ import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import { IoMdArrowDropdown } from 'react-icons/io'
 import Tooltip from '../common/Tooltip'
+import { GUITAR_SCALES } from '../../utils/instruments/guitar/guitarScales'
+import { GUITAR_CHORDS } from '../../utils/instruments/guitar/guitarChords'
 
-interface PracticeOption {
-  id: string
-  label: string
-}
+const difficultyLabels = ['Learn', 'Custom']
 
-const practiceOptions: PracticeOption[] = [
-  { id: 'melodies', label: 'Melodies' },
-  { id: 'chords', label: 'Chords' }
-]
-
-const difficultyLabels = ['Beginner', 'Intermediate', 'Advanced', 'Professional', 'Custom']
-
-const scaleOptions = [
-  { id: 'major', label: 'Major' },
-  { id: 'major-minor', label: 'Major/Minor' },
-  { id: 'modes', label: 'Modes' },
-  { id: 'all', label: 'All' }
-]
-
-const chordOptions = [
-  { id: 'major', label: 'Major' },
-  { id: 'major-minor', label: 'Major/Minor' },
-  { id: 'all', label: 'All' }
-]
+// Get scale and chord names from the definitions
+const scaleNames = GUITAR_SCALES.map(s => s.name)
+const chordNames = GUITAR_CHORDS.map(c => c.name)
 
 export interface LessonSettings {
   lessonType: string
@@ -38,8 +21,8 @@ export interface LessonSettings {
   bpm: number
   beats: number
   chordCount: number
-  scale?: string
-  chord?: string
+  scales?: string[]
+  chords?: string[]
   octaveLow?: number
   octaveHigh?: number
   fretLow?: number
@@ -57,47 +40,71 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
 }) => {
   const [selectedInstrument, setSelectedInstrument] = useState<string>('keyboard')
   const [selectedOption, setSelectedOption] = useState<string>('melodies')
-  const [difficulty, setDifficulty] = useState<number>(1)
-  const [bpm, setBpm] = useState<number>(120)
+  const [difficulty, setDifficulty] = useState<number>(0) // 0 = Learn, 1 = Custom
+  const [bpm, setBpm] = useState<number>(80)
   const [beats, setBeats] = useState<number>(4)
   const [chordCount, setChordCount] = useState<number>(4)
-  const [selectedScale, setSelectedScale] = useState<string>('major-minor')
-  const [selectedChord, setSelectedChord] = useState<string>('major-minor')
+  const [selectedScales, setSelectedScales] = useState<string[]>(['Major', 'Minor'])
+  const [selectedChords, setSelectedChords] = useState<string[]>(['Major', 'Minor'])
   const [octaveLow, setOctaveLow] = useState<number>(4)
   const [octaveHigh, setOctaveHigh] = useState<number>(5)
   const [fretLow, setFretLow] = useState<number>(0)
   const [fretHigh, setFretHigh] = useState<number>(12)
   const [isInstrumentDropdownOpen, setIsInstrumentDropdownOpen] = useState<boolean>(false)
 
-  // Difficulty presets with octave and fret ranges
-  const difficultyPresets = [
-    { bpm: 60, beats: 3, chordCount: 2, scale: 'major', chord: 'major', octaveLow: 4, octaveHigh: 4, fretLow: 0, fretHigh: 4 },           // Beginner
-    { bpm: 120, beats: 4, chordCount: 4, scale: 'major-minor', chord: 'major-minor', octaveLow: 4, octaveHigh: 5, fretLow: 0, fretHigh: 8 }, // Intermediate
-    { bpm: 180, beats: 6, chordCount: 6, scale: 'modes', chord: 'all', octaveLow: 4, octaveHigh: 6, fretLow: 0, fretHigh: 12 },            // Advanced
-    { bpm: 240, beats: 8, chordCount: 8, scale: 'all', chord: 'all', octaveLow: 1, octaveHigh: 8, fretLow: 0, fretHigh: 24 }               // Professional
-  ]
+  // Preset for Learn mode
+  const learnPreset = {
+    bpm: 80,
+    beats: 4,
+    chordCount: 4,
+    scales: ['Major', 'Minor'],
+    chords: ['Major', 'Minor'],
+    octaveLow: 4,
+    octaveHigh: 5,
+    fretLow: 0,
+    fretHigh: 12
+  }
 
   const handleDifficultyChange = (newDifficulty: number) => {
     setDifficulty(newDifficulty)
-    // Custom mode (4) doesn't apply presets - user controls all settings
-    const preset = difficultyPresets[newDifficulty]
-    if (preset) {
-      setBpm(preset.bpm)
-      setBeats(preset.beats)
-      setChordCount(preset.chordCount)
-      setSelectedScale(preset.scale)
-      setSelectedChord(preset.chord)
-      setOctaveLow(preset.octaveLow)
-      setOctaveHigh(preset.octaveHigh)
-      setFretLow(preset.fretLow)
-      setFretHigh(preset.fretHigh)
+    // Learn mode (0) applies preset, Custom mode (1) keeps current settings
+    if (newDifficulty === 0) {
+      setBpm(learnPreset.bpm)
+      setBeats(learnPreset.beats)
+      setChordCount(learnPreset.chordCount)
+      setSelectedScales(learnPreset.scales)
+      setSelectedChords(learnPreset.chords)
+      setOctaveLow(learnPreset.octaveLow)
+      setOctaveHigh(learnPreset.octaveHigh)
+      setFretLow(learnPreset.fretLow)
+      setFretHigh(learnPreset.fretHigh)
     }
+  }
+
+  // Toggle scale selection
+  const toggleScale = (scaleName: string) => {
+    handleManualChange()
+    setSelectedScales(prev =>
+      prev.includes(scaleName)
+        ? prev.filter(s => s !== scaleName)
+        : [...prev, scaleName]
+    )
+  }
+
+  // Toggle chord selection
+  const toggleChord = (chordName: string) => {
+    handleManualChange()
+    setSelectedChords(prev =>
+      prev.includes(chordName)
+        ? prev.filter(c => c !== chordName)
+        : [...prev, chordName]
+    )
   }
 
   // Switch to Custom mode when user manually changes any setting
   const handleManualChange = () => {
-    if (difficulty !== 4) {
-      setDifficulty(4)
+    if (difficulty !== 1) {
+      setDifficulty(1)
     }
   }
 
@@ -114,8 +121,8 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         bpm,
         beats,
         chordCount,
-        scale: selectedOption === 'melodies' ? selectedScale : undefined,
-        chord: selectedOption === 'chords' ? selectedChord : undefined,
+        scales: selectedOption === 'melodies' ? selectedScales : undefined,
+        chords: selectedOption === 'chords' ? selectedChords : undefined,
         octaveLow: isKeyboard ? octaveLow : undefined,
         octaveHigh: isKeyboard ? octaveHigh : undefined,
         fretLow: isStringInstrument ? fretLow : undefined,
@@ -252,32 +259,6 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
             >
               Chords
             </button>
-          </div>
-        </div>
-
-        <div className={styles.formGroup}>
-          <label className={styles.formLabel}>
-            Difficulty: <span className={styles.difficultyValue}>{difficultyLabels[difficulty]}</span>
-          </label>
-          <div className={styles.sliderContainer}>
-            <input
-              type="range"
-              min="0"
-              max="4"
-              value={difficulty}
-              onChange={(e) => handleDifficultyChange(Number(e.target.value))}
-              className={styles.slider}
-            />
-            <div className={styles.sliderLabels}>
-              {difficultyLabels.map((label, index) => (
-                <span
-                  key={label}
-                  className={`${styles.sliderLabel} ${index === difficulty ? styles.activeLabel : ''}`}
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
           </div>
         </div>
 
@@ -439,52 +420,42 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
           </div>
         )}
 
-        {/* Scales dropdown - only for scales lesson */}
+        {/* Scales checkboxes - only for melodies lesson */}
         {selectedOption === 'melodies' && (
           <div className={styles.formGroup}>
-            <label className={styles.formLabel}>Scale</label>
-            <div className={styles.selectWrapper}>
-              <select
-                className={styles.select}
-                value={selectedScale}
-                onChange={(e) => { setSelectedScale(e.target.value); handleManualChange() }}
-              >
-                {scaleOptions.map(option => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <div className={styles.selectArrow}>
-                <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                  <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
+            <label className={styles.formLabel}>Scales</label>
+            <div className={styles.checkboxGrid}>
+              {scaleNames.map(scaleName => (
+                <label key={scaleName} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={selectedScales.includes(scaleName)}
+                    onChange={() => toggleScale(scaleName)}
+                    className={styles.checkbox}
+                  />
+                  <span className={styles.checkboxText}>{scaleName}</span>
+                </label>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Chords dropdown - only for chords lesson */}
+        {/* Chords checkboxes - only for chords lesson */}
         {selectedOption === 'chords' && (
           <div className={styles.formGroup}>
-            <label className={styles.formLabel}>Chord</label>
-            <div className={styles.selectWrapper}>
-              <select
-                className={styles.select}
-                value={selectedChord}
-                onChange={(e) => { setSelectedChord(e.target.value); handleManualChange() }}
-              >
-                {chordOptions.map(option => (
-                  <option key={option.id} value={option.id}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              <div className={styles.selectArrow}>
-                <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                  <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
+            <label className={styles.formLabel}>Chords</label>
+            <div className={styles.checkboxGrid}>
+              {chordNames.map(chordName => (
+                <label key={chordName} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={selectedChords.includes(chordName)}
+                    onChange={() => toggleChord(chordName)}
+                    className={styles.checkbox}
+                  />
+                  <span className={styles.checkboxText}>{chordName}</span>
+                </label>
+              ))}
             </div>
           </div>
         )}

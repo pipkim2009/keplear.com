@@ -249,6 +249,128 @@
 }
 
 /* ===========================================
+   BADGE CONTAINER & POPUP
+   =========================================== */
+
+.badgeContainer {
+  position: relative;
+  display: inline-block;
+}
+
+.badge {
+  cursor: pointer;
+}
+
+.badge.active {
+  transform: translateY(-1px);
+}
+
+.badge.locked.active {
+  background: var(--white-alpha-10);
+  border-color: var(--primary-purple-alpha-30);
+  opacity: 0.9;
+}
+
+:global(.light) .badge.locked.active {
+  background: var(--gray-200);
+  border-color: var(--primary-purple-alpha-30);
+}
+
+.badgePopup {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-12px);
+  background: var(--dark-bg-primary);
+  border: 2px solid var(--primary-purple);
+  border-radius: 12px;
+  padding: 16px 20px;
+  min-width: 220px;
+  max-width: 280px;
+  z-index: 1000;
+  animation: popupFadeIn 0.2s ease-out;
+}
+
+.badgePopup::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: var(--primary-purple);
+}
+
+:global(.light) .badgePopup {
+  background: white;
+  border-color: var(--primary-purple);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+:global(.light) .badgePopup::after {
+  border-top-color: var(--primary-purple);
+}
+
+.popupTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary-purple-light);
+  margin-bottom: 8px;
+}
+
+:global(.light) .popupTitle {
+  color: var(--primary-purple);
+}
+
+.popupDescription {
+  font-size: 0.875rem;
+  color: var(--dark-text-secondary);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+:global(.light) .popupDescription {
+  color: var(--light-text-secondary);
+}
+
+.startLessonButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-dark) 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.startLessonButton:hover {
+  background: linear-gradient(135deg, var(--primary-purple-dark) 0%, #4a0ba8 100%);
+  transform: translateY(-1px);
+}
+
+.startLessonButton:active {
+  transform: translateY(0);
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-12px);
+  }
+}
+
+/* ===========================================
    RESPONSIVE
    =========================================== */
 
@@ -281,6 +403,20 @@
     padding: 6px 12px;
     font-size: 0.8125rem;
   }
+
+  .badgePopup {
+    min-width: 200px;
+    max-width: 240px;
+    padding: 14px 16px;
+  }
+
+  .popupTitle {
+    font-size: 1rem;
+  }
+
+  .popupDescription {
+    font-size: 0.8125rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -303,5 +439,25 @@
 
   .badgeIcon {
     font-size: 0.75rem;
+  }
+
+  .badgePopup {
+    min-width: 180px;
+    max-width: 220px;
+    padding: 12px 14px;
+  }
+
+  .popupTitle {
+    font-size: 0.9rem;
+  }
+
+  .popupDescription {
+    font-size: 0.75rem;
+    margin-bottom: 12px;
+  }
+
+  .startLessonButton {
+    padding: 8px 12px;
+    font-size: 0.8rem;
   }
 }

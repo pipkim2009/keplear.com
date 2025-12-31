@@ -13,6 +13,19 @@ import type { ChordMode } from '../reducers/uiReducer'
 import { useScaleChordManagement } from '../hooks/useScaleChordManagement'
 import type { AppliedChord, AppliedScale } from '../components/common/ScaleChordOptions'
 
+export interface SkillLessonSettings {
+  instrument: 'keyboard' | 'guitar' | 'bass'
+  skillType: 'scales' | 'chords'
+  skillName: string
+  octaveLow: number
+  octaveHigh: number
+  fretLow: number
+  fretHigh: number
+  bpm: number
+  beats: number
+  chordCount: number
+}
+
 interface InstrumentContextType {
   // Audio functions
   playNote: (note: string) => Promise<void>
@@ -98,6 +111,11 @@ interface InstrumentContextType {
   appliedChords: AppliedChord[]
   appliedScales: AppliedScale[]
   scaleChordManagement: ReturnType<typeof useScaleChordManagement>
+
+  // Skill Lesson
+  pendingSkillLesson: SkillLessonSettings | null
+  startSkillLesson: (settings: SkillLessonSettings) => void
+  clearPendingSkillLesson: () => void
 }
 
 const InstrumentContext = createContext<InstrumentContextType | undefined>(undefined)
@@ -117,6 +135,9 @@ interface InstrumentProviderProps {
 export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children }) => {
   // State for melody generation
   const [isGeneratingMelody, setIsGeneratingMelody] = useState(false)
+
+  // State for skill lesson (from Skills page)
+  const [pendingSkillLesson, setPendingSkillLesson] = useState<SkillLessonSettings | null>(null)
 
   // State for octave ranges (needed for scale/chord management)
   const [lowerOctaves, setLowerOctaves] = useState<number>(0)
@@ -421,6 +442,17 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     navigateToSandboxOriginal
   ])
 
+  // Start a skill lesson from the Skills page
+  const startSkillLesson = useCallback((settings: SkillLessonSettings): void => {
+    setPendingSkillLesson(settings)
+    navigateToPractice()
+  }, [navigateToPractice])
+
+  // Clear pending skill lesson (called by Practice after handling it)
+  const clearPendingSkillLesson = useCallback((): void => {
+    setPendingSkillLesson(null)
+  }, [])
+
   const value: InstrumentContextType = {
     // Audio functions
     playNote,
@@ -505,7 +537,12 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     // Scale/Chord Management
     appliedChords,
     appliedScales,
-    scaleChordManagement
+    scaleChordManagement,
+
+    // Skill Lesson
+    pendingSkillLesson,
+    startSkillLesson,
+    clearPendingSkillLesson
   }
 
   return (
