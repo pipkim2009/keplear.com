@@ -435,7 +435,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           // Get individual scale boxes and filter to those within fret range
           const allScaleBoxes = getScaleBoxes(randomRoot, randomScale, guitarNotes)
           const scaleBoxes = allScaleBoxes.filter(box =>
-            box.minFret <= fretHigh && box.maxFret >= fretLow
+            box.minFret >= fretLow && box.maxFret <= fretHigh
           )
 
           setSetupDetails({
@@ -474,7 +474,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           // Get actual chord boxes for this chord/root and filter to fret range
           const chordBoxes = getChordBoxes(randomRoot, randomChord, guitarNotes)
           const validBoxes = chordBoxes.filter(box =>
-            box.minFret <= fretHigh && box.maxFret >= fretLow
+            box.minFret >= fretLow && box.maxFret <= fretHigh
           )
 
           if (validBoxes.length > 0) {
@@ -564,7 +564,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           // Get individual scale boxes and filter to those within fret range
           const allScaleBoxes = getBassScaleBoxes(randomRoot, randomScale, bassNotes)
           const scaleBoxes = allScaleBoxes.filter(box =>
-            box.minFret <= fretHigh && box.maxFret >= fretLow
+            box.minFret >= fretLow && box.maxFret <= fretHigh
           )
 
           setSetupDetails({
@@ -603,7 +603,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           // Get actual chord boxes for this chord/root and filter to fret range
           const chordBoxes = getBassChordBoxes(randomRoot, randomChord, bassNotes)
           const validBoxes = chordBoxes.filter(box =>
-            box.minFret <= fretHigh && box.maxFret >= fretLow
+            box.minFret >= fretLow && box.maxFret <= fretHigh
           )
 
           if (validBoxes.length > 0) {
