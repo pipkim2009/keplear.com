@@ -3,6 +3,8 @@ import styles from '../../styles/Practice.module.css'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import PracticeOptionsModal, { type LessonSettings } from './PracticeOptionsModal'
 import { useInstrument } from '../../contexts/InstrumentContext'
+import { useAuth } from '../../hooks/useAuth'
+import AuthModal from '../auth/AuthModal'
 import type { Note } from '../../utils/notes'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
@@ -87,6 +89,11 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   const [practiceOptions, setPracticeOptions] = useState<string[]>([])
   const [sessionStarted, setSessionStarted] = useState(false)
 
+  // Auth state for skills button
+  const { user } = useAuth()
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [pendingSkillsNavigation, setPendingSkillsNavigation] = useState(false)
+
   // Lesson State
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
   const [welcomeSpeechDone, setWelcomeSpeechDone] = useState(false)
@@ -151,6 +158,30 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
   const handleStartLesson = () => {
     setShowOptionsModal(true)
+  }
+
+  // Handle navigation to skills after successful login
+  useEffect(() => {
+    if (user && pendingSkillsNavigation) {
+      setPendingSkillsNavigation(false)
+      setShowAuthModal(false)
+      navigateToSkills()
+    }
+  }, [user, pendingSkillsNavigation, navigateToSkills])
+
+  const handleSkillsClick = () => {
+    if (user) {
+      navigateToSkills()
+    } else {
+      setPendingSkillsNavigation(true)
+      setShowAuthModal(true)
+    }
+  }
+
+  const handleAuthModalClose = () => {
+    setShowAuthModal(false)
+    // Only clear pending navigation if user didn't log in (manual dismiss)
+    // The useEffect will handle navigation and clearing if login succeeded
   }
 
   const [difficulty, setDifficulty] = useState<number>(2) // 0-4: Beginner to Expert
@@ -877,12 +908,18 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         </button>
         <button
           className={styles.skillsButton}
-          onClick={navigateToSkills}
+          onClick={handleSkillsClick}
           aria-label="View skills"
         >
           Skills
         </button>
       </section>
+
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={handleAuthModalClose}
+        initialForm="login"
+      />
     </div>
   )
 }
