@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useTheme } from '../../hooks/useTheme'
-import { PiCaretUpFill, PiSignOutFill, PiTrashFill } from 'react-icons/pi'
+import { PiCaretUpFill, PiSignOutFill, PiTrashFill, PiTrophy } from 'react-icons/pi'
+import { useInstrument } from '../../contexts/InstrumentContext'
 import logo from '/Keplear-logo.png'
 import styles from './UserMenu.module.css'
 import authStyles from './AuthForms.module.css'
@@ -15,6 +16,7 @@ interface UserProfile {
 const UserMenu = () => {
   const { user, signOut, deleteAccount } = useAuth()
   const { isDarkMode } = useTheme()
+  const { navigateToSkills } = useInstrument()
   const [isOpen, setIsOpen] = useState(false)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -56,6 +58,11 @@ const UserMenu = () => {
 
   const handleDeleteAccount = () => {
     setShowDeleteConfirm(true)
+    setIsOpen(false)
+  }
+
+  const handleNavigateToSkills = () => {
+    navigateToSkills()
     setIsOpen(false)
   }
 
@@ -196,6 +203,18 @@ const UserMenu = () => {
             <div className={styles.userInfo}>
               <div className={styles.userNameLarge}>{userProfile.username}</div>
             </div>
+          </div>
+
+          <div className={styles.userMenuDivider}></div>
+
+          <div className={styles.userMenuActions}>
+            <button
+              className={styles.menuItem}
+              onClick={handleNavigateToSkills}
+            >
+              <PiTrophy size={16} />
+              Skills
+            </button>
           </div>
 
           <div className={styles.userMenuDivider}></div>

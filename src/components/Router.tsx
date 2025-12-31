@@ -1,5 +1,6 @@
 import Home from './pages/Home'
 import Practice from './pages/Practice'
+import Skills from './pages/Skills'
 import NotFound from './pages/NotFound'
 import InstrumentDisplay from './instruments/shared/InstrumentDisplay'
 import { useInstrument } from '../contexts/InstrumentContext'
@@ -123,6 +124,13 @@ function Router() {
       return (
         <Practice
           onNavigateToSandbox={navigateToSandbox}
+        />
+      )
+
+    case 'skills':
+      return (
+        <Skills
+          onNavigateToHome={navigateToHome}
         />
       )
 

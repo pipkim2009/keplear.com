@@ -1,0 +1,307 @@
+/* ===========================================
+   KEPLEAR SKILLS PAGE
+   =========================================== */
+
+.skills {
+  min-height: calc(100vh - 120px);
+  padding: 120px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container {
+  max-width: 1000px;
+  width: 100%;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
+  color: var(--dark-text-primary);
+  margin: 0 0 16px;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+:global(.light) .title {
+  background: linear-gradient(135deg, var(--primary-purple-dark) 0%, var(--primary-purple) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: var(--dark-text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+:global(.light) .subtitle {
+  color: var(--light-text-secondary);
+}
+
+/* ===========================================
+   INSTRUMENT SECTIONS
+   =========================================== */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.instrumentSection {
+  padding: 32px;
+  background: var(--white-alpha-05);
+  border: 1px solid var(--white-alpha-10);
+  border-radius: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.instrumentSection:hover {
+  background: var(--white-alpha-08);
+  border-color: var(--white-alpha-15);
+}
+
+:global(.light) .instrumentSection {
+  background: white;
+  border-color: var(--black-alpha-10);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+:global(.light) .instrumentSection:hover {
+  background: var(--gray-50);
+  border-color: var(--black-alpha-15);
+}
+
+.instrumentHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--white-alpha-10);
+}
+
+:global(.light) .instrumentHeader {
+  border-bottom-color: var(--black-alpha-10);
+}
+
+.instrumentIcon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 1.5rem;
+}
+
+.instrumentIcon.keyboard {
+  background: linear-gradient(135deg, var(--blue-alpha-20) 0%, var(--blue-alpha-10) 100%);
+  color: var(--blue-500);
+}
+
+.instrumentIcon.guitar {
+  background: linear-gradient(135deg, var(--green-alpha-20) 0%, var(--green-alpha-10) 100%);
+  color: var(--green-500);
+}
+
+.instrumentIcon.bass {
+  background: linear-gradient(135deg, var(--red-alpha-20) 0%, var(--red-alpha-10) 100%);
+  color: var(--red-500);
+}
+
+.instrumentTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--dark-text-primary);
+  margin: 0;
+}
+
+:global(.light) .instrumentTitle {
+  color: var(--light-text-primary);
+}
+
+/* ===========================================
+   SKILL GROUPS
+   =========================================== */
+
+.skillGroup {
+  margin-bottom: 24px;
+}
+
+.skillGroup:last-child {
+  margin-bottom: 0;
+}
+
+.skillGroupTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--dark-text-secondary);
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+:global(.light) .skillGroupTitle {
+  color: var(--light-text-secondary);
+}
+
+/* ===========================================
+   BADGES
+   =========================================== */
+
+.badgeGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 100px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: default;
+  transition: all 0.2s ease;
+}
+
+/* Locked State */
+.badge.locked {
+  background: var(--white-alpha-05);
+  border: 1px solid var(--white-alpha-10);
+  color: var(--dark-text-tertiary);
+  opacity: 0.7;
+}
+
+.badge.locked:hover {
+  background: var(--white-alpha-08);
+  opacity: 0.85;
+}
+
+.badge.locked .badgeIcon {
+  color: var(--dark-text-tertiary);
+}
+
+:global(.light) .badge.locked {
+  background: var(--gray-100);
+  border-color: var(--black-alpha-08);
+  color: var(--light-text-tertiary);
+}
+
+:global(.light) .badge.locked:hover {
+  background: var(--gray-150);
+}
+
+:global(.light) .badge.locked .badgeIcon {
+  color: var(--light-text-tertiary);
+}
+
+/* Unlocked State */
+.badge.unlocked {
+  background: linear-gradient(135deg, var(--primary-purple-alpha-15) 0%, var(--primary-purple-alpha-10) 100%);
+  border: 1px solid var(--primary-purple-alpha-30);
+  color: var(--primary-purple-light);
+}
+
+.badge.unlocked:hover {
+  background: linear-gradient(135deg, var(--primary-purple-alpha-20) 0%, var(--primary-purple-alpha-15) 100%);
+  border-color: var(--primary-purple-alpha-50);
+  transform: translateY(-1px);
+}
+
+.badge.unlocked .badgeIcon {
+  color: var(--green-500);
+}
+
+:global(.light) .badge.unlocked {
+  background: linear-gradient(135deg, var(--primary-purple-alpha-10) 0%, var(--primary-purple-alpha-05) 100%);
+  border-color: var(--primary-purple-alpha-30);
+  color: var(--primary-purple);
+}
+
+:global(.light) .badge.unlocked:hover {
+  background: linear-gradient(135deg, var(--primary-purple-alpha-15) 0%, var(--primary-purple-alpha-10) 100%);
+  border-color: var(--primary-purple-alpha-50);
+}
+
+:global(.light) .badge.unlocked .badgeIcon {
+  color: var(--green-600);
+}
+
+.badgeIcon {
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+/* ===========================================
+   RESPONSIVE
+   =========================================== */
+
+@media (max-width: 768px) {
+  .skills {
+    padding: 100px 16px 60px;
+  }
+
+  .instrumentSection {
+    padding: 24px;
+  }
+
+  .instrumentHeader {
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+  }
+
+  .instrumentIcon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .instrumentTitle {
+    font-size: 1.25rem;
+  }
+
+  .badge {
+    padding: 6px 12px;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .skills {
+    padding: 90px 12px 40px;
+  }
+
+  .instrumentSection {
+    padding: 20px;
+  }
+
+  .badgeGrid {
+    gap: 8px;
+  }
+
+  .badge {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+
+  .badgeIcon {
+    font-size: 0.75rem;
+  }
+}
