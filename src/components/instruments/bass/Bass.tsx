@@ -35,9 +35,11 @@ interface BassProps {
   currentlyPlayingChordId?: string | null
   previewPositions?: FretboardPreview | null
   disableNoteSelection?: boolean
+  fretRangeLow?: number
+  fretRangeHigh?: number
 }
 
-const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false }) => {
+const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false, fretRangeLow, fretRangeHigh }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(4).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -804,6 +806,20 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   return (
     <div className={`bass-container ${disableNoteSelection ? 'practice-mode' : ''}`}>
       <div className={`bass-fretboard ${showNotes ? 'melody-active' : ''}`}>
+        {/* Fret range dimming overlays */}
+        {fretRangeLow !== undefined && fretRangeLow > 0 && (
+          <div
+            className="bass-fret-range-dim bass-fret-range-dim-left"
+            style={{ width: `${fretRangeLow * 54}px` }}
+          />
+        )}
+        {fretRangeHigh !== undefined && fretRangeHigh < 24 && (
+          <div
+            className="bass-fret-range-dim bass-fret-range-dim-right"
+            style={{ left: `${fretRangeHigh * 54}px` }}
+          />
+        )}
+
         {/* Open fret checkbox */}
         {!disableNoteSelection && (
           <div className="bass-fret-checkbox-container" style={{ left: '4.5px', bottom: '-40px' }}>

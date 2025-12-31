@@ -891,3 +891,36 @@
   cursor: default;
   pointer-events: none;
 }
+
+/* Fret range dimming for practice mode */
+.fret-range-dim {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  pointer-events: none;
+}
+
+.fret-range-dim-left {
+  left: 0;
+  border-right: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.fret-range-dim-right {
+  right: 0;
+  width: auto;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.dark .fret-range-dim {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.dark .fret-range-dim-left {
+  border-right: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .fret-range-dim-right {
+  border-left: 2px solid rgba(255, 255, 255, 0.2);
+}

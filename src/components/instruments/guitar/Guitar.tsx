@@ -35,9 +35,11 @@ interface GuitarProps {
   currentlyPlayingChordId?: string | null
   previewPositions?: FretboardPreview | null
   disableNoteSelection?: boolean
+  fretRangeLow?: number
+  fretRangeHigh?: number
 }
 
-const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false }) => {
+const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false, fretRangeLow, fretRangeHigh }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -936,6 +938,20 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   return (
     <div className={`guitar-container ${disableNoteSelection ? 'practice-mode' : ''}`}>
       <div className={`fretboard ${showNotes ? 'melody-active' : ''}`}>
+        {/* Fret range dimming overlays */}
+        {fretRangeLow !== undefined && fretRangeLow > 0 && (
+          <div
+            className="fret-range-dim fret-range-dim-left"
+            style={{ width: `${fretRangeLow * 54}px` }}
+          />
+        )}
+        {fretRangeHigh !== undefined && fretRangeHigh < 24 && (
+          <div
+            className="fret-range-dim fret-range-dim-right"
+            style={{ left: `${fretRangeHigh * 54}px` }}
+          />
+        )}
+
         {/* Open fret checkbox */}
         {!disableNoteSelection && (
           <div className="fret-checkbox-container" style={{ left: '4.5px', bottom: '-40px' }}>

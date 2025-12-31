@@ -712,41 +712,9 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   useEffect(() => {
     if (welcomeSpeechDone && generatedMelody.length > 0 && recordedAudioBlob && !hasAnnouncedMelody.current && setupDetails) {
       hasAnnouncedMelody.current = true
-
-      // Convert octave number to ordinal
-      const octaveOrdinals: { [key: string]: string } = {
-        '1': 'first', '2': 'second', '3': 'third', '4': 'fourth',
-        '5': 'fifth', '6': 'sixth', '7': 'seventh', '8': 'eighth'
-      }
-
-      let announcement = ''
-
-      // Create announcement based on lesson type
-      if (setupDetails.type === 'melodies') {
-        // Check if it's keyboard (has octaveRange) or guitar/bass (has position)
-        if (setupDetails.details.octaveRange) {
-          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale across octaves ${setupDetails.details.octaveRange} at ${bpm} BPM`
-        } else if (setupDetails.details.position) {
-          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale on ${setupDetails.details.position} at ${bpm} BPM`
-        } else {
-          announcement = `I have set up a ${generatedMelody.length} beat melody using the ${setupDetails.details.root} ${setupDetails.details.scaleName} scale at ${bpm} BPM`
-        }
-      }
-      else if (setupDetails.type === 'chords') {
-        // Check if it's keyboard (has octave) or guitar/bass (no octave specified)
-        if (setupDetails.details.octave) {
-          const octaveOrdinal = octaveOrdinals[setupDetails.details.octave.toString()] || 'fourth'
-          const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
-          announcement = `I have set up a ${generatedMelody.length} beat melody using chords on the ${octaveOrdinal} octave at ${bpm} BPM`
-        } else {
-          const chordNames = setupDetails.details.chords.map((c: any) => `${c.root} ${c.chord}`).join(', ')
-          announcement = `I have set up a ${generatedMelody.length} beat melody using chords at ${bpm} BPM`
-        }
-      }
-      // Set the message for subtitle display (WelcomeSubtitle component will handle TTS and subtitle)
-      setMelodySetupMessage(announcement)
+      setMelodySetupMessage('I have set up a melody for you to attempt')
     }
-  }, [welcomeSpeechDone, generatedMelody, recordedAudioBlob, bpm, setupDetails])
+  }, [welcomeSpeechDone, generatedMelody, recordedAudioBlob, setupDetails])
 
 
   // Show practice options modal
@@ -763,16 +731,19 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   if (selectedInstrument && sessionStarted) {
     const instrumentName = instrumentNames[selectedInstrument] || 'Instrument'
 
-    // Get the practice topic label
-    const practiceTopics = [
-      { id: 'melodies', label: 'Melodies' },
-      { id: 'chords', label: 'Chords' }
-    ]
-    const practiceTopicLabel = practiceOptions.map(opt =>
-      practiceTopics.find(t => t.id === opt)?.label || opt
-    ).join(', ')
+    const welcomeMessage = `Welcome to your ${instrumentName} lesson`
 
-    const welcomeMessage = `Welcome to your ${instrumentName} lesson on ${practiceTopicLabel}`
+    // Calculate octave range for keyboard based on lesson settings
+    // Formula: lowerOctaves = 4 - octaveLow, higherOctaves = octaveHigh - 5
+    // Base keyboard range is octaves 4-5
+    const octaveLow = lessonSettings?.octaveLow ?? 3
+    const octaveHigh = lessonSettings?.octaveHigh ?? 5
+    const calculatedLowerOctaves = selectedInstrument === 'keyboard' ? 4 - octaveLow : 0
+    const calculatedHigherOctaves = selectedInstrument === 'keyboard' ? octaveHigh - 5 : 0
+
+    // Get fret range for guitar/bass lessons
+    const fretLow = lessonSettings?.fretLow
+    const fretHigh = lessonSettings?.fretHigh
 
     return (
       <>
@@ -814,8 +785,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           onOctaveRangeChange={handleOctaveRangeChange}
           keyboardSelectionMode={keyboardSelectionMode}
           onKeyboardSelectionModeChange={handleKeyboardSelectionModeChange}
-          initialLowerOctaves={3}
-          initialHigherOctaves={3}
+          initialLowerOctaves={calculatedLowerOctaves}
+          initialHigherOctaves={calculatedHigherOctaves}
           disableOctaveCleanup={true}
           flashingInputs={{
             bpm: flashingInputs.bpm || activeInputs.bpm,
@@ -859,6 +830,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           practiceMode={true}
           onLessonComplete={handleLessonComplete}
           autoPlayAudio={autoPlayAudio}
+          fretRangeLow={fretLow}
+          fretRangeHigh={fretHigh}
         />
 
         {/* Welcome Subtitle Overlay */}
