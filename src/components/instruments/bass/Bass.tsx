@@ -521,8 +521,11 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(new Set())
     setScaleSelectedNotes(new Set())
+    // Clear refs as well (they're used for highlighting)
+    scaleSelectedNotesRef.current = new Set()
     setCurrentChord(null)
     setChordSelectedNotes(new Set())
+    chordSelectedNotesRef.current = new Set()
     setBassNotes([])
   }, [setBassNotes])
 
@@ -583,6 +586,11 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(new Set())
     setChordSelectedNotes(new Set())
+    // Clear refs as well (they're used for highlighting)
+    chordSelectedNotesRef.current = new Set()
+    scaleSelectedNotesRef.current = new Set()
+    setScaleSelectedNotes(new Set())
+    setCurrentScale(null)
   }, [])
 
   const handleRemoveChordNotes = useCallback((noteKeys: string[]) => {

@@ -608,9 +608,13 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(new Set())
     setScaleSelectedNotes(new Set())
+    // Clear refs as well (they're used for highlighting)
+    scaleSelectedNotesRef.current = new Set()
+    selectedNotesRef.current = new Set()
     // Clear chord state when clearing scale
     setCurrentChord(null)
     setChordSelectedNotes(new Set())
+    chordSelectedNotesRef.current = new Set()
 
     // Notify parent that selections are cleared for "deselect all" button visibility
     setGuitarNotes([])
@@ -684,6 +688,12 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
     setFretCheckboxes(new Array(25).fill(false))
     setSelectedNotes(new Set())
     setChordSelectedNotes(new Set())
+    // Clear refs as well (they're used for highlighting)
+    chordSelectedNotesRef.current = new Set()
+    selectedNotesRef.current = new Set()
+    scaleSelectedNotesRef.current = new Set()
+    setScaleSelectedNotes(new Set())
+    setCurrentScale(null)
   }, [])
 
   // Handle removing specific chord notes
