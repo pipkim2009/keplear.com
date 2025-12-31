@@ -78,8 +78,17 @@ const Badge: React.FC<BadgeProps> = ({ name, description, isUnlocked, instrument
   )
 }
 
+type InstrumentType = 'keyboard' | 'guitar' | 'bass'
+
+const INSTRUMENTS: { value: InstrumentType; label: string; icon: React.FC<{ className?: string }> }[] = [
+  { value: 'keyboard', label: 'Keyboard', icon: PiPianoKeysFill },
+  { value: 'guitar', label: 'Guitar', icon: GiGuitarHead },
+  { value: 'bass', label: 'Bass', icon: GiGuitarBassHead }
+]
+
 const Skills: React.FC<SkillsProps> = () => {
   const { startSkillLesson } = useInstrument()
+  const [selectedInstrument, setSelectedInstrument] = useState<InstrumentType>('keyboard')
 
   // Keyboard uses the same scales and chords as guitar
   const keyboardScales = GUITAR_SCALES
@@ -112,6 +121,67 @@ const Skills: React.FC<SkillsProps> = () => {
     startSkillLesson(settings)
   }
 
+  // Get scales and chords for the selected instrument
+  const getScalesForInstrument = () => {
+    switch (selectedInstrument) {
+      case 'keyboard':
+        return keyboardScales
+      case 'guitar':
+        return GUITAR_SCALES
+      case 'bass':
+        return BASS_SCALES
+    }
+  }
+
+  const getChordsForInstrument = () => {
+    switch (selectedInstrument) {
+      case 'keyboard':
+        return keyboardChords
+      case 'guitar':
+        return GUITAR_CHORDS
+      case 'bass':
+        return BASS_CHORDS
+    }
+  }
+
+  const scales = getScalesForInstrument()
+  const chords = getChordsForInstrument()
+
+  // Helper to find scale/chord data by name
+  const findScaleByName = (name: string) => scales.find(s => s.name === name)
+  const findChordByName = (name: string) => chords.find(c => c.name === name)
+
+  // Helper to render a badge if the scale/chord exists
+  const renderScaleBadge = (name: string) => {
+    const scale = findScaleByName(name)
+    if (!scale) return null
+    return (
+      <Badge
+        name={name}
+        description={scale.description}
+        isUnlocked={isUnlocked(selectedInstrument, 'scales', name)}
+        instrument={selectedInstrument}
+        skillType="scales"
+        onStartLesson={handleStartLesson}
+      />
+    )
+  }
+
+  const renderChordBadge = (name: string) => {
+    const chord = findChordByName(name)
+    if (!chord) return null
+    return (
+      <Badge
+        name={name}
+        description={chord.description}
+        isUnlocked={isUnlocked(selectedInstrument, 'chords', name)}
+        instrument={selectedInstrument}
+        skillType="chords"
+        onStartLesson={handleStartLesson}
+      />
+    )
+  }
+
   return (
     <div className={styles.skills}>
       <div className={styles.container}>
@@ -122,135 +192,142 @@ const Skills: React.FC<SkillsProps> = () => {
           </p>
         </header>
 
+        {/* Instrument Selector */}
+        <div className={styles.instrumentSelector}>
+          {INSTRUMENTS.map((inst) => {
+            const Icon = inst.icon
+            return (
+              <button
+                key={inst.value}
+                className={`${styles.instrumentButton} ${selectedInstrument === inst.value ? styles.active : ''}`}
+                onClick={() => setSelectedInstrument(inst.value)}
+              >
+                <Icon className={styles.instrumentButtonIcon} />
+                <span>{inst.label}</span>
+              </button>
+            )
+          })}
+        </div>
+
         <div className={styles.content}>
-          {/* Keyboard Section */}
+          {/* Selected Instrument Section */}
           <section className={styles.instrumentSection}>
             <div className={styles.instrumentHeader}>
-              <div className={`${styles.instrumentIcon} ${styles.keyboard}`}>
-                <PiPianoKeysFill />
+              <div className={`${styles.instrumentIcon} ${styles[selectedInstrument]}`}>
+                {selectedInstrument === 'keyboard' && <PiPianoKeysFill />}
+                {selectedInstrument === 'guitar' && <GiGuitarHead />}
+                {selectedInstrument === 'bass' && <GiGuitarBassHead />}
               </div>
-              <h2 className={styles.instrumentTitle}>Keyboard</h2>
+              <h2 className={styles.instrumentTitle}>
+                {selectedInstrument.charAt(0).toUpperCase() + selectedInstrument.slice(1)}
+              </h2>
             </div>
 
+            {/* Scales Tree */}
             <div className={styles.skillGroup}>
               <h3 className={styles.skillGroupTitle}>Scales</h3>
-              <div className={styles.badgeGrid}>
-                {keyboardScales.map((scale) => (
-                  <Badge
-                    key={scale.name}
-                    name={scale.name}
-                    description={scale.description}
-                    isUnlocked={isUnlocked('keyboard', 'scales', scale.name)}
-                    instrument="keyboard"
-                    skillType="scales"
-                    onStartLesson={handleStartLesson}
-                  />
-                ))}
+              <div className={styles.skillTree}>
+                {/* Level 1: Major */}
+                <div className={styles.treeLevel}>
+                  <div className={styles.treeNode}>
+                    {renderScaleBadge('Major')}
+                    <div className={styles.treeLine} />
+                  </div>
+                </div>
+
+                {/* Level 2: Minor */}
+                <div className={styles.treeLevel}>
+                  <div className={styles.treeNode}>
+                    {renderScaleBadge('Minor')}
+                    <div className={styles.treeLineBranch} />
+                  </div>
+                </div>
+
+                {/* Level 3: Branches */}
+                <div className={styles.treeBranches}>
+                  {/* Modes Branch */}
+                  <div className={styles.treeBranch}>
+                    <div className={styles.branchLabel}>Modes</div>
+                    <div className={styles.branchNodes}>
+                      <div className={styles.treeNode}>{renderScaleBadge('Dorian')}<div className={styles.treeLine} /></div>
+                      <div className={styles.treeNode}>{renderScaleBadge('Phrygian')}<div className={styles.treeLine} /></div>
+                      <div className={styles.treeNode}>{renderScaleBadge('Lydian')}<div className={styles.treeLine} /></div>
+                      <div className={styles.treeNode}>{renderScaleBadge('Mixolydian')}<div className={styles.treeLine} /></div>
+                      <div className={styles.treeNode}>{renderScaleBadge('Locrian')}</div>
+                    </div>
+                  </div>
+
+                  {/* Pentatonic Branch */}
+                  <div className={styles.treeBranch}>
+                    <div className={styles.branchLabel}>Pentatonic</div>
+                    <div className={styles.branchNodes}>
+                      <div className={styles.treeNode}>{renderScaleBadge('Pentatonic Major')}<div className={styles.treeLine} /></div>
+                      <div className={styles.treeNode}>{renderScaleBadge('Pentatonic Minor')}</div>
+                    </div>
+                  </div>
+
+                  {/* Advanced Branch */}
+                  <div className={styles.treeBranch}>
+                    <div className={styles.branchLabel}>Advanced</div>
+                    <div className={styles.branchNodes}>
+                      <div className={styles.treeNode}>{renderScaleBadge('Harmonic Minor')}<div className={styles.treeLine} /></div>
+                      <div className={styles.treeNode}>{renderScaleBadge('Blues Scale')}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
+            {/* Chords Tree */}
             <div className={styles.skillGroup}>
               <h3 className={styles.skillGroupTitle}>Chords</h3>
-              <div className={styles.badgeGrid}>
-                {keyboardChords.map((chord) => (
-                  <Badge
-                    key={chord.name}
-                    name={chord.name}
-                    description={chord.description}
-                    isUnlocked={isUnlocked('keyboard', 'chords', chord.name)}
-                    instrument="keyboard"
-                    skillType="chords"
-                    onStartLesson={handleStartLesson}
-                  />
-                ))}
-              </div>
-            </div>
-          </section>
+              <div className={styles.skillTree}>
+                {/* Level 1: Major */}
+                <div className={styles.treeLevel}>
+                  <div className={styles.treeNode}>
+                    {renderChordBadge('Major')}
+                    <div className={styles.treeLine} />
+                  </div>
+                </div>
 
-          {/* Guitar Section */}
-          <section className={styles.instrumentSection}>
-            <div className={styles.instrumentHeader}>
-              <div className={`${styles.instrumentIcon} ${styles.guitar}`}>
-                <GiGuitarHead />
-              </div>
-              <h2 className={styles.instrumentTitle}>Guitar</h2>
-            </div>
+                {/* Level 2: Minor */}
+                <div className={styles.treeLevel}>
+                  <div className={styles.treeNode}>
+                    {renderChordBadge('Minor')}
+                    <div className={styles.treeLineBranch} />
+                  </div>
+                </div>
 
-            <div className={styles.skillGroup}>
-              <h3 className={styles.skillGroupTitle}>Scales</h3>
-              <div className={styles.badgeGrid}>
-                {GUITAR_SCALES.map((scale) => (
-                  <Badge
-                    key={scale.name}
-                    name={scale.name}
-                    description={scale.description}
-                    isUnlocked={isUnlocked('guitar', 'scales', scale.name)}
-                    instrument="guitar"
-                    skillType="scales"
-                    onStartLesson={handleStartLesson}
-                  />
-                ))}
-              </div>
-            </div>
+                {/* Level 3: Branches */}
+                <div className={styles.treeBranches}>
+                  {/* 7th Chords Branch */}
+                  <div className={styles.treeBranch}>
+                    <div className={styles.branchLabel}>7th Chords</div>
+                    <div className={styles.branchNodes}>
+                      <div className={styles.treeNode}>{renderChordBadge('Dominant 7th')}<div className={styles.treeLine} /></div>
+                      <div className={styles.treeNode}>{renderChordBadge('Major 7th')}<div className={styles.treeLine} /></div>
+                      <div className={styles.treeNode}>{renderChordBadge('Minor 7th')}</div>
+                    </div>
+                  </div>
 
-            <div className={styles.skillGroup}>
-              <h3 className={styles.skillGroupTitle}>Chords</h3>
-              <div className={styles.badgeGrid}>
-                {GUITAR_CHORDS.map((chord) => (
-                  <Badge
-                    key={chord.name}
-                    name={chord.name}
-                    description={chord.description}
-                    isUnlocked={isUnlocked('guitar', 'chords', chord.name)}
-                    instrument="guitar"
-                    skillType="chords"
-                    onStartLesson={handleStartLesson}
-                  />
-                ))}
-              </div>
-            </div>
-          </section>
+                  {/* Suspended Branch */}
+                  <div className={styles.treeBranch}>
+                    <div className={styles.branchLabel}>Suspended</div>
+                    <div className={styles.branchNodes}>
+                      <div className={styles.treeNode}>{renderChordBadge('Sus2')}<div className={styles.treeLine} /></div>
+                      <div className={styles.treeNode}>{renderChordBadge('Sus4')}</div>
+                    </div>
+                  </div>
 
-          {/* Bass Section */}
-          <section className={styles.instrumentSection}>
-            <div className={styles.instrumentHeader}>
-              <div className={`${styles.instrumentIcon} ${styles.bass}`}>
-                <GiGuitarBassHead />
-              </div>
-              <h2 className={styles.instrumentTitle}>Bass</h2>
-            </div>
-
-            <div className={styles.skillGroup}>
-              <h3 className={styles.skillGroupTitle}>Scales</h3>
-              <div className={styles.badgeGrid}>
-                {BASS_SCALES.map((scale) => (
-                  <Badge
-                    key={scale.name}
-                    name={scale.name}
-                    description={scale.description}
-                    isUnlocked={isUnlocked('bass', 'scales', scale.name)}
-                    instrument="bass"
-                    skillType="scales"
-                    onStartLesson={handleStartLesson}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.skillGroup}>
-              <h3 className={styles.skillGroupTitle}>Chords</h3>
-              <div className={styles.badgeGrid}>
-                {BASS_CHORDS.map((chord) => (
-                  <Badge
-                    key={chord.name}
-                    name={chord.name}
-                    description={chord.description}
-                    isUnlocked={isUnlocked('bass', 'chords', chord.name)}
-                    instrument="bass"
-                    skillType="chords"
-                    onStartLesson={handleStartLesson}
-                  />
-                ))}
+                  {/* Altered Branch */}
+                  <div className={styles.treeBranch}>
+                    <div className={styles.branchLabel}>Altered</div>
+                    <div className={styles.branchNodes}>
+                      <div className={styles.treeNode}>{renderChordBadge('Augmented')}<div className={styles.treeLine} /></div>
+                      <div className={styles.treeNode}>{renderChordBadge('Diminished')}</div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </section>

@@ -51,6 +51,71 @@
 }
 
 /* ===========================================
+   INSTRUMENT SELECTOR
+   =========================================== */
+
+.instrumentSelector {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding: 8px;
+  background: var(--white-alpha-05);
+  border: 1px solid var(--white-alpha-10);
+  border-radius: 16px;
+}
+
+:global(.light) .instrumentSelector {
+  background: var(--gray-100);
+  border-color: var(--black-alpha-08);
+}
+
+.instrumentButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  color: var(--dark-text-secondary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.instrumentButton:hover {
+  background: var(--white-alpha-08);
+  color: var(--dark-text-primary);
+}
+
+.instrumentButton.active {
+  background: var(--primary-purple-alpha-15);
+  border-color: var(--primary-purple);
+  color: var(--primary-purple-light);
+}
+
+:global(.light) .instrumentButton {
+  color: var(--light-text-secondary);
+}
+
+:global(.light) .instrumentButton:hover {
+  background: var(--gray-200);
+  color: var(--light-text-primary);
+}
+
+:global(.light) .instrumentButton.active {
+  background: var(--primary-purple-alpha-10);
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+}
+
+.instrumentButtonIcon {
+  font-size: 1.25rem;
+}
+
+/* ===========================================
    INSTRUMENT SECTIONS
    =========================================== */
 
@@ -156,6 +221,132 @@
 
 :global(.light) .skillGroupTitle {
   color: var(--light-text-secondary);
+}
+
+/* ===========================================
+   SKILL TREE LAYOUT
+   =========================================== */
+
+.skillTree {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+}
+
+.treeLevel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.treeNode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.treeLine {
+  width: 2px;
+  height: 20px;
+  background: linear-gradient(180deg, var(--primary-purple), var(--primary-purple-alpha-50));
+  margin: 4px 0;
+}
+
+:global(.light) .treeLine {
+  background: linear-gradient(180deg, var(--primary-purple), var(--primary-purple-alpha-40));
+}
+
+.treeLineBranch {
+  width: 2px;
+  height: 24px;
+  background: var(--primary-purple);
+  margin: 4px 0;
+  position: relative;
+}
+
+.treeLineBranch::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 8px solid var(--primary-purple);
+}
+
+/* Branches container */
+.treeBranches {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  padding-top: 16px;
+  position: relative;
+}
+
+.treeBranches::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 100px);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--primary-purple), var(--primary-purple), transparent);
+}
+
+:global(.light) .treeBranches::before {
+  background: linear-gradient(90deg, transparent, var(--primary-purple-alpha-60), var(--primary-purple-alpha-60), transparent);
+}
+
+/* Individual branch */
+.treeBranch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 120px;
+}
+
+.treeBranch::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 16px;
+  background: var(--primary-purple);
+}
+
+.branchLabel {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--primary-purple-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  background: var(--primary-purple-alpha-15);
+  border: 1px solid var(--primary-purple-alpha-30);
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+:global(.light) .branchLabel {
+  color: var(--primary-purple);
+  background: var(--primary-purple-alpha-10);
+  border-color: var(--primary-purple-alpha-20);
+}
+
+.branchNodes {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
 }
 
 /* ===========================================
@@ -379,6 +570,20 @@
     padding: 100px 16px 60px;
   }
 
+  .instrumentSelector {
+    gap: 8px;
+    padding: 6px;
+  }
+
+  .instrumentButton {
+    padding: 10px 16px;
+    font-size: 0.875rem;
+  }
+
+  .instrumentButtonIcon {
+    font-size: 1.125rem;
+  }
+
   .instrumentSection {
     padding: 24px;
   }
@@ -397,6 +602,29 @@
 
   .instrumentTitle {
     font-size: 1.25rem;
+  }
+
+  .skillTree {
+    padding: 16px 0;
+  }
+
+  .treeBranches {
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+  }
+
+  .treeBranch {
+    min-width: 100px;
+  }
+
+  .branchLabel {
+    font-size: 0.625rem;
+    padding: 3px 10px;
+  }
+
+  .treeLine {
+    height: 16px;
   }
 
   .badge {
@@ -424,8 +652,62 @@
     padding: 90px 12px 40px;
   }
 
+  .instrumentSelector {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .instrumentButton {
+    padding: 8px 12px;
+    font-size: 0.8125rem;
+    flex: 1;
+    justify-content: center;
+    min-width: 90px;
+  }
+
+  .instrumentButtonIcon {
+    font-size: 1rem;
+  }
+
   .instrumentSection {
     padding: 20px;
+  }
+
+  .skillTree {
+    padding: 12px 0;
+  }
+
+  .treeBranches {
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .treeBranches::before {
+    display: none;
+  }
+
+  .treeBranch {
+    min-width: 90px;
+  }
+
+  .treeBranch::before {
+    display: none;
+  }
+
+  .branchLabel {
+    font-size: 0.5625rem;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+
+  .treeLine {
+    height: 12px;
+  }
+
+  .treeLineBranch {
+    height: 16px;
   }
 
   .badgeGrid {
