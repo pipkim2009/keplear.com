@@ -74,6 +74,7 @@ interface InstrumentDisplayProps {
   autoPlayAudio?: boolean
   fretRangeLow?: number
   fretRangeHigh?: number
+  lessonType?: 'melodies' | 'chords'
 }
 
 const InstrumentDisplay = memo(function InstrumentDisplay({
@@ -140,7 +141,8 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   onLessonComplete,
   autoPlayAudio = false,
   fretRangeLow,
-  fretRangeHigh
+  fretRangeHigh,
+  lessonType
 }: InstrumentDisplayProps) {
   const [lowerOctaves, setLowerOctaves] = useState<number>(initialLowerOctaves)
   const [higherOctaves, setHigherOctaves] = useState<number>(initialHigherOctaves)
@@ -444,6 +446,7 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           onFretboardPreviewChange={setFretboardPreview}
           onKeyboardPreviewChange={setKeyboardPreview}
           availableKeyboardNotes={availableKeyboardNotes}
+          lessonType={lessonType}
         />
 
         <InstrumentRenderer

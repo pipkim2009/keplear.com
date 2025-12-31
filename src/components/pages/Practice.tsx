@@ -832,6 +832,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           autoPlayAudio={autoPlayAudio}
           fretRangeLow={fretLow}
           fretRangeHigh={fretHigh}
+          lessonType={lessonSettings?.lessonType as 'melodies' | 'chords' | undefined}
         />
 
         {/* Welcome Subtitle Overlay */}

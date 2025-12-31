@@ -76,6 +76,8 @@ interface ScaleChordOptionsProps {
   onKeyboardPreviewChange?: (preview: KeyboardPreview | null) => void
   // Available keyboard notes for preview calculation
   availableKeyboardNotes?: readonly Note[]
+  // Lesson type to show only scales or chords button label
+  lessonType?: 'melodies' | 'chords'
 }
 
 const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
@@ -104,7 +106,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   disableDelete = false,
   onFretboardPreviewChange,
   onKeyboardPreviewChange,
-  availableKeyboardNotes = []
+  availableKeyboardNotes = [],
+  lessonType
 }) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [isScaleMode, setIsScaleMode] = useState(true) // true for scales, false for chords
@@ -516,10 +519,10 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
       <button
         className={`scale-options-toggle instrument-${instrument}`}
         onClick={toggleExpanded}
-        title={isExpanded ? 'Close Scales/Chords' : 'Open Scales/Chords'}
+        title={isExpanded ? `Close ${lessonType === 'melodies' ? 'Scales' : lessonType === 'chords' ? 'Chords' : 'Scales/Chords'}` : `Open ${lessonType === 'melodies' ? 'Scales' : lessonType === 'chords' ? 'Chords' : 'Scales/Chords'}`}
       >
         <IoMusicalNotes size={16} />
-        Scales/Chords
+        {lessonType === 'melodies' ? 'Scales' : lessonType === 'chords' ? 'Chords' : 'Scales/Chords'}
       </button>
 
       {isExpanded && (

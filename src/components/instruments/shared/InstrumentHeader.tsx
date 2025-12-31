@@ -46,6 +46,7 @@ interface InstrumentHeaderProps {
   onFretboardPreviewChange?: (preview: FretboardPreview | null) => void
   onKeyboardPreviewChange?: (preview: KeyboardPreview | null) => void
   availableKeyboardNotes?: readonly Note[]
+  lessonType?: 'melodies' | 'chords'
 }
 
 const InstrumentHeader = memo(function InstrumentHeader({
@@ -82,7 +83,8 @@ const InstrumentHeader = memo(function InstrumentHeader({
   hideSelectionMode = false,
   onFretboardPreviewChange,
   onKeyboardPreviewChange,
-  availableKeyboardNotes = []
+  availableKeyboardNotes = [],
+  lessonType
 }: InstrumentHeaderProps) {
   // Memoize selection mode handlers
   const handleRangeClick = useCallback(() => {
@@ -172,6 +174,7 @@ Multi Select - Select the specific notes to use"
             onFretboardPreviewChange={onFretboardPreviewChange}
             onKeyboardPreviewChange={onKeyboardPreviewChange}
             availableKeyboardNotes={availableKeyboardNotes}
+            lessonType={lessonType}
           />
         </div>
 
