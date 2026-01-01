@@ -6,6 +6,8 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import { useAuth } from '../../hooks/useAuth'
 import AuthModal from '../auth/AuthModal'
 import type { Note } from '../../utils/notes'
+import { usePitchDetection, usePerformanceGrading } from '../../hooks'
+import { LiveFeedback, ScoreDisplay } from '../practice'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
 import { GUITAR_SCALES, ROOT_NOTES as GUITAR_ROOT_NOTES, getScalePositions, getScaleBoxes } from '../../utils/instruments/guitar/guitarScales'
@@ -94,6 +96,11 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [pendingSkillsNavigation, setPendingSkillsNavigation] = useState(false)
 
+  // Pitch detection and performance grading hooks
+  const pitchDetection = usePitchDetection()
+  const performanceGrading = usePerformanceGrading()
+  const [showPitchFeedback, setShowPitchFeedback] = useState(false)
+
   // Lesson State
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
   const [welcomeSpeechDone, setWelcomeSpeechDone] = useState(false)
@@ -155,6 +162,29 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     clearPendingSkillLesson,
     navigateToSkills
   } = useInstrument()
+
+  // Pass pitch detection results to grading system
+  useEffect(() => {
+    if (pitchDetection.currentPitch && performanceGrading.state.isActive) {
+      performanceGrading.processPitch(pitchDetection.currentPitch)
+    }
+  }, [pitchDetection.currentPitch, performanceGrading.state.isActive, performanceGrading.processPitch])
+
+  // Start performance grading when user starts listening and melody is ready
+  const handleStartPracticeWithFeedback = () => {
+    if (generatedMelody.length > 0) {
+      setShowPitchFeedback(true)
+      performanceGrading.startPerformance(generatedMelody)
+      pitchDetection.startListening()
+    }
+  }
+
+  // Stop practice session
+  const handleStopPracticeWithFeedback = () => {
+    pitchDetection.stopListening()
+    performanceGrading.stopPerformance()
+    setShowPitchFeedback(false)
+  }
 
   const handleStartLesson = () => {
     setShowOptionsModal(true)
@@ -834,6 +864,33 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           fretRangeHigh={fretHigh}
           lessonType={lessonSettings?.lessonType as 'melodies' | 'chords' | undefined}
         />
+
+        {/* Real-time Pitch Feedback Section */}
+        {generatedMelody.length > 0 && (
+          <div style={{ width: '100%', maxWidth: '600px', margin: '2rem auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {/* Score Display - shows during and after performance */}
+            {(performanceGrading.state.isActive || performanceGrading.result) && (
+              <ScoreDisplay
+                state={performanceGrading.state}
+                result={performanceGrading.result}
+                totalNotes={generatedMelody.length}
+              />
+            )}
+
+            {/* Live Feedback - pitch detection controls */}
+            <LiveFeedback
+              isListening={pitchDetection.isListening}
+              onStartListening={handleStartPracticeWithFeedback}
+              onStopListening={handleStopPracticeWithFeedback}
+              currentPitch={pitchDetection.currentPitch}
+              volumeLevel={pitchDetection.volumeLevel}
+              performanceState={performanceGrading.state}
+              lastNoteResult={performanceGrading.lastNoteResult}
+              error={pitchDetection.error}
+              permission={pitchDetection.permission}
+            />
+          </div>
+        )}
 
         {/* Welcome Subtitle Overlay */}
         <WelcomeSubtitle
