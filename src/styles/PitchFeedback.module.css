@@ -1,0 +1,739 @@
+/* ========================================
+   PITCH FEEDBACK COMPONENTS
+   Real-time performance grading UI
+   ======================================== */
+
+/* ========================================
+   LIVE FEEDBACK CONTAINER
+   ======================================== */
+
+.liveFeedbackContainer {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: var(--white-alpha-80);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgb(210, 210, 249, 0.3);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+:global(.dark) .liveFeedbackContainer {
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(45, 55, 72, 0.8) 100%);
+  border: 1px solid rgb(210, 210, 249, 0.2);
+}
+
+/* ========================================
+   MICROPHONE BUTTON
+   ======================================== */
+
+.microphoneButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--primary-purple);
+  color: var(--white);
+}
+
+:global(.dark) .microphoneButton {
+  background: var(--primary-purple-light);
+}
+
+.microphoneButton:hover:not(:disabled) {
+  background: var(--primary-purple-dark);
+  transform: translateY(-2px);
+}
+
+:global(.dark) .microphoneButton:hover:not(:disabled) {
+  background: var(--primary-purple);
+}
+
+.microphoneButton.listening {
+  background: rgb(239, 68, 68);
+  animation: pulse 2s infinite;
+}
+
+:global(.dark) .microphoneButton.listening {
+  background: rgb(248, 113, 113);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+}
+
+.microphoneButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================
+   PITCH DISPLAY
+   ======================================== */
+
+.pitchDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgb(148, 163, 184, 0.1);
+  border-radius: 16px;
+}
+
+:global(.dark) .pitchDisplay {
+  background: rgb(148, 163, 184, 0.15);
+}
+
+.currentNote {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--light-text-primary);
+  line-height: 1;
+}
+
+:global(.dark) .currentNote {
+  color: var(--dark-text-primary);
+}
+
+.currentNote.correct {
+  color: rgb(34, 197, 94);
+}
+
+.currentNote.close {
+  color: rgb(245, 158, 11);
+}
+
+.currentNote.wrong {
+  color: rgb(239, 68, 68);
+}
+
+.expectedNote {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .expectedNote {
+  color: var(--dark-text-secondary);
+}
+
+/* ========================================
+   VOLUME METER
+   ======================================== */
+
+.volumeMeterContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.volumeMeterLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .volumeMeterLabel {
+  color: var(--dark-text-secondary);
+}
+
+.volumeMeter {
+  width: 100%;
+  height: 8px;
+  background: rgb(148, 163, 184, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.volumeMeterFill {
+  height: 100%;
+  background: linear-gradient(90deg, rgb(34, 197, 94) 0%, rgb(245, 158, 11) 70%, rgb(239, 68, 68) 100%);
+  border-radius: 4px;
+  transition: width 0.05s ease-out;
+}
+
+/* ========================================
+   NOTE RESULT FEEDBACK
+   ======================================== */
+
+.noteResultFeedback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.125rem;
+  animation: feedbackPop 0.3s ease-out;
+}
+
+@keyframes feedbackPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.noteResultFeedback.perfect {
+  background: linear-gradient(135deg, rgb(34, 197, 94, 0.2) 0%, rgb(34, 197, 94, 0.3) 100%);
+  color: rgb(22, 163, 74);
+  border: 2px solid rgb(34, 197, 94, 0.5);
+}
+
+:global(.dark) .noteResultFeedback.perfect {
+  background: linear-gradient(135deg, rgb(34, 197, 94, 0.25) 0%, rgb(34, 197, 94, 0.35) 100%);
+  color: rgb(74, 222, 128);
+}
+
+.noteResultFeedback.good {
+  background: linear-gradient(135deg, rgb(59, 130, 246, 0.2) 0%, rgb(59, 130, 246, 0.3) 100%);
+  color: rgb(37, 99, 235);
+  border: 2px solid rgb(59, 130, 246, 0.5);
+}
+
+:global(.dark) .noteResultFeedback.good {
+  background: linear-gradient(135deg, rgb(59, 130, 246, 0.25) 0%, rgb(59, 130, 246, 0.35) 100%);
+  color: rgb(147, 197, 253);
+}
+
+.noteResultFeedback.ok {
+  background: linear-gradient(135deg, rgb(245, 158, 11, 0.2) 0%, rgb(245, 158, 11, 0.3) 100%);
+  color: rgb(217, 119, 6);
+  border: 2px solid rgb(245, 158, 11, 0.5);
+}
+
+:global(.dark) .noteResultFeedback.ok {
+  background: linear-gradient(135deg, rgb(245, 158, 11, 0.25) 0%, rgb(245, 158, 11, 0.35) 100%);
+  color: rgb(251, 191, 36);
+}
+
+.noteResultFeedback.miss {
+  background: linear-gradient(135deg, rgb(239, 68, 68, 0.2) 0%, rgb(239, 68, 68, 0.3) 100%);
+  color: rgb(220, 38, 38);
+  border: 2px solid rgb(239, 68, 68, 0.5);
+}
+
+:global(.dark) .noteResultFeedback.miss {
+  background: linear-gradient(135deg, rgb(239, 68, 68, 0.25) 0%, rgb(239, 68, 68, 0.35) 100%);
+  color: rgb(252, 165, 165);
+}
+
+/* ========================================
+   SCORE DISPLAY
+   ======================================== */
+
+.scoreDisplayContainer {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: var(--white-alpha-80);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgb(210, 210, 249, 0.3);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+:global(.dark) .scoreDisplayContainer {
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(45, 55, 72, 0.8) 100%);
+  border: 1px solid rgb(210, 210, 249, 0.2);
+}
+
+/* ========================================
+   HEADER ROW (Lives + Score)
+   ======================================== */
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ========================================
+   LIVES DISPLAY
+   ======================================== */
+
+.livesContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.livesLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .livesLabel {
+  color: var(--dark-text-secondary);
+}
+
+.livesHearts {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.heart {
+  font-size: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.heart.active {
+  color: rgb(239, 68, 68);
+  filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.5));
+}
+
+.heart.lost {
+  color: rgb(148, 163, 184, 0.3);
+  transform: scale(0.9);
+}
+
+.heart.losing {
+  animation: heartBreak 0.5s ease-out;
+}
+
+@keyframes heartBreak {
+  0% {
+    color: rgb(239, 68, 68);
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    color: rgb(148, 163, 184, 0.3);
+    transform: scale(0.9);
+  }
+}
+
+/* ========================================
+   RUNNING SCORE
+   ======================================== */
+
+.runningScore {
+  display: flex;
+  align-items: baseline;
+  gap: 0.25rem;
+}
+
+.scoreValue {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .scoreValue {
+  color: var(--dark-text-primary);
+}
+
+.scoreLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .scoreLabel {
+  color: var(--dark-text-secondary);
+}
+
+/* ========================================
+   PROGRESS BAR
+   ======================================== */
+
+.progressContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progressLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+  display: flex;
+  justify-content: space-between;
+}
+
+:global(.dark) .progressLabel {
+  color: var(--dark-text-secondary);
+}
+
+.progressBar {
+  width: 100%;
+  height: 12px;
+  background: rgb(148, 163, 184, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  border-radius: 6px;
+  transition: width 0.3s ease-out;
+}
+
+:global(.dark) .progressFill {
+  background: linear-gradient(90deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+}
+
+/* ========================================
+   STARS DISPLAY
+   ======================================== */
+
+.starsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 0;
+}
+
+.star {
+  font-size: 2.5rem;
+  transition: all 0.3s ease;
+}
+
+.star.earned {
+  color: rgb(250, 204, 21);
+  filter: drop-shadow(0 0 6px rgba(250, 204, 21, 0.6));
+  animation: starEarn 0.5s ease-out;
+}
+
+.star.unearned {
+  color: rgb(148, 163, 184, 0.3);
+}
+
+@keyframes starEarn {
+  0% {
+    transform: scale(0) rotate(-180deg);
+  }
+  60% {
+    transform: scale(1.3) rotate(20deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+/* ========================================
+   RESULT STATS
+   ======================================== */
+
+.resultStats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  background: rgb(148, 163, 184, 0.1);
+  border-radius: 12px;
+}
+
+:global(.dark) .resultStats {
+  background: rgb(148, 163, 184, 0.15);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.statValue.perfect {
+  color: rgb(34, 197, 94);
+}
+
+.statValue.good {
+  color: rgb(59, 130, 246);
+}
+
+.statValue.ok {
+  color: rgb(245, 158, 11);
+}
+
+.statValue.miss {
+  color: rgb(239, 68, 68);
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .statLabel {
+  color: var(--dark-text-secondary);
+}
+
+/* ========================================
+   RESULT MESSAGE
+   ======================================== */
+
+.resultMessage {
+  text-align: center;
+  padding: 1.5rem;
+  border-radius: 12px;
+  animation: resultSlideIn 0.5s ease-out;
+}
+
+@keyframes resultSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.resultMessage.passed {
+  background: linear-gradient(135deg, rgb(34, 197, 94, 0.15) 0%, rgb(34, 197, 94, 0.25) 100%);
+  border: 2px solid rgb(34, 197, 94, 0.4);
+}
+
+:global(.dark) .resultMessage.passed {
+  background: linear-gradient(135deg, rgb(34, 197, 94, 0.2) 0%, rgb(34, 197, 94, 0.3) 100%);
+}
+
+.resultMessage.failed {
+  background: linear-gradient(135deg, rgb(239, 68, 68, 0.15) 0%, rgb(239, 68, 68, 0.25) 100%);
+  border: 2px solid rgb(239, 68, 68, 0.4);
+}
+
+:global(.dark) .resultMessage.failed {
+  background: linear-gradient(135deg, rgb(239, 68, 68, 0.2) 0%, rgb(239, 68, 68, 0.3) 100%);
+}
+
+.resultTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+}
+
+.resultMessage.passed .resultTitle {
+  color: rgb(22, 163, 74);
+}
+
+:global(.dark) .resultMessage.passed .resultTitle {
+  color: rgb(74, 222, 128);
+}
+
+.resultMessage.failed .resultTitle {
+  color: rgb(220, 38, 38);
+}
+
+:global(.dark) .resultMessage.failed .resultTitle {
+  color: rgb(252, 165, 165);
+}
+
+.resultSubtitle {
+  font-size: 1rem;
+  margin: 0;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .resultSubtitle {
+  color: var(--dark-text-secondary);
+}
+
+/* ========================================
+   DIFFICULTY SELECTOR
+   ======================================== */
+
+.difficultySelector {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.difficultyLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .difficultyLabel {
+  color: var(--dark-text-secondary);
+}
+
+.difficultyButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.difficultyButton {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border: 2px solid rgb(210, 210, 249, 0.3);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .difficultyButton {
+  border-color: rgb(210, 210, 249, 0.2);
+  color: var(--dark-text-secondary);
+}
+
+.difficultyButton:hover:not(.active) {
+  border-color: var(--primary-purple-alpha-50);
+  background: var(--primary-purple-alpha-10);
+}
+
+.difficultyButton.active {
+  border-color: var(--primary-purple);
+  background: var(--primary-purple);
+  color: var(--white);
+}
+
+:global(.dark) .difficultyButton.active {
+  border-color: var(--primary-purple-light);
+  background: var(--primary-purple-light);
+}
+
+/* ========================================
+   ERROR MESSAGE
+   ======================================== */
+
+.errorMessage {
+  padding: 1rem 1.5rem;
+  background: rgb(239, 68, 68, 0.15);
+  border: 2px solid rgb(239, 68, 68, 0.4);
+  border-radius: 12px;
+  color: rgb(220, 38, 38);
+  font-weight: 600;
+  text-align: center;
+}
+
+:global(.dark) .errorMessage {
+  background: rgb(239, 68, 68, 0.2);
+  color: rgb(252, 165, 165);
+}
+
+/* ========================================
+   PERMISSION PROMPT
+   ======================================== */
+
+.permissionPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.permissionIcon {
+  font-size: 3rem;
+  color: var(--primary-purple);
+}
+
+:global(.dark) .permissionIcon {
+  color: var(--primary-purple-light);
+}
+
+.permissionText {
+  font-size: 1rem;
+  color: var(--light-text-secondary);
+  max-width: 400px;
+  line-height: 1.6;
+}
+
+:global(.dark) .permissionText {
+  color: var(--dark-text-secondary);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 767px) {
+  .liveFeedbackContainer,
+  .scoreDisplayContainer {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+
+  .currentNote {
+    font-size: 2.5rem;
+  }
+
+  .resultStats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .starsContainer {
+    gap: 0.25rem;
+  }
+
+  .star {
+    font-size: 2rem;
+  }
+
+  .difficultyButtons {
+    flex-direction: column;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .microphoneButton,
+  .heart,
+  .star,
+  .noteResultFeedback,
+  .resultMessage,
+  .volumeMeterFill,
+  .progressFill {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  .microphoneButton.listening {
+    animation: none !important;
+  }
+}
