@@ -866,7 +866,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         />
 
         {/* Real-time Pitch Feedback Section */}
-        {generatedMelody.length > 0 && (
+        {generatedMelody.length > 0 && !isGeneratingMelody && (
           <div style={{ width: '100%', maxWidth: '600px', margin: '2rem auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             {/* Score Display - shows during and after performance */}
             {(performanceGrading.state.isActive || performanceGrading.result) && (

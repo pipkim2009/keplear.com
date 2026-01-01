@@ -145,17 +145,19 @@ function Sandbox() {
         )}
 
         {/* Live Feedback - pitch detection controls */}
-        <LiveFeedback
-          isListening={pitchDetection.isListening}
-          onStartListening={handleStartPracticeWithFeedback}
-          onStopListening={handleStopPracticeWithFeedback}
-          currentPitch={pitchDetection.currentPitch}
-          volumeLevel={pitchDetection.volumeLevel}
-          performanceState={performanceGrading.state}
-          lastNoteResult={performanceGrading.lastNoteResult}
-          error={pitchDetection.error}
-          permission={pitchDetection.permission}
-        />
+        {generatedMelody.length > 0 && !isGeneratingMelody && (
+          <LiveFeedback
+            isListening={pitchDetection.isListening}
+            onStartListening={handleStartPracticeWithFeedback}
+            onStopListening={handleStopPracticeWithFeedback}
+            currentPitch={pitchDetection.currentPitch}
+            volumeLevel={pitchDetection.volumeLevel}
+            performanceState={performanceGrading.state}
+            lastNoteResult={performanceGrading.lastNoteResult}
+            error={pitchDetection.error}
+            permission={pitchDetection.permission}
+          />
+        )}
       </div>
     </>
   )
