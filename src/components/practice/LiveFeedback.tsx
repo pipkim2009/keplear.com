@@ -3,9 +3,10 @@
  * Real-time visual feedback during performance (Yousician-style)
  */
 
-import { Mic, MicOff } from 'lucide-react'
+import { Mic, MicOff, Check, X } from 'lucide-react'
 import type { PitchDetectionResult } from '../../hooks/usePitchDetection'
 import type { NoteResult, PerformanceState } from '../../hooks/usePerformanceGrading'
+import type { Note } from '../../utils/notes'
 import styles from '../../styles/PitchFeedback.module.css'
 
 interface LiveFeedbackProps {
@@ -27,6 +28,10 @@ interface LiveFeedbackProps {
   error: string | null
   /** Microphone permission state */
   permission: 'prompt' | 'granted' | 'denied' | 'error'
+  /** Total notes in the melody */
+  totalNotes: number
+  /** The melody being practiced */
+  melody: Note[]
 }
 
 export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
@@ -38,7 +43,9 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
   performanceState,
   lastNoteResult,
   error,
-  permission
+  permission,
+  totalNotes,
+  melody
 }) => {
   // Determine note display state - compare pitch class only (ignore octave)
   const getNoteDisplayClass = (): string => {
@@ -102,16 +109,32 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
         </button>
       )}
 
-      {/* Volume Meter */}
+      {/* Volume Indicator */}
       {isListening && (
-        <div className={styles.volumeMeterContainer}>
-          <span className={styles.volumeMeterLabel}>Input Level</span>
-          <div className={styles.volumeMeter}>
-            <div
-              className={styles.volumeMeterFill}
-              style={{ width: `${volumeLevel * 100}%` }}
-            />
+        <div className={styles.volumeIndicatorContainer}>
+          <div className={styles.volumeIndicatorHeader}>
+            <span className={styles.volumeIndicatorLabel}>Input Level</span>
+            <span className={styles.volumeIndicatorValue}>{Math.round(volumeLevel * 100)}%</span>
           </div>
+          <div className={styles.volumeIndicatorTrack}>
+            <div className={styles.volumeIndicatorSegments}>
+              {Array.from({ length: 20 }).map((_, i) => {
+                const segmentThreshold = (i + 1) / 20
+                const isActive = volumeLevel >= segmentThreshold
+                const segmentClass = i < 12 ? styles.segmentGreen : i < 16 ? styles.segmentYellow : styles.segmentRed
+                return (
+                  <div
+                    key={i}
+                    className={`${styles.volumeSegment} ${isActive ? `${styles.active} ${segmentClass}` : ''}`}
+                  />
+                )
+              })}
+            </div>
+            <div className={styles.volumeIndicatorGlow} style={{ width: `${volumeLevel * 100}%` }} />
+          </div>
+          {volumeLevel < 0.1 && (
+            <span className={styles.volumeWarning}>Speak louder or move closer to mic</span>
+          )}
         </div>
       )}
 
@@ -129,13 +152,44 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
         </div>
       )}
 
-      {/* Last Note Result Feedback */}
-      {lastNoteResult && performanceState.isActive && (
-        <div className={`${styles.noteResultFeedback} ${lastNoteResult.isCorrect ? styles.correct : styles.miss}`}>
-          {lastNoteResult.isCorrect ? 'Correct!' : 'Miss'}
-          {lastNoteResult.playedNote && (
-            <span> ({lastNoteResult.playedNote})</span>
-          )}
+      {/* Notes History - shows all notes as user plays */}
+      {(performanceState.isActive || performanceState.noteResults.length > 0) && (
+        <div className={styles.notesHistoryContainer}>
+          <div className={styles.notesHistoryHeader}>
+            <span className={styles.notesHistoryLabel}>Notes</span>
+            <span className={styles.notesHistoryProgress}>
+              {performanceState.noteResults.length} / {totalNotes}
+            </span>
+          </div>
+          <div className={styles.notesHistoryGrid}>
+            {melody.map((note, index) => {
+              const result = performanceState.noteResults.find(r => r.noteIndex === index)
+              const isCurrent = index === performanceState.currentNoteIndex && performanceState.isActive
+              const isPending = index > performanceState.currentNoteIndex || (!result && !isCurrent)
+
+              return (
+                <div
+                  key={index}
+                  className={`${styles.noteHistoryItem} ${
+                    result?.isCorrect ? styles.correct :
+                    result && !result.isCorrect ? styles.missed :
+                    isCurrent ? styles.current :
+                    styles.pending
+                  }`}
+                >
+                  <span className={styles.noteHistoryName}>{note.name}</span>
+                  {result && (
+                    <span className={styles.noteHistoryIcon}>
+                      {result.isCorrect ? <Check size={14} /> : <X size={14} />}
+                    </span>
+                  )}
+                  {isCurrent && !result && (
+                    <span className={styles.noteHistoryCurrentIndicator} />
+                  )}
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
     </div>

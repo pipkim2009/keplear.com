@@ -3,4 +3,3 @@
  */
 
 export { LiveFeedback } from './LiveFeedback'
-export { ScoreDisplay } from './ScoreDisplay'

@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import { usePitchDetection, usePerformanceGrading } from '../../hooks'
-import { LiveFeedback, ScoreDisplay } from '../practice'
+import { LiveFeedback } from '../practice'
 
 function Sandbox() {
   const {
@@ -135,16 +135,7 @@ function Sandbox() {
 
       {/* Pitch Feedback Section */}
       <div style={{ width: '100%', maxWidth: '600px', margin: '2rem auto', padding: '0 1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        {/* Score Display - shows during and after performance */}
-        {generatedMelody.length > 0 && (performanceGrading.state.isActive || performanceGrading.result) && (
-          <ScoreDisplay
-            state={performanceGrading.state}
-            result={performanceGrading.result}
-            totalNotes={generatedMelody.length}
-          />
-        )}
-
-        {/* Live Feedback - pitch detection controls */}
+        {/* Live Feedback - pitch detection controls and notes history */}
         {generatedMelody.length > 0 && !isGeneratingMelody && (
           <LiveFeedback
             isListening={pitchDetection.isListening}
@@ -156,6 +147,8 @@ function Sandbox() {
             lastNoteResult={performanceGrading.lastNoteResult}
             error={pitchDetection.error}
             permission={pitchDetection.permission}
+            totalNotes={generatedMelody.length}
+            melody={generatedMelody}
           />
         )}
       </div>

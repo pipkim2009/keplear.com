@@ -7,7 +7,7 @@ import { useAuth } from '../../hooks/useAuth'
 import AuthModal from '../auth/AuthModal'
 import type { Note } from '../../utils/notes'
 import { usePitchDetection, usePerformanceGrading } from '../../hooks'
-import { LiveFeedback, ScoreDisplay } from '../practice'
+import { LiveFeedback } from '../practice'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
 import { GUITAR_SCALES, ROOT_NOTES as GUITAR_ROOT_NOTES, getScalePositions, getScaleBoxes } from '../../utils/instruments/guitar/guitarScales'
@@ -868,16 +868,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
         {/* Real-time Pitch Feedback Section */}
         {generatedMelody.length > 0 && !isGeneratingMelody && (
           <div style={{ width: '100%', maxWidth: '600px', margin: '2rem auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {/* Score Display - shows during and after performance */}
-            {(performanceGrading.state.isActive || performanceGrading.result) && (
-              <ScoreDisplay
-                state={performanceGrading.state}
-                result={performanceGrading.result}
-                totalNotes={generatedMelody.length}
-              />
-            )}
-
-            {/* Live Feedback - pitch detection controls */}
+            {/* Live Feedback - pitch detection controls and notes history */}
             <LiveFeedback
               isListening={pitchDetection.isListening}
               onStartListening={handleStartPracticeWithFeedback}
@@ -888,6 +879,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
               lastNoteResult={performanceGrading.lastNoteResult}
               error={pitchDetection.error}
               permission={pitchDetection.permission}
+              totalNotes={generatedMelody.length}
+              melody={generatedMelody}
             />
           </div>
         )}
