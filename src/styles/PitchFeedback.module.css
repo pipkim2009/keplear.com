@@ -308,6 +308,143 @@
   color: var(--dark-text-primary);
 }
 
+/* Two-row comparison layout */
+.notesComparisonContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notesRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rowLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--light-text-secondary);
+  min-width: 60px;
+  text-align: right;
+}
+
+:global(.dark) .rowLabel {
+  color: var(--dark-text-secondary);
+}
+
+.notesRowGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  flex: 1;
+}
+
+.noteCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  min-width: 44px;
+  padding: 0.375rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.noteCellName {
+  font-weight: 700;
+}
+
+.noteCellIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Expected row cells */
+.expectedCell.pending {
+  background: rgb(148, 163, 184, 0.15);
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .expectedCell.pending {
+  background: rgb(148, 163, 184, 0.1);
+  color: var(--dark-text-secondary);
+}
+
+.expectedCell.current {
+  background: linear-gradient(135deg, var(--primary-purple-alpha-30) 0%, var(--primary-purple-alpha-20) 100%);
+  color: var(--primary-purple);
+  border: 2px solid var(--primary-purple);
+  animation: pulseNote 1.5s ease-in-out infinite;
+}
+
+:global(.dark) .expectedCell.current {
+  color: var(--primary-purple-light);
+  border-color: var(--primary-purple-light);
+}
+
+.expectedCell.correct {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.25) 100%);
+  color: rgb(22, 163, 74);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+:global(.dark) .expectedCell.correct {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.3) 100%);
+  color: rgb(74, 222, 128);
+}
+
+.expectedCell.missed {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.25) 100%);
+  color: rgb(220, 38, 38);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+:global(.dark) .expectedCell.missed {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.3) 100%);
+  color: rgb(252, 165, 165);
+}
+
+/* Received row cells */
+.receivedCell.empty {
+  background: rgb(148, 163, 184, 0.08);
+  color: var(--light-text-secondary);
+  opacity: 0.5;
+}
+
+:global(.dark) .receivedCell.empty {
+  background: rgb(148, 163, 184, 0.05);
+  color: var(--dark-text-secondary);
+}
+
+.receivedCell.correct {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.3) 100%);
+  color: rgb(22, 163, 74);
+  border: 2px solid rgba(34, 197, 94, 0.5);
+}
+
+:global(.dark) .receivedCell.correct {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.35) 100%);
+  color: rgb(74, 222, 128);
+}
+
+.receivedCell.missed {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.3) 100%);
+  color: rgb(220, 38, 38);
+  border: 2px solid rgba(239, 68, 68, 0.5);
+}
+
+:global(.dark) .receivedCell.missed {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(239, 68, 68, 0.35) 100%);
+  color: rgb(252, 165, 165);
+}
+
+/* Legacy grid styles - can be removed if not used elsewhere */
 .notesHistoryGrid {
   display: flex;
   flex-wrap: wrap;
@@ -359,17 +496,44 @@
   }
 }
 
-.noteHistoryItem.correct {
+/* Timing Grade Colors - Perfect (purple/gold) */
+.noteHistoryItem.perfect {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(250, 204, 21, 0.2) 100%);
+  color: rgb(139, 92, 246);
+  border: 2px solid rgba(139, 92, 246, 0.5);
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.3);
+}
+
+:global(.dark) .noteHistoryItem.perfect {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(250, 204, 21, 0.25) 100%);
+  color: rgb(196, 167, 250);
+}
+
+/* Timing Grade Colors - Good (green) */
+.noteHistoryItem.good {
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.3) 100%);
   color: rgb(22, 163, 74);
   border: 2px solid rgba(34, 197, 94, 0.5);
 }
 
-:global(.dark) .noteHistoryItem.correct {
+:global(.dark) .noteHistoryItem.good {
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.35) 100%);
   color: rgb(74, 222, 128);
 }
 
+/* Timing Grade Colors - OK (yellow/orange) */
+.noteHistoryItem.ok {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(245, 158, 11, 0.3) 100%);
+  color: rgb(217, 119, 6);
+  border: 2px solid rgba(245, 158, 11, 0.5);
+}
+
+:global(.dark) .noteHistoryItem.ok {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(245, 158, 11, 0.35) 100%);
+  color: rgb(251, 191, 36);
+}
+
+/* Timing Grade Colors - Miss (red) */
 .noteHistoryItem.missed {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.3) 100%);
   color: rgb(220, 38, 38);
@@ -379,6 +543,18 @@
 :global(.dark) .noteHistoryItem.missed {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(239, 68, 68, 0.35) 100%);
   color: rgb(252, 165, 165);
+}
+
+/* Legacy correct class for backwards compatibility */
+.noteHistoryItem.correct {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.3) 100%);
+  color: rgb(22, 163, 74);
+  border: 2px solid rgba(34, 197, 94, 0.5);
+}
+
+:global(.dark) .noteHistoryItem.correct {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.25) 0%, rgba(34, 197, 94, 0.35) 100%);
+  color: rgb(74, 222, 128);
 }
 
 .noteHistoryName {
@@ -417,6 +593,80 @@
 }
 
 /* ========================================
+   STATS ROW
+   ======================================== */
+
+.statsRow {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.statBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  min-width: 60px;
+}
+
+.statBadge.perfect {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(250, 204, 21, 0.15) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.statBadge.good {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.statBadge.ok {
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.statBadge.miss {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.statCount {
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.statBadge.perfect .statCount {
+  color: rgb(139, 92, 246);
+}
+
+.statBadge.good .statCount {
+  color: rgb(34, 197, 94);
+}
+
+.statBadge.ok .statCount {
+  color: rgb(245, 158, 11);
+}
+
+.statBadge.miss .statCount {
+  color: rgb(239, 68, 68);
+}
+
+.statsRow .statLabel {
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--light-text-secondary);
+  margin-top: 0.25rem;
+}
+
+:global(.dark) .statsRow .statLabel {
+  color: var(--dark-text-secondary);
+}
+
+/* ========================================
    NOTE RESULT FEEDBACK
    ======================================== */
 
@@ -430,6 +680,35 @@
   font-weight: 700;
   font-size: 1.125rem;
   animation: feedbackPop 0.3s ease-out;
+}
+
+.timingGradeText {
+  font-weight: 800;
+}
+
+.timingOffset {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.wrongPitchNote {
+  font-size: 0.875rem;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.pitchConfidence {
+  font-size: 0.75rem;
+  color: var(--light-text-secondary);
+  font-weight: 500;
+}
+
+:global(.dark) .pitchConfidence {
+  color: var(--dark-text-secondary);
 }
 
 @keyframes feedbackPop {
@@ -960,6 +1239,28 @@
 
   .difficultyButtons {
     flex-direction: column;
+  }
+
+  /* Two-row notes responsive */
+  .notesRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.375rem;
+  }
+
+  .rowLabel {
+    text-align: left;
+    min-width: auto;
+  }
+
+  .notesRowGrid {
+    width: 100%;
+  }
+
+  .noteCell {
+    min-width: 38px;
+    padding: 0.25rem 0.375rem;
+    font-size: 0.75rem;
   }
 }
 

@@ -6,7 +6,7 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import { useAuth } from '../../hooks/useAuth'
 import AuthModal from '../auth/AuthModal'
 import type { Note } from '../../utils/notes'
-import { usePitchDetection, usePerformanceGrading } from '../../hooks'
+import { useAIPitchDetection, usePerformanceGrading } from '../../hooks'
 import { LiveFeedback } from '../practice'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
@@ -96,8 +96,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [pendingSkillsNavigation, setPendingSkillsNavigation] = useState(false)
 
-  // Pitch detection and performance grading hooks
-  const pitchDetection = usePitchDetection()
+  // AI Pitch detection and performance grading hooks
+  const pitchDetection = useAIPitchDetection()
   const performanceGrading = usePerformanceGrading()
   const [showPitchFeedback, setShowPitchFeedback] = useState(false)
 

@@ -1,6 +1,10 @@
 /**
- * Performance grading hook (Yousician-style)
- * Simple: play the right notes in order, no timing requirements
+ * Performance grading hook
+ *
+ * Simple pitch-based note detection:
+ * - Play notes in order
+ * - Each note is graded as correct or wrong based on pitch
+ * - No timing requirements - play at your own pace
  */
 
 import { useState, useCallback, useRef } from 'react'
@@ -8,19 +12,21 @@ import type { Note } from '../utils/notes'
 import type { PitchDetectionResult } from './usePitchDetection'
 import { isNoteCorrect } from '../utils/pitchUtils'
 
-const MIN_SCORE_TO_PASS = 60
+// ============================================================================
+// TYPES
+// ============================================================================
 
 /**
  * Result for a single note in the performance
  */
 export interface NoteResult {
-  /** Expected note name (e.g., "C4") */
-  expectedNote: string
   /** Index in the melody */
   noteIndex: number
-  /** What the user actually played, null if missed */
+  /** Expected note name */
+  expectedNote: string
+  /** What the user actually played */
   playedNote: string | null
-  /** Whether the note was correct */
+  /** Whether the pitch was correct */
   isCorrect: boolean
 }
 
@@ -28,78 +34,88 @@ export interface NoteResult {
  * Overall performance result
  */
 export interface PerformanceResult {
-  /** Results for each note */
   noteResults: NoteResult[]
-  /** Total score (percentage of correct notes) */
-  totalScore: number
-  /** Stars earned (1-3) */
-  stars: 1 | 2 | 3
   /** Number of correct notes */
   correctCount: number
-  /** Number of missed/wrong notes */
+  /** Number of wrong notes */
   missCount: number
-  /** Whether the performance passed */
+  /** Accuracy percentage */
+  accuracy: number
+  /** Whether passed (>60%) */
   passed: boolean
 }
 
 /**
- * Current state during an active performance
+ * Current state during performance
  */
 export interface PerformanceState {
-  /** Current note index being evaluated */
-  currentNoteIndex: number
-  /** Notes results so far */
-  noteResults: NoteResult[]
   /** Whether performance is active */
   isActive: boolean
-  /** Current expected note */
+  /** Current expected note (next to play) */
   currentExpectedNote: Note | null
+  /** Current note index */
+  currentNoteIndex: number
+  /** Results so far */
+  noteResults: NoteResult[]
 }
 
-/**
- * Return type for usePerformanceGrading hook
- */
 interface UsePerformanceGradingReturn {
-  /** Start a new performance session */
+  /** Start a performance session */
   startPerformance: (melody: Note[]) => void
-  /** Stop the current performance */
+  /** Stop the performance */
   stopPerformance: () => void
-  /** Process a pitch detection result */
+  /** Process a pitch detection (called on each detection) */
   processPitch: (pitch: PitchDetectionResult) => void
-  /** Current performance state */
+  /** Current state */
   state: PerformanceState
-  /** Final result (after performance ends) */
+  /** Final result (when complete) */
   result: PerformanceResult | null
   /** Last note result for immediate feedback */
   lastNoteResult: NoteResult | null
 }
 
-/**
- * Calculate stars from score percentage
- */
-const calculateStars = (score: number): 1 | 2 | 3 => {
-  if (score >= 90) return 3
-  if (score >= 70) return 2
-  return 1
-}
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
 
-/**
- * Hook for grading user performance on a melody
- * No timing - just checks if you play the right notes in order
- */
+const PASS_THRESHOLD = 60 // 60% to pass
+
+// ============================================================================
+// HOOK IMPLEMENTATION
+// ============================================================================
+
 export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
+  // State
   const [state, setState] = useState<PerformanceState>({
-    currentNoteIndex: 0,
-    noteResults: [],
     isActive: false,
-    currentExpectedNote: null
+    currentExpectedNote: null,
+    currentNoteIndex: 0,
+    noteResults: []
   })
   const [result, setResult] = useState<PerformanceResult | null>(null)
   const [lastNoteResult, setLastNoteResult] = useState<NoteResult | null>(null)
 
-  // Refs for data that shouldn't trigger re-renders
+  // Refs
   const melodyRef = useRef<Note[]>([])
-  const lastProcessedNoteRef = useRef<string | null>(null)
+  const lastProcessedOnsetRef = useRef<number>(0)
+
+  /**
+   * Calculate final result
+   */
+  const calculateResult = useCallback((noteResults: NoteResult[]): PerformanceResult => {
+    const totalNotes = noteResults.length
+    const correctCount = noteResults.filter(r => r.isCorrect).length
+    const missCount = totalNotes - correctCount
+    const accuracy = totalNotes > 0 ? Math.round((correctCount / totalNotes) * 100) : 0
+
+    return {
+      noteResults,
+      correctCount,
+      missCount,
+      accuracy,
+      passed: accuracy >= PASS_THRESHOLD
+    }
+  }, [])
 
   /**
    * Start a new performance
@@ -108,53 +124,32 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
     if (melody.length === 0) return
 
     melodyRef.current = melody
-    lastProcessedNoteRef.current = null
+    lastProcessedOnsetRef.current = 0
 
     setResult(null)
     setLastNoteResult(null)
     setState({
-      currentNoteIndex: 0,
-      noteResults: [],
       isActive: true,
-      currentExpectedNote: melody[0]
+      currentExpectedNote: melody[0],
+      currentNoteIndex: 0,
+      noteResults: []
     })
-  }, [])
-
-  /**
-   * End the performance and calculate final result
-   */
-  const endPerformance = useCallback((noteResults: NoteResult[]) => {
-    const correctCount = noteResults.filter(r => r.isCorrect).length
-    const missCount = noteResults.length - correctCount
-    const totalScore = noteResults.length > 0
-      ? Math.round((correctCount / noteResults.length) * 100)
-      : 0
-
-    const performanceResult: PerformanceResult = {
-      noteResults,
-      totalScore,
-      stars: calculateStars(totalScore),
-      correctCount,
-      missCount,
-      passed: totalScore >= MIN_SCORE_TO_PASS
-    }
-
-    setResult(performanceResult)
-    setState(prev => ({
-      ...prev,
-      isActive: false,
-      noteResults
-    }))
   }, [])
 
   /**
    * Stop performance manually
    */
   const stopPerformance = useCallback(() => {
-    if (state.isActive) {
-      endPerformance(state.noteResults)
-    }
-  }, [state.isActive, state.noteResults, endPerformance])
+    setState(prev => {
+      if (!prev.isActive) return prev
+
+      // Calculate result with current progress
+      const finalResult = calculateResult(prev.noteResults)
+      setResult(finalResult)
+
+      return { ...prev, isActive: false }
+    })
+  }, [calculateResult])
 
   /**
    * Process a pitch detection result
@@ -162,25 +157,27 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
   const processPitch = useCallback((pitch: PitchDetectionResult) => {
     if (!state.isActive || !pitch.note) return
 
+    // Only process on note onsets (new notes)
+    if (!pitch.isOnset) return
+
+    // Debounce rapid onsets (50ms minimum between notes)
+    if (pitch.timestamp - lastProcessedOnsetRef.current < 50) return
+    lastProcessedOnsetRef.current = pitch.timestamp
+
     const melody = melodyRef.current
-    const noteIndex = state.currentNoteIndex
+    const currentIndex = state.currentNoteIndex
 
-    // Ignore if we already processed this exact note (debounce)
-    if (pitch.note === lastProcessedNoteRef.current) return
-    lastProcessedNoteRef.current = pitch.note
+    // Check if we've finished
+    if (currentIndex >= melody.length) return
 
-    // Check if performance is complete
-    if (noteIndex >= melody.length) {
-      endPerformance(state.noteResults)
-      return
-    }
+    const expectedNote = melody[currentIndex]
 
-    const expectedNote = melody[noteIndex]
+    // Check if pitch matches (comparing pitch class only - octave ignored)
     const isCorrect = isNoteCorrect(pitch.note, expectedNote.name)
 
     const noteResult: NoteResult = {
+      noteIndex: currentIndex,
       expectedNote: expectedNote.name,
-      noteIndex,
       playedNote: pitch.note,
       isCorrect
     }
@@ -189,21 +186,30 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
 
     setState(prev => {
       const newResults = [...prev.noteResults, noteResult]
-      const nextIndex = noteIndex + 1
+      const nextIndex = currentIndex + 1
 
       // Check if performance is complete
       if (nextIndex >= melody.length) {
-        setTimeout(() => endPerformance(newResults), 0)
+        const finalResult = calculateResult(newResults)
+        setResult(finalResult)
+
+        return {
+          ...prev,
+          noteResults: newResults,
+          currentNoteIndex: nextIndex,
+          currentExpectedNote: null,
+          isActive: false
+        }
       }
 
       return {
         ...prev,
-        currentNoteIndex: nextIndex,
         noteResults: newResults,
-        currentExpectedNote: melody[nextIndex] || null
+        currentNoteIndex: nextIndex,
+        currentExpectedNote: melody[nextIndex]
       }
     })
-  }, [state.isActive, state.currentNoteIndex, state.noteResults, endPerformance])
+  }, [state.isActive, state.currentNoteIndex, calculateResult])
 
   return {
     startPerformance,

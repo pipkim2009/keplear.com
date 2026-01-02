@@ -1,6 +1,12 @@
 /**
  * LiveFeedback Component
- * Real-time visual feedback during performance (Yousician-style)
+ * Real-time visual feedback during performance
+ *
+ * Features:
+ * - Volume indicator with segmented bars
+ * - Notes history showing correct/wrong
+ * - Current note indicator
+ * - Pitch detection display
  */
 
 import { Mic, MicOff, Check, X } from 'lucide-react'
@@ -47,7 +53,7 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
   totalNotes,
   melody
 }) => {
-  // Determine note display state - compare pitch class only (ignore octave)
+  // Determine note display state
   const getNoteDisplayClass = (): string => {
     if (!currentPitch?.note || !performanceState.currentExpectedNote) {
       return ''
@@ -68,6 +74,10 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
 
     return styles.wrong
   }
+
+  // Calculate stats from results
+  const correctCount = performanceState.noteResults.filter(r => r.isCorrect).length
+  const missCount = performanceState.noteResults.filter(r => !r.isCorrect).length
 
   return (
     <div className={styles.liveFeedbackContainer}>
@@ -149,10 +159,41 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
               Expected: {performanceState.currentExpectedNote.name}
             </span>
           )}
+          {currentPitch && (
+            <span className={styles.pitchConfidence}>
+              Confidence: {Math.round((currentPitch.confidence || 0) * 100)}%
+            </span>
+          )}
         </div>
       )}
 
-      {/* Notes History - shows all notes as user plays */}
+      {/* Last Note Result Feedback */}
+      {lastNoteResult && performanceState.isActive && (
+        <div className={`${styles.noteResultFeedback} ${lastNoteResult.isCorrect ? styles.correct : styles.miss}`}>
+          {lastNoteResult.isCorrect ? 'Correct!' : 'Wrong'}
+          {lastNoteResult.playedNote && !lastNoteResult.isCorrect && (
+            <span className={styles.wrongPitchNote}>
+              (played {lastNoteResult.playedNote})
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* Stats Row */}
+      {performanceState.isActive && performanceState.noteResults.length > 0 && (
+        <div className={styles.statsRow}>
+          <div className={`${styles.statBadge} ${styles.correct}`}>
+            <span className={styles.statCount}>{correctCount}</span>
+            <span className={styles.statLabel}>Correct</span>
+          </div>
+          <div className={`${styles.statBadge} ${styles.miss}`}>
+            <span className={styles.statCount}>{missCount}</span>
+            <span className={styles.statLabel}>Wrong</span>
+          </div>
+        </div>
+      )}
+
+      {/* Notes History - two rows: intended notes on top, received notes below */}
       {(performanceState.isActive || performanceState.noteResults.length > 0) && (
         <div className={styles.notesHistoryContainer}>
           <div className={styles.notesHistoryHeader}>
@@ -161,34 +202,70 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
               {performanceState.noteResults.length} / {totalNotes}
             </span>
           </div>
-          <div className={styles.notesHistoryGrid}>
-            {melody.map((note, index) => {
-              const result = performanceState.noteResults.find(r => r.noteIndex === index)
-              const isCurrent = index === performanceState.currentNoteIndex && performanceState.isActive
-              const isPending = index > performanceState.currentNoteIndex || (!result && !isCurrent)
 
-              return (
-                <div
-                  key={index}
-                  className={`${styles.noteHistoryItem} ${
-                    result?.isCorrect ? styles.correct :
-                    result && !result.isCorrect ? styles.missed :
-                    isCurrent ? styles.current :
-                    styles.pending
-                  }`}
-                >
-                  <span className={styles.noteHistoryName}>{note.name}</span>
-                  {result && (
-                    <span className={styles.noteHistoryIcon}>
-                      {result.isCorrect ? <Check size={14} /> : <X size={14} />}
-                    </span>
-                  )}
-                  {isCurrent && !result && (
-                    <span className={styles.noteHistoryCurrentIndicator} />
-                  )}
-                </div>
-              )
-            })}
+          {/* Two-row notes display */}
+          <div className={styles.notesComparisonContainer}>
+            {/* Top row - Intended/Expected notes */}
+            <div className={styles.notesRow}>
+              <span className={styles.rowLabel}>Expected</span>
+              <div className={styles.notesRowGrid}>
+                {melody.map((note, index) => {
+                  const result = performanceState.noteResults.find(r => r.noteIndex === index)
+                  const isCurrent = index === performanceState.currentNoteIndex && performanceState.isActive
+
+                  return (
+                    <div
+                      key={index}
+                      className={`${styles.noteCell} ${styles.expectedCell} ${
+                        result?.isCorrect ? styles.correct :
+                        result && !result.isCorrect ? styles.missed :
+                        isCurrent ? styles.current :
+                        styles.pending
+                      }`}
+                    >
+                      <span className={styles.noteCellName}>{note.name}</span>
+                      {isCurrent && !result && (
+                        <span className={styles.noteHistoryCurrentIndicator} />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Bottom row - Received/Played notes */}
+            <div className={styles.notesRow}>
+              <span className={styles.rowLabel}>Played</span>
+              <div className={styles.notesRowGrid}>
+                {melody.map((_, index) => {
+                  const result = performanceState.noteResults.find(r => r.noteIndex === index)
+
+                  return (
+                    <div
+                      key={index}
+                      className={`${styles.noteCell} ${styles.receivedCell} ${
+                        result?.isCorrect ? styles.correct :
+                        result && !result.isCorrect ? styles.missed :
+                        styles.empty
+                      }`}
+                    >
+                      {result ? (
+                        <>
+                          <span className={styles.noteCellName}>
+                            {result.playedNote || '--'}
+                          </span>
+                          <span className={styles.noteCellIcon}>
+                            {result.isCorrect ? <Check size={12} /> : <X size={12} />}
+                          </span>
+                        </>
+                      ) : (
+                        <span className={styles.noteCellName}>--</span>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
           </div>
         </div>
       )}

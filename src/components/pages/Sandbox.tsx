@@ -5,7 +5,7 @@
 import { useEffect } from 'react'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import { useInstrument } from '../../contexts/InstrumentContext'
-import { usePitchDetection, usePerformanceGrading } from '../../hooks'
+import { useAIPitchDetection, usePerformanceGrading } from '../../hooks'
 import { LiveFeedback } from '../practice'
 
 function Sandbox() {
@@ -54,8 +54,8 @@ function Sandbox() {
     handleCurrentlyPlayingNoteChange
   } = useInstrument()
 
-  // Pitch detection and performance grading hooks
-  const pitchDetection = usePitchDetection()
+  // AI Pitch detection and performance grading hooks
+  const pitchDetection = useAIPitchDetection()
   const performanceGrading = usePerformanceGrading()
 
   // Pass pitch detection results to grading system
