@@ -76,14 +76,15 @@ const CREPE_MODEL_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models@m
 const CONFIG = {
   DETECTION_INTERVAL_MS: 30,
   MIN_VOLUME_RMS: 0.01,
-  ONSET_VOLUME_JUMP: 0.025,
+  ONSET_VOLUME_JUMP: 0.08,        // Higher threshold - need significant volume jump
   MIN_CONFIDENCE: 0.5,
-  STABILITY_WINDOW_MS: 60,
-  MIN_STABLE_DETECTIONS: 2,
-  PITCH_STABILITY_CENTS: 40,
-  ONSET_SILENCE_MS: 40,
-  ONSET_COOLDOWN_MS: 80,
-  HISTORY_SIZE: 8,
+  STABILITY_WINDOW_MS: 80,        // Longer stability check window
+  MIN_STABLE_DETECTIONS: 3,       // Need more stable detections before confirming
+  PITCH_STABILITY_CENTS: 35,
+  ONSET_SILENCE_MS: 80,           // Need longer silence before new onset
+  ONSET_COOLDOWN_MS: 350,         // Much longer cooldown - prevents rapid triggers
+  NOTE_HOLD_WINDOW_MS: 150,       // Time to consider we're "holding" a note
+  HISTORY_SIZE: 10,
 }
 
 // ============================================================================
@@ -167,6 +168,8 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
   const lastVolumeRef = useRef<number>(0)
   const silenceStartRef = useRef<number>(0)
   const wasInSilenceRef = useRef<boolean>(true)
+  const noteHoldStartRef = useRef<number>(0)
+  const currentHeldNoteRef = useRef<string | null>(null)
 
   // Track if model loading has been attempted
   const modelLoadAttemptedRef = useRef(false)
@@ -247,30 +250,60 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
   }, [])
 
   /**
-   * Detect onset
+   * Detect onset - only triggers when a genuinely new note is played
    */
   const detectOnset = useCallback((currentNote: string, currentVolume: number, isStable: boolean): boolean => {
     const now = performance.now()
 
+    // Strict cooldown - never trigger onsets faster than this
     if (now - lastOnsetTimeRef.current < CONFIG.ONSET_COOLDOWN_MS) {
       return false
     }
 
-    if (wasInSilenceRef.current && currentVolume > CONFIG.MIN_VOLUME_RMS && isStable) {
+    // Only process stable detections
+    if (!isStable) {
+      return false
+    }
+
+    // Case 1: Coming out of silence - this is the primary onset trigger
+    if (wasInSilenceRef.current && currentVolume > CONFIG.MIN_VOLUME_RMS * 2) {
       lastOnsetTimeRef.current = now
       wasInSilenceRef.current = false
+      currentHeldNoteRef.current = currentNote
+      noteHoldStartRef.current = now
       return true
     }
 
+    // Case 2: Significant volume spike (new attack) - must be a substantial jump
     const volumeJump = currentVolume - lastVolumeRef.current
-    if (volumeJump > CONFIG.ONSET_VOLUME_JUMP && isStable) {
-      lastOnsetTimeRef.current = now
-      return true
+    if (volumeJump > CONFIG.ONSET_VOLUME_JUMP) {
+      // Only count as new note if it's actually a different note OR we had a mini-silence
+      const timeSinceLastOnset = now - lastOnsetTimeRef.current
+      if (timeSinceLastOnset > CONFIG.ONSET_COOLDOWN_MS * 1.5) {
+        lastOnsetTimeRef.current = now
+        currentHeldNoteRef.current = currentNote
+        noteHoldStartRef.current = now
+        return true
+      }
     }
 
-    if (isStable && lastStablePitchRef.current && lastStablePitchRef.current !== currentNote) {
-      lastOnsetTimeRef.current = now
-      return true
+    // Case 3: Clear pitch change after holding a note for a while
+    if (currentHeldNoteRef.current && currentHeldNoteRef.current !== currentNote) {
+      const holdDuration = now - noteHoldStartRef.current
+      // Only trigger if we've been holding the previous note for a meaningful duration
+      if (holdDuration > CONFIG.NOTE_HOLD_WINDOW_MS) {
+        lastOnsetTimeRef.current = now
+        currentHeldNoteRef.current = currentNote
+        noteHoldStartRef.current = now
+        return true
+      }
+    }
+
+    // Update held note tracking (without triggering onset)
+    if (currentHeldNoteRef.current !== currentNote) {
+      // Note is changing but we haven't held it long enough - just update tracking
+      currentHeldNoteRef.current = currentNote
+      noteHoldStartRef.current = now
     }
 
     return false
@@ -471,6 +504,8 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     pitchHistoryRef.current = []
     lastStablePitchRef.current = null
     wasInSilenceRef.current = true
+    currentHeldNoteRef.current = null
+    noteHoldStartRef.current = 0
 
     setCurrentPitch(null)
     setRawPitch(null)
@@ -527,6 +562,8 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
       lastVolumeRef.current = 0
       wasInSilenceRef.current = true
       silenceStartRef.current = performance.now()
+      currentHeldNoteRef.current = null
+      noteHoldStartRef.current = 0
 
       setIsListening(true)
       detectionIntervalRef.current = window.setInterval(detectPitch, CONFIG.DETECTION_INTERVAL_MS)
