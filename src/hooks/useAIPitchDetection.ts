@@ -75,16 +75,16 @@ const CREPE_MODEL_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models@m
 
 const CONFIG = {
   DETECTION_INTERVAL_MS: 30,
-  MIN_VOLUME_RMS: 0.01,
-  ONSET_VOLUME_JUMP: 0.08,        // Higher threshold - need significant volume jump
-  MIN_CONFIDENCE: 0.5,
-  STABILITY_WINDOW_MS: 80,        // Longer stability check window
-  MIN_STABLE_DETECTIONS: 3,       // Need more stable detections before confirming
-  PITCH_STABILITY_CENTS: 35,
-  ONSET_SILENCE_MS: 80,           // Need longer silence before new onset
-  ONSET_COOLDOWN_MS: 350,         // Much longer cooldown - prevents rapid triggers
-  NOTE_HOLD_WINDOW_MS: 150,       // Time to consider we're "holding" a note
-  HISTORY_SIZE: 10,
+  MIN_VOLUME_RMS: 0.005,          // More sensitive to quiet sounds
+  ONSET_VOLUME_JUMP: 0.03,        // Lower volume jump threshold
+  MIN_CONFIDENCE: 0.3,            // Lower confidence threshold for CREPE
+  STABILITY_WINDOW_MS: 50,        // Shorter stability window
+  MIN_STABLE_DETECTIONS: 2,       // Need stable detections before confirming
+  PITCH_STABILITY_CENTS: 60,      // More tolerance for pitch variation
+  ONSET_SILENCE_MS: 40,           // Silence duration to reset
+  ONSET_COOLDOWN_MS: 180,         // Cooldown between onsets
+  NOTE_HOLD_WINDOW_MS: 80,        // Time to consider we're "holding" a note
+  HISTORY_SIZE: 6,
 }
 
 // ============================================================================
@@ -173,6 +173,8 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
 
   // Track if model loading has been attempted
   const modelLoadAttemptedRef = useRef(false)
+  // Track model status in ref to avoid closure issues
+  const modelStatusRef = useRef<ModelStatus>('unloaded')
 
   /**
    * Load CREPE model (called only when starting to listen)
@@ -188,26 +190,32 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
 
     modelLoadAttemptedRef.current = true
     setModelStatus('loading')
+    modelStatusRef.current = 'loading'
     setError(null)
 
     try {
       // Lazy load TensorFlow.js
+      console.log('Loading TensorFlow.js...')
       if (!tf) {
         tf = await import('@tensorflow/tfjs')
       }
 
       // Set TensorFlow.js backend
+      console.log('TensorFlow.js loaded, initializing backend...')
       await tf.ready()
+      console.log('TensorFlow backend ready, loading CREPE model...')
 
       // Load the CREPE model from CDN
       modelRef.current = await tf.loadLayersModel(CREPE_MODEL_URL)
-      console.log('CREPE model loaded successfully')
+      console.log('CREPE model loaded successfully!')
       setModelStatus('ready')
+      modelStatusRef.current = 'ready'
       return true
     } catch (err) {
       console.error('Failed to load AI model:', err)
       setError('Failed to load AI pitch detection model. Please check your internet connection and refresh the page.')
       setModelStatus('error')
+      modelStatusRef.current = 'error'
       modelRef.current = null
       return false
     }
@@ -250,23 +258,23 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
   }, [])
 
   /**
-   * Detect onset - only triggers when a genuinely new note is played
+   * Detect onset - triggers when a new note is played
    */
   const detectOnset = useCallback((currentNote: string, currentVolume: number, isStable: boolean): boolean => {
     const now = performance.now()
 
-    // Strict cooldown - never trigger onsets faster than this
+    // Cooldown - don't trigger too rapidly
     if (now - lastOnsetTimeRef.current < CONFIG.ONSET_COOLDOWN_MS) {
+      // But still track the current note
+      if (isStable && currentHeldNoteRef.current !== currentNote) {
+        currentHeldNoteRef.current = currentNote
+        noteHoldStartRef.current = now
+      }
       return false
     }
 
-    // Only process stable detections
-    if (!isStable) {
-      return false
-    }
-
-    // Case 1: Coming out of silence - this is the primary onset trigger
-    if (wasInSilenceRef.current && currentVolume > CONFIG.MIN_VOLUME_RMS * 2) {
+    // Case 1: Coming out of silence - primary onset trigger
+    if (wasInSilenceRef.current && currentVolume > CONFIG.MIN_VOLUME_RMS && isStable) {
       lastOnsetTimeRef.current = now
       wasInSilenceRef.current = false
       currentHeldNoteRef.current = currentNote
@@ -274,23 +282,9 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
       return true
     }
 
-    // Case 2: Significant volume spike (new attack) - must be a substantial jump
-    const volumeJump = currentVolume - lastVolumeRef.current
-    if (volumeJump > CONFIG.ONSET_VOLUME_JUMP) {
-      // Only count as new note if it's actually a different note OR we had a mini-silence
-      const timeSinceLastOnset = now - lastOnsetTimeRef.current
-      if (timeSinceLastOnset > CONFIG.ONSET_COOLDOWN_MS * 1.5) {
-        lastOnsetTimeRef.current = now
-        currentHeldNoteRef.current = currentNote
-        noteHoldStartRef.current = now
-        return true
-      }
-    }
-
-    // Case 3: Clear pitch change after holding a note for a while
-    if (currentHeldNoteRef.current && currentHeldNoteRef.current !== currentNote) {
+    // Case 2: Note change - different note than what we were holding
+    if (isStable && currentHeldNoteRef.current && currentHeldNoteRef.current !== currentNote) {
       const holdDuration = now - noteHoldStartRef.current
-      // Only trigger if we've been holding the previous note for a meaningful duration
       if (holdDuration > CONFIG.NOTE_HOLD_WINDOW_MS) {
         lastOnsetTimeRef.current = now
         currentHeldNoteRef.current = currentNote
@@ -299,9 +293,17 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
       }
     }
 
-    // Update held note tracking (without triggering onset)
-    if (currentHeldNoteRef.current !== currentNote) {
-      // Note is changing but we haven't held it long enough - just update tracking
+    // Case 3: Volume spike (re-attack of same or new note)
+    const volumeJump = currentVolume - lastVolumeRef.current
+    if (volumeJump > CONFIG.ONSET_VOLUME_JUMP && isStable) {
+      lastOnsetTimeRef.current = now
+      currentHeldNoteRef.current = currentNote
+      noteHoldStartRef.current = now
+      return true
+    }
+
+    // Track current note without triggering
+    if (isStable && currentHeldNoteRef.current !== currentNote) {
       currentHeldNoteRef.current = currentNote
       noteHoldStartRef.current = now
     }
@@ -365,11 +367,6 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
   const detectPitch = useCallback(async () => {
     if (!analyserRef.current) return
 
-    // Check if model is available
-    if (!modelRef.current || modelStatus !== 'ready') {
-      return
-    }
-
     const analyser = analyserRef.current
     const buffer = new Float32Array(analyser.fftSize)
     analyser.getFloatTimeDomainData(buffer)
@@ -377,7 +374,15 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     const now = performance.now()
     const rms = calculateRMS(buffer)
 
+    // Always update volume level regardless of model status
     setVolumeLevel(Math.min(1, rms * 10))
+
+    // Check if model is available for pitch detection (use ref to avoid stale closure)
+    if (!modelRef.current || modelStatusRef.current !== 'ready') {
+      // Debug: log model status occasionally
+      if (Math.random() < 0.01) console.log(`Model not ready: status=${modelStatusRef.current}, model=${!!modelRef.current}`)
+      return
+    }
 
     // Silence detection
     if (rms < CONFIG.MIN_VOLUME_RMS) {
@@ -411,12 +416,19 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     const result = await runCrepeInference(crepeInput)
 
     if (!result) {
+      // Log occasionally to debug
+      if (Math.random() < 0.02) console.log('CREPE returned null result')
       lastVolumeRef.current = rms
       return
     }
 
     const { frequency, confidence } = result
     const note = frequencyToNote(frequency)
+
+    // Debug log occasionally
+    if (Math.random() < 0.05) {
+      console.log(`Pitch detected: ${note} (${frequency.toFixed(1)}Hz) conf: ${confidence.toFixed(2)}`)
+    }
 
     if (!note) {
       lastVolumeRef.current = rms
@@ -437,44 +449,37 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     const avgConf = pitchHistoryRef.current.reduce((sum, h) => sum + h.confidence, 0) / pitchHistoryRef.current.length
     setAverageConfidence(avgConf)
 
-    // Raw pitch for visualization
-    const rawResult: AIPitchDetectionResult = {
+    // Check stability for onset detection
+    const isStable = checkPitchStability(note, frequency)
+
+    // Detect onset (for advancing in melody)
+    const isOnset = confidence >= CONFIG.MIN_CONFIDENCE && detectOnset(note, rms, isStable)
+
+    // Create pitch result
+    const pitchResult: AIPitchDetectionResult = {
       frequency,
       note,
       confidence,
       centsOffset,
       timestamp: now,
-      isOnset: false
-    }
-    setRawPitch(rawResult)
-
-    // Check stability
-    const isStable = checkPitchStability(note, frequency)
-
-    if (confidence < CONFIG.MIN_CONFIDENCE) {
-      lastVolumeRef.current = rms
-      return
+      isOnset
     }
 
-    if (isStable) {
-      const isOnset = detectOnset(note, rms, isStable)
+    // Always set raw pitch for debugging
+    setRawPitch(pitchResult)
 
-      const stableResult: AIPitchDetectionResult = {
-        frequency,
-        note,
-        confidence,
-        centsOffset,
-        timestamp: now,
-        isOnset
-      }
-
-      setCurrentPitch(stableResult)
+    // Set current pitch if confidence is reasonable (even if not perfectly stable)
+    if (confidence >= CONFIG.MIN_CONFIDENCE * 0.7) {
+      setCurrentPitch(pitchResult)
       setIsSustaining(true)
-      lastStablePitchRef.current = note
+
+      if (isStable) {
+        lastStablePitchRef.current = note
+      }
     }
 
     lastVolumeRef.current = rms
-  }, [modelStatus, calculateRMS, checkPitchStability, detectOnset, runCrepeInference])
+  }, [calculateRMS, checkPitchStability, detectOnset, runCrepeInference])
 
   /**
    * Cleanup

@@ -160,8 +160,8 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
     // Only process on note onsets (new notes)
     if (!pitch.isOnset) return
 
-    // Debounce rapid onsets (300ms minimum between notes)
-    if (pitch.timestamp - lastProcessedOnsetRef.current < 300) return
+    // Debounce rapid onsets (150ms minimum between notes)
+    if (pitch.timestamp - lastProcessedOnsetRef.current < 150) return
     lastProcessedOnsetRef.current = pitch.timestamp
 
     const melody = melodyRef.current
