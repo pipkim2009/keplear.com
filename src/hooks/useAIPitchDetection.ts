@@ -16,7 +16,8 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { frequencyToNote, noteToFrequency, calculateCentsDifference } from '../utils/pitchUtils'
+import { frequencyToNote, noteToFrequency, calculateCentsDifference, INSTRUMENT_CONFIG, isFrequencyInInstrumentRange } from '../utils/pitchUtils'
+import type { InstrumentType } from '../types/instrument'
 
 // Lazy-loaded TensorFlow.js reference
 let tf: typeof import('@tensorflow/tfjs') | null = null
@@ -37,6 +38,11 @@ export interface AIPitchDetectionResult {
 export type MicrophonePermission = 'prompt' | 'granted' | 'denied' | 'error'
 export type ModelStatus = 'unloaded' | 'loading' | 'ready' | 'error'
 
+interface UseAIPitchDetectionOptions {
+  /** The instrument type for frequency filtering */
+  instrument?: InstrumentType
+}
+
 interface UseAIPitchDetectionReturn {
   startListening: () => Promise<void>
   stopListening: () => void
@@ -50,6 +56,8 @@ interface UseAIPitchDetectionReturn {
   isModelLoading: boolean
   averageConfidence: number
   isSustaining: boolean
+  /** Update the instrument type for filtering */
+  setInstrument: (instrument: InstrumentType) => void
 }
 
 // ============================================================================
@@ -73,19 +81,55 @@ const CREPE_MODEL_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models@m
 // CONFIGURATION
 // ============================================================================
 
-const CONFIG = {
+// Base config values
+const BASE_CONFIG = {
   DETECTION_INTERVAL_MS: 30,
-  MIN_VOLUME_RMS: 0.005,          // More sensitive to quiet sounds
-  ONSET_VOLUME_JUMP: 0.03,        // Lower volume jump threshold
-  MIN_CONFIDENCE: 0.3,            // Lower confidence threshold for CREPE
-  STABILITY_WINDOW_MS: 50,        // Shorter stability window
-  MIN_STABLE_DETECTIONS: 2,       // Need stable detections before confirming
-  PITCH_STABILITY_CENTS: 60,      // More tolerance for pitch variation
-  ONSET_SILENCE_MS: 40,           // Silence duration to reset
-  ONSET_COOLDOWN_MS: 180,         // Cooldown between onsets
-  NOTE_HOLD_WINDOW_MS: 80,        // Time to consider we're "holding" a note
+  MIN_VOLUME_RMS: 0.01,
+  ONSET_VOLUME_JUMP: 0.03,
+  MIN_CONFIDENCE: 0.6,
+  STABILITY_WINDOW_MS: 80,
+  MIN_STABLE_DETECTIONS: 3,
+  PITCH_STABILITY_CENTS: 40,
+  ONSET_SILENCE_MS: 40,
+  ONSET_COOLDOWN_MS: 180,
+  NOTE_HOLD_WINDOW_MS: 100,
   HISTORY_SIZE: 6,
 }
+
+/**
+ * Get instrument-adjusted config values
+ * Different instruments have different attack characteristics:
+ * - Piano: Sharp attacks, clear onset
+ * - Guitar: Softer attacks, string noise
+ * - Bass: Very soft attacks, low frequencies need more sensitivity
+ */
+const getInstrumentConfig = (instrument: InstrumentType) => {
+  const instrumentConfig = INSTRUMENT_CONFIG[instrument]
+
+  // Adjust based on instrument sensitivity (0.5 = bass, 0.6 = guitar, 0.7 = piano)
+  const sensitivity = instrumentConfig.onsetSensitivity
+
+  return {
+    ...BASE_CONFIG,
+    // Lower confidence threshold for instruments with softer attacks
+    MIN_CONFIDENCE: BASE_CONFIG.MIN_CONFIDENCE * sensitivity,
+    // Adjust volume jump threshold (bass needs lower threshold)
+    ONSET_VOLUME_JUMP: BASE_CONFIG.ONSET_VOLUME_JUMP * sensitivity,
+    // Bass needs longer stability window due to low frequency oscillations
+    STABILITY_WINDOW_MS: instrument === 'bass'
+      ? BASE_CONFIG.STABILITY_WINDOW_MS * 1.5
+      : BASE_CONFIG.STABILITY_WINDOW_MS,
+    // Adjust cooldown based on sustain type
+    ONSET_COOLDOWN_MS: instrumentConfig.sustainType === 'long'
+      ? BASE_CONFIG.ONSET_COOLDOWN_MS * 1.3
+      : instrumentConfig.sustainType === 'short'
+        ? BASE_CONFIG.ONSET_COOLDOWN_MS * 0.8
+        : BASE_CONFIG.ONSET_COOLDOWN_MS,
+  }
+}
+
+// Default config (will be overridden by instrument-specific values)
+let CONFIG = BASE_CONFIG
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -139,12 +183,23 @@ const normalizeBuffer = (buffer: Float32Array): Float32Array => {
 // HOOK IMPLEMENTATION
 // ============================================================================
 
-export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
+export const useAIPitchDetection = (options?: UseAIPitchDetectionOptions): UseAIPitchDetectionReturn => {
   // State
   const [isListening, setIsListening] = useState(false)
   const [permission, setPermission] = useState<MicrophonePermission>('prompt')
   const [error, setError] = useState<string | null>(null)
   const [currentPitch, setCurrentPitch] = useState<AIPitchDetectionResult | null>(null)
+
+  // Instrument type for frequency filtering (stored in ref to avoid stale closures)
+  const instrumentRef = useRef<InstrumentType>(options?.instrument || 'keyboard')
+  // Instrument-specific config (updated when instrument changes)
+  const configRef = useRef(getInstrumentConfig(options?.instrument || 'keyboard'))
+
+  const setInstrument = useCallback((instrument: InstrumentType) => {
+    instrumentRef.current = instrument
+    configRef.current = getInstrumentConfig(instrument)
+    console.log(`Pitch detection configured for ${instrument}:`, configRef.current)
+  }, [])
   const [rawPitch, setRawPitch] = useState<AIPitchDetectionResult | null>(null)
   const [volumeLevel, setVolumeLevel] = useState(0)
   const [modelStatus, setModelStatus] = useState<ModelStatus>('unloaded')
@@ -239,16 +294,16 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     const history = pitchHistoryRef.current
     const now = performance.now()
 
-    const recentHistory = history.filter(h => now - h.timestamp < CONFIG.STABILITY_WINDOW_MS)
+    const recentHistory = history.filter(h => now - h.timestamp < configRef.current.STABILITY_WINDOW_MS)
 
-    if (recentHistory.length < CONFIG.MIN_STABLE_DETECTIONS) {
+    if (recentHistory.length < configRef.current.MIN_STABLE_DETECTIONS) {
       return false
     }
 
     for (const entry of recentHistory) {
       if (entry.note !== currentNote) {
         const centsDiff = Math.abs(calculateCentsDifference(entry.frequency, currentFreq))
-        if (centsDiff > CONFIG.PITCH_STABILITY_CENTS) {
+        if (centsDiff > configRef.current.PITCH_STABILITY_CENTS) {
           return false
         }
       }
@@ -264,7 +319,7 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     const now = performance.now()
 
     // Cooldown - don't trigger too rapidly
-    if (now - lastOnsetTimeRef.current < CONFIG.ONSET_COOLDOWN_MS) {
+    if (now - lastOnsetTimeRef.current < configRef.current.ONSET_COOLDOWN_MS) {
       // But still track the current note
       if (isStable && currentHeldNoteRef.current !== currentNote) {
         currentHeldNoteRef.current = currentNote
@@ -274,7 +329,7 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     }
 
     // Case 1: Coming out of silence - primary onset trigger
-    if (wasInSilenceRef.current && currentVolume > CONFIG.MIN_VOLUME_RMS && isStable) {
+    if (wasInSilenceRef.current && currentVolume > configRef.current.MIN_VOLUME_RMS && isStable) {
       lastOnsetTimeRef.current = now
       wasInSilenceRef.current = false
       currentHeldNoteRef.current = currentNote
@@ -285,7 +340,7 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     // Case 2: Note change - different note than what we were holding
     if (isStable && currentHeldNoteRef.current && currentHeldNoteRef.current !== currentNote) {
       const holdDuration = now - noteHoldStartRef.current
-      if (holdDuration > CONFIG.NOTE_HOLD_WINDOW_MS) {
+      if (holdDuration > configRef.current.NOTE_HOLD_WINDOW_MS) {
         lastOnsetTimeRef.current = now
         currentHeldNoteRef.current = currentNote
         noteHoldStartRef.current = now
@@ -295,7 +350,7 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
 
     // Case 3: Volume spike (re-attack of same or new note)
     const volumeJump = currentVolume - lastVolumeRef.current
-    if (volumeJump > CONFIG.ONSET_VOLUME_JUMP && isStable) {
+    if (volumeJump > configRef.current.ONSET_VOLUME_JUMP && isStable) {
       lastOnsetTimeRef.current = now
       currentHeldNoteRef.current = currentNote
       noteHoldStartRef.current = now
@@ -385,11 +440,11 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     }
 
     // Silence detection
-    if (rms < CONFIG.MIN_VOLUME_RMS) {
+    if (rms < configRef.current.MIN_VOLUME_RMS) {
       if (!wasInSilenceRef.current) {
         silenceStartRef.current = now
       }
-      if (now - silenceStartRef.current > CONFIG.ONSET_SILENCE_MS) {
+      if (now - silenceStartRef.current > configRef.current.ONSET_SILENCE_MS) {
         wasInSilenceRef.current = true
       }
 
@@ -423,11 +478,24 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     }
 
     const { frequency, confidence } = result
+
+    // INSTRUMENT-SPECIFIC FILTERING: Skip frequencies outside instrument range
+    // This helps filter out harmonics, noise, and sounds from other sources
+    if (!isFrequencyInInstrumentRange(frequency, instrumentRef.current)) {
+      // Log occasionally for debugging
+      if (Math.random() < 0.02) {
+        const config = INSTRUMENT_CONFIG[instrumentRef.current]
+        console.log(`Frequency ${frequency.toFixed(1)}Hz outside ${instrumentRef.current} range (${config.minFreq}-${config.maxFreq}Hz)`)
+      }
+      lastVolumeRef.current = rms
+      return
+    }
+
     const note = frequencyToNote(frequency)
 
     // Debug log occasionally
     if (Math.random() < 0.05) {
-      console.log(`Pitch detected: ${note} (${frequency.toFixed(1)}Hz) conf: ${confidence.toFixed(2)}`)
+      console.log(`Pitch detected: ${note} (${frequency.toFixed(1)}Hz) conf: ${confidence.toFixed(2)} [${instrumentRef.current}]`)
     }
 
     if (!note) {
@@ -441,7 +509,7 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
 
     // Add to history
     pitchHistoryRef.current.push({ note, frequency, confidence, timestamp: now })
-    if (pitchHistoryRef.current.length > CONFIG.HISTORY_SIZE) {
+    if (pitchHistoryRef.current.length > configRef.current.HISTORY_SIZE) {
       pitchHistoryRef.current.shift()
     }
 
@@ -453,7 +521,7 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     const isStable = checkPitchStability(note, frequency)
 
     // Detect onset (for advancing in melody)
-    const isOnset = confidence >= CONFIG.MIN_CONFIDENCE && detectOnset(note, rms, isStable)
+    const isOnset = confidence >= configRef.current.MIN_CONFIDENCE && detectOnset(note, rms, isStable)
 
     // Create pitch result
     const pitchResult: AIPitchDetectionResult = {
@@ -468,8 +536,8 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     // Always set raw pitch for debugging
     setRawPitch(pitchResult)
 
-    // Set current pitch if confidence is reasonable (even if not perfectly stable)
-    if (confidence >= CONFIG.MIN_CONFIDENCE * 0.7) {
+    // Set current pitch if confidence is high enough (filters out speech)
+    if (confidence >= configRef.current.MIN_CONFIDENCE) {
       setCurrentPitch(pitchResult)
       setIsSustaining(true)
 
@@ -571,7 +639,7 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
       noteHoldStartRef.current = 0
 
       setIsListening(true)
-      detectionIntervalRef.current = window.setInterval(detectPitch, CONFIG.DETECTION_INTERVAL_MS)
+      detectionIntervalRef.current = window.setInterval(detectPitch, BASE_CONFIG.DETECTION_INTERVAL_MS)
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error'
 
@@ -618,6 +686,7 @@ export const useAIPitchDetection = (): UseAIPitchDetectionReturn => {
     modelStatus,
     isModelLoading: modelStatus === 'loading',
     averageConfidence,
-    isSustaining
+    isSustaining,
+    setInstrument
   }
 }

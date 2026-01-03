@@ -10,7 +10,7 @@
 import { useState, useCallback, useRef } from 'react'
 import type { Note } from '../utils/notes'
 import type { PitchDetectionResult } from './usePitchDetection'
-import { isNoteCorrect } from '../utils/pitchUtils'
+import { isNoteCorrectWithBias } from '../utils/pitchUtils'
 
 // ============================================================================
 // TYPES
@@ -95,9 +95,11 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
   const [result, setResult] = useState<PerformanceResult | null>(null)
   const [lastNoteResult, setLastNoteResult] = useState<NoteResult | null>(null)
 
-  // Refs
+  // Refs to avoid stale closure issues
   const melodyRef = useRef<Note[]>([])
   const lastProcessedOnsetRef = useRef<number>(0)
+  const isActiveRef = useRef(false)
+  const currentNoteIndexRef = useRef(0)
 
   /**
    * Calculate final result
@@ -125,6 +127,8 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
 
     melodyRef.current = melody
     lastProcessedOnsetRef.current = 0
+    isActiveRef.current = true
+    currentNoteIndexRef.current = 0
 
     setResult(null)
     setLastNoteResult(null)
@@ -140,6 +144,8 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
    * Stop performance manually
    */
   const stopPerformance = useCallback(() => {
+    isActiveRef.current = false
+
     setState(prev => {
       if (!prev.isActive) return prev
 
@@ -155,7 +161,8 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
    * Process a pitch detection result
    */
   const processPitch = useCallback((pitch: PitchDetectionResult) => {
-    if (!state.isActive || !pitch.note) return
+    // Use refs to avoid stale closure issues
+    if (!isActiveRef.current || !pitch.note) return
 
     // Only process on note onsets (new notes)
     if (!pitch.isOnset) return
@@ -165,15 +172,16 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
     lastProcessedOnsetRef.current = pitch.timestamp
 
     const melody = melodyRef.current
-    const currentIndex = state.currentNoteIndex
+    const currentIndex = currentNoteIndexRef.current
 
     // Check if we've finished
     if (currentIndex >= melody.length) return
 
     const expectedNote = melody[currentIndex]
 
-    // Check if pitch matches (comparing pitch class only - octave ignored)
-    const isCorrect = isNoteCorrect(pitch.note, expectedNote.name)
+    // Check if pitch matches using smart matching with expected note bias
+    // This uses both note name comparison AND frequency proximity
+    const isCorrect = isNoteCorrectWithBias(pitch.note, pitch.frequency, expectedNote.name)
 
     const noteResult: NoteResult = {
       noteIndex: currentIndex,
@@ -182,14 +190,22 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
       isCorrect
     }
 
+    // Update ref immediately for next call
+    const nextIndex = currentIndex + 1
+    currentNoteIndexRef.current = nextIndex
+
+    // Check if performance is complete
+    const isComplete = nextIndex >= melody.length
+    if (isComplete) {
+      isActiveRef.current = false
+    }
+
     setLastNoteResult(noteResult)
 
     setState(prev => {
       const newResults = [...prev.noteResults, noteResult]
-      const nextIndex = currentIndex + 1
 
-      // Check if performance is complete
-      if (nextIndex >= melody.length) {
+      if (isComplete) {
         const finalResult = calculateResult(newResults)
         setResult(finalResult)
 
@@ -209,7 +225,7 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
         currentExpectedNote: melody[nextIndex]
       }
     })
-  }, [state.isActive, state.currentNoteIndex, calculateResult])
+  }, [calculateResult])
 
   return {
     startPerformance,

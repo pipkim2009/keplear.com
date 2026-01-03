@@ -55,8 +55,13 @@ function Sandbox() {
   } = useInstrument()
 
   // AI Pitch detection and performance grading hooks
-  const pitchDetection = useAIPitchDetection()
+  const pitchDetection = useAIPitchDetection({ instrument })
   const performanceGrading = usePerformanceGrading()
+
+  // Keep pitch detection in sync with current instrument
+  useEffect(() => {
+    pitchDetection.setInstrument(instrument)
+  }, [instrument, pitchDetection.setInstrument])
 
   // Pass pitch detection results to grading system
   useEffect(() => {
