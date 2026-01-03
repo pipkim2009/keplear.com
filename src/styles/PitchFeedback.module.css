@@ -1211,6 +1211,580 @@
 }
 
 /* ========================================
+   GUIDED MODE STYLES
+   ======================================== */
+
+.guidedContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(139, 92, 246, 0.2);
+}
+
+:global(.dark) .guidedContainer {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
+}
+
+.guidedNoteSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.guidedLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .guidedLabel {
+  color: var(--dark-text-secondary);
+}
+
+.guidedCurrentNote {
+  font-size: 4rem;
+  font-weight: 900;
+  color: var(--light-text-primary);
+  line-height: 1;
+  padding: 1rem 2rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 3px solid rgba(139, 92, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+:global(.dark) .guidedCurrentNote {
+  color: var(--dark-text-primary);
+  background: rgba(26, 32, 44, 0.8);
+}
+
+.guidedCurrentNote.listening {
+  border-color: rgb(34, 197, 94);
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  animation: notePulse 1s ease-in-out infinite;
+}
+
+@keyframes notePulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.5);
+  }
+}
+
+.guidedCurrentNote.correct {
+  border-color: rgb(34, 197, 94);
+  background: rgba(34, 197, 94, 0.15);
+  color: rgb(22, 163, 74);
+}
+
+:global(.dark) .guidedCurrentNote.correct {
+  background: rgba(34, 197, 94, 0.25);
+  color: rgb(74, 222, 128);
+}
+
+.guidedCurrentNote.wrong {
+  border-color: rgb(239, 68, 68);
+  background: rgba(239, 68, 68, 0.15);
+  color: rgb(220, 38, 38);
+}
+
+:global(.dark) .guidedCurrentNote.wrong {
+  background: rgba(239, 68, 68, 0.25);
+  color: rgb(252, 165, 165);
+}
+
+.guidedCurrentNote.timeout {
+  border-color: rgb(245, 158, 11);
+  background: rgba(245, 158, 11, 0.15);
+  color: rgb(217, 119, 6);
+}
+
+:global(.dark) .guidedCurrentNote.timeout {
+  background: rgba(245, 158, 11, 0.25);
+  color: rgb(251, 191, 36);
+}
+
+/* BPM Display */
+.bpmDisplay {
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--primary-purple);
+  padding: 0.375rem 0.75rem;
+  background: rgba(139, 92, 246, 0.1);
+  border-radius: 20px;
+  display: inline-block;
+  margin: 0 auto;
+}
+
+:global(.dark) .bpmDisplay {
+  color: var(--primary-purple-light);
+  background: rgba(139, 92, 246, 0.2);
+}
+
+/* Count-In Container */
+.countInContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(139, 92, 246, 0.3);
+}
+
+:global(.dark) .countInContainer {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+}
+
+.countInBeats {
+  display: flex;
+  gap: 1rem;
+}
+
+.countInBeat {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 900;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--light-text-secondary);
+  transition: all 0.15s ease;
+}
+
+:global(.dark) .countInBeat {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--dark-text-secondary);
+}
+
+.countInBeat.active {
+  background: rgba(139, 92, 246, 0.3);
+  color: var(--primary-purple);
+}
+
+:global(.dark) .countInBeat.active {
+  color: var(--primary-purple-light);
+}
+
+.countInBeat.current {
+  background: var(--primary-purple);
+  color: white;
+  transform: scale(1.15);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  animation: beatPop 0.15s ease-out;
+}
+
+:global(.dark) .countInBeat.current {
+  background: var(--primary-purple-light);
+}
+
+@keyframes beatPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1.15);
+  }
+}
+
+.countInLabel {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .countInLabel {
+  color: var(--dark-text-secondary);
+}
+
+/* Beat Indicator */
+.beatIndicator {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.beatPulse {
+  width: 12px;
+  height: 12px;
+  background: rgb(34, 197, 94);
+  border-radius: 50%;
+  animation: beatPulseAnim ease-out forwards;
+}
+
+@keyframes beatPulseAnim {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+    box-shadow: 0 0 0 15px rgba(34, 197, 94, 0);
+  }
+}
+
+/* Listening Indicator */
+.listeningIndicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 200px;
+}
+
+.listeningPulse {
+  width: 16px;
+  height: 16px;
+  background: rgb(34, 197, 94);
+  border-radius: 50%;
+  animation: listeningPulseAnim 1s ease-in-out infinite;
+}
+
+@keyframes listeningPulseAnim {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+}
+
+.listeningText {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: rgb(34, 197, 94);
+}
+
+.timerBar {
+  width: 100%;
+  height: 8px;
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.timerProgress {
+  height: 100%;
+  background: linear-gradient(90deg, rgb(34, 197, 94) 0%, rgb(74, 222, 128) 100%);
+  border-radius: 4px;
+  width: 100%;
+  animation: timerCountdown linear forwards;
+}
+
+@keyframes timerCountdown {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+.timerText {
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .timerText {
+  color: var(--dark-text-secondary);
+}
+
+/* Detected Note */
+.detectedNote {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+  padding: 0.5rem 1rem;
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 8px;
+}
+
+:global(.dark) .detectedNote {
+  color: var(--dark-text-secondary);
+  background: rgba(148, 163, 184, 0.15);
+}
+
+.detectedNoteName {
+  font-weight: 800;
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .detectedNoteName {
+  color: var(--dark-text-primary);
+}
+
+/* Skip Button */
+.skipButton {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--light-text-secondary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:global(.dark) .skipButton {
+  color: var(--dark-text-secondary);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.skipButton:hover {
+  border-color: rgba(245, 158, 11, 0.5);
+  color: rgb(245, 158, 11);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+/* Last Result Feedback */
+.lastResultFeedback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  animation: resultPop 0.3s ease-out;
+}
+
+@keyframes resultPop {
+  0% {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.lastResultFeedback.correct {
+  background: rgba(34, 197, 94, 0.15);
+  color: rgb(22, 163, 74);
+  border: 2px solid rgba(34, 197, 94, 0.4);
+}
+
+:global(.dark) .lastResultFeedback.correct {
+  background: rgba(34, 197, 94, 0.25);
+  color: rgb(74, 222, 128);
+}
+
+.lastResultFeedback.wrong {
+  background: rgba(239, 68, 68, 0.15);
+  color: rgb(220, 38, 38);
+  border: 2px solid rgba(239, 68, 68, 0.4);
+}
+
+:global(.dark) .lastResultFeedback.wrong {
+  background: rgba(239, 68, 68, 0.25);
+  color: rgb(252, 165, 165);
+}
+
+.lastResultFeedback.timeout {
+  background: rgba(245, 158, 11, 0.15);
+  color: rgb(217, 119, 6);
+  border: 2px solid rgba(245, 158, 11, 0.4);
+}
+
+:global(.dark) .lastResultFeedback.timeout {
+  background: rgba(245, 158, 11, 0.25);
+  color: rgb(251, 191, 36);
+}
+
+/* Model Loading */
+.modelLoading {
+  padding: 1rem;
+  text-align: center;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 8px;
+}
+
+:global(.dark) .modelLoading {
+  color: var(--dark-text-secondary);
+  background: rgba(148, 163, 184, 0.15);
+}
+
+/* Progress Section */
+.progressSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(148, 163, 184, 0.08);
+  border-radius: 12px;
+}
+
+:global(.dark) .progressSection {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.progressInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.progressLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .progressLabel {
+  color: var(--dark-text-secondary);
+}
+
+.progressValue {
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .progressValue {
+  color: var(--dark-text-primary);
+}
+
+/* Compact Stats Row */
+.statsRow .statBadge {
+  flex-direction: row;
+  padding: 0.375rem 0.75rem;
+  gap: 0.375rem;
+  min-width: auto;
+}
+
+.statBadge.correct {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: rgb(22, 163, 74);
+}
+
+:global(.dark) .statBadge.correct {
+  color: rgb(74, 222, 128);
+}
+
+/* Compact Notes Grid */
+.notesGridCompact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.noteGridItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  min-width: 40px;
+  padding: 0.375rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.noteGridName {
+  font-weight: 700;
+}
+
+.noteGridIcon {
+  display: flex;
+  align-items: center;
+}
+
+.noteGridCurrent {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--primary-purple);
+  border-radius: 50%;
+}
+
+:global(.dark) .noteGridCurrent {
+  background: var(--primary-purple-light);
+}
+
+.noteGridItem.pending {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .noteGridItem.pending {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--dark-text-secondary);
+}
+
+.noteGridItem.current {
+  background: linear-gradient(135deg, var(--primary-purple-alpha-30) 0%, var(--primary-purple-alpha-20) 100%);
+  color: var(--primary-purple);
+  border: 2px solid var(--primary-purple);
+}
+
+:global(.dark) .noteGridItem.current {
+  color: var(--primary-purple-light);
+  border-color: var(--primary-purple-light);
+}
+
+.noteGridItem.correct {
+  background: rgba(34, 197, 94, 0.2);
+  color: rgb(22, 163, 74);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+:global(.dark) .noteGridItem.correct {
+  background: rgba(34, 197, 94, 0.25);
+  color: rgb(74, 222, 128);
+}
+
+.noteGridItem.missed {
+  background: rgba(239, 68, 68, 0.2);
+  color: rgb(220, 38, 38);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+:global(.dark) .noteGridItem.missed {
+  background: rgba(239, 68, 68, 0.25);
+  color: rgb(252, 165, 165);
+}
+
+/* ========================================
    RESPONSIVE
    ======================================== */
 

@@ -82,12 +82,12 @@ const CREPE_MODEL_URL = 'https://cdn.jsdelivr.net/gh/ml5js/ml5-data-and-models@m
 // CONFIGURATION
 // ============================================================================
 
-// Base config values - OPTIMIZED for responsiveness
+// Base config values - PERMISSIVE for better note detection
 const BASE_CONFIG = {
   DETECTION_INTERVAL_MS: 20,        // 50 FPS for faster response
-  MIN_VOLUME_RMS: 0.004,            // Very low to catch soft notes
-  ONSET_VOLUME_JUMP: 0.008,         // Very low threshold for attack detection
-  MIN_CONFIDENCE: 0.35,             // Lower threshold - let matching handle accuracy
+  MIN_VOLUME_RMS: 0.005,            // Lower to detect quieter notes
+  ONSET_VOLUME_JUMP: 0.006,         // Low threshold for attack detection
+  MIN_CONFIDENCE: 0.25,             // Lower threshold for better detection
   STABILITY_WINDOW_MS: 40,          // Faster stability check
   MIN_STABLE_DETECTIONS: 1,         // Just 1 detection needed (more responsive)
   PITCH_STABILITY_CENTS: 50,        // Looser for stability
@@ -96,11 +96,15 @@ const BASE_CONFIG = {
   NOTE_HOLD_WINDOW_MS: 30,          // Short hold window
   HISTORY_SIZE: 6,                  // Less history for faster response
 
-  // New advanced features
+  // Noise rejection - more permissive
   ADAPTIVE_NOISE_FLOOR: true,
-  NOISE_FLOOR_DECAY: 0.999,         // Slower decay
-  NOISE_FLOOR_ATTACK: 0.02,         // Slower attack
-  MIN_PERIODICITY: 0.2,
+  NOISE_FLOOR_DECAY: 0.997,         // Moderate decay
+  NOISE_FLOOR_ATTACK: 0.05,         // Moderate attack
+  NOISE_FLOOR_MULTIPLIER: 2,        // Lower multiplier for detection
+  MIN_PERIODICITY: 0.15,            // Lower periodicity requirement
+  USE_PERIODICITY_FILTER: false,    // Disable periodicity filter for now
+
+  // Advanced features
   USE_PARABOLIC_INTERP: true,
   USE_VITERBI_SMOOTHING: false,     // Disable for now - can cause lag
   USE_OCTAVE_CORRECTION: true,
@@ -477,7 +481,6 @@ export const useAIPitchDetection = (options?: UseAIPitchDetectionOptions): UseAI
   const setInstrument = useCallback((instrument: InstrumentType) => {
     instrumentRef.current = instrument
     configRef.current = getInstrumentConfig(instrument)
-    console.log(`Pitch detection configured for ${instrument}:`, configRef.current)
   }, [])
   const [rawPitch, setRawPitch] = useState<AIPitchDetectionResult | null>(null)
   const [volumeLevel, setVolumeLevel] = useState(0)
@@ -529,24 +532,20 @@ export const useAIPitchDetection = (options?: UseAIPitchDetectionOptions): UseAI
 
     try {
       // Lazy load TensorFlow.js
-      console.log('Loading TensorFlow.js...')
       if (!tf) {
         tf = await import('@tensorflow/tfjs')
       }
 
       // Set TensorFlow.js backend
-      console.log('TensorFlow.js loaded, initializing backend...')
       await tf.ready()
-      console.log('TensorFlow backend ready, loading CREPE model...')
 
       // Load the CREPE model from CDN
       modelRef.current = await tf.loadLayersModel(CREPE_MODEL_URL)
-      console.log('CREPE model loaded successfully!')
       setModelStatus('ready')
       modelStatusRef.current = 'ready'
       return true
     } catch (err) {
-      console.error('Failed to load AI model:', err)
+      console.error('[PitchDetection] Failed to load AI model:', err)
       setError('Failed to load AI pitch detection model. Please check your internet connection and refresh the page.')
       setModelStatus('error')
       modelStatusRef.current = 'error'
@@ -827,14 +826,14 @@ export const useAIPitchDetection = (options?: UseAIPitchDetectionOptions): UseAI
 
     // Check if model is available for pitch detection (use ref to avoid stale closure)
     if (!modelRef.current || modelStatusRef.current !== 'ready') {
-      // Debug: log model status occasionally
-      if (Math.random() < 0.01) console.log(`Model not ready: status=${modelStatusRef.current}, model=${!!modelRef.current}`)
+      // Debug: log model status more frequently when not ready
       return
     }
 
     // Silence detection with adaptive threshold
+    const noiseMultiplier = config.NOISE_FLOOR_MULTIPLIER || 3
     const silenceThreshold = config.ADAPTIVE_NOISE_FLOOR
-      ? Math.max(config.MIN_VOLUME_RMS, noiseFloorRef.current * 2)
+      ? Math.max(config.MIN_VOLUME_RMS, noiseFloorRef.current * noiseMultiplier)
       : config.MIN_VOLUME_RMS
 
     if (rms < silenceThreshold) {
@@ -873,35 +872,47 @@ export const useAIPitchDetection = (options?: UseAIPitchDetectionOptions): UseAI
     const result = await runCrepeInference(crepeInput, buffer, sampleRate)
 
     if (!result) {
-      // Debug: log occasionally when result is null
-      if (Math.random() < 0.02) {
-        console.log('CREPE returned null - buffer length:', crepeInput.length, 'rms:', rms.toFixed(4))
-      }
       lastVolumeRef.current = rms
       return
     }
 
     const { frequency, confidence, periodicity = 0 } = result
 
-    // Debug: log detection results occasionally
-    if (Math.random() < 0.1) {
-      console.log(`Detection: freq=${frequency.toFixed(1)}Hz conf=${confidence.toFixed(2)} period=${periodicity.toFixed(2)}`)
+    // Get the note name first so we can check if it's a repeat
+    const detectedNote = frequencyToNote(frequency)
+
+    // SMART PERIODICITY FILTER:
+    // - Strict for NEW notes (to reject noise)
+    // - Lenient for SAME note (to allow re-attacks)
+    const isSameNote = detectedNote && currentHeldNoteRef.current === detectedNote
+    const periodicityThreshold = isSameNote ? 0.15 : config.MIN_PERIODICITY  // Much lower for same note
+
+    if (config.USE_PERIODICITY_FILTER && periodicity < periodicityThreshold && !isSameNote) {
+      lastVolumeRef.current = rms
+      return
     }
 
-    // Combined confidence with periodicity (only if periodicity is valid)
-    const combinedConfidence = config.USE_OCTAVE_CORRECTION && periodicity > 0
-      ? confidence * 0.7 + periodicity * 0.3
+    // Combined confidence - weight periodicity less for same note re-attacks
+    const periodicityWeight = isSameNote ? 0.2 : 0.4
+    const combinedConfidence = periodicity > 0
+      ? confidence * (1 - periodicityWeight) + periodicity * periodicityWeight
       : confidence
 
+    // Lower confidence threshold for same note re-attacks
+    const confThreshold = isSameNote ? config.MIN_CONFIDENCE * 0.7 : config.MIN_CONFIDENCE
+    if (combinedConfidence < confThreshold) {
+      lastVolumeRef.current = rms
+      return
+    }
+
     // INSTRUMENT-SPECIFIC FILTERING: Skip frequencies outside instrument range
-    // This helps filter out harmonics, noise, and sounds from other sources
     if (!isFrequencyInInstrumentRange(frequency, instrumentRef.current)) {
       lastVolumeRef.current = rms
       return
     }
 
-    const note = frequencyToNote(frequency)
-
+    // Use the note we already detected
+    const note = detectedNote
     if (!note) {
       lastVolumeRef.current = rms
       return
@@ -926,11 +937,6 @@ export const useAIPitchDetection = (options?: UseAIPitchDetectionOptions): UseAI
 
     // Detect onset (for advancing in melody) - always check, let onset logic decide
     const isOnset = detectOnset(note, rms, isStable)
-
-    // Debug: log onsets
-    if (isOnset) {
-      console.log(`🎵 ONSET: ${note} (freq=${frequency.toFixed(1)}Hz, conf=${combinedConfidence.toFixed(2)}, vol=${rms.toFixed(4)})`)
-    }
 
     // Create pitch result
     const pitchResult: AIPitchDetectionResult = {

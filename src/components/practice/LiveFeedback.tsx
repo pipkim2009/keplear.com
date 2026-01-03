@@ -2,14 +2,13 @@
  * LiveFeedback Component
  * Real-time visual feedback during performance
  *
- * Features:
- * - Volume indicator with segmented bars
- * - Notes history showing correct/wrong
- * - Current note indicator
- * - Pitch detection display
+ * BPM-SYNCED GUIDED MODE:
+ * - 4-beat count-in with visual beat indicators
+ * - Current note displayed prominently
+ * - Beat-synced progress
  */
 
-import { Mic, MicOff, Check, X } from 'lucide-react'
+import { Mic, MicOff, Check, X, SkipForward } from 'lucide-react'
 import type { PitchDetectionResult } from '../../hooks/usePitchDetection'
 import type { NoteResult, PerformanceState } from '../../hooks/usePerformanceGrading'
 import type { Note } from '../../utils/notes'
@@ -38,6 +37,10 @@ interface LiveFeedbackProps {
   totalNotes: number
   /** The melody being practiced */
   melody: Note[]
+  /** Model loading status */
+  modelStatus?: 'unloaded' | 'loading' | 'ready' | 'error'
+  /** Skip current note callback */
+  onSkipNote?: () => void
 }
 
 export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
@@ -51,33 +54,22 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
   error,
   permission,
   totalNotes,
-  melody
+  melody,
+  modelStatus = 'ready',
+  onSkipNote
 }) => {
-  // Determine note display state
-  const getNoteDisplayClass = (): string => {
-    if (!currentPitch?.note || !performanceState.currentExpectedNote) {
-      return ''
-    }
-
-    // Extract just the note name without octave
-    const detectedMatch = currentPitch.note.match(/^([A-G]#?)/)
-    const expectedMatch = performanceState.currentExpectedNote.name.match(/^([A-G]#?)/)
-
-    if (!detectedMatch || !expectedMatch) return ''
-
-    const detected = detectedMatch[1]
-    const expected = expectedMatch[1]
-
-    if (detected === expected) {
-      return styles.correct
-    }
-
-    return styles.wrong
-  }
+  const { guided } = performanceState
 
   // Calculate stats from results
   const correctCount = performanceState.noteResults.filter(r => r.isCorrect).length
   const missCount = performanceState.noteResults.filter(r => !r.isCorrect).length
+
+  // Get feedback class for last result
+  const getLastResultClass = () => {
+    if (!lastNoteResult) return ''
+    if (lastNoteResult.isTimeout) return styles.timeout
+    return lastNoteResult.isCorrect ? styles.correct : styles.wrong
+  }
 
   return (
     <div className={styles.liveFeedbackContainer}>
@@ -108,22 +100,105 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
           {isListening ? (
             <>
               <MicOff size={20} />
-              Stop Listening
+              Stop Practice
             </>
           ) : (
             <>
               <Mic size={20} />
-              Start Listening
+              Start Practice
             </>
           )}
         </button>
       )}
 
+      {/* Model Loading State */}
+      {isListening && modelStatus === 'loading' && (
+        <div className={styles.modelLoading}>
+          Loading AI model...
+        </div>
+      )}
+
+      {/* BPM Display */}
+      {isListening && performanceState.isActive && (
+        <div className={styles.bpmDisplay}>
+          {guided.bpm} BPM
+        </div>
+      )}
+
+      {/* COUNT-IN DISPLAY */}
+      {isListening && performanceState.isActive && guided.isCountingIn && (
+        <div className={styles.countInContainer}>
+          <div className={styles.countInBeats}>
+            {[1, 2, 3, 4].map(beat => (
+              <div
+                key={beat}
+                className={`${styles.countInBeat} ${guided.countInBeat >= beat ? styles.active : ''} ${guided.countInBeat === beat ? styles.current : ''}`}
+              >
+                {beat}
+              </div>
+            ))}
+          </div>
+          <span className={styles.countInLabel}>Count in...</span>
+        </div>
+      )}
+
+      {/* PLAYING MODE UI */}
+      {isListening && performanceState.isActive && !guided.isCountingIn && (
+        <div className={styles.guidedContainer}>
+          {/* Current Note Display - Large and prominent */}
+          <div className={styles.guidedNoteSection}>
+            <span className={styles.guidedLabel}>Play:</span>
+            <div className={`${styles.guidedCurrentNote} ${guided.isListening ? styles.listening : ''} ${getLastResultClass()}`}>
+              {performanceState.currentExpectedNote?.name || '--'}
+            </div>
+
+            {/* Beat indicator */}
+            {guided.isListening && (
+              <div className={styles.beatIndicator}>
+                <div className={styles.beatPulse} style={{ animationDuration: `${guided.beatDuration}ms` }} />
+              </div>
+            )}
+
+            {/* Detected Note Display */}
+            {guided.isListening && currentPitch?.note && (
+              <div className={styles.detectedNote}>
+                Heard: <span className={styles.detectedNoteName}>{currentPitch.note}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Skip Button */}
+          {guided.isListening && onSkipNote && (
+            <button
+              className={styles.skipButton}
+              onClick={onSkipNote}
+              title="Skip this note"
+            >
+              <SkipForward size={16} />
+              Skip
+            </button>
+          )}
+
+          {/* Last Result Feedback - shows between notes */}
+          {lastNoteResult && !guided.isListening && (
+            <div className={`${styles.lastResultFeedback} ${getLastResultClass()}`}>
+              {lastNoteResult.isTimeout ? (
+                <span>Missed!</span>
+              ) : lastNoteResult.isCorrect ? (
+                <span><Check size={20} /> Correct!</span>
+              ) : (
+                <span><X size={20} /> {lastNoteResult.playedNote}</span>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Volume Indicator */}
       {isListening && (
-        <div className={styles.volumeIndicatorContainer}>
+        <div className={styles.volumeIndicatorContainer} style={{ marginTop: '1rem' }}>
           <div className={styles.volumeIndicatorHeader}>
-            <span className={styles.volumeIndicatorLabel}>Input Level</span>
+            <span className={styles.volumeIndicatorLabel}>Mic Level</span>
             <span className={styles.volumeIndicatorValue}>{Math.round(volumeLevel * 100)}%</span>
           </div>
           <div className={styles.volumeIndicatorTrack}>
@@ -140,132 +215,62 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
                 )
               })}
             </div>
-            <div className={styles.volumeIndicatorGlow} style={{ width: `${volumeLevel * 100}%` }} />
           </div>
-          {volumeLevel < 0.1 && (
-            <span className={styles.volumeWarning}>Speak louder or move closer to mic</span>
-          )}
-        </div>
-      )}
-
-      {/* Pitch Display */}
-      {isListening && (
-        <div className={styles.pitchDisplay}>
-          <span className={`${styles.currentNote} ${getNoteDisplayClass()}`}>
-            {currentPitch?.note || '--'}
-          </span>
-          {performanceState.currentExpectedNote && (
-            <span className={styles.expectedNote}>
-              Expected: {performanceState.currentExpectedNote.name}
-            </span>
-          )}
-          {currentPitch && (
-            <span className={styles.pitchConfidence}>
-              Confidence: {Math.round((currentPitch.confidence || 0) * 100)}%
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* Last Note Result Feedback */}
-      {lastNoteResult && performanceState.isActive && (
-        <div className={`${styles.noteResultFeedback} ${lastNoteResult.isCorrect ? styles.correct : styles.miss}`}>
-          {lastNoteResult.isCorrect ? 'Correct!' : 'Wrong'}
-          {lastNoteResult.playedNote && !lastNoteResult.isCorrect && (
-            <span className={styles.wrongPitchNote}>
-              (played {lastNoteResult.playedNote})
-            </span>
-          )}
         </div>
       )}
 
       {/* Stats Row */}
-      {performanceState.isActive && performanceState.noteResults.length > 0 && (
+      {performanceState.isActive && (
         <div className={styles.statsRow}>
+          <div className={styles.progressValue}>
+            {performanceState.noteResults.length} / {totalNotes}
+          </div>
           <div className={`${styles.statBadge} ${styles.correct}`}>
-            <span className={styles.statCount}>{correctCount}</span>
-            <span className={styles.statLabel}>Correct</span>
+            <Check size={14} />
+            <span>{correctCount}</span>
           </div>
           <div className={`${styles.statBadge} ${styles.miss}`}>
-            <span className={styles.statCount}>{missCount}</span>
-            <span className={styles.statLabel}>Wrong</span>
+            <X size={14} />
+            <span>{missCount}</span>
           </div>
         </div>
       )}
 
-      {/* Notes History - two rows: intended notes on top, received notes below */}
+      {/* Notes History - Compact grid */}
       {(performanceState.isActive || performanceState.noteResults.length > 0) && (
         <div className={styles.notesHistoryContainer}>
           <div className={styles.notesHistoryHeader}>
             <span className={styles.notesHistoryLabel}>Notes</span>
-            <span className={styles.notesHistoryProgress}>
-              {performanceState.noteResults.length} / {totalNotes}
-            </span>
           </div>
 
-          {/* Two-row notes display */}
-          <div className={styles.notesComparisonContainer}>
-            {/* Top row - Intended/Expected notes */}
-            <div className={styles.notesRow}>
-              <span className={styles.rowLabel}>Expected</span>
-              <div className={styles.notesRowGrid}>
-                {melody.map((note, index) => {
-                  const result = performanceState.noteResults.find(r => r.noteIndex === index)
-                  const isCurrent = index === performanceState.currentNoteIndex && performanceState.isActive
+          <div className={styles.notesGridCompact}>
+            {melody.map((note, index) => {
+              const result = performanceState.noteResults.find(r => r.noteIndex === index)
+              const isCurrent = index === performanceState.currentNoteIndex && performanceState.isActive
 
-                  return (
-                    <div
-                      key={index}
-                      className={`${styles.noteCell} ${styles.expectedCell} ${
-                        result?.isCorrect ? styles.correct :
-                        result && !result.isCorrect ? styles.missed :
-                        isCurrent ? styles.current :
-                        styles.pending
-                      }`}
-                    >
-                      <span className={styles.noteCellName}>{note.name}</span>
-                      {isCurrent && !result && (
-                        <span className={styles.noteHistoryCurrentIndicator} />
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Bottom row - Received/Played notes */}
-            <div className={styles.notesRow}>
-              <span className={styles.rowLabel}>Played</span>
-              <div className={styles.notesRowGrid}>
-                {melody.map((_, index) => {
-                  const result = performanceState.noteResults.find(r => r.noteIndex === index)
-
-                  return (
-                    <div
-                      key={index}
-                      className={`${styles.noteCell} ${styles.receivedCell} ${
-                        result?.isCorrect ? styles.correct :
-                        result && !result.isCorrect ? styles.missed :
-                        styles.empty
-                      }`}
-                    >
-                      {result ? (
-                        <>
-                          <span className={styles.noteCellName}>
-                            {result.playedNote || '--'}
-                          </span>
-                          <span className={styles.noteCellIcon}>
-                            {result.isCorrect ? <Check size={12} /> : <X size={12} />}
-                          </span>
-                        </>
-                      ) : (
-                        <span className={styles.noteCellName}>--</span>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
+              return (
+                <div
+                  key={index}
+                  className={`${styles.noteGridItem} ${
+                    result?.isCorrect ? styles.correct :
+                    result && !result.isCorrect ? styles.missed :
+                    isCurrent ? styles.current :
+                    styles.pending
+                  }`}
+                  title={result ? `${result.expectedNote} → ${result.playedNote || 'missed'}` : note.name}
+                >
+                  <span className={styles.noteGridName}>{note.name}</span>
+                  {result && (
+                    <span className={styles.noteGridIcon}>
+                      {result.isCorrect ? <Check size={10} /> : <X size={10} />}
+                    </span>
+                  )}
+                  {isCurrent && !result && (
+                    <span className={styles.noteGridCurrent} />
+                  )}
+                </div>
+              )
+            })}
           </div>
         </div>
       )}

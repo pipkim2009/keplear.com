@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import styles from '../../styles/Practice.module.css'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import PracticeOptionsModal, { type LessonSettings } from './PracticeOptionsModal'
@@ -171,13 +171,18 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   }, [pitchDetection.currentPitch, performanceGrading.state.isActive, performanceGrading.processPitch])
 
   // Start performance grading when user starts listening and melody is ready
-  const handleStartPracticeWithFeedback = () => {
+  const handleStartPracticeWithFeedback = useCallback(() => {
     if (generatedMelody.length > 0) {
       setShowPitchFeedback(true)
-      performanceGrading.startPerformance(generatedMelody)
+      // Set the correct instrument for pitch detection filtering
+      if (selectedInstrument) {
+        pitchDetection.setInstrument(selectedInstrument as 'keyboard' | 'guitar' | 'bass')
+      }
+      // Pass BPM for beat-synced practice
+      performanceGrading.startPerformance(generatedMelody, bpm)
       pitchDetection.startListening()
     }
-  }
+  }, [generatedMelody, selectedInstrument, bpm, pitchDetection, performanceGrading])
 
   // Stop practice session
   const handleStopPracticeWithFeedback = () => {
@@ -881,6 +886,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
               permission={pitchDetection.permission}
               totalNotes={generatedMelody.length}
               melody={generatedMelody}
+              modelStatus={pitchDetection.modelStatus}
+              onSkipNote={performanceGrading.skipNote}
             />
           </div>
         )}

@@ -73,7 +73,7 @@ function Sandbox() {
   // Start performance grading when user starts listening and melody is ready
   const handleStartPracticeWithFeedback = () => {
     if (generatedMelody.length > 0) {
-      performanceGrading.startPerformance(generatedMelody)
+      performanceGrading.startPerformance(generatedMelody, bpm)
       pitchDetection.startListening()
     } else {
       // Just start listening without grading if no melody
