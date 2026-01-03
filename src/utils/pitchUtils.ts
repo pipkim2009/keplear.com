@@ -1,6 +1,11 @@
 /**
  * Pitch detection and analysis utilities
  * Used for real-time performance grading (Yousician-style)
+ *
+ * Enhanced with:
+ * - Professional-grade frequency-to-note conversion
+ * - Multi-octave tolerance for flexible matching
+ * - Cents-based precision for tuning feedback
  */
 
 import { MUSIC_CONFIG } from '../constants'
@@ -8,11 +13,12 @@ import type { InstrumentType } from '../types/instrument'
 
 /**
  * A4 reference frequency (standard tuning)
+ * Can be adjusted for different tuning standards (e.g., 432 Hz)
  */
 const A4_FREQUENCY = 440
 
 /**
- * A4 MIDI note number
+ * A4 MIDI note number (standard)
  */
 const A4_MIDI = 69
 
@@ -24,8 +30,19 @@ const NOTE_NAMES = MUSIC_CONFIG.chromaticNotes
 /**
  * Pitch tolerance in cents (±50 cents = half a semitone)
  * This matches Yousician's approach - if you're within 50 cents, you hit the note
+ * Tightened from 50 to 45 for more accurate grading
  */
-export const PITCH_TOLERANCE_CENTS = 50
+export const PITCH_TOLERANCE_CENTS = 45
+
+/**
+ * Strict tolerance for advanced mode (±25 cents = quarter semitone)
+ */
+export const PITCH_TOLERANCE_STRICT_CENTS = 25
+
+/**
+ * Lenient tolerance for beginners (±75 cents)
+ */
+export const PITCH_TOLERANCE_LENIENT_CENTS = 75
 
 /**
  * Instrument-specific frequency ranges and detection parameters
@@ -254,7 +271,7 @@ export const isNoteCorrectWithBias = (
   detectedFrequency: number,
   expectedNote: string
 ): boolean => {
-  // First, check standard note matching
+  // First, check standard note matching (pitch class only)
   if (isNoteCorrect(detectedNote, expectedNote)) {
     return true
   }
@@ -262,7 +279,133 @@ export const isNoteCorrectWithBias = (
   // If standard matching failed, check if frequency is close to expected
   // This handles edge cases where the frequency is between two notes
   // and rounded to the wrong one
-  return isFrequencyCloseToExpectedNote(detectedFrequency, expectedNote, 55)
+  return isFrequencyCloseToExpectedNote(detectedFrequency, expectedNote, 50)
+}
+
+/**
+ * ADVANCED NOTE MATCHING: More sophisticated matching with confidence scoring
+ * Returns both whether the note is correct and a confidence score
+ *
+ * @param detectedNote - The detected note name
+ * @param detectedFrequency - The detected frequency
+ * @param expectedNote - The note we expect
+ * @param options - Matching options
+ * @returns Match result with correctness and confidence
+ */
+export interface NoteMatchResult {
+  isCorrect: boolean
+  confidence: number      // 0-1, how confident in the match
+  centsOff: number        // How many cents off from perfect
+  matchType: 'exact' | 'pitch-class' | 'frequency-close' | 'octave-error' | 'wrong'
+}
+
+export const advancedNoteMatch = (
+  detectedNote: string | null,
+  detectedFrequency: number,
+  expectedNote: string,
+  options: {
+    toleranceCents?: number
+    allowOctaveErrors?: boolean
+    strictOctave?: boolean
+  } = {}
+): NoteMatchResult => {
+  const {
+    toleranceCents = PITCH_TOLERANCE_CENTS,
+    allowOctaveErrors = true,
+    strictOctave = false
+  } = options
+
+  // No detection
+  if (!detectedNote || detectedFrequency <= 0) {
+    return { isCorrect: false, confidence: 0, centsOff: 0, matchType: 'wrong' }
+  }
+
+  const expectedFreq = noteToFrequency(expectedNote)
+  if (!expectedFreq) {
+    return { isCorrect: false, confidence: 0, centsOff: 0, matchType: 'wrong' }
+  }
+
+  const centsOff = Math.abs(calculateCentsDifference(detectedFrequency, expectedFreq))
+
+  // Exact octave match - check frequency directly
+  if (centsOff <= toleranceCents) {
+    const confidence = 1 - (centsOff / toleranceCents) * 0.3
+    return { isCorrect: true, confidence, centsOff, matchType: 'exact' }
+  }
+
+  // Check for octave errors (frequency is 2x or 0.5x expected)
+  if (allowOctaveErrors && !strictOctave) {
+    const octaveUpCents = Math.abs(calculateCentsDifference(detectedFrequency, expectedFreq * 2))
+    const octaveDownCents = Math.abs(calculateCentsDifference(detectedFrequency, expectedFreq / 2))
+
+    if (octaveUpCents <= toleranceCents) {
+      // Playing an octave higher
+      const confidence = 0.8 - (octaveUpCents / toleranceCents) * 0.2
+      return { isCorrect: true, confidence, centsOff: octaveUpCents, matchType: 'octave-error' }
+    }
+
+    if (octaveDownCents <= toleranceCents) {
+      // Playing an octave lower
+      const confidence = 0.8 - (octaveDownCents / toleranceCents) * 0.2
+      return { isCorrect: true, confidence, centsOff: octaveDownCents, matchType: 'octave-error' }
+    }
+  }
+
+  // Pitch class match (same note name, any octave)
+  const detectedClass = getNoteClass(detectedNote)
+  const expectedClass = getNoteClass(expectedNote)
+
+  if (detectedClass && expectedClass && detectedClass === expectedClass) {
+    // Same pitch class, but not same octave and not within tolerance
+    // Still consider correct but with lower confidence
+    const confidence = 0.7
+    return { isCorrect: true, confidence, centsOff, matchType: 'pitch-class' }
+  }
+
+  // Check if frequency is very close to expected (handles edge cases)
+  if (centsOff <= toleranceCents * 1.2) {
+    const confidence = 0.6 - (centsOff / toleranceCents) * 0.3
+    return { isCorrect: true, confidence, centsOff, matchType: 'frequency-close' }
+  }
+
+  return { isCorrect: false, confidence: 0, centsOff, matchType: 'wrong' }
+}
+
+/**
+ * Calculate the harmonic relationship between two frequencies
+ * Useful for detecting octave errors and harmonic confusion
+ */
+export const getHarmonicRelationship = (
+  freq1: number,
+  freq2: number
+): { ratio: number; isHarmonic: boolean; relationship: string } => {
+  const ratio = freq1 / freq2
+  const log2Ratio = Math.log2(ratio)
+  const nearestOctave = Math.round(log2Ratio)
+  const octaveError = Math.abs(log2Ratio - nearestOctave)
+
+  // Check for octave relationship
+  if (octaveError < 0.08) { // Within ~1.3 semitones of an octave
+    if (nearestOctave === 0) {
+      return { ratio, isHarmonic: true, relationship: 'unison' }
+    } else if (nearestOctave === 1) {
+      return { ratio, isHarmonic: true, relationship: 'octave-up' }
+    } else if (nearestOctave === -1) {
+      return { ratio, isHarmonic: true, relationship: 'octave-down' }
+    } else if (nearestOctave === 2) {
+      return { ratio, isHarmonic: true, relationship: 'two-octaves-up' }
+    } else if (nearestOctave === -2) {
+      return { ratio, isHarmonic: true, relationship: 'two-octaves-down' }
+    }
+  }
+
+  // Check for perfect fifth (3:2 ratio, ~7 semitones)
+  const fifthRatio = freq1 / freq2
+  if (Math.abs(fifthRatio - 1.5) < 0.05 || Math.abs(fifthRatio - 0.667) < 0.03) {
+    return { ratio, isHarmonic: true, relationship: 'fifth' }
+  }
+
+  return { ratio, isHarmonic: false, relationship: 'none' }
 }
 
 /**

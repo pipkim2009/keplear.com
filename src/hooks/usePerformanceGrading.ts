@@ -1,16 +1,17 @@
 /**
  * Performance grading hook
  *
- * Simple pitch-based note detection:
+ * Enhanced pitch-based note detection:
  * - Play notes in order
- * - Each note is graded as correct or wrong based on pitch
+ * - Each note is graded with advanced frequency-based matching
+ * - Handles octave errors gracefully
  * - No timing requirements - play at your own pace
  */
 
 import { useState, useCallback, useRef } from 'react'
 import type { Note } from '../utils/notes'
 import type { PitchDetectionResult } from './usePitchDetection'
-import { isNoteCorrectWithBias } from '../utils/pitchUtils'
+import { advancedNoteMatch, isNoteCorrectWithBias, type NoteMatchResult } from '../utils/pitchUtils'
 
 // ============================================================================
 // TYPES
@@ -28,6 +29,12 @@ export interface NoteResult {
   playedNote: string | null
   /** Whether the pitch was correct */
   isCorrect: boolean
+  /** Match confidence (0-1) */
+  matchConfidence?: number
+  /** How many cents off from perfect */
+  centsOff?: number
+  /** Type of match (exact, pitch-class, octave-error, etc.) */
+  matchType?: NoteMatchResult['matchType']
 }
 
 /**
@@ -179,15 +186,22 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
 
     const expectedNote = melody[currentIndex]
 
-    // Check if pitch matches using smart matching with expected note bias
-    // This uses both note name comparison AND frequency proximity
-    const isCorrect = isNoteCorrectWithBias(pitch.note, pitch.frequency, expectedNote.name)
+    // Use advanced note matching with detailed feedback
+    // This provides: correct/wrong, confidence, cents off, and match type
+    const matchResult = advancedNoteMatch(pitch.note, pitch.frequency, expectedNote.name, {
+      toleranceCents: 45, // Slightly tighter than default for better accuracy
+      allowOctaveErrors: true, // Accept octave transpositions as correct
+      strictOctave: false
+    })
 
     const noteResult: NoteResult = {
       noteIndex: currentIndex,
       expectedNote: expectedNote.name,
       playedNote: pitch.note,
-      isCorrect
+      isCorrect: matchResult.isCorrect,
+      matchConfidence: matchResult.confidence,
+      centsOff: matchResult.centsOff,
+      matchType: matchResult.matchType
     }
 
     // Update ref immediately for next call
