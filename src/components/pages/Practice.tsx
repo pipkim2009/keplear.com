@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import styles from '../../styles/Practice.module.css'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import PracticeOptionsModal, { type LessonSettings } from './PracticeOptionsModal'
@@ -6,7 +6,8 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import { useAuth } from '../../hooks/useAuth'
 import AuthModal from '../auth/AuthModal'
 import type { Note } from '../../utils/notes'
-import { useAIPitchDetection, usePerformanceGrading } from '../../hooks'
+import { useDSPPitchDetection, usePerformanceGrading } from '../../hooks'
+import type { PitchDetectionResult } from '../../hooks/usePitchDetection'
 import { LiveFeedback } from '../practice'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
@@ -96,10 +97,23 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [pendingSkillsNavigation, setPendingSkillsNavigation] = useState(false)
 
-  // AI Pitch detection and performance grading hooks
-  const pitchDetection = useAIPitchDetection()
+  // DSP-based pitch detection and performance grading hooks
+  const pitchDetection = useDSPPitchDetection()
   const performanceGrading = usePerformanceGrading()
   const [showPitchFeedback, setShowPitchFeedback] = useState(false)
+
+  // Convert DSP pitch result to the format expected by grading system
+  const currentPitchForGrading = useMemo((): PitchDetectionResult | null => {
+    if (!pitchDetection.currentPitch) return null
+    return {
+      frequency: pitchDetection.currentPitch.frequency,
+      note: pitchDetection.currentPitch.note,
+      confidence: pitchDetection.currentPitch.confidence,
+      centsOffset: pitchDetection.currentPitch.cents,
+      timestamp: pitchDetection.currentPitch.timestamp,
+      isOnset: pitchDetection.currentPitch.isOnset
+    }
+  }, [pitchDetection.currentPitch])
 
   // Lesson State
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
@@ -165,10 +179,10 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
 
   // Pass pitch detection results to grading system
   useEffect(() => {
-    if (pitchDetection.currentPitch && performanceGrading.state.isActive) {
-      performanceGrading.processPitch(pitchDetection.currentPitch)
+    if (currentPitchForGrading && performanceGrading.state.isActive) {
+      performanceGrading.processPitch(currentPitchForGrading)
     }
-  }, [pitchDetection.currentPitch, performanceGrading.state.isActive, performanceGrading.processPitch])
+  }, [currentPitchForGrading, performanceGrading.state.isActive, performanceGrading.processPitch])
 
   // Stop listening when a new melody is being generated
   useEffect(() => {
@@ -887,7 +901,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
               isListening={pitchDetection.isListening}
               onStartListening={handleStartPracticeWithFeedback}
               onStopListening={handleStopPracticeWithFeedback}
-              currentPitch={pitchDetection.currentPitch}
+              currentPitch={currentPitchForGrading}
               volumeLevel={pitchDetection.volumeLevel}
               performanceState={performanceGrading.state}
               lastNoteResult={performanceGrading.lastNoteResult}
@@ -895,7 +909,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
               permission={pitchDetection.permission}
               totalNotes={generatedMelody.length}
               melody={generatedMelody}
-              modelStatus={pitchDetection.modelStatus}
               onSkipNote={performanceGrading.skipNote}
             />
           </div>

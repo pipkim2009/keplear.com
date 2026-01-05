@@ -2,11 +2,12 @@
  * Sandbox Page - Free play mode with optional pitch detection feedback
  */
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import { useInstrument } from '../../contexts/InstrumentContext'
-import { useAIPitchDetection, usePerformanceGrading } from '../../hooks'
+import { useDSPPitchDetection, usePerformanceGrading } from '../../hooks'
 import { LiveFeedback } from '../practice'
+import type { PitchDetectionResult } from '../../hooks/usePitchDetection'
 
 function Sandbox() {
   const {
@@ -54,21 +55,34 @@ function Sandbox() {
     handleCurrentlyPlayingNoteChange
   } = useInstrument()
 
-  // AI Pitch detection and performance grading hooks
-  const pitchDetection = useAIPitchDetection({ instrument })
+  // DSP-based pitch detection and performance grading hooks
+  const pitchDetection = useDSPPitchDetection({ instrument: instrument as 'keyboard' | 'guitar' | 'bass' })
   const performanceGrading = usePerformanceGrading()
+
+  // Convert DSP pitch result to the format expected by grading system
+  const currentPitchForGrading = useMemo((): PitchDetectionResult | null => {
+    if (!pitchDetection.currentPitch) return null
+    return {
+      frequency: pitchDetection.currentPitch.frequency,
+      note: pitchDetection.currentPitch.note,
+      confidence: pitchDetection.currentPitch.confidence,
+      centsOffset: pitchDetection.currentPitch.cents,
+      timestamp: pitchDetection.currentPitch.timestamp,
+      isOnset: pitchDetection.currentPitch.isOnset
+    }
+  }, [pitchDetection.currentPitch])
 
   // Keep pitch detection in sync with current instrument
   useEffect(() => {
-    pitchDetection.setInstrument(instrument)
+    pitchDetection.setInstrument(instrument as 'keyboard' | 'guitar' | 'bass')
   }, [instrument, pitchDetection.setInstrument])
 
   // Pass pitch detection results to grading system
   useEffect(() => {
-    if (pitchDetection.currentPitch && performanceGrading.state.isActive) {
-      performanceGrading.processPitch(pitchDetection.currentPitch)
+    if (currentPitchForGrading && performanceGrading.state.isActive) {
+      performanceGrading.processPitch(currentPitchForGrading)
     }
-  }, [pitchDetection.currentPitch, performanceGrading.state.isActive, performanceGrading.processPitch])
+  }, [currentPitchForGrading, performanceGrading.state.isActive, performanceGrading.processPitch])
 
   // Stop listening when a new melody is being generated
   useEffect(() => {
@@ -154,7 +168,7 @@ function Sandbox() {
             isListening={pitchDetection.isListening}
             onStartListening={handleStartPracticeWithFeedback}
             onStopListening={handleStopPracticeWithFeedback}
-            currentPitch={pitchDetection.currentPitch}
+            currentPitch={currentPitchForGrading}
             volumeLevel={pitchDetection.volumeLevel}
             performanceState={performanceGrading.state}
             lastNoteResult={performanceGrading.lastNoteResult}
