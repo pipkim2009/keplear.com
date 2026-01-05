@@ -4,7 +4,7 @@
  * GUIDED MODE: BPM-synced note detection
  * - 4-beat count-in with metronome clicks
  * - Each note gets one beat to play
- * - Listening window synced to BPM
+ * - Single interval-based beat loop for consistent timing
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react'
@@ -174,22 +174,24 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
 
   // Refs to avoid stale closure issues
   const melodyRef = useRef<Note[]>([])
+  const noteResultsRef = useRef<NoteResult[]>([])
   const isActiveRef = useRef(false)
   const currentNoteIndexRef = useRef(0)
   const isListeningRef = useRef(false)
   const hasDetectedNoteRef = useRef(false)
   const bpmRef = useRef(DEFAULT_BPM)
+  const beatCountRef = useRef(0) // Total beats since start (count-in + notes)
 
-  // Timer refs
-  const beatTimerRef = useRef<number | null>(null)
+  // Single interval ref for the beat loop
+  const beatIntervalRef = useRef<number | null>(null)
 
   /**
-   * Clear all timers
+   * Clear the beat interval
    */
-  const clearAllTimers = useCallback(() => {
-    if (beatTimerRef.current) {
-      clearTimeout(beatTimerRef.current)
-      beatTimerRef.current = null
+  const clearBeatInterval = useCallback(() => {
+    if (beatIntervalRef.current) {
+      clearInterval(beatIntervalRef.current)
+      beatIntervalRef.current = null
     }
   }, [])
 
@@ -212,75 +214,130 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
   }, [])
 
   /**
-   * Handle note result and move to next note
+   * End the performance
    */
-  const handleNoteResult = useCallback((noteResult: NoteResult, noteResults: NoteResult[]) => {
-    const melody = melodyRef.current
-    const nextIndex = noteResult.noteIndex + 1
-    currentNoteIndexRef.current = nextIndex
+  const endPerformance = useCallback(() => {
+    clearBeatInterval()
+    isActiveRef.current = false
     isListeningRef.current = false
-    hasDetectedNoteRef.current = false
 
-    const newResults = [...noteResults, noteResult]
+    const finalResult = calculateResult(noteResultsRef.current)
+    setResult(finalResult)
+
+    setState(prev => ({
+      ...prev,
+      isActive: false,
+      currentExpectedNote: null,
+      guided: {
+        ...prev.guided,
+        isCountingIn: false,
+        isListening: false
+      }
+    }))
+  }, [clearBeatInterval, calculateResult])
+
+  /**
+   * Record a note result
+   */
+  const recordNoteResult = useCallback((noteResult: NoteResult) => {
+    noteResultsRef.current = [...noteResultsRef.current, noteResult]
     setLastNoteResult(noteResult)
 
-    // Check if performance is complete
-    const isComplete = nextIndex >= melody.length
-    if (isComplete) {
-      isActiveRef.current = false
-      clearAllTimers()
-      const finalResult = calculateResult(newResults)
-      setResult(finalResult)
+    setState(prev => ({
+      ...prev,
+      noteResults: noteResultsRef.current
+    }))
+  }, [])
+
+  /**
+   * Handle a beat tick - this is called once per beat
+   */
+  const onBeatTick = useCallback(() => {
+    if (!isActiveRef.current) return
+
+    const melody = melodyRef.current
+    // Add 1 extra beat after last note to show its result before ending
+    const totalBeats = COUNT_IN_BEATS + melody.length + 1
+
+    beatCountRef.current++
+    const currentBeat = beatCountRef.current
+
+    // Are we in count-in phase?
+    if (currentBeat <= COUNT_IN_BEATS) {
+      // Count-in beat
+      playClick(currentBeat === 1) // Accent on first beat
 
       setState(prev => ({
         ...prev,
-        noteResults: newResults,
-        currentNoteIndex: nextIndex,
-        currentExpectedNote: null,
-        isActive: false,
         guided: {
           ...prev.guided,
-          isCountingIn: false,
-          isListening: false
+          isCountingIn: true,
+          countInBeat: currentBeat,
+          isListening: false,
+          currentBeat
         }
       }))
       return
     }
 
-    // Update state for next note
-    setState(prev => ({
-      ...prev,
-      noteResults: newResults,
-      currentNoteIndex: nextIndex,
-      currentExpectedNote: melody[nextIndex],
-      guided: {
-        ...prev.guided,
-        isListening: false,
-        currentBeat: prev.guided.currentBeat + 1
+    // We're in the note-playing phase
+    const noteIndex = currentBeat - COUNT_IN_BEATS - 1 // 0-indexed note
+
+    // First, check if the PREVIOUS note timed out (no detection)
+    if (noteIndex > 0 && !hasDetectedNoteRef.current && isListeningRef.current) {
+      // Previous note wasn't played - record timeout
+      const prevNoteIndex = noteIndex - 1
+      const prevNote = melody[prevNoteIndex]
+      const timeoutResult: NoteResult = {
+        noteIndex: prevNoteIndex,
+        expectedNote: prevNote.name,
+        playedNote: null,
+        isCorrect: false,
+        isTimeout: true
       }
-    }))
+      recordNoteResult(timeoutResult)
+    }
 
-    // Schedule next beat (next note's listening window)
-    const beatDuration = 60000 / bpmRef.current
-    beatTimerRef.current = window.setTimeout(() => {
-      startListeningForNote(nextIndex)
-    }, beatDuration)
-  }, [calculateResult, clearAllTimers])
+    // Check if we've completed all notes (this is the "result display" beat after last note)
+    if (noteIndex >= melody.length) {
+      // Check if last note timed out
+      if (!hasDetectedNoteRef.current && isListeningRef.current) {
+        const lastNoteIndex = melody.length - 1
+        const lastNote = melody[lastNoteIndex]
+        const timeoutResult: NoteResult = {
+          noteIndex: lastNoteIndex,
+          expectedNote: lastNote.name,
+          playedNote: null,
+          isCorrect: false,
+          isTimeout: true
+        }
+        recordNoteResult(timeoutResult)
+      }
 
-  /**
-   * Start listening for a specific note
-   */
-  const startListeningForNote = useCallback((noteIndex: number) => {
-    if (!isActiveRef.current) return
+      // Update state to show we're done listening but still displaying result
+      isListeningRef.current = false
+      setState(prev => ({
+        ...prev,
+        guided: {
+          ...prev.guided,
+          isListening: false,
+          currentBeat
+        }
+      }))
 
-    const melody = melodyRef.current
-    if (noteIndex >= melody.length) return
+      // Check if this is the final beat (one beat after last note's result was shown)
+      if (currentBeat > totalBeats) {
+        endPerformance()
+      }
+      return
+    }
 
+    // Start listening for this note
+    playClick(false)
+
+    currentNoteIndexRef.current = noteIndex
     isListeningRef.current = true
     hasDetectedNoteRef.current = false
-
-    // Play click on the beat
-    playClick(false)
 
     setState(prev => ({
       ...prev,
@@ -290,71 +347,10 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
         ...prev.guided,
         isCountingIn: false,
         isListening: true,
-        currentBeat: prev.guided.currentBeat + 1
+        currentBeat
       }
     }))
-
-    // Set timeout for this beat - if no note detected, mark as timeout
-    const beatDuration = 60000 / bpmRef.current
-    beatTimerRef.current = window.setTimeout(() => {
-      if (isListeningRef.current && !hasDetectedNoteRef.current && isActiveRef.current) {
-        const expectedNote = melody[noteIndex]
-        const timeoutResult: NoteResult = {
-          noteIndex,
-          expectedNote: expectedNote.name,
-          playedNote: null,
-          isCorrect: false,
-          isTimeout: true
-        }
-
-        setState(prev => {
-          handleNoteResult(timeoutResult, prev.noteResults)
-          return prev
-        })
-      }
-    }, beatDuration)
-  }, [handleNoteResult])
-
-  /**
-   * Run count-in beats
-   */
-  const startCountIn = useCallback(() => {
-    if (!isActiveRef.current) return
-
-    const beatDuration = 60000 / bpmRef.current
-    let beat = 0
-
-    const countInTick = () => {
-      if (!isActiveRef.current) return
-
-      beat++
-
-      // Play click (accent on beat 1)
-      playClick(beat === 1)
-
-      setState(prev => ({
-        ...prev,
-        guided: {
-          ...prev.guided,
-          isCountingIn: true,
-          countInBeat: beat
-        }
-      }))
-
-      if (beat < COUNT_IN_BEATS) {
-        // Schedule next count-in beat
-        beatTimerRef.current = window.setTimeout(countInTick, beatDuration)
-      } else {
-        // Count-in done, start first note on next beat
-        beatTimerRef.current = window.setTimeout(() => {
-          startListeningForNote(0)
-        }, beatDuration)
-      }
-    }
-
-    // Start first beat immediately
-    countInTick()
-  }, [startListeningForNote])
+  }, [endPerformance, recordNoteResult])
 
   /**
    * Start a new performance
@@ -362,14 +358,17 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
   const startPerformance = useCallback((melody: Note[], bpm: number = DEFAULT_BPM) => {
     if (melody.length === 0) return
 
-    clearAllTimers()
+    clearBeatInterval()
 
+    // Reset all refs
     melodyRef.current = melody
+    noteResultsRef.current = []
     isActiveRef.current = true
     currentNoteIndexRef.current = 0
     isListeningRef.current = false
     hasDetectedNoteRef.current = false
     bpmRef.current = bpm
+    beatCountRef.current = 0
 
     const beatDuration = 60000 / bpm
 
@@ -392,32 +391,35 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
 
     // Resume audio context if suspended
     const ctx = getAudioContext()
+    const startBeatLoop = () => {
+      if (!isActiveRef.current) return
+
+      // Start the beat loop - first beat fires immediately, then every beatDuration
+      onBeatTick() // First beat immediately
+      beatIntervalRef.current = window.setInterval(onBeatTick, beatDuration)
+    }
+
     if (ctx.state === 'suspended') {
       ctx.resume().then(() => {
-        startCountIn()
+        setTimeout(startBeatLoop, 300)
       })
     } else {
-      // Small delay before starting count-in
-      setTimeout(() => {
-        if (isActiveRef.current) {
-          startCountIn()
-        }
-      }, 300)
+      setTimeout(startBeatLoop, 300)
     }
-  }, [clearAllTimers, startCountIn])
+  }, [clearBeatInterval, onBeatTick])
 
   /**
    * Stop performance manually
    */
   const stopPerformance = useCallback(() => {
-    clearAllTimers()
+    clearBeatInterval()
     isActiveRef.current = false
     isListeningRef.current = false
 
     setState(prev => {
       if (!prev.isActive) return prev
 
-      const finalResult = calculateResult(prev.noteResults)
+      const finalResult = calculateResult(noteResultsRef.current)
       setResult(finalResult)
 
       return {
@@ -430,7 +432,7 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
         }
       }
     })
-  }, [clearAllTimers, calculateResult])
+  }, [clearBeatInterval, calculateResult])
 
   /**
    * Skip current note (mark as timeout)
@@ -438,11 +440,13 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
   const skipNote = useCallback(() => {
     if (!isActiveRef.current || !isListeningRef.current) return
 
-    clearAllTimers()
-
     const noteIndex = currentNoteIndexRef.current
     const melody = melodyRef.current
     if (noteIndex >= melody.length) return
+
+    // Mark as detected so the beat tick doesn't also record a timeout
+    hasDetectedNoteRef.current = true
+    isListeningRef.current = false
 
     const expectedNote = melody[noteIndex]
     const skipResult: NoteResult = {
@@ -453,11 +457,8 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
       isTimeout: true
     }
 
-    setState(prev => {
-      handleNoteResult(skipResult, prev.noteResults)
-      return prev
-    })
-  }, [clearAllTimers, handleNoteResult])
+    recordNoteResult(skipResult)
+  }, [recordNoteResult])
 
   /**
    * Process a pitch detection result
@@ -485,12 +486,7 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
 
     // Mark that we've detected a note
     hasDetectedNoteRef.current = true
-
-    // Clear the timeout since we got a note
-    if (beatTimerRef.current) {
-      clearTimeout(beatTimerRef.current)
-      beatTimerRef.current = null
-    }
+    isListeningRef.current = false
 
     const noteResult: NoteResult = {
       noteIndex: currentIndex,
@@ -502,18 +498,24 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
       matchType: matchResult.matchType
     }
 
-    setState(prev => {
-      handleNoteResult(noteResult, prev.noteResults)
-      return prev
-    })
-  }, [handleNoteResult])
+    recordNoteResult(noteResult)
+
+    // Update state to show we're no longer listening
+    setState(prev => ({
+      ...prev,
+      guided: {
+        ...prev.guided,
+        isListening: false
+      }
+    }))
+  }, [recordNoteResult])
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      clearAllTimers()
+      clearBeatInterval()
     }
-  }, [clearAllTimers])
+  }, [clearBeatInterval])
 
   return {
     startPerformance,

@@ -170,6 +170,15 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     }
   }, [pitchDetection.currentPitch, performanceGrading.state.isActive, performanceGrading.processPitch])
 
+  // Stop listening when a new melody is being generated
+  useEffect(() => {
+    if (isGeneratingMelody) {
+      pitchDetection.stopListening()
+      performanceGrading.stopPerformance()
+      setShowPitchFeedback(false)
+    }
+  }, [isGeneratingMelody, pitchDetection, performanceGrading])
+
   // Start performance grading when user starts listening and melody is ready
   const handleStartPracticeWithFeedback = useCallback(() => {
     if (generatedMelody.length > 0) {
