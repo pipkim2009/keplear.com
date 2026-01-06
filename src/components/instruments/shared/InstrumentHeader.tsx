@@ -124,7 +124,7 @@ const InstrumentHeader = memo(function InstrumentHeader({
               title="Clear selected notes, chords, and scales"
             >
               <PiTrashFill size={16} />
-              Deselect All
+              Clear
             </button>
           </div>
         )}
