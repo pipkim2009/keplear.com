@@ -46,24 +46,24 @@ export interface InstrumentRange {
 export const INSTRUMENT_RANGES: Record<string, InstrumentRange> = {
   guitar: {
     name: 'Guitar',
-    lowHz: 80,      // Low E ~82Hz
-    highHz: 1200,   // High frets
+    lowHz: 82,      // E2 ~82.4Hz
+    highHz: 1320,   // E6 ~1318.5Hz
     highPassHz: 75,
-    lowPassHz: 1500
+    lowPassHz: 1400
   },
   bass: {
     name: 'Bass',
-    lowHz: 40,      // Low B ~31Hz, Low E ~41Hz
-    highHz: 400,    // Upper register
-    highPassHz: 35,
-    lowPassHz: 500
+    lowHz: 41,      // E1 ~41.2Hz
+    highHz: 392,    // G4 ~392Hz
+    highPassHz: 38,
+    lowPassHz: 420
   },
   keyboard: {
     name: 'Keyboard/Piano',
-    lowHz: 60,      // ~B1
-    highHz: 2000,   // Upper octaves
-    highPassHz: 55,
-    lowPassHz: 2500
+    lowHz: 32,      // C1 ~32.7Hz
+    highHz: 4186,   // C8 ~4186Hz
+    highPassHz: 30,
+    lowPassHz: 4500
   },
   voice: {
     name: 'Voice',

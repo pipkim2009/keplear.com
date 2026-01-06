@@ -477,11 +477,11 @@ export const usePerformanceGrading = (): UsePerformanceGradingReturn => {
 
     const expectedNote = melody[currentIndex]
 
-    // Use advanced note matching
+    // Use advanced note matching - strict octave, no octave errors allowed
     const matchResult = advancedNoteMatch(pitch.note, pitch.frequency, expectedNote.name, {
       toleranceCents: 50,
-      allowOctaveErrors: true,
-      strictOctave: false
+      allowOctaveErrors: false,
+      strictOctave: true
     })
 
     // Mark that we've detected a note

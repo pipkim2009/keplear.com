@@ -102,7 +102,7 @@ const DEFAULT_OPTIONS: Required<UseDSPPitchDetectionOptions> = {
   feedbackDelayMs: 50
 }
 
-// Detection runs at ~20-30 FPS
+// Detection runs at ~28 FPS
 const DETECTION_INTERVAL_MS = 35
 
 // Minimum frames for stability check
