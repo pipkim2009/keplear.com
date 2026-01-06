@@ -60,10 +60,8 @@ interface InstrumentContextType {
   // Instrument Config
   instrument: InstrumentType
   keyboardOctaves: { lower: number; higher: number }
-  keyboardSelectionMode: 'range' | 'multi'
   clearChordsAndScalesTrigger: number
   setInstrument: (instrument: InstrumentType) => void
-  setKeyboardSelectionMode: (mode: 'range' | 'multi') => void
   triggerClearChordsAndScales: () => void
 
   // Melody Generation
@@ -97,6 +95,8 @@ interface InstrumentContextType {
   // Melody Generation Status
   isGeneratingMelody: boolean
   isAutoRecording: boolean
+  /** BPM that was used when generating the current melody */
+  melodyBpm: number
 
   // Handlers
   handleNoteClick: (note: Note) => Promise<void>
@@ -104,7 +104,6 @@ interface InstrumentContextType {
   handlePlayMelody: () => void
   handleInstrumentChange: (newInstrument: InstrumentType) => void
   handleOctaveRangeChange: (lowerOctaves: number, higherOctaves: number) => void
-  handleKeyboardSelectionModeChange: (mode: 'range' | 'multi', clearSelections?: boolean) => void
   handleCurrentlyPlayingNoteChange: (index: number | null) => void
 
   // Scale/Chord Management
@@ -135,6 +134,7 @@ interface InstrumentProviderProps {
 export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children }) => {
   // State for melody generation
   const [isGeneratingMelody, setIsGeneratingMelody] = useState(false)
+  const [melodyBpm, setMelodyBpm] = useState(80) // BPM used when melody was generated
 
   // State for skill lesson (from Skills page)
   const [pendingSkillLesson, setPendingSkillLesson] = useState<SkillLessonSettings | null>(null)
@@ -180,10 +180,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
   const {
     instrument,
     keyboardOctaves,
-    keyboardSelectionMode,
     clearChordsAndScalesTrigger,
     setInstrument,
-    setKeyboardSelectionMode,
     triggerClearChordsAndScales
   } = useInstrumentConfig()
 
@@ -226,19 +224,6 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     chordMode
   })
 
-  // Define handler needed by useScaleChordManagement before using it
-  const handleKeyboardSelectionModeChange = useCallback((mode: 'range' | 'multi', clearSelections: boolean = true): void => {
-    setKeyboardSelectionMode(mode as any)
-    if (clearSelections) {
-      clearSelection()
-    }
-    // Clear all scales and chords when switching to range mode
-    if (mode === 'range') {
-      triggerClearChordsAndScales()
-    }
-    triggerInputFlash('mode')
-  }, [setKeyboardSelectionMode, clearSelection, triggerInputFlash, triggerClearChordsAndScales])
-
   // Scale and chord management (must come before useMelodyChanges)
   const scaleChordManagement = useScaleChordManagement({
     instrument,
@@ -247,8 +232,6 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     selectNote,
     clearSelection,
     clearChordsAndScales: clearChordsAndScalesTrigger,
-    keyboardSelectionMode: keyboardSelectionMode as 'range' | 'multi',
-    onKeyboardSelectionModeChange: handleKeyboardSelectionModeChange,
     lowerOctaves,
     higherOctaves
   })
@@ -261,7 +244,6 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     numberOfBeats,
     generatedMelody,
     instrument,
-    keyboardSelectionMode,
     appliedChords
   })
 
@@ -312,15 +294,17 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
           await playNote(note.name)
         }
       }
-      // Only use keyboardSelectionMode for keyboard instrument
-      const selectionMode = instrument === 'keyboard' ? keyboardSelectionMode : 'multi'
-      selectNote(note, selectionMode as 'range' | 'multi')
+      // Always use multi-select mode
+      selectNote(note, 'multi')
     } catch (error) {
     }
-  }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, keyboardSelectionMode, isGeneratingMelody, isAutoRecording])
+  }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, isGeneratingMelody, isAutoRecording])
 
   const handleGenerateMelody = useCallback((): void => {
     setIsGeneratingMelody(true)
+
+    // Store the BPM used for this melody
+    setMelodyBpm(bpm)
 
     // Generate melody immediately with current values
     // Use local lowerOctaves/higherOctaves state which is updated by the octave buttons
@@ -331,8 +315,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     // Take a snapshot of currently selected notes to prevent interference from note clicks during generation
     const selectedNotesSnapshot = [...selectedNotes]
 
-    // Pass chordMode, appliedChords, and appliedScales to generateMelody
-    generateMelody(melodyNotes, numberOfBeats, instrument, keyboardSelectionMode, selectedNotesSnapshot, chordMode, appliedChords, appliedScales)
+    // Pass chordMode, appliedChords, and appliedScales to generateMelody (always use 'multi' mode)
+    generateMelody(melodyNotes, numberOfBeats, instrument, 'multi', selectedNotesSnapshot, chordMode, appliedChords, appliedScales)
 
     const duration = calculateMelodyDuration(numberOfBeats, bpm, instrument)
     setMelodyDuration(duration)
@@ -341,7 +325,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     clearChanges()
 
     // isGeneratingMelody will stay true until recorded audio is ready
-  }, [generateMelody, numberOfBeats, instrument, lowerOctaves, higherOctaves, keyboardSelectionMode, selectedNotes, calculateMelodyDuration, bpm, setMelodyDuration, setPlaybackProgress, handleClearRecordedAudio, clearChanges, chordMode, appliedChords, appliedScales])
+  }, [generateMelody, numberOfBeats, instrument, lowerOctaves, higherOctaves, selectedNotes, calculateMelodyDuration, bpm, setMelodyDuration, setPlaybackProgress, handleClearRecordedAudio, clearChanges, chordMode, appliedChords, appliedScales])
 
   const handlePlayMelody = useCallback((): void => {
     if (isPlaying) {
@@ -420,9 +404,6 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     setLowerOctaves(0)
     setHigherOctaves(0)
 
-    // Reset keyboard selection mode to default (range)
-    setKeyboardSelectionMode('range')
-
     // Finally navigate to sandbox
     navigateToSandboxOriginal()
   }, [
@@ -438,7 +419,6 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     setMelodyDuration,
     resetSettings,
     setInstrument,
-    setKeyboardSelectionMode,
     navigateToSandboxOriginal
   ])
 
@@ -487,10 +467,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     // Instrument Config
     instrument,
     keyboardOctaves,
-    keyboardSelectionMode,
     clearChordsAndScalesTrigger,
     setInstrument,
-    setKeyboardSelectionMode,
     triggerClearChordsAndScales,
 
     // Melody Generation
@@ -524,6 +502,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     // Melody Generation Status
     isGeneratingMelody,
     isAutoRecording,
+    melodyBpm,
 
     // Handlers
     handleNoteClick,
@@ -531,7 +510,6 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     handlePlayMelody,
     handleInstrumentChange,
     handleOctaveRangeChange,
-    handleKeyboardSelectionModeChange,
     handleCurrentlyPlayingNoteChange,
 
     // Scale/Chord Management

@@ -1178,6 +1178,11 @@
   flex: 0 0 auto !important;
 }
 
+/* Keyboard mode - reduced top margin */
+body:has([data-instrument='keyboard']) .control-group.scale-chord-options {
+  margin-top: 3px !important;
+}
+
 /* ============================================================
    MOBILE INSTRUMENT HEADER CONTROLS LAYOUT
    Complete responsive redesign for mobile devices
@@ -1219,6 +1224,11 @@
 
   .control-button.delete-selection {
     margin: 0 !important;
+  }
+
+  /* Keyboard mode - reduced top margin */
+  body:has([data-instrument='keyboard']) .control-group.scale-chord-options {
+    margin-top: 5px !important;
   }
 
   /* Guitar and Bass modes - move scales/chords and deselect all upwards */
@@ -2755,12 +2765,12 @@ body.dark .modern-control-item.audio-player-section audio {
 
 /* Only apply these margins on devices larger than 480px (tablets and desktop) */
 @media (min-width: 481px) {
-  /* Keyboard mode: 23px margin on tablets/desktop (added 2px) */
+  /* Keyboard mode: 5px margin on tablets/desktop (matches scales/chords button) */
   body:has([data-instrument='keyboard']) .control-button.delete-selection {
-    margin-top: 23px !important;
+    margin-top: 5px !important;
   }
 
-  /* Guitar/Bass/Practice mode: 5px margin on tablets/desktop (added 1px) */
+  /* Guitar/Bass/Practice mode: 5px margin on tablets/desktop */
   body:has([data-instrument='guitar']) .control-button.delete-selection,
   body:has([data-instrument='bass']) .control-button.delete-selection,
   body:has(.instrument-container[data-practice-mode="true"]) .control-button.delete-selection {

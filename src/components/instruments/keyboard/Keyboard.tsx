@@ -1,7 +1,6 @@
 import { memo, useMemo, useCallback } from 'react'
 import KeyboardKey from './KeyboardKey'
 import { whiteKeys, blackKeys, getBlackKeyLeft, getBlackKeyLeftDynamic, generateWhiteKeysWithSeparateOctaves, generateBlackKeysWithSeparateOctaves, type Note } from '../../../utils/notes'
-import type { KeyboardSelectionMode } from '../shared/InstrumentControls'
 import type { KeyboardPreview } from '../../common/ScaleChordOptions'
 import '../../../styles/Keyboard.css'
 
@@ -12,7 +11,6 @@ interface KeyboardProps {
   showNotes: boolean
   lowerOctaves?: number
   higherOctaves?: number
-  selectionMode?: KeyboardSelectionMode
   isNoteInScale?: (note: Note) => boolean
   isNoteRoot?: (note: Note) => boolean
   isNoteInChord?: (note: Note) => boolean
@@ -30,7 +28,6 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   showNotes,
   lowerOctaves = 0,
   higherOctaves = 0,
-  selectionMode = 'range',
   isNoteInScale,
   isNoteRoot,
   isNoteInChord,

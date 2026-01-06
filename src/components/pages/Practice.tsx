@@ -100,7 +100,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
   // DSP-based pitch detection and performance grading hooks
   const pitchDetection = useDSPPitchDetection()
   const performanceGrading = usePerformanceGrading()
-  const [showPitchFeedback, setShowPitchFeedback] = useState(false)
 
   // Convert DSP pitch result to the format expected by grading system
   const currentPitchForGrading = useMemo((): PitchDetectionResult | null => {
@@ -147,8 +146,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     selectedNotes,
     selectNote,
     handleOctaveRangeChange,
-    keyboardSelectionMode,
-    handleKeyboardSelectionModeChange,
     flashingInputs,
     activeInputs,
     triggerInputFlash,
@@ -174,7 +171,8 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     scaleChordManagement,
     pendingSkillLesson,
     clearPendingSkillLesson,
-    navigateToSkills
+    navigateToSkills,
+    melodyBpm
   } = useInstrument()
 
   // Pass pitch detection results to grading system
@@ -189,30 +187,27 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
     if (isGeneratingMelody) {
       pitchDetection.stopListening()
       performanceGrading.stopPerformance()
-      setShowPitchFeedback(false)
     }
   }, [isGeneratingMelody, pitchDetection, performanceGrading])
 
   // Start performance grading when user starts listening and melody is ready
   const handleStartPracticeWithFeedback = useCallback(() => {
     if (generatedMelody.length > 0) {
-      setShowPitchFeedback(true)
       // Set the correct instrument for pitch detection filtering
       if (selectedInstrument) {
         pitchDetection.setInstrument(selectedInstrument as 'keyboard' | 'guitar' | 'bass')
       }
-      // Pass BPM for beat-synced practice
-      performanceGrading.startPerformance(generatedMelody, bpm)
+      // Use melodyBpm (BPM when melody was generated) not current bpm
+      performanceGrading.startPerformance(generatedMelody, melodyBpm)
       pitchDetection.startListening()
     }
-  }, [generatedMelody, selectedInstrument, bpm, pitchDetection, performanceGrading])
+  }, [generatedMelody, selectedInstrument, melodyBpm, pitchDetection, performanceGrading])
 
   // Stop practice session
-  const handleStopPracticeWithFeedback = () => {
+  const handleStopPracticeWithFeedback = useCallback(() => {
     pitchDetection.stopListening()
     performanceGrading.stopPerformance()
-    setShowPitchFeedback(false)
-  }
+  }, [pitchDetection, performanceGrading])
 
   const handleStartLesson = () => {
     setShowOptionsModal(true)
@@ -703,7 +698,7 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
       }
 
     }
-  }, [sessionStarted, practiceOptions, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, setGuitarNotes, setBpm, setNumberOfBeats, selectedInstrument, handleKeyboardSelectionModeChange, setChordMode, handleOctaveRangeChange, scaleChordManagement, lessonSettings])
+  }, [sessionStarted, practiceOptions, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, setGuitarNotes, setBpm, setNumberOfBeats, selectedInstrument, setChordMode, handleOctaveRangeChange, scaleChordManagement, lessonSettings])
 
   // Set visual display on fretboard once handlers become available
   useEffect(() => {
@@ -841,8 +836,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           selectedNotes={selectedNotes}
           selectNote={selectNote}
           onOctaveRangeChange={handleOctaveRangeChange}
-          keyboardSelectionMode={keyboardSelectionMode}
-          onKeyboardSelectionModeChange={handleKeyboardSelectionModeChange}
           initialLowerOctaves={calculatedLowerOctaves}
           initialHigherOctaves={calculatedHigherOctaves}
           disableOctaveCleanup={true}
@@ -883,8 +876,6 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
           disableBpmInput={true}
           disableBeatsInput={true}
           disableChordMode={true}
-          disableSelectionMode={true}
-          hideSelectionMode={true}
           practiceMode={true}
           onLessonComplete={handleLessonComplete}
           autoPlayAudio={autoPlayAudio}
@@ -904,12 +895,9 @@ function Practice({ onNavigateToSandbox }: PracticeProps) {
               currentPitch={currentPitchForGrading}
               volumeLevel={pitchDetection.volumeLevel}
               performanceState={performanceGrading.state}
-              lastNoteResult={performanceGrading.lastNoteResult}
               error={pitchDetection.error}
               permission={pitchDetection.permission}
-              totalNotes={generatedMelody.length}
               melody={generatedMelody}
-              onSkipNote={performanceGrading.skipNote}
             />
           </div>
         )}

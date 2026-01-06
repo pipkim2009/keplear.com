@@ -31,7 +31,8 @@
   min-height: 72px;
 }
 
-/* Reduce height for guitar and bass */
+/* Reduce height for keyboard, guitar and bass */
+.instrument-container:has(.keyboard-container) .instrument-header-controls,
 .instrument-container:has(.guitar-container) .instrument-header-controls,
 .instrument-container:has(.bass-container) .instrument-header-controls,
 .instrument-container[data-practice-mode="true"] .instrument-header-controls {

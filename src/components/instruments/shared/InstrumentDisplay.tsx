@@ -3,7 +3,6 @@ import InstrumentHeader from './InstrumentHeader'
 import InstrumentRenderer from './InstrumentRenderer'
 import { useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { generateNotesWithSeparateOctaves, type Note } from '../../../utils/notes'
-import type { KeyboardSelectionMode } from './InstrumentControls'
 import type { ChordMode } from '../../../reducers/uiReducer'
 import { useInstrument } from '../../../contexts/InstrumentContext'
 import { useKeyboardHighlighting } from '../../../hooks/useKeyboardHighlighting'
@@ -29,8 +28,6 @@ interface InstrumentDisplayProps {
   selectedNotes: Note[]
   selectNote?: (note: Note, selectionMode?: 'range' | 'multi') => void
   onOctaveRangeChange?: (lowerOctaves: number, higherOctaves: number) => void
-  keyboardSelectionMode?: KeyboardSelectionMode
-  onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
   initialLowerOctaves?: number
   initialHigherOctaves?: number
   disableOctaveCleanup?: boolean
@@ -67,8 +64,6 @@ interface InstrumentDisplayProps {
   disableBpmInput?: boolean
   disableBeatsInput?: boolean
   disableChordMode?: boolean
-  disableSelectionMode?: boolean
-  hideSelectionMode?: boolean
   practiceMode?: boolean
   onLessonComplete?: () => void
   autoPlayAudio?: boolean
@@ -97,8 +92,6 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   selectedNotes,
   selectNote,
   onOctaveRangeChange,
-  keyboardSelectionMode = 'range',
-  onKeyboardSelectionModeChange,
   initialLowerOctaves = 0,
   initialHigherOctaves = 0,
   disableOctaveCleanup = false,
@@ -135,8 +128,6 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   disableBpmInput = false,
   disableBeatsInput = false,
   disableChordMode = false,
-  disableSelectionMode = false,
-  hideSelectionMode = false,
   practiceMode = false,
   onLessonComplete,
   autoPlayAudio = false,
@@ -319,7 +310,7 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
     if (notesToRemove.length > 0 && selectNote) {
       // Remove each note that's outside the range
       notesToRemove.forEach(note => {
-        selectNote(note, keyboardSelectionMode)
+        selectNote(note, 'multi')
       })
     }
 
@@ -342,7 +333,7 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
     scalesToRemove.forEach(scale => {
       handleScaleDelete(scale.id)
     })
-  }, [lowerOctaves, higherOctaves, instrument, selectedNotes, appliedChords, appliedScales, selectNote, keyboardSelectionMode, handleChordDelete, handleScaleDelete])
+  }, [lowerOctaves, higherOctaves, instrument, selectedNotes, appliedChords, appliedScales, selectNote, handleChordDelete, handleScaleDelete])
 
   return (
     <>
@@ -367,8 +358,6 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           onRemoveLowerOctave={handleRemoveLowerOctave}
           onAddHigherOctave={handleAddHigherOctave}
           onRemoveHigherOctave={handleRemoveHigherOctave}
-          keyboardSelectionMode={keyboardSelectionMode}
-          onKeyboardSelectionModeChange={onKeyboardSelectionModeChange}
           onKeyboardScaleApply={handleKeyboardScaleApply}
           onKeyboardScaleClear={handleKeyboardScaleClear}
           flashingInputs={flashingInputs}
@@ -413,9 +402,6 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
       <div className="instrument-container" data-practice-mode={practiceMode}>
         <InstrumentHeader
           instrument={instrument}
-          keyboardSelectionMode={keyboardSelectionMode}
-          onKeyboardSelectionModeChange={onKeyboardSelectionModeChange}
-          flashingInputs={flashingInputs}
           selectedNotes={selectedNotes}
           appliedChords={appliedChords}
           appliedScales={appliedScales}
@@ -441,8 +427,6 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           hideDeselectAll={hideDeselectAll}
           showOnlyAppliedList={showOnlyAppliedList}
           disableDelete={practiceMode}
-          disableSelectionMode={disableSelectionMode}
-          hideSelectionMode={hideSelectionMode}
           onFretboardPreviewChange={setFretboardPreview}
           onKeyboardPreviewChange={setKeyboardPreview}
           availableKeyboardNotes={availableKeyboardNotes}
@@ -460,7 +444,6 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           clearTrigger={clearTrigger}
           lowerOctaves={lowerOctaves}
           higherOctaves={higherOctaves}
-          keyboardSelectionMode={keyboardSelectionMode}
           isNoteInKeyboardScale={isNoteInKeyboardScale}
           isNoteKeyboardRoot={isNoteKeyboardRoot}
           isNoteInKeyboardChord={isNoteInKeyboardChord}

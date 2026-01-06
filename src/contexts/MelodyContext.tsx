@@ -23,6 +23,8 @@ interface MelodyContextType {
   generateMelody: (notes: Note[], count: number, instrument: InstrumentType, mode: 'range' | 'multi', notesToUse?: readonly Note[]) => void
   isInMelody: (note: Note, showNotes: boolean) => boolean
   isGeneratingMelody: boolean
+  /** BPM that was used when generating the current melody */
+  melodyBpm: number
 
   // Melody Playback
   showNotes: boolean
@@ -66,6 +68,7 @@ interface MelodyProviderProps {
 
 export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
   const [isGeneratingMelody, setIsGeneratingMelody] = useState(false)
+  const [melodyBpm, setMelodyBpm] = useState(80) // Default BPM
 
   // Get dependencies from other contexts
   const audio = useAudioContext()
@@ -105,7 +108,6 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
     numberOfBeats: ui.numberOfBeats,
     generatedMelody: melodyGen.generatedMelody,
     instrument: config.instrument,
-    keyboardSelectionMode: config.keyboardSelectionMode,
     appliedChords,
     appliedScales
   })
@@ -157,15 +159,18 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
           await audio.playNote(note.name)
         }
       }
-      melodyGen.selectNote(note, config.keyboardSelectionMode)
+      melodyGen.selectNote(note, 'multi')
     } catch (error) {
       // Error handling done in audio layer
     }
-  }, [config.instrument, audio, melodyGen, config.keyboardSelectionMode, isGeneratingMelody, melodyPlayer.isAutoRecording])
+  }, [config.instrument, audio, melodyGen, isGeneratingMelody, melodyPlayer.isAutoRecording])
 
   // Handle melody generation
   const handleGenerateMelody = useCallback((): void => {
     setIsGeneratingMelody(true)
+
+    // Store the BPM used for this melody
+    setMelodyBpm(ui.bpm)
 
     // Hide notes before generating new melody
     melodyPlayer.setShowNotes(false)
@@ -176,7 +181,7 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
 
     const selectedNotesSnapshot = [...melodyGen.selectedNotes]
 
-    melodyGen.generateMelody(melodyNotes, ui.numberOfBeats, config.instrument, config.keyboardSelectionMode, selectedNotesSnapshot)
+    melodyGen.generateMelody(melodyNotes, ui.numberOfBeats, config.instrument, 'multi', selectedNotesSnapshot)
 
     const duration = melodyPlayer.calculateMelodyDuration(ui.numberOfBeats, ui.bpm, config.instrument)
     melodyPlayer.setMelodyDuration(duration)
@@ -222,6 +227,7 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
     generateMelody: melodyGen.generateMelody,
     isInMelody: melodyGen.isInMelody,
     isGeneratingMelody,
+    melodyBpm,
 
     // Melody Playback
     showNotes: melodyPlayer.showNotes,

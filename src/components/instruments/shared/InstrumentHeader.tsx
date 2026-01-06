@@ -1,6 +1,5 @@
-import { memo, useCallback, useMemo } from 'react'
+import { memo, useMemo } from 'react'
 import ScaleChordOptions, { type AppliedChord, type AppliedScale, type FretboardPreview, type KeyboardPreview } from '../../common/ScaleChordOptions'
-import Tooltip from '../../common/Tooltip'
 import { PiTrashFill } from 'react-icons/pi'
 import type { Note } from '../../../utils/notes'
 import type { KeyboardScale } from '../../../utils/instruments/keyboard/keyboardScales'
@@ -8,13 +7,9 @@ import type { KeyboardChord } from '../../../utils/instruments/keyboard/keyboard
 import type { GuitarChord, ChordShape } from '../../../utils/instruments/guitar/guitarChords'
 import type { GuitarScale, ScaleBox } from '../../../utils/instruments/guitar/guitarScales'
 import type { BassChord, BassChordShape } from '../../../utils/instruments/bass/bassChords'
-import type { KeyboardSelectionMode } from './InstrumentControls'
 
 interface InstrumentHeaderProps {
   instrument: string
-  keyboardSelectionMode?: KeyboardSelectionMode
-  onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
-  flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
   selectedNotes: Note[]
   appliedChords: AppliedChord[]
   appliedScales: AppliedScale[]
@@ -40,8 +35,6 @@ interface InstrumentHeaderProps {
   hideDeselectAll?: boolean
   showOnlyAppliedList?: boolean
   disableDelete?: boolean
-  disableSelectionMode?: boolean
-  hideSelectionMode?: boolean
   // Preview callbacks
   onFretboardPreviewChange?: (preview: FretboardPreview | null) => void
   onKeyboardPreviewChange?: (preview: KeyboardPreview | null) => void
@@ -51,9 +44,6 @@ interface InstrumentHeaderProps {
 
 const InstrumentHeader = memo(function InstrumentHeader({
   instrument,
-  keyboardSelectionMode,
-  onKeyboardSelectionModeChange,
-  flashingInputs,
   selectedNotes,
   appliedChords,
   appliedScales,
@@ -79,72 +69,19 @@ const InstrumentHeader = memo(function InstrumentHeader({
   hideDeselectAll = false,
   showOnlyAppliedList = false,
   disableDelete = false,
-  disableSelectionMode = false,
-  hideSelectionMode = false,
   onFretboardPreviewChange,
   onKeyboardPreviewChange,
   availableKeyboardNotes = [],
   lessonType
 }: InstrumentHeaderProps) {
-  // Memoize selection mode handlers
-  const handleRangeClick = useCallback(() => {
-    if (!disableSelectionMode && onKeyboardSelectionModeChange && keyboardSelectionMode !== 'range') {
-      onKeyboardSelectionModeChange('range')
-    }
-  }, [disableSelectionMode, onKeyboardSelectionModeChange, keyboardSelectionMode])
-
-  const handleMultiClick = useCallback(() => {
-    if (!disableSelectionMode && onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
-      onKeyboardSelectionModeChange('multi')
-    }
-  }, [disableSelectionMode, onKeyboardSelectionModeChange, keyboardSelectionMode])
-
   // Memoize computed values
   const showDeselectButton = useMemo(() => {
     return !hideDeselectAll && (selectedNotes.length > 0 || appliedChords.length > 0 || appliedScales.length > 0)
   }, [hideDeselectAll, selectedNotes.length, appliedChords.length, appliedScales.length])
 
-  const selectionModeClass = useMemo(() => {
-    return `selection-mode-switch ${flashingInputs.mode ? 'flashing' : ''} ${disableSelectionMode ? 'disabled' : ''}`
-  }, [flashingInputs.mode, disableSelectionMode])
-
   return (
     <div className="instrument-header-controls">
       <div className="header-controls-left">
-        {instrument === 'keyboard' && !hideSelectionMode && (
-          <div className="control-group">
-            <div className="label-with-tooltip">
-              <label className="control-label">Selection Mode</label>
-              <Tooltip
-                title="Selection Mode"
-                text="Select your note selection method
-Range Select - Select 2 notes and use the inclusive interval
-Multi Select - Select the specific notes to use"
-              >
-                <div className="tooltip-icon">?</div>
-              </Tooltip>
-            </div>
-            <div className={selectionModeClass}>
-              <button
-                className={`switch-option ${keyboardSelectionMode === 'range' ? 'active' : ''}`}
-                onClick={handleRangeClick}
-                title="Range Select"
-                disabled={disableSelectionMode}
-              >
-                Range
-              </button>
-              <button
-                className={`switch-option ${keyboardSelectionMode === 'multi' ? 'active' : ''}`}
-                onClick={handleMultiClick}
-                title="Multi Select"
-                disabled={disableSelectionMode}
-              >
-                Multi
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Scale/Chord Options */}
         <div className="control-group scale-chord-options">
           <ScaleChordOptions

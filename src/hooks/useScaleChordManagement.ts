@@ -10,7 +10,6 @@ import type { AppliedChord, AppliedScale } from '../components/common/ScaleChord
 import { applyScaleToKeyboard } from '../utils/instruments/keyboard/keyboardScales'
 import { applyChordToKeyboard } from '../utils/instruments/keyboard/keyboardChords'
 import { generateNotesWithSeparateOctaves } from '../utils/notes'
-import type { KeyboardSelectionMode } from '../components/instruments/shared/InstrumentControls'
 import { applyScaleToGuitar, applyScaleBoxToGuitar } from '../utils/instruments/guitar/guitarScales'
 import { applyScaleToBass, applyScaleBoxToBass } from '../utils/instruments/bass/bassScales'
 import { applyChordToGuitar, applyChordShapeToGuitar, getChordBoxes } from '../utils/instruments/guitar/guitarChords'
@@ -59,8 +58,6 @@ interface UseScaleChordManagementProps {
   selectNote?: (note: Note, selectionMode?: 'range' | 'multi') => void
   clearSelection: () => void
   clearChordsAndScales?: number
-  keyboardSelectionMode?: KeyboardSelectionMode
-  onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
   lowerOctaves: number
   higherOctaves: number
 }
@@ -72,8 +69,6 @@ export const useScaleChordManagement = ({
   selectNote,
   clearSelection,
   clearChordsAndScales,
-  keyboardSelectionMode,
-  onKeyboardSelectionModeChange,
   lowerOctaves,
   higherOctaves
 }: UseScaleChordManagementProps) => {
@@ -654,11 +649,6 @@ export const useScaleChordManagement = ({
       return // Don't add duplicate scales
     }
 
-    // Switch to multi-select mode automatically (but keep existing selections)
-    if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
-      onKeyboardSelectionModeChange('multi', false) // false = don't clear selections
-    }
-
     // Generate keyboard notes - use full range if specific octave is requested
     // This ensures notes are found even if octave range state hasn't updated yet
     const currentNotes = octave !== undefined
@@ -695,7 +685,7 @@ export const useScaleChordManagement = ({
 
     // Store current scale info for visual highlighting
     setCurrentKeyboardScale({ root: rootNote, scale })
-  }, [appliedScales, onKeyboardSelectionModeChange, keyboardSelectionMode, lowerOctaves, higherOctaves, selectNote, selectedNotes])
+  }, [appliedScales, lowerOctaves, higherOctaves, selectNote, selectedNotes])
 
   const handleKeyboardScaleClear = useCallback(() => {
     // Clear all selected notes
@@ -762,11 +752,6 @@ export const useScaleChordManagement = ({
       return
     }
 
-    // Switch to multi-select mode automatically (but keep existing selections)
-    if (onKeyboardSelectionModeChange && keyboardSelectionMode !== 'multi') {
-      onKeyboardSelectionModeChange('multi', false) // false = don't clear selections
-    }
-
     // Generate keyboard notes - use full range if specific octave is requested
     // This ensures notes are found even if octave range state hasn't updated yet
     const currentNotes = octave !== undefined
@@ -800,7 +785,7 @@ export const useScaleChordManagement = ({
       octave: octave // Store the octave for regeneration
     }
     setAppliedChords(prev => [...prev, newAppliedChord])
-  }, [isChordAlreadyApplied, appliedChords, onKeyboardSelectionModeChange, keyboardSelectionMode, lowerOctaves, higherOctaves, selectNote, selectedNotes])
+  }, [isChordAlreadyApplied, appliedChords, lowerOctaves, higherOctaves, selectNote, selectedNotes])
 
   const handleKeyboardChordClear = useCallback(() => {
     // Clear all selected notes

@@ -22,7 +22,8 @@
   width: auto;
 }
 
-/* Set container height to exactly match button height for guitar and bass */
+/* Set container height to exactly match button height for keyboard, guitar and bass */
+.scale-options-container.collapsed:has(.scale-options-toggle.instrument-keyboard),
 .scale-options-container.collapsed:has(.scale-options-toggle.instrument-guitar),
 .scale-options-container.collapsed:has(.scale-options-toggle.instrument-bass),
 body:has(.instrument-container[data-practice-mode="true"]) .scale-options-container.collapsed {
@@ -38,7 +39,8 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-contai
   max-height: 32px;
 }
 
-/* Keep expanded container height same as button for guitar/bass */
+/* Keep expanded container height same as button for keyboard/guitar/bass */
+.scale-options-container.expanded:has(.scale-options-toggle.instrument-keyboard),
 .scale-options-container.expanded:has(.scale-options-toggle.instrument-guitar),
 .scale-options-container.expanded:has(.scale-options-toggle.instrument-bass),
 body:has(.instrument-container[data-practice-mode="true"]) .scale-options-container.expanded {
@@ -108,6 +110,10 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-contai
   margin-bottom: 0;
   z-index: 101;
   pointer-events: auto;
+}
+
+.scale-options-toggle.instrument-keyboard {
+  margin-top: 2px;
 }
 
 .scale-options-toggle.instrument-guitar,
@@ -447,6 +453,7 @@ input:checked + .toggle-slider:hover {
     top: calc(100% + 23px) !important;
   }
 
+  .scale-options-popup.instrument-keyboard,
   .scale-options-popup.instrument-guitar,
   .scale-options-popup.instrument-bass,
   body:has(.instrument-container[data-practice-mode="true"]) .scale-options-popup {
@@ -463,6 +470,7 @@ input:checked + .toggle-slider:hover {
     top: calc(100% + 23px) !important;
   }
 
+  .scale-options-popup.instrument-keyboard,
   .scale-options-popup.instrument-guitar,
   .scale-options-popup.instrument-bass,
   body:has(.instrument-container[data-practice-mode="true"]) .scale-options-popup {
@@ -472,8 +480,9 @@ input:checked + .toggle-slider:hover {
   }
 }
 
-/* Guitar and bass - expand to the right on non-very-small devices */
+/* Keyboard, guitar and bass - expand to the right on non-very-small devices */
 @media (min-width: 361px) {
+  .scale-options-popup.instrument-keyboard,
   .scale-options-popup.instrument-guitar,
   .scale-options-popup.instrument-bass,
   body:has(.instrument-container[data-practice-mode="true"]) .scale-options-popup {
@@ -495,6 +504,7 @@ input:checked + .toggle-slider:hover {
     margin: 0 !important;
   }
 
+  .scale-options-toggle.instrument-keyboard,
   .scale-options-toggle.instrument-guitar,
   .scale-options-toggle.instrument-bass,
   body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle {
@@ -518,17 +528,13 @@ input:checked + .toggle-slider:hover {
     top: 100% !important;
   }
 
+  .scale-options-popup.instrument-keyboard,
   .scale-options-popup.instrument-guitar,
   .scale-options-popup.instrument-bass,
   body:has(.instrument-container[data-practice-mode="true"]) .scale-options-popup {
     left: 0 !important;
     right: auto !important;
     top: 100% !important;
-  }
-
-  .scale-options-popup.instrument-keyboard {
-    top: 100% !important;
-    right: 0 !important;
   }
 
   /* Content sizing */
@@ -575,6 +581,7 @@ input:checked + .toggle-slider:hover {
     margin: 0 !important;
   }
 
+  .scale-options-toggle.instrument-keyboard,
   .scale-options-toggle.instrument-guitar,
   .scale-options-toggle.instrument-bass,
   body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle {
@@ -599,7 +606,8 @@ input:checked + .toggle-slider:hover {
     top: 100% !important;
   }
 
-  /* Guitar/Bass containers - centered */
+  /* Keyboard/Guitar/Bass containers - centered */
+  .scale-options-container:has(.scale-options-toggle.instrument-keyboard),
   .scale-options-container:has(.scale-options-toggle.instrument-guitar),
   .scale-options-container:has(.scale-options-toggle.instrument-bass),
   body:has(.instrument-container[data-practice-mode="true"]) .scale-options-container {

@@ -17,8 +17,6 @@ import { IoMdArrowDropdown } from 'react-icons/io'
 import { useIncrementDecrement } from '../../../hooks/useHoldButton'
 import { sanitizeNumericInput } from '../../../utils/inputValidation'
 
-export type KeyboardSelectionMode = 'range' | 'multi'
-
 interface InstrumentControlsProps {
   bpm: number
   setBpm: (bpm: number) => void
@@ -39,8 +37,6 @@ interface InstrumentControlsProps {
   onRemoveLowerOctave?: () => void
   onAddHigherOctave?: () => void
   onRemoveHigherOctave?: () => void
-  keyboardSelectionMode?: KeyboardSelectionMode
-  onKeyboardSelectionModeChange?: (mode: KeyboardSelectionMode) => void
   onKeyboardScaleApply?: (rootNote: string, scale: KeyboardScale) => void
   onKeyboardScaleClear?: () => void
   flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
@@ -100,8 +96,6 @@ const InstrumentControls = memo(function InstrumentControls({
   onRemoveLowerOctave,
   onAddHigherOctave,
   onRemoveHigherOctave,
-  keyboardSelectionMode = 'range',
-  onKeyboardSelectionModeChange,
   onKeyboardScaleApply,
   onKeyboardScaleClear,
   flashingInputs,
@@ -507,14 +501,10 @@ const InstrumentControls = memo(function InstrumentControls({
     }
   }, [audioFileUrl])
 
-  // Determine if melody can be generated based on instrument and selection mode
+  // Determine if melody can be generated
   const canGenerateMelody = appliedChordsCount > 0 || // Can always generate with applied chords
     appliedScalesCount > 0 || // Can always generate with applied scales
-    (instrument === 'keyboard'
-      ? (keyboardSelectionMode === 'range'
-          ? selectedNotesCount === 2  // Range mode needs exactly 2 notes
-          : selectedNotesCount > 0)   // Multi mode needs at least 1 note
-      : selectedNotesCount > 0)       // Guitar/Bass needs at least 1 note
+    selectedNotesCount > 0    // Need at least 1 note selected
   return (
     <div className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
       {/* Top row: Instrument selector */}

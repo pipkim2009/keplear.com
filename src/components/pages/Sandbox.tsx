@@ -2,7 +2,7 @@
  * Sandbox Page - Free play mode with optional pitch detection feedback
  */
 
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useCallback } from 'react'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import { useDSPPitchDetection, usePerformanceGrading } from '../../hooks'
@@ -29,8 +29,6 @@ function Sandbox() {
     selectedNotes,
     selectNote,
     handleOctaveRangeChange,
-    keyboardSelectionMode,
-    handleKeyboardSelectionModeChange,
     flashingInputs,
     activeInputs,
     triggerInputFlash,
@@ -52,7 +50,8 @@ function Sandbox() {
     isGeneratingMelody,
     isAutoRecording,
     currentlyPlayingNoteIndex,
-    handleCurrentlyPlayingNoteChange
+    handleCurrentlyPlayingNoteChange,
+    melodyBpm
   } = useInstrument()
 
   // DSP-based pitch detection and performance grading hooks
@@ -93,21 +92,22 @@ function Sandbox() {
   }, [isGeneratingMelody, pitchDetection, performanceGrading])
 
   // Start performance grading when user starts listening and melody is ready
-  const handleStartPracticeWithFeedback = () => {
+  const handleStartPracticeWithFeedback = useCallback(() => {
     if (generatedMelody.length > 0) {
-      performanceGrading.startPerformance(generatedMelody, bpm)
+      // Use melodyBpm (BPM when melody was generated) not current bpm
+      performanceGrading.startPerformance(generatedMelody, melodyBpm)
       pitchDetection.startListening()
     } else {
       // Just start listening without grading if no melody
       pitchDetection.startListening()
     }
-  }
+  }, [generatedMelody, melodyBpm, performanceGrading, pitchDetection])
 
   // Stop practice session
-  const handleStopPracticeWithFeedback = () => {
+  const handleStopPracticeWithFeedback = useCallback(() => {
     pitchDetection.stopListening()
     performanceGrading.stopPerformance()
-  }
+  }, [pitchDetection, performanceGrading])
 
   return (
     <>
@@ -130,8 +130,6 @@ function Sandbox() {
         selectedNotes={selectedNotes}
         selectNote={selectNote}
         onOctaveRangeChange={handleOctaveRangeChange}
-        keyboardSelectionMode={keyboardSelectionMode}
-        onKeyboardSelectionModeChange={handleKeyboardSelectionModeChange}
         flashingInputs={{
           bpm: flashingInputs.bpm || activeInputs.bpm,
           beats: flashingInputs.beats || activeInputs.beats,
@@ -171,10 +169,8 @@ function Sandbox() {
             currentPitch={currentPitchForGrading}
             volumeLevel={pitchDetection.volumeLevel}
             performanceState={performanceGrading.state}
-            lastNoteResult={performanceGrading.lastNoteResult}
             error={pitchDetection.error}
             permission={pitchDetection.permission}
-            totalNotes={generatedMelody.length}
             melody={generatedMelody}
           />
         )}

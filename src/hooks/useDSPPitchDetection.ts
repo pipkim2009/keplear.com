@@ -98,7 +98,7 @@ const DEFAULT_OPTIONS: Required<UseDSPPitchDetectionOptions> = {
   instrument: 'keyboard',
   bufferSize: 2048,
   yinThreshold: 0.15,
-  stabilityWindowMs: 100,
+  stabilityWindowMs: 60,
   feedbackDelayMs: 50
 }
 

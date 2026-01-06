@@ -25,7 +25,7 @@ export type InstrumentAction =
 export const initialInstrumentState: InstrumentState = {
   instrument: 'keyboard',
   keyboardOctaves: { lower: 0, higher: 0 },
-  keyboardSelectionMode: 'range',
+  keyboardSelectionMode: 'multi',
   clearChordsAndScalesTrigger: 0
 }
 

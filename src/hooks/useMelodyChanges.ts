@@ -8,7 +8,6 @@ interface UseMelodyChangesProps {
   numberOfBeats: number
   generatedMelody: readonly Note[]
   instrument: string
-  keyboardSelectionMode: string
   appliedChords?: AppliedChord[]
   appliedScales?: AppliedScale[]
 }
@@ -28,7 +27,6 @@ export const useMelodyChanges = ({
   numberOfBeats,
   generatedMelody,
   instrument,
-  keyboardSelectionMode,
   appliedChords = [],
   appliedScales = []
 }: UseMelodyChangesProps): UseMelodyChangesReturn => {
@@ -42,15 +40,8 @@ export const useMelodyChanges = ({
       return true
     }
 
-    if (instrument === 'keyboard') {
-      if (keyboardSelectionMode === 'range') {
-        return selectedNotes.length === 2  // Range mode needs exactly 2 notes
-      } else {
-        return selectedNotes.length > 0   // Multi mode needs at least 1 note
-      }
-    } else {
-      return selectedNotes.length > 0     // Guitar/Bass needs at least 1 note
-    }
+    // Need at least 1 note selected
+    return selectedNotes.length > 0
   }
 
   // Track the last values when melody was generated
@@ -122,7 +113,7 @@ export const useMelodyChanges = ({
 
     // Only show badge if there are changes AND user can generate a melody
     setHasChanges(hasAnyChanges && canGenerateMelody())
-  }, [selectedNotes, appliedChords, appliedScales, bpm, numberOfBeats, instrument, keyboardSelectionMode])
+  }, [selectedNotes, appliedChords, appliedScales, bpm, numberOfBeats, instrument])
 
   const clearChanges = () => {
     const noteNames = selectedNotes.map(note => note.name)

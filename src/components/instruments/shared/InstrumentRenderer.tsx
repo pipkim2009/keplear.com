@@ -6,7 +6,6 @@ import type { GuitarScale, ScaleBox } from '../../../utils/instruments/guitar/gu
 import type { BassScale, BassScaleBox } from '../../../utils/instruments/bass/bassScales'
 import type { GuitarChord, ChordShape } from '../../../utils/instruments/guitar/guitarChords'
 import type { BassChord, BassChordShape } from '../../../utils/instruments/bass/bassChords'
-import type { KeyboardSelectionMode } from './InstrumentControls'
 import type { AppliedChord, AppliedScale, FretboardPreview, KeyboardPreview } from '../../common/ScaleChordOptions'
 
 interface InstrumentRendererProps {
@@ -20,7 +19,6 @@ interface InstrumentRendererProps {
   clearTrigger: number
   lowerOctaves: number
   higherOctaves: number
-  keyboardSelectionMode?: KeyboardSelectionMode
   isNoteInKeyboardScale: (note: Note) => boolean
   isNoteKeyboardRoot: (note: Note) => boolean
   isNoteInKeyboardChord: (note: Note) => boolean
@@ -79,7 +77,6 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
   clearTrigger,
   lowerOctaves,
   higherOctaves,
-  keyboardSelectionMode,
   isNoteInKeyboardScale,
   isNoteKeyboardRoot,
   isNoteInKeyboardChord,
@@ -112,7 +109,6 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           showNotes={showNotes}
           lowerOctaves={lowerOctaves}
           higherOctaves={higherOctaves}
-          selectionMode={keyboardSelectionMode}
           isNoteInScale={isNoteInKeyboardScale}
           isNoteRoot={isNoteKeyboardRoot}
           isNoteInChord={isNoteInKeyboardChord}
