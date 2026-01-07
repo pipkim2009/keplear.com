@@ -52,15 +52,16 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
 }) => {
   const { guided } = performanceState
 
-  // Check if all notes have been graded
+  // Check if all notes have been graded OR performance has ended
   const isComplete = melody.length > 0 && performanceState.noteResults.length === melody.length
+  const isDone = isComplete || (performanceState.noteResults.length > 0 && !performanceState.isActive)
 
-  // Auto-stop listening when all notes are graded
+  // Auto-stop listening when done
   useEffect(() => {
-    if (isComplete && isListening) {
+    if (isDone && isListening) {
       onStopListening()
     }
-  }, [isComplete, isListening, onStopListening])
+  }, [isDone, isListening, onStopListening])
 
   return (
     <div className={styles.liveFeedbackContainer}>
@@ -82,13 +83,13 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
         </div>
       )}
 
-      {/* Microphone Button - hide when showing results */}
-      {permission !== 'denied' && !isComplete && (
+      {/* Microphone Button - shows again when complete to allow restart */}
+      {permission !== 'denied' && (
         <button
-          className={`${styles.microphoneButton} ${isListening ? styles.listening : ''}`}
-          onClick={isListening ? onStopListening : onStartListening}
+          className={`${styles.microphoneButton} ${isListening && !isDone ? styles.listening : ''}`}
+          onClick={isListening && !isDone ? onStopListening : onStartListening}
         >
-          {isListening ? (
+          {isListening && !isDone ? (
             <>
               <MicOff size={20} />
               Stop Feedback
@@ -181,8 +182,8 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
         </div>
       )}
 
-      {/* Volume Indicator - hide when complete */}
-      {isListening && !isComplete && (
+      {/* Volume Indicator - hide when done */}
+      {isListening && !isDone && (
         <div className={styles.volumeIndicatorContainer} style={{ marginTop: '1rem' }}>
           <div className={styles.volumeIndicatorHeader}>
             <span className={styles.volumeIndicatorLabel}>Mic Level</span>

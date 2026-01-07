@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { PiPlayFill, PiPauseFill, PiSpeakerHighFill, PiSpeakerLowFill, PiSpeakerSlashFill } from 'react-icons/pi'
+import { Eye, EyeOff } from 'lucide-react'
+import type { Note } from '../../utils/notes'
 
 interface CustomAudioPlayerProps {
   src: string
@@ -9,6 +11,10 @@ interface CustomAudioPlayerProps {
   onNoteIndexChange?: (index: number | null) => void
   audioRef?: React.RefObject<HTMLAudioElement>
   autoPlayAudio?: boolean
+  showNotes?: boolean
+  onToggleNotes?: () => void
+  melody?: Note[]
+  currentlyPlayingNoteIndex?: number | null
 }
 
 const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
@@ -18,7 +24,11 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   melodyLength,
   onNoteIndexChange,
   audioRef: externalAudioRef,
-  autoPlayAudio = false
+  autoPlayAudio = false,
+  showNotes = false,
+  onToggleNotes,
+  melody = [],
+  currentlyPlayingNoteIndex = null
 }) => {
   const internalAudioRef = useRef<HTMLAudioElement>(null)
   const audioRef = externalAudioRef || internalAudioRef
@@ -229,7 +239,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0
 
   return (
-    <div className="custom-audio-player" ref={containerRef}>
+    <div className={`custom-audio-player ${showNotes && melody.length > 0 ? 'expanded' : ''}`} ref={containerRef}>
       <audio
         ref={audioRef}
         src={src}
@@ -239,6 +249,17 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
       />
 
       <div className="audio-controls">
+        {onToggleNotes && (
+          <button
+            className={`reveal-btn ${showNotes ? 'active' : ''}`}
+            onClick={onToggleNotes}
+            aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
+            title={showNotes ? 'Hide notes' : 'Reveal notes'}
+          >
+            {showNotes ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
+
         <button
           className="play-pause-btn"
           onClick={togglePlay}
@@ -317,6 +338,22 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           )}
         </div>
       </div>
+
+      {/* Melody Notes Expansion */}
+      {showNotes && melody.length > 0 && (
+        <div className="melody-expansion">
+          <div className="melody-notes-row">
+            {melody.map((note, index) => (
+              <span
+                key={index}
+                className={`melody-note-pill ${currentlyPlayingNoteIndex === index ? 'playing' : ''}`}
+              >
+                {note.name}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

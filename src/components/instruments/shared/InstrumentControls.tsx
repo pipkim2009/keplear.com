@@ -4,11 +4,9 @@ import '../../../styles/MelodyControls.css'
 import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../../utils/instruments/guitar/guitarScales'
 import { guitarNotes } from '../../../utils/instruments/guitar/guitarNotes'
 import { KEYBOARD_SCALES, type KeyboardScale } from '../../../utils/instruments/keyboard/keyboardScales'
-import NotesToggle from '../../common/NotesToggle'
 import Tooltip from '../../common/Tooltip'
 import type { Note } from '../../../utils/notes'
 import type { ChordMode } from '../../../reducers/uiReducer'
-import MelodyDisplay from '../../melody/MelodyDisplay'
 import CustomAudioPlayer from '../../common/CustomAudioPlayer'
 import '../../../styles/CustomAudioPlayer.css'
 import { PiPianoKeysFill } from 'react-icons/pi'
@@ -980,36 +978,12 @@ Progression - Use entire chords"
                     onNoteIndexChange={onCurrentlyPlayingNoteChange}
                     audioRef={audioPlayerRef}
                     autoPlayAudio={autoPlayAudio}
-                  />
-                )
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Third row - Expandable Reveal/Hide Notes Button */}
-        {audioFileBlob && (
-          <div className="controls-container third-row">
-            <div className={`modern-notes-toggle-button ${showNotes ? 'expanded' : ''}`}>
-              <button
-                className="toggle-content"
-                onClick={onToggleNotes}
-                title={showNotes ? 'Hide notes' : 'Reveal notes'}
-                aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
-              >
-                <NotesToggle showNotes={showNotes} onToggle={() => {}} />
-              </button>
-
-              {/* Expanded melody content */}
-              {showNotes && generatedMelody && generatedMelody.length > 0 && (
-                <div className="expanded-melody-content">
-                  <MelodyDisplay
-                    generatedMelody={generatedMelody}
                     showNotes={showNotes}
-                    chordMode={chordMode}
+                    onToggleNotes={onToggleNotes}
+                    melody={generatedMelody}
                     currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
                   />
-                </div>
+                )
               )}
             </div>
           </div>

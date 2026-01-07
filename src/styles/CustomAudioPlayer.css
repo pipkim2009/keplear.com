@@ -48,6 +48,110 @@
   height: 18px;
 }
 
+/* Expanded state for melody display */
+.custom-audio-player.expanded {
+  border-radius: 8px 8px 8px 8px;
+}
+
+/* Melody Expansion Section */
+.melody-expansion {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--gray-700);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.melody-notes-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.melody-note-pill {
+  background: linear-gradient(145deg, var(--green-500), var(--green-600));
+  color: var(--white);
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+  border: 2px solid transparent;
+}
+
+.melody-note-pill.playing {
+  background: linear-gradient(145deg, var(--amber-400), var(--amber-500));
+  color: var(--gray-900);
+  border-color: var(--amber-300);
+  transform: scale(1.1);
+  box-shadow: 0 0 16px var(--amber-alpha-60), 0 0 32px var(--amber-alpha-40);
+  animation: noteGlow 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes noteGlow {
+  from {
+    box-shadow: 0 0 12px var(--amber-alpha-60), 0 0 24px var(--amber-alpha-40);
+  }
+  to {
+    box-shadow: 0 0 20px var(--amber-alpha-80), 0 0 40px var(--amber-alpha-60);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .melody-note-pill.playing {
+    animation: none;
+    box-shadow: 0 0 16px var(--amber-alpha-60);
+  }
+
+  .melody-expansion {
+    animation: none;
+  }
+}
+
+/* Reveal Notes Button */
+.reveal-btn {
+  background: linear-gradient(145deg, var(--green-500), var(--green-600));
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.reveal-btn:hover {
+  background: linear-gradient(145deg, var(--green-400), var(--green-500));
+}
+
+.reveal-btn.active {
+  background: linear-gradient(145deg, var(--green-600), var(--green-700));
+  box-shadow: 0 0 0 2px var(--green-400);
+}
+
+.reveal-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 .time-display {
   font-size: 12px;
   font-weight: 600;
@@ -262,6 +366,18 @@
     gap: 6px;
   }
 
+  .reveal-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+  }
+
+  .reveal-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
   .play-pause-btn {
     width: 32px;
     height: 32px;
@@ -281,6 +397,26 @@
 
   .progress-bar {
     min-width: 60px;
+  }
+
+  /* Melody expansion mobile styles */
+  .melody-expansion {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  .melody-notes-row {
+    gap: 4px;
+  }
+
+  .melody-note-pill {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 12px;
+  }
+
+  .melody-note-pill.playing {
+    transform: scale(1.05);
   }
 
   .progress-track {
@@ -322,6 +458,18 @@
     gap: 4px;
   }
 
+  .reveal-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  .reveal-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
   .play-pause-btn {
     width: 28px;
     height: 28px;
@@ -341,6 +489,17 @@
 
   .progress-bar {
     min-width: 50px;
+  }
+
+  /* Melody expansion small mobile styles */
+  .melody-expansion {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+
+  .melody-note-pill {
+    padding: 3px 6px;
+    font-size: 10px;
   }
 
   .progress-track {
