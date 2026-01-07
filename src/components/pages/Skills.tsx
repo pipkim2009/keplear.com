@@ -19,9 +19,10 @@ interface BadgeProps {
   instrument: 'keyboard' | 'guitar' | 'bass'
   skillType: 'scales' | 'chords'
   onStartLesson: (instrument: 'keyboard' | 'guitar' | 'bass', skillType: 'scales' | 'chords', name: string) => void
+  isHighlighted?: boolean
 }
 
-const Badge: React.FC<BadgeProps> = ({ name, description, isUnlocked, instrument, skillType, onStartLesson }) => {
+const Badge: React.FC<BadgeProps> = ({ name, description, isUnlocked, instrument, skillType, onStartLesson, isHighlighted = false }) => {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -53,7 +54,7 @@ const Badge: React.FC<BadgeProps> = ({ name, description, isUnlocked, instrument
   return (
     <div className={styles.badgeContainer} ref={containerRef}>
       <div
-        className={`${styles.badge} ${isUnlocked ? styles.unlocked : styles.locked} ${isOpen ? styles.active : ''}`}
+        className={`${styles.badge} ${isUnlocked ? styles.unlocked : styles.locked} ${isOpen ? styles.active : ''} ${isHighlighted ? styles.highlighted : ''}`}
         onClick={handleBadgeClick}
       >
         {isUnlocked ? (
@@ -152,7 +153,7 @@ const Skills: React.FC<SkillsProps> = () => {
   const findChordByName = (name: string) => chords.find(c => c.name === name)
 
   // Helper to render a badge if the scale/chord exists
-  const renderScaleBadge = (name: string) => {
+  const renderScaleBadge = (name: string, isHighlighted: boolean = false) => {
     const scale = findScaleByName(name)
     if (!scale) return null
     return (
@@ -163,11 +164,12 @@ const Skills: React.FC<SkillsProps> = () => {
         instrument={selectedInstrument}
         skillType="scales"
         onStartLesson={handleStartLesson}
+        isHighlighted={isHighlighted}
       />
     )
   }
 
-  const renderChordBadge = (name: string) => {
+  const renderChordBadge = (name: string, isHighlighted: boolean = false) => {
     const chord = findChordByName(name)
     if (!chord) return null
     return (
@@ -178,6 +180,7 @@ const Skills: React.FC<SkillsProps> = () => {
         instrument={selectedInstrument}
         skillType="chords"
         onStartLesson={handleStartLesson}
+        isHighlighted={isHighlighted}
       />
     )
   }
@@ -223,14 +226,14 @@ const Skills: React.FC<SkillsProps> = () => {
               </h2>
             </div>
 
-            {/* Scales Tree */}
+            {/* Melodies Tree */}
             <div className={styles.skillGroup}>
-              <h3 className={styles.skillGroupTitle}>Scales</h3>
+              <h3 className={styles.skillGroupTitle}>Melodies</h3>
               <div className={styles.skillTree}>
                 {/* Level 1: Major */}
                 <div className={styles.treeLevel}>
                   <div className={styles.treeNode}>
-                    {renderScaleBadge('Major')}
+                    {renderScaleBadge('Major', true)}
                     <div className={styles.treeLine} />
                   </div>
                 </div>
@@ -285,7 +288,7 @@ const Skills: React.FC<SkillsProps> = () => {
                 {/* Level 1: Major */}
                 <div className={styles.treeLevel}>
                   <div className={styles.treeNode}>
-                    {renderChordBadge('Major')}
+                    {renderChordBadge('Major', true)}
                     <div className={styles.treeLine} />
                   </div>
                 </div>

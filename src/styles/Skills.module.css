@@ -439,6 +439,52 @@
   flex-shrink: 0;
 }
 
+/* Highlighted State - Start Here */
+.badge.highlighted {
+  background: linear-gradient(135deg, var(--green-alpha-20) 0%, var(--green-alpha-10) 100%);
+  border: 2px solid var(--green-500);
+  color: var(--green-400);
+  animation: highlightPulse 2s ease-in-out infinite;
+  box-shadow: 0 0 12px var(--green-alpha-40);
+}
+
+.badge.highlighted:hover {
+  background: linear-gradient(135deg, var(--green-alpha-30) 0%, var(--green-alpha-20) 100%);
+  border-color: var(--green-400);
+  transform: translateY(-2px);
+  box-shadow: 0 0 20px var(--green-alpha-50);
+}
+
+.badge.highlighted .badgeIcon {
+  color: var(--green-400);
+}
+
+:global(.light) .badge.highlighted {
+  background: linear-gradient(135deg, var(--green-alpha-15) 0%, var(--green-alpha-08) 100%);
+  border-color: var(--green-600);
+  color: var(--green-700);
+  box-shadow: 0 0 12px var(--green-alpha-30);
+}
+
+:global(.light) .badge.highlighted:hover {
+  background: linear-gradient(135deg, var(--green-alpha-25) 0%, var(--green-alpha-15) 100%);
+  border-color: var(--green-500);
+  box-shadow: 0 0 20px var(--green-alpha-40);
+}
+
+:global(.light) .badge.highlighted .badgeIcon {
+  color: var(--green-600);
+}
+
+@keyframes highlightPulse {
+  0%, 100% {
+    box-shadow: 0 0 8px var(--green-alpha-40);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--green-alpha-60);
+  }
+}
+
 /* ===========================================
    BADGE CONTAINER & POPUP
    =========================================== */
