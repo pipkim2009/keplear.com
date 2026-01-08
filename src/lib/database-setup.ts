@@ -76,6 +76,65 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
         CREATE TRIGGER update_profiles_updated_at
           BEFORE UPDATE ON public.profiles
           FOR EACH ROW EXECUTE FUNCTION public.update_updated_at();
+
+        -- Create classrooms table
+        CREATE TABLE IF NOT EXISTS public.classrooms (
+          id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+          title TEXT NOT NULL,
+          created_by UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+          created_at TIMESTAMPTZ DEFAULT NOW()
+        );
+
+        -- Enable RLS on classrooms table
+        ALTER TABLE public.classrooms ENABLE ROW LEVEL SECURITY;
+
+        -- Anyone can view classrooms
+        DROP POLICY IF EXISTS "Anyone can view classrooms" ON public.classrooms;
+        CREATE POLICY "Anyone can view classrooms"
+          ON public.classrooms FOR SELECT
+          USING (true);
+
+        -- Authenticated users can create classrooms
+        DROP POLICY IF EXISTS "Authenticated users can create classrooms" ON public.classrooms;
+        CREATE POLICY "Authenticated users can create classrooms"
+          ON public.classrooms FOR INSERT
+          WITH CHECK (auth.uid() IS NOT NULL);
+
+        -- Users can delete their own classrooms
+        DROP POLICY IF EXISTS "Users can delete own classrooms" ON public.classrooms;
+        CREATE POLICY "Users can delete own classrooms"
+          ON public.classrooms FOR DELETE
+          USING (auth.uid() = created_by);
+
+        -- Create classroom_students table for enrollments
+        CREATE TABLE IF NOT EXISTS public.classroom_students (
+          id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+          classroom_id UUID REFERENCES public.classrooms(id) ON DELETE CASCADE,
+          user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+          joined_at TIMESTAMPTZ DEFAULT NOW(),
+          UNIQUE(classroom_id, user_id)
+        );
+
+        -- Enable RLS on classroom_students table
+        ALTER TABLE public.classroom_students ENABLE ROW LEVEL SECURITY;
+
+        -- Anyone can view classroom enrollments
+        DROP POLICY IF EXISTS "Anyone can view enrollments" ON public.classroom_students;
+        CREATE POLICY "Anyone can view enrollments"
+          ON public.classroom_students FOR SELECT
+          USING (true);
+
+        -- Authenticated users can join classrooms
+        DROP POLICY IF EXISTS "Users can join classrooms" ON public.classroom_students;
+        CREATE POLICY "Users can join classrooms"
+          ON public.classroom_students FOR INSERT
+          WITH CHECK (auth.uid() = user_id);
+
+        -- Users can leave classrooms
+        DROP POLICY IF EXISTS "Users can leave classrooms" ON public.classroom_students;
+        CREATE POLICY "Users can leave classrooms"
+          ON public.classroom_students FOR DELETE
+          USING (auth.uid() = user_id);
       `
     })
 
