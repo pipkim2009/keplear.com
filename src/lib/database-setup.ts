@@ -135,6 +135,51 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
         CREATE POLICY "Users can leave classrooms"
           ON public.classroom_students FOR DELETE
           USING (auth.uid() = user_id);
+
+        -- Create assignments table
+        CREATE TABLE IF NOT EXISTS public.assignments (
+          id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+          classroom_id UUID REFERENCES public.classrooms(id) ON DELETE CASCADE,
+          title TEXT NOT NULL,
+          lesson_type TEXT NOT NULL,
+          instrument TEXT NOT NULL,
+          bpm INTEGER NOT NULL DEFAULT 120,
+          beats INTEGER NOT NULL DEFAULT 4,
+          chord_count INTEGER DEFAULT 4,
+          scales TEXT[] DEFAULT ARRAY['Major', 'Minor'],
+          chords TEXT[] DEFAULT ARRAY['Major', 'Minor'],
+          octave_low INTEGER DEFAULT 4,
+          octave_high INTEGER DEFAULT 5,
+          fret_low INTEGER DEFAULT 0,
+          fret_high INTEGER DEFAULT 12,
+          created_by UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+          created_at TIMESTAMPTZ DEFAULT NOW()
+        );
+
+        -- Enable RLS on assignments table
+        ALTER TABLE public.assignments ENABLE ROW LEVEL SECURITY;
+
+        -- Anyone can view assignments
+        DROP POLICY IF EXISTS "Anyone can view assignments" ON public.assignments;
+        CREATE POLICY "Anyone can view assignments"
+          ON public.assignments FOR SELECT
+          USING (true);
+
+        -- Classroom owners can create assignments
+        DROP POLICY IF EXISTS "Classroom owners can create assignments" ON public.assignments;
+        CREATE POLICY "Classroom owners can create assignments"
+          ON public.assignments FOR INSERT
+          WITH CHECK (
+            auth.uid() IN (
+              SELECT created_by FROM public.classrooms WHERE id = classroom_id
+            )
+          );
+
+        -- Classroom owners can delete assignments
+        DROP POLICY IF EXISTS "Classroom owners can delete assignments" ON public.assignments;
+        CREATE POLICY "Classroom owners can delete assignments"
+          ON public.assignments FOR DELETE
+          USING (auth.uid() = created_by);
       `
     })
 

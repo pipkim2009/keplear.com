@@ -355,6 +355,184 @@
 }
 
 /* ========================================
+   ASSIGNMENTS SECTION
+   ======================================== */
+
+.assignmentsSection {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(210, 210, 249, 0.2);
+}
+
+:global(.dark) .assignmentsSection {
+  border-top-color: rgb(210, 210, 249, 0.1);
+}
+
+.assignmentsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.assignmentsLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+  margin: 0;
+}
+
+:global(.dark) .assignmentsLabel {
+  color: var(--dark-text-secondary);
+}
+
+.addAssignmentButton {
+  padding: 0.25rem 0.625rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--primary-purple-alpha-15);
+  color: var(--primary-purple);
+}
+
+:global(.dark) .addAssignmentButton {
+  background: var(--primary-purple-alpha-25);
+  color: var(--primary-purple-light);
+}
+
+.addAssignmentButton:hover {
+  background: var(--primary-purple-alpha-25);
+}
+
+:global(.dark) .addAssignmentButton:hover {
+  background: var(--primary-purple-alpha-35);
+}
+
+.noAssignments {
+  font-size: 0.8125rem;
+  color: var(--light-text-tertiary);
+  margin: 0;
+  font-style: italic;
+}
+
+:global(.dark) .noAssignments {
+  color: var(--dark-text-tertiary);
+}
+
+.assignmentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.assignmentItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--primary-purple-alpha-10);
+  border-radius: 8px;
+  gap: 0.5rem;
+}
+
+:global(.dark) .assignmentItem {
+  background: var(--primary-purple-alpha-15);
+}
+
+.assignmentInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.assignmentTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:global(.dark) .assignmentTitle {
+  color: var(--dark-text-primary);
+}
+
+.assignmentMeta {
+  font-size: 0.6875rem;
+  color: var(--light-text-tertiary);
+  text-transform: capitalize;
+}
+
+:global(.dark) .assignmentMeta {
+  color: var(--dark-text-tertiary);
+}
+
+.assignmentActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.startAssignmentButton {
+  padding: 0.25rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  color: var(--white);
+}
+
+:global(.dark) .startAssignmentButton {
+  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+}
+
+.startAssignmentButton:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+.deleteAssignmentButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(239, 68, 68, 0.1);
+  color: rgb(239, 68, 68);
+  flex-shrink: 0;
+}
+
+.deleteAssignmentButton:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.1);
+}
+
+:global(.dark) .deleteAssignmentButton {
+  background: rgba(239, 68, 68, 0.2);
+  color: rgb(252, 165, 165);
+}
+
+:global(.dark) .deleteAssignmentButton:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+/* ========================================
    EMPTY STATE
    ======================================== */
 
@@ -634,6 +812,394 @@
 }
 
 /* ========================================
+   CLICKABLE CLASS CARD
+   ======================================== */
+
+.classCardClickable {
+  background: var(--white-alpha-80);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgb(210, 210, 249, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+:global(.dark) .classCardClickable {
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.4) 100%);
+  border: 1px solid rgb(210, 210, 249, 0.2);
+}
+
+.classCardClickable:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
+  border-color: var(--primary-purple-alpha-50);
+}
+
+:global(.dark) .classCardClickable:hover {
+  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.3);
+}
+
+.classCardStats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(210, 210, 249, 0.2);
+}
+
+:global(.dark) .classCardStats {
+  border-top-color: rgb(210, 210, 249, 0.1);
+}
+
+.statItem {
+  font-size: 0.8125rem;
+  color: var(--light-text-tertiary);
+}
+
+:global(.dark) .statItem {
+  color: var(--dark-text-tertiary);
+}
+
+.statDivider {
+  color: var(--light-text-tertiary);
+  opacity: 0.5;
+}
+
+:global(.dark) .statDivider {
+  color: var(--dark-text-tertiary);
+}
+
+/* ========================================
+   FULL PAGE VIEW
+   ======================================== */
+
+.fullPageView {
+  width: 100%;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.backButtonCircle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--primary-purple-alpha-15);
+  color: var(--primary-purple);
+  margin-bottom: 1.5rem;
+}
+
+:global(.dark) .backButtonCircle {
+  background: var(--primary-purple-alpha-25);
+  color: var(--primary-purple-light);
+}
+
+.backButtonCircle:hover {
+  background: var(--primary-purple-alpha-25);
+  transform: translateX(-3px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+}
+
+:global(.dark) .backButtonCircle:hover {
+  background: var(--primary-purple-alpha-35);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.fullPageHeader {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgb(210, 210, 249, 0.2);
+}
+
+:global(.dark) .fullPageHeader {
+  border-bottom-color: rgb(210, 210, 249, 0.1);
+}
+
+.fullPageTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.fullPageTitle {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+:global(.dark) .fullPageTitle {
+  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.fullPageAuthor {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--primary-purple);
+  margin: 0;
+}
+
+:global(.dark) .fullPageAuthor {
+  color: var(--primary-purple-light);
+}
+
+.fullPageMeta {
+  font-size: 0.9375rem;
+  color: var(--light-text-tertiary);
+  margin: 0.25rem 0 0 0;
+}
+
+:global(.dark) .fullPageMeta {
+  color: var(--dark-text-tertiary);
+}
+
+.fullPageContent {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+}
+
+.fullPageColumn {
+  background: var(--white-alpha-80);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgb(210, 210, 249, 0.3);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+:global(.dark) .fullPageColumn {
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(27, 105, 64, 0.2) 100%);
+  border: 1px solid rgb(210, 210, 249, 0.15);
+}
+
+.fullPageSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgb(210, 210, 249, 0.2);
+}
+
+:global(.dark) .fullPageSectionHeader {
+  border-bottom-color: rgb(210, 210, 249, 0.1);
+}
+
+.fullPageSectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--light-text-primary);
+  margin: 0;
+}
+
+:global(.dark) .fullPageSectionTitle {
+  color: var(--dark-text-primary);
+}
+
+.fullPageCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 0.5rem;
+  border-radius: 14px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--primary-purple-alpha-15);
+  color: var(--primary-purple);
+}
+
+:global(.dark) .fullPageCount {
+  background: var(--primary-purple-alpha-25);
+  color: var(--primary-purple-light);
+}
+
+.fullPageEmpty {
+  font-size: 0.9375rem;
+  color: var(--light-text-tertiary);
+  font-style: italic;
+  margin: 0;
+}
+
+:global(.dark) .fullPageEmpty {
+  color: var(--dark-text-tertiary);
+}
+
+.fullPageStudentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fullPageStudentItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.fullPageStudentItem:hover {
+  background: var(--primary-purple-alpha-10);
+}
+
+:global(.dark) .fullPageStudentItem:hover {
+  background: var(--primary-purple-alpha-15);
+}
+
+.studentAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.studentName {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .studentName {
+  color: var(--dark-text-primary);
+}
+
+.addAssignmentButtonLarge {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  color: white;
+}
+
+:global(.dark) .addAssignmentButtonLarge {
+  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+}
+
+.addAssignmentButtonLarge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.fullPageAssignmentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.fullPageAssignmentItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--primary-purple-alpha-10);
+  border-radius: 12px;
+  gap: 1rem;
+}
+
+:global(.dark) .fullPageAssignmentItem {
+  background: var(--primary-purple-alpha-15);
+}
+
+.fullPageAssignmentInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.fullPageAssignmentTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--light-text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+:global(.dark) .fullPageAssignmentTitle {
+  color: var(--dark-text-primary);
+}
+
+.fullPageAssignmentDetails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.assignmentDetailTag {
+  display: inline-block;
+  padding: 0.25rem 0.625rem;
+  background: var(--white-alpha-80);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--light-text-secondary);
+  text-transform: capitalize;
+}
+
+:global(.dark) .assignmentDetailTag {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--dark-text-secondary);
+}
+
+.fullPageAssignmentActions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.startAssignmentButtonLarge {
+  padding: 0.625rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  color: white;
+}
+
+:global(.dark) .startAssignmentButtonLarge {
+  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+}
+
+.startAssignmentButtonLarge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);
+}
+
+/* ========================================
    RESPONSIVE DESIGN
    ======================================== */
 
@@ -677,5 +1243,32 @@
 
   .modalTitle {
     font-size: 1.25rem;
+  }
+
+  .fullPageTitle {
+    font-size: 1.75rem;
+  }
+
+  .fullPageContent {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .fullPageColumn {
+    padding: 1rem;
+  }
+
+  .fullPageAssignmentItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fullPageAssignmentActions {
+    width: 100%;
+    margin-top: 0.75rem;
+  }
+
+  .startAssignmentButtonLarge {
+    flex: 1;
   }
 }

@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
-import PracticeOptionsModal, { type LessonSettings } from './PracticeOptionsModal'
+import { type LessonSettings } from './PracticeOptionsModal'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import { useDSPPitchDetection, usePerformanceGrading } from '../../hooks'
 import { LiveFeedback } from '../practice'
@@ -133,7 +133,6 @@ function Sandbox() {
   } = useInstrument()
 
   // Practice session state
-  const [showOptionsModal, setShowOptionsModal] = useState(false)
   const [sessionStarted, setSessionStarted] = useState(false)
   const [selectedInstrument, setSelectedInstrument] = useState<string | null>(null)
   const [practiceOptions, setPracticeOptions] = useState<string[]>([])
@@ -155,6 +154,44 @@ function Sandbox() {
   // DSP-based pitch detection and performance grading hooks
   const pitchDetection = useDSPPitchDetection({ instrument: instrument as 'keyboard' | 'guitar' | 'bass' })
   const performanceGrading = usePerformanceGrading()
+
+  // Check for assignment settings from Classroom page
+  useEffect(() => {
+    const storedSettings = localStorage.getItem('assignmentSettings')
+    if (storedSettings) {
+      try {
+        const settings = JSON.parse(storedSettings)
+        // Clear the stored settings so they don't persist
+        localStorage.removeItem('assignmentSettings')
+
+        // Convert to LessonSettings format and start session
+        const lessonSettings: LessonSettings = {
+          lessonType: settings.lessonType,
+          difficulty: 1, // Custom
+          bpm: settings.bpm,
+          beats: settings.beats,
+          chordCount: settings.chordCount,
+          scales: settings.scales,
+          chords: settings.chords,
+          octaveLow: settings.octaveLow,
+          octaveHigh: settings.octaveHigh,
+          fretLow: settings.fretLow,
+          fretHigh: settings.fretHigh
+        }
+
+        // Start the session with assignment settings
+        setSelectedInstrument(settings.instrument)
+        setInstrument(settings.instrument as 'keyboard' | 'guitar' | 'bass')
+        setPracticeOptions([settings.lessonType])
+        setDifficulty(1)
+        setLessonSettings(lessonSettings)
+        setSessionStarted(true)
+      } catch (err) {
+        console.error('Error parsing assignment settings:', err)
+        localStorage.removeItem('assignmentSettings')
+      }
+    }
+  }, [setInstrument])
 
   // Convert DSP pitch result to the format expected by grading system
   const currentPitchForGrading = useMemo((): PitchDetectionResult | null => {
@@ -211,11 +248,6 @@ function Sandbox() {
     performanceGrading.stopPerformance()
   }, [pitchDetection, performanceGrading])
 
-  // Begin Session button click handler
-  const handleBeginSession = () => {
-    setShowOptionsModal(true)
-  }
-
   // Practice options modal handlers
   const handleOptionsStart = (instrumentId: string, selectedOptions: string[], selectedDifficulty: number, settings: LessonSettings) => {
     setSelectedInstrument(instrumentId)
@@ -225,13 +257,7 @@ function Sandbox() {
     setPracticeOptions(selectedOptions)
     setDifficulty(selectedDifficulty)
     setLessonSettings(settings)
-    setShowOptionsModal(false)
     setSessionStarted(true)
-  }
-
-  const handleOptionsCancel = () => {
-    setShowOptionsModal(false)
-    setSelectedInstrument(null)
   }
 
   const handleBackToSelection = () => {
@@ -241,7 +267,6 @@ function Sandbox() {
     }
 
     setSelectedInstrument(null)
-    setShowOptionsModal(false)
     setPracticeOptions([])
     setSessionStarted(false)
     setFeedbackMessage('')
@@ -671,16 +696,6 @@ function Sandbox() {
   }, [welcomeSpeechDone, generatedMelody, recordedAudioBlob, setupDetails])
 
 
-  // Show practice options modal
-  if (showOptionsModal) {
-    return (
-      <PracticeOptionsModal
-        onStart={handleOptionsStart}
-        onCancel={handleOptionsCancel}
-      />
-    )
-  }
-
   // If session started, show the practice session UI
   if (sessionStarted && selectedInstrument) {
     const instrumentName = instrumentNames[selectedInstrument] || 'Instrument'
@@ -827,40 +842,6 @@ function Sandbox() {
   // Default: Free play sandbox mode
   return (
     <>
-      {/* Begin Session Button */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        padding: '1rem',
-        marginBottom: '0.5rem'
-      }}>
-        <button
-          onClick={handleBeginSession}
-          style={{
-            padding: '0.75rem 2rem',
-            borderRadius: '12px',
-            fontSize: '1rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            background: 'linear-gradient(135deg, #1b6940 0%, #2d8a5a 100%)',
-            color: 'white',
-            border: 'none',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 4px 15px rgba(27, 105, 64, 0.3)'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = 'translateY(-2px)'
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(27, 105, 64, 0.4)'
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)'
-            e.currentTarget.style.boxShadow = '0 4px 15px rgba(27, 105, 64, 0.3)'
-          }}
-        >
-          Begin Session
-        </button>
-      </div>
-
       <InstrumentDisplay
         onNoteClick={handleNoteClick}
         isSelected={isSelected}

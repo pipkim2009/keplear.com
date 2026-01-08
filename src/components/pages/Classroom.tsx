@@ -6,6 +6,8 @@ import { useState, useEffect, useCallback, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import AuthContext from '../../contexts/AuthContext'
+import { useInstrument } from '../../contexts/InstrumentContext'
+import AssignmentModal, { AssignmentSettings } from './AssignmentModal'
 import styles from '../../styles/Classroom.module.css'
 
 interface StudentData {
@@ -13,6 +15,24 @@ interface StudentData {
   profiles: {
     username: string | null
   } | null
+}
+
+interface AssignmentData {
+  id: string
+  title: string
+  lesson_type: string
+  instrument: string
+  bpm: number
+  beats: number
+  chord_count: number
+  scales: string[]
+  chords: string[]
+  octave_low: number
+  octave_high: number
+  fret_low: number
+  fret_high: number
+  created_at: string
+  created_by: string
 }
 
 interface ClassroomData {
@@ -24,15 +44,20 @@ interface ClassroomData {
     username: string | null
   } | null
   classroom_students: StudentData[]
+  assignments: AssignmentData[]
 }
 
 function Classroom() {
   const authContext = useContext(AuthContext)
   const user = authContext?.user ?? null
+  const { navigateToSandbox } = useInstrument()
 
   const [classrooms, setClassrooms] = useState<ClassroomData[]>([])
+  const [selectedClassroom, setSelectedClassroom] = useState<ClassroomData | null>(null)
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false)
+  const [activeClassroomId, setActiveClassroomId] = useState<string | null>(null)
   const [newTitle, setNewTitle] = useState('')
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -60,10 +85,10 @@ function Classroom() {
     try {
       setLoading(true)
 
-      // Try to fetch with profiles and students join
+      // Try to fetch with profiles, students, and assignments join
       let { data, error: fetchError } = await supabase
         .from('classrooms')
-        .select('*, profiles(username), classroom_students(user_id, profiles(username))')
+        .select('*, profiles(username), classroom_students(user_id, profiles(username)), assignments(*)')
         .order('created_at', { ascending: false })
 
       // If join fails, fetch without profiles
@@ -74,16 +99,24 @@ function Classroom() {
           .select('*')
           .order('created_at', { ascending: false })
 
-        data = fallback.data?.map(c => ({ ...c, profiles: null, classroom_students: [] })) ?? []
+        data = fallback.data?.map(c => ({ ...c, profiles: null, classroom_students: [], assignments: [] })) ?? []
       }
 
       setClassrooms(data ?? [])
+
+      // Update selected classroom if it exists
+      if (selectedClassroom) {
+        const updated = data?.find(c => c.id === selectedClassroom.id)
+        if (updated) {
+          setSelectedClassroom(updated)
+        }
+      }
     } catch (err) {
       console.error('Error fetching classrooms:', err)
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [selectedClassroom])
 
   // Delete classroom
   const handleDeleteClassroom = async (classroomId: string) => {
@@ -101,9 +134,32 @@ function Classroom() {
         return
       }
 
+      setSelectedClassroom(null)
       fetchClassrooms()
     } catch (err) {
       console.error('Error deleting classroom:', err)
+    }
+  }
+
+  // Delete assignment
+  const handleDeleteAssignment = async (assignmentId: string) => {
+    if (!user) return
+
+    try {
+      const { error: deleteError } = await supabase
+        .from('assignments')
+        .delete()
+        .eq('id', assignmentId)
+        .eq('created_by', user.id)
+
+      if (deleteError) {
+        console.error('Error deleting assignment:', deleteError)
+        return
+      }
+
+      fetchClassrooms()
+    } catch (err) {
+      console.error('Error deleting assignment:', err)
     }
   }
 
@@ -171,7 +227,7 @@ function Classroom() {
 
   useEffect(() => {
     fetchClassrooms()
-  }, [fetchClassrooms])
+  }, [])
 
   // Create classroom
   const handleCreateClassroom = async (e: React.FormEvent) => {
@@ -214,6 +270,38 @@ function Classroom() {
     }
   }
 
+  // Create assignment
+  const handleCreateAssignment = async (settings: AssignmentSettings) => {
+    if (!user || !activeClassroomId) return
+
+    const { error: insertError } = await supabase
+      .from('assignments')
+      .insert({
+        classroom_id: activeClassroomId,
+        title: settings.title,
+        lesson_type: settings.lessonType,
+        instrument: settings.instrument,
+        bpm: settings.bpm,
+        beats: settings.beats,
+        chord_count: settings.chordCount,
+        scales: settings.scales,
+        chords: settings.chords,
+        octave_low: settings.octaveLow,
+        octave_high: settings.octaveHigh,
+        fret_low: settings.fretLow,
+        fret_high: settings.fretHigh,
+        created_by: user.id
+      })
+
+    if (insertError) {
+      throw insertError
+    }
+
+    setIsAssignmentModalOpen(false)
+    setActiveClassroomId(null)
+    fetchClassrooms()
+  }
+
   const handleOpenModal = () => {
     if (!user) {
       setError('Please log in to create a classroom')
@@ -228,6 +316,39 @@ function Classroom() {
     setIsModalOpen(false)
     setNewTitle('')
     setError(null)
+  }
+
+  const handleOpenAssignmentModal = (classroomId: string) => {
+    setActiveClassroomId(classroomId)
+    setIsAssignmentModalOpen(true)
+  }
+
+  const handleCloseAssignmentModal = () => {
+    setIsAssignmentModalOpen(false)
+    setActiveClassroomId(null)
+  }
+
+  // Start assignment - store settings and navigate to Sandbox
+  const handleStartAssignment = (assignment: AssignmentData) => {
+    const assignmentSettings = {
+      lessonType: assignment.lesson_type,
+      instrument: assignment.instrument,
+      bpm: assignment.bpm,
+      beats: assignment.beats,
+      chordCount: assignment.chord_count,
+      scales: assignment.scales,
+      chords: assignment.chords,
+      octaveLow: assignment.octave_low,
+      octaveHigh: assignment.octave_high,
+      fretLow: assignment.fret_low,
+      fretHigh: assignment.fret_high
+    }
+
+    // Store in localStorage for Sandbox to pick up
+    localStorage.setItem('assignmentSettings', JSON.stringify(assignmentSettings))
+
+    // Navigate to Sandbox
+    navigateToSandbox()
   }
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -295,6 +416,162 @@ function Classroom() {
     document.body
   )
 
+  // Full-page classroom view
+  if (selectedClassroom) {
+    const isOwner = user && user.id === selectedClassroom.created_by
+    const joined = hasJoined(selectedClassroom)
+    const studentCount = selectedClassroom.classroom_students?.length ?? 0
+    const assignments = selectedClassroom.assignments ?? []
+
+    return (
+      <div className={styles.classroomContainer}>
+        <div className={styles.fullPageView}>
+          {/* Back button */}
+          <button
+            className={styles.backButtonCircle}
+            onClick={() => setSelectedClassroom(null)}
+            aria-label="Back to classes"
+            title="Back to classes"
+          >
+            ←
+          </button>
+
+          {/* Header */}
+          <div className={styles.fullPageHeader}>
+            <div className={styles.fullPageTitleRow}>
+              <h1 className={styles.fullPageTitle}>{selectedClassroom.title}</h1>
+              {isOwner && (
+                <button
+                  className={styles.deleteButton}
+                  onClick={() => handleDeleteClassroom(selectedClassroom.id)}
+                  title="Delete classroom"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+            <p className={styles.fullPageAuthor}>
+              by {selectedClassroom.profiles?.username ?? 'Unknown'}
+            </p>
+            <p className={styles.fullPageMeta}>
+              Created {formatDate(selectedClassroom.created_at)}
+            </p>
+
+            {/* Join/Leave button */}
+            {user && !isOwner && (
+              <button
+                className={joined ? styles.leaveButton : styles.joinButton}
+                onClick={() => joined
+                  ? handleLeaveClassroom(selectedClassroom.id)
+                  : handleJoinClassroom(selectedClassroom.id)
+                }
+                disabled={joiningClassId === selectedClassroom.id}
+                style={{ marginTop: '1rem', width: 'auto' }}
+              >
+                {joiningClassId === selectedClassroom.id
+                  ? 'Loading...'
+                  : joined
+                    ? 'Leave Class'
+                    : 'Join Class'
+                }
+              </button>
+            )}
+          </div>
+
+          {/* Two column layout */}
+          <div className={styles.fullPageContent}>
+            {/* Students column */}
+            <div className={styles.fullPageColumn}>
+              <div className={styles.fullPageSectionHeader}>
+                <h2 className={styles.fullPageSectionTitle}>Students</h2>
+                <span className={styles.fullPageCount}>{studentCount}</span>
+              </div>
+              {studentCount === 0 ? (
+                <p className={styles.fullPageEmpty}>No students enrolled yet</p>
+              ) : (
+                <div className={styles.fullPageStudentsList}>
+                  {selectedClassroom.classroom_students.map((student) => (
+                    <div key={student.user_id} className={styles.fullPageStudentItem}>
+                      <div className={styles.studentAvatar}>
+                        {(student.profiles?.username ?? 'U')[0].toUpperCase()}
+                      </div>
+                      <span className={styles.studentName}>
+                        {student.profiles?.username ?? 'Unknown'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Assignments column */}
+            <div className={styles.fullPageColumn}>
+              <div className={styles.fullPageSectionHeader}>
+                <h2 className={styles.fullPageSectionTitle}>Assignments</h2>
+                {isOwner && (
+                  <button
+                    className={styles.addAssignmentButtonLarge}
+                    onClick={() => handleOpenAssignmentModal(selectedClassroom.id)}
+                  >
+                    + Add Assignment
+                  </button>
+                )}
+              </div>
+              {assignments.length === 0 ? (
+                <p className={styles.fullPageEmpty}>No assignments yet</p>
+              ) : (
+                <div className={styles.fullPageAssignmentsList}>
+                  {assignments.map((assignment) => (
+                    <div key={assignment.id} className={styles.fullPageAssignmentItem}>
+                      <div className={styles.fullPageAssignmentInfo}>
+                        <h3 className={styles.fullPageAssignmentTitle}>{assignment.title}</h3>
+                        <div className={styles.fullPageAssignmentDetails}>
+                          <span className={styles.assignmentDetailTag}>{assignment.instrument}</span>
+                          <span className={styles.assignmentDetailTag}>{assignment.lesson_type}</span>
+                          <span className={styles.assignmentDetailTag}>{assignment.bpm} BPM</span>
+                          <span className={styles.assignmentDetailTag}>{assignment.beats} beats</span>
+                        </div>
+                      </div>
+                      <div className={styles.fullPageAssignmentActions}>
+                        {user && (
+                          <button
+                            className={styles.startAssignmentButtonLarge}
+                            onClick={() => handleStartAssignment(assignment)}
+                          >
+                            Start
+                          </button>
+                        )}
+                        {isOwner && (
+                          <button
+                            className={styles.deleteAssignmentButton}
+                            onClick={() => handleDeleteAssignment(assignment.id)}
+                            title="Delete assignment"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {isAssignmentModalOpen && activeClassroomId && (
+          <AssignmentModal
+            classroomId={activeClassroomId}
+            isDarkMode={isDarkMode}
+            onSubmit={handleCreateAssignment}
+            onCancel={handleCloseAssignmentModal}
+          />
+        )}
+      </div>
+    )
+  }
+
+  // Class list view
   return (
     <div className={styles.classroomContainer}>
       <section className={styles.headerSection}>
@@ -328,69 +605,31 @@ function Classroom() {
         ) : (
           <div className={styles.classesGrid}>
             {classrooms.map((classroom) => {
-              const isOwner = user && user.id === classroom.created_by
-              const joined = hasJoined(classroom)
               const studentCount = classroom.classroom_students?.length ?? 0
+              const assignmentCount = classroom.assignments?.length ?? 0
 
               return (
-                <div key={classroom.id} className={styles.classCard}>
-                  <div className={styles.classCardHeader}>
-                    <h3 className={styles.classTitle}>{classroom.title}</h3>
-                    {isOwner && (
-                      <button
-                        className={styles.deleteButton}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleDeleteClassroom(classroom.id)
-                        }}
-                        aria-label="Delete classroom"
-                        title="Delete classroom"
-                      >
-                        ×
-                      </button>
-                    )}
-                  </div>
+                <div
+                  key={classroom.id}
+                  className={styles.classCardClickable}
+                  onClick={() => setSelectedClassroom(classroom)}
+                >
+                  <h3 className={styles.classTitle}>{classroom.title}</h3>
                   <p className={styles.classAuthor}>
                     by {classroom.profiles?.username ?? 'Unknown'}
                   </p>
                   <p className={styles.classMeta}>
                     Created {formatDate(classroom.created_at)}
                   </p>
-
-                  {/* Students section */}
-                  <div className={styles.studentsSection}>
-                    <p className={styles.studentCount}>
+                  <div className={styles.classCardStats}>
+                    <span className={styles.statItem}>
                       {studentCount} {studentCount === 1 ? 'student' : 'students'}
-                    </p>
-                    {studentCount > 0 && (
-                      <div className={styles.studentsList}>
-                        {classroom.classroom_students.map((student) => (
-                          <span key={student.user_id} className={styles.studentTag}>
-                            {student.profiles?.username ?? 'Unknown'}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    </span>
+                    <span className={styles.statDivider}>•</span>
+                    <span className={styles.statItem}>
+                      {assignmentCount} {assignmentCount === 1 ? 'assignment' : 'assignments'}
+                    </span>
                   </div>
-
-                  {/* Join/Leave button */}
-                  {user && !isOwner && (
-                    <button
-                      className={joined ? styles.leaveButton : styles.joinButton}
-                      onClick={() => joined
-                        ? handleLeaveClassroom(classroom.id)
-                        : handleJoinClassroom(classroom.id)
-                      }
-                      disabled={joiningClassId === classroom.id}
-                    >
-                      {joiningClassId === classroom.id
-                        ? 'Loading...'
-                        : joined
-                          ? 'Leave'
-                          : 'Join'
-                      }
-                    </button>
-                  )}
                 </div>
               )
             })}
