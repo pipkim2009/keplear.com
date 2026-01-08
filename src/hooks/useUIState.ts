@@ -21,8 +21,7 @@ interface UseUIStateReturn {
   // Navigation actions
   navigateToHome: () => void
   navigateToSandbox: () => void
-  navigateToPractice: () => void
-  navigateToSkills: () => void
+  navigateToClassroom: () => void
   setCurrentPage: (page: PageType) => void
 
   // Settings actions
@@ -61,12 +60,8 @@ export const useUIState = (): UseUIStateReturn => {
     dispatch({ type: 'SET_CURRENT_PAGE', payload: 'sandbox' })
   }, [])
 
-  const navigateToPractice = useCallback(() => {
-    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'practice' })
-  }, [])
-
-  const navigateToSkills = useCallback(() => {
-    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'skills' })
+  const navigateToClassroom = useCallback(() => {
+    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'classroom' })
   }, [])
 
   const setCurrentPage = useCallback((page: PageType) => {
@@ -143,8 +138,7 @@ export const useUIState = (): UseUIStateReturn => {
     // Navigation actions
     navigateToHome,
     navigateToSandbox,
-    navigateToPractice,
-    navigateToSkills,
+    navigateToClassroom,
     setCurrentPage,
 
     // Settings actions

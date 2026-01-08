@@ -478,46 +478,6 @@
   outline-color: var(--primary-purple-lighter);
 }
 
-.skillsButton {
-  padding: 0.875rem 2rem;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: var(--white-alpha-80);
-  color: var(--light-text-primary);
-  border: 2px solid var(--primary-purple-alpha-30);
-  min-width: 220px;
-}
-
-:global(.dark) .skillsButton {
-  background: var(--dark-bg-secondary);
-  color: var(--dark-text-primary);
-  border-color: var(--primary-purple-alpha-50);
-}
-
-.skillsButton:hover {
-  background: var(--white);
-  border-color: var(--primary-purple);
-  transform: translateY(-2px);
-}
-
-:global(.dark) .skillsButton:hover {
-  background: var(--dark-bg-tertiary);
-  border-color: var(--primary-purple-light);
-}
-
-.skillsButton:focus-visible {
-  outline: 3px solid var(--primary-purple);
-  outline-offset: 2px;
-}
-
-:global(.dark) .skillsButton:focus-visible {
-  outline-color: var(--primary-purple-lighter);
-}
-
 /* ========================================
    INSTRUMENTS SECTION
    ======================================== */
@@ -1080,11 +1040,6 @@
     font-size: 1.125rem;
   }
 
-  .skillsButton {
-    padding: 0.75rem 1.75rem;
-    font-size: 0.9375rem;
-  }
-
   .instrumentsGrid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -1157,13 +1112,6 @@
   .startSessionButton {
     padding: 1rem 2rem;
     font-size: 1rem;
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .skillsButton {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.9375rem;
     width: 100%;
     max-width: 300px;
   }
@@ -1260,7 +1208,6 @@
   .featuredLessonCard,
   .startButton,
   .startSessionButton,
-  .skillsButton,
   .sandboxButton,
   .generateButton,
   .playButton,
@@ -1284,7 +1231,6 @@
   .featuredLessonCard:hover,
   .startButton:hover,
   .startSessionButton:hover,
-  .skillsButton:hover,
   .sandboxButton:hover,
   .generateButton:hover,
   .playButton:hover,

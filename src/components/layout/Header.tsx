@@ -20,7 +20,7 @@ const Header = memo(function Header({
     currentPage,
     navigateToHome,
     navigateToSandbox,
-    navigateToPractice
+    navigateToClassroom
   } = useInstrument()
   const { user, loading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
@@ -56,19 +56,18 @@ const Header = memo(function Header({
           >
             Home
           </button>
-          <button 
+          <button
             className={`nav-link ${currentPage === 'sandbox' ? 'nav-link-active' : ''}`}
             onClick={navigateToSandbox}
           >
             Sandbox
           </button>
           <button
-            className={`nav-link ${currentPage === 'practice' ? 'nav-link-active' : ''}`}
-            onClick={navigateToPractice}
+            className={`nav-link ${currentPage === 'classroom' ? 'nav-link-active' : ''}`}
+            onClick={navigateToClassroom}
           >
-            Practice
+            Classroom
           </button>
-
         </nav>
         
         <div className="header-right">

@@ -1,8 +1,7 @@
 import Home from './pages/Home'
-import Practice from './pages/Practice'
-import Skills from './pages/Skills'
 import NotFound from './pages/NotFound'
 import Sandbox from './pages/Sandbox'
+import Classroom from './pages/Classroom'
 import { useInstrument } from '../contexts/InstrumentContext'
 
 /**
@@ -12,8 +11,7 @@ function Router() {
   const {
     currentPage,
     navigateToHome,
-    navigateToSandbox,
-    navigateToPractice
+    navigateToSandbox
   } = useInstrument()
 
   switch (currentPage) {
@@ -21,26 +19,14 @@ function Router() {
       return (
         <Home
           onNavigateToSandbox={navigateToSandbox}
-          onNavigateToPractice={navigateToPractice}
         />
       )
 
     case 'sandbox':
       return <Sandbox />
 
-    case 'practice':
-      return (
-        <Practice
-          onNavigateToSandbox={navigateToSandbox}
-        />
-      )
-
-    case 'skills':
-      return (
-        <Skills
-          onNavigateToHome={navigateToHome}
-        />
-      )
+    case 'classroom':
+      return <Classroom />
 
     case '404':
       return (
@@ -53,7 +39,6 @@ function Router() {
       return (
         <Home
           onNavigateToSandbox={navigateToSandbox}
-          onNavigateToPractice={navigateToPractice}
         />
       )
   }

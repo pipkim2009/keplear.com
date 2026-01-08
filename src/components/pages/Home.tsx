@@ -5,7 +5,6 @@ import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
 
 interface HomeProps {
   onNavigateToSandbox: () => void
-  onNavigateToPractice: () => void
 }
 
 const ROTATING_WORDS = ['Your Sound', 'Any Scale', 'Any Chord']
