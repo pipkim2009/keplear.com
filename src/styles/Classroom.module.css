@@ -1086,10 +1086,42 @@
   font-size: 0.9375rem;
   font-weight: 600;
   color: var(--light-text-primary);
+  flex: 1;
 }
 
 :global(.dark) .studentName {
   color: var(--dark-text-primary);
+}
+
+.removeStudentButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(239, 68, 68, 0.1);
+  color: rgb(239, 68, 68);
+  flex-shrink: 0;
+}
+
+.removeStudentButton:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.1);
+}
+
+:global(.dark) .removeStudentButton {
+  background: rgba(239, 68, 68, 0.2);
+  color: rgb(252, 165, 165);
+}
+
+:global(.dark) .removeStudentButton:hover {
+  background: rgba(239, 68, 68, 0.3);
 }
 
 .addAssignmentButtonLarge {

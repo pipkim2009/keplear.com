@@ -219,6 +219,28 @@ function Classroom() {
     }
   }
 
+  // Remove student from classroom (owner only)
+  const handleRemoveStudent = async (classroomId: string, studentId: string) => {
+    if (!user) return
+
+    try {
+      const { error: removeError } = await supabase
+        .from('classroom_students')
+        .delete()
+        .eq('classroom_id', classroomId)
+        .eq('user_id', studentId)
+
+      if (removeError) {
+        console.error('Error removing student:', removeError)
+        return
+      }
+
+      fetchClassrooms()
+    } catch (err) {
+      console.error('Error removing student:', err)
+    }
+  }
+
   // Check if user has joined a classroom
   const hasJoined = (classroom: ClassroomData) => {
     if (!user) return false
@@ -498,6 +520,16 @@ function Classroom() {
                       <span className={styles.studentName}>
                         {student.profiles?.username ?? 'Unknown'}
                       </span>
+                      {isOwner && (
+                        <button
+                          className={styles.removeStudentButton}
+                          onClick={() => handleRemoveStudent(selectedClassroom.id, student.user_id)}
+                          aria-label="Remove student"
+                          title="Remove student"
+                        >
+                          ×
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>

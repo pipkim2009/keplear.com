@@ -136,6 +136,16 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
           ON public.classroom_students FOR DELETE
           USING (auth.uid() = user_id);
 
+        -- Classroom owners can remove students
+        DROP POLICY IF EXISTS "Owners can remove students" ON public.classroom_students;
+        CREATE POLICY "Owners can remove students"
+          ON public.classroom_students FOR DELETE
+          USING (
+            auth.uid() IN (
+              SELECT created_by FROM public.classrooms WHERE id = classroom_id
+            )
+          );
+
         -- Create assignments table
         CREATE TABLE IF NOT EXISTS public.assignments (
           id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
