@@ -849,6 +849,17 @@ export const useScaleChordManagement = ({
     setSelectedChordRoot(rootNote)
   }, [])
 
+  // Direct setters for loading assignments (bypasses handlers)
+  const setAppliedScalesDirectly = useCallback((scales: AppliedScale[]) => {
+    console.log('Setting applied scales directly:', scales)
+    setAppliedScales(scales)
+  }, [])
+
+  const setAppliedChordsDirectly = useCallback((chords: AppliedChord[]) => {
+    console.log('Setting applied chords directly:', chords)
+    setAppliedChords(chords)
+  }, [])
+
   return {
     // State
     appliedChords,
@@ -857,6 +868,10 @@ export const useScaleChordManagement = ({
     selectedChordRoot,
     currentKeyboardScale,
     currentKeyboardChord,
+
+    // Direct setters (for assignment loading)
+    setAppliedScalesDirectly,
+    setAppliedChordsDirectly,
 
     // Handler setters (for instruments to register their handlers)
     setScaleHandlers,

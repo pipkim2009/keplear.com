@@ -96,6 +96,10 @@ interface InstrumentContextType {
   appliedChords: AppliedChord[]
   appliedScales: AppliedScale[]
   scaleChordManagement: ReturnType<typeof useScaleChordManagement>
+
+  // Octave Range
+  lowerOctaves: number
+  higherOctaves: number
 }
 
 const InstrumentContext = createContext<InstrumentContextType | undefined>(undefined)
@@ -480,7 +484,11 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     // Scale/Chord Management
     appliedChords,
     appliedScales,
-    scaleChordManagement
+    scaleChordManagement,
+
+    // Octave Range
+    lowerOctaves,
+    higherOctaves
   }
 
   return (

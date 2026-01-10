@@ -7,7 +7,6 @@ import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import AuthContext from '../../contexts/AuthContext'
 import { useInstrument } from '../../contexts/InstrumentContext'
-import AssignmentModal, { AssignmentSettings } from './AssignmentModal'
 import styles from '../../styles/Classroom.module.css'
 
 interface StudentData {
@@ -15,6 +14,23 @@ interface StudentData {
   profiles: {
     username: string | null
   } | null
+}
+
+interface SelectionData {
+  selectedNoteIds: string[]
+  appliedScales: Array<{
+    root: string
+    scaleName: string
+    octave?: number
+    displayName: string
+  }>
+  appliedChords: Array<{
+    root: string
+    chordName: string
+    octave?: number
+    fretZone?: number
+    displayName: string
+  }>
 }
 
 interface AssignmentData {
@@ -31,6 +47,7 @@ interface AssignmentData {
   octave_high: number
   fret_low: number
   fret_high: number
+  selection_data: SelectionData | null
   created_at: string
   created_by: string
 }
@@ -56,8 +73,6 @@ function Classroom() {
   const [selectedClassroom, setSelectedClassroom] = useState<ClassroomData | null>(null)
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false)
-  const [activeClassroomId, setActiveClassroomId] = useState<string | null>(null)
   const [newTitle, setNewTitle] = useState('')
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -292,36 +307,11 @@ function Classroom() {
     }
   }
 
-  // Create assignment
-  const handleCreateAssignment = async (settings: AssignmentSettings) => {
-    if (!user || !activeClassroomId) return
-
-    const { error: insertError } = await supabase
-      .from('assignments')
-      .insert({
-        classroom_id: activeClassroomId,
-        title: settings.title,
-        lesson_type: settings.lessonType,
-        instrument: settings.instrument,
-        bpm: settings.bpm,
-        beats: settings.beats,
-        chord_count: settings.chordCount,
-        scales: settings.scales,
-        chords: settings.chords,
-        octave_low: settings.octaveLow,
-        octave_high: settings.octaveHigh,
-        fret_low: settings.fretLow,
-        fret_high: settings.fretHigh,
-        created_by: user.id
-      })
-
-    if (insertError) {
-      throw insertError
-    }
-
-    setIsAssignmentModalOpen(false)
-    setActiveClassroomId(null)
-    fetchClassrooms()
+  // Open Sandbox to create assignment
+  const handleCreateAssignment = (classroomId: string) => {
+    // Store classroom ID for Sandbox to pick up
+    localStorage.setItem('assigningToClassroom', classroomId)
+    navigateToSandbox()
   }
 
   const handleOpenModal = () => {
@@ -340,18 +330,12 @@ function Classroom() {
     setError(null)
   }
 
-  const handleOpenAssignmentModal = (classroomId: string) => {
-    setActiveClassroomId(classroomId)
-    setIsAssignmentModalOpen(true)
-  }
-
-  const handleCloseAssignmentModal = () => {
-    setIsAssignmentModalOpen(false)
-    setActiveClassroomId(null)
-  }
-
   // Start assignment - store settings and navigate to Sandbox
   const handleStartAssignment = (assignment: AssignmentData) => {
+    console.error('=== STARTING ASSIGNMENT ===')
+    console.error('Assignment data:', assignment)
+    console.error('selection_data:', assignment.selection_data)
+
     const assignmentSettings = {
       lessonType: assignment.lesson_type,
       instrument: assignment.instrument,
@@ -363,8 +347,10 @@ function Classroom() {
       octaveLow: assignment.octave_low,
       octaveHigh: assignment.octave_high,
       fretLow: assignment.fret_low,
-      fretHigh: assignment.fret_high
+      fretHigh: assignment.fret_high,
+      selectionData: assignment.selection_data
     }
+    console.log('Assignment settings to save:', assignmentSettings)
 
     // Store in localStorage for Sandbox to pick up
     localStorage.setItem('assignmentSettings', JSON.stringify(assignmentSettings))
@@ -543,7 +529,7 @@ function Classroom() {
                 {isOwner && (
                   <button
                     className={styles.addAssignmentButtonLarge}
-                    onClick={() => handleOpenAssignmentModal(selectedClassroom.id)}
+                    onClick={() => handleCreateAssignment(selectedClassroom.id)}
                   >
                     + Add Assignment
                   </button>
@@ -590,15 +576,6 @@ function Classroom() {
             </div>
           </div>
         </div>
-
-        {isAssignmentModalOpen && activeClassroomId && (
-          <AssignmentModal
-            classroomId={activeClassroomId}
-            isDarkMode={isDarkMode}
-            onSubmit={handleCreateAssignment}
-            onCancel={handleCloseAssignmentModal}
-          />
-        )}
       </div>
     )
   }

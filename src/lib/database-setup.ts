@@ -162,6 +162,7 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
           octave_high INTEGER DEFAULT 5,
           fret_low INTEGER DEFAULT 0,
           fret_high INTEGER DEFAULT 12,
+          selection_data JSONB DEFAULT NULL,
           created_by UUID REFERENCES auth.users(id) ON DELETE CASCADE,
           created_at TIMESTAMPTZ DEFAULT NOW()
         );

@@ -138,6 +138,15 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   const [lowerOctaves, setLowerOctaves] = useState<number>(initialLowerOctaves)
   const [higherOctaves, setHigherOctaves] = useState<number>(initialHigherOctaves)
 
+  // Sync octave state when initial props change (e.g., when loading an assignment)
+  useEffect(() => {
+    setLowerOctaves(initialLowerOctaves)
+  }, [initialLowerOctaves])
+
+  useEffect(() => {
+    setHigherOctaves(initialHigherOctaves)
+  }, [initialHigherOctaves])
+
   // Preview state for scale/chord menu
   const [fretboardPreview, setFretboardPreview] = useState<FretboardPreview | null>(null)
   const [keyboardPreview, setKeyboardPreview] = useState<KeyboardPreview | null>(null)

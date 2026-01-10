@@ -15,6 +15,23 @@ const difficultyLabels = ['Learn', 'Custom']
 const scaleNames = GUITAR_SCALES.map(s => s.name)
 const chordNames = GUITAR_CHORDS.map(c => c.name)
 
+export interface SelectionData {
+  selectedNoteIds: string[]
+  appliedScales: Array<{
+    root: string
+    scaleName: string
+    octave?: number
+    displayName: string
+  }>
+  appliedChords: Array<{
+    root: string
+    chordName: string
+    octave?: number
+    fretZone?: number
+    displayName: string
+  }>
+}
+
 export interface LessonSettings {
   lessonType: string
   difficulty: number
@@ -27,6 +44,7 @@ export interface LessonSettings {
   octaveHigh?: number
   fretLow?: number
   fretHigh?: number
+  selectionData?: SelectionData | null
 }
 
 interface PracticeOptionsModalProps {

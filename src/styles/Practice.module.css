@@ -1238,3 +1238,369 @@
     transform: none !important;
   }
 }
+
+/* ========================================
+   ASSIGNMENT MODE BAR
+   ======================================== */
+
+.assignmentModeBar {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, var(--primary-purple-alpha-15) 0%, var(--primary-purple-alpha-25) 100%);
+  border-radius: 16px;
+  border: 2px solid var(--primary-purple-alpha-30);
+  margin-bottom: 1rem;
+}
+
+:global(.dark) .assignmentModeBar {
+  background: linear-gradient(135deg, var(--primary-purple-alpha-30) 0%, var(--primary-purple-alpha-50) 100%);
+  border-color: var(--primary-purple-alpha-50);
+}
+
+.assignmentModeText {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary-purple);
+}
+
+:global(.dark) .assignmentModeText {
+  color: var(--primary-purple-light);
+}
+
+.assignmentModeButtons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.assignmentCancelButton {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--white-alpha-80);
+  color: var(--light-text-primary);
+  border: 2px solid rgb(210, 210, 249, 0.3);
+}
+
+:global(.dark) .assignmentCancelButton {
+  background: var(--dark-bg-secondary);
+  color: var(--dark-text-primary);
+  border-color: rgb(210, 210, 249, 0.2);
+}
+
+.assignmentCancelButton:hover {
+  background: var(--white);
+}
+
+:global(.dark) .assignmentCancelButton:hover {
+  background: var(--dark-bg-tertiary);
+}
+
+.assignmentAssignButton {
+  padding: 0.625rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-darker) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+:global(.dark) .assignmentAssignButton {
+  background: linear-gradient(135deg, var(--primary-purple-lighter) 0%, var(--primary-purple) 100%);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.assignmentAssignButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+:global(.dark) .assignmentAssignButton:hover {
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+/* ========================================
+   ASSIGNMENT TITLE MODAL
+   ======================================== */
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: modalFadeIn 0.2s ease-out;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.assignModal {
+  background: var(--white);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 450px;
+  margin: 1rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+:global(.dark) .assignModal {
+  background: var(--dark-bg-secondary);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.assignModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid rgb(210, 210, 249, 0.3);
+}
+
+:global(.dark) .assignModalHeader {
+  border-bottom-color: rgb(210, 210, 249, 0.2);
+}
+
+.assignModalTitle {
+  font-size: 1.375rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .assignModalTitle {
+  color: var(--dark-text-primary);
+}
+
+.assignModalClose {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: rgb(210, 210, 249, 0.2);
+  color: var(--light-text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+:global(.dark) .assignModalClose {
+  background: rgb(210, 210, 249, 0.15);
+  color: var(--dark-text-secondary);
+}
+
+.assignModalClose:hover {
+  background: rgb(210, 210, 249, 0.4);
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .assignModalClose:hover {
+  background: rgb(210, 210, 249, 0.25);
+  color: var(--dark-text-primary);
+}
+
+.assignModalContent {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.assignModalError {
+  padding: 0.75rem 1rem;
+  background: rgb(239, 68, 68, 0.15);
+  border: 1px solid rgb(239, 68, 68, 0.4);
+  border-radius: 10px;
+  color: rgb(220, 38, 38);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+:global(.dark) .assignModalError {
+  background: rgb(239, 68, 68, 0.2);
+  border-color: rgb(239, 68, 68, 0.5);
+  color: rgb(252, 165, 165);
+}
+
+.assignModalField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.assignModalLabel {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .assignModalLabel {
+  color: var(--dark-text-primary);
+}
+
+.assignModalInput {
+  padding: 0.875rem 1rem;
+  border: 2px solid rgb(210, 210, 249, 0.3);
+  border-radius: 12px;
+  font-size: 1rem;
+  background: var(--white);
+  color: var(--light-text-primary);
+  transition: all 0.2s ease;
+}
+
+:global(.dark) .assignModalInput {
+  background: var(--dark-bg-tertiary);
+  color: var(--dark-text-primary);
+  border-color: rgb(210, 210, 249, 0.2);
+}
+
+.assignModalInput:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+}
+
+:global(.dark) .assignModalInput:focus {
+  border-color: var(--primary-purple-light);
+}
+
+.assignModalInput::placeholder {
+  color: var(--light-text-tertiary);
+}
+
+:global(.dark) .assignModalInput::placeholder {
+  color: var(--dark-text-tertiary);
+}
+
+.assignModalInfo {
+  padding: 1rem;
+  background: rgb(148, 163, 184, 0.1);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+:global(.dark) .assignModalInfo {
+  background: rgb(148, 163, 184, 0.15);
+}
+
+.assignModalInfo p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .assignModalInfo p {
+  color: var(--dark-text-secondary);
+}
+
+.assignModalInfo strong {
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .assignModalInfo strong {
+  color: var(--dark-text-primary);
+}
+
+.assignModalSubmit {
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-darker) 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+:global(.dark) .assignModalSubmit {
+  background: linear-gradient(135deg, var(--primary-purple-lighter) 0%, var(--primary-purple) 100%);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.assignModalSubmit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+:global(.dark) .assignModalSubmit:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+.assignModalSubmit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Responsive adjustments for assignment mode */
+@media (max-width: 767px) {
+  .assignmentModeBar {
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .assignmentModeText {
+    font-size: 0.875rem;
+  }
+
+  .assignmentModeButtons {
+    width: 100%;
+  }
+
+  .assignmentCancelButton,
+  .assignmentAssignButton {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+
+  .assignModal {
+    max-width: 100%;
+    margin: 0.5rem;
+  }
+}
