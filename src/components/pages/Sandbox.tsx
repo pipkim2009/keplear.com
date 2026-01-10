@@ -151,6 +151,12 @@ function Sandbox() {
   const [isSavingAssignment, setIsSavingAssignment] = useState(false)
   const [assignmentError, setAssignmentError] = useState<string | null>(null)
 
+  // Export to classroom state
+  const [showClassroomSelectModal, setShowClassroomSelectModal] = useState(false)
+  const [userClassrooms, setUserClassrooms] = useState<any[]>([])
+  const [isLoadingClassrooms, setIsLoadingClassrooms] = useState(false)
+  const [isExportMode, setIsExportMode] = useState(false)
+
   // Loading state - check on initial render if we have assignment to load
   const [isLoadingFromAssignment, setIsLoadingFromAssignment] = useState(() => {
     return !!localStorage.getItem('assignmentSettings')
@@ -364,6 +370,11 @@ function Sandbox() {
     setShowAssignTitleModal(false)
     setAssignmentTitle('')
     setAssignmentError(null)
+    // If in export mode, also clear the classroom assignment state
+    if (isExportMode) {
+      setAssigningToClassroomId(null)
+      setIsExportMode(false)
+    }
   }
 
   const handleCancelAssignment = () => {
@@ -447,17 +458,62 @@ function Sandbox() {
         return
       }
 
-      // Success - clean up and navigate back
+      // Success - clean up
       localStorage.removeItem('assigningToClassroom')
       setAssigningToClassroomId(null)
       setShowAssignTitleModal(false)
-      navigateToClassroom()
+
+      // If export mode, stay on sandbox; otherwise navigate to classroom
+      if (isExportMode) {
+        setIsExportMode(false)
+      } else {
+        navigateToClassroom()
+      }
     } catch (err) {
       setAssignmentError('An error occurred while saving')
       console.error('Error saving assignment:', err)
     } finally {
       setIsSavingAssignment(false)
     }
+  }
+
+  // Export to classroom handlers
+  const fetchUserClassrooms = async () => {
+    if (!user) return
+    setIsLoadingClassrooms(true)
+    try {
+      const { data, error } = await supabase
+        .from('classrooms')
+        .select('id, title')
+        .eq('created_by', user.id)
+        .order('created_at', { ascending: false })
+      if (!error && data) {
+        setUserClassrooms(data)
+      }
+    } catch (err) {
+      // Silently fail - modal will show "no classrooms" state
+    } finally {
+      setIsLoadingClassrooms(false)
+    }
+  }
+
+  const handleOpenExportModal = () => {
+    fetchUserClassrooms()
+    setShowClassroomSelectModal(true)
+  }
+
+  const handleCloseExportModal = () => {
+    setShowClassroomSelectModal(false)
+  }
+
+  const handleSelectClassroomForExport = (classroomId: string) => {
+    setAssigningToClassroomId(classroomId)
+    setShowClassroomSelectModal(false)
+    setIsExportMode(true)
+    // Open the assignment title modal directly
+    setAssignmentTitle('')
+    setAssignmentError(null)
+    setShowAssignTitleModal(true)
   }
 
   const handleLessonComplete = () => {
@@ -1476,8 +1532,8 @@ function Sandbox() {
   // Default: Free play sandbox mode
   return (
     <>
-      {/* Assignment mode buttons */}
-      {assigningToClassroomId && (
+      {/* Assignment mode buttons - only show when coming from Classroom page, not export mode */}
+      {assigningToClassroomId && !isExportMode && (
         <div className={styles.assignmentModeBar}>
           <span className={styles.assignmentModeText}>Creating Assignment</span>
           <div className={styles.assignmentModeButtons}>
@@ -1545,8 +1601,8 @@ function Sandbox() {
       />
 
       {/* Pitch Feedback Section for free play */}
-      <div style={{ width: '100%', maxWidth: '600px', margin: '2rem auto', padding: '0 1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        {generatedMelody.length > 0 && !isGeneratingMelody && (
+      {generatedMelody.length > 0 && !isGeneratingMelody && (
+        <div style={{ width: '100%', maxWidth: '600px', margin: '1rem auto', padding: '0 1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <LiveFeedback
             isListening={pitchDetection.isListening}
             onStartListening={handleStartPracticeWithFeedback}
@@ -1558,8 +1614,99 @@ function Sandbox() {
             permission={pitchDetection.permission}
             melody={generatedMelody}
           />
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Export to Classroom button - only show when logged in and not already in assignment mode */}
+      {user && !assigningToClassroomId && (() => {
+        const hasContent = selectedNotes.length > 0 ||
+                          scaleChordManagement.appliedScales.length > 0 ||
+                          scaleChordManagement.appliedChords.length > 0
+        return (
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '0.5rem', marginBottom: '1rem' }}>
+            <button
+              className={styles.exportToClassroomButton}
+              onClick={handleOpenExportModal}
+              disabled={!hasContent}
+            >
+              Export to Classroom
+            </button>
+          </div>
+        )
+      })()}
+
+      {/* Classroom selection modal */}
+      {showClassroomSelectModal && createPortal(
+        <div
+          className={styles.modalOverlay}
+          onClick={(e) => e.target === e.currentTarget && handleCloseExportModal()}
+        >
+          <div className={styles.exportModal}>
+            <div className={styles.exportModalHeader}>
+              <div>
+                <h2 className={styles.exportModalTitle}>Export to Classroom</h2>
+                <p className={styles.exportModalSubtitle}>Select a classroom to create an assignment</p>
+              </div>
+              <button
+                className={styles.exportModalClose}
+                onClick={handleCloseExportModal}
+                aria-label="Close"
+              >×</button>
+            </div>
+
+            <div className={styles.exportModalContent}>
+              {isLoadingClassrooms ? (
+                <div className={styles.exportModalLoading}>
+                  <div className={styles.exportModalSpinner}></div>
+                  <p>Loading your classrooms...</p>
+                </div>
+              ) : userClassrooms.length === 0 ? (
+                <div className={styles.exportModalEmpty}>
+                  <div className={styles.exportModalEmptyIcon}>
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 20h9"></path>
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                  </div>
+                  <h3 className={styles.exportModalEmptyTitle}>No Classrooms Yet</h3>
+                  <p className={styles.exportModalEmptyText}>
+                    Create your first classroom to start assigning lessons to students.
+                  </p>
+                  <button
+                    className={styles.exportModalCreateButton}
+                    onClick={() => {
+                      handleCloseExportModal()
+                      navigateToClassroom()
+                    }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Create a Classroom
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.exportModalList}>
+                  {userClassrooms.map((classroom) => (
+                    <button
+                      key={classroom.id}
+                      className={styles.exportModalListItem}
+                      onClick={() => handleSelectClassroomForExport(classroom.id)}
+                    >
+                      <span className={styles.exportModalListTitle}>{classroom.title}</span>
+                      <svg className={styles.exportModalListArrow} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                      </svg>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {assignTitleModal}
     </>

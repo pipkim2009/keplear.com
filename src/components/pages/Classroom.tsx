@@ -947,7 +947,7 @@ function Classroom() {
     const calculatedHigherOctaves = currentAssignment.instrument === 'keyboard' ? octaveHigh - 5 : 0
 
     return (
-      <div className={styles.classroomContainer}>
+      <>
         <div className={practiceStyles.backButtonContainer}>
           <button className={practiceStyles.backButton} onClick={handleEndLesson} aria-label="End practice session">
             End Session
@@ -1041,14 +1041,14 @@ function Classroom() {
         <WelcomeSubtitle message={welcomeMessage} onSpeechEnd={() => setWelcomeSpeechDone(true)} />
         {melodySetupMessage && <WelcomeSubtitle message={melodySetupMessage} onSpeechEnd={() => setAutoPlayAudio(true)} />}
         {congratulationsMessage && <WelcomeSubtitle message={congratulationsMessage} onSpeechEnd={handleEndLesson} />}
-      </div>
+      </>
     )
   }
 
   // ========== RENDER: Creating Assignment Mode ==========
   if (viewMode === 'creating-assignment' && assigningToClassroomId) {
     return (
-      <div className={styles.classroomContainer}>
+      <>
         <div className={practiceStyles.assignmentModeBar}>
           <span className={practiceStyles.assignmentModeText}>Creating Assignment</span>
           <div className={practiceStyles.assignmentModeButtons}>
@@ -1109,7 +1109,7 @@ function Classroom() {
         />
 
         {assignTitleModal}
-      </div>
+      </>
     )
   }
 
