@@ -151,6 +151,11 @@ function Sandbox() {
   const [isSavingAssignment, setIsSavingAssignment] = useState(false)
   const [assignmentError, setAssignmentError] = useState<string | null>(null)
 
+  // Loading state - check on initial render if we have assignment to load
+  const [isLoadingFromAssignment, setIsLoadingFromAssignment] = useState(() => {
+    return !!localStorage.getItem('assignmentSettings')
+  })
+
   // Flag to force initialization when loading from assignment (bypasses hasNoContent check)
   const [forceInitFromAssignment, setForceInitFromAssignment] = useState(false)
 
@@ -233,15 +238,19 @@ function Sandbox() {
         // will set appliedScales/appliedChords directly, replacing any existing data.
         clearSelection()
 
-        // Start session - the second effect will apply the selection data
-        setTimeout(() => {
-          setSessionStarted(true)
-        }, 100)
+        // Start session immediately - this puts user directly into practice mode
+        console.error('Setting sessionStarted=true, selectedInstrument=', settings.instrument)
+        setSessionStarted(true)
+        setIsLoadingFromAssignment(false)
 
       } catch (err) {
         console.error('Error parsing assignment settings:', err)
         localStorage.removeItem('assignmentSettings')
+        setIsLoadingFromAssignment(false)
       }
+    } else {
+      // No assignment settings found, clear loading state
+      setIsLoadingFromAssignment(false)
     }
   }, [setInstrument, clearSelection, setBpm, setNumberOfBeats])
 
@@ -1286,7 +1295,8 @@ function Sandbox() {
     }, 300) // 300ms delay to ensure components are mounted
 
     return () => clearTimeout(applyTimeoutId)
-  }, [pendingSelectionData, scaleChordManagement.setAppliedScalesDirectly, scaleChordManagement.setAppliedChordsDirectly, scaleChordManagement.noteHandlers, scaleChordManagement.bassNoteHandlers, setChordMode, selectNote])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingSelectionData])
 
   // Trigger melody generation once notes/scales/chords are selected (for all lesson types)
   useEffect(() => {
@@ -1313,7 +1323,13 @@ function Sandbox() {
   }, [welcomeSpeechDone, generatedMelody, recordedAudioBlob, setupDetails])
 
 
+  // If loading from assignment, show nothing (prevents flash of sandbox mode)
+  if (isLoadingFromAssignment) {
+    return null
+  }
+
   // If session started, show the practice session UI
+  console.error('Render check - sessionStarted:', sessionStarted, 'selectedInstrument:', selectedInstrument)
   if (sessionStarted && selectedInstrument) {
     const instrumentName = instrumentNames[selectedInstrument] || 'Instrument'
     const welcomeMessage = `Welcome to your ${instrumentName} lesson`
