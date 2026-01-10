@@ -70,6 +70,7 @@ interface InstrumentDisplayProps {
   fretRangeLow?: number
   fretRangeHigh?: number
   lessonType?: 'melodies' | 'chords'
+  externalSelectedNoteIds?: string[]
 }
 
 const InstrumentDisplay = memo(function InstrumentDisplay({
@@ -133,7 +134,8 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   autoPlayAudio = false,
   fretRangeLow,
   fretRangeHigh,
-  lessonType
+  lessonType,
+  externalSelectedNoteIds
 }: InstrumentDisplayProps) {
   const [lowerOctaves, setLowerOctaves] = useState<number>(initialLowerOctaves)
   const [higherOctaves, setHigherOctaves] = useState<number>(initialHigherOctaves)
@@ -469,6 +471,7 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           onBassNoteHandlersReady={setBassNoteHandlers}
           appliedScales={appliedScales}
           appliedChords={appliedChords}
+          externalSelectedNoteIds={externalSelectedNoteIds}
           fretboardPreview={fretboardPreview}
           keyboardPreview={keyboardPreview}
           disableNoteSelection={practiceMode}

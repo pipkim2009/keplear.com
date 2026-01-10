@@ -278,6 +278,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
       // Always use multi-select mode
       selectNote(note, 'multi')
     } catch (error) {
+      console.error('handleNoteClick error:', error)
     }
   }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, isGeneratingMelody, isAutoRecording])
 

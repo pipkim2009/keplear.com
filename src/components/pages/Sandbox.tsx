@@ -191,8 +191,6 @@ function Sandbox() {
     if (storedSettings) {
       try {
         const settings = JSON.parse(storedSettings)
-        console.log('Loading assignment settings:', settings)
-        console.log('Selection data from settings:', settings.selectionData)
 
         // Clear the stored settings so they don't persist
         localStorage.removeItem('assignmentSettings')
@@ -239,12 +237,11 @@ function Sandbox() {
         clearSelection()
 
         // Start session immediately - this puts user directly into practice mode
-        console.error('Setting sessionStarted=true, selectedInstrument=', settings.instrument)
         setSessionStarted(true)
         setIsLoadingFromAssignment(false)
 
       } catch (err) {
-        console.error('Error parsing assignment settings:', err)
+        // Error parsing assignment settings
         localStorage.removeItem('assignmentSettings')
         setIsLoadingFromAssignment(false)
       }
@@ -420,7 +417,6 @@ function Sandbox() {
     // octaveHigh = 5 + higherOctaves (end octave plus higher extension)
     const octaveLow = 4 - lowerOctaves
     const octaveHigh = 5 + higherOctaves
-    console.log('Saving assignment - lowerOctaves:', lowerOctaves, 'higherOctaves:', higherOctaves, '-> octaveLow:', octaveLow, 'octaveHigh:', octaveHigh)
 
     try {
       setIsSavingAssignment(true)
@@ -484,12 +480,9 @@ function Sandbox() {
   // Auto-select notes/scales/chords and BPM when session starts
   useEffect(() => {
     // Use ref to prevent double initialization (React Strict Mode or async timing)
-    console.log('Init effect check - sessionStarted:', sessionStarted, 'hasInitializedNotes:', hasInitializedNotes.current, 'lessonSettings:', !!lessonSettings)
     if (!sessionStarted || hasInitializedNotes.current || !lessonSettings) {
       return
     }
-
-    console.log('Init effect running - forceInitFromAssignment:', forceInitFromAssignment, 'selectionData:', lessonSettings.selectionData)
 
     const hasNoContent = selectedNotes.length === 0 &&
                          scaleChordManagement.appliedScales.length === 0 &&
@@ -497,7 +490,6 @@ function Sandbox() {
 
     // For assignment-loaded sessions, force initialization regardless of current content
     const shouldInitialize = hasNoContent || forceInitFromAssignment
-    console.log('shouldInitialize:', shouldInitialize, 'hasNoContent:', hasNoContent)
 
     // Reset the force flag after checking
     if (forceInitFromAssignment) {
@@ -510,11 +502,7 @@ function Sandbox() {
     const selectedChordCount = lessonSettings.chordCount
 
     // If we have selectionData, restore the exact teacher selection instead of randomizing
-    console.error('=== INIT EFFECT CHECK ===')
-    console.error('shouldInitialize:', shouldInitialize, 'hasSelectionData:', !!lessonSettings.selectionData)
-    console.error('selectedInstrument:', selectedInstrument)
     if (shouldInitialize && lessonSettings.selectionData) {
-      console.error('ENTERING selectionData branch with:', lessonSettings.selectionData)
       hasInitializedNotes.current = true
       setBpm(selectedBpm)
       setNumberOfBeats(selectedNoteCount)
@@ -536,36 +524,26 @@ function Sandbox() {
       // Apply the exact selection after handlers are ready
       // For guitar/bass, we need to wait for InstrumentDisplay to mount and register handlers
       const applySelectionData = () => {
-        console.log('Applying assignment selection data:', selectionData)
-        console.log('Handlers ready check - scaleHandlers:', !!scaleChordManagement.scaleHandlers, 'chordHandlers:', !!scaleChordManagement.chordHandlers, 'bassScaleHandlers:', !!scaleChordManagement.bassScaleHandlers, 'bassChordHandlers:', !!scaleChordManagement.bassChordHandlers)
-
         // Apply scales
         if (selectionData.appliedScales && selectionData.appliedScales.length > 0) {
-          console.log('Applying scales:', selectionData.appliedScales)
           if (selectedInstrument === 'keyboard') {
             selectionData.appliedScales.forEach(scaleData => {
               const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
-              console.log('Found scale object:', scaleObj, 'for', scaleData.scaleName)
               if (scaleObj) {
-                console.log('Calling handleKeyboardScaleApply:', scaleData.root, scaleObj.name, scaleData.octave || 4)
                 scaleChordManagement.handleKeyboardScaleApply(scaleData.root, scaleObj, scaleData.octave || 4)
               }
             })
           } else if (selectedInstrument === 'guitar') {
             selectionData.appliedScales.forEach(scaleData => {
               const scaleObj = GUITAR_SCALES.find(s => s.name === scaleData.scaleName)
-              console.log('Guitar scale - scaleObj:', scaleObj, 'scaleHandlers:', !!scaleChordManagement.scaleHandlers)
               if (scaleObj) {
-                // Use handleScaleSelect which properly registers the scale
                 scaleChordManagement.handleScaleSelect(scaleData.root, scaleObj)
               }
             })
           } else if (selectedInstrument === 'bass') {
             selectionData.appliedScales.forEach(scaleData => {
               const scaleObj = BASS_SCALES.find(s => s.name === scaleData.scaleName)
-              console.log('Bass scale - scaleObj:', scaleObj, 'bassScaleHandlers:', !!scaleChordManagement.bassScaleHandlers)
               if (scaleObj) {
-                // Use handleScaleSelect which properly registers the scale
                 scaleChordManagement.handleScaleSelect(scaleData.root, scaleObj as any)
               }
             })
@@ -574,21 +552,17 @@ function Sandbox() {
 
         // Apply chords
         if (selectionData.appliedChords && selectionData.appliedChords.length > 0) {
-          console.log('Applying chords:', selectionData.appliedChords)
           setChordMode('progression')
           if (selectedInstrument === 'keyboard') {
             selectionData.appliedChords.forEach(chordData => {
               const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
-              console.log('Found chord object:', chordObj, 'for', chordData.chordName)
               if (chordObj) {
-                console.log('Calling handleKeyboardChordApply:', chordData.root, chordObj.name, chordData.octave || 4)
                 scaleChordManagement.handleKeyboardChordApply(chordData.root, chordObj, chordData.octave || 4)
               }
             })
           } else if (selectedInstrument === 'guitar') {
             selectionData.appliedChords.forEach(chordData => {
               const chordObj = GUITAR_CHORDS.find(c => c.name === chordData.chordName)
-              console.log('Guitar chord - chordObj:', chordObj, 'chordHandlers:', !!scaleChordManagement.chordHandlers)
               if (chordObj) {
                 scaleChordManagement.handleGuitarChordApply(chordData.root, chordObj, chordData.fretZone || 0)
               }
@@ -596,7 +570,6 @@ function Sandbox() {
           } else if (selectedInstrument === 'bass') {
             selectionData.appliedChords.forEach(chordData => {
               const chordObj = BASS_CHORDS.find(c => c.name === chordData.chordName)
-              console.log('Bass chord - chordObj:', chordObj, 'bassChordHandlers:', !!scaleChordManagement.bassChordHandlers)
               if (chordObj) {
                 scaleChordManagement.handleBassChordApply(chordData.root, chordObj, chordData.fretZone || 0)
               }
@@ -606,8 +579,6 @@ function Sandbox() {
 
         // Apply individual notes
         if (selectionData.selectedNoteIds && selectionData.selectedNoteIds.length > 0) {
-          console.log('Applying individual notes:', selectionData.selectedNoteIds)
-
           if (selectedInstrument === 'keyboard') {
             // Calculate octave range for note lookup
             // Default keyboard range is 4-5, so:
@@ -624,17 +595,13 @@ function Sandbox() {
             selectionData.selectedNoteIds.forEach((noteId: string) => {
               const noteObj = getKeyboardNoteById(noteId, lowerOctaves, higherOctaves)
               if (noteObj) {
-                console.log('Selecting keyboard note:', noteId, noteObj)
                 selectNote(noteObj, 'multi')
-              } else {
-                console.log('Could not find keyboard note:', noteId)
               }
             })
           } else if (selectedInstrument === 'guitar') {
             selectionData.selectedNoteIds.forEach((noteId: string) => {
               const noteObj = getGuitarNoteById(noteId)
               if (noteObj) {
-                console.log('Selecting guitar note:', noteId)
                 // Convert guitar note to Note format for selectNote
                 const note = {
                   id: noteObj.id,
@@ -650,7 +617,6 @@ function Sandbox() {
             selectionData.selectedNoteIds.forEach((noteId: string) => {
               const noteObj = getBassNoteById(noteId)
               if (noteObj) {
-                console.log('Selecting bass note:', noteId)
                 // Convert bass note to Note format for selectNote
                 const note = {
                   id: noteObj.id,
@@ -672,11 +638,6 @@ function Sandbox() {
         setTimeout(applySelectionData, 300)
       } else {
         // Store the selection data and instrument - a separate useEffect will apply it when handlers are ready
-        console.error('=== STORING PENDING SELECTION DATA ===')
-        console.error('For instrument:', selectedInstrument)
-        console.error('SelectionData scales:', selectionData.appliedScales?.length || 0)
-        console.error('SelectionData chords:', selectionData.appliedChords?.length || 0)
-        console.error('SelectionData notes:', selectionData.selectedNoteIds?.length || 0)
         setPendingSelectionData({
           instrument: selectedInstrument,
           selectionData: selectionData,
@@ -1060,18 +1021,10 @@ function Sandbox() {
 
     const { instrument: pendingInstrument, selectionData } = pendingSelectionData
 
-    console.log('Applying pending selection data directly for:', pendingInstrument, selectionData)
-
     // Delay to ensure Guitar/Bass components have mounted and their sync effects are ready
     const applyTimeoutId = setTimeout(() => {
-    console.error('=== PENDING SELECTION EFFECT RUNNING ===')
-    console.error('Instrument:', pendingInstrument)
-    console.error('Selection data:', JSON.stringify(selectionData, null, 2))
-
     // Apply scales using direct setter
     if (selectionData.appliedScales && selectionData.appliedScales.length > 0) {
-      console.error('Found scales to apply:', selectionData.appliedScales.length)
-
       const scalesToApply: AppliedScale[] = []
 
       if (pendingInstrument === 'guitar') {
@@ -1081,14 +1034,11 @@ function Sandbox() {
           const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
           const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
           const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-          console.error('Looking for scale:', scaleData.scaleName, '-> base name:', baseScaleName, 'frets:', fretLow, '-', fretHigh)
           const scaleObj = GUITAR_SCALES.find(s => s.name === baseScaleName || s.name === scaleData.scaleName)
-          console.error('Found scale object:', scaleObj?.name)
           if (scaleObj) {
             // Get scale positions and filter to the specific fret range
             const allPositions = getScalePositions(scaleData.root, scaleObj, guitarNotes)
             const positions = allPositions.filter(pos => pos.fret >= fretLow && pos.fret <= fretHigh)
-            console.error('Filtered positions:', allPositions.length, '->', positions.length)
             const scaleNotes = positions.map(pos => {
               const noteId = `g-s${pos.string}-f${pos.fret}`
               const guitarNote = getGuitarNoteById(noteId)
@@ -1153,19 +1103,12 @@ function Sandbox() {
       }
 
       if (scalesToApply.length > 0) {
-        console.error('Calling setAppliedScalesDirectly with:', scalesToApply.length, 'scales')
-        console.error('Scale notes sample:', scalesToApply[0]?.notes?.slice(0, 3))
         scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-      } else {
-        console.error('No scales to apply!')
       }
-    } else {
-      console.error('No appliedScales in selectionData')
     }
 
     // Apply chords using direct setter
     if (selectionData.appliedChords && selectionData.appliedChords.length > 0) {
-      console.log('Setting applied chords directly:', selectionData.appliedChords)
       setChordMode('progression')
 
       const chordsToApply: AppliedChord[] = []
@@ -1177,9 +1120,7 @@ function Sandbox() {
           let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
           // Remove root note prefix (e.g., "C Major" -> "Major", "C# Minor" -> "Minor")
           baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
-          console.error('Chord lookup:', chordData.chordName, '-> base:', baseChordName)
           const chordObj = GUITAR_CHORDS.find(c => c.name === baseChordName || c.name === chordData.chordName)
-          console.error('Found chord:', chordObj?.name)
           if (chordObj) {
             const chordBoxes = getChordBoxes(chordData.root, chordObj, guitarNotes)
             if (chordBoxes.length > 0) {
@@ -1244,11 +1185,9 @@ function Sandbox() {
     // Apply individual notes - filter out nulls from old assignments
     const validNoteIds = (selectionData.selectedNoteIds || []).filter((id: string | null) => id !== null && id !== undefined)
     if (validNoteIds.length > 0) {
-      console.error('Applying pending notes:', validNoteIds)
       if (pendingInstrument === 'guitar') {
         // Use note handler if available to set manual notes directly on guitar
         if (scaleChordManagement.noteHandlers?.handleSetManualNotes) {
-          console.error('Using guitar note handler to set manual notes')
           scaleChordManagement.noteHandlers.handleSetManualNotes(validNoteIds)
         } else {
           // Fallback to context selectNote
@@ -1269,7 +1208,6 @@ function Sandbox() {
       } else if (pendingInstrument === 'bass') {
         // Use bass note handler if available
         if (scaleChordManagement.bassNoteHandlers?.handleSetManualNotes) {
-          console.error('Using bass note handler to set manual notes')
           scaleChordManagement.bassNoteHandlers.handleSetManualNotes(validNoteIds)
         } else {
           // Fallback to context selectNote
@@ -1329,7 +1267,6 @@ function Sandbox() {
   }
 
   // If session started, show the practice session UI
-  console.error('Render check - sessionStarted:', sessionStarted, 'selectedInstrument:', selectedInstrument)
   if (sessionStarted && selectedInstrument) {
     const instrumentName = instrumentNames[selectedInstrument] || 'Instrument'
     const welcomeMessage = `Welcome to your ${instrumentName} lesson`
@@ -1340,7 +1277,6 @@ function Sandbox() {
     const octaveHigh = lessonSettings?.octaveHigh ?? 5
     const calculatedLowerOctaves = selectedInstrument === 'keyboard' ? 4 - octaveLow : 0
     const calculatedHigherOctaves = selectedInstrument === 'keyboard' ? octaveHigh - 5 : 0
-    console.log('Session render - octaveLow:', octaveLow, 'octaveHigh:', octaveHigh, '-> calculatedLower:', calculatedLowerOctaves, 'calculatedHigher:', calculatedHigherOctaves)
 
     // Get fret range for guitar/bass lessons
     // For assignments with selection data, don't restrict fret range (show full fretboard)

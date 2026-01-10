@@ -59,6 +59,7 @@ interface InstrumentRendererProps {
   } | null) => void
   appliedScales?: AppliedScale[]
   appliedChords?: AppliedChord[]
+  externalSelectedNoteIds?: string[]
   fretboardPreview?: FretboardPreview | null
   keyboardPreview?: KeyboardPreview | null
   disableNoteSelection?: boolean
@@ -93,6 +94,7 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
   onBassNoteHandlersReady,
   appliedScales,
   appliedChords,
+  externalSelectedNoteIds,
   fretboardPreview,
   keyboardPreview,
   disableNoteSelection = false,
@@ -130,6 +132,7 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           onNoteHandlersReady={onNoteHandlersReady}
           appliedScales={appliedScales}
           appliedChords={appliedChords}
+          externalSelectedNoteIds={externalSelectedNoteIds}
           currentlyPlayingNote={currentlyPlayingNote}
           currentlyPlayingNoteNames={currentlyPlayingNoteNames}
           currentlyPlayingNoteIds={currentlyPlayingNoteIds}
@@ -151,6 +154,7 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
           onNoteHandlersReady={onBassNoteHandlersReady}
           appliedScales={appliedScales}
           appliedChords={appliedChords}
+          externalSelectedNoteIds={externalSelectedNoteIds}
           currentlyPlayingNote={currentlyPlayingNote}
           currentlyPlayingNoteNames={currentlyPlayingNoteNames}
           currentlyPlayingNoteIds={currentlyPlayingNoteIds}

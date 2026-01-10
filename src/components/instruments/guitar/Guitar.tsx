@@ -29,6 +29,7 @@ interface GuitarProps {
   }) => void
   appliedScales?: AppliedScale[]
   appliedChords?: AppliedChord[]
+  externalSelectedNoteIds?: string[]
   currentlyPlayingNote?: Note | null
   currentlyPlayingNoteNames?: string[]
   currentlyPlayingNoteIds?: string[]
@@ -39,7 +40,7 @@ interface GuitarProps {
   fretRangeHigh?: number
 }
 
-const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false, fretRangeLow, fretRangeHigh }) => {
+const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, externalSelectedNoteIds, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false, fretRangeLow, fretRangeHigh }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -347,6 +348,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           const isManual = isOpenStringInManualLayer(stringIndex)
 
           melodyNotes.push({
+            id: `g-s${guitarString}-f0`, // Include ID for open string
             name: openNote.name,
             frequency: openNote.frequency,
             isBlack: openNote.name.includes('#'),
@@ -375,6 +377,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
 
             // Convert to melody system format
             melodyNotes.push({
+              id: `g-s${guitarString}-f${fretIndex + 1}`, // Include ID for fretted note
               name: noteName,
               frequency: guitarNote ? guitarNote.frequency : 0,
               isBlack: noteName.includes('#'),
@@ -932,11 +935,8 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   const prevAppliedChordsLength = useRef(0)
 
   useEffect(() => {
-    console.error('Guitar sync effect - appliedScales:', appliedScales?.length, 'prev:', prevAppliedScalesLength.current)
     // Only sync when scales are added (not when cleared)
     if (appliedScales && appliedScales.length > 0 && appliedScales.length !== prevAppliedScalesLength.current) {
-      console.error('Guitar: SYNCING from appliedScales prop:', appliedScales)
-
       // Build note keys from all applied scales
       const newScaleNotes = new Set<string>()
       appliedScales.forEach(appliedScale => {
@@ -951,27 +951,17 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         }
       })
 
-      console.error('Guitar: Built', newScaleNotes.size, 'scale notes:', Array.from(newScaleNotes).slice(0, 5))
       if (newScaleNotes.size > 0) {
-        console.error('Guitar: Setting scale notes from props:', newScaleNotes.size)
         setScaleSelectedNotes(newScaleNotes)
         setSelectedNotes(prev => new Set([...prev, ...newScaleNotes]))
-      } else {
-        console.error('Guitar: No scale notes built - checking notes structure')
-        appliedScales.forEach((s, i) => {
-          console.error(`Scale ${i}: notes count=${s.notes?.length}, sample note=`, s.notes?.[0])
-        })
       }
     }
     prevAppliedScalesLength.current = appliedScales?.length || 0
   }, [appliedScales])
 
   useEffect(() => {
-    console.error('Guitar chord sync effect - appliedChords:', appliedChords?.length, 'prev:', prevAppliedChordsLength.current)
     // Only sync when chords are added (not when cleared)
     if (appliedChords && appliedChords.length > 0 && appliedChords.length !== prevAppliedChordsLength.current) {
-      console.error('Guitar: SYNCING from appliedChords prop:', appliedChords)
-
       // Build note keys from all applied chords
       const newChordNotes = new Set<string>()
       appliedChords.forEach(appliedChord => {
@@ -990,20 +980,25 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
         }
       })
 
-      console.error('Guitar: Built', newChordNotes.size, 'chord notes:', Array.from(newChordNotes).slice(0, 5))
       if (newChordNotes.size > 0) {
-        console.error('Guitar: Setting chord notes from props:', newChordNotes.size)
         setChordSelectedNotes(newChordNotes)
         setSelectedNotes(prev => new Set([...prev, ...newChordNotes]))
-      } else {
-        console.error('Guitar: No chord notes built - checking structure')
-        appliedChords.forEach((c, i) => {
-          console.error(`Chord ${i}: noteKeys=${c.noteKeys?.length}, notes=${c.notes?.length}`)
-        })
       }
     }
     prevAppliedChordsLength.current = appliedChords?.length || 0
   }, [appliedChords])
+
+  // Sync internal state from externalSelectedNoteIds prop (for assignment loading)
+  const prevExternalNoteIdsLength = useRef(0)
+
+  useEffect(() => {
+    // Only sync when notes are added (not when cleared)
+    if (externalSelectedNoteIds && externalSelectedNoteIds.length > 0 && externalSelectedNoteIds.length !== prevExternalNoteIdsLength.current) {
+      // Use the handleSetManualNotes function to apply the notes
+      handleSetManualNotes(externalSelectedNoteIds)
+    }
+    prevExternalNoteIdsLength.current = externalSelectedNoteIds?.length || 0
+  }, [externalSelectedNoteIds, handleSetManualNotes])
 
   // Track previous clearTrigger to only clear on actual changes
   const prevClearTrigger = useRef(clearTrigger)

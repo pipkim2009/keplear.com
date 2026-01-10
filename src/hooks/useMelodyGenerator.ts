@@ -43,14 +43,21 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
       setSelectedNotes(prev => prev.length < 2 ? [...prev, note] : [note])
     } else {
       // Multi mode: toggle individual note selection
+      // For guitar/bass, compare by ID to allow same note name on different strings
+      // For keyboard, fall back to name comparison
       setSelectedNotes(prev => {
-        const isAlreadySelected = prev.some(n => n.name === note.name)
+        const isAlreadySelected = note.id
+          ? prev.some(n => n.id === note.id)
+          : prev.some(n => n.name === note.name)
         if (isAlreadySelected) {
           // Remove the note if already selected
-          return prev.filter(n => n.name !== note.name)
+          return note.id
+            ? prev.filter(n => n.id !== note.id)
+            : prev.filter(n => n.name !== note.name)
         } else {
-          // Add the note
-          return [...prev, note]
+          // Add the note - make sure to preserve the id
+          const noteWithId = { ...note }
+          return [...prev, noteWithId]
         }
       })
     }
@@ -303,8 +310,10 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
    * @param note - The note to check
    * @returns True if the note is selected
    */
-  const isSelected = useCallback((note: Note): boolean => 
-    selectedNotes.some(n => n.name === note.name), [selectedNotes])
+  const isSelected = useCallback((note: Note): boolean =>
+    note.id
+      ? selectedNotes.some(n => n.id === note.id)
+      : selectedNotes.some(n => n.name === note.name), [selectedNotes])
 
   /**
    * Checks if a note is part of the generated melody (when notes are shown)

@@ -29,6 +29,7 @@ interface BassProps {
   }) => void
   appliedScales?: AppliedScale[]
   appliedChords?: AppliedChord[]
+  externalSelectedNoteIds?: string[]
   currentlyPlayingNote?: Note | null
   currentlyPlayingNoteNames?: string[]
   currentlyPlayingNoteIds?: string[]
@@ -39,7 +40,7 @@ interface BassProps {
   fretRangeHigh?: number
 }
 
-const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false, fretRangeLow, fretRangeHigh }) => {
+const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, externalSelectedNoteIds, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false, fretRangeLow, fretRangeHigh }) => {
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(4).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -320,6 +321,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
           const isManual = isOpenStringInManualLayer(stringIndex)
 
           melodyNotes.push({
+            id: `b-s${bassString}-f0`, // Include ID for open string
             name: openNote.name,
             frequency: openNote.frequency,
             isBlack: openNote.name.includes('#'),
@@ -345,6 +347,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             const isManual = isNoteInManualLayer(stringIndex, fretIndex)
 
             melodyNotes.push({
+              id: `b-s${bassString}-f${fretIndex + 1}`, // Include ID for fretted note
               name: noteName,
               frequency: bassNote ? bassNote.frequency : 0,
               isBlack: noteName.includes('#'),
@@ -801,8 +804,6 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   useEffect(() => {
     // Only sync when scales are added (not when cleared)
     if (appliedScales && appliedScales.length > 0 && appliedScales.length !== prevAppliedScalesLength.current) {
-      console.log('Bass: Syncing from appliedScales prop:', appliedScales)
-
       // Build note keys from all applied scales
       const newScaleNotes = new Set<string>()
       appliedScales.forEach(appliedScale => {
@@ -818,7 +819,6 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       })
 
       if (newScaleNotes.size > 0) {
-        console.log('Bass: Setting scale notes from props:', newScaleNotes)
         setScaleSelectedNotes(newScaleNotes)
         setSelectedNotes(prev => new Set([...prev, ...newScaleNotes]))
       }
@@ -829,8 +829,6 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   useEffect(() => {
     // Only sync when chords are added (not when cleared)
     if (appliedChords && appliedChords.length > 0 && appliedChords.length !== prevAppliedChordsLength.current) {
-      console.log('Bass: Syncing from appliedChords prop:', appliedChords)
-
       // Build note keys from all applied chords
       const newChordNotes = new Set<string>()
       appliedChords.forEach(appliedChord => {
@@ -850,13 +848,24 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       })
 
       if (newChordNotes.size > 0) {
-        console.log('Bass: Setting chord notes from props:', newChordNotes)
         setChordSelectedNotes(newChordNotes)
         setSelectedNotes(prev => new Set([...prev, ...newChordNotes]))
       }
     }
     prevAppliedChordsLength.current = appliedChords?.length || 0
   }, [appliedChords])
+
+  // Sync internal state from externalSelectedNoteIds prop (for assignment loading)
+  const prevExternalNoteIdsLength = useRef(0)
+
+  useEffect(() => {
+    // Only sync when notes are added (not when cleared)
+    if (externalSelectedNoteIds && externalSelectedNoteIds.length > 0 && externalSelectedNoteIds.length !== prevExternalNoteIdsLength.current) {
+      // Use the handleSetManualNotes function to apply the notes
+      handleSetManualNotes(externalSelectedNoteIds)
+    }
+    prevExternalNoteIdsLength.current = externalSelectedNoteIds?.length || 0
+  }, [externalSelectedNoteIds, handleSetManualNotes])
 
   // Track previous clearTrigger to only clear on actual changes
   const prevClearTrigger = useRef(clearTrigger)

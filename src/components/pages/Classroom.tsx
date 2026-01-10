@@ -17,10 +17,10 @@ import type { AppliedScale, AppliedChord } from '../common/ScaleChordOptions'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
 import { GUITAR_SCALES, ROOT_NOTES as GUITAR_ROOT_NOTES, getScalePositions } from '../../utils/instruments/guitar/guitarScales'
-import { GUITAR_CHORDS } from '../../utils/instruments/guitar/guitarChords'
+import { GUITAR_CHORDS, getChordBoxes } from '../../utils/instruments/guitar/guitarChords'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
 import { BASS_SCALES, BASS_ROOT_NOTES, getBassScalePositions } from '../../utils/instruments/bass/bassScales'
-import { BASS_CHORDS } from '../../utils/instruments/bass/bassChords'
+import { BASS_CHORDS, getBassChordBoxes } from '../../utils/instruments/bass/bassChords'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
 import {
   getGuitarNoteById,
@@ -201,6 +201,7 @@ function Classroom() {
   // Lesson taking state
   const [currentAssignment, setCurrentAssignment] = useState<AssignmentData | null>(null)
   const [pendingSelectionData, setPendingSelectionData] = useState<any>(null)
+  const [externalSelectedNoteIds, setExternalSelectedNoteIds] = useState<string[]>([])
   const [welcomeSpeechDone, setWelcomeSpeechDone] = useState(false)
   const [hasGeneratedMelody, setHasGeneratedMelody] = useState(false)
   const [autoPlayAudio, setAutoPlayAudio] = useState(false)
@@ -461,8 +462,15 @@ function Classroom() {
     const appliedScaleNames = scaleChordManagement.appliedScales.map(s => s.scale?.name || 'Major')
     const appliedChordNames = scaleChordManagement.appliedChords.map(c => c.chord?.name || 'Major')
 
+    // Only save manually selected notes (not scale/chord notes)
+    // For guitar/bass, isManualSelection === true means manual
+    // For keyboard, isManualSelection is undefined (all keyboard notes are manual)
+    const manualNoteIds = selectedNotes
+      .filter(n => n.isManualSelection === true || n.isManualSelection === undefined)
+      .map(n => n.id)
+
     const selectionData = {
-      selectedNoteIds: selectedNotes.map(n => n.id),
+      selectedNoteIds: manualNoteIds,
       appliedScales: scaleChordManagement.appliedScales.map(s => ({
         root: s.root,
         scaleName: s.scale?.name || 'Major',
@@ -541,8 +549,11 @@ function Classroom() {
     setBpm(assignment.bpm)
     setNumberOfBeats(assignment.beats)
 
-    // Clear existing content
+    // Clear ALL existing content (notes, scales, chords)
     clearSelection()
+    scaleChordManagement.setAppliedScalesDirectly([])
+    scaleChordManagement.setAppliedChordsDirectly([])
+    setExternalSelectedNoteIds([])
 
     setViewMode('taking-lesson')
   }
@@ -556,6 +567,7 @@ function Classroom() {
     performanceGrading.stopPerformance()
     setCurrentAssignment(null)
     setPendingSelectionData(null)
+    setExternalSelectedNoteIds([])
     clearSelection()
     triggerClearChordsAndScales()
     setViewMode('classroom')
@@ -707,14 +719,25 @@ function Classroom() {
             baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
             const chordObj = GUITAR_CHORDS.find(c => c.name === baseChordName || c.name === chordData.chordName)
             if (chordObj) {
-              chordsToApply.push({
-                id: `guitar-${chordData.root}-${chordObj.name}-${Date.now()}`,
-                root: chordData.root,
-                chord: chordObj as any,
-                displayName: `${chordData.root} ${chordObj.name}`,
-                noteKeys: [],
-                fretZone: chordData.fretZone || 0
-              })
+              // Compute actual chord positions
+              const chordBoxes = getChordBoxes(chordData.root, chordObj, guitarNotes)
+              if (chordBoxes.length > 0) {
+                const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
+                const chordBox = chordBoxes[boxIndex]
+                const noteKeys = chordBox.positions.map(pos => {
+                  const stringIndex = 6 - pos.string
+                  const fretIndex = pos.fret
+                  return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                })
+                chordsToApply.push({
+                  id: `guitar-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
+                  root: chordData.root,
+                  chord: chordObj as any,
+                  displayName: `${chordData.root} ${chordObj.name}`,
+                  noteKeys: noteKeys,
+                  fretZone: boxIndex
+                })
+              }
             }
           })
         } else if (pendingInstrument === 'bass') {
@@ -723,14 +746,25 @@ function Classroom() {
             baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
             const chordObj = BASS_CHORDS.find(c => c.name === baseChordName || c.name === chordData.chordName)
             if (chordObj) {
-              chordsToApply.push({
-                id: `bass-${chordData.root}-${chordObj.name}-${Date.now()}`,
-                root: chordData.root,
-                chord: chordObj as any,
-                displayName: `${chordData.root} ${chordObj.name}`,
-                noteKeys: [],
-                fretZone: chordData.fretZone || 0
-              })
+              // Compute actual chord positions
+              const chordBoxes = getBassChordBoxes(chordData.root, chordObj, bassNotes)
+              if (chordBoxes.length > 0) {
+                const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
+                const chordBox = chordBoxes[boxIndex]
+                const noteKeys = chordBox.positions.map(pos => {
+                  const stringIndex = 4 - pos.string
+                  const fretIndex = pos.fret
+                  return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                })
+                chordsToApply.push({
+                  id: `bass-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
+                  root: chordData.root,
+                  chord: chordObj as any,
+                  displayName: `${chordData.root} ${chordObj.name}`,
+                  noteKeys: noteKeys,
+                  fretZone: boxIndex
+                })
+              }
             }
           })
         }
@@ -740,27 +774,10 @@ function Classroom() {
         }
       }
 
-      // Apply notes
-      const validNoteIds = (selectionData.selectedNoteIds || []).filter((id: string | null) => id !== null)
+      // Apply notes - set external note IDs for Guitar/Bass to sync from
+      const validNoteIds = (selectionData.selectedNoteIds || []).filter((id: string | null) => id !== null) as string[]
       if (validNoteIds.length > 0) {
-        if (pendingInstrument === 'guitar' && scaleChordManagement.noteHandlers?.handleSetManualNotes) {
-          scaleChordManagement.noteHandlers.handleSetManualNotes(validNoteIds)
-        } else if (pendingInstrument === 'bass' && scaleChordManagement.bassNoteHandlers?.handleSetManualNotes) {
-          scaleChordManagement.bassNoteHandlers.handleSetManualNotes(validNoteIds)
-        } else {
-          validNoteIds.forEach((noteId: string) => {
-            const noteObj = pendingInstrument === 'guitar' ? getGuitarNoteById(noteId) : getBassNoteById(noteId)
-            if (noteObj) {
-              selectNote({
-                id: noteObj.id,
-                name: noteObj.name,
-                frequency: noteObj.frequency,
-                isBlack: noteObj.name.includes('#'),
-                position: noteObj.position
-              }, 'multi')
-            }
-          })
-        }
+        setExternalSelectedNoteIds(validNoteIds)
       }
 
       setPendingSelectionData(null)
@@ -1002,6 +1019,7 @@ function Classroom() {
           practiceMode={true}
           autoPlayAudio={autoPlayAudio}
           lessonType={currentAssignment.lesson_type as 'melodies' | 'chords' | undefined}
+          externalSelectedNoteIds={externalSelectedNoteIds}
         />
 
         {generatedMelody.length > 0 && !isGeneratingMelody && (

@@ -851,12 +851,10 @@ export const useScaleChordManagement = ({
 
   // Direct setters for loading assignments (bypasses handlers)
   const setAppliedScalesDirectly = useCallback((scales: AppliedScale[]) => {
-    console.log('Setting applied scales directly:', scales)
     setAppliedScales(scales)
   }, [])
 
   const setAppliedChordsDirectly = useCallback((chords: AppliedChord[]) => {
-    console.log('Setting applied chords directly:', chords)
     setAppliedChords(chords)
   }, [])
 
