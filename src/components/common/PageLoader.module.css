@@ -1,0 +1,80 @@
+/* Page Loader - Loading fallback for lazy-loaded pages */
+
+.loaderContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  width: 100%;
+  padding: 40px 20px;
+}
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.spinnerRing {
+  display: inline-block;
+  position: relative;
+  width: 48px;
+  height: 48px;
+}
+
+.spinnerRing div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  margin: 4px;
+  border: 4px solid transparent;
+  border-radius: 50%;
+  border-top-color: #7c3aed;
+  animation: spinnerRing 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.spinnerRing div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+
+.spinnerRing div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+
+.spinnerRing div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+
+@keyframes spinnerRing {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingText {
+  font-size: 14px;
+  font-weight: 500;
+  color: #7c3aed;
+  opacity: 0.8;
+}
+
+:global(.dark) .spinnerRing div {
+  border-top-color: #a78bfa;
+}
+
+:global(.dark) .loadingText {
+  color: #a78bfa;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .spinnerRing div {
+    animation-duration: 3s;
+  }
+}

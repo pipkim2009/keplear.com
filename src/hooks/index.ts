@@ -51,3 +51,17 @@ export type { Classroom, Assignment, ClassroomStudent, CreateClassroomData, Crea
 
 // Accessibility hooks
 export { useFocusTrap, useBodyScrollLock } from './useFocusTrap'
+
+// Performance hooks
+export {
+  useDebounce,
+  useDebouncedCallback,
+  useThrottledCallback,
+  useStableValue,
+  usePrevious,
+  useDeepMemo,
+  useRenderCount,
+  usePerformanceMeasure,
+  useLazyRef,
+  useUpdateEffect
+} from './usePerformance'

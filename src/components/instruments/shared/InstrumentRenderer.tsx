@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import Keyboard from '../keyboard/Keyboard'
 import Guitar from '../guitar/Guitar'
 import Bass from '../bass/Bass'
@@ -67,7 +68,12 @@ interface InstrumentRendererProps {
   fretRangeHigh?: number
 }
 
-const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
+/**
+ * InstrumentRenderer - Renders the appropriate instrument based on type
+ * Uses default memo comparison - callback props like isSelected close over
+ * selection state and must trigger re-renders when that state changes.
+ */
+const InstrumentRenderer: React.FC<InstrumentRendererProps> = memo(function InstrumentRenderer({
   instrument,
   onNoteClick,
   isSelected,
@@ -100,7 +106,7 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
   disableNoteSelection = false,
   fretRangeLow,
   fretRangeHigh
-}) => {
+}) {
   return (
     <div className="instrument-wrapper">
       {instrument === 'keyboard' ? (
@@ -167,6 +173,6 @@ const InstrumentRenderer: React.FC<InstrumentRendererProps> = ({
       )}
     </div>
   )
-}
+})
 
 export default InstrumentRenderer

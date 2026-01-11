@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import type { Note } from '../utils/notes'
 import type { AppliedChord, AppliedScale } from '../components/common/ScaleChordOptions'
 import type { KeyboardScale } from '../utils/instruments/keyboard/keyboardScales'
@@ -13,89 +13,126 @@ interface UseKeyboardHighlightingProps {
   higherOctaves: number
 }
 
+/**
+ * Hook for keyboard note highlighting
+ * Optimized with pre-computed Sets for O(1) lookup instead of O(n*m) iteration
+ */
 export const useKeyboardHighlighting = ({
   instrument,
   appliedScales,
   appliedChords,
   currentKeyboardScale,
-  lowerOctaves,
-  higherOctaves
 }: UseKeyboardHighlightingProps) => {
 
-  // Helper functions for keyboard scale and chord highlighting
-  const isNoteInKeyboardScale = useCallback((note: Note): boolean => {
-    // Check against all applied keyboard scales, not just the current one
-    if (instrument === 'keyboard' && appliedScales.length > 0) {
-      return appliedScales.some(appliedScale => {
-        // If the scale has notes (with octave filtering), check against those
-        if (appliedScale.notes) {
-          return appliedScale.notes.some(scaleNote => scaleNote.name === note.name)
-        }
-        // Fallback: check by note name without octave (for backward compatibility)
-        return isKeyboardNoteInScale(note, appliedScale.root, appliedScale.scale)
-      })
+  // Pre-compute Sets for O(1) lookup performance
+  // This runs once when appliedScales/appliedChords change, not on every note check
+  const scaleNoteNames = useMemo(() => {
+    if (instrument !== 'keyboard' || appliedScales.length === 0) {
+      return new Set<string>()
     }
+
+    const names = new Set<string>()
+    for (const appliedScale of appliedScales) {
+      if (appliedScale.notes) {
+        for (const note of appliedScale.notes) {
+          names.add(note.name)
+        }
+      }
+    }
+    return names
+  }, [instrument, appliedScales])
+
+  const chordNoteNames = useMemo(() => {
+    if (instrument !== 'keyboard' || appliedChords.length === 0) {
+      return new Set<string>()
+    }
+
+    const names = new Set<string>()
+    for (const appliedChord of appliedChords) {
+      if (appliedChord.notes) {
+        for (const note of appliedChord.notes) {
+          names.add(note.name)
+        }
+      }
+    }
+    return names
+  }, [instrument, appliedChords])
+
+  // Pre-compute root notes for scales
+  const scaleRootNotes = useMemo(() => {
+    if (instrument !== 'keyboard' || appliedScales.length === 0) {
+      return new Set<string>()
+    }
+
+    const roots = new Set<string>()
+    for (const appliedScale of appliedScales) {
+      if (appliedScale.notes) {
+        for (const scaleNote of appliedScale.notes) {
+          const noteNameWithoutOctave = scaleNote.name.replace(/\d+$/, '')
+          if (noteNameWithoutOctave === appliedScale.root) {
+            roots.add(scaleNote.name)
+          }
+        }
+      }
+    }
+    return roots
+  }, [instrument, appliedScales])
+
+  // Pre-compute root notes for chords
+  const chordRootNotes = useMemo(() => {
+    if (instrument !== 'keyboard' || appliedChords.length === 0) {
+      return new Set<string>()
+    }
+
+    const roots = new Set<string>()
+    for (const appliedChord of appliedChords) {
+      roots.add(appliedChord.root)
+    }
+    return roots
+  }, [instrument, appliedChords])
+
+  // O(1) lookup using pre-computed Sets
+  const isNoteInKeyboardScale = useCallback((note: Note): boolean => {
+    // Fast path: check pre-computed Set
+    if (scaleNoteNames.size > 0) {
+      return scaleNoteNames.has(note.name)
+    }
+
     // Fallback to current scale for backward compatibility
     if (currentKeyboardScale) {
       return isKeyboardNoteInScale(note, currentKeyboardScale.root, currentKeyboardScale.scale)
     }
     return false
-  }, [instrument, appliedScales, currentKeyboardScale])
+  }, [scaleNoteNames, currentKeyboardScale])
 
   const isNoteInKeyboardChord = useCallback((note: Note): boolean => {
-    // Check against all applied keyboard chords, not just the current one
-    if (instrument === 'keyboard' && appliedChords.length > 0) {
-      return appliedChords.some(appliedChord => {
-        if (appliedChord.notes) {
-          // Check if this note matches any of the applied chord's notes
-          return appliedChord.notes.some(chordNote => chordNote.name === note.name)
-        }
-        return false
-      })
-    }
-    return false
-  }, [instrument, appliedChords])
+    // Fast path: O(1) Set lookup
+    return chordNoteNames.has(note.name)
+  }, [chordNoteNames])
 
   const isNoteKeyboardRoot = useCallback((note: Note): boolean => {
-    // Check against all applied keyboard scales, not just the current one
-    if (instrument === 'keyboard' && appliedScales.length > 0) {
-      return appliedScales.some(appliedScale => {
-        // If the scale has notes (with octave filtering), check if this note is the root in those notes
-        if (appliedScale.notes) {
-          const noteNameWithoutOctave = note.name.replace(/\d+$/, '')
-          return appliedScale.notes.some(scaleNote => {
-            const scaleNoteWithoutOctave = scaleNote.name.replace(/\d+$/, '')
-            return scaleNote.name === note.name && scaleNoteWithoutOctave === appliedScale.root
-          })
-        }
-        // Fallback: check by root note without octave (for backward compatibility)
-        return isKeyboardNoteRoot(note, appliedScale.root)
-      })
+    // Fast path: check pre-computed Set
+    if (scaleRootNotes.size > 0) {
+      return scaleRootNotes.has(note.name)
     }
+
     // Fallback to current scale for backward compatibility
     if (currentKeyboardScale) {
       return isKeyboardNoteRoot(note, currentKeyboardScale.root)
     }
     return false
-  }, [instrument, appliedScales, currentKeyboardScale])
+  }, [scaleRootNotes, currentKeyboardScale])
 
   const isNoteKeyboardChordRoot = useCallback((note: Note): boolean => {
-    // Check if this note is a root of any applied keyboard chord
-    if (instrument === 'keyboard' && appliedChords.length > 0) {
-      return appliedChords.some(appliedChord => {
-        if (appliedChord.notes) {
-          // Check if this note is the root of any applied chord
-          const noteNameWithoutOctave = note.name.replace(/\d+$/, '')
-          return appliedChord.root === noteNameWithoutOctave
-        }
-        return false
-      })
+    // Fast path: check if note name (without octave) is in chord roots
+    if (chordRootNotes.size > 0) {
+      const noteNameWithoutOctave = note.name.replace(/\d+$/, '')
+      return chordRootNotes.has(noteNameWithoutOctave)
     }
     return false
-  }, [instrument, appliedChords])
+  }, [chordRootNotes])
 
-  // NOTE: We removed the useEffect that was auto-adding scale/chord notes to selectedNotes
-  // This hook should ONLY provide highlighting detection, not modify selections
+  // NOTE: This hook should ONLY provide highlighting detection, not modify selections
   // Scale/chord notes are stored in appliedScales/appliedChords and should NOT be in selectedNotes
 
   return {

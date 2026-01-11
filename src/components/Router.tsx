@@ -1,11 +1,19 @@
-import Home from './pages/Home'
-import NotFound from './pages/NotFound'
-import Sandbox from './pages/Sandbox'
-import Classroom from './pages/Classroom'
+import { lazy, Suspense } from 'react'
 import { useInstrument } from '../contexts/InstrumentContext'
+import PageLoader from './common/PageLoader'
+
+/**
+ * Lazy-loaded page components for code splitting
+ * Each page is loaded on-demand, reducing initial bundle size
+ */
+const Home = lazy(() => import('./pages/Home'))
+const Sandbox = lazy(() => import('./pages/Sandbox'))
+const Classroom = lazy(() => import('./pages/Classroom'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
 /**
  * Router component that handles page navigation and renders appropriate content
+ * Uses React.lazy for route-based code splitting to optimize initial load time
  */
 function Router() {
   const {
@@ -14,34 +22,42 @@ function Router() {
     navigateToSandbox
   } = useInstrument()
 
-  switch (currentPage) {
-    case 'home':
-      return (
-        <Home
-          onNavigateToSandbox={navigateToSandbox}
-        />
-      )
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'home':
+        return (
+          <Home
+            onNavigateToSandbox={navigateToSandbox}
+          />
+        )
 
-    case 'sandbox':
-      return <Sandbox />
+      case 'sandbox':
+        return <Sandbox />
 
-    case 'classroom':
-      return <Classroom />
+      case 'classroom':
+        return <Classroom />
 
-    case '404':
-      return (
-        <NotFound
-          onNavigateToHome={navigateToHome}
-        />
-      )
+      case '404':
+        return (
+          <NotFound
+            onNavigateToHome={navigateToHome}
+          />
+        )
 
-    default:
-      return (
-        <Home
-          onNavigateToSandbox={navigateToSandbox}
-        />
-      )
+      default:
+        return (
+          <Home
+            onNavigateToSandbox={navigateToSandbox}
+          />
+        )
+    }
   }
+
+  return (
+    <Suspense fallback={<PageLoader />}>
+      {renderPage()}
+    </Suspense>
+  )
 }
 
 export default Router

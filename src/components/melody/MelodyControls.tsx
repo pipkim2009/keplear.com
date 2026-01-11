@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useMemo, useEffect, useRef } from 'react'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import '../../styles/MelodyControls.css'
 import { IoMusicalNotes } from 'react-icons/io5'
@@ -22,6 +22,36 @@ const MelodyControls = memo(function MelodyControls() {
     recordedAudioBlob,
     hasChanges
   } = useInstrument()
+
+  // Store the current blob URL for cleanup
+  const blobUrlRef = useRef<string | null>(null)
+
+  // Create blob URL only when blob changes, and clean up old URLs
+  const audioUrl = useMemo(() => {
+    // Revoke previous URL to prevent memory leak
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current)
+      blobUrlRef.current = null
+    }
+
+    if (recordedAudioBlob) {
+      const url = URL.createObjectURL(recordedAudioBlob)
+      blobUrlRef.current = url
+      return url
+    }
+
+    return null
+  }, [recordedAudioBlob])
+
+  // Cleanup blob URL on unmount
+  useEffect(() => {
+    return () => {
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current)
+        blobUrlRef.current = null
+      }
+    }
+  }, [])
 
   return (
     <div className="melody-controls">
@@ -52,9 +82,9 @@ const MelodyControls = memo(function MelodyControls() {
         </button>
       </div>
 
-      {recordedAudioBlob && (
+      {audioUrl && (
         <div className="recorded-audio-controls">
-          <audio controls src={URL.createObjectURL(recordedAudioBlob)} />
+          <audio controls src={audioUrl} />
           <button
             className="button clear-button"
             onClick={handleClearRecordedAudio}
