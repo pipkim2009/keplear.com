@@ -1,5 +1,5 @@
 import { memo, useMemo, useEffect, useRef } from 'react'
-import { useInstrument } from '../../contexts/InstrumentContext'
+import { useMelodyPlayback } from '../../hooks'
 import '../../styles/MelodyControls.css'
 import { IoMusicalNotes } from 'react-icons/io5'
 import { FaPlay, FaPause, FaStop } from 'react-icons/fa'
@@ -8,9 +8,10 @@ import { BsFillMicFill, BsTrashFill } from 'react-icons/bs'
 /**
  * Component responsible for melody generation and playback controls
  * Extracted from InstrumentControls for better separation of concerns
- * Optimized with React.memo
+ * Optimized with React.memo and focused context hook
  */
 const MelodyControls = memo(function MelodyControls() {
+  // Use focused melody playback hook instead of full context
   const {
     handleGenerateMelody,
     handlePlayMelody,
@@ -21,7 +22,7 @@ const MelodyControls = memo(function MelodyControls() {
     handleClearRecordedAudio,
     recordedAudioBlob,
     hasChanges
-  } = useInstrument()
+  } = useMelodyPlayback()
 
   // Store the current blob URL for cleanup
   const blobUrlRef = useRef<string | null>(null)

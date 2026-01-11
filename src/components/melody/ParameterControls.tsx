@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { useInstrument } from '../../contexts/InstrumentContext'
+import { useMelodySettings } from '../../hooks'
 import { IoSettingsSharp } from 'react-icons/io5'
 import { IoMusicalNotes } from 'react-icons/io5'
 import { MdMusicNote } from 'react-icons/md'
@@ -7,9 +7,10 @@ import { MdMusicNote } from 'react-icons/md'
 /**
  * Component for controlling melody parameters (BPM, number of notes, etc.)
  * Extracted from InstrumentControls for better organization
- * Optimized with React.memo
+ * Optimized with React.memo and focused context hook
  */
 const ParameterControls = memo(function ParameterControls() {
+  // Use focused melody settings hook instead of full context
   const {
     bpm,
     setBpm,
@@ -19,7 +20,7 @@ const ParameterControls = memo(function ParameterControls() {
     activeInputs,
     triggerInputFlash,
     setInputActive
-  } = useInstrument()
+  } = useMelodySettings()
 
   const handleBpmChange = (newBpm: number) => {
     // Validate input to prevent NaN

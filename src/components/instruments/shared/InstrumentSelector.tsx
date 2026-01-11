@@ -1,5 +1,5 @@
 import { memo, useMemo, useCallback } from 'react'
-import { useInstrument } from '../../../contexts/InstrumentContext'
+import { useInstrumentType } from '../../../hooks'
 import type { InstrumentType } from '../../../types/instrument'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
@@ -14,10 +14,11 @@ const INSTRUMENTS = [
 /**
  * Component for selecting different instruments
  * Extracted from InstrumentControls for better modularity
- * Optimized with memo and useMemo
+ * Optimized with memo, useMemo, and focused context hook
  */
 const InstrumentSelector = memo(function InstrumentSelector() {
-  const { instrument, handleInstrumentChange } = useInstrument()
+  // Use focused instrument type hook instead of full context
+  const { instrument, handleInstrumentChange } = useInstrumentType()
 
   // Memoize click handlers to prevent recreation on every render
   const handleKeyboardClick = useCallback(() => handleInstrumentChange('keyboard'), [handleInstrumentChange])

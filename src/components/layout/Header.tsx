@@ -1,6 +1,6 @@
 import { useState, useCallback, memo } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { useInstrument } from '../../contexts/InstrumentContext'
+import { useNavigation } from '../../hooks'
 import ThemeToggle from '../common/ThemeToggle'
 import AuthModal from '../auth/AuthModal'
 import UserMenu from '../auth/UserMenu'
@@ -16,12 +16,13 @@ const Header = memo(function Header({
   isDarkMode,
   onToggleTheme
 }: HeaderProps) {
+  // Use focused navigation hook instead of full context
   const {
     currentPage,
     navigateToHome,
     navigateToSandbox,
     navigateToClassroom
-  } = useInstrument()
+  } = useNavigation()
   const { user, loading } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authForm, setAuthForm] = useState<'login' | 'signup'>('login')

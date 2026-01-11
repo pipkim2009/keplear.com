@@ -67,3 +67,15 @@ export {
   useLazyRef,
   useUpdateEffect
 } from './usePerformance'
+
+// Context selector hooks (focused state slices for better performance)
+export {
+  useNavigation,
+  useInstrumentType,
+  useMelodySettings,
+  useMelodyPlayback,
+  useNoteSelection,
+  useAudioPlayback,
+  useScaleChordState,
+  useOctaveRange
+} from './useInstrumentSelectors'

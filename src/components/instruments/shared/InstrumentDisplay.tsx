@@ -4,7 +4,7 @@ import InstrumentRenderer from './InstrumentRenderer'
 import { useState, useEffect, useMemo, useCallback, memo } from 'react'
 import { generateNotesWithSeparateOctaves, type Note } from '../../../utils/notes'
 import type { ChordMode } from '../../../reducers/uiReducer'
-import { useInstrument } from '../../../contexts/InstrumentContext'
+import { useScaleChordState } from '../../../hooks'
 import { useKeyboardHighlighting } from '../../../hooks/useKeyboardHighlighting'
 import type { FretboardPreview, KeyboardPreview } from '../../common/ScaleChordOptions'
 
@@ -217,8 +217,8 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
     return generatedMelody[currentlyPlayingNoteIndex] ?? null
   }, [currentlyPlayingNoteIndex, generatedMelody])
 
-  // Get scale/chord management from context
-  const { appliedChords, appliedScales, scaleChordManagement } = useInstrument()
+  // Get scale/chord management from focused context hook
+  const { appliedChords, appliedScales, scaleChordManagement } = useScaleChordState()
 
   const {
     selectedRoot,
