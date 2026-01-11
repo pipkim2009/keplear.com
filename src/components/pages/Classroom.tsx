@@ -946,11 +946,19 @@ function Classroom() {
     const calculatedLowerOctaves = currentAssignment.instrument === 'keyboard' ? 4 - octaveLow : 0
     const calculatedHigherOctaves = currentAssignment.instrument === 'keyboard' ? octaveHigh - 5 : 0
 
+    // Check if lesson has no scales or chords
+    const selectionData = currentAssignment.selection_data
+    const hasNoScalesOrChords = !selectionData ||
+      ((selectionData.appliedScales?.length ?? 0) === 0 && (selectionData.appliedChords?.length ?? 0) === 0)
+    const hasChords = selectionData && (selectionData.appliedChords?.length ?? 0) > 0
+
     return (
       <>
         <div className={practiceStyles.backButtonContainer}>
           <button className={practiceStyles.backButton} onClick={handleEndLesson} aria-label="End practice session">
-            End Session
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
           </button>
           <button className={practiceStyles.doneButton} onClick={handleEndLesson} aria-label="Done with lesson">
             Done
@@ -1006,13 +1014,14 @@ function Classroom() {
           currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
           onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
           hideInstrumentSelector={true}
-          hideOctaveRange={true}
+          hideOctaveRange={currentAssignment.instrument !== 'keyboard'}
+          disableOctaveRange={true}
           hideBpmButtons={true}
           hideBeatsButtons={true}
           hideGenerateButton={true}
           hideDeselectAll={true}
           showOnlyAppliedList={true}
-          hideChordMode={true}
+          hideChordMode={!hasChords}
           disableBpmInput={true}
           disableBeatsInput={true}
           disableChordMode={true}
@@ -1020,6 +1029,7 @@ function Classroom() {
           autoPlayAudio={autoPlayAudio}
           lessonType={currentAssignment.lesson_type as 'melodies' | 'chords' | undefined}
           externalSelectedNoteIds={externalSelectedNoteIds}
+          hideScalesChords={hasNoScalesOrChords}
         />
 
         {generatedMelody.length > 0 && !isGeneratingMelody && (
@@ -1129,7 +1139,9 @@ function Classroom() {
             aria-label="Back to classes"
             title="Back to classes"
           >
-            ←
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
           </button>
 
           <div className={styles.fullPageHeader}>

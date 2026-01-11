@@ -30,32 +30,35 @@
 }
 
 .backButton {
-  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
   border: none;
-  border-radius: 12px;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: var(--white-alpha-80);
-  color: var(--light-text-primary);
-  border: 2px solid rgb(210, 210, 249, 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
 }
 
 :global(.dark) .backButton {
-  background: var(--dark-bg-secondary);
-  color: var(--dark-text-primary);
-  border: 2px solid rgb(210, 210, 249, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .backButton:hover {
-  background: var(--white);
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(-3px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
 }
 
 :global(.dark) .backButton:hover {
-  background: var(--dark-bg-tertiary);
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .backButton:focus-visible {
@@ -1018,8 +1021,8 @@
   }
 
   .backButton {
-    font-size: 0.875rem;
-    padding: 0.625rem 1.25rem;
+    width: 40px;
+    height: 40px;
   }
 
   .doneButton {
@@ -1085,8 +1088,8 @@
   }
 
   .backButton {
-    font-size: 0.875rem;
-    padding: 0.625rem 1rem;
+    width: 38px;
+    height: 38px;
   }
 
   .doneButton {

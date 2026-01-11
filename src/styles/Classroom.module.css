@@ -893,28 +893,28 @@
   border: none;
   border-radius: 50%;
   font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: var(--primary-purple-alpha-15);
-  color: var(--primary-purple);
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
   margin-bottom: 1.5rem;
 }
 
 :global(.dark) .backButtonCircle {
-  background: var(--primary-purple-alpha-25);
-  color: var(--primary-purple-light);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 
 .backButtonCircle:hover {
-  background: var(--primary-purple-alpha-25);
+  background: rgba(255, 255, 255, 0.25);
   transform: translateX(-3px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
 }
 
 :global(.dark) .backButtonCircle:hover {
-  background: var(--primary-purple-alpha-35);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
 }
 
 .fullPageHeader {

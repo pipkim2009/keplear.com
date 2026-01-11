@@ -1482,6 +1482,10 @@ body:has([data-instrument='keyboard']) .control-group.scale-chord-options {
   width: 100%;
 }
 
+.slider-hidden .octave-visual {
+  margin-top: -8px;
+}
+
 .keyboard-range-container {
   position: relative;
   width: 100%;

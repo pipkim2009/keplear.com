@@ -35,6 +35,7 @@ interface InstrumentHeaderProps {
   hideDeselectAll?: boolean
   showOnlyAppliedList?: boolean
   disableDelete?: boolean
+  hideScalesChords?: boolean
   // Preview callbacks
   onFretboardPreviewChange?: (preview: FretboardPreview | null) => void
   onKeyboardPreviewChange?: (preview: KeyboardPreview | null) => void
@@ -69,6 +70,7 @@ const InstrumentHeader = memo(function InstrumentHeader({
   hideDeselectAll = false,
   showOnlyAppliedList = false,
   disableDelete = false,
+  hideScalesChords = false,
   onFretboardPreviewChange,
   onKeyboardPreviewChange,
   availableKeyboardNotes = [],
@@ -83,6 +85,7 @@ const InstrumentHeader = memo(function InstrumentHeader({
     <div className="instrument-header-controls">
       <div className="header-controls-left">
         {/* Scale/Chord Options */}
+        {!hideScalesChords && (
         <div className="control-group scale-chord-options">
           <ScaleChordOptions
             instrument={instrument}
@@ -114,6 +117,7 @@ const InstrumentHeader = memo(function InstrumentHeader({
             lessonType={lessonType}
           />
         </div>
+        )}
 
         {/* Deselect All button */}
         {showDeselectButton && (

@@ -55,6 +55,7 @@ interface InstrumentDisplayProps {
   onCurrentlyPlayingNoteChange?: (index: number | null) => void
   hideInstrumentSelector?: boolean
   hideOctaveRange?: boolean
+  disableOctaveRange?: boolean
   hideBpmButtons?: boolean
   hideBeatsButtons?: boolean
   hideGenerateButton?: boolean
@@ -71,6 +72,7 @@ interface InstrumentDisplayProps {
   fretRangeHigh?: number
   lessonType?: 'melodies' | 'chords'
   externalSelectedNoteIds?: string[]
+  hideScalesChords?: boolean
 }
 
 const InstrumentDisplay = memo(function InstrumentDisplay({
@@ -120,6 +122,7 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   onCurrentlyPlayingNoteChange,
   hideInstrumentSelector = false,
   hideOctaveRange = false,
+  disableOctaveRange = false,
   hideBpmButtons = false,
   hideBeatsButtons = false,
   hideGenerateButton = false,
@@ -135,7 +138,8 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   fretRangeLow,
   fretRangeHigh,
   lessonType,
-  externalSelectedNoteIds
+  externalSelectedNoteIds,
+  hideScalesChords = false
 }: InstrumentDisplayProps) {
   const [lowerOctaves, setLowerOctaves] = useState<number>(initialLowerOctaves)
   const [higherOctaves, setHigherOctaves] = useState<number>(initialHigherOctaves)
@@ -398,6 +402,7 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
           hideInstrumentSelector={hideInstrumentSelector}
           hideOctaveRange={hideOctaveRange}
+          disableOctaveRange={disableOctaveRange}
           hideBpmButtons={hideBpmButtons}
           hideBeatsButtons={hideBeatsButtons}
           hideGenerateButton={hideGenerateButton}
@@ -411,38 +416,41 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
       </div>
 
       <div className="instrument-container" data-practice-mode={practiceMode}>
-        <InstrumentHeader
-          instrument={instrument}
-          selectedNotes={selectedNotes}
-          appliedChords={appliedChords}
-          appliedScales={appliedScales}
-          selectedRoot={selectedRoot}
-          selectedChordRoot={selectedChordRoot}
-          onScaleSelect={handleScaleSelect}
-          onScaleBoxSelect={handleScaleBoxSelect}
-          onClearScale={handleClearScale}
-          onChordSelect={handleChordSelect}
-          onChordShapeSelect={handleChordShapeSelect}
-          onClearChord={handleClearChord}
-          onRootChange={handleRootChange}
-          onChordRootChange={handleChordRootChange}
-          onKeyboardScaleApply={handleKeyboardScaleApply}
-          onKeyboardScaleClear={handleKeyboardScaleClear}
-          onKeyboardChordApply={handleKeyboardChordApply}
-          onKeyboardChordClear={handleKeyboardChordClear}
-          onChordDelete={handleChordDelete}
-          onScaleDelete={handleScaleDelete}
-          onClearAllSelections={handleClearAllSelections}
-          lowerOctaves={lowerOctaves}
-          higherOctaves={higherOctaves}
-          hideDeselectAll={hideDeselectAll}
-          showOnlyAppliedList={showOnlyAppliedList}
-          disableDelete={practiceMode}
-          onFretboardPreviewChange={setFretboardPreview}
-          onKeyboardPreviewChange={setKeyboardPreview}
-          availableKeyboardNotes={availableKeyboardNotes}
-          lessonType={lessonType}
-        />
+        {!(hideScalesChords && hideDeselectAll) && (
+          <InstrumentHeader
+            instrument={instrument}
+            selectedNotes={selectedNotes}
+            appliedChords={appliedChords}
+            appliedScales={appliedScales}
+            selectedRoot={selectedRoot}
+            selectedChordRoot={selectedChordRoot}
+            onScaleSelect={handleScaleSelect}
+            onScaleBoxSelect={handleScaleBoxSelect}
+            onClearScale={handleClearScale}
+            onChordSelect={handleChordSelect}
+            onChordShapeSelect={handleChordShapeSelect}
+            onClearChord={handleClearChord}
+            onRootChange={handleRootChange}
+            onChordRootChange={handleChordRootChange}
+            onKeyboardScaleApply={handleKeyboardScaleApply}
+            onKeyboardScaleClear={handleKeyboardScaleClear}
+            onKeyboardChordApply={handleKeyboardChordApply}
+            onKeyboardChordClear={handleKeyboardChordClear}
+            onChordDelete={handleChordDelete}
+            onScaleDelete={handleScaleDelete}
+            onClearAllSelections={handleClearAllSelections}
+            lowerOctaves={lowerOctaves}
+            higherOctaves={higherOctaves}
+            hideDeselectAll={hideDeselectAll}
+            showOnlyAppliedList={showOnlyAppliedList}
+            disableDelete={practiceMode}
+            hideScalesChords={hideScalesChords}
+            onFretboardPreviewChange={setFretboardPreview}
+            onKeyboardPreviewChange={setKeyboardPreview}
+            availableKeyboardNotes={availableKeyboardNotes}
+            lessonType={lessonType}
+          />
+        )}
 
         <InstrumentRenderer
           instrument={instrument}

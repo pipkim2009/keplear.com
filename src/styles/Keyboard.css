@@ -1194,6 +1194,16 @@
   background: transparent;
 }
 
+/* Single option mode for lessons - only shows selected option */
+.chord-mode-switch.single-option {
+  min-width: auto;
+}
+
+.chord-mode-switch.single-option .switch-option {
+  border-radius: 0.375rem;
+  cursor: default;
+}
+
 /*
   ===========================================
   LIGHT THEME SUPPORT

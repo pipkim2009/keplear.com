@@ -64,6 +64,7 @@ interface InstrumentControlsProps {
   currentlyPlayingNoteIndex?: number | null
   hideInstrumentSelector?: boolean
   hideOctaveRange?: boolean
+  disableOctaveRange?: boolean
   hideBpmButtons?: boolean
   hideBeatsButtons?: boolean
   hideGenerateButton?: boolean
@@ -123,6 +124,7 @@ const InstrumentControls = memo(function InstrumentControls({
   currentlyPlayingNoteIndex,
   hideInstrumentSelector = false,
   hideOctaveRange = false,
+  disableOctaveRange = false,
   hideBpmButtons = false,
   hideBeatsButtons = false,
   hideGenerateButton = false,
@@ -672,12 +674,13 @@ const InstrumentControls = memo(function InstrumentControls({
               <div className="tooltip-icon">?</div>
             </Tooltip>
           </div>
-          <div className="octave-range-slider">
+          <div className={`octave-range-slider${disableOctaveRange ? ' slider-hidden' : ''}`}>
             <div className="range-labels-center">
               <span className="range-label-center">
                 {Math.max(1, 4 - lowerOctaves)} - {Math.min(8, 5 + higherOctaves)}
               </span>
             </div>
+            {!disableOctaveRange && (
             <div className="dual-range-container">
               <div
                 className="range-fill"
@@ -745,6 +748,7 @@ const InstrumentControls = memo(function InstrumentControls({
                 title="Set highest octave"
               />
             </div>
+            )}
             <div className="octave-visual">
               {(() => {
                 const currentLowOctave = Math.max(1, 4 - lowerOctaves)
@@ -897,36 +901,44 @@ Progression - Use entire chords"
                 </Tooltip>
               </div>
               <div>
-                <div className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''} ${appliedChordsCount === 0 || disableChordMode ? 'disabled' : ''}`}>
-                  <button
-                    className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
-                    onClick={() => {
-                      if (!disableChordMode && appliedChordsCount > 0 && chordMode !== 'arpeggiator') {
-                        setChordMode('arpeggiator')
-                        setIsChordModeFlashing(true)
-                        setTimeout(() => setIsChordModeFlashing(false), 500)
-                      }
-                    }}
-                    title={appliedChordsCount === 0 ? "Apply chords to enable" : "Arpeggiator"}
-                    disabled={appliedChordsCount === 0 || disableChordMode}
-                  >
-                    Arpeggiator
-                  </button>
-                  <button
-                    className={`switch-option ${chordMode === 'progression' ? 'active' : ''}`}
-                    onClick={() => {
-                      if (!disableChordMode && appliedChordsCount > 0 && chordMode !== 'progression') {
-                        setChordMode('progression')
-                        setIsChordModeFlashing(true)
-                        setTimeout(() => setIsChordModeFlashing(false), 500)
-                      }
-                    }}
-                    title={appliedChordsCount === 0 ? "Apply chords to enable" : "Progression"}
-                    disabled={appliedChordsCount === 0 || disableChordMode}
-                  >
-                    Progression
-                  </button>
-                </div>
+                {disableChordMode ? (
+                  <div className="chord-mode-switch single-option">
+                    <span className="switch-option active">
+                      {chordMode === 'arpeggiator' ? 'Arpeggiator' : 'Progression'}
+                    </span>
+                  </div>
+                ) : (
+                  <div className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''} ${appliedChordsCount === 0 ? 'disabled' : ''}`}>
+                    <button
+                      className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
+                      onClick={() => {
+                        if (appliedChordsCount > 0 && chordMode !== 'arpeggiator') {
+                          setChordMode('arpeggiator')
+                          setIsChordModeFlashing(true)
+                          setTimeout(() => setIsChordModeFlashing(false), 500)
+                        }
+                      }}
+                      title={appliedChordsCount === 0 ? "Apply chords to enable" : "Arpeggiator"}
+                      disabled={appliedChordsCount === 0}
+                    >
+                      Arpeggiator
+                    </button>
+                    <button
+                      className={`switch-option ${chordMode === 'progression' ? 'active' : ''}`}
+                      onClick={() => {
+                        if (appliedChordsCount > 0 && chordMode !== 'progression') {
+                          setChordMode('progression')
+                          setIsChordModeFlashing(true)
+                          setTimeout(() => setIsChordModeFlashing(false), 500)
+                        }
+                      }}
+                      title={appliedChordsCount === 0 ? "Apply chords to enable" : "Progression"}
+                      disabled={appliedChordsCount === 0}
+                    >
+                      Progression
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
