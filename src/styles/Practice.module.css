@@ -1334,6 +1334,112 @@
   box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
 }
 
+.classroomSelector {
+  padding: 0.625rem 1rem;
+  padding-right: 2.5rem;
+  border: 2px solid var(--primary-purple-alpha-30);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--white-alpha-80);
+  color: var(--gray-700);
+  min-width: 180px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+}
+
+:global(.dark) .classroomSelector {
+  background: var(--dark-bg-secondary);
+  color: var(--dark-text-primary);
+  border-color: var(--primary-purple-alpha-50);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+}
+
+.classroomSelector:hover {
+  border-color: var(--primary-purple);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+}
+
+:global(.dark) .classroomSelector:hover {
+  border-color: var(--primary-purple-lighter);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+}
+
+.classroomSelector:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+:global(.dark) .classroomSelector:focus {
+  border-color: var(--primary-purple-lighter);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+
+.classroomSelector option {
+  padding: 0.5rem;
+  background: var(--white);
+  color: var(--gray-700);
+}
+
+:global(.dark) .classroomSelector option {
+  background: var(--dark-bg-secondary);
+  color: var(--dark-text-primary);
+}
+
+.assignmentTitleInput {
+  padding: 0.625rem 1rem;
+  border: 2px solid var(--primary-purple-alpha-30);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: var(--white-alpha-80);
+  color: var(--gray-700);
+  min-width: 200px;
+}
+
+:global(.dark) .assignmentTitleInput {
+  background: var(--dark-bg-secondary);
+  color: var(--dark-text-primary);
+  border-color: var(--primary-purple-alpha-50);
+}
+
+.assignmentTitleInput::placeholder {
+  color: var(--gray-400);
+}
+
+:global(.dark) .assignmentTitleInput::placeholder {
+  color: var(--gray-500);
+}
+
+.assignmentTitleInput:hover {
+  border-color: var(--primary-purple);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+}
+
+:global(.dark) .assignmentTitleInput:hover {
+  border-color: var(--primary-purple-lighter);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+}
+
+.assignmentTitleInput:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+:global(.dark) .assignmentTitleInput:focus {
+  border-color: var(--primary-purple-lighter);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+
 /* ========================================
    ASSIGNMENT TITLE MODAL
    ======================================== */
@@ -1600,6 +1706,20 @@
     flex: 1;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
+  }
+
+  .classroomSelector {
+    width: 100%;
+    min-width: unset;
+    font-size: 0.875rem;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+  }
+
+  .assignmentTitleInput {
+    width: 100%;
+    min-width: unset;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
   }
 
   .assignModal {

@@ -151,11 +151,6 @@ function Sandbox() {
   const [isSavingAssignment, setIsSavingAssignment] = useState(false)
   const [assignmentError, setAssignmentError] = useState<string | null>(null)
 
-  // Export to classroom state
-  const [showClassroomSelectModal, setShowClassroomSelectModal] = useState(false)
-  const [userClassrooms, setUserClassrooms] = useState<any[]>([])
-  const [isLoadingClassrooms, setIsLoadingClassrooms] = useState(false)
-  const [isExportMode, setIsExportMode] = useState(false)
 
   // Loading state - check on initial render if we have assignment to load
   const [isLoadingFromAssignment, setIsLoadingFromAssignment] = useState(() => {
@@ -370,11 +365,6 @@ function Sandbox() {
     setShowAssignTitleModal(false)
     setAssignmentTitle('')
     setAssignmentError(null)
-    // If in export mode, also clear the classroom assignment state
-    if (isExportMode) {
-      setAssigningToClassroomId(null)
-      setIsExportMode(false)
-    }
   }
 
   const handleCancelAssignment = () => {
@@ -470,12 +460,9 @@ function Sandbox() {
       setAssigningToClassroomId(null)
       setShowAssignTitleModal(false)
 
-      // If export mode, stay on sandbox; otherwise navigate to classroom
-      if (isExportMode) {
-        setIsExportMode(false)
-      } else {
-        navigateToClassroom()
-      }
+      // Navigate to classroom after saving
+      localStorage.setItem('navigateToClassroomId', assigningToClassroomId)
+      navigateToClassroom()
     } catch (err) {
       setAssignmentError('An error occurred while saving')
       console.error('Error saving assignment:', err)
@@ -484,43 +471,61 @@ function Sandbox() {
     }
   }
 
-  // Export to classroom handlers
-  const fetchUserClassrooms = async () => {
-    if (!user) return
-    setIsLoadingClassrooms(true)
-    try {
-      const { data, error } = await supabase
-        .from('classrooms')
-        .select('id, title')
-        .eq('created_by', user.id)
-        .order('created_at', { ascending: false })
-      if (!error && data) {
-        setUserClassrooms(data)
-      }
-    } catch (err) {
-      // Silently fail - modal will show "no classrooms" state
-    } finally {
-      setIsLoadingClassrooms(false)
+  const handleExportToClassroom = () => {
+    // Build export data from current sandbox state
+    const hasScales = scaleChordManagement.appliedScales.length > 0
+    const hasChords = scaleChordManagement.appliedChords.length > 0
+    const hasNotes = selectedNotes.length > 0
+    const lessonType = hasChords ? 'chords' : 'melodies'
+
+    // Get scales/chords from applied items
+    const appliedScaleNames = scaleChordManagement.appliedScales.map(s => s.scale?.name || 'Major')
+    const appliedChordNames = scaleChordManagement.appliedChords.map(c => c.chord?.name || 'Major')
+
+    // Only save manually selected notes
+    const manualNoteIds = selectedNotes
+      .filter(n => n.isManualSelection === true || n.isManualSelection === undefined)
+      .map(n => n.id)
+
+    // Build the complete selection data
+    const selectionData = {
+      selectedNoteIds: manualNoteIds,
+      appliedScales: scaleChordManagement.appliedScales.map(s => ({
+        root: s.root,
+        scaleName: s.scale?.name || 'Major',
+        octave: s.octave,
+        displayName: s.displayName
+      })),
+      appliedChords: scaleChordManagement.appliedChords.map(c => ({
+        root: c.root,
+        chordName: c.chord?.name || 'Major',
+        octave: c.octave,
+        fretZone: c.fretZone,
+        displayName: c.displayName
+      }))
     }
-  }
 
-  const handleOpenExportModal = () => {
-    fetchUserClassrooms()
-    setShowClassroomSelectModal(true)
-  }
+    // Calculate octave range
+    const octaveLow = 4 - lowerOctaves
+    const octaveHigh = 5 + higherOctaves
 
-  const handleCloseExportModal = () => {
-    setShowClassroomSelectModal(false)
-  }
+    // Store export data in localStorage
+    const exportData = {
+      instrument,
+      lessonType,
+      bpm,
+      beats: numberOfBeats,
+      chordMode,
+      chordCount: hasChords ? scaleChordManagement.appliedChords.length : 4,
+      scales: appliedScaleNames.length > 0 ? appliedScaleNames : ['Major', 'Minor'],
+      chords: appliedChordNames.length > 0 ? appliedChordNames : ['Major', 'Minor'],
+      octaveLow,
+      octaveHigh,
+      selectionData: (hasNotes || hasScales || hasChords) ? selectionData : null
+    }
 
-  const handleSelectClassroomForExport = (classroomId: string) => {
-    setAssigningToClassroomId(classroomId)
-    setShowClassroomSelectModal(false)
-    setIsExportMode(true)
-    // Open the assignment title modal directly
-    setAssignmentTitle('')
-    setAssignmentError(null)
-    setShowAssignTitleModal(true)
+    localStorage.setItem('exportToClassroomData', JSON.stringify(exportData))
+    navigateToClassroom()
   }
 
   const handleLessonComplete = () => {
@@ -1539,10 +1544,10 @@ function Sandbox() {
   // Default: Free play sandbox mode
   return (
     <>
-      {/* Assignment mode buttons - only show when coming from Classroom page, not export mode */}
-      {assigningToClassroomId && !isExportMode && (
+      {/* Assignment mode buttons - only show when coming from Classroom page */}
+      {assigningToClassroomId && (
         <div className={styles.assignmentModeBar}>
-          <span className={styles.assignmentModeText}>Creating Assignment</span>
+          <span className={styles.assignmentModeText}>Assignment Editor</span>
           <div className={styles.assignmentModeButtons}>
             <button
               className={styles.assignmentCancelButton}
@@ -1633,7 +1638,7 @@ function Sandbox() {
           <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '0.5rem', marginBottom: '1rem' }}>
             <button
               className={styles.exportToClassroomButton}
-              onClick={handleOpenExportModal}
+              onClick={handleExportToClassroom}
               disabled={!hasContent}
             >
               Export to Classroom
@@ -1641,79 +1646,6 @@ function Sandbox() {
           </div>
         )
       })()}
-
-      {/* Classroom selection modal */}
-      {showClassroomSelectModal && createPortal(
-        <div
-          className={styles.modalOverlay}
-          onClick={(e) => e.target === e.currentTarget && handleCloseExportModal()}
-        >
-          <div className={styles.exportModal}>
-            <div className={styles.exportModalHeader}>
-              <div>
-                <h2 className={styles.exportModalTitle}>Export to Classroom</h2>
-                <p className={styles.exportModalSubtitle}>Select a classroom to create an assignment</p>
-              </div>
-              <button
-                className={styles.exportModalClose}
-                onClick={handleCloseExportModal}
-                aria-label="Close"
-              >×</button>
-            </div>
-
-            <div className={styles.exportModalContent}>
-              {isLoadingClassrooms ? (
-                <div className={styles.exportModalLoading}>
-                  <div className={styles.exportModalSpinner}></div>
-                  <p>Loading your classrooms...</p>
-                </div>
-              ) : userClassrooms.length === 0 ? (
-                <div className={styles.exportModalEmpty}>
-                  <div className={styles.exportModalEmptyIcon}>
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M12 20h9"></path>
-                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                    </svg>
-                  </div>
-                  <h3 className={styles.exportModalEmptyTitle}>No Classrooms Yet</h3>
-                  <p className={styles.exportModalEmptyText}>
-                    Create your first classroom to start assigning lessons to students.
-                  </p>
-                  <button
-                    className={styles.exportModalCreateButton}
-                    onClick={() => {
-                      handleCloseExportModal()
-                      navigateToClassroom()
-                    }}
-                  >
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="12" y1="5" x2="12" y2="19"></line>
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    Create a Classroom
-                  </button>
-                </div>
-              ) : (
-                <div className={styles.exportModalList}>
-                  {userClassrooms.map((classroom) => (
-                    <button
-                      key={classroom.id}
-                      className={styles.exportModalListItem}
-                      onClick={() => handleSelectClassroomForExport(classroom.id)}
-                    >
-                      <span className={styles.exportModalListTitle}>{classroom.title}</span>
-                      <svg className={styles.exportModalListArrow} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                      </svg>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
 
       {assignTitleModal}
     </>
