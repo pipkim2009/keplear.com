@@ -516,7 +516,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   return (
     <div ref={containerRef} className={`scale-options-container ${isExpanded ? 'expanded' : 'collapsed'}`}>
       <button
-        className={`scale-options-toggle instrument-${instrument}`}
+        className={`scale-options-toggle instrument-${instrument} ${lessonType === 'melodies' ? 'type-scales' : lessonType === 'chords' ? 'type-chords' : 'type-both'}`}
         onClick={toggleExpanded}
         title={isExpanded ? `Close ${lessonType === 'melodies' ? 'Scales' : lessonType === 'chords' ? 'Chords' : 'Scales/Chords'}` : `Open ${lessonType === 'melodies' ? 'Scales' : lessonType === 'chords' ? 'Chords' : 'Scales/Chords'}`}
       >
@@ -526,13 +526,32 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
       {isExpanded && (
         <div
-          className={`scale-options-popup ${showOnlyAppliedList ? (appliedChords.length > 0 && appliedScales.length === 0 ? 'chord-mode' : '') : (!isScaleMode ? 'chord-mode' : '')} instrument-${instrument}`}
+          className={`scale-options-popup ${showOnlyAppliedList ? ((appliedChords.length > 0 && appliedScales.length === 0) || (appliedChords.length > 0 && appliedScales.length > 0 && !isScaleMode) ? 'chord-mode' : '') : (!isScaleMode ? 'chord-mode' : '')} instrument-${instrument}`}
         >
-          <div className={`scale-options-content ${showOnlyAppliedList ? (appliedChords.length > 0 && appliedScales.length === 0 ? 'chord-mode' : '') : (!isScaleMode ? 'chord-mode' : '')}`}>
+          <div className={`scale-options-content ${showOnlyAppliedList ? ((appliedChords.length > 0 && appliedScales.length === 0) || (appliedChords.length > 0 && appliedScales.length > 0 && !isScaleMode) ? 'chord-mode' : '') : (!isScaleMode ? 'chord-mode' : '')}`}>
             {showOnlyAppliedList ? (
               <>
-                {/* Applied Scales List */}
-                {appliedScales.length > 0 && (
+                {/* Show toggle when both scales and chords exist */}
+                {appliedScales.length > 0 && appliedChords.length > 0 && (
+                  <div className="control-section">
+                    <div className="mode-toggle">
+                      <label className="toggle-switch">
+                        <input
+                          type="checkbox"
+                          checked={!isScaleMode}
+                          onChange={(e) => setIsScaleMode(!e.target.checked)}
+                        />
+                        <span className="toggle-slider">
+                          <span className="toggle-text left">Scales</span>
+                          <span className="toggle-text right">Chords</span>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                {/* Applied Scales List - show when scales only OR when in scale mode with both */}
+                {appliedScales.length > 0 && (appliedChords.length === 0 || isScaleMode) && (
                   <div className="control-section scale-theme">
                     <label className="control-label scale-label">Applied Scales</label>
                     <div className="applied-scales-list">
@@ -554,8 +573,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                   </div>
                 )}
 
-                {/* Applied Chords List */}
-                {appliedChords.length > 0 && (
+                {/* Applied Chords List - show when chords only OR when in chord mode with both */}
+                {appliedChords.length > 0 && (appliedScales.length === 0 || !isScaleMode) && (
                   <div className="control-section chord-theme">
                     <label className="control-label chord-label">Applied Chords</label>
                     <div className="applied-chords-list">

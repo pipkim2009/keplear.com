@@ -135,6 +135,51 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
   outline-offset: var(--focus-ring-offset);
 }
 
+/* Scales button - Orange */
+.scale-options-toggle.type-scales {
+  background: rgb(249, 115, 22, 0.1);
+  border-color: var(--orange-500);
+  color: var(--white);
+}
+
+.scale-options-toggle.type-scales:hover {
+  background: rgb(249, 115, 22, 0.2);
+}
+
+.scale-options-toggle.type-scales:active {
+  background: rgb(249, 115, 22, 0.15);
+}
+
+/* Chords button - Purple */
+.scale-options-toggle.type-chords {
+  background: rgb(168, 85, 247, 0.1);
+  border-color: var(--purple-600);
+  color: var(--white);
+}
+
+.scale-options-toggle.type-chords:hover {
+  background: rgb(168, 85, 247, 0.2);
+}
+
+.scale-options-toggle.type-chords:active {
+  background: rgb(168, 85, 247, 0.15);
+}
+
+/* Scales/Chords button - Orange to Purple gradient */
+.scale-options-toggle.type-both {
+  background: linear-gradient(135deg, rgb(249, 115, 22, 0.15), rgb(168, 85, 247, 0.15));
+  border-image: linear-gradient(135deg, var(--orange-500), var(--purple-600)) 1;
+  color: var(--white);
+}
+
+.scale-options-toggle.type-both:hover {
+  background: linear-gradient(135deg, rgb(249, 115, 22, 0.25), rgb(168, 85, 247, 0.25));
+}
+
+.scale-options-toggle.type-both:active {
+  background: linear-gradient(135deg, rgb(249, 115, 22, 0.2), rgb(168, 85, 247, 0.2));
+}
+
 .scale-controls {
   margin: 0 auto;
   padding: 8px;

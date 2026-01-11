@@ -661,11 +661,12 @@ function Classroom() {
                   __guitarCoord: { stringIndex: 6 - pos.string, fretIndex: pos.fret }
                 }
               })
+              const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
               scalesToApply.push({
                 id: `guitar-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
                 root: scaleData.root,
                 scale: scaleObj,
-                displayName: `${scaleData.root} ${scaleObj.name}`,
+                displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
                 notes: scaleNotes
               })
             }
@@ -692,11 +693,12 @@ function Classroom() {
                   __bassCoord: { stringIndex: 4 - pos.string, fretIndex: pos.fret }
                 }
               })
+              const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
               scalesToApply.push({
                 id: `bass-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
                 root: scaleData.root,
                 scale: scaleObj as any,
-                displayName: `${scaleData.root} ${scaleObj.name}`,
+                displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
                 notes: scaleNotes
               })
             }
@@ -733,7 +735,7 @@ function Classroom() {
                   id: `guitar-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
                   root: chordData.root,
                   chord: chordObj as any,
-                  displayName: `${chordData.root} ${chordObj.name}`,
+                  displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
                   noteKeys: noteKeys,
                   fretZone: boxIndex
                 })
@@ -760,7 +762,7 @@ function Classroom() {
                   id: `bass-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
                   root: chordData.root,
                   chord: chordObj as any,
-                  displayName: `${chordData.root} ${chordObj.name}`,
+                  displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
                   noteKeys: noteKeys,
                   fretZone: boxIndex
                 })
@@ -951,6 +953,8 @@ function Classroom() {
     const hasNoScalesOrChords = !selectionData ||
       ((selectionData.appliedScales?.length ?? 0) === 0 && (selectionData.appliedChords?.length ?? 0) === 0)
     const hasChords = selectionData && (selectionData.appliedChords?.length ?? 0) > 0
+    const hasScales = selectionData && (selectionData.appliedScales?.length ?? 0) > 0
+    const hasBothScalesAndChords = hasScales && hasChords
 
     return (
       <>
@@ -1027,7 +1031,7 @@ function Classroom() {
           disableChordMode={true}
           practiceMode={true}
           autoPlayAudio={autoPlayAudio}
-          lessonType={currentAssignment.lesson_type as 'melodies' | 'chords' | undefined}
+          lessonType={hasBothScalesAndChords ? undefined : (currentAssignment.lesson_type as 'melodies' | 'chords' | undefined)}
           externalSelectedNoteIds={externalSelectedNoteIds}
           hideScalesChords={hasNoScalesOrChords}
         />
