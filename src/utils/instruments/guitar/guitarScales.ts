@@ -1,3 +1,5 @@
+import type { GuitarNote } from './guitarNotes'
+
 export type GuitarScale = {
   name: string
   intervals: number[] // Semitone intervals from root note
@@ -106,7 +108,7 @@ export const isNoteInScale = (noteName: string, rootNote: string, scale: GuitarS
 export const getScalePositions = (
   rootNote: string, 
   scale: GuitarScale, 
-  guitarNotes: any[]
+  guitarNotes: GuitarNote[]
 ): ScalePosition[] => {
   const scaleNotes = getScaleNotes(rootNote, scale)
   const positions: ScalePosition[] = []
@@ -135,7 +137,7 @@ export const getScalePositions = (
 export const getScaleBoxes = (
   rootNote: string,
   scale: GuitarScale,
-  guitarNotes: any[]
+  guitarNotes: GuitarNote[]
 ): ScaleBox[] => {
   const allPositions = getScalePositions(rootNote, scale, guitarNotes)
   const boxes: ScaleBox[] = []
@@ -172,7 +174,7 @@ export const getScaleBoxes = (
 export const applyScaleToGuitar = (
   rootNote: string, 
   scale: GuitarScale, 
-  guitarNotes: any[]
+  guitarNotes: GuitarNote[]
 ): { stringIndex: number, fretIndex: number }[] => {
   const scalePositions = getScalePositions(rootNote, scale, guitarNotes)
   const selections: { stringIndex: number, fretIndex: number }[] = []

@@ -1,3 +1,5 @@
+import type { GuitarNote } from './guitarNotes'
+
 export type GuitarChord = {
   name: string
   intervals: number[] // Semitone intervals from root note
@@ -389,7 +391,7 @@ export const isNoteInChord = (noteName: string, rootNote: string, chord: GuitarC
 export const getChordPositions = (
   rootNote: string,
   chord: GuitarChord,
-  guitarNotes: any[]
+  guitarNotes: GuitarNote[]
 ): ChordPosition[] => {
   const chordNotes = getChordNotes(rootNote, chord)
   const positions: ChordPosition[] = []
@@ -480,7 +482,7 @@ const getTransposedBarreChords = (rootNote: string, chord: GuitarChord): ChordFi
 // Function to convert chord fingering to guitar positions for selection
 export const applyChordFingeringToGuitar = (
   fingering: ChordFingering,
-  guitarNotes: any[]
+  guitarNotes: GuitarNote[]
 ): { stringIndex: number, fretIndex: number }[] => {
   const selections: { stringIndex: number, fretIndex: number }[] = []
 
@@ -505,7 +507,7 @@ export const applyChordFingeringToGuitar = (
 export const getChordShapes = (
   rootNote: string,
   chord: GuitarChord,
-  guitarNotes: any[]
+  guitarNotes: GuitarNote[]
 ): ChordShape[] => {
   const fingerings = getGuitarChordFingerings(rootNote, chord)
   const shapes: ChordShape[] = []
@@ -530,7 +532,7 @@ export const getChordShapes = (
 // Helper function to convert fingering to chord positions
 const convertFingeringToPositions = (
   fingering: ChordFingering,
-  guitarNotes: any[]
+  guitarNotes: GuitarNote[]
 ): ChordPosition[] => {
   const positions: ChordPosition[] = []
 
@@ -541,7 +543,7 @@ const convertFingeringToPositions = (
     const guitarString = stringNumber + 1 // Convert 0-based to 1-based
 
     // Find the corresponding guitar note
-    const guitarNote = guitarNotes.find((note: any) =>
+    const guitarNote = guitarNotes.find((note: GuitarNote) =>
       note.string === guitarString && note.fret === actualFret
     )
 
@@ -562,7 +564,7 @@ const convertFingeringToPositions = (
 export const applyChordToGuitar = (
   rootNote: string,
   chord: GuitarChord,
-  guitarNotes: any[]
+  guitarNotes: GuitarNote[]
 ): { stringIndex: number, fretIndex: number }[] => {
   const fingerings = getGuitarChordFingerings(rootNote, chord)
 
@@ -605,7 +607,7 @@ export const applyChordShapeToGuitar = (
 export const getChordBoxes = (
   rootNote: string,
   chord: GuitarChord,
-  guitarNotes: any[]
+  guitarNotes: GuitarNote[]
 ): ChordBox[] => {
   const allPositions = getChordPositions(rootNote, chord, guitarNotes)
   const boxes: ChordBox[] = []

@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
-import { validatePassword, sanitizeInput, containsScriptInjection } from '../../utils/security'
+import { validatePassword, containsScriptInjection } from '../../utils/security'
 import logo from '/Keplear-logo.png'
 import styles from './AuthForms.module.css'
 

@@ -686,7 +686,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
           return appliedScales.some(appliedScale => {
             return noteNameWithoutOctave === appliedScale.root &&
                    appliedScale.notes &&
-                   appliedScale.notes.some((note: any) => {
+                   appliedScale.notes.some((note) => {
                      if (note.__bassCoord) {
                        const { stringIndex: noteStringIndex, fretIndex: noteFretIndex } = note.__bassCoord
                        const appliedNoteKey = noteFretIndex === 0 ? `${noteStringIndex}-open` : `${noteStringIndex}-${noteFretIndex - 1}`
@@ -720,7 +720,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
           return appliedChords.some(appliedChord => {
             return noteNameWithoutOctave === appliedChord.root &&
                    appliedChord.notes &&
-                   appliedChord.notes.some((note: any) => {
+                   appliedChord.notes.some((note) => {
                      if (note.__bassCoord) {
                        const { stringIndex: noteStringIndex, fretIndex: noteFretIndex } = note.__bassCoord
                        const appliedNoteKey = noteFretIndex === 0 ? `${noteStringIndex}-open` : `${noteStringIndex}-${noteFretIndex - 1}`
@@ -808,7 +808,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       const newScaleNotes = new Set<string>()
       appliedScales.forEach(appliedScale => {
         if (appliedScale.notes) {
-          appliedScale.notes.forEach((note: any) => {
+          appliedScale.notes.forEach((note) => {
             if (note.__bassCoord) {
               const { stringIndex, fretIndex } = note.__bassCoord
               const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
@@ -837,7 +837,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             newChordNotes.add(noteKey)
           })
         } else if (appliedChord.notes) {
-          appliedChord.notes.forEach((note: any) => {
+          appliedChord.notes.forEach((note) => {
             if (note.__bassCoord) {
               const { stringIndex, fretIndex } = note.__bassCoord
               const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`

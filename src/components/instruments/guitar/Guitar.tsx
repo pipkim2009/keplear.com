@@ -801,7 +801,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           return appliedScales.some(appliedScale => {
             return noteNameWithoutOctave === appliedScale.root &&
                    appliedScale.notes &&
-                   appliedScale.notes.some((note: any) => {
+                   appliedScale.notes.some((note) => {
                      // Check if this applied scale contains this specific note position
                      if (note.__guitarCoord) {
                        const { stringIndex: noteStringIndex, fretIndex: noteFretIndex } = note.__guitarCoord
@@ -842,7 +842,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
           return appliedChords.some(appliedChord => {
             return noteNameWithoutOctave === appliedChord.root &&
                    appliedChord.notes &&
-                   appliedChord.notes.some((note: any) => {
+                   appliedChord.notes.some((note) => {
                      // Check if this applied chord contains this specific note position
                      if (note.__guitarCoord) {
                        const { stringIndex: noteStringIndex, fretIndex: noteFretIndex } = note.__guitarCoord
@@ -941,7 +941,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
       const newScaleNotes = new Set<string>()
       appliedScales.forEach(appliedScale => {
         if (appliedScale.notes) {
-          appliedScale.notes.forEach((note: any) => {
+          appliedScale.notes.forEach((note) => {
             if (note.__guitarCoord) {
               const { stringIndex, fretIndex } = note.__guitarCoord
               const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
@@ -970,7 +970,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
             newChordNotes.add(noteKey)
           })
         } else if (appliedChord.notes) {
-          appliedChord.notes.forEach((note: any) => {
+          appliedChord.notes.forEach((note) => {
             if (note.__guitarCoord) {
               const { stringIndex, fretIndex } = note.__guitarCoord
               const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`

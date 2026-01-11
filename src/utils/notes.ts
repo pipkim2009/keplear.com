@@ -17,6 +17,14 @@ export interface ChordGroupInfo {
 }
 
 /**
+ * Fretboard coordinate for guitar/bass note positions
+ */
+export interface FretboardCoordinate {
+  readonly stringIndex: number
+  readonly fretIndex: number
+}
+
+/**
  * Represents a musical note with its properties
  */
 export interface Note {
@@ -32,6 +40,8 @@ export interface Note {
   readonly position: number
   /** Optional: chord group this note belongs to (for progression mode) */
   readonly chordGroup?: ChordGroupInfo
+  /** Optional: fretboard coordinate when note is placed on guitar/bass */
+  readonly __guitarCoord?: FretboardCoordinate
 }
 
 /**

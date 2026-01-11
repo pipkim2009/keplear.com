@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { createPortal } from 'react-dom'
 import { IoMusicalNotes } from 'react-icons/io5'
 import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, applyScaleToGuitar, applyScaleBoxToGuitar, type GuitarScale, type ScaleBox } from '../../utils/instruments/guitar/guitarScales'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
 import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, applyScaleToBass, applyScaleBoxToBass, type BassScale, type BassScaleBox } from '../../utils/instruments/bass/bassScales'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
 import { KEYBOARD_SCALES, type KeyboardScale, applyScaleToKeyboard } from '../../utils/instruments/keyboard/keyboardScales'
-import { CHORD_ROOT_NOTES, GUITAR_CHORDS, getChordShapes, getChordBoxes, applyChordToGuitar, applyChordShapeToGuitar, applyChordBoxToGuitar, type GuitarChord, type ChordShape, type ChordBox } from '../../utils/instruments/guitar/guitarChords'
-import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, getBassChordBoxes, applyChordToBass, applyBassChordShapeToBass, applyBassChordBoxToBass, type BassChord, type BassChordShape, type BassChordBox } from '../../utils/instruments/bass/bassChords'
+import { CHORD_ROOT_NOTES, GUITAR_CHORDS, getChordShapes, getChordBoxes, applyChordToGuitar, applyChordBoxToGuitar, type GuitarChord, type ChordShape, type ChordBox } from '../../utils/instruments/guitar/guitarChords'
+import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, getBassChordBoxes, applyChordToBass, applyBassChordBoxToBass, type BassChord, type BassChordShape, type BassChordBox } from '../../utils/instruments/bass/bassChords'
 import { KEYBOARD_CHORDS, type KeyboardChord, applyChordToKeyboard } from '../../utils/instruments/keyboard/keyboardChords'
 import type { Note } from '../../utils/notes'
 import '../../styles/ScaleOptions.css'
@@ -32,7 +31,7 @@ export interface AppliedChord {
   chord: GuitarChord | BassChord | KeyboardChord
   displayName: string
   noteKeys?: string[] // For guitar/bass: note keys like "0-open", "1-2" etc.
-  notes?: any[] // For keyboard: actual Note objects
+  notes?: Note[] // For keyboard: actual Note objects
   octave?: number // For keyboard: specific octave position
   fretZone?: number // For guitar/bass: fret zone position
 }
@@ -43,7 +42,7 @@ export interface AppliedScale {
   scale: GuitarScale | BassScale | KeyboardScale
   displayName: string
   noteKeys?: string[] // For guitar/bass: note keys like "0-open", "1-2" etc.
-  notes?: any[] // For keyboard: actual Note objects
+  notes?: Note[] // For keyboard: actual Note objects
   octave?: number // For keyboard: specific octave position
 }
 
@@ -220,7 +219,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         }
         // Find root positions
         positions.forEach(pos => {
-          const note = guitarNotes.find((n: any) => {
+          const note = guitarNotes.find((n) => {
             const stringIdx = 6 - n.string
             return stringIdx === pos.stringIndex && n.fret === pos.fretIndex
           })
@@ -237,7 +236,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         }
         // Find root positions
         positions.forEach(pos => {
-          const note = guitarNotes.find((n: any) => {
+          const note = guitarNotes.find((n) => {
             const stringIdx = 6 - n.string
             return stringIdx === pos.stringIndex && n.fret === pos.fretIndex
           })
@@ -261,7 +260,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         }
         // Find root positions
         positions.forEach(pos => {
-          const note = bassNotes.find((n: any) => {
+          const note = bassNotes.find((n) => {
             // Bass mapping: visual stringIndex 0-3 maps to n.string 4-1 (top G to bottom E)
             // So n.string 4 → stringIndex 0, n.string 1 → stringIndex 3
             // Therefore: stringIndex = 4 - n.string
@@ -280,7 +279,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         }
         // Find root positions
         positions.forEach(pos => {
-          const note = bassNotes.find((n: any) => {
+          const note = bassNotes.find((n) => {
             // Bass mapping: visual stringIndex 0-3 maps to n.string 4-1 (top G to bottom E)
             return (4 - n.string) === pos.stringIndex && n.fret === pos.fretIndex
           })

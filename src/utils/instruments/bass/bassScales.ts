@@ -1,3 +1,5 @@
+import type { BassNote } from './bassNotes'
+
 export type BassScale = {
   name: string
   intervals: number[] // Semitone intervals from root note
@@ -111,7 +113,7 @@ export const isNoteInBassScale = (noteName: string, rootNote: string, scale: Bas
 export const getBassScalePositions = (
   rootNote: string,
   scale: BassScale,
-  bassNotes: any[]
+  bassNotes: BassNote[]
 ): BassScalePosition[] => {
   const scaleNotes = getBassScaleNotes(rootNote, scale)
   const positions: BassScalePosition[] = []
@@ -137,7 +139,7 @@ export const getBassScalePositions = (
 export const getBassScaleBoxes = (
   rootNote: string,
   scale: BassScale,
-  bassNotes: any[]
+  bassNotes: BassNote[]
 ): BassScaleBox[] => {
   const allPositions = getBassScalePositions(rootNote, scale, bassNotes)
   const boxes: BassScaleBox[] = []
@@ -174,7 +176,7 @@ export const getBassScaleBoxes = (
 export const applyScaleToBass = (
   rootNote: string,
   scale: BassScale,
-  bassNotes: any[]
+  bassNotes: BassNote[]
 ): { stringIndex: number, fretIndex: number }[] => {
   const scalePositions = getBassScalePositions(rootNote, scale, bassNotes)
   const selections: { stringIndex: number, fretIndex: number }[] = []

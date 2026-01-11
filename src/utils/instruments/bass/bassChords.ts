@@ -1,3 +1,5 @@
+import type { BassNote } from './bassNotes'
+
 export type BassChord = {
   name: string
   intervals: number[] // Semitone intervals from root note
@@ -443,7 +445,7 @@ export const isNoteInBassChord = (noteName: string, rootNote: string, chord: Bas
 export const getBassChordPositions = (
   rootNote: string,
   chord: BassChord,
-  bassNotes: any[]
+  bassNotes: BassNote[]
 ): BassChordPosition[] => {
   const chordNotes = getBassChordNotes(rootNote, chord)
   const positions: BassChordPosition[] = []
@@ -534,7 +536,7 @@ const getTransposedBassChords = (rootNote: string, chord: BassChord): BassChordF
 // Function to convert bass chord fingering to positions for selection
 export const applyBassChordFingeringToBass = (
   fingering: BassChordFingering,
-  bassNotes: any[]
+  bassNotes: BassNote[]
 ): { stringIndex: number, fretIndex: number }[] => {
   const selections: { stringIndex: number, fretIndex: number }[] = []
 
@@ -559,7 +561,7 @@ export const applyBassChordFingeringToBass = (
 export const getBassChordShapes = (
   rootNote: string,
   chord: BassChord,
-  bassNotes: any[]
+  bassNotes: BassNote[]
 ): BassChordShape[] => {
   const fingerings = getBassChordFingerings(rootNote, chord)
   const shapes: BassChordShape[] = []
@@ -584,7 +586,7 @@ export const getBassChordShapes = (
 // Helper function to convert bass fingering to chord positions
 const convertBassFingeringToPositions = (
   fingering: BassChordFingering,
-  bassNotes: any[]
+  bassNotes: BassNote[]
 ): BassChordPosition[] => {
   const positions: BassChordPosition[] = []
 
@@ -598,7 +600,7 @@ const convertBassFingeringToPositions = (
     const bassString = 4 - stringNumber
 
     // Find the corresponding bass note
-    const bassNote = bassNotes.find((note: any) =>
+    const bassNote = bassNotes.find((note: BassNote) =>
       note.string === bassString && note.fret === actualFret
     )
 
@@ -619,7 +621,7 @@ const convertBassFingeringToPositions = (
 export const applyChordToBass = (
   rootNote: string,
   chord: BassChord,
-  bassNotes: any[]
+  bassNotes: BassNote[]
 ): { stringIndex: number, fretIndex: number }[] => {
   const fingerings = getBassChordFingerings(rootNote, chord)
 
@@ -662,7 +664,7 @@ export const applyBassChordShapeToBass = (
 export const getBassChordBoxes = (
   rootNote: string,
   chord: BassChord,
-  bassNotes: any[]
+  bassNotes: BassNote[]
 ): BassChordBox[] => {
   const allPositions = getBassChordPositions(rootNote, chord, bassNotes)
   const boxes: BassChordBox[] = []
