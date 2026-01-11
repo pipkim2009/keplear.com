@@ -2,7 +2,37 @@
  * Core type definitions for instruments
  */
 
+/**
+ * Available instrument types
+ */
 export type InstrumentType = 'keyboard' | 'guitar' | 'bass'
+
+/**
+ * Instrument type constants for avoiding magic strings
+ */
+export const INSTRUMENT_TYPES = {
+  KEYBOARD: 'keyboard' as const,
+  GUITAR: 'guitar' as const,
+  BASS: 'bass' as const
+} as const
+
+/**
+ * Array of all instrument types for iteration
+ */
+export const ALL_INSTRUMENTS: readonly InstrumentType[] = ['keyboard', 'guitar', 'bass'] as const
+
+/**
+ * Chord playback modes
+ */
+export type ChordMode = 'arpeggiator' | 'progression'
+
+/**
+ * Chord mode constants
+ */
+export const CHORD_MODES = {
+  ARPEGGIATOR: 'arpeggiator' as const,
+  PROGRESSION: 'progression' as const
+} as const
 
 export interface InstrumentConfig {
   type: InstrumentType

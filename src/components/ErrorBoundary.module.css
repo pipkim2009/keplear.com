@@ -1,0 +1,114 @@
+/* ErrorBoundary styles */
+
+.container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #121212 25%, #2d1b4e 50%, #3b1d6e 75%, #121212 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.card {
+  padding: 40px 20px;
+  border: 2px solid #9333ea;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #2d3748, #1a202c);
+  color: #e2e8f0;
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.title {
+  background: linear-gradient(145deg, #9333ea, #c084fc);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.titleIcon {
+  background: linear-gradient(145deg, #9333ea, #c084fc);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.message {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.retryInfo {
+  font-style: italic;
+  font-size: 14px;
+  color: #a0aec0;
+  margin-bottom: 1rem;
+}
+
+.details {
+  margin-top: 20px;
+  text-align: left;
+  background: rgba(74, 85, 104, 0.2);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #4a5568;
+}
+
+.detailsSummary {
+  cursor: pointer;
+  font-weight: bold;
+  color: #e2e8f0;
+}
+
+.detailsContent {
+  margin-top: 15px;
+}
+
+.errorStack {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #1a202c;
+  border: 1px solid #4a5568;
+  border-radius: 8px;
+  font-size: 12px;
+  overflow: auto;
+  color: #e2e8f0;
+}
+
+.buttonContainer {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.reloadButton {
+  padding: 12px 24px;
+  background: linear-gradient(145deg, #9333ea, #c084fc);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
+}
+
+.reloadButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(107, 70, 193, 0.4);
+}
+
+.reloadButton:active {
+  transform: translateY(0);
+}

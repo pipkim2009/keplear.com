@@ -404,9 +404,16 @@ function Sandbox() {
     const appliedScaleNames = scaleChordManagement.appliedScales.map(s => s.scale?.name || 'Major')
     const appliedChordNames = scaleChordManagement.appliedChords.map(c => c.chord?.name || 'Major')
 
+    // Only save manually selected notes (not scale/chord notes)
+    // For guitar/bass, isManualSelection === true means manual
+    // For keyboard, isManualSelection is undefined (all keyboard notes are manual)
+    const manualNoteIds = selectedNotes
+      .filter(n => n.isManualSelection === true || n.isManualSelection === undefined)
+      .map(n => n.id)
+
     // Build the complete selection data to save the exact teacher selection
     const selectionData = {
-      selectedNoteIds: selectedNotes.map(n => n.id),
+      selectedNoteIds: manualNoteIds,
       appliedScales: scaleChordManagement.appliedScales.map(s => ({
         root: s.root,
         scaleName: s.scale?.name || 'Major',

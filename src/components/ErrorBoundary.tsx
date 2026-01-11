@@ -1,7 +1,7 @@
 import React, { Component, type ReactNode } from 'react'
 import { logErrorToService, type ErrorInfo } from '../utils/errorHandler'
 import { IoMusicalNotes } from 'react-icons/io5'
-import { createRoot } from 'react-dom/client'
+import styles from './ErrorBoundary.module.css'
 
 interface ErrorBoundaryProps {
   children: ReactNode
@@ -18,8 +18,12 @@ interface ErrorBoundaryState {
   retryAttempts: number
 }
 
+/**
+ * Error boundary component that catches JavaScript errors in child components
+ * and displays a fallback UI instead of crashing the whole app
+ */
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  private retryTimeoutId: NodeJS.Timeout | null = null
+  private retryTimeoutId: ReturnType<typeof setTimeout> | null = null
 
   constructor(props: ErrorBoundaryProps) {
     super(props)
@@ -31,7 +35,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
-    const errorId = `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const errorId = `error_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
     return {
       hasError: true,
       error,
@@ -39,14 +43,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     }
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     const enhancedErrorInfo: ErrorInfo = {
       componentStack: errorInfo.componentStack,
       errorBoundary: errorInfo.errorBoundary,
       errorBoundaryStack: errorInfo.errorBoundaryStack
     }
 
-    console.error(`ErrorBoundary [${this.state.errorId}] caught an error:`, error, enhancedErrorInfo)
     logErrorToService(error, enhancedErrorInfo)
 
     if (this.props.onError) {
@@ -54,13 +57,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     }
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     if (this.retryTimeoutId) {
       clearTimeout(this.retryTimeoutId)
     }
   }
 
-  handleRetry = () => {
+  handleRetry = (): void => {
     const maxRetries = this.props.retryCount ?? 3
     if (this.state.retryAttempts < maxRetries) {
       this.setState(prevState => ({
@@ -70,146 +73,60 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       }))
 
       this.retryTimeoutId = setTimeout(() => {
-        if (this.state.hasError) {
-          console.warn(`Auto-retry attempt ${this.state.retryAttempts + 1}/${maxRetries}`)
-        }
+        // Auto-retry timeout - state will be updated if error persists
       }, Math.pow(2, this.state.retryAttempts) * 1000)
     }
   }
 
-  handleReload = () => {
+  handleReload = (): void => {
     window.location.reload()
   }
 
-  render() {
+  render(): ReactNode {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback
       }
 
       const maxRetries = this.props.retryCount ?? 3
-      const canRetry = this.state.retryAttempts < maxRetries && (this.props.showRetryButton ?? true)
 
       return (
-        <div style={{
-          minHeight: '100vh',
-          background: 'linear-gradient(135deg, #0a0a0a 0%, #121212 25%, #2d1b4e 50%, #3b1d6e 75%, #121212 100%)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '20px',
-          fontFamily: 'system-ui, -apple-system, sans-serif'
-        }}>
-          <div style={{
-            padding: '40px 20px',
-            border: '2px solid #9333ea',
-            borderRadius: '16px',
-            background: 'linear-gradient(145deg, #2d3748, #1a202c)',
-            color: '#e2e8f0',
-            textAlign: 'center',
-            maxWidth: '600px',
-            width: '100%',
-            boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)'
-          }}>
-            <h2 style={{
-              background: 'linear-gradient(145deg, #9333ea, #c084fc)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              fontSize: '2rem',
-              fontWeight: 'bold',
-              marginBottom: '1rem',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem'
-            }}>
-              <span style={{
-                background: 'linear-gradient(145deg, #9333ea, #c084fc)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }}>
+        <div className={styles.container}>
+          <div className={styles.card}>
+            <h2 className={styles.title}>
+              <span className={styles.titleIcon}>
                 <IoMusicalNotes />
               </span>
               Oops! Something went wrong
             </h2>
-            <p style={{ fontSize: '1.1rem', marginBottom: '1.5rem' }}>
+            <p className={styles.message}>
               We're sorry, but something unexpected happened while making music.
             </p>
 
             {this.state.retryAttempts > 0 && (
-              <p style={{
-                fontStyle: 'italic',
-                fontSize: '14px',
-                color: '#a0aec0',
-                marginBottom: '1rem'
-              }}>
+              <p className={styles.retryInfo}>
                 Retry attempt {this.state.retryAttempts}/{maxRetries}
               </p>
             )}
 
-            <details style={{
-              marginTop: '20px',
-              textAlign: 'left',
-              background: 'rgba(74, 85, 104, 0.2)',
-              padding: '15px',
-              borderRadius: '8px',
-              border: '1px solid #4a5568'
-            }}>
-              <summary style={{
-                cursor: 'pointer',
-                fontWeight: 'bold',
-                color: '#e2e8f0'
-              }}>
+            <details className={styles.details}>
+              <summary className={styles.detailsSummary}>
                 Error Details (click to expand)
               </summary>
-              <div style={{ marginTop: '15px' }}>
+              <div className={styles.detailsContent}>
                 <p><strong>Error ID:</strong> {this.state.errorId}</p>
                 <p><strong>Timestamp:</strong> {new Date().toISOString()}</p>
-                <pre style={{
-                  marginTop: '15px',
-                  padding: '15px',
-                  backgroundColor: '#1a202c',
-                  border: '1px solid #4a5568',
-                  borderRadius: '8px',
-                  fontSize: '12px',
-                  overflow: 'auto',
-                  color: '#e2e8f0'
-                }}>
+                <pre className={styles.errorStack}>
                   {this.state.error?.toString()}
                   {this.state.error?.stack && '\n\n' + this.state.error.stack}
                 </pre>
               </div>
             </details>
 
-            <div style={{
-              marginTop: '30px',
-              display: 'flex',
-              justifyContent: 'center'
-            }}>
+            <div className={styles.buttonContainer}>
               <button
                 onClick={this.handleReload}
-                style={{
-                  padding: '12px 24px',
-                  background: 'linear-gradient(145deg, #9333ea, #c084fc)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: '600',
-                  fontSize: '14px',
-                  transition: 'all 0.2s ease',
-                  boxShadow: '0 4px 12px rgba(107, 70, 193, 0.3)'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1px)'
-                  e.currentTarget.style.boxShadow = '0 6px 16px rgba(107, 70, 193, 0.4)'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)'
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(107, 70, 193, 0.3)'
-                }}
+                className={styles.reloadButton}
               >
                 Reload Page
               </button>
