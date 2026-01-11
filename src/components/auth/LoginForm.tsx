@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import logo from '/Keplear-logo.png'
 import styles from './AuthForms.module.css'
@@ -10,28 +10,118 @@ interface LoginFormProps {
   onAuthSuccess?: () => void
 }
 
+interface FormData {
+  username: string
+  password: string
+}
+
+interface FieldErrors {
+  username?: string
+  password?: string
+}
+
+interface TouchedFields {
+  username: boolean
+  password: boolean
+}
+
 const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess }: LoginFormProps) => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [formData, setFormData] = useState<FormData>({
+    username: '',
+    password: ''
+  })
+  const [touched, setTouched] = useState<TouchedFields>({
+    username: false,
+    password: false
+  })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const { signIn, signOut } = useAuth()
 
+  // Real-time field validation
+  const fieldErrors = useMemo<FieldErrors>(() => {
+    const errors: FieldErrors = {}
+
+    // Username validation
+    if (formData.username && formData.username.length < 3) {
+      errors.username = 'Username must be at least 3 characters'
+    }
+
+    // Password validation
+    if (formData.password && formData.password.length < 8) {
+      errors.password = 'Password must be at least 8 characters'
+    }
+
+    return errors
+  }, [formData])
+
+  // Check if field is valid
+  const isFieldValid = useCallback((field: keyof FormData): boolean => {
+    if (!formData[field]) return false
+    if (fieldErrors[field]) return false
+
+    if (field === 'username') return formData.username.length >= 3
+    if (field === 'password') return formData.password.length >= 8
+
+    return true
+  }, [formData, fieldErrors])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+    // Clear global error when user starts typing
+    if (error) setError('')
+  }
+
+  const handleBlur = (field: keyof TouchedFields) => {
+    setTouched(prev => ({
+      ...prev,
+      [field]: true
+    }))
+  }
+
+  const getInputClassName = (field: keyof FormData): string => {
+    if (!touched[field]) return ''
+    if (fieldErrors[field]) return styles.inputError
+    if (isFieldValid(field)) return styles.inputValid
+    return ''
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setError('')
 
-    if (!username || !password) {
-      setError('Please fill in all fields')
-      setLoading(false)
+    // Mark all fields as touched
+    setTouched({
+      username: true,
+      password: true
+    })
+
+    // Check for validation errors
+    if (Object.keys(fieldErrors).length > 0) {
+      setError('Please fix the errors above')
       return
     }
 
+    // Check required fields
+    if (!formData.username || !formData.password) {
+      setError('Please fill in all fields')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
     try {
-      const { error } = await signIn(username, password)
-      if (error) {
-        setError(typeof error === 'object' && error && 'message' in error ? String((error as { message: string }).message) : 'An error occurred')
+      const { error: signInError } = await signIn(formData.username, formData.password)
+      if (signInError) {
+        setError(
+          typeof signInError === 'object' && signInError && 'message' in signInError
+            ? String((signInError as { message: string }).message)
+            : 'Invalid username or password'
+        )
       } else {
         // If this is a gate login (onAuthSuccess provided), sign out and grant site access
         if (onAuthSuccess) {
@@ -56,45 +146,61 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
       <p className={styles.formDescription}>Sign in to your account</p>
 
       {error && (
-        <div className={styles.errorMessage}>
+        <div className={styles.errorMessage} role="alert" aria-live="polite">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} autoComplete="on">
+      <form onSubmit={handleSubmit} autoComplete="on" noValidate>
         <div className={styles.formGroup}>
-          <label htmlFor="username">Username</label>
+          <label htmlFor="login-username">Username</label>
           <input
-            id="username"
+            id="login-username"
             name="username"
             type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={formData.username}
+            onChange={handleChange}
+            onBlur={() => handleBlur('username')}
             placeholder="Enter your username"
             disabled={loading}
             autoComplete="username"
-            required
+            className={getInputClassName('username')}
+            aria-invalid={touched.username && !!fieldErrors.username}
+            aria-describedby={fieldErrors.username ? 'login-username-error' : undefined}
           />
+          {touched.username && fieldErrors.username && (
+            <div id="login-username-error" className={styles.fieldError} role="alert">
+              {fieldErrors.username}
+            </div>
+          )}
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="password">Password</label>
+          <label htmlFor="login-password">Password</label>
           <input
-            id="password"
-            name="current-password"
+            id="login-password"
+            name="password"
             type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formData.password}
+            onChange={handleChange}
+            onBlur={() => handleBlur('password')}
             placeholder="Enter your password"
             disabled={loading}
             autoComplete="current-password"
-            required
+            className={getInputClassName('password')}
+            aria-invalid={touched.password && !!fieldErrors.password}
+            aria-describedby={fieldErrors.password ? 'login-password-error' : undefined}
           />
+          {touched.password && fieldErrors.password && (
+            <div id="login-password-error" className={styles.fieldError} role="alert">
+              {fieldErrors.password}
+            </div>
+          )}
         </div>
 
         <button
           type="submit"
-          className={`${styles.authButton} ${styles.primary} ${styles.createAccount}`}
+          className={`${styles.authButton} ${styles.primary}`}
           disabled={loading}
         >
           {loading ? 'Signing in...' : 'Sign In'}

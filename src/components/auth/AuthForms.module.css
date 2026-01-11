@@ -212,6 +212,156 @@
   background: rgb(50, 50, 50, 0.5);
 }
 
+/* Validation States */
+.formGroup input.inputError {
+  border-color: #dc2626;
+  background: rgb(254, 226, 226, 0.3);
+}
+
+:global(.dark) .formGroup input.inputError {
+  border-color: #f87171;
+  background: rgb(239, 68, 68, 0.1);
+}
+
+.formGroup input.inputError:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgb(220, 38, 38, 0.1);
+}
+
+:global(.dark) .formGroup input.inputError:focus {
+  border-color: #f87171;
+  box-shadow: 0 0 0 3px rgb(248, 113, 113, 0.1);
+}
+
+.formGroup input.inputValid {
+  border-color: #16a34a;
+  background: rgb(209, 250, 229, 0.3);
+}
+
+:global(.dark) .formGroup input.inputValid {
+  border-color: #4ade80;
+  background: rgb(34, 197, 94, 0.1);
+}
+
+.fieldError {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  animation: fadeInError 0.2s ease-out;
+}
+
+:global(.dark) .fieldError {
+  color: #fca5a5;
+}
+
+.fieldHint {
+  color: #6b7280;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+:global(.dark) .fieldHint {
+  color: #9ca3af;
+}
+
+.fieldSuccess {
+  color: #16a34a;
+  font-size: 12px;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+:global(.dark) .fieldSuccess {
+  color: #4ade80;
+}
+
+@keyframes fadeInError {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Password strength indicator */
+.passwordStrength {
+  margin-top: 8px;
+}
+
+.strengthBar {
+  height: 4px;
+  background: rgb(210, 210, 249, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+:global(.dark) .strengthBar {
+  background: rgb(80, 80, 80, 0.3);
+}
+
+.strengthFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strengthFill.weak {
+  width: 33%;
+  background: #dc2626;
+}
+
+.strengthFill.medium {
+  width: 66%;
+  background: #f59e0b;
+}
+
+.strengthFill.strong {
+  width: 100%;
+  background: #16a34a;
+}
+
+.strengthText {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+:global(.dark) .strengthText {
+  color: #9ca3af;
+}
+
+.strengthText.weak {
+  color: #dc2626;
+}
+
+.strengthText.medium {
+  color: #f59e0b;
+}
+
+.strengthText.strong {
+  color: #16a34a;
+}
+
+:global(.dark) .strengthText.weak {
+  color: #fca5a5;
+}
+
+:global(.dark) .strengthText.medium {
+  color: #fcd34d;
+}
+
+:global(.dark) .strengthText.strong {
+  color: #4ade80;
+}
+
 .authButton {
   width: 100%;
   padding: 16px 24px;

@@ -24,3 +24,30 @@ export { useDSPPitchDetection } from './useDSPPitchDetection'
 export type { DSPPitchResult } from './useDSPPitchDetection'
 export { usePerformanceGrading } from './usePerformanceGrading'
 export type { NoteResult, PerformanceResult, PerformanceState } from './usePerformanceGrading'
+
+// Database hooks
+export { useQueryCache, invalidateCache, clearCache, setCache } from './useQueryCache'
+export type { CacheEntry, CacheOptions } from './useQueryCache'
+export { useSupabaseQuery, usePaginatedQuery, invalidateQueries, prefetchQuery } from './useSupabaseQuery'
+export type { QueryOptions, PaginatedResult, UseSupabaseQueryResult, UsePaginatedQueryResult } from './useSupabaseQuery'
+export { useSupabaseMutation, useInsertMutation, useUpdateMutation, useDeleteMutation } from './useSupabaseMutation'
+export type { MutationOptions, MutationResult } from './useSupabaseMutation'
+export { useRealtimeSubscription, useClassroomRealtime } from './useRealtimeSubscription'
+export type { RealtimeEvent, RealtimeOptions, UseRealtimeResult } from './useRealtimeSubscription'
+export {
+  useClassroomsList,
+  useClassroom,
+  useCreateClassroom,
+  useDeleteClassroom,
+  useJoinClassroom,
+  useLeaveClassroom,
+  useCreateAssignment,
+  useDeleteAssignment,
+  useUpdateAssignment,
+  useClassroomsWithRealtime,
+  prefetchClassroom
+} from './useClassrooms'
+export type { Classroom, Assignment, ClassroomStudent, CreateClassroomData, CreateAssignmentData } from './useClassrooms'
+
+// Accessibility hooks
+export { useFocusTrap, useBodyScrollLock } from './useFocusTrap'

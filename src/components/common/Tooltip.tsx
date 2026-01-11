@@ -1,4 +1,4 @@
-import React, { ReactNode, useState, useRef, useEffect } from 'react'
+import React, { ReactNode, useState, useRef, useEffect, useCallback } from 'react'
 import '../../styles/Tooltip.css'
 
 interface TooltipProps {
@@ -7,37 +7,101 @@ interface TooltipProps {
   children: ReactNode
 }
 
+/**
+ * Accessible tooltip component with keyboard navigation
+ * - Click or Enter/Space to toggle
+ * - Escape to close
+ * - Click outside to close
+ */
 const Tooltip: React.FC<TooltipProps> = ({ title, text, children }) => {
   const [isVisible, setIsVisible] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLDivElement>(null)
+  const tooltipId = useRef(`tooltip-${Math.random().toString(36).substring(2, 9)}`).current
 
+  const closeTooltip = useCallback(() => {
+    setIsVisible(false)
+  }, [])
+
+  const toggleTooltip = useCallback(() => {
+    setIsVisible(prev => !prev)
+  }, [])
+
+  // Handle click
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
-    setIsVisible(!isVisible)
+    toggleTooltip()
   }
 
+  // Handle keyboard interaction
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    switch (e.key) {
+      case 'Enter':
+      case ' ':
+        e.preventDefault()
+        e.stopPropagation()
+        toggleTooltip()
+        break
+      case 'Escape':
+        e.preventDefault()
+        e.stopPropagation()
+        closeTooltip()
+        // Return focus to trigger
+        triggerRef.current?.focus()
+        break
+    }
+  }
+
+  // Handle global escape key when tooltip is visible
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsVisible(false)
+    if (!isVisible) return
+
+    const handleGlobalKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        closeTooltip()
+        triggerRef.current?.focus()
       }
     }
 
-    if (isVisible) {
-      document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', handleGlobalKeyDown)
+    return () => document.removeEventListener('keydown', handleGlobalKeyDown)
+  }, [isVisible, closeTooltip])
+
+  // Handle click outside
+  useEffect(() => {
+    if (!isVisible) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        closeTooltip()
+      }
     }
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isVisible])
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isVisible, closeTooltip])
 
   return (
     <div className="tooltip-container" ref={containerRef}>
-      <div onClick={handleClick} className={isVisible ? 'active' : ''}>
+      <div
+        ref={triggerRef}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        className={isVisible ? 'active' : ''}
+        role="button"
+        tabIndex={0}
+        aria-expanded={isVisible}
+        aria-describedby={isVisible ? tooltipId : undefined}
+        aria-haspopup="true"
+      >
         {children}
       </div>
-      <div className={`tooltip-box ${isVisible ? 'visible' : ''}`}>
+      <div
+        id={tooltipId}
+        className={`tooltip-box ${isVisible ? 'visible' : ''}`}
+        role="tooltip"
+        aria-hidden={!isVisible}
+      >
         <div className="tooltip-title">{title}</div>
         <div className="tooltip-text">{text}</div>
       </div>

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
+import { useFocusTrap, useBodyScrollLock } from '../../hooks/useFocusTrap'
 import styles from './AuthForms.module.css'
 
 interface AuthModalProps {
@@ -12,10 +13,39 @@ interface AuthModalProps {
   onAuthSuccess?: () => void
 }
 
-const AuthModal = ({ isOpen, onClose, initialForm = 'login', disableSignup = false, onAuthSuccess }: AuthModalProps) => {
+/**
+ * Modal component for authentication (login/signup)
+ * Implements accessible modal behavior with focus trap and keyboard navigation
+ */
+const AuthModal = ({
+  isOpen,
+  onClose,
+  initialForm = 'login',
+  disableSignup = false,
+  onAuthSuccess
+}: AuthModalProps) => {
   const [currentForm, setCurrentForm] = useState<'login' | 'signup'>(initialForm)
   const [isDarkMode, setIsDarkMode] = useState(false)
 
+  // Handle close - only if not forced login
+  const handleClose = useCallback(() => {
+    if (disableSignup) return // Can't close if forced login
+    setCurrentForm('login')
+    onClose()
+  }, [disableSignup, onClose])
+
+  // Focus trap with escape key handling
+  const { containerRef } = useFocusTrap<HTMLDivElement>({
+    isActive: isOpen,
+    onEscape: disableSignup ? undefined : handleClose,
+    restoreFocus: true,
+    initialFocus: 'input' // Focus first input field
+  })
+
+  // Lock body scroll when modal is open
+  useBodyScrollLock(isOpen)
+
+  // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
       setCurrentForm(initialForm)
@@ -28,10 +58,8 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login', disableSignup = fal
       setIsDarkMode(document.body.classList.contains('dark'))
     }
 
-    // Check initially
     checkDarkMode()
 
-    // Set up observer to watch for theme changes
     const observer = new MutationObserver(checkDarkMode)
     observer.observe(document.body, {
       attributes: true,
@@ -44,20 +72,13 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login', disableSignup = fal
   if (!isOpen) return null
 
   const handleToggleForm = (formType: 'login' | 'signup') => {
-    // Don't allow switching to signup if it's disabled
     if (disableSignup && formType === 'signup') {
       return
     }
     setCurrentForm(formType)
   }
 
-  const handleClose = () => {
-    setCurrentForm('login')
-    onClose()
-  }
-
   const handleBackdropClick = (e: React.MouseEvent) => {
-    // Don't allow closing via backdrop if signup is disabled (forced login)
     if (e.target === e.currentTarget && !disableSignup) {
       handleClose()
     }
@@ -68,18 +89,35 @@ const AuthModal = ({ isOpen, onClose, initialForm = 'login', disableSignup = fal
       case 'signup':
         return <SignupForm onToggleForm={handleToggleForm} onClose={handleClose} />
       default:
-        return <LoginForm onToggleForm={handleToggleForm} onClose={handleClose} disableSignup={disableSignup} onAuthSuccess={onAuthSuccess} />
+        return (
+          <LoginForm
+            onToggleForm={handleToggleForm}
+            onClose={handleClose}
+            disableSignup={disableSignup}
+            onAuthSuccess={onAuthSuccess}
+          />
+        )
     }
   }
 
   const modalContent = (
-    <div className={`${styles.authModalOverlay} ${isDarkMode ? 'dark' : ''}`} onClick={handleBackdropClick}>
-      <div className={`${styles.authModal} ${isDarkMode ? 'dark' : ''}`}>
+    <div
+      className={`${styles.authModalOverlay} ${isDarkMode ? 'dark' : ''}`}
+      onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="auth-modal-title"
+    >
+      <div
+        ref={containerRef}
+        className={`${styles.authModal} ${isDarkMode ? 'dark' : ''}`}
+      >
         {!disableSignup && (
           <button
             className={styles.closeButton}
             onClick={handleClose}
-            aria-label="Close"
+            aria-label="Close modal"
+            type="button"
           >
             ×
           </button>
