@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
+import { containsScriptInjection } from '../../utils/security'
 import logo from '/Keplear-logo.png'
 import styles from './AuthForms.module.css'
 
@@ -38,18 +39,22 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
   const [error, setError] = useState('')
   const { signIn, signOut } = useAuth()
 
-  // Real-time field validation
+  // Real-time field validation with security checks
   const fieldErrors = useMemo<FieldErrors>(() => {
     const errors: FieldErrors = {}
 
-    // Username validation
-    if (formData.username && formData.username.length < 3) {
-      errors.username = 'Username must be at least 3 characters'
+    // Username validation with injection check
+    if (formData.username) {
+      if (containsScriptInjection(formData.username)) {
+        errors.username = 'Invalid characters detected'
+      } else if (formData.username.length < 3) {
+        errors.username = 'Username must be at least 3 characters'
+      }
     }
 
-    // Password validation
-    if (formData.password && formData.password.length < 8) {
-      errors.password = 'Password must be at least 8 characters'
+    // Password validation (basic check for login - user may have old password)
+    if (formData.password && formData.password.length < 6) {
+      errors.password = 'Password too short'
     }
 
     return errors
@@ -60,8 +65,8 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
     if (!formData[field]) return false
     if (fieldErrors[field]) return false
 
-    if (field === 'username') return formData.username.length >= 3
-    if (field === 'password') return formData.password.length >= 8
+    if (field === 'username') return formData.username.length >= 3 && !containsScriptInjection(formData.username)
+    if (field === 'password') return formData.password.length >= 6
 
     return true
   }, [formData, fieldErrors])

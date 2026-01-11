@@ -18,3 +18,34 @@ export * from './instruments/keyboard/keyboardChords'
 // Core utilities
 export { CircuitBreaker } from './errorHandler'
 export * from './inputValidation'
+
+// Security utilities
+export {
+  validatePassword,
+  sanitizeInput,
+  sanitizeUrlInput,
+  sanitizeUsername,
+  isValidUsername,
+  isValidEmail,
+  containsScriptInjection,
+  safeJsonParse,
+  generateSecureToken,
+  hashString,
+  RateLimiter,
+  authRateLimiter,
+  apiRateLimiter,
+  SECURITY_CONFIG
+} from './security'
+export type { PasswordRequirements, PasswordValidationResult } from './security'
+
+// Performance utilities
+export {
+  measurePerformance,
+  debounce,
+  throttle,
+  memoizeWithCache,
+  shallowEqual,
+  deepEqual,
+  batchUpdates,
+  RenderMonitor
+} from './performance'

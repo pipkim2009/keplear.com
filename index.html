@@ -6,6 +6,27 @@
     <link rel="apple-touch-icon" href="/Keplear-favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Keplear - Master music by ear with keyboard, guitar, and bass. Generate melodies from scales and chords, record your practice, and learn music theory hands-on." />
+
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="Permissions-Policy" content="microphone=(self), camera=()" />
+
+    <!-- Content Security Policy - allows Supabase, fonts, and audio samples -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: blob: https:;
+      media-src 'self' blob: https://nbrosowsky.github.io;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io;
+      frame-ancestors 'self';
+      base-uri 'self';
+      form-action 'self';
+    " />
+
     <title>Keplear - Interactive Music Ear Training</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

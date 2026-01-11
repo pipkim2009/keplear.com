@@ -39,12 +39,17 @@ export const AUTH_CONFIG = {
   minUsernameLength: 3,
   /** Maximum username length */
   maxUsernameLength: 20,
-  /** Minimum password length */
-  minPasswordLength: 6,
+  /** Minimum password length (requires uppercase, lowercase, number) */
+  minPasswordLength: 8,
   /** Maximum password length */
   maxPasswordLength: 128,
   /** Username validation regex */
-  usernamePattern: /^[a-zA-Z0-9_]+$/
+  usernamePattern: /^[a-zA-Z0-9_]+$/,
+  /** Rate limiting for auth attempts */
+  rateLimit: {
+    maxAttempts: 5,
+    windowMs: 60000
+  }
 } as const
 
 /**
@@ -144,11 +149,12 @@ export const PERFORMANCE_CONFIG = {
 export const ERROR_MESSAGES = {
   auth: {
     invalidUsername: 'Username must be 3-20 characters and contain only letters, numbers, and underscores',
-    invalidPassword: 'Password must be 6-128 characters long',
+    invalidPassword: 'Password must be 8+ characters with uppercase, lowercase, and number',
     signUpFailed: 'Failed to create account. Please try again.',
     signInFailed: 'Invalid username or password',
     updatePasswordFailed: 'Failed to update password',
-    deleteAccountFailed: 'Failed to delete account'
+    deleteAccountFailed: 'Failed to delete account',
+    rateLimited: 'Too many attempts. Please try again later.'
   },
   audio: {
     initializationFailed: 'Failed to initialize audio system',

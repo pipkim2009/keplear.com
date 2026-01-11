@@ -2,6 +2,7 @@ import { createContext, useEffect, useState, useCallback } from 'react'
 import type { ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import type { User, AuthError } from '@supabase/supabase-js'
+import { validatePassword, sanitizeUsername, authRateLimiter } from '../utils/security'
 
 /**
  * Authentication result type for operations that return data
@@ -61,11 +62,12 @@ const isValidUsername = (username: string): boolean => {
 
 /**
  * Validates password strength
+ * Requires: 8+ chars, uppercase, lowercase, number
  * @param password - The password to validate
  * @returns True if valid, false otherwise
  */
 const isValidPassword = (password: string): boolean => {
-  return password.length >= 6
+  return validatePassword(password).isValid
 }
 
 /**
@@ -126,14 +128,27 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       }
 
       if (!isValidPassword(password)) {
+        const validation = validatePassword(password)
         return {
           data: null,
-          error: new Error('Password must be at least 6 characters long')
+          error: new Error(validation.message || 'Password must be at least 8 characters with uppercase, lowercase, and number')
         }
       }
 
+      // Check rate limiting
+      if (!authRateLimiter.isAllowed('signup')) {
+        const resetTime = authRateLimiter.getResetTime('signup')
+        return {
+          data: null,
+          error: new Error(`Too many attempts. Please try again in ${resetTime} seconds.`)
+        }
+      }
+      authRateLimiter.recordAttempt('signup')
+
       // Generate placeholder email for Supabase compatibility
-      const placeholderEmail = createPlaceholderEmail(username)
+      // Sanitize username for email format
+      const sanitizedUsername = sanitizeUsername(username)
+      const placeholderEmail = createPlaceholderEmail(sanitizedUsername)
       
       const { data, error } = await supabase.auth.signUp({
         email: placeholderEmail,
@@ -175,8 +190,19 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         }
       }
 
+      // Check rate limiting
+      if (!authRateLimiter.isAllowed('signin')) {
+        const resetTime = authRateLimiter.getResetTime('signin')
+        return {
+          data: null,
+          error: new Error(`Too many login attempts. Please try again in ${resetTime} seconds.`)
+        }
+      }
+      authRateLimiter.recordAttempt('signin')
+
       // Generate the same placeholder email format for sign in
-      const placeholderEmail = createPlaceholderEmail(username)
+      const sanitizedUsername = sanitizeUsername(username)
+      const placeholderEmail = createPlaceholderEmail(sanitizedUsername)
       
       const { data, error } = await supabase.auth.signInWithPassword({
         email: placeholderEmail,
@@ -214,8 +240,9 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const updatePassword = useCallback(async (newPassword: string): Promise<AuthErrorResult> => {
     try {
       if (!isValidPassword(newPassword)) {
+        const validation = validatePassword(newPassword)
         return {
-          error: new Error('Password must be at least 6 characters long')
+          error: new Error(validation.message || 'Password must be at least 8 characters with uppercase, lowercase, and number')
         }
       }
 

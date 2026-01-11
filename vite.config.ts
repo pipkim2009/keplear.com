@@ -66,6 +66,23 @@ export default defineConfig(({ mode }) => ({
   server: {
     hmr: {
       overlay: false // Disable HMR overlay for better development experience
+    },
+    // Security headers for development server
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'SAMEORIGIN',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Permissions-Policy': 'microphone=(self), camera=()'
+    }
+  },
+  // Preview server (production build preview)
+  preview: {
+    headers: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'SAMEORIGIN',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
+      'Permissions-Policy': 'microphone=(self), camera=()',
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
     }
   }
 }))

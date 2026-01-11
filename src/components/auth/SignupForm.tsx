@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
+import { validatePassword, sanitizeInput, containsScriptInjection } from '../../utils/security'
 import logo from '/Keplear-logo.png'
 import styles from './AuthForms.module.css'
 
@@ -29,21 +30,10 @@ interface TouchedFields {
 type PasswordStrength = 'weak' | 'medium' | 'strong'
 
 /**
- * Calculates password strength based on various criteria
+ * Calculates password strength using security utility
  */
 function calculatePasswordStrength(password: string): PasswordStrength {
-  if (password.length < 8) return 'weak'
-
-  let score = 0
-  if (password.length >= 8) score++
-  if (password.length >= 12) score++
-  if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++
-  if (/\d/.test(password)) score++
-  if (/[^a-zA-Z0-9]/.test(password)) score++
-
-  if (score <= 2) return 'weak'
-  if (score <= 3) return 'medium'
-  return 'strong'
+  return validatePassword(password).strength
 }
 
 const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
@@ -62,13 +52,15 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
   const [message, setMessage] = useState('')
   const { signUp, signIn } = useAuth()
 
-  // Real-time field validation
+  // Real-time field validation with security checks
   const fieldErrors = useMemo<FieldErrors>(() => {
     const errors: FieldErrors = {}
 
-    // Username validation
+    // Username validation with injection check
     if (formData.username) {
-      if (formData.username.length < 3) {
+      if (containsScriptInjection(formData.username)) {
+        errors.username = 'Invalid characters detected'
+      } else if (formData.username.length < 3) {
         errors.username = 'Username must be at least 3 characters'
       } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
         errors.username = 'Only letters, numbers, and underscores allowed'
@@ -77,9 +69,12 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
       }
     }
 
-    // Password validation
-    if (formData.password && formData.password.length < 8) {
-      errors.password = 'Password must be at least 8 characters'
+    // Password validation using security utility
+    if (formData.password) {
+      const validation = validatePassword(formData.password)
+      if (!validation.isValid) {
+        errors.password = validation.message
+      }
     }
 
     // Confirm password validation
@@ -102,7 +97,7 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
 
     // Additional checks per field
     if (field === 'username') return formData.username.length >= 3
-    if (field === 'password') return formData.password.length >= 8
+    if (field === 'password') return validatePassword(formData.password).isValid
     if (field === 'confirmPassword') return formData.password === formData.confirmPassword && formData.confirmPassword.length > 0
 
     return true
@@ -193,9 +188,13 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
   }
 
   const getStrengthLabel = (strength: PasswordStrength): string => {
+    const validation = validatePassword(formData.password)
+    if (!validation.isValid) {
+      return validation.message
+    }
     switch (strength) {
-      case 'weak': return 'Weak - add more characters or variety'
-      case 'medium': return 'Medium - consider adding special characters'
+      case 'weak': return 'Weak - needs uppercase, lowercase, and number'
+      case 'medium': return 'Medium - add a special character for extra security'
       case 'strong': return 'Strong password'
     }
   }
