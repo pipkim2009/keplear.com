@@ -270,22 +270,10 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
 
         setGeneratedMelody(melody)
       }
-    } else if (instrument === 'guitar') {
-      // Guitar logic: use all selected notes directly
+    } else {
+      // Guitar/Bass logic: use all selected notes directly
       if (currentSelectedNotes.length === 0) {
-        console.warn('Guitar requires at least one note selected')
-        return
-      }
-
-      const melody = Array(numberOfNotes).fill(null).map(() =>
-        currentSelectedNotes[Math.floor(Math.random() * currentSelectedNotes.length)]
-      )
-
-      setGeneratedMelody(melody)
-    } else if (instrument === 'bass') {
-      // Bass logic: use all selected notes directly (same as guitar)
-      if (currentSelectedNotes.length === 0) {
-        console.warn('Bass requires at least one note selected')
+        console.warn(`${instrument} requires at least one note selected`)
         return
       }
 
@@ -295,7 +283,7 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
 
       setGeneratedMelody(melody)
     }
-  }, [])
+  }, [selectedNotes])
 
   /**
    * Guitar-specific method to set all selected notes at once

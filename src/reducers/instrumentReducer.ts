@@ -18,6 +18,10 @@ export type InstrumentAction =
   | { type: 'SET_KEYBOARD_OCTAVES'; payload: { lower: number; higher: number } }
   | { type: 'UPDATE_LOWER_OCTAVES'; payload: number }
   | { type: 'UPDATE_HIGHER_OCTAVES'; payload: number }
+  | { type: 'ADD_LOWER_OCTAVE' }
+  | { type: 'REMOVE_LOWER_OCTAVE' }
+  | { type: 'ADD_HIGHER_OCTAVE' }
+  | { type: 'REMOVE_HIGHER_OCTAVE' }
   | { type: 'SET_KEYBOARD_SELECTION_MODE'; payload: KeyboardSelectionMode }
   | { type: 'TRIGGER_CLEAR_CHORDS_AND_SCALES' }
   | { type: 'RESET_OCTAVES' }
@@ -63,6 +67,42 @@ export function instrumentReducer(state: InstrumentState, action: InstrumentActi
         keyboardOctaves: {
           ...state.keyboardOctaves,
           higher: Math.max(-4, Math.min(7, action.payload))
+        }
+      }
+
+    case 'ADD_LOWER_OCTAVE':
+      return {
+        ...state,
+        keyboardOctaves: {
+          ...state.keyboardOctaves,
+          lower: Math.min(7, state.keyboardOctaves.lower + 1)
+        }
+      }
+
+    case 'REMOVE_LOWER_OCTAVE':
+      return {
+        ...state,
+        keyboardOctaves: {
+          ...state.keyboardOctaves,
+          lower: Math.max(-4, state.keyboardOctaves.lower - 1)
+        }
+      }
+
+    case 'ADD_HIGHER_OCTAVE':
+      return {
+        ...state,
+        keyboardOctaves: {
+          ...state.keyboardOctaves,
+          higher: Math.min(7, state.keyboardOctaves.higher + 1)
+        }
+      }
+
+    case 'REMOVE_HIGHER_OCTAVE':
+      return {
+        ...state,
+        keyboardOctaves: {
+          ...state.keyboardOctaves,
+          higher: Math.max(-4, state.keyboardOctaves.higher - 1)
         }
       }
 

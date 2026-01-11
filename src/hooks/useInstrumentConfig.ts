@@ -47,20 +47,20 @@ export const useInstrumentConfig = (): UseInstrumentConfigReturn => {
   }, [])
 
   const addLowerOctave = useCallback(() => {
-    dispatch({ type: 'UPDATE_LOWER_OCTAVES', payload: state.keyboardOctaves.lower + 1 })
-  }, [state.keyboardOctaves.lower])
+    dispatch({ type: 'ADD_LOWER_OCTAVE' })
+  }, [])
 
   const removeLowerOctave = useCallback(() => {
-    dispatch({ type: 'UPDATE_LOWER_OCTAVES', payload: state.keyboardOctaves.lower - 1 })
-  }, [state.keyboardOctaves.lower])
+    dispatch({ type: 'REMOVE_LOWER_OCTAVE' })
+  }, [])
 
   const addHigherOctave = useCallback(() => {
-    dispatch({ type: 'UPDATE_HIGHER_OCTAVES', payload: state.keyboardOctaves.higher + 1 })
-  }, [state.keyboardOctaves.higher])
+    dispatch({ type: 'ADD_HIGHER_OCTAVE' })
+  }, [])
 
   const removeHigherOctave = useCallback(() => {
-    dispatch({ type: 'UPDATE_HIGHER_OCTAVES', payload: state.keyboardOctaves.higher - 1 })
-  }, [state.keyboardOctaves.higher])
+    dispatch({ type: 'REMOVE_HIGHER_OCTAVE' })
+  }, [])
 
   const setKeyboardSelectionMode = useCallback((mode: KeyboardSelectionMode) => {
     dispatch({ type: 'SET_KEYBOARD_SELECTION_MODE', payload: mode })
