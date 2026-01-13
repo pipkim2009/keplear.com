@@ -78,6 +78,8 @@ interface ClassroomData {
   title: string
   created_by: string | null
   created_at: string
+  is_public: boolean
+  join_code: string | null
   profiles: {
     username: string | null
   } | null
@@ -89,6 +91,16 @@ const instrumentNames: Record<string, string> = {
   keyboard: 'Keyboard',
   guitar: 'Guitar',
   bass: 'Bass'
+}
+
+// Generate a random 6-character join code
+const generateJoinCode = (): string => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  let code = ''
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return code
 }
 
 // Welcome Subtitle Component with Text-to-Speech
@@ -186,10 +198,23 @@ function Classroom() {
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newTitle, setNewTitle] = useState('')
+  const [isPublic, setIsPublic] = useState(true)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [joiningClassId, setJoiningClassId] = useState<string | null>(null)
+
+  // Join modal state
+  const [isJoinModalOpen, setIsJoinModalOpen] = useState(false)
+  const [joinCode, setJoinCode] = useState('')
+  const [joinError, setJoinError] = useState<string | null>(null)
+  const [isJoining, setIsJoining] = useState(false)
+
+  // Copy feedback state
+  const [codeCopied, setCodeCopied] = useState(false)
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Assignment creation state
   const [assigningToClassroomId, setAssigningToClassroomId] = useState<string | null>(null)
@@ -620,14 +645,21 @@ function Classroom() {
     try {
       setCreating(true)
       setError(null)
+      const joinCodeValue = isPublic ? null : generateJoinCode()
       const { error: insertError } = await supabase
         .from('classrooms')
-        .insert({ title: newTitle.trim(), created_by: user.id })
+        .insert({
+          title: newTitle.trim(),
+          created_by: user.id,
+          is_public: isPublic,
+          join_code: joinCodeValue
+        })
       if (insertError) {
         setError(insertError.message)
         return
       }
       setNewTitle('')
+      setIsPublic(true)
       setIsModalOpen(false)
       fetchClassrooms()
     } catch (err) {
@@ -635,6 +667,67 @@ function Classroom() {
       console.error('Error creating classroom:', err)
     } finally {
       setCreating(false)
+    }
+  }
+
+  // Join classroom by code
+  const handleJoinByCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!joinCode.trim()) {
+      setJoinError('Please enter a class code')
+      return
+    }
+    if (!user) {
+      setJoinError('You must be logged in to join a classroom')
+      return
+    }
+    try {
+      setIsJoining(true)
+      setJoinError(null)
+
+      // Find classroom by join code
+      const { data: classroom, error: findError } = await supabase
+        .from('classrooms')
+        .select('id, title')
+        .eq('join_code', joinCode.trim().toUpperCase())
+        .single()
+
+      if (findError || !classroom) {
+        setJoinError('Invalid class code. Please check and try again.')
+        return
+      }
+
+      // Check if already joined
+      const { data: existingMembership } = await supabase
+        .from('classroom_students')
+        .select('user_id')
+        .eq('classroom_id', classroom.id)
+        .eq('user_id', user.id)
+        .single()
+
+      if (existingMembership) {
+        setJoinError('You are already a member of this class')
+        return
+      }
+
+      // Join the classroom
+      const { error: joinError } = await supabase
+        .from('classroom_students')
+        .insert({ classroom_id: classroom.id, user_id: user.id })
+
+      if (joinError) {
+        setJoinError(joinError.message)
+        return
+      }
+
+      setJoinCode('')
+      setIsJoinModalOpen(false)
+      fetchClassrooms()
+    } catch (err) {
+      setJoinError('An error occurred while joining the classroom')
+      console.error('Error joining classroom:', err)
+    } finally {
+      setIsJoining(false)
     }
   }
 
@@ -1083,11 +1176,32 @@ function Classroom() {
   const handleCloseModal = () => {
     setIsModalOpen(false)
     setNewTitle('')
+    setIsPublic(true)
     setError(null)
   }
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) handleCloseModal()
+  }
+
+  const handleOpenJoinModal = () => {
+    if (!user) {
+      setError('Please log in to join a classroom')
+      return
+    }
+    setJoinError(null)
+    setJoinCode('')
+    setIsJoinModalOpen(true)
+  }
+
+  const handleCloseJoinModal = () => {
+    setIsJoinModalOpen(false)
+    setJoinCode('')
+    setJoinError(null)
+  }
+
+  const handleJoinBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) handleCloseJoinModal()
   }
 
   const formatDate = (dateString: string) => {
@@ -1118,8 +1232,67 @@ function Classroom() {
               disabled={creating}
             />
           </div>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Visibility</label>
+            <div className={styles.toggleContainer}>
+              <button
+                type="button"
+                className={`${styles.toggleOption} ${isPublic ? styles.toggleActive : ''}`}
+                onClick={() => setIsPublic(true)}
+                disabled={creating}
+              >
+                Public
+              </button>
+              <button
+                type="button"
+                className={`${styles.toggleOption} ${!isPublic ? styles.toggleActive : ''}`}
+                onClick={() => setIsPublic(false)}
+                disabled={creating}
+              >
+                Private
+              </button>
+            </div>
+            <p className={styles.visibilityHint}>
+              {isPublic
+                ? 'Anyone can see and join this class'
+                : 'Only users with the class code can join'}
+            </p>
+          </div>
           <button type="submit" className={styles.submitButton} disabled={creating || !newTitle.trim()}>
             {creating ? 'Creating...' : 'Create Classroom'}
+          </button>
+        </form>
+      </div>
+    </div>,
+    document.body
+  )
+
+  // Join classroom modal
+  const joinModal = isJoinModalOpen && createPortal(
+    <div className={`${styles.modalOverlay} ${isDarkMode ? 'dark' : ''}`} onClick={handleJoinBackdropClick}>
+      <div className={`${styles.modal} ${isDarkMode ? 'dark' : ''}`}>
+        <div className={styles.modalHeader}>
+          <h2 className={styles.modalTitle}>Join Classroom</h2>
+          <button className={styles.closeButton} onClick={handleCloseJoinModal} aria-label="Close">×</button>
+        </div>
+        <form className={styles.form} onSubmit={handleJoinByCode}>
+          {joinError && <div className={styles.errorMessage}>{joinError}</div>}
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel} htmlFor="joinCode">Class Code</label>
+            <input
+              id="joinCode"
+              type="text"
+              className={`${styles.formInput} ${styles.codeInput}`}
+              value={joinCode}
+              onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+              placeholder="XXXXXX"
+              autoFocus
+              disabled={isJoining}
+              maxLength={6}
+            />
+          </div>
+          <button type="submit" className={styles.submitButton} disabled={isJoining || !joinCode.trim()}>
+            {isJoining ? 'Joining...' : 'Join Classroom'}
           </button>
         </form>
       </div>
@@ -1419,6 +1592,33 @@ function Classroom() {
             <p className={styles.fullPageAuthor}>by {selectedClassroom.profiles?.username ?? 'Unknown'}</p>
             <p className={styles.fullPageMeta}>Created {formatDate(selectedClassroom.created_at)}</p>
 
+            {isOwner && !selectedClassroom.is_public && selectedClassroom.join_code && (
+              <div className={styles.joinCodeDisplay}>
+                <span className={styles.joinCodeLabel}>Class Code:</span>
+                <span className={styles.joinCodeValue}>{selectedClassroom.join_code}</span>
+                <button
+                  className={`${styles.copyCodeButton} ${codeCopied ? styles.copied : ''}`}
+                  onClick={() => {
+                    navigator.clipboard.writeText(selectedClassroom.join_code!)
+                    setCodeCopied(true)
+                    setTimeout(() => setCodeCopied(false), 2000)
+                  }}
+                  title="Copy code"
+                >
+                  {codeCopied ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  ) : (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                  )}
+                </button>
+              </div>
+            )}
+
             {user && !isOwner && (
               <button
                 className={joined ? styles.leaveButton : styles.joinButton}
@@ -1521,6 +1721,59 @@ function Classroom() {
   }
 
   // ========== RENDER: Class List View ==========
+  // Split classrooms into "My Classes" (owned + joined) and "Available Classes" (public, not joined)
+  const myClasses = classrooms.filter(classroom => {
+    if (!user) return false
+    if (classroom.created_by === user.id) return true
+    if (classroom.classroom_students?.some(s => s.user_id === user.id)) return true
+    return false
+  })
+
+  const availableClasses = classrooms.filter(classroom => {
+    if (!classroom.is_public) return false
+    if (!user) return true
+    // Exclude classes user owns or has joined
+    if (classroom.created_by === user.id) return false
+    if (classroom.classroom_students?.some(s => s.user_id === user.id)) return false
+    return true
+  })
+
+  const renderClassCard = (classroom: ClassroomData, showOwnershipBadge: boolean = false) => {
+    const studentCount = classroom.classroom_students?.length ?? 0
+    const assignmentCount = classroom.assignments?.length ?? 0
+    const isPrivate = !classroom.is_public
+    const isOwner = user && classroom.created_by === user.id
+    const isJoined = user && classroom.classroom_students?.some(s => s.user_id === user.id)
+
+    return (
+      <div
+        key={classroom.id}
+        className={styles.classCardClickable}
+        onClick={() => { setSelectedClassroom(classroom); setViewMode('classroom') }}
+      >
+        <div className={styles.classTitleRow}>
+          <h3 className={styles.classTitle}>{classroom.title}</h3>
+          <div className={styles.tagGroup}>
+            {showOwnershipBadge && isOwner && <span className={styles.ownerTag}>Owner</span>}
+            {showOwnershipBadge && !isOwner && isJoined && <span className={styles.studentTag}>Student</span>}
+            {isPrivate ? (
+              <span className={styles.privateTag}>Private</span>
+            ) : (
+              <span className={styles.publicTag}>Public</span>
+            )}
+          </div>
+        </div>
+        <p className={styles.classAuthor}>by {classroom.profiles?.username ?? 'Unknown'}</p>
+        <p className={styles.classMeta}>Created {formatDate(classroom.created_at)}</p>
+        <div className={styles.classCardStats}>
+          <span className={styles.statItem}>{studentCount} {studentCount === 1 ? 'student' : 'students'}</span>
+          <span className={styles.statDivider}>•</span>
+          <span className={styles.statItem}>{assignmentCount} {assignmentCount === 1 ? 'assignment' : 'assignments'}</span>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={styles.classroomContainer}>
       <section className={styles.headerSection}>
@@ -1528,55 +1781,131 @@ function Classroom() {
         <p className={styles.pageSubtitle}>Structured lessons and courses for learning music theory</p>
       </section>
 
+      {/* My Classes Section */}
+      {user && (
+        <section className={styles.classesSection}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>My Classes</h2>
+            <div className={styles.sectionButtons}>
+              <button
+                className={styles.joinClassButton}
+                onClick={handleOpenJoinModal}
+                aria-label="Join a classroom"
+                title="Join a classroom with code"
+              >
+                Join
+              </button>
+              <button
+                className={styles.createButton}
+                onClick={handleOpenModal}
+                aria-label="Create new classroom"
+                title="Create new classroom"
+              >
+                Create
+              </button>
+            </div>
+          </div>
+
+          {loading ? (
+            <div className={styles.loadingState}>Loading classrooms...</div>
+          ) : myClasses.length === 0 ? (
+            <div className={styles.emptyState}>
+              <p className={styles.emptyStateText}>You haven't created or joined any classes yet.</p>
+            </div>
+          ) : (
+            <div className={styles.classesGrid}>
+              {myClasses.map(classroom => renderClassCard(classroom, true))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* Available Classes Section */}
       <section className={styles.classesSection}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>Available Classes</h2>
-          <button
-            className={styles.addButton}
-            onClick={handleOpenModal}
-            aria-label="Create new classroom"
-            title={user ? 'Create new classroom' : 'Log in to create a classroom'}
-          >
-            +
-          </button>
+          {!user && (
+            <div className={styles.sectionButtons}>
+              <button
+                className={styles.joinClassButton}
+                onClick={handleOpenJoinModal}
+                aria-label="Join a classroom"
+                title="Log in to join a classroom"
+              >
+                Join
+              </button>
+              <button
+                className={styles.createButton}
+                onClick={handleOpenModal}
+                aria-label="Create new classroom"
+                title="Log in to create a classroom"
+              >
+                Create
+              </button>
+            </div>
+          )}
         </div>
 
-        {loading ? (
-          <div className={styles.loadingState}>Loading classrooms...</div>
-        ) : classrooms.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p className={styles.emptyStateText}>No classrooms yet. Be the first to create one!</p>
-          </div>
-        ) : (
-          <div className={styles.classesGrid}>
-            {classrooms.map((classroom) => {
-              const studentCount = classroom.classroom_students?.length ?? 0
-              const assignmentCount = classroom.assignments?.length ?? 0
+        <div className={styles.searchContainer}>
+          <svg className={styles.searchIcon} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input
+            type="text"
+            className={styles.searchInput}
+            placeholder="Search classes..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              className={styles.searchClear}
+              onClick={() => setSearchQuery('')}
+              aria-label="Clear search"
+            >
+              ×
+            </button>
+          )}
+        </div>
 
-              return (
-                <div
-                  key={classroom.id}
-                  className={styles.classCardClickable}
-                  onClick={() => { setSelectedClassroom(classroom); setViewMode('classroom') }}
-                >
-                  <h3 className={styles.classTitle}>{classroom.title}</h3>
-                  <p className={styles.classAuthor}>by {classroom.profiles?.username ?? 'Unknown'}</p>
-                  <p className={styles.classMeta}>Created {formatDate(classroom.created_at)}</p>
-                  <div className={styles.classCardStats}>
-                    <span className={styles.statItem}>{studentCount} {studentCount === 1 ? 'student' : 'students'}</span>
-                    <span className={styles.statDivider}>•</span>
-                    <span className={styles.statItem}>{assignmentCount} {assignmentCount === 1 ? 'assignment' : 'assignments'}</span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
+        {(() => {
+          const filteredClasses = availableClasses.filter(classroom =>
+            classroom.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (classroom.profiles?.username?.toLowerCase().includes(searchQuery.toLowerCase()))
+          )
+
+          if (loading) {
+            return <div className={styles.loadingState}>Loading classrooms...</div>
+          }
+          if (availableClasses.length === 0) {
+            return (
+              <div className={styles.emptyState}>
+                <p className={styles.emptyStateText}>
+                  {user ? 'No more public classes available.' : 'No public classes yet. Be the first to create one!'}
+                </p>
+              </div>
+            )
+          }
+          if (filteredClasses.length === 0) {
+            return (
+              <div className={styles.emptyState}>
+                <p className={styles.emptyStateText}>No classes found matching "{searchQuery}"</p>
+              </div>
+            )
+          }
+          return (
+            <div className={styles.classesGrid}>
+              {filteredClasses.map(classroom => renderClassCard(classroom, false))}
+            </div>
+          )
+        })()}
 
         {!user && error && <div className={styles.errorMessage}>{error}</div>}
       </section>
 
       {modal}
+      {joinModal}
       {assignTitleModal}
     </div>
   )

@@ -128,6 +128,409 @@
 }
 
 /* ========================================
+   SECTION BUTTONS (Join + Create)
+   ======================================== */
+
+.sectionButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.joinClassButton {
+  padding: 0.625rem 1.25rem;
+  border: 2px solid var(--primary-purple);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: var(--primary-purple);
+}
+
+:global(.dark) .joinClassButton {
+  border-color: var(--primary-purple-light);
+  color: var(--primary-purple-light);
+}
+
+.joinClassButton:hover {
+  background: var(--primary-purple-alpha-15);
+  transform: translateY(-1px);
+}
+
+:global(.dark) .joinClassButton:hover {
+  background: var(--primary-purple-alpha-25);
+}
+
+.createButton {
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  color: var(--white);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+:global(.dark) .createButton {
+  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.createButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+:global(.dark) .createButton:hover {
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+/* ========================================
+   VISIBILITY TOGGLE
+   ======================================== */
+
+.toggleContainer {
+  display: flex;
+  gap: 0;
+  border: 2px solid rgb(210, 210, 249, 0.4);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+:global(.dark) .toggleContainer {
+  border-color: rgb(80, 80, 80, 0.5);
+}
+
+.toggleOption {
+  flex: 1;
+  padding: 0.625rem 1rem;
+  border: none;
+  background: transparent;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .toggleOption {
+  color: var(--dark-text-secondary);
+}
+
+.toggleOption:first-child {
+  border-right: 1px solid rgb(210, 210, 249, 0.4);
+}
+
+:global(.dark) .toggleOption:first-child {
+  border-right-color: rgb(80, 80, 80, 0.5);
+}
+
+.toggleOption:hover:not(.toggleActive) {
+  background: var(--primary-purple-alpha-10);
+}
+
+.toggleActive {
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  color: white;
+}
+
+:global(.dark) .toggleActive {
+  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+}
+
+.visibilityHint {
+  font-size: 0.8125rem;
+  color: var(--light-text-tertiary);
+  margin: 0.5rem 0 0 0;
+  font-style: italic;
+}
+
+:global(.dark) .visibilityHint {
+  color: var(--dark-text-tertiary);
+}
+
+/* ========================================
+   CODE INPUT
+   ======================================== */
+
+.codeInput {
+  text-align: center;
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  font-family: monospace;
+  text-transform: uppercase;
+}
+
+/* ========================================
+   PRIVATE TAG
+   ======================================== */
+
+.classTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.privateTag {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: rgb(220, 38, 38);
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+:global(.dark) .privateTag {
+  background: rgba(239, 68, 68, 0.2);
+  color: rgb(252, 165, 165);
+}
+
+.publicTag {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: rgba(34, 197, 94, 0.1);
+  color: rgb(22, 163, 74);
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+:global(.dark) .publicTag {
+  background: rgba(34, 197, 94, 0.2);
+  color: rgb(134, 239, 172);
+}
+
+.tagGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+}
+
+.ownerTag {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: rgba(139, 92, 246, 0.15);
+  color: var(--primary-purple);
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+:global(.dark) .ownerTag {
+  background: rgba(139, 92, 246, 0.25);
+  color: var(--primary-purple-light);
+}
+
+.studentTag {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: rgb(37, 99, 235);
+  border-radius: 6px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+:global(.dark) .studentTag {
+  background: rgba(59, 130, 246, 0.2);
+  color: rgb(147, 197, 253);
+}
+
+/* ========================================
+   JOIN CODE DISPLAY
+   ======================================== */
+
+.joinCodeDisplay {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--primary-purple-alpha-10);
+  border-radius: 10px;
+  border: 1px dashed var(--primary-purple-alpha-50);
+}
+
+:global(.dark) .joinCodeDisplay {
+  background: var(--primary-purple-alpha-15);
+}
+
+.joinCodeLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .joinCodeLabel {
+  color: var(--dark-text-secondary);
+}
+
+.joinCodeValue {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: monospace;
+  letter-spacing: 0.25rem;
+  color: var(--primary-purple);
+  background: var(--white-alpha-80);
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+}
+
+:global(.dark) .joinCodeValue {
+  color: var(--primary-purple-light);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.copyCodeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: var(--primary-purple-alpha-15);
+  color: var(--primary-purple);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.copyCodeButton:hover {
+  background: var(--primary-purple-alpha-25);
+  transform: scale(1.05);
+}
+
+:global(.dark) .copyCodeButton {
+  background: var(--primary-purple-alpha-25);
+  color: var(--primary-purple-light);
+}
+
+:global(.dark) .copyCodeButton:hover {
+  background: var(--primary-purple-alpha-35);
+}
+
+.copyCodeButton.copied {
+  background: rgba(34, 197, 94, 0.2);
+  color: rgb(22, 163, 74);
+}
+
+:global(.dark) .copyCodeButton.copied {
+  background: rgba(34, 197, 94, 0.3);
+  color: rgb(134, 239, 172);
+}
+
+/* ========================================
+   SEARCH BAR
+   ======================================== */
+
+.searchContainer {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--light-text-tertiary);
+  pointer-events: none;
+}
+
+:global(.dark) .searchIcon {
+  color: var(--dark-text-tertiary);
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 2.75rem;
+  border: 2px solid rgb(210, 210, 249, 0.3);
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  background: var(--white-alpha-80);
+  color: var(--light-text-primary);
+  box-sizing: border-box;
+}
+
+:global(.dark) .searchInput {
+  background: rgba(40, 40, 40, 0.8);
+  border-color: rgb(80, 80, 80, 0.4);
+  color: var(--dark-text-primary);
+}
+
+.searchInput::placeholder {
+  color: var(--light-text-tertiary);
+}
+
+:global(.dark) .searchInput::placeholder {
+  color: var(--dark-text-tertiary);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  background: var(--white-alpha-95);
+}
+
+:global(.dark) .searchInput:focus {
+  border-color: var(--primary-purple-light);
+  background: rgba(50, 50, 50, 0.9);
+}
+
+.searchClear {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: var(--light-text-tertiary);
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  opacity: 0.6;
+}
+
+.searchClear:hover {
+  opacity: 1;
+  background: var(--primary-purple);
+}
+
+:global(.dark) .searchClear {
+  background: var(--dark-text-tertiary);
+}
+
+:global(.dark) .searchClear:hover {
+  background: var(--primary-purple-light);
+}
+
+/* ========================================
    CLASSES GRID
    ======================================== */
 
@@ -1261,6 +1664,16 @@
     width: 44px;
     height: 44px;
     font-size: 1.25rem;
+  }
+
+  .sectionButtons {
+    gap: 0.5rem;
+  }
+
+  .joinClassButton,
+  .createButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
   }
 
   .classesGrid {
