@@ -72,7 +72,8 @@ export default defineConfig(({ mode }) => ({
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'SAMEORIGIN',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'Permissions-Policy': 'microphone=(self), camera=()'
+      'Permissions-Policy': 'microphone=(self), camera=()',
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://nbrosowsky.github.io; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
     }
   },
   // Preview server (production build preview)
@@ -82,7 +83,8 @@ export default defineConfig(({ mode }) => ({
       'X-Frame-Options': 'SAMEORIGIN',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'Permissions-Policy': 'microphone=(self), camera=()',
-      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://nbrosowsky.github.io; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
     }
   }
 }))

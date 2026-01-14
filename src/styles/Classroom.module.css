@@ -191,67 +191,76 @@
 }
 
 /* ========================================
-   VISIBILITY TOGGLE
+   VISIBILITY CHECKBOXES
    ======================================== */
 
-.toggleContainer {
+.visibilityOptions {
   display: flex;
-  gap: 0;
-  border: 2px solid rgb(210, 210, 249, 0.4);
-  border-radius: 10px;
-  overflow: hidden;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
-:global(.dark) .toggleContainer {
-  border-color: rgb(80, 80, 80, 0.5);
-}
-
-.toggleOption {
-  flex: 1;
-  padding: 0.625rem 1rem;
-  border: none;
-  background: transparent;
-  font-size: 0.9375rem;
-  font-weight: 600;
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   cursor: pointer;
-  transition: all 0.2s ease;
-  color: var(--light-text-secondary);
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: background 0.2s ease;
 }
 
-:global(.dark) .toggleOption {
-  color: var(--dark-text-secondary);
-}
-
-.toggleOption:first-child {
-  border-right: 1px solid rgb(210, 210, 249, 0.4);
-}
-
-:global(.dark) .toggleOption:first-child {
-  border-right-color: rgb(80, 80, 80, 0.5);
-}
-
-.toggleOption:hover:not(.toggleActive) {
+.checkboxLabel:hover {
   background: var(--primary-purple-alpha-10);
 }
 
-.toggleActive {
-  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
-  color: white;
+.checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgb(210, 210, 249, 0.6);
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  position: relative;
 }
 
-:global(.dark) .toggleActive {
-  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+:global(.dark) .checkbox {
+  border-color: rgb(120, 120, 120, 0.6);
 }
 
-.visibilityHint {
-  font-size: 0.8125rem;
-  color: var(--light-text-tertiary);
-  margin: 0.5rem 0 0 0;
-  font-style: italic;
+.checkbox:checked {
+  background: var(--primary-purple);
+  border-color: var(--primary-purple);
 }
 
-:global(.dark) .visibilityHint {
-  color: var(--dark-text-tertiary);
+.checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkboxText {
+  font-size: 0.9375rem;
+  color: var(--light-text-primary);
+  line-height: 1.4;
+}
+
+:global(.dark) .checkboxText {
+  color: var(--dark-text-primary);
 }
 
 /* ========================================

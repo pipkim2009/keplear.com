@@ -1234,29 +1234,28 @@ function Classroom() {
           </div>
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Visibility</label>
-            <div className={styles.toggleContainer}>
-              <button
-                type="button"
-                className={`${styles.toggleOption} ${isPublic ? styles.toggleActive : ''}`}
-                onClick={() => setIsPublic(true)}
-                disabled={creating}
-              >
-                Public
-              </button>
-              <button
-                type="button"
-                className={`${styles.toggleOption} ${!isPublic ? styles.toggleActive : ''}`}
-                onClick={() => setIsPublic(false)}
-                disabled={creating}
-              >
-                Private
-              </button>
+            <div className={styles.visibilityOptions}>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  className={styles.checkbox}
+                  checked={isPublic}
+                  onChange={() => setIsPublic(true)}
+                  disabled={creating}
+                />
+                <span className={styles.checkboxText}>Public - Anyone can see and join this class</span>
+              </label>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  className={styles.checkbox}
+                  checked={!isPublic}
+                  onChange={() => setIsPublic(false)}
+                  disabled={creating}
+                />
+                <span className={styles.checkboxText}>Private - Only users with the class code can join</span>
+              </label>
             </div>
-            <p className={styles.visibilityHint}>
-              {isPublic
-                ? 'Anyone can see and join this class'
-                : 'Only users with the class code can join'}
-            </p>
           </div>
           <button type="submit" className={styles.submitButton} disabled={creating || !newTitle.trim()}>
             {creating ? 'Creating...' : 'Create Classroom'}
@@ -1497,8 +1496,8 @@ function Classroom() {
             <button
               className={practiceStyles.assignmentAssignButton}
               onClick={handleSaveAssignment}
-              disabled={!assigningToClassroomId || !assignmentTitle.trim() || isSavingAssignment}
-              style={{ opacity: (assigningToClassroomId && assignmentTitle.trim()) ? 1 : 0.5 }}
+              disabled={!assigningToClassroomId || !assignmentTitle.trim() || selectedNotes.length === 0 || isSavingAssignment}
+              style={{ opacity: (assigningToClassroomId && assignmentTitle.trim() && selectedNotes.length > 0) ? 1 : 0.5 }}
             >
               {isSavingAssignment ? 'Saving...' : 'Assign'}
             </button>

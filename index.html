@@ -7,13 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Keplear - Master music by ear with keyboard, guitar, and bass. Generate melodies from scales and chords, record your practice, and learn music theory hands-on." />
 
-    <!-- Security Headers -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN" />
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-    <meta http-equiv="Permissions-Policy" content="microphone=(self), camera=()" />
-
-    <!-- Content Security Policy - allows Supabase, fonts, and audio samples -->
+    <!-- Content Security Policy - allows Supabase, fonts, audio samples, and Tone.js workers -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
       script-src 'self' 'unsafe-inline' 'unsafe-eval';
@@ -22,7 +16,7 @@
       img-src 'self' data: blob: https:;
       media-src 'self' blob: https://nbrosowsky.github.io;
       connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io;
-      frame-ancestors 'self';
+      worker-src 'self' blob:;
       base-uri 'self';
       form-action 'self';
     " />

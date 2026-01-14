@@ -80,7 +80,7 @@ const InstrumentControls = memo(function InstrumentControls({
   setBpm,
   numberOfBeats,
   setNumberOfBeats,
-  chordMode = 'arpeggiator',
+  chordMode = 'progression',
   setChordMode,
   instrument,
   setInstrument,
@@ -910,20 +910,6 @@ Progression - Use entire chords"
                 ) : (
                   <div className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''} ${appliedChordsCount === 0 ? 'disabled' : ''}`}>
                     <button
-                      className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
-                      onClick={() => {
-                        if (appliedChordsCount > 0 && chordMode !== 'arpeggiator') {
-                          setChordMode('arpeggiator')
-                          setIsChordModeFlashing(true)
-                          setTimeout(() => setIsChordModeFlashing(false), 500)
-                        }
-                      }}
-                      title={appliedChordsCount === 0 ? "Apply chords to enable" : "Arpeggiator"}
-                      disabled={appliedChordsCount === 0}
-                    >
-                      Arpeggiator
-                    </button>
-                    <button
                       className={`switch-option ${chordMode === 'progression' ? 'active' : ''}`}
                       onClick={() => {
                         if (appliedChordsCount > 0 && chordMode !== 'progression') {
@@ -936,6 +922,20 @@ Progression - Use entire chords"
                       disabled={appliedChordsCount === 0}
                     >
                       Progression
+                    </button>
+                    <button
+                      className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
+                      onClick={() => {
+                        if (appliedChordsCount > 0 && chordMode !== 'arpeggiator') {
+                          setChordMode('arpeggiator')
+                          setIsChordModeFlashing(true)
+                          setTimeout(() => setIsChordModeFlashing(false), 500)
+                        }
+                      }}
+                      title={appliedChordsCount === 0 ? "Apply chords to enable" : "Arpeggiator"}
+                      disabled={appliedChordsCount === 0}
+                    >
+                      Arpeggiator
                     </button>
                   </div>
                 )}

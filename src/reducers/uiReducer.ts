@@ -31,7 +31,7 @@ export type UIAction =
 export const DEFAULT_SETTINGS = {
   bpm: 120,
   numberOfBeats: 5,
-  chordMode: 'arpeggiator' as ChordMode
+  chordMode: 'progression' as ChordMode
 } as const
 
 export const initialUIState: UIState = {
