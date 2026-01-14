@@ -103,27 +103,29 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
-  color: var(--white);
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  background: #9333ea;
+  color: white;
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
 }
 
 :global(.dark) .addButton {
-  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+  background: #a855f7;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
 }
 
 .addButton:hover {
+  background: #a855f7;
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
 }
 
 :global(.dark) .addButton:hover {
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+  background: #c084fc;
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
 }
 
 .addButton:focus-visible {
-  outline: 3px solid var(--primary-purple);
+  outline: 3px solid #9333ea;
   outline-offset: 2px;
 }
 
@@ -139,28 +141,28 @@
 
 .joinClassButton {
   padding: 0.625rem 1.25rem;
-  border: 2px solid var(--primary-purple);
+  border: 2px solid #9333ea;
   border-radius: 10px;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   background: transparent;
-  color: var(--primary-purple);
+  color: #9333ea;
 }
 
 :global(.dark) .joinClassButton {
-  border-color: var(--primary-purple-light);
-  color: var(--primary-purple-light);
+  border-color: #a855f7;
+  color: #a855f7;
 }
 
 .joinClassButton:hover {
-  background: var(--primary-purple-alpha-15);
+  background: rgba(147, 51, 234, 0.15);
   transform: translateY(-1px);
 }
 
 :global(.dark) .joinClassButton:hover {
-  background: var(--primary-purple-alpha-25);
+  background: rgba(168, 85, 247, 0.25);
 }
 
 .createButton {
@@ -168,26 +170,28 @@
   border: none;
   border-radius: 10px;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
-  color: var(--white);
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  background: #9333ea;
+  color: white;
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
 }
 
 :global(.dark) .createButton {
-  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+  background: #a855f7;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
 }
 
 .createButton:hover {
+  background: #a855f7;
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
 }
 
 :global(.dark) .createButton:hover {
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+  background: #c084fc;
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
 }
 
 /* ========================================
@@ -232,8 +236,13 @@
 }
 
 .checkbox:checked {
-  background: var(--primary-purple);
-  border-color: var(--primary-purple);
+  background: #9333ea;
+  border-color: #9333ea;
+}
+
+:global(.dark) .checkbox:checked {
+  background: #a855f7;
+  border-color: #a855f7;
 }
 
 .checkbox:checked::after {
@@ -255,12 +264,12 @@
 
 .checkboxText {
   font-size: 0.9375rem;
-  color: var(--light-text-primary);
+  color: #9333ea;
   line-height: 1.4;
 }
 
 :global(.dark) .checkboxText {
-  color: var(--dark-text-primary);
+  color: #f8f9fa;
 }
 
 /* ========================================
@@ -329,7 +338,7 @@
 .ownerTag {
   display: inline-block;
   padding: 0.25rem 0.5rem;
-  background: rgba(139, 92, 246, 0.15);
+  background: rgba(147, 51, 234, 0.15);
   color: var(--primary-purple);
   border-radius: 6px;
   font-size: 0.6875rem;
@@ -339,7 +348,7 @@
 }
 
 :global(.dark) .ownerTag {
-  background: rgba(139, 92, 246, 0.25);
+  background: rgba(147, 51, 234, 0.25);
   color: var(--primary-purple-light);
 }
 
@@ -470,39 +479,42 @@
 .searchInput {
   width: 100%;
   padding: 0.75rem 2.5rem 0.75rem 2.75rem;
-  border: 2px solid rgb(210, 210, 249, 0.3);
+  border: 2px solid rgb(210, 210, 249, 0.4);
   border-radius: 12px;
   font-size: 0.9375rem;
   font-weight: 500;
-  transition: all 0.2s ease;
-  background: var(--white-alpha-80);
-  color: var(--light-text-primary);
+  transition: all 0.3s ease;
+  background: rgb(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  color: #9333ea;
   box-sizing: border-box;
 }
 
 :global(.dark) .searchInput {
-  background: rgba(40, 40, 40, 0.8);
+  background: rgb(60, 60, 60, 0.8);
   border-color: rgb(80, 80, 80, 0.4);
-  color: var(--dark-text-primary);
+  color: #f8f9fa;
 }
 
 .searchInput::placeholder {
-  color: var(--light-text-tertiary);
+  color: rgb(147, 51, 234, 0.6);
+  font-weight: 500;
 }
 
 :global(.dark) .searchInput::placeholder {
-  color: var(--dark-text-tertiary);
+  color: rgb(248, 249, 250, 0.6);
 }
 
 .searchInput:focus {
   outline: none;
-  border-color: var(--primary-purple);
-  background: var(--white-alpha-95);
+  border-color: #3b82f6;
+  background: rgb(255, 255, 255, 0.95);
+  transform: translateY(-2px);
 }
 
 :global(.dark) .searchInput:focus {
-  border-color: var(--primary-purple-light);
-  background: rgba(50, 50, 50, 0.9);
+  border-color: #3b82f6;
+  background: rgb(70, 70, 70, 0.9);
 }
 
 .searchClear {
@@ -575,12 +587,12 @@
 
 .classCard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+  box-shadow: 0 8px 25px rgba(147, 51, 234, 0.15);
   border-color: var(--primary-purple-alpha-50);
 }
 
 :global(.dark) .classCard:hover {
-  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.25);
+  box-shadow: 0 8px 25px rgba(147, 51, 234, 0.25);
 }
 
 .classCardHeader {
@@ -711,20 +723,25 @@
   border: none;
   border-radius: 10px;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
-  color: var(--white);
+  background: #9333ea;
+  color: white;
 }
 
 :global(.dark) .joinButton {
-  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+  background: #a855f7;
 }
 
 .joinButton:hover:not(:disabled) {
+  background: #a855f7;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+}
+
+:global(.dark) .joinButton:hover:not(:disabled) {
+  background: #c084fc;
 }
 
 .joinButton:disabled {
@@ -897,20 +914,25 @@
   border: none;
   border-radius: 6px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
-  color: var(--white);
+  background: #9333ea;
+  color: white;
 }
 
 :global(.dark) .startAssignmentButton {
-  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+  background: #a855f7;
 }
 
 .startAssignmentButton:hover {
+  background: #a855f7;
   transform: scale(1.05);
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
+}
+
+:global(.dark) .startAssignmentButton:hover {
+  background: #c084fc;
 }
 
 .deleteAssignmentButton {
@@ -981,8 +1003,11 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: linear-gradient(135deg,
+    rgb(147, 51, 234, 0.75) 0%,
+    rgb(126, 34, 206, 0.85) 50%,
+    rgb(18, 18, 18, 0.8) 100%);
+  backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -992,7 +1017,11 @@
 }
 
 :global(.dark) .modalOverlay {
-  background: rgba(0, 0, 0, 0.7);
+  background: linear-gradient(135deg,
+    rgb(18, 18, 18, 0.9) 0%,
+    rgb(30, 30, 30, 0.8) 30%,
+    rgb(40, 40, 40, 0.9) 70%,
+    rgb(18, 18, 18, 0.9) 100%);
 }
 
 /* ========================================
@@ -1030,12 +1059,12 @@
 .modalTitle {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--light-text-primary);
+  color: #9333ea;
   margin: 0;
 }
 
 :global(.dark) .modalTitle {
-  color: var(--dark-text-primary);
+  color: #f8f9fa;
 }
 
 .closeButton {
@@ -1046,13 +1075,14 @@
   height: 36px;
   font-size: 18px;
   cursor: pointer;
-  color: var(--primary-purple);
+  color: #9333ea;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   padding: 0;
   transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
 }
 
 .closeButton:hover {
@@ -1062,7 +1092,7 @@
 :global(.dark) .closeButton {
   background: rgb(0, 0, 0, 0.3);
   border-color: rgb(255, 255, 255, 0.3);
-  color: var(--dark-text-primary);
+  color: #f8f9fa;
 }
 
 :global(.dark) .closeButton:hover {
@@ -1086,13 +1116,13 @@
 }
 
 .formLabel {
-  font-weight: 600;
-  color: var(--light-text-primary);
+  font-weight: 700;
+  color: #9333ea;
   font-size: 0.9375rem;
 }
 
 :global(.dark) .formLabel {
-  color: var(--dark-text-primary);
+  color: #f8f9fa;
 }
 
 .formInput {
@@ -1104,32 +1134,35 @@
   font-weight: 500;
   transition: all 0.3s ease;
   background: rgb(255, 255, 255, 0.8);
-  color: var(--light-text-primary);
+  backdrop-filter: blur(10px);
+  color: #9333ea;
   box-sizing: border-box;
 }
 
 :global(.dark) .formInput {
   background: rgb(60, 60, 60, 0.8);
   border-color: rgb(80, 80, 80, 0.4);
-  color: var(--dark-text-primary);
+  color: #f8f9fa;
 }
 
 .formInput::placeholder {
-  color: var(--light-text-tertiary);
+  color: rgb(147, 51, 234, 0.6);
+  font-weight: 500;
 }
 
 :global(.dark) .formInput::placeholder {
-  color: var(--dark-text-tertiary);
+  color: rgb(248, 249, 250, 0.6);
 }
 
 .formInput:focus {
   outline: none;
-  border-color: var(--primary-purple);
+  border-color: #3b82f6;
   background: rgb(255, 255, 255, 0.95);
+  transform: translateY(-2px);
 }
 
 :global(.dark) .formInput:focus {
-  border-color: var(--primary-purple-light);
+  border-color: #3b82f6;
   background: rgb(70, 70, 70, 0.9);
 }
 
@@ -1139,25 +1172,30 @@
 
 .submitButton {
   width: 100%;
-  padding: 0.875rem 1.5rem;
+  padding: 1rem 1.5rem;
   border: none;
   border-radius: 12px;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
-  color: var(--white);
+  background: #9333ea;
+  color: white;
   margin-top: 0.5rem;
 }
 
 :global(.dark) .submitButton {
-  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+  background: #a855f7;
 }
 
 .submitButton:hover:not(:disabled) {
+  background: #a855f7;
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+}
+
+:global(.dark) .submitButton:hover:not(:disabled) {
+  background: #c084fc;
 }
 
 .submitButton:disabled {
@@ -1248,12 +1286,12 @@
 
 .classCardClickable:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.2);
+  box-shadow: 0 12px 30px rgba(147, 51, 234, 0.2);
   border-color: var(--primary-purple-alpha-50);
 }
 
 :global(.dark) .classCardClickable:hover {
-  box-shadow: 0 12px 30px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 12px 30px rgba(147, 51, 234, 0.3);
 }
 
 .classCardStats {
@@ -1541,20 +1579,25 @@
   border: none;
   border-radius: 8px;
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  background: #9333ea;
   color: white;
 }
 
 :global(.dark) .addAssignmentButtonLarge {
-  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+  background: #a855f7;
 }
 
 .addAssignmentButtonLarge:hover {
+  background: #a855f7;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
+}
+
+:global(.dark) .addAssignmentButtonLarge:hover {
+  background: #c084fc;
 }
 
 .fullPageAssignmentsList {
@@ -1627,20 +1670,25 @@
   border: none;
   border-radius: 8px;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  background: #9333ea;
   color: white;
 }
 
 :global(.dark) .startAssignmentButtonLarge {
-  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
+  background: #a855f7;
 }
 
 .startAssignmentButtonLarge:hover {
+  background: #a855f7;
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(139, 92, 246, 0.3);
+  box-shadow: 0 6px 15px rgba(147, 51, 234, 0.3);
+}
+
+:global(.dark) .startAssignmentButtonLarge:hover {
+  background: #c084fc;
 }
 
 /* ========================================

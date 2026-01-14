@@ -7,6 +7,7 @@ import Router from './components/Router'
 import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import SkipLink from './components/common/SkipLink'
+import ChatPanel from './components/common/ChatPanel'
 import { AriaLiveProvider } from './components/common/AriaLive'
 import { useTheme } from './hooks/useTheme'
 import styles from './styles/App.module.css'
@@ -73,6 +74,7 @@ const App = memo(function App() {
               </main>
 
               <Footer />
+              <ChatPanel />
             </div>
           </InstrumentProvider>
         </AriaLiveProvider>
