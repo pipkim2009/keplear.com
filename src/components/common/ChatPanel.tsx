@@ -108,7 +108,7 @@ const ChatPanel = memo(function ChatPanel() {
         <div className={styles.chatHeader}>
           <div className={styles.chatHeaderInfo}>
             <IoSparkles className={styles.chatHeaderIcon} />
-            <span className={styles.chatHeaderTitle}>AI Assistant</span>
+            <span className={styles.chatHeaderTitle}>Keplear Assistant</span>
           </div>
           <button
             className={styles.closeButton}
@@ -182,9 +182,6 @@ const ChatPanel = memo(function ChatPanel() {
         aria-label="Open chat"
       >
         <IoChatbubbleEllipses />
-        <span className={styles.chatButtonBadge}>
-          <IoSparkles />
-        </span>
       </button>
     </div>,
     document.body
