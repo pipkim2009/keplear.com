@@ -90,6 +90,8 @@ interface ClassroomData {
 interface ExerciseData {
   id: string
   name: string
+  transcript: string
+  instrument: 'keyboard' | 'guitar' | 'bass'
   bpm: number
   beats: number
   chordMode: 'single' | 'progression'
@@ -135,11 +137,18 @@ interface WelcomeSubtitleProps {
 
 const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd }) => {
   const [isVisible, setIsVisible] = useState(true)
-  const hasSpoken = useRef(false)
+  const lastSpokenMessage = useRef<string>('')
 
   useEffect(() => {
-    if ('speechSynthesis' in window && !hasSpoken.current) {
-      hasSpoken.current = true
+    // Reset visibility when message changes
+    setIsVisible(true)
+
+    // Only speak if message changed and is not empty
+    if ('speechSynthesis' in window && message && message !== lastSpokenMessage.current) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel()
+
+      lastSpokenMessage.current = message
       const utterance = new SpeechSynthesisUtterance(message)
       utterance.rate = 0.9
       utterance.pitch = 1
@@ -156,7 +165,7 @@ const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd 
     return () => clearTimeout(timer)
   }, [message, onSpeechEnd])
 
-  if (!isVisible) return null
+  if (!isVisible || !message) return null
   return <div className={practiceStyles.welcomeSubtitle}>{message}</div>
 }
 
@@ -250,6 +259,7 @@ function Classroom() {
   // Multi-exercise state for assignment editor
   const [exercises, setExercises] = useState<ExerciseData[]>([])
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0)
+  const [currentExerciseTranscript, setCurrentExerciseTranscript] = useState('')
 
   // Lesson taking state
   const [currentAssignment, setCurrentAssignment] = useState<AssignmentData | null>(null)
@@ -578,6 +588,8 @@ function Classroom() {
             setExercises([{
               id: `exercise-${Date.now()}`,
               name: 'Exercise 1',
+              transcript: '',
+              instrument: data.instrument as 'keyboard' | 'guitar' | 'bass' || 'keyboard',
               bpm: data.bpm || 120,
               beats: data.beats || 4,
               chordMode: data.chordMode || 'single',
@@ -596,6 +608,8 @@ function Classroom() {
           setExercises([{
             id: `exercise-${Date.now()}`,
             name: 'Exercise 1',
+            transcript: '',
+            instrument: data.instrument as 'keyboard' | 'guitar' | 'bass' || 'keyboard',
             bpm: data.bpm || 120,
             beats: data.beats || 4,
             chordMode: data.chordMode || 'single',
@@ -835,6 +849,8 @@ function Classroom() {
     setExercises([{
       id: `exercise-${Date.now()}`,
       name: 'Exercise 1',
+      transcript: '',
+      instrument: instrument,
       bpm: bpm,
       beats: numberOfBeats,
       chordMode: chordMode,
@@ -855,6 +871,7 @@ function Classroom() {
     triggerClearChordsAndScales()
     setExercises([])
     setCurrentExerciseIndex(0)
+    setCurrentExerciseTranscript('')
     setViewMode('classroom')
   }
 
@@ -900,6 +917,8 @@ function Classroom() {
         const existingExercise = updated[currentExerciseIndex]
         updated[currentExerciseIndex] = {
           ...existingExercise,
+          transcript: currentExerciseTranscript,
+          instrument: instrument,
           bpm: currentData.bpm,
           beats: currentData.beats,
           chordMode: currentData.chordMode,
@@ -921,6 +940,8 @@ function Classroom() {
       const newExercise: ExerciseData = {
         id: `exercise-${Date.now()}`,
         name: `Exercise ${updated.length + 1}`,
+        transcript: '',
+        instrument: instrument,
         bpm: bpm,
         beats: numberOfBeats,
         chordMode: chordMode,
@@ -936,10 +957,11 @@ function Classroom() {
     // Clear instrument for new exercise
     clearSelection()
     triggerClearChordsAndScales()
+    setCurrentExerciseTranscript('')
 
     // Switch to new exercise
     setCurrentExerciseIndex(prev => exercises.length > 0 ? exercises.length : 0)
-  }, [saveCurrentToExercise, currentExerciseIndex, exercises.length, clearSelection, triggerClearChordsAndScales, bpm, numberOfBeats, chordMode, lowerOctaves, higherOctaves])
+  }, [saveCurrentToExercise, currentExerciseIndex, exercises.length, clearSelection, triggerClearChordsAndScales, bpm, numberOfBeats, chordMode, lowerOctaves, higherOctaves, currentExerciseTranscript])
 
   // Switch to a different exercise
   const handleSwitchExercise = useCallback((index: number) => {
@@ -952,6 +974,8 @@ function Classroom() {
       const existingExercise = updated[currentExerciseIndex]
       updated[currentExerciseIndex] = {
         ...existingExercise,
+        transcript: currentExerciseTranscript,
+        instrument: instrument,
         bpm: currentData.bpm,
         beats: currentData.beats,
         chordMode: currentData.chordMode,
@@ -978,10 +1002,12 @@ function Classroom() {
     // Load the target exercise data
     const targetExercise = exercises[index]
     if (targetExercise) {
-      // Apply BPM, beats, chord mode, and octave range
+      // Apply instrument, BPM, beats, chord mode, transcript, and octave range
+      if (targetExercise.instrument) handleInstrumentChange(targetExercise.instrument)
       if (targetExercise.bpm) setBpm(targetExercise.bpm)
       if (targetExercise.beats) setNumberOfBeats(targetExercise.beats)
       if (targetExercise.chordMode) setChordMode(targetExercise.chordMode)
+      setCurrentExerciseTranscript(targetExercise.transcript || '')
       // Apply octave range (use defaults if not set for backward compatibility)
       const targetLower = targetExercise.lowerOctaves ?? 0
       const targetHigher = targetExercise.higherOctaves ?? 0
@@ -1026,7 +1052,7 @@ function Classroom() {
     }
 
     setCurrentExerciseIndex(index)
-  }, [currentExerciseIndex, exercises, saveCurrentToExercise, clearSelection, scaleChordManagement, instrument, setChordMode, selectNote, handleOctaveRangeChange])
+  }, [currentExerciseIndex, exercises, saveCurrentToExercise, clearSelection, scaleChordManagement, instrument, setChordMode, selectNote, handleOctaveRangeChange, currentExerciseTranscript, handleInstrumentChange])
 
   // Remove an exercise
   const handleRemoveExercise = useCallback((index: number) => {
@@ -1082,6 +1108,8 @@ function Classroom() {
       updatedExercises[currentExerciseIndex] = {
         ...existingExercise,
         // Use current state if it has content, otherwise keep original
+        transcript: currentExerciseTranscript,
+        instrument: instrument,
         bpm: currentData.bpm,
         beats: currentData.beats,
         chordMode: currentData.chordMode,
@@ -1126,6 +1154,8 @@ function Classroom() {
       exercises: updatedExercises.map(exercise => ({
         id: exercise.id,
         name: exercise.name,
+        transcript: exercise.transcript,
+        instrument: exercise.instrument,
         bpm: exercise.bpm,
         beats: exercise.beats,
         chordMode: exercise.chordMode,
@@ -1177,6 +1207,7 @@ function Classroom() {
       triggerClearChordsAndScales()
       setExercises([])
       setCurrentExerciseIndex(0)
+      setCurrentExerciseTranscript('')
 
       // Navigate to the classroom where assignment was saved
       const targetClassroom = classrooms.find(c => c.id === savedClassroomId)
@@ -1204,8 +1235,12 @@ function Classroom() {
     setMelodySetupMessage('')
     setCongratulationsMessage('')
 
-    // Set up instrument
-    setInstrument(assignment.instrument as 'keyboard' | 'guitar' | 'bass')
+    // Initialize exercises from assignment first to get first exercise's instrument
+    const selectionData = assignment.selection_data
+    const firstExerciseInstrument = selectionData?.exercises?.[0]?.instrument || assignment.instrument
+
+    // Set up instrument (use first exercise's instrument if available)
+    setInstrument(firstExerciseInstrument as 'keyboard' | 'guitar' | 'bass')
     setBpm(assignment.bpm)
     setNumberOfBeats(assignment.beats)
 
@@ -1216,11 +1251,12 @@ function Classroom() {
     setExternalSelectedNoteIds([])
 
     // Initialize exercises from assignment
-    const selectionData = assignment.selection_data
     if (selectionData?.exercises && selectionData.exercises.length > 0) {
-      // Map exercises with fallback for bpm/beats
+      // Map exercises with fallback for bpm/beats, transcript, and instrument
       setLessonExercises(selectionData.exercises.map((ex: any) => ({
         ...ex,
+        transcript: ex.transcript || '',
+        instrument: ex.instrument || assignment.instrument,
         bpm: ex.bpm || assignment.bpm,
         beats: ex.beats || assignment.beats
       })))
@@ -1229,8 +1265,13 @@ function Classroom() {
       setLessonExercises([{
         id: 'legacy-exercise',
         name: 'Exercise 1',
+        transcript: '',
+        instrument: assignment.instrument as 'keyboard' | 'guitar' | 'bass',
         bpm: assignment.bpm,
         beats: assignment.beats,
+        chordMode: 'single',
+        lowerOctaves: 0,
+        higherOctaves: 0,
         selectedNoteIds: selectionData.selectedNoteIds || [],
         appliedScales: selectionData.appliedScales || [],
         appliedChords: selectionData.appliedChords || []
@@ -1270,7 +1311,7 @@ function Classroom() {
     scaleChordManagement.setAppliedChordsDirectly([])
     setExternalSelectedNoteIds([])
 
-    // Reset melody state for new exercise
+    // Reset melody and speech state for new exercise
     setHasGeneratedMelody(false)
     setAutoPlayAudio(false)
     setMelodySetupMessage('')
@@ -1278,8 +1319,17 @@ function Classroom() {
 
     // Load the target exercise
     const targetExercise = lessonExercises[index]
+
+    // If no transcript, mark speech as done immediately so auto-play can proceed
+    if (!targetExercise?.transcript) {
+      setWelcomeSpeechDone(true)
+    } else {
+      setWelcomeSpeechDone(false)
+    }
+
     if (targetExercise) {
-      // Apply BPM, beats, and chord mode from exercise
+      // Apply instrument, BPM, beats, and chord mode from exercise
+      if (targetExercise.instrument) setInstrument(targetExercise.instrument)
       if (targetExercise.bpm) setBpm(targetExercise.bpm)
       if (targetExercise.beats) setNumberOfBeats(targetExercise.beats)
       if (targetExercise.chordMode) setChordMode(targetExercise.chordMode)
@@ -1289,7 +1339,8 @@ function Classroom() {
       handleOctaveRangeChange(targetLower, targetHigher)
     }
 
-    if (targetExercise && currentAssignment.instrument === 'keyboard') {
+    const exerciseInstrument = targetExercise?.instrument || currentAssignment.instrument
+    if (targetExercise && exerciseInstrument === 'keyboard') {
       // Use exercise-level octave range or fall back to assignment-level
       const targetLower = targetExercise.lowerOctaves ?? 0
       const targetHigher = targetExercise.higherOctaves ?? 0
@@ -1328,7 +1379,7 @@ function Classroom() {
     // TODO: Add guitar/bass exercise switching
 
     setLessonExerciseIndex(index)
-  }, [lessonExerciseIndex, lessonExercises, currentAssignment, clearSelection, scaleChordManagement, setChordMode, selectNote, handleOctaveRangeChange])
+  }, [lessonExerciseIndex, lessonExercises, currentAssignment, clearSelection, scaleChordManagement, setChordMode, selectNote, handleOctaveRangeChange, setInstrument])
 
   // Auto-advance to next exercise or end lesson
   const handleExerciseComplete = useCallback(() => {
@@ -1577,12 +1628,13 @@ function Classroom() {
     }
   }, [viewMode, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, hasGeneratedMelody, handleGenerateMelody])
 
-  // Announce melody when ready
+  // Track when melody is ready (without announcing)
   useEffect(() => {
     if (viewMode !== 'taking-lesson') return
     if (welcomeSpeechDone && generatedMelody.length > 0 && recordedAudioBlob && !hasAnnouncedMelody.current) {
       hasAnnouncedMelody.current = true
-      setMelodySetupMessage('I have set up a melody for you to attempt')
+      // Melody is ready - auto-play will be triggered by transcript speech end or immediately if no transcript
+      setAutoPlayAudio(true)
     }
   }, [viewMode, welcomeSpeechDone, generatedMelody, recordedAudioBlob])
 
@@ -1791,8 +1843,9 @@ function Classroom() {
 
   // ========== RENDER: Taking Lesson Mode ==========
   if (viewMode === 'taking-lesson' && currentAssignment) {
-    const instrumentName = instrumentNames[currentAssignment.instrument] || 'Instrument'
-    const welcomeMessage = `Welcome to your ${instrumentName} lesson`
+    // Get custom transcript from current exercise (no default message)
+    const currentExerciseForTranscript = lessonExercises[lessonExerciseIndex]
+    const customTranscript = currentExerciseForTranscript?.transcript || ''
 
     const octaveLow = currentAssignment.octave_low ?? 4
     const octaveHigh = currentAssignment.octave_high ?? 5
@@ -1816,12 +1869,16 @@ function Classroom() {
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
-          <button className={practiceStyles.doneButton} onClick={handleEndLesson} aria-label="Done with lesson">
-            Done
+          <button
+            className={practiceStyles.doneButton}
+            onClick={lessonExerciseIndex < lessonExercises.length - 1 ? () => handleSwitchLessonExercise(lessonExerciseIndex + 1) : handleEndLesson}
+            aria-label={lessonExerciseIndex < lessonExercises.length - 1 ? "Next exercise" : "Done with lesson"}
+          >
+            {lessonExerciseIndex < lessonExercises.length - 1 ? 'Next' : 'Done'}
           </button>
         </div>
 
-        {/* Timeline for multi-exercise lessons */}
+        {/* Timeline for multi-exercise lessons (read-only progress indicator) */}
         {hasMultipleExercises && (
           <div className={practiceStyles.exerciseTimelineBar}>
             <span className={practiceStyles.exerciseTimelineLabel}>Timeline</span>
@@ -1829,14 +1886,14 @@ function Classroom() {
               <div className={practiceStyles.exerciseTimelineLine} />
               <div className={practiceStyles.exerciseCircles}>
                 {lessonExercises.map((exercise, index) => (
-                  <button
+                  <div
                     key={exercise.id}
-                    className={`${practiceStyles.exerciseCircle} ${index === lessonExerciseIndex ? practiceStyles.exerciseCircleActive : ''}`}
-                    onClick={() => handleSwitchLessonExercise(index)}
+                    className={`${practiceStyles.exerciseCircle} ${index === lessonExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${index < lessonExerciseIndex ? practiceStyles.exerciseCircleCompleted : ''}`}
                     title={exercise.name}
+                    style={{ cursor: 'default' }}
                   >
                     {index + 1}
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
@@ -1926,8 +1983,7 @@ function Classroom() {
           </div>
         )}
 
-        <WelcomeSubtitle message={welcomeMessage} onSpeechEnd={() => setWelcomeSpeechDone(true)} />
-        {melodySetupMessage && <WelcomeSubtitle message={melodySetupMessage} onSpeechEnd={() => setAutoPlayAudio(true)} />}
+        {customTranscript && <WelcomeSubtitle message={customTranscript} onSpeechEnd={() => setWelcomeSpeechDone(true)} />}
         {congratulationsMessage && <WelcomeSubtitle message={congratulationsMessage} onSpeechEnd={handleExerciseComplete} />}
       </>
     )
@@ -1963,38 +2019,17 @@ function Classroom() {
 
     return (
       <>
-        {/* Row 1: Header with title and action buttons */}
-        <div className={practiceStyles.assignmentModeBar}>
-          <span className={practiceStyles.assignmentModeText}>Assignment Editor</span>
-          <div className={practiceStyles.assignmentModeButtons}>
-            <button className={practiceStyles.assignmentCancelButton} onClick={handleCancelAssignment}>
-              Cancel
-            </button>
-            <button
-              className={practiceStyles.assignmentAssignButton}
-              onClick={handleSaveAssignment}
-              disabled={!assigningToClassroomId || !assignmentTitle.trim() || !allExercisesHaveContent || isSavingAssignment}
-              style={{ opacity: (assigningToClassroomId && assignmentTitle.trim() && allExercisesHaveContent) ? 1 : 0.5 }}
-            >
-              {isSavingAssignment ? 'Saving...' : 'Assign'}
-            </button>
-          </div>
+        {/* Back button and header */}
+        <div className={practiceStyles.backButtonContainer}>
+          <button className={practiceStyles.backButton} onClick={handleCancelAssignment} aria-label="Cancel assignment">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
         </div>
 
-        {/* Row 2: Selectors for instrument, classroom, and title */}
-        <div className={practiceStyles.assignmentSelectorsBar}>
-          <select
-            className={practiceStyles.instrumentSelector}
-            value={instrument}
-            onChange={(e) => {
-              const newInstrument = e.target.value as 'keyboard' | 'guitar' | 'bass'
-              handleInstrumentChange(newInstrument)
-            }}
-          >
-            <option value="keyboard">Keyboard</option>
-            <option value="guitar">Guitar</option>
-            <option value="bass">Bass</option>
-          </select>
+        {/* Header with classroom selector, title input, and assign button */}
+        <div className={practiceStyles.assignmentModeBar}>
           <select
             className={practiceStyles.classroomSelector}
             value={assigningToClassroomId || ''}
@@ -2010,57 +2045,83 @@ function Classroom() {
           <input
             type="text"
             className={practiceStyles.assignmentTitleInput}
+            style={{ flex: 1 }}
             value={assignmentTitle}
             onChange={(e) => setAssignmentTitle(e.target.value)}
             placeholder="Assignment title"
           />
+          <button
+            className={practiceStyles.assignmentAssignButton}
+            onClick={handleSaveAssignment}
+            disabled={!assigningToClassroomId || !assignmentTitle.trim() || !allExercisesHaveContent || isSavingAssignment}
+            style={{ opacity: (assigningToClassroomId && assignmentTitle.trim() && allExercisesHaveContent) ? 1 : 0.5 }}
+          >
+            {isSavingAssignment ? 'Saving...' : 'Assign'}
+          </button>
         </div>
 
-        {/* Timeline Bar */}
-        <div className={practiceStyles.exerciseTimelineBar}>
-          <span className={practiceStyles.exerciseTimelineLabel}>Timeline</span>
-          <div className={practiceStyles.exerciseTimeline}>
-            <div className={practiceStyles.exerciseTimelineLine} />
-            <div className={practiceStyles.exerciseCircles}>
-              {exercises.map((exercise, index) => {
-                // Check if this exercise has content
-                const hasContent = index === currentExerciseIndex
-                  ? currentHasContent
-                  : exerciseHasNotes(exercise)
-                return (
-                  <div key={exercise.id} className={practiceStyles.exerciseCircleWrapper}>
-                    <button
-                      className={`${practiceStyles.exerciseCircle} ${index === currentExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${!hasContent ? practiceStyles.exerciseCircleEmpty : ''}`}
-                      onClick={() => handleSwitchExercise(index)}
-                      title={hasContent ? exercise.name : `${exercise.name} (no notes selected)`}
-                    >
-                      {index + 1}
-                    </button>
-                    {exercises.length > 1 && index === currentExerciseIndex && (
+        {/* Timeline and Transcript Combined */}
+        <div className={practiceStyles.exerciseTimelineBar} style={{ flexDirection: 'column', gap: '0.75rem' }}>
+          {/* Row 1: Timeline */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
+            <span className={practiceStyles.exerciseTimelineLabel} style={{ minWidth: '70px' }}>Timeline</span>
+            <div className={practiceStyles.exerciseTimeline}>
+              <div className={practiceStyles.exerciseTimelineLine} />
+              <div className={practiceStyles.exerciseCircles}>
+                {exercises.map((exercise, index) => {
+                  // Check if this exercise has content
+                  const hasContent = index === currentExerciseIndex
+                    ? currentHasContent
+                    : exerciseHasNotes(exercise)
+                  return (
+                    <div key={exercise.id} className={practiceStyles.exerciseCircleWrapper}>
                       <button
-                        className={practiceStyles.exerciseCircleRemove}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleRemoveExercise(index)
-                        }}
-                        title="Remove exercise"
+                        className={`${practiceStyles.exerciseCircle} ${index === currentExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${!hasContent ? practiceStyles.exerciseCircleEmpty : ''}`}
+                        onClick={() => handleSwitchExercise(index)}
+                        title={hasContent ? exercise.name : `${exercise.name} (no notes selected)`}
                       >
-                        ×
+                        {index + 1}
                       </button>
-                    )}
-                  </div>
-                )
-              })}
-              {exercises.length < 10 && (
-                <button
-                  className={practiceStyles.exerciseCircleAdd}
-                  onClick={handleAddExercise}
-                  title="Add new exercise"
-                >
-                  +
-                </button>
-              )}
+                      {exercises.length > 1 && index === currentExerciseIndex && (
+                        <button
+                          className={practiceStyles.exerciseCircleRemove}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRemoveExercise(index)
+                          }}
+                          title="Remove exercise"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
+                {exercises.length < 10 && (
+                  <button
+                    className={practiceStyles.exerciseCircleAdd}
+                    onClick={handleAddExercise}
+                    title="Add new exercise"
+                  >
+                    +
+                  </button>
+                )}
+              </div>
             </div>
+          </div>
+          {/* Row 2: Transcript */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
+            <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--primary-purple)', whiteSpace: 'nowrap', minWidth: '70px' }}>
+              Transcript
+            </label>
+            <input
+              type="text"
+              className={practiceStyles.assignmentTitleInput}
+              style={{ flex: 1 }}
+              value={currentExerciseTranscript}
+              onChange={(e) => setCurrentExerciseTranscript(e.target.value)}
+              placeholder="e.g. try out this C Major scale exercise"
+            />
           </div>
         </div>
 
@@ -2109,7 +2170,6 @@ function Classroom() {
           isAutoRecording={isAutoRecording}
           currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
           onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
-          hideInstrumentSelector={true}
           externalSelectedNoteIds={externalSelectedNoteIds}
         />
       </>
@@ -2244,12 +2304,6 @@ function Classroom() {
                     <div key={assignment.id} className={styles.fullPageAssignmentItem}>
                       <div className={styles.fullPageAssignmentInfo}>
                         <h3 className={styles.fullPageAssignmentTitle}>{assignment.title}</h3>
-                        <div className={styles.fullPageAssignmentDetails}>
-                          <span className={styles.assignmentDetailTag}>{assignment.instrument}</span>
-                          <span className={styles.assignmentDetailTag}>{assignment.lesson_type}</span>
-                          <span className={styles.assignmentDetailTag}>{assignment.bpm} BPM</span>
-                          <span className={styles.assignmentDetailTag}>{assignment.beats} beats</span>
-                        </div>
                       </div>
                       <div className={styles.fullPageAssignmentActions}>
                         {user && (
