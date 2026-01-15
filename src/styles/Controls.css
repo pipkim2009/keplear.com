@@ -746,7 +746,7 @@
   border: 2px solid var(--red-600);
   color: var(--red-lighter);
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 0;
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;

@@ -23,8 +23,47 @@ const ChatPanel = memo(function ChatPanel() {
   ])
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [bottomOffset, setBottomOffset] = useState(24)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  // Adjust position based on footer visibility
+  useEffect(() => {
+    const BASE_OFFSET = 24
+
+    const updatePosition = () => {
+      const footer = document.querySelector('.footer')
+      if (!footer) {
+        setBottomOffset(BASE_OFFSET)
+        return
+      }
+
+      const footerRect = footer.getBoundingClientRect()
+      const viewportHeight = window.innerHeight
+
+      // Footer is visible if its top edge is within the viewport
+      const isFooterVisible = footerRect.top < viewportHeight && footerRect.bottom > 0
+
+      if (isFooterVisible) {
+        // Calculate how much of the footer is visible from the bottom of viewport
+        const footerVisibleHeight = viewportHeight - footerRect.top
+        setBottomOffset(footerVisibleHeight + BASE_OFFSET)
+      } else {
+        setBottomOffset(BASE_OFFSET)
+      }
+    }
+
+    // Only update position on scroll/resize - not on initial load
+    window.addEventListener('scroll', updatePosition, { passive: true })
+    window.addEventListener('resize', updatePosition, { passive: true })
+    document.addEventListener('scroll', updatePosition, { passive: true, capture: true })
+
+    return () => {
+      window.removeEventListener('scroll', updatePosition)
+      window.removeEventListener('resize', updatePosition)
+      document.removeEventListener('scroll', updatePosition, { capture: true })
+    }
+  }, [])
 
   // Scroll to bottom when new messages arrive
   useEffect(() => {
@@ -102,7 +141,7 @@ const ChatPanel = memo(function ChatPanel() {
   }
 
   return createPortal(
-    <div className={styles.chatContainer}>
+    <div className={styles.chatContainer} style={{ bottom: `${bottomOffset}px` }}>
       {/* Chat Panel */}
       <div className={`${styles.chatPanel} ${isOpen ? styles.open : ''}`}>
         <div className={styles.chatHeader}>
