@@ -15,7 +15,7 @@
  * 9. Harmonic sanity check
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import {
   yin,
   calculateRMS,
@@ -143,6 +143,8 @@ export function useDSPPitchDetection(
   const lowPassFilterRef = useRef<BiquadFilterNode | null>(null)
   const highPassFilterRef = useRef<BiquadFilterNode | null>(null)
   const detectionIntervalRef = useRef<number | null>(null)
+  const animationFrameRef = useRef<number | null>(null)
+  const isRunningRef = useRef(false)
 
   // Detection state refs
   const instrumentRef = useRef<InstrumentType>(config.instrument)
@@ -152,6 +154,7 @@ export function useDSPPitchDetection(
   const frequencyHistoryRef = useRef<number[]>([])
   const lastOnsetTimeRef = useRef(0)
   const isAfterOnsetRef = useRef(false)
+  const detectPitchRef = useRef<() => void>(() => {})
 
   // Audio buffer for YIN
   const audioBufferRef = useRef<Float32Array | null>(null)
@@ -209,7 +212,8 @@ export function useDSPPitchDetection(
 
     // Calculate RMS
     const rms = calculateRMS(buffer)
-    setVolumeLevel(Math.min(1, rms * 10))
+    // RMS values are typically 0.001-0.3, so scale up significantly for visualization
+    setVolumeLevel(Math.min(1, rms * 50))
 
     // Noise gate - reject frames below noise threshold
     const threshold = noiseCalibrationRef.current?.threshold || 0.01
@@ -314,6 +318,11 @@ export function useDSPPitchDetection(
     }
   }, [config.yinThreshold, config.stabilityWindowMs, getInstrumentRange])
 
+  // Keep ref updated with latest detectPitch
+  useEffect(() => {
+    detectPitchRef.current = detectPitch
+  }, [detectPitch])
+
   /**
    * Calibrate noise floor
    */
@@ -382,6 +391,11 @@ export function useDSPPitchDetection(
       })
       audioContextRef.current = audioContext
 
+      // Resume audio context (required for browsers that start suspended)
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume()
+      }
+
       // Create nodes
       const source = audioContext.createMediaStreamSource(stream)
       sourceRef.current = source
@@ -409,8 +423,21 @@ export function useDSPPitchDetection(
       // Create audio buffer
       audioBufferRef.current = new Float32Array(analyser.fftSize)
 
-      // Start detection loop
-      detectionIntervalRef.current = window.setInterval(detectPitch, DETECTION_INTERVAL_MS)
+      // Start detection loop using requestAnimationFrame for reliable updates
+      isRunningRef.current = true
+      let lastTime = 0
+      const loop = (timestamp: number) => {
+        if (!isRunningRef.current) return
+
+        // Throttle to ~30fps (every ~33ms)
+        if (timestamp - lastTime >= DETECTION_INTERVAL_MS) {
+          detectPitchRef.current()
+          lastTime = timestamp
+        }
+
+        animationFrameRef.current = requestAnimationFrame(loop)
+      }
+      animationFrameRef.current = requestAnimationFrame(loop)
 
       setState(prev => ({ ...prev, isListening: true }))
 
@@ -439,13 +466,18 @@ export function useDSPPitchDetection(
         }))
       }
     }
-  }, [config.bufferSize, setupFilters, detectPitch, calibrateNoise])
+  }, [config.bufferSize, setupFilters, calibrateNoise])
 
   /**
    * Stop listening
    */
   const stopListening = useCallback(() => {
     // Stop detection loop
+    isRunningRef.current = false
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+      animationFrameRef.current = null
+    }
     if (detectionIntervalRef.current) {
       clearInterval(detectionIntervalRef.current)
       detectionIntervalRef.current = null
@@ -488,7 +520,7 @@ export function useDSPPitchDetection(
     }
   }, [stopListening])
 
-  return {
+  return useMemo(() => ({
     // State
     isListening: state.isListening,
     isCalibrating: state.isCalibrating,
@@ -510,5 +542,20 @@ export function useDSPPitchDetection(
     // Debug
     rawFrequency,
     rawConfidence
-  }
+  }), [
+    state.isListening,
+    state.isCalibrating,
+    state.isCalibrated,
+    state.permission,
+    state.error,
+    currentPitch,
+    volumeLevel,
+    noiseFloor,
+    startListening,
+    stopListening,
+    calibrateNoise,
+    setInstrument,
+    rawFrequency,
+    rawConfidence
+  ])
 }

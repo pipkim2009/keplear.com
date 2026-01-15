@@ -11,7 +11,6 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import AuthContext from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { useDSPPitchDetection, usePerformanceGrading } from '../../hooks'
-import { LiveFeedback } from '../practice'
 import type { PitchDetectionResult } from '../../hooks/usePitchDetection'
 import type { Note } from '../../utils/notes'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
@@ -292,7 +291,8 @@ function Sandbox() {
       pitchDetection.stopListening()
       performanceGrading.stopPerformance()
     }
-  }, [isGeneratingMelody, pitchDetection, performanceGrading])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isGeneratingMelody])
 
   // Start performance grading when user starts listening and melody is ready
   const handleStartPracticeWithFeedback = useCallback(() => {
@@ -308,13 +308,15 @@ function Sandbox() {
       // Just start listening without grading if no melody
       pitchDetection.startListening()
     }
-  }, [generatedMelody, sessionStarted, selectedInstrument, melodyBpm, performanceGrading, pitchDetection])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [generatedMelody, sessionStarted, selectedInstrument, melodyBpm])
 
   // Stop practice session
   const handleStopPracticeWithFeedback = useCallback(() => {
     pitchDetection.stopListening()
     performanceGrading.stopPerformance()
-  }, [pitchDetection, performanceGrading])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Practice options modal handlers
   const handleOptionsStart = (instrumentId: string, selectedOptions: string[], selectedDifficulty: number, settings: LessonSettings) => {
@@ -1440,24 +1442,12 @@ function Sandbox() {
           fretRangeLow={fretLow}
           fretRangeHigh={fretHigh}
           lessonType={lessonSettings?.lessonType as 'melodies' | 'chords' | undefined}
+          isListening={pitchDetection.isListening}
+          onStartFeedback={handleStartPracticeWithFeedback}
+          onStopFeedback={handleStopPracticeWithFeedback}
+          performanceState={performanceGrading.state}
+          volumeLevel={pitchDetection.volumeLevel}
         />
-
-        {/* Real-time Pitch Feedback Section */}
-        {generatedMelody.length > 0 && !isGeneratingMelody && (
-          <div style={{ width: '100%', maxWidth: '600px', margin: '2rem auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <LiveFeedback
-              isListening={pitchDetection.isListening}
-              onStartListening={handleStartPracticeWithFeedback}
-              onStopListening={handleStopPracticeWithFeedback}
-              currentPitch={currentPitchForGrading}
-              volumeLevel={pitchDetection.volumeLevel}
-              performanceState={performanceGrading.state}
-              error={pitchDetection.error}
-              permission={pitchDetection.permission}
-              melody={generatedMelody}
-            />
-          </div>
-        )}
 
         {/* Welcome Subtitle Overlay */}
         <WelcomeSubtitle
@@ -1610,24 +1600,12 @@ function Sandbox() {
         isAutoRecording={isAutoRecording}
         currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
         onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
+        isListening={pitchDetection.isListening}
+        onStartFeedback={handleStartPracticeWithFeedback}
+        onStopFeedback={handleStopPracticeWithFeedback}
+        performanceState={performanceGrading.state}
+        volumeLevel={pitchDetection.volumeLevel}
       />
-
-      {/* Pitch Feedback Section for free play */}
-      {generatedMelody.length > 0 && !isGeneratingMelody && (
-        <div style={{ width: '100%', maxWidth: '600px', margin: '1rem auto', padding: '0 1rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          <LiveFeedback
-            isListening={pitchDetection.isListening}
-            onStartListening={handleStartPracticeWithFeedback}
-            onStopListening={handleStopPracticeWithFeedback}
-            currentPitch={currentPitchForGrading}
-            volumeLevel={pitchDetection.volumeLevel}
-            performanceState={performanceGrading.state}
-            error={pitchDetection.error}
-            permission={pitchDetection.permission}
-            melody={generatedMelody}
-          />
-        </div>
-      )}
 
       {/* Export to Classroom button - only show when logged in and not already in assignment mode */}
       {user && !assigningToClassroomId && (() => {

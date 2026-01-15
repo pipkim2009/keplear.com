@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { PiPlayFill, PiPauseFill, PiSpeakerHighFill, PiSpeakerLowFill, PiSpeakerSlashFill } from 'react-icons/pi'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Mic, MicOff } from 'lucide-react'
 import type { Note } from '../../utils/notes'
+import type { PerformanceState } from '../../hooks/usePerformanceGrading'
 
 interface CustomAudioPlayerProps {
   src: string
@@ -15,6 +16,12 @@ interface CustomAudioPlayerProps {
   onToggleNotes?: () => void
   melody?: Note[]
   currentlyPlayingNoteIndex?: number | null
+  // Feedback props
+  isListening?: boolean
+  onStartFeedback?: () => void
+  onStopFeedback?: () => void
+  performanceState?: PerformanceState
+  volumeLevel?: number
 }
 
 const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
@@ -28,7 +35,12 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   showNotes = false,
   onToggleNotes,
   melody = [],
-  currentlyPlayingNoteIndex = null
+  currentlyPlayingNoteIndex = null,
+  isListening = false,
+  onStartFeedback,
+  onStopFeedback,
+  performanceState,
+  volumeLevel = 0
 }) => {
   const internalAudioRef = useRef<HTMLAudioElement>(null)
   const audioRef = externalAudioRef || internalAudioRef
@@ -260,6 +272,17 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           </button>
         )}
 
+        {(onStartFeedback || onStopFeedback) && (
+          <button
+            className={`mic-btn ${isListening ? 'active' : ''}`}
+            onClick={isListening ? onStopFeedback : onStartFeedback}
+            aria-label={isListening ? 'Stop feedback' : 'Start feedback'}
+            title={isListening ? 'Stop feedback' : 'Start feedback'}
+          >
+            {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+          </button>
+        )}
+
         <button
           className="play-pause-btn"
           onClick={togglePlay}
@@ -351,6 +374,67 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
                 {note.name}
               </span>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Expansion - shows when listening */}
+      {isListening && performanceState && (
+        <div className="feedback-expansion">
+          {/* Count-in display */}
+          {performanceState.guided.isCountingIn && (
+            <div className="count-in-container">
+              <div className="count-in-beats">
+                {[1, 2, 3, 4].map(beat => (
+                  <div
+                    key={beat}
+                    className={`count-in-beat ${performanceState.guided.countInBeat >= beat ? 'active' : ''} ${performanceState.guided.countInBeat === beat ? 'current' : ''}`}
+                  >
+                    {beat}
+                  </div>
+                ))}
+              </div>
+              <span className="count-in-label">Count in...</span>
+            </div>
+          )}
+
+          {/* Note Timeline with results */}
+          {((!performanceState.guided.isCountingIn && performanceState.guided.currentBeat > 4) || performanceState.noteResults.length > 0) && melody.length > 0 && (
+            <div className="feedback-timeline">
+              <div className="feedback-timeline-track">
+                {melody.map((note, index) => {
+                  const result = performanceState.noteResults.find(r => r.noteIndex === index)
+                  const isCurrent = index === performanceState.currentNoteIndex
+                  const isPast = index < performanceState.currentNoteIndex
+
+                  return (
+                    <div
+                      key={index}
+                      className={`feedback-note ${
+                        result?.isCorrect ? 'correct' :
+                        result && !result.isCorrect ? 'missed' :
+                        isCurrent ? 'current' :
+                        isPast ? 'past' : 'pending'
+                      }`}
+                    >
+                      <span className="feedback-note-name">{note.name}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Volume indicator */}
+          <div className="volume-indicator">
+            <span className="volume-indicator-label">Mic Level</span>
+            <div className="volume-indicator-bar">
+              <div
+                className="volume-indicator-fill"
+                style={{ width: `${Math.min(100, volumeLevel * 100)}%` }}
+              />
+            </div>
+            <span className="volume-indicator-value">{Math.round(volumeLevel * 100)}%</span>
           </div>
         </div>
       )}

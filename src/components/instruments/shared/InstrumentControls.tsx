@@ -73,6 +73,12 @@ interface InstrumentControlsProps {
   disableBeatsInput?: boolean
   disableChordMode?: boolean
   autoPlayAudio?: boolean
+  // Feedback props
+  isListening?: boolean
+  onStartFeedback?: () => void
+  onStopFeedback?: () => void
+  performanceState?: any
+  volumeLevel?: number
 }
 
 const InstrumentControls = memo(function InstrumentControls({
@@ -132,7 +138,12 @@ const InstrumentControls = memo(function InstrumentControls({
   disableBpmInput = false,
   disableBeatsInput = false,
   disableChordMode = false,
-  autoPlayAudio = false
+  autoPlayAudio = false,
+  isListening = false,
+  onStartFeedback,
+  onStopFeedback,
+  performanceState,
+  volumeLevel = 0
 }: InstrumentControlsProps) {
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
@@ -994,6 +1005,11 @@ Progression - Use entire chords"
                     onToggleNotes={onToggleNotes}
                     melody={generatedMelody}
                     currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
+                    isListening={isListening}
+                    onStartFeedback={onStartFeedback}
+                    onStopFeedback={onStopFeedback}
+                    performanceState={performanceState}
+                    volumeLevel={volumeLevel}
                   />
                 )
               )}

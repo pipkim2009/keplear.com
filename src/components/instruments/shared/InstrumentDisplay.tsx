@@ -73,6 +73,12 @@ interface InstrumentDisplayProps {
   lessonType?: 'melodies' | 'chords'
   externalSelectedNoteIds?: string[]
   hideScalesChords?: boolean
+  // Feedback props
+  isListening?: boolean
+  onStartFeedback?: () => void
+  onStopFeedback?: () => void
+  performanceState?: any
+  volumeLevel?: number
 }
 
 const InstrumentDisplay = memo(function InstrumentDisplay({
@@ -139,7 +145,12 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   fretRangeHigh,
   lessonType,
   externalSelectedNoteIds,
-  hideScalesChords = false
+  hideScalesChords = false,
+  isListening = false,
+  onStartFeedback,
+  onStopFeedback,
+  performanceState,
+  volumeLevel = 0
 }: InstrumentDisplayProps) {
   const [lowerOctaves, setLowerOctaves] = useState<number>(initialLowerOctaves)
   const [higherOctaves, setHigherOctaves] = useState<number>(initialHigherOctaves)
@@ -412,6 +423,11 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           disableChordMode={disableChordMode}
           onLessonComplete={onLessonComplete}
           autoPlayAudio={autoPlayAudio}
+          isListening={isListening}
+          onStartFeedback={onStartFeedback}
+          onStopFeedback={onStopFeedback}
+          performanceState={performanceState}
+          volumeLevel={volumeLevel}
         />
       </div>
 

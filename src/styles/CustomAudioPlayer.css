@@ -144,10 +144,40 @@
 
 .reveal-btn.active {
   background: linear-gradient(145deg, var(--green-600), var(--green-700));
-  box-shadow: 0 0 0 2px var(--green-400);
 }
 
 .reveal-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Mic/Feedback Button - Purple */
+.mic-btn {
+  background: linear-gradient(145deg, var(--purple-500), var(--purple-600));
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.mic-btn:hover {
+  background: linear-gradient(145deg, var(--purple-400), var(--purple-500));
+}
+
+.mic-btn.active {
+  background: linear-gradient(145deg, var(--purple-600), var(--purple-700));
+}
+
+.mic-btn svg {
   width: 18px;
   height: 18px;
 }
@@ -378,6 +408,18 @@
     height: 14px;
   }
 
+  .mic-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+  }
+
+  .mic-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
   .play-pause-btn {
     width: 32px;
     height: 32px;
@@ -466,6 +508,18 @@
   }
 
   .reveal-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .mic-btn {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+  }
+
+  .mic-btn svg {
     width: 12px;
     height: 12px;
   }
@@ -1118,5 +1172,383 @@
 }
 
 .light .complete-stats {
+  color: var(--light-text-secondary);
+}
+
+/* ===========================================
+   FEEDBACK EXPANSION UI
+   =========================================== */
+
+.feedback-expansion {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--gray-700);
+  animation: slideDown 0.3s ease-out;
+}
+
+/* When feedback follows melody expansion, remove duplicate border */
+.melody-expansion + .feedback-expansion {
+  border-top: none;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+/* Count-in Container */
+.count-in-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+}
+
+.count-in-beats {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.count-in-beat {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  background: var(--gray-800);
+  border: 2px solid var(--gray-600);
+  color: var(--gray-500);
+  transition: all 0.15s ease;
+}
+
+.count-in-beat.active {
+  background: var(--purple-700);
+  border-color: var(--purple-500);
+  color: var(--white);
+}
+
+.count-in-beat.current {
+  background: var(--purple-600);
+  border-color: var(--purple-400);
+  color: var(--white);
+  transform: scale(1.15);
+  box-shadow: 0 0 20px var(--purple-alpha-60);
+}
+
+.count-in-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--purple-400);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Feedback Timeline */
+.feedback-timeline {
+  padding: 8px 0;
+}
+
+.feedback-timeline-track {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.feedback-note {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gray-800);
+  border: 2px solid var(--gray-600);
+  transition: all 0.15s ease;
+}
+
+.feedback-note-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--gray-500);
+}
+
+.feedback-note-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feedback-note.pending {
+  background: var(--gray-800);
+  border-color: var(--gray-600);
+}
+
+.feedback-note.pending .feedback-note-name {
+  color: var(--gray-500);
+}
+
+.feedback-note.current {
+  background: var(--blue-900);
+  border-color: var(--blue-400);
+  color: var(--white);
+  transform: scale(1.15);
+  box-shadow: 0 0 20px var(--blue-alpha-60);
+  animation: pulseCurrent 1s ease-in-out infinite;
+}
+
+.feedback-note.current .feedback-note-name {
+  color: #60a5fa;
+}
+
+@keyframes pulseCurrent {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--blue-alpha-40);
+  }
+  50% {
+    box-shadow: 0 0 12px 4px var(--blue-alpha-40);
+  }
+}
+
+.feedback-note.past {
+  background: var(--gray-700);
+  border-color: var(--gray-500);
+  opacity: 0.7;
+}
+
+.feedback-note.past .feedback-note-name {
+  color: var(--gray-400);
+}
+
+.feedback-note.correct {
+  background: var(--green-900);
+  border-color: var(--green-500);
+}
+
+.feedback-note.correct .feedback-note-name {
+  color: #4ade80;
+}
+
+.feedback-note.correct .feedback-note-icon {
+  color: #22c55e;
+}
+
+.feedback-note.missed {
+  background: var(--red-900);
+  border-color: var(--red-500);
+}
+
+.feedback-note.missed .feedback-note-name {
+  color: #f87171;
+}
+
+.feedback-note.missed .feedback-note-icon {
+  color: #ef4444;
+}
+
+/* Volume Indicator */
+.volume-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  margin-top: 8px;
+}
+
+.volume-indicator-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 60px;
+}
+
+.volume-indicator-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--gray-800);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.volume-indicator-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-500), var(--green-400));
+  border-radius: 4px;
+  transition: width 0.05s ease-out;
+}
+
+.volume-indicator-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-400);
+  min-width: 35px;
+  text-align: right;
+}
+
+/* Responsive Feedback Expansion */
+@media (max-width: 480px) {
+  .feedback-expansion {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  .count-in-container {
+    padding: 12px;
+    gap: 6px;
+  }
+
+  .count-in-beats {
+    gap: 8px;
+  }
+
+  .count-in-beat {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .count-in-label {
+    font-size: 12px;
+  }
+
+  .feedback-note {
+    width: 32px;
+    height: 32px;
+  }
+
+  .feedback-note-name {
+    font-size: 12px;
+  }
+
+  .volume-indicator {
+    padding: 8px 12px;
+  }
+
+  .volume-indicator-label {
+    font-size: 10px;
+    min-width: 50px;
+  }
+
+  .volume-indicator-bar {
+    height: 6px;
+  }
+
+  .volume-indicator-value {
+    font-size: 10px;
+    min-width: 30px;
+  }
+}
+
+@media (max-width: 360px) {
+  .count-in-beat {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .feedback-note {
+    width: 28px;
+    height: 28px;
+  }
+
+  .feedback-note-name {
+    font-size: 10px;
+  }
+}
+
+/* Light Theme Feedback Expansion */
+.light .feedback-expansion {
+  border-top-color: var(--light-border-primary);
+}
+
+.light .count-in-beat {
+  background: var(--light-bg-tertiary);
+  border-color: var(--light-border-secondary);
+  color: var(--light-text-tertiary);
+}
+
+.light .count-in-beat.active {
+  background: var(--purple-100);
+  border-color: var(--purple-400);
+  color: var(--purple-700);
+}
+
+.light .count-in-beat.current {
+  background: var(--purple-200);
+  border-color: var(--purple-500);
+  color: var(--purple-800);
+}
+
+.light .count-in-label {
+  color: var(--purple-600);
+}
+
+.light .feedback-note {
+  background: var(--light-bg-tertiary);
+  border-color: var(--light-border-secondary);
+}
+
+.light .feedback-note-name {
+  color: var(--light-text-secondary);
+}
+
+.light .feedback-note.pending {
+  background: var(--light-bg-tertiary);
+  border-color: var(--light-border-secondary);
+}
+
+.light .feedback-note.pending .feedback-note-name {
+  color: var(--light-text-tertiary);
+}
+
+.light .feedback-note.current {
+  background: var(--blue-100);
+  border-color: var(--blue-500);
+}
+
+.light .feedback-note.current .feedback-note-name {
+  color: var(--blue-700);
+}
+
+.light .feedback-note.correct {
+  background: var(--green-100);
+  border-color: var(--green-500);
+}
+
+.light .feedback-note.correct .feedback-note-name {
+  color: #15803d;
+}
+
+.light .feedback-note.correct .feedback-note-icon {
+  color: #16a34a;
+}
+
+.light .feedback-note.missed {
+  background: var(--red-100);
+  border-color: var(--red-500);
+}
+
+.light .feedback-note.missed .feedback-note-name {
+  color: #b91c1c;
+}
+
+.light .feedback-note.missed .feedback-note-icon {
+  color: #dc2626;
+}
+
+.light .volume-indicator-label {
+  color: var(--light-text-secondary);
+}
+
+.light .volume-indicator-bar {
+  background: var(--light-bg-secondary);
+}
+
+.light .volume-indicator-value {
   color: var(--light-text-secondary);
 }

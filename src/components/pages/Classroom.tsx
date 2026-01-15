@@ -10,7 +10,6 @@ import AuthContext from '../../contexts/AuthContext'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import { useDSPPitchDetection, usePerformanceGrading } from '../../hooks'
-import { LiveFeedback } from '../practice'
 import type { PitchDetectionResult } from '../../hooks/usePitchDetection'
 import type { Note } from '../../utils/notes'
 import type { AppliedScale, AppliedChord } from '../common/ScaleChordOptions'
@@ -1649,12 +1648,14 @@ function Classroom() {
     } else {
       pitchDetection.startListening()
     }
-  }, [generatedMelody, currentAssignment, melodyBpm, performanceGrading, pitchDetection])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [generatedMelody, currentAssignment, melodyBpm])
 
   const handleStopPracticeWithFeedback = useCallback(() => {
     pitchDetection.stopListening()
     performanceGrading.stopPerformance()
-  }, [pitchDetection, performanceGrading])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Pass pitch detection results to grading system
   useEffect(() => {
@@ -1965,23 +1966,12 @@ function Classroom() {
           lessonType={hasBothScalesAndChords ? undefined : (currentAssignment.lesson_type as 'melodies' | 'chords' | undefined)}
           externalSelectedNoteIds={externalSelectedNoteIds}
           hideScalesChords={hasNoScalesOrChords}
+          isListening={pitchDetection.isListening}
+          onStartFeedback={handleStartPracticeWithFeedback}
+          onStopFeedback={handleStopPracticeWithFeedback}
+          performanceState={performanceGrading.state}
+          volumeLevel={pitchDetection.volumeLevel}
         />
-
-        {generatedMelody.length > 0 && !isGeneratingMelody && (
-          <div style={{ width: '100%', maxWidth: '600px', margin: '2rem auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <LiveFeedback
-              isListening={pitchDetection.isListening}
-              onStartListening={handleStartPracticeWithFeedback}
-              onStopListening={handleStopPracticeWithFeedback}
-              currentPitch={currentPitchForGrading}
-              volumeLevel={pitchDetection.volumeLevel}
-              performanceState={performanceGrading.state}
-              error={pitchDetection.error}
-              permission={pitchDetection.permission}
-              melody={generatedMelody}
-            />
-          </div>
-        )}
 
         {customTranscript && <WelcomeSubtitle message={customTranscript} onSpeechEnd={() => setWelcomeSpeechDone(true)} />}
         {congratulationsMessage && <WelcomeSubtitle message={congratulationsMessage} onSpeechEnd={handleExerciseComplete} />}
