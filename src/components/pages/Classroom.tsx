@@ -26,6 +26,7 @@ import {
   getBassNoteById,
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
+import { PiTrashFill } from 'react-icons/pi'
 import styles from '../../styles/Classroom.module.css'
 import practiceStyles from '../../styles/Practice.module.css'
 
@@ -2081,7 +2082,7 @@ function Classroom() {
                           }}
                           title="Remove exercise"
                         >
-                          ×
+                          <PiTrashFill size={10} />
                         </button>
                       )}
                     </div>
@@ -2196,7 +2197,7 @@ function Classroom() {
                   onClick={() => handleDeleteClassroom(selectedClassroom.id)}
                   title="Delete classroom"
                 >
-                  ×
+                  <PiTrashFill size={16} />
                 </button>
               )}
             </div>
@@ -2265,7 +2266,7 @@ function Classroom() {
                           aria-label="Remove student"
                           title="Remove student"
                         >
-                          ×
+                          <PiTrashFill size={14} />
                         </button>
                       )}
                     </div>
@@ -2310,7 +2311,7 @@ function Classroom() {
                             onClick={() => handleDeleteAssignment(assignment.id)}
                             title="Delete assignment"
                           >
-                            ×
+                            <PiTrashFill size={14} />
                           </button>
                         )}
                       </div>

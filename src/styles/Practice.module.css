@@ -1670,7 +1670,7 @@
 :global(.dark) .exerciseCircleEmpty {
   border-color: var(--red-400) !important;
   background: rgba(239, 68, 68, 0.12);
-  color: var(--red-400);
+  color: var(--white);
 }
 
 .exerciseCircleEmpty.exerciseCircleActive {

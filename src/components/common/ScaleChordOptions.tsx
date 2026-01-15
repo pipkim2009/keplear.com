@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { IoMusicalNotes } from 'react-icons/io5'
+import { PiTrashFill } from 'react-icons/pi'
 import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, applyScaleToGuitar, applyScaleBoxToGuitar, type GuitarScale, type ScaleBox } from '../../utils/instruments/guitar/guitarScales'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
 import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, applyScaleToBass, applyScaleBoxToBass, type BassScale, type BassScaleBox } from '../../utils/instruments/bass/bassScales'
@@ -566,7 +567,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                               className="delete-scale-button"
                               title={`Remove ${appliedScale.displayName}`}
                             >
-                              ×
+                              <PiTrashFill size={12} />
                             </button>
                           )}
                         </div>
@@ -589,7 +590,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                               className="delete-chord-button"
                               title={`Remove ${appliedChord.displayName}`}
                             >
-                              ×
+                              <PiTrashFill size={12} />
                             </button>
                           )}
                         </div>
@@ -750,7 +751,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                             className="delete-scale-button"
                             title={`Remove ${appliedScale.displayName}`}
                           >
-                            ×
+                            <PiTrashFill size={12} />
                           </button>
                         </div>
                       ))
@@ -866,7 +867,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                             className="delete-chord-button"
                             title={`Remove ${appliedChord.displayName}`}
                           >
-                            ×
+                            <PiTrashFill size={12} />
                           </button>
                         </div>
                       ))
