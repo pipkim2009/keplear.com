@@ -1280,6 +1280,25 @@
   gap: 0.75rem;
 }
 
+.assignmentSelectorsBar {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  background: var(--white-alpha-60);
+  border-radius: 12px;
+  border: 1px solid var(--primary-purple-alpha-20);
+  margin-bottom: 1rem;
+}
+
+:global(.dark) .assignmentSelectorsBar {
+  background: var(--dark-bg-secondary);
+  border-color: var(--primary-purple-alpha-40);
+}
+
 .assignmentCancelButton {
   padding: 0.625rem 1.25rem;
   border: none;
@@ -1332,6 +1351,65 @@
 
 :global(.dark) .assignmentAssignButton:hover {
   box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+}
+
+.instrumentSelector {
+  padding: 0.625rem 1rem;
+  padding-right: 2.5rem;
+  border: 2px solid var(--primary-purple-alpha-30);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--white-alpha-80);
+  color: var(--gray-700);
+  min-width: 120px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+}
+
+:global(.dark) .instrumentSelector {
+  background: var(--dark-bg-secondary);
+  color: var(--dark-text-primary);
+  border-color: var(--primary-purple-alpha-50);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+}
+
+.instrumentSelector:hover {
+  border-color: var(--primary-purple);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+}
+
+:global(.dark) .instrumentSelector:hover {
+  border-color: var(--primary-purple-lighter);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+}
+
+.instrumentSelector:focus {
+  outline: none;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+:global(.dark) .instrumentSelector:focus {
+  border-color: var(--primary-purple-lighter);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+
+.instrumentSelector option {
+  padding: 0.5rem;
+  background: var(--white);
+  color: var(--gray-700);
+}
+
+:global(.dark) .instrumentSelector option {
+  background: var(--dark-bg-secondary);
+  color: var(--dark-text-primary);
 }
 
 .classroomSelector {
@@ -1438,6 +1516,241 @@
 :global(.dark) .assignmentTitleInput:focus {
   border-color: var(--primary-purple-lighter);
   box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+}
+
+/* ========================================
+   EXERCISE TIMELINE
+   ======================================== */
+
+.exerciseTimelineBar {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: var(--white-alpha-60);
+  border-radius: 12px;
+  border: 1px solid var(--primary-purple-alpha-20);
+  margin-bottom: 1rem;
+}
+
+:global(.dark) .exerciseTimelineBar {
+  background: var(--dark-bg-secondary);
+  border-color: var(--primary-purple-alpha-30);
+}
+
+.exerciseTimelineLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary-purple);
+  white-space: nowrap;
+}
+
+:global(.dark) .exerciseTimelineLabel {
+  color: var(--primary-purple-light);
+}
+
+.exerciseTimeline {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+.exerciseTimelineLine {
+  position: absolute;
+  left: 18px;
+  right: 56px;
+  top: 50%;
+  height: 3px;
+  background: var(--primary-purple-alpha-30);
+  border-radius: 2px;
+  transform: translateY(-50%);
+}
+
+:global(.dark) .exerciseTimelineLine {
+  background: var(--primary-purple-alpha-40);
+}
+
+/* Lesson mode - line extends to last circle (no add button) */
+.exerciseTimelineLesson .exerciseTimelineLine {
+  right: 18px;
+}
+
+.exerciseCircles {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.exerciseCircleWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exerciseCircle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-purple-alpha-40);
+  background: var(--white);
+  color: var(--primary-purple);
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:global(.dark) .exerciseCircle {
+  background: var(--dark-bg-tertiary);
+  border-color: var(--primary-purple-alpha-50);
+  color: var(--primary-purple-light);
+}
+
+.exerciseCircle:hover {
+  border-color: var(--primary-purple);
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+}
+
+:global(.dark) .exerciseCircle:hover {
+  border-color: var(--primary-purple-light);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+}
+
+.exerciseCircleActive,
+.exerciseCircleActive:hover {
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-darker) 100%);
+  border-color: var(--primary-purple);
+  color: white;
+  cursor: default;
+  transform: scale(1.1);
+  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.4);
+}
+
+:global(.dark) .exerciseCircleActive,
+:global(.dark) .exerciseCircleActive:hover {
+  background: linear-gradient(135deg, var(--primary-purple-lighter) 0%, var(--primary-purple) 100%);
+  border-color: var(--primary-purple-light);
+  color: white;
+  box-shadow: 0 2px 12px rgba(139, 92, 246, 0.5);
+}
+
+/* Empty exercise - no notes selected */
+.exerciseCircleEmpty {
+  opacity: 0.6;
+  border-color: var(--red-500) !important;
+  border-width: 2px;
+  border-style: dashed;
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--red-600);
+  animation: emptyExercisePulse 2s ease-in-out infinite;
+}
+
+@keyframes emptyExercisePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
+  }
+}
+
+:global(.dark) .exerciseCircleEmpty {
+  border-color: var(--red-400) !important;
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--red-400);
+}
+
+.exerciseCircleEmpty.exerciseCircleActive {
+  opacity: 1;
+  background: linear-gradient(135deg, var(--red-500) 0%, var(--red-600) 100%);
+  border-color: var(--red-500) !important;
+  border-style: solid;
+  color: white;
+  animation: activeEmptyPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes activeEmptyPulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 2px 16px rgba(239, 68, 68, 0.6);
+  }
+}
+
+:global(.dark) .exerciseCircleEmpty.exerciseCircleActive {
+  background: linear-gradient(135deg, var(--red-400) 0%, var(--red-500) 100%);
+  border-color: var(--red-400) !important;
+}
+
+.exerciseCircleRemove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: var(--red-500);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.exerciseCircleRemove:hover {
+  background: var(--red-600);
+  transform: scale(1.1);
+}
+
+.exerciseCircleAdd {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px dashed var(--primary-purple-alpha-50);
+  background: transparent;
+  color: var(--primary-purple);
+  font-size: 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:global(.dark) .exerciseCircleAdd {
+  border-color: var(--primary-purple-alpha-60);
+  color: var(--primary-purple-light);
+}
+
+.exerciseCircleAdd:hover {
+  border-color: var(--primary-purple);
+  background: var(--primary-purple-alpha-10);
+  transform: scale(1.1);
+}
+
+:global(.dark) .exerciseCircleAdd:hover {
+  border-color: var(--primary-purple-light);
+  background: var(--primary-purple-alpha-20);
 }
 
 /* ========================================
@@ -1706,6 +2019,19 @@
     flex: 1;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
+  }
+
+  .assignmentSelectorsBar {
+    flex-direction: column;
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+  }
+
+  .instrumentSelector {
+    width: 100%;
+    min-width: unset;
+    font-size: 0.875rem;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
   }
 
   .classroomSelector {

@@ -87,6 +87,30 @@ interface ClassroomData {
   assignments: AssignmentData[]
 }
 
+interface ExerciseData {
+  id: string
+  name: string
+  bpm: number
+  beats: number
+  chordMode: 'single' | 'progression'
+  lowerOctaves: number
+  higherOctaves: number
+  selectedNoteIds: string[]
+  appliedScales: Array<{
+    root: string
+    scaleName: string
+    octave?: number
+    displayName: string
+  }>
+  appliedChords: Array<{
+    root: string
+    chordName: string
+    octave?: number
+    fretZone?: number
+    displayName: string
+  }>
+}
+
 const instrumentNames: Record<string, string> = {
   keyboard: 'Keyboard',
   guitar: 'Guitar',
@@ -223,9 +247,15 @@ function Classroom() {
   const [isSavingAssignment, setIsSavingAssignment] = useState(false)
   const [assignmentError, setAssignmentError] = useState<string | null>(null)
 
+  // Multi-exercise state for assignment editor
+  const [exercises, setExercises] = useState<ExerciseData[]>([])
+  const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0)
+
   // Lesson taking state
   const [currentAssignment, setCurrentAssignment] = useState<AssignmentData | null>(null)
   const [pendingSelectionData, setPendingSelectionData] = useState<any>(null)
+  const [lessonExercises, setLessonExercises] = useState<ExerciseData[]>([])
+  const [lessonExerciseIndex, setLessonExerciseIndex] = useState(0)
   const [externalSelectedNoteIds, setExternalSelectedNoteIds] = useState<string[]>([])
   const [welcomeSpeechDone, setWelcomeSpeechDone] = useState(false)
   const [hasGeneratedMelody, setHasGeneratedMelody] = useState(false)
@@ -736,6 +766,20 @@ function Classroom() {
     setAssigningToClassroomId(classroomId)
     clearSelection()
     triggerClearChordsAndScales()
+    // Initialize with one empty exercise
+    setExercises([{
+      id: `exercise-${Date.now()}`,
+      name: 'Exercise 1',
+      bpm: bpm,
+      beats: numberOfBeats,
+      chordMode: chordMode,
+      lowerOctaves: lowerOctaves,
+      higherOctaves: higherOctaves,
+      selectedNoteIds: [],
+      appliedScales: [],
+      appliedChords: []
+    }])
+    setCurrentExerciseIndex(0)
     setViewMode('creating-assignment')
   }
 
@@ -744,8 +788,173 @@ function Classroom() {
     setAssigningToClassroomId(null)
     clearSelection()
     triggerClearChordsAndScales()
+    setExercises([])
+    setCurrentExerciseIndex(0)
     setViewMode('classroom')
   }
+
+  // Save current instrument state to an exercise
+  const saveCurrentToExercise = useCallback(() => {
+    const manualNoteIds = selectedNotes
+      .filter(n => n.isManualSelection === true || n.isManualSelection === undefined)
+      .map(n => n.id)
+
+    return {
+      bpm: bpm,
+      beats: numberOfBeats,
+      chordMode: chordMode,
+      lowerOctaves: lowerOctaves,
+      higherOctaves: higherOctaves,
+      selectedNoteIds: manualNoteIds,
+      appliedScales: scaleChordManagement.appliedScales.map(s => ({
+        root: s.root,
+        scaleName: s.scale?.name || 'Major',
+        octave: s.octave,
+        displayName: s.displayName
+      })),
+      appliedChords: scaleChordManagement.appliedChords.map(c => ({
+        root: c.root,
+        chordName: c.chord?.name || 'Major',
+        octave: c.octave,
+        fretZone: c.fretZone,
+        displayName: c.displayName
+      }))
+    }
+  }, [selectedNotes, scaleChordManagement.appliedScales, scaleChordManagement.appliedChords, bpm, numberOfBeats, chordMode, lowerOctaves, higherOctaves])
+
+  // Add a new exercise (saves current state first) - max 10 exercises
+  const handleAddExercise = useCallback(() => {
+    if (exercises.length >= 10) return // Max 10 exercises
+
+    const currentData = saveCurrentToExercise()
+
+    // Update current exercise with latest data
+    setExercises(prev => {
+      const updated = [...prev]
+      if (updated.length > 0) {
+        updated[currentExerciseIndex] = {
+          ...updated[currentExerciseIndex],
+          ...currentData
+        }
+      }
+
+      // Add new exercise
+      const newExercise: ExerciseData = {
+        id: `exercise-${Date.now()}`,
+        name: `Exercise ${updated.length + 1}`,
+        bpm: bpm,
+        beats: numberOfBeats,
+        chordMode: chordMode,
+        lowerOctaves: lowerOctaves,
+        higherOctaves: higherOctaves,
+        selectedNoteIds: [],
+        appliedScales: [],
+        appliedChords: []
+      }
+      return [...updated, newExercise]
+    })
+
+    // Clear instrument for new exercise
+    clearSelection()
+    triggerClearChordsAndScales()
+
+    // Switch to new exercise
+    setCurrentExerciseIndex(prev => exercises.length > 0 ? exercises.length : 0)
+  }, [saveCurrentToExercise, currentExerciseIndex, exercises.length, clearSelection, triggerClearChordsAndScales, bpm, numberOfBeats, chordMode, lowerOctaves, higherOctaves])
+
+  // Switch to a different exercise
+  const handleSwitchExercise = useCallback((index: number) => {
+    if (index === currentExerciseIndex || index < 0 || index >= exercises.length) return
+
+    // Save current state before switching
+    const currentData = saveCurrentToExercise()
+    setExercises(prev => {
+      const updated = [...prev]
+      updated[currentExerciseIndex] = {
+        ...updated[currentExerciseIndex],
+        ...currentData
+      }
+      return updated
+    })
+
+    // Clear current selection
+    clearSelection()
+    scaleChordManagement.setAppliedScalesDirectly([])
+    scaleChordManagement.setAppliedChordsDirectly([])
+
+    // Load the target exercise data
+    const targetExercise = exercises[index]
+    if (targetExercise) {
+      // Apply BPM, beats, chord mode, and octave range
+      if (targetExercise.bpm) setBpm(targetExercise.bpm)
+      if (targetExercise.beats) setNumberOfBeats(targetExercise.beats)
+      if (targetExercise.chordMode) setChordMode(targetExercise.chordMode)
+      // Apply octave range (use defaults if not set for backward compatibility)
+      const targetLower = targetExercise.lowerOctaves ?? 0
+      const targetHigher = targetExercise.higherOctaves ?? 0
+      handleOctaveRangeChange(targetLower, targetHigher)
+
+      setTimeout(() => {
+        // Apply scales from exercise
+        if (targetExercise.appliedScales?.length > 0) {
+          if (instrument === 'keyboard') {
+            targetExercise.appliedScales.forEach((scaleData) => {
+              const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
+              if (scaleObj) {
+                scaleChordManagement.handleKeyboardScaleApply(scaleData.root, scaleObj, scaleData.octave || 4)
+              }
+            })
+          }
+          // TODO: Add guitar/bass scale loading similar to lesson mode
+        }
+
+        // Apply chords from exercise
+        if (targetExercise.appliedChords?.length > 0) {
+          setChordMode('progression')
+          if (instrument === 'keyboard') {
+            targetExercise.appliedChords.forEach((chordData) => {
+              const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
+              if (chordObj) {
+                scaleChordManagement.handleKeyboardChordApply(chordData.root, chordObj, chordData.octave || 4)
+              }
+            })
+          }
+          // TODO: Add guitar/bass chord loading similar to lesson mode
+        }
+
+        // Apply notes from exercise (use target exercise octave range)
+        if (targetExercise.selectedNoteIds?.length > 0 && instrument === 'keyboard') {
+          targetExercise.selectedNoteIds.forEach((noteId) => {
+            const noteObj = getKeyboardNoteById(noteId, targetLower, targetHigher)
+            if (noteObj) selectNote(noteObj, 'multi')
+          })
+        }
+      }, 100)
+    }
+
+    setCurrentExerciseIndex(index)
+  }, [currentExerciseIndex, exercises, saveCurrentToExercise, clearSelection, scaleChordManagement, instrument, setChordMode, selectNote, handleOctaveRangeChange])
+
+  // Remove an exercise
+  const handleRemoveExercise = useCallback((index: number) => {
+    if (exercises.length <= 1) return // Keep at least one exercise
+
+    setExercises(prev => {
+      const updated = prev.filter((_, i) => i !== index)
+      // Rename exercises sequentially
+      return updated.map((exercise, i) => ({
+        ...exercise,
+        name: `Exercise ${i + 1}`
+      }))
+    })
+
+    // Adjust current index if needed
+    if (currentExerciseIndex >= exercises.length - 1) {
+      setCurrentExerciseIndex(Math.max(0, exercises.length - 2))
+    } else if (index < currentExerciseIndex) {
+      setCurrentExerciseIndex(prev => prev - 1)
+    }
+  }, [exercises.length, currentExerciseIndex])
 
   // Open assignment title modal
   const handleOpenAssignModal = () => {
@@ -771,6 +980,23 @@ function Classroom() {
       return
     }
 
+    // Save current exercise state before saving
+    const currentData = saveCurrentToExercise()
+    const updatedExercises = [...exercises]
+    if (updatedExercises.length > 0) {
+      updatedExercises[currentExerciseIndex] = {
+        ...updatedExercises[currentExerciseIndex],
+        ...currentData
+      }
+    }
+
+    // Check if any exercise has content
+    const hasAnyContent = updatedExercises.some(exercise =>
+      exercise.selectedNoteIds.length > 0 ||
+      exercise.appliedScales.length > 0 ||
+      exercise.appliedChords.length > 0
+    )
+
     const hasScales = scaleChordManagement.appliedScales.length > 0
     const hasChords = scaleChordManagement.appliedChords.length > 0
     const hasNotes = selectedNotes.length > 0
@@ -779,27 +1005,26 @@ function Classroom() {
     const appliedScaleNames = scaleChordManagement.appliedScales.map(s => s.scale?.name || 'Major')
     const appliedChordNames = scaleChordManagement.appliedChords.map(c => c.chord?.name || 'Major')
 
-    // Only save manually selected notes (not scale/chord notes)
-    // For guitar/bass, isManualSelection === true means manual
-    // For keyboard, isManualSelection is undefined (all keyboard notes are manual)
-    const manualNoteIds = selectedNotes
-      .filter(n => n.isManualSelection === true || n.isManualSelection === undefined)
-      .map(n => n.id)
-
+    // Build selection_data with exercises support
+    // For backward compatibility, if there's only one exercise, also include top-level fields
+    const firstExercise = updatedExercises[0]
     const selectionData = {
-      selectedNoteIds: manualNoteIds,
-      appliedScales: scaleChordManagement.appliedScales.map(s => ({
-        root: s.root,
-        scaleName: s.scale?.name || 'Major',
-        octave: s.octave,
-        displayName: s.displayName
-      })),
-      appliedChords: scaleChordManagement.appliedChords.map(c => ({
-        root: c.root,
-        chordName: c.chord?.name || 'Major',
-        octave: c.octave,
-        fretZone: c.fretZone,
-        displayName: c.displayName
+      // Legacy fields for backward compatibility (from first exercise)
+      selectedNoteIds: firstExercise?.selectedNoteIds || [],
+      appliedScales: firstExercise?.appliedScales || [],
+      appliedChords: firstExercise?.appliedChords || [],
+      // Exercise timeline array
+      exercises: updatedExercises.map(exercise => ({
+        id: exercise.id,
+        name: exercise.name,
+        bpm: exercise.bpm,
+        beats: exercise.beats,
+        chordMode: exercise.chordMode,
+        lowerOctaves: exercise.lowerOctaves,
+        higherOctaves: exercise.higherOctaves,
+        selectedNoteIds: exercise.selectedNoteIds,
+        appliedScales: exercise.appliedScales,
+        appliedChords: exercise.appliedChords
       }))
     }
 
@@ -826,7 +1051,7 @@ function Classroom() {
           octave_high: octaveHigh,
           fret_low: 0,
           fret_high: 12,
-          selection_data: (hasNotes || hasScales || hasChords) ? selectionData : null,
+          selection_data: hasAnyContent ? selectionData : null,
           created_by: user.id
         })
 
@@ -841,6 +1066,8 @@ function Classroom() {
       setAssigningToClassroomId(null)
       clearSelection()
       triggerClearChordsAndScales()
+      setExercises([])
+      setCurrentExerciseIndex(0)
 
       // Navigate to the classroom where assignment was saved
       const targetClassroom = classrooms.find(c => c.id === savedClassroomId)
@@ -879,6 +1106,31 @@ function Classroom() {
     scaleChordManagement.setAppliedChordsDirectly([])
     setExternalSelectedNoteIds([])
 
+    // Initialize exercises from assignment
+    const selectionData = assignment.selection_data
+    if (selectionData?.exercises && selectionData.exercises.length > 0) {
+      // Map exercises with fallback for bpm/beats
+      setLessonExercises(selectionData.exercises.map((ex: any) => ({
+        ...ex,
+        bpm: ex.bpm || assignment.bpm,
+        beats: ex.beats || assignment.beats
+      })))
+    } else if (selectionData) {
+      // Legacy format - single exercise from top-level fields
+      setLessonExercises([{
+        id: 'legacy-exercise',
+        name: 'Exercise 1',
+        bpm: assignment.bpm,
+        beats: assignment.beats,
+        selectedNoteIds: selectionData.selectedNoteIds || [],
+        appliedScales: selectionData.appliedScales || [],
+        appliedChords: selectionData.appliedChords || []
+      }])
+    } else {
+      setLessonExercises([])
+    }
+    setLessonExerciseIndex(0)
+
     setViewMode('taking-lesson')
   }
 
@@ -892,31 +1144,118 @@ function Classroom() {
     setCurrentAssignment(null)
     setPendingSelectionData(null)
     setExternalSelectedNoteIds([])
+    setLessonExercises([])
+    setLessonExerciseIndex(0)
     clearSelection()
     triggerClearChordsAndScales()
     setViewMode('classroom')
   }
 
-  // Apply assignment selection data when in lesson mode
+  // Switch to a different exercise in lesson mode
+  const handleSwitchLessonExercise = useCallback((index: number) => {
+    if (index === lessonExerciseIndex || index < 0 || index >= lessonExercises.length || !currentAssignment) return
+
+    // Clear current content
+    clearSelection()
+    scaleChordManagement.setAppliedScalesDirectly([])
+    scaleChordManagement.setAppliedChordsDirectly([])
+    setExternalSelectedNoteIds([])
+
+    // Reset melody state for new exercise
+    setHasGeneratedMelody(false)
+    setAutoPlayAudio(false)
+    setMelodySetupMessage('')
+    hasAnnouncedMelody.current = false
+
+    // Load the target exercise
+    const targetExercise = lessonExercises[index]
+    if (targetExercise) {
+      // Apply BPM, beats, and chord mode from exercise
+      if (targetExercise.bpm) setBpm(targetExercise.bpm)
+      if (targetExercise.beats) setNumberOfBeats(targetExercise.beats)
+      if (targetExercise.chordMode) setChordMode(targetExercise.chordMode)
+      // Apply octave range from exercise (use defaults if not set)
+      const targetLower = targetExercise.lowerOctaves ?? 0
+      const targetHigher = targetExercise.higherOctaves ?? 0
+      handleOctaveRangeChange(targetLower, targetHigher)
+    }
+
+    if (targetExercise && currentAssignment.instrument === 'keyboard') {
+      // Use exercise-level octave range or fall back to assignment-level
+      const targetLower = targetExercise.lowerOctaves ?? 0
+      const targetHigher = targetExercise.higherOctaves ?? 0
+
+      setTimeout(() => {
+        // Apply scales from exercise
+        if (targetExercise.appliedScales?.length > 0) {
+          targetExercise.appliedScales.forEach((scaleData) => {
+            const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
+            if (scaleObj) {
+              scaleChordManagement.handleKeyboardScaleApply(scaleData.root, scaleObj, scaleData.octave || 4)
+            }
+          })
+        }
+
+        // Apply chords from exercise
+        if (targetExercise.appliedChords?.length > 0) {
+          setChordMode('progression')
+          targetExercise.appliedChords.forEach((chordData) => {
+            const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
+            if (chordObj) {
+              scaleChordManagement.handleKeyboardChordApply(chordData.root, chordObj, chordData.octave || 4)
+            }
+          })
+        }
+
+        // Apply notes from exercise
+        if (targetExercise.selectedNoteIds?.length > 0) {
+          targetExercise.selectedNoteIds.forEach((noteId) => {
+            const noteObj = getKeyboardNoteById(noteId, targetLower, targetHigher)
+            if (noteObj) selectNote(noteObj, 'multi')
+          })
+        }
+      }, 100)
+    }
+    // TODO: Add guitar/bass exercise switching
+
+    setLessonExerciseIndex(index)
+  }, [lessonExerciseIndex, lessonExercises, currentAssignment, clearSelection, scaleChordManagement, setChordMode, selectNote, handleOctaveRangeChange])
+
+  // Auto-advance to next exercise or end lesson
+  const handleExerciseComplete = useCallback(() => {
+    if (lessonExerciseIndex < lessonExercises.length - 1) {
+      // More exercises available - advance to next
+      handleSwitchLessonExercise(lessonExerciseIndex + 1)
+    } else {
+      // Last exercise - end lesson
+      handleEndLesson()
+    }
+  }, [lessonExerciseIndex, lessonExercises.length, handleSwitchLessonExercise, handleEndLesson])
+
+  // Apply assignment selection data when in lesson mode (first exercise)
   useEffect(() => {
     if (viewMode !== 'taking-lesson' || !currentAssignment || hasInitializedNotes.current) return
+    if (lessonExercises.length === 0) return
 
     hasInitializedNotes.current = true
-    const selectionData = currentAssignment.selection_data
-
-    if (!selectionData) return
+    const currentExercise = lessonExercises[0] // Start with first exercise
 
     // For keyboard, apply immediately; for guitar/bass, store as pending
     if (currentAssignment.instrument === 'keyboard') {
-      // Set octave range
-      const octaveLow = currentAssignment.octave_low || 4
-      const octaveHigh = currentAssignment.octave_high || 5
-      handleOctaveRangeChange(4 - octaveLow, octaveHigh - 5)
+      // Set octave range from exercise (use defaults if not set for backward compatibility)
+      const exerciseLower = currentExercise.lowerOctaves ?? 0
+      const exerciseHigher = currentExercise.higherOctaves ?? 0
+      handleOctaveRangeChange(exerciseLower, exerciseHigher)
+
+      // Apply BPM, beats, and chord mode from first exercise
+      if (currentExercise.bpm) setBpm(currentExercise.bpm)
+      if (currentExercise.beats) setNumberOfBeats(currentExercise.beats)
+      if (currentExercise.chordMode) setChordMode(currentExercise.chordMode)
 
       setTimeout(() => {
         // Apply scales
-        if (selectionData.appliedScales?.length > 0) {
-          selectionData.appliedScales.forEach((scaleData: any) => {
+        if (currentExercise.appliedScales?.length > 0) {
+          currentExercise.appliedScales.forEach((scaleData: any) => {
             const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
             if (scaleObj) {
               scaleChordManagement.handleKeyboardScaleApply(scaleData.root, scaleObj, scaleData.octave || 4)
@@ -925,9 +1264,9 @@ function Classroom() {
         }
 
         // Apply chords
-        if (selectionData.appliedChords?.length > 0) {
+        if (currentExercise.appliedChords?.length > 0) {
           setChordMode('progression')
-          selectionData.appliedChords.forEach((chordData: any) => {
+          currentExercise.appliedChords.forEach((chordData: any) => {
             const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
             if (chordObj) {
               scaleChordManagement.handleKeyboardChordApply(chordData.root, chordObj, chordData.octave || 4)
@@ -936,9 +1275,9 @@ function Classroom() {
         }
 
         // Apply notes
-        if (selectionData.selectedNoteIds?.length > 0) {
-          selectionData.selectedNoteIds.forEach((noteId: string) => {
-            const noteObj = getKeyboardNoteById(noteId, 4 - octaveLow, octaveHigh - 5)
+        if (currentExercise.selectedNoteIds?.length > 0) {
+          currentExercise.selectedNoteIds.forEach((noteId: string) => {
+            const noteObj = getKeyboardNoteById(noteId, exerciseLower, exerciseHigher)
             if (noteObj) selectNote(noteObj, 'multi')
           })
         }
@@ -947,10 +1286,10 @@ function Classroom() {
       // Guitar/Bass - store pending data
       setPendingSelectionData({
         instrument: currentAssignment.instrument,
-        selectionData: selectionData
+        selectionData: currentExercise
       })
     }
-  }, [viewMode, currentAssignment, handleOctaveRangeChange, scaleChordManagement, setChordMode, selectNote])
+  }, [viewMode, currentAssignment, lessonExercises, handleOctaveRangeChange, scaleChordManagement, setChordMode, selectNote])
 
   // Apply pending selection data for guitar/bass
   useEffect(() => {
@@ -1351,13 +1690,14 @@ function Classroom() {
     const calculatedLowerOctaves = currentAssignment.instrument === 'keyboard' ? 4 - octaveLow : 0
     const calculatedHigherOctaves = currentAssignment.instrument === 'keyboard' ? octaveHigh - 5 : 0
 
-    // Check if lesson has no scales or chords
-    const selectionData = currentAssignment.selection_data
-    const hasNoScalesOrChords = !selectionData ||
-      ((selectionData.appliedScales?.length ?? 0) === 0 && (selectionData.appliedChords?.length ?? 0) === 0)
-    const hasChords = selectionData && (selectionData.appliedChords?.length ?? 0) > 0
-    const hasScales = selectionData && (selectionData.appliedScales?.length ?? 0) > 0
+    // Check if lesson has no scales or chords (use current exercise data)
+    const currentExercise = lessonExercises[lessonExerciseIndex]
+    const hasNoScalesOrChords = !currentExercise ||
+      ((currentExercise.appliedScales?.length ?? 0) === 0 && (currentExercise.appliedChords?.length ?? 0) === 0)
+    const hasChords = currentExercise && (currentExercise.appliedChords?.length ?? 0) > 0
+    const hasScales = currentExercise && (currentExercise.appliedScales?.length ?? 0) > 0
     const hasBothScalesAndChords = hasScales && hasChords
+    const hasMultipleExercises = lessonExercises.length > 1
 
     return (
       <>
@@ -1371,6 +1711,28 @@ function Classroom() {
             Done
           </button>
         </div>
+
+        {/* Timeline for multi-exercise lessons */}
+        {hasMultipleExercises && (
+          <div className={practiceStyles.exerciseTimelineBar}>
+            <span className={practiceStyles.exerciseTimelineLabel}>Timeline</span>
+            <div className={`${practiceStyles.exerciseTimeline} ${practiceStyles.exerciseTimelineLesson}`}>
+              <div className={practiceStyles.exerciseTimelineLine} />
+              <div className={practiceStyles.exerciseCircles}>
+                {lessonExercises.map((exercise, index) => (
+                  <button
+                    key={exercise.id}
+                    className={`${practiceStyles.exerciseCircle} ${index === lessonExerciseIndex ? practiceStyles.exerciseCircleActive : ''}`}
+                    onClick={() => handleSwitchLessonExercise(index)}
+                    title={exercise.name}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         <InstrumentDisplay
           onNoteClick={handleNoteClick}
@@ -1457,7 +1819,7 @@ function Classroom() {
 
         <WelcomeSubtitle message={welcomeMessage} onSpeechEnd={() => setWelcomeSpeechDone(true)} />
         {melodySetupMessage && <WelcomeSubtitle message={melodySetupMessage} onSpeechEnd={() => setAutoPlayAudio(true)} />}
-        {congratulationsMessage && <WelcomeSubtitle message={congratulationsMessage} onSpeechEnd={handleEndLesson} />}
+        {congratulationsMessage && <WelcomeSubtitle message={congratulationsMessage} onSpeechEnd={handleExerciseComplete} />}
       </>
     )
   }
@@ -1466,41 +1828,130 @@ function Classroom() {
   if (viewMode === 'creating-assignment') {
     const userClassrooms = classrooms.filter(c => c.created_by === user?.id)
 
+    // Helper to check if an exercise has notes selected
+    const exerciseHasNotes = (exercise: ExerciseData) =>
+      exercise.selectedNoteIds.length > 0 ||
+      exercise.appliedScales.length > 0 ||
+      exercise.appliedChords.length > 0
+
+    // Check current exercise content (for the current one being edited)
+    const currentExerciseData = {
+      selectedNoteIds: selectedNotes.map(n => n.id),
+      appliedScales: scaleChordManagement.appliedScales,
+      appliedChords: scaleChordManagement.appliedChords
+    }
+    const currentHasContent = currentExerciseData.selectedNoteIds.length > 0 ||
+      currentExerciseData.appliedScales.length > 0 ||
+      currentExerciseData.appliedChords.length > 0
+
+    // Check if all exercises have content (including current unsaved state)
+    const allExercisesHaveContent = exercises.every((exercise, index) => {
+      if (index === currentExerciseIndex) {
+        return currentHasContent
+      }
+      return exerciseHasNotes(exercise)
+    })
+
     return (
       <>
+        {/* Row 1: Header with title and action buttons */}
         <div className={practiceStyles.assignmentModeBar}>
           <span className={practiceStyles.assignmentModeText}>Assignment Editor</span>
           <div className={practiceStyles.assignmentModeButtons}>
-            <select
-              className={practiceStyles.classroomSelector}
-              value={assigningToClassroomId || ''}
-              onChange={(e) => setAssigningToClassroomId(e.target.value || null)}
-            >
-              <option value="">Select Classroom</option>
-              {userClassrooms.map((classroom) => (
-                <option key={classroom.id} value={classroom.id}>
-                  {classroom.title}
-                </option>
-              ))}
-            </select>
-            <input
-              type="text"
-              className={practiceStyles.assignmentTitleInput}
-              value={assignmentTitle}
-              onChange={(e) => setAssignmentTitle(e.target.value)}
-              placeholder="Assignment title"
-            />
             <button className={practiceStyles.assignmentCancelButton} onClick={handleCancelAssignment}>
               Cancel
             </button>
             <button
               className={practiceStyles.assignmentAssignButton}
               onClick={handleSaveAssignment}
-              disabled={!assigningToClassroomId || !assignmentTitle.trim() || selectedNotes.length === 0 || isSavingAssignment}
-              style={{ opacity: (assigningToClassroomId && assignmentTitle.trim() && selectedNotes.length > 0) ? 1 : 0.5 }}
+              disabled={!assigningToClassroomId || !assignmentTitle.trim() || !allExercisesHaveContent || isSavingAssignment}
+              style={{ opacity: (assigningToClassroomId && assignmentTitle.trim() && allExercisesHaveContent) ? 1 : 0.5 }}
             >
               {isSavingAssignment ? 'Saving...' : 'Assign'}
             </button>
+          </div>
+        </div>
+
+        {/* Row 2: Selectors for instrument, classroom, and title */}
+        <div className={practiceStyles.assignmentSelectorsBar}>
+          <select
+            className={practiceStyles.instrumentSelector}
+            value={instrument}
+            onChange={(e) => {
+              const newInstrument = e.target.value as 'keyboard' | 'guitar' | 'bass'
+              handleInstrumentChange(newInstrument)
+            }}
+          >
+            <option value="keyboard">Keyboard</option>
+            <option value="guitar">Guitar</option>
+            <option value="bass">Bass</option>
+          </select>
+          <select
+            className={practiceStyles.classroomSelector}
+            value={assigningToClassroomId || ''}
+            onChange={(e) => setAssigningToClassroomId(e.target.value || null)}
+          >
+            <option value="">Select Classroom</option>
+            {userClassrooms.map((classroom) => (
+              <option key={classroom.id} value={classroom.id}>
+                {classroom.title}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            className={practiceStyles.assignmentTitleInput}
+            value={assignmentTitle}
+            onChange={(e) => setAssignmentTitle(e.target.value)}
+            placeholder="Assignment title"
+          />
+        </div>
+
+        {/* Timeline Bar */}
+        <div className={practiceStyles.exerciseTimelineBar}>
+          <span className={practiceStyles.exerciseTimelineLabel}>Timeline</span>
+          <div className={practiceStyles.exerciseTimeline}>
+            <div className={practiceStyles.exerciseTimelineLine} />
+            <div className={practiceStyles.exerciseCircles}>
+              {exercises.map((exercise, index) => {
+                // Check if this exercise has content
+                const hasContent = index === currentExerciseIndex
+                  ? currentHasContent
+                  : exerciseHasNotes(exercise)
+                return (
+                  <div key={exercise.id} className={practiceStyles.exerciseCircleWrapper}>
+                    <button
+                      className={`${practiceStyles.exerciseCircle} ${index === currentExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${!hasContent ? practiceStyles.exerciseCircleEmpty : ''}`}
+                      onClick={() => handleSwitchExercise(index)}
+                      title={hasContent ? exercise.name : `${exercise.name} (no notes selected)`}
+                    >
+                      {index + 1}
+                    </button>
+                    {exercises.length > 1 && index === currentExerciseIndex && (
+                      <button
+                        className={practiceStyles.exerciseCircleRemove}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleRemoveExercise(index)
+                        }}
+                        title="Remove exercise"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+              {exercises.length < 10 && (
+                <button
+                  className={practiceStyles.exerciseCircleAdd}
+                  onClick={handleAddExercise}
+                  title="Add new exercise"
+                >
+                  +
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1549,6 +2000,7 @@ function Classroom() {
           isAutoRecording={isAutoRecording}
           currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
           onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
+          hideInstrumentSelector={true}
         />
       </>
     )
