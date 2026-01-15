@@ -475,10 +475,25 @@ function Classroom() {
                     if (chordBoxes.length > 0) {
                       const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
                       const chordBox = chordBoxes[boxIndex]
-                      const noteKeys = chordBox.positions.map(pos => {
+                      const noteKeys: string[] = []
+                      const chordNotes: Note[] = []
+                      chordBox.positions.forEach(pos => {
                         const stringIndex = 6 - pos.string
                         const fretIndex = pos.fret
-                        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                        noteKeys.push(noteKey)
+                        // Find the guitar note for this position
+                        const guitarNote = guitarNotes.find(n => n.string === pos.string && n.fret === pos.fret)
+                        if (guitarNote) {
+                          chordNotes.push({
+                            id: `g-s${pos.string}-f${pos.fret}`,
+                            name: guitarNote.name,
+                            frequency: guitarNote.frequency,
+                            isBlack: guitarNote.name.includes('#'),
+                            position: stringIndex * 100 + (fretIndex > 0 ? fretIndex - 1 : -1),
+                            __guitarCoord: { stringIndex, fretIndex: pos.fret }
+                          } as Note)
+                        }
                       })
                       chordsToApply.push({
                         id: `guitar-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
@@ -486,6 +501,7 @@ function Classroom() {
                         chord: chordObj as any,
                         displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
                         noteKeys: noteKeys,
+                        notes: chordNotes,
                         fretZone: boxIndex
                       })
                     }
@@ -505,10 +521,25 @@ function Classroom() {
                     if (chordBoxes.length > 0) {
                       const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
                       const chordBox = chordBoxes[boxIndex]
-                      const noteKeys = chordBox.positions.map(pos => {
+                      const noteKeys: string[] = []
+                      const chordNotes: Note[] = []
+                      chordBox.positions.forEach(pos => {
                         const stringIndex = 4 - pos.string
                         const fretIndex = pos.fret
-                        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                        noteKeys.push(noteKey)
+                        // Find the bass note for this position
+                        const bassNote = bassNotes.find(n => n.string === pos.string && n.fret === pos.fret)
+                        if (bassNote) {
+                          chordNotes.push({
+                            id: `b-s${pos.string}-f${pos.fret}`,
+                            name: bassNote.name,
+                            frequency: bassNote.frequency,
+                            isBlack: bassNote.name.includes('#'),
+                            position: stringIndex * 100 + (fretIndex > 0 ? fretIndex - 1 : -1),
+                            __bassCoord: { stringIndex, fretIndex: pos.fret }
+                          } as Note)
+                        }
                       })
                       chordsToApply.push({
                         id: `bass-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
@@ -516,6 +547,7 @@ function Classroom() {
                         chord: chordObj as any,
                         displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
                         noteKeys: noteKeys,
+                        notes: chordNotes,
                         fretZone: boxIndex
                       })
                     }
@@ -530,17 +562,50 @@ function Classroom() {
             // Apply manually selected notes
             if (selectionData.selectedNoteIds?.length > 0) {
               if (data.instrument === 'keyboard') {
-                const octaveLow = data.octaveLow || 4
-                const octaveHigh = data.octaveHigh || 5
+                // Use full octave range (3 below, 3 above base) to ensure all notes are found
                 selectionData.selectedNoteIds.forEach((noteId: string) => {
-                  const noteObj = getKeyboardNoteById(noteId, 4 - octaveLow, octaveHigh - 5)
+                  const noteObj = getKeyboardNoteById(noteId, 3, 3)
                   if (noteObj) selectNote(noteObj, 'multi')
                 })
               } else {
                 setExternalSelectedNoteIds(selectionData.selectedNoteIds)
               }
             }
+
+            // Initialize exercises array with the exported data
+            const lowerOct = 4 - (data.octaveLow || 4)
+            const higherOct = (data.octaveHigh || 5) - 5
+            setExercises([{
+              id: `exercise-${Date.now()}`,
+              name: 'Exercise 1',
+              bpm: data.bpm || 120,
+              beats: data.beats || 4,
+              chordMode: data.chordMode || 'single',
+              lowerOctaves: lowerOct,
+              higherOctaves: higherOct,
+              selectedNoteIds: selectionData.selectedNoteIds || [],
+              appliedScales: selectionData.appliedScales || [],
+              appliedChords: selectionData.appliedChords || []
+            }])
+            setCurrentExerciseIndex(0)
           }, 300)
+        } else {
+          // No selection data - initialize with empty exercise
+          const lowerOct = 4 - (data.octaveLow || 4)
+          const higherOct = (data.octaveHigh || 5) - 5
+          setExercises([{
+            id: `exercise-${Date.now()}`,
+            name: 'Exercise 1',
+            bpm: data.bpm || 120,
+            beats: data.beats || 4,
+            chordMode: data.chordMode || 'single',
+            lowerOctaves: lowerOct,
+            higherOctaves: higherOct,
+            selectedNoteIds: [],
+            appliedScales: [],
+            appliedChords: []
+          }])
+          setCurrentExerciseIndex(0)
         }
 
         // Go straight to creating-assignment mode (no classroom selected yet)
@@ -828,13 +893,27 @@ function Classroom() {
 
     const currentData = saveCurrentToExercise()
 
-    // Update current exercise with latest data
+    // Update current exercise with latest data - merge intelligently
     setExercises(prev => {
       const updated = [...prev]
       if (updated.length > 0) {
+        const existingExercise = updated[currentExerciseIndex]
         updated[currentExerciseIndex] = {
-          ...updated[currentExerciseIndex],
-          ...currentData
+          ...existingExercise,
+          bpm: currentData.bpm,
+          beats: currentData.beats,
+          chordMode: currentData.chordMode,
+          lowerOctaves: currentData.lowerOctaves,
+          higherOctaves: currentData.higherOctaves,
+          selectedNoteIds: currentData.selectedNoteIds.length > 0
+            ? currentData.selectedNoteIds
+            : existingExercise.selectedNoteIds,
+          appliedScales: currentData.appliedScales.length > 0
+            ? currentData.appliedScales
+            : existingExercise.appliedScales,
+          appliedChords: currentData.appliedChords.length > 0
+            ? currentData.appliedChords
+            : existingExercise.appliedChords
         }
       }
 
@@ -866,13 +945,27 @@ function Classroom() {
   const handleSwitchExercise = useCallback((index: number) => {
     if (index === currentExerciseIndex || index < 0 || index >= exercises.length) return
 
-    // Save current state before switching
+    // Save current state before switching - merge intelligently
     const currentData = saveCurrentToExercise()
     setExercises(prev => {
       const updated = [...prev]
+      const existingExercise = updated[currentExerciseIndex]
       updated[currentExerciseIndex] = {
-        ...updated[currentExerciseIndex],
-        ...currentData
+        ...existingExercise,
+        bpm: currentData.bpm,
+        beats: currentData.beats,
+        chordMode: currentData.chordMode,
+        lowerOctaves: currentData.lowerOctaves,
+        higherOctaves: currentData.higherOctaves,
+        selectedNoteIds: currentData.selectedNoteIds.length > 0
+          ? currentData.selectedNoteIds
+          : existingExercise.selectedNoteIds,
+        appliedScales: currentData.appliedScales.length > 0
+          ? currentData.appliedScales
+          : existingExercise.appliedScales,
+        appliedChords: currentData.appliedChords.length > 0
+          ? currentData.appliedChords
+          : existingExercise.appliedChords
       }
       return updated
     })
@@ -981,12 +1074,28 @@ function Classroom() {
     }
 
     // Save current exercise state before saving
+    // Merge intelligently - preserve original data if current state is empty
     const currentData = saveCurrentToExercise()
     const updatedExercises = [...exercises]
     if (updatedExercises.length > 0) {
+      const existingExercise = updatedExercises[currentExerciseIndex]
       updatedExercises[currentExerciseIndex] = {
-        ...updatedExercises[currentExerciseIndex],
-        ...currentData
+        ...existingExercise,
+        // Use current state if it has content, otherwise keep original
+        bpm: currentData.bpm,
+        beats: currentData.beats,
+        chordMode: currentData.chordMode,
+        lowerOctaves: currentData.lowerOctaves,
+        higherOctaves: currentData.higherOctaves,
+        selectedNoteIds: currentData.selectedNoteIds.length > 0
+          ? currentData.selectedNoteIds
+          : existingExercise.selectedNoteIds,
+        appliedScales: currentData.appliedScales.length > 0
+          ? currentData.appliedScales
+          : existingExercise.appliedScales,
+        appliedChords: currentData.appliedChords.length > 0
+          ? currentData.appliedChords
+          : existingExercise.appliedChords
       }
     }
 
@@ -2001,6 +2110,7 @@ function Classroom() {
           currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
           onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
           hideInstrumentSelector={true}
+          externalSelectedNoteIds={externalSelectedNoteIds}
         />
       </>
     )

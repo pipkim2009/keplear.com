@@ -512,7 +512,7 @@ export const useScaleChordManagement = ({
     }
   }, [instrument, chordHandlers, bassChordHandlers, isChordAlreadyApplied, convertSelectionsToNotes])
 
-  const handleChordShapeSelect = useCallback((chordShape: ChordShape & { root?: string }) => {
+  const handleChordShapeSelect = useCallback((chordShape: ChordShape & { root?: string; fretZone?: number }) => {
     // Check if this chord shape is already applied (simplified check)
     if (appliedChords.some(chord => chord.displayName === chordShape.name)) {
       return
@@ -541,7 +541,8 @@ export const useScaleChordManagement = ({
         chord: { name: chordShape.name, intervals: [] } as any, // Simplified for shapes
         displayName: chordShape.name,
         notes: chordNotes, // Store the actual notes for removal
-        noteKeys: noteKeys // Store the fretboard positions for shape-specific highlighting
+        noteKeys: noteKeys, // Store the fretboard positions for shape-specific highlighting
+        fretZone: chordShape.fretZone // Store the fret zone for export
       }
       setAppliedChords(prev => [...prev, newAppliedChord])
     } else if (instrument === 'bass' && bassChordHandlers) {
@@ -567,7 +568,8 @@ export const useScaleChordManagement = ({
         chord: { name: chordShape.name, intervals: [] } as any, // Simplified for shapes
         displayName: chordShape.name,
         notes: chordNotes, // Store the actual notes for removal
-        noteKeys: noteKeys // Store the fretboard positions for shape-specific highlighting
+        noteKeys: noteKeys, // Store the fretboard positions for shape-specific highlighting
+        fretZone: chordShape.fretZone // Store the fret zone for export
       }
       setAppliedChords(prev => [...prev, newAppliedChord])
     }
@@ -593,7 +595,8 @@ export const useScaleChordManagement = ({
     }
 
     // Use specified box index or default to first
-    const chordBox = chordBoxes[Math.min(boxIndex, chordBoxes.length - 1)]
+    const actualBoxIndex = Math.min(boxIndex, chordBoxes.length - 1)
+    const chordBox = chordBoxes[actualBoxIndex]
 
     // Create chord shape from box - exactly like sandbox mode does
     const chordShapeFromBox = {
@@ -602,7 +605,8 @@ export const useScaleChordManagement = ({
       maxFret: chordBox.maxFret,
       positions: chordBox.positions,
       difficulty: 'Medium' as const,
-      root: rootNote
+      root: rootNote,
+      fretZone: actualBoxIndex // Store the fret zone for export
     }
 
     // Use handleChordShapeSelect - same as sandbox mode
@@ -619,7 +623,8 @@ export const useScaleChordManagement = ({
     }
 
     // Use specified box index or default to first
-    const chordBox = chordBoxes[Math.min(boxIndex, chordBoxes.length - 1)]
+    const actualBoxIndex = Math.min(boxIndex, chordBoxes.length - 1)
+    const chordBox = chordBoxes[actualBoxIndex]
 
     // Create chord shape from box - exactly like sandbox mode does
     const bassChordShapeFromBox = {
@@ -628,7 +633,8 @@ export const useScaleChordManagement = ({
       maxFret: chordBox.maxFret,
       positions: chordBox.positions,
       difficulty: 'Medium' as const,
-      root: rootNote
+      root: rootNote,
+      fretZone: actualBoxIndex // Store the fret zone for export
     }
 
     // Use handleChordShapeSelect - same as sandbox mode

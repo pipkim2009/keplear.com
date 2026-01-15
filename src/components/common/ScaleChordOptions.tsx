@@ -478,7 +478,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
           maxFret: chordBox.maxFret,
           positions: chordBox.positions,
           difficulty: 'Medium' as const,
-          root: selectedChordRoot
+          root: selectedChordRoot,
+          fretZone: selectedChordBoxIndex // Store the position index for export
         }
         onChordShapeSelect(chordShapeFromBox as any)
       } else if (onChordSelect) {
@@ -494,7 +495,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
           maxFret: chordBox.maxFret,
           positions: chordBox.positions,
           difficulty: 'Medium' as const,
-          root: selectedChordRoot
+          root: selectedChordRoot,
+          fretZone: selectedChordBoxIndex // Store the position index for export
         }
         onChordShapeSelect(bassChordShapeFromBox as any)
       } else if (onChordSelect) {
