@@ -989,15 +989,22 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
   }, [appliedChords])
 
   // Sync internal state from externalSelectedNoteIds prop (for assignment loading)
-  const prevExternalNoteIdsLength = useRef(0)
+  const prevExternalNoteIds = useRef<string[]>([])
 
   useEffect(() => {
-    // Only sync when notes are added (not when cleared)
-    if (externalSelectedNoteIds && externalSelectedNoteIds.length > 0 && externalSelectedNoteIds.length !== prevExternalNoteIdsLength.current) {
-      // Use the handleSetManualNotes function to apply the notes
-      handleSetManualNotes(externalSelectedNoteIds)
+    // Only sync when notes are provided and different from previous
+    if (externalSelectedNoteIds && externalSelectedNoteIds.length > 0) {
+      const prevIds = prevExternalNoteIds.current
+      const currentIds = externalSelectedNoteIds
+      // Check if arrays are different (different length or different content)
+      const isDifferent = prevIds.length !== currentIds.length ||
+        currentIds.some((id, idx) => prevIds[idx] !== id)
+      if (isDifferent) {
+        // Use the handleSetManualNotes function to apply the notes
+        handleSetManualNotes(externalSelectedNoteIds)
+      }
     }
-    prevExternalNoteIdsLength.current = externalSelectedNoteIds?.length || 0
+    prevExternalNoteIds.current = externalSelectedNoteIds || []
   }, [externalSelectedNoteIds, handleSetManualNotes])
 
   // Track previous clearTrigger to only clear on actual changes

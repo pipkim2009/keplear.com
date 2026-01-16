@@ -969,38 +969,41 @@ function Classroom() {
 
     // Save current state before switching - merge intelligently
     const currentData = saveCurrentToExercise()
-    setExercises(prev => {
-      const updated = [...prev]
-      const existingExercise = updated[currentExerciseIndex]
-      updated[currentExerciseIndex] = {
-        ...existingExercise,
-        transcript: currentExerciseTranscript,
-        instrument: instrument,
-        bpm: currentData.bpm,
-        beats: currentData.beats,
-        chordMode: currentData.chordMode,
-        lowerOctaves: currentData.lowerOctaves,
-        higherOctaves: currentData.higherOctaves,
-        selectedNoteIds: currentData.selectedNoteIds.length > 0
-          ? currentData.selectedNoteIds
-          : existingExercise.selectedNoteIds,
-        appliedScales: currentData.appliedScales.length > 0
-          ? currentData.appliedScales
-          : existingExercise.appliedScales,
-        appliedChords: currentData.appliedChords.length > 0
-          ? currentData.appliedChords
-          : existingExercise.appliedChords
-      }
-      return updated
-    })
+
+    // Build updated exercises array synchronously so we can read target exercise from it
+    const updatedExercises = [...exercises]
+    const existingExercise = updatedExercises[currentExerciseIndex]
+    updatedExercises[currentExerciseIndex] = {
+      ...existingExercise,
+      transcript: currentExerciseTranscript,
+      instrument: instrument,
+      bpm: currentData.bpm,
+      beats: currentData.beats,
+      chordMode: currentData.chordMode,
+      lowerOctaves: currentData.lowerOctaves,
+      higherOctaves: currentData.higherOctaves,
+      selectedNoteIds: currentData.selectedNoteIds.length > 0
+        ? currentData.selectedNoteIds
+        : existingExercise.selectedNoteIds,
+      appliedScales: currentData.appliedScales.length > 0
+        ? currentData.appliedScales
+        : existingExercise.appliedScales,
+      appliedChords: currentData.appliedChords.length > 0
+        ? currentData.appliedChords
+        : existingExercise.appliedChords
+    }
+
+    // Update state with the new exercises array
+    setExercises(updatedExercises)
 
     // Clear current selection
     clearSelection()
     scaleChordManagement.setAppliedScalesDirectly([])
     scaleChordManagement.setAppliedChordsDirectly([])
+    setExternalSelectedNoteIds([])
 
-    // Load the target exercise data
-    const targetExercise = exercises[index]
+    // Load the target exercise data from the UPDATED array
+    const targetExercise = updatedExercises[index]
     if (targetExercise) {
       // Apply instrument, BPM, beats, chord mode, transcript, and octave range
       if (targetExercise.instrument) handleInstrumentChange(targetExercise.instrument)
@@ -1028,7 +1031,8 @@ function Classroom() {
           } else if (targetInstrument === 'guitar') {
             const scalesToApply: AppliedScale[] = []
             targetExercise.appliedScales.forEach((scaleData) => {
-              const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
+              // Extract fret range from displayName (e.g., "C Major (Frets 0-12)")
+              const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
               const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
               const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
               const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
@@ -1064,7 +1068,8 @@ function Classroom() {
           } else if (targetInstrument === 'bass') {
             const scalesToApply: AppliedScale[] = []
             targetExercise.appliedScales.forEach((scaleData) => {
-              const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
+              // Extract fret range from displayName (e.g., "C Major (Frets 0-12)")
+              const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
               const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
               const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
               const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
@@ -1612,7 +1617,8 @@ function Classroom() {
 
         if (pendingInstrument === 'guitar') {
           selectionData.appliedScales.forEach((scaleData: any) => {
-            const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
+            // Extract fret range from displayName (e.g., "C Major (Frets 0-12)")
+            const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
             const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
             const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
             const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
@@ -1644,7 +1650,8 @@ function Classroom() {
           })
         } else if (pendingInstrument === 'bass') {
           selectionData.appliedScales.forEach((scaleData: any) => {
-            const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
+            // Extract fret range from displayName (e.g., "C Major (Frets 0-12)")
+            const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
             const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
             const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
             const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
