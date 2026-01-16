@@ -366,10 +366,12 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         const boxes = getScaleBoxes(selectedRoot, selectedScale, guitarNotes)
         setAvailableBoxes(boxes)
         setSelectedBoxIndex(0)
+        setShowPositions(true) // Reset to show positions mode
       } else if (instrument === 'bass') {
         const boxes = getBassScaleBoxes(selectedRoot, selectedBassScale, bassNotes)
         setAvailableBassBoxes(boxes)
         setSelectedBoxIndex(0)
+        setShowPositions(true) // Reset to show positions mode
       }
     }
   }, [selectedRoot, selectedScale, selectedBassScale, instrument, isScaleMode])
@@ -385,6 +387,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         const boxes = getChordBoxes(selectedChordRoot, selectedChord, guitarNotes)
         setAvailableChordBoxes(boxes)
         setSelectedChordBoxIndex(0)
+        setShowChordPositions(true) // Reset to show positions mode
       } else if (instrument === 'bass') {
         const shapes = getBassChordShapes(selectedChordRoot, selectedBassChord, bassNotes)
         setAvailableBassShapes(shapes)
@@ -393,6 +396,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         const boxes = getBassChordBoxes(selectedChordRoot, selectedBassChord, bassNotes)
         setAvailableBassChordBoxes(boxes)
         setSelectedChordBoxIndex(0)
+        setShowChordPositions(true) // Reset to show positions mode
       }
     }
   }, [selectedChordRoot, selectedChord, selectedBassChord, instrument, isScaleMode])
