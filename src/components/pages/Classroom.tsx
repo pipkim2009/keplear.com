@@ -267,6 +267,7 @@ function Classroom() {
   const [lessonExerciseIndex, setLessonExerciseIndex] = useState(0)
   const [externalSelectedNoteIds, setExternalSelectedNoteIds] = useState<string[]>([])
   const [welcomeSpeechDone, setWelcomeSpeechDone] = useState(false)
+  const [genericWelcomeDone, setGenericWelcomeDone] = useState(false)
   const [hasGeneratedMelody, setHasGeneratedMelody] = useState(false)
   const [autoPlayAudio, setAutoPlayAudio] = useState(false)
   const [melodySetupMessage, setMelodySetupMessage] = useState<string>('')
@@ -1384,6 +1385,7 @@ function Classroom() {
     hasInitializedNotes.current = false
     hasAnnouncedMelody.current = false
     setWelcomeSpeechDone(false)
+    setGenericWelcomeDone(false)
     setHasGeneratedMelody(false)
     setAutoPlayAudio(false)
     setMelodySetupMessage('')
@@ -1396,6 +1398,7 @@ function Classroom() {
 
     // Clear ALL existing content (notes, scales, chords)
     clearSelection()
+    triggerClearChordsAndScales()
     scaleChordManagement.setAppliedScalesDirectly([])
     scaleChordManagement.setAppliedChordsDirectly([])
     setExternalSelectedNoteIds([])
@@ -1456,6 +1459,7 @@ function Classroom() {
 
     // Clear current content
     clearSelection()
+    triggerClearChordsAndScales()
     scaleChordManagement.setAppliedScalesDirectly([])
     scaleChordManagement.setAppliedChordsDirectly([])
     setExternalSelectedNoteIds([])
@@ -1535,7 +1539,7 @@ function Classroom() {
     }
 
     setLessonExerciseIndex(index)
-  }, [lessonExerciseIndex, lessonExercises, currentAssignment, clearSelection, scaleChordManagement, setChordMode, selectNote, handleOctaveRangeChange])
+  }, [lessonExerciseIndex, lessonExercises, currentAssignment, clearSelection, triggerClearChordsAndScales, scaleChordManagement, setChordMode, selectNote, handleOctaveRangeChange])
 
   // Auto-advance to next exercise or end lesson
   const handleExerciseComplete = useCallback(() => {
@@ -1787,6 +1791,18 @@ function Classroom() {
     }
   }, [viewMode, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, hasGeneratedMelody, handleGenerateMelody])
 
+  // When generic welcome is done and there's no transcript, mark welcomeSpeechDone as true
+  useEffect(() => {
+    if (viewMode !== 'taking-lesson') return
+    if (genericWelcomeDone && !welcomeSpeechDone) {
+      const currentExercise = lessonExercises[lessonExerciseIndex]
+      const hasTranscript = (currentExercise?.transcript || '').trim().length > 0
+      if (!hasTranscript) {
+        setWelcomeSpeechDone(true)
+      }
+    }
+  }, [viewMode, genericWelcomeDone, welcomeSpeechDone, lessonExercises, lessonExerciseIndex])
+
   // Track when melody is ready (without announcing)
   useEffect(() => {
     if (viewMode !== 'taking-lesson') return
@@ -2004,9 +2020,12 @@ function Classroom() {
 
   // ========== RENDER: Taking Lesson Mode ==========
   if (viewMode === 'taking-lesson' && currentAssignment) {
-    // Get custom transcript from current exercise (no default message)
+    // Generic welcome message for the lesson
+    const genericWelcomeMessage = !genericWelcomeDone ? `Welcome to this lesson on ${currentAssignment.title}` : ''
+
+    // Get custom transcript from current exercise (only show after generic welcome)
     const currentExerciseForTranscript = lessonExercises[lessonExerciseIndex]
-    const customTranscript = currentExerciseForTranscript?.transcript || ''
+    const customTranscript = genericWelcomeDone ? (currentExerciseForTranscript?.transcript || '') : ''
 
     const octaveLow = currentAssignment.octave_low ?? 4
     const octaveHigh = currentAssignment.octave_high ?? 5
@@ -2133,6 +2152,7 @@ function Classroom() {
           volumeLevel={pitchDetection.volumeLevel}
         />
 
+        {genericWelcomeMessage && <WelcomeSubtitle message={genericWelcomeMessage} onSpeechEnd={() => setGenericWelcomeDone(true)} />}
         {customTranscript && <WelcomeSubtitle message={customTranscript} onSpeechEnd={() => setWelcomeSpeechDone(true)} />}
         {congratulationsMessage && <WelcomeSubtitle message={congratulationsMessage} onSpeechEnd={handleExerciseComplete} />}
       </>
