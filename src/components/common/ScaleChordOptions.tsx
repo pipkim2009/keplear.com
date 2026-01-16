@@ -423,13 +423,33 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   const handleApplyScale = () => {
 
     if (instrument === 'guitar') {
-      if (showPositions && availableBoxes.length > 0 && selectedBoxIndex < availableBoxes.length && onScaleBoxSelect) {
+      // Check if "Entire Fretboard" is selected (index equals array length)
+      if (availableBoxes.length > 0 && selectedBoxIndex === availableBoxes.length && onScaleBoxSelect) {
+        // Apply all position boxes that aren't already applied
+        availableBoxes.forEach((box) => {
+          const boxName = `${selectedRoot} ${box.name}`
+          const isAlreadyApplied = appliedScales.some(s => s.displayName.includes(boxName) || s.displayName.includes(`Frets ${box.minFret}-${box.maxFret}`))
+          if (!isAlreadyApplied) {
+            onScaleBoxSelect(box)
+          }
+        })
+      } else if (showPositions && availableBoxes.length > 0 && selectedBoxIndex < availableBoxes.length && onScaleBoxSelect) {
         onScaleBoxSelect(availableBoxes[selectedBoxIndex])
       } else if (onScaleSelect) {
         onScaleSelect(selectedRoot, selectedScale)
       }
     } else if (instrument === 'bass') {
-      if (showPositions && availableBassBoxes.length > 0 && selectedBoxIndex < availableBassBoxes.length && onScaleBoxSelect) {
+      // Check if "Entire Fretboard" is selected (index equals array length)
+      if (availableBassBoxes.length > 0 && selectedBoxIndex === availableBassBoxes.length && onScaleBoxSelect) {
+        // Apply all position boxes that aren't already applied
+        availableBassBoxes.forEach((box) => {
+          const boxName = `${selectedRoot} ${box.name}`
+          const isAlreadyApplied = appliedScales.some(s => s.displayName.includes(boxName) || s.displayName.includes(`Frets ${box.minFret}-${box.maxFret}`))
+          if (!isAlreadyApplied) {
+            onScaleBoxSelect(box as any)
+          }
+        })
+      } else if (showPositions && availableBassBoxes.length > 0 && selectedBoxIndex < availableBassBoxes.length && onScaleBoxSelect) {
         onScaleBoxSelect(availableBassBoxes[selectedBoxIndex] as any)
       } else if (onScaleSelect) {
         onScaleSelect(selectedRoot, selectedBassScale as any)
@@ -472,7 +492,26 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
   const handleApplyChord = () => {
     if (instrument === 'guitar') {
-      if (showChordPositions && availableChordBoxes.length > 0 && selectedChordBoxIndex < availableChordBoxes.length && onChordShapeSelect) {
+      // Check if "Entire Fretboard" is selected (index equals array length)
+      if (availableChordBoxes.length > 0 && selectedChordBoxIndex === availableChordBoxes.length && onChordShapeSelect) {
+        // Apply all chord position boxes that aren't already applied
+        availableChordBoxes.forEach((chordBox, index) => {
+          const chordName = `${selectedChordRoot} ${selectedChord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`
+          const isAlreadyApplied = appliedChords.some(c => c.displayName === chordName)
+          if (!isAlreadyApplied) {
+            const chordShapeFromBox = {
+              name: chordName,
+              minFret: chordBox.minFret,
+              maxFret: chordBox.maxFret,
+              positions: chordBox.positions,
+              difficulty: 'Medium' as const,
+              root: selectedChordRoot,
+              fretZone: index
+            }
+            onChordShapeSelect(chordShapeFromBox as any)
+          }
+        })
+      } else if (showChordPositions && availableChordBoxes.length > 0 && selectedChordBoxIndex < availableChordBoxes.length && onChordShapeSelect) {
         // Use chord box (fret-based position) - convert to ChordShape format for compatibility
         const chordBox = availableChordBoxes[selectedChordBoxIndex]
         const chordShapeFromBox = {
@@ -489,7 +528,26 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
         onChordSelect(selectedChordRoot, selectedChord)
       }
     } else if (instrument === 'bass') {
-      if (showChordPositions && availableBassChordBoxes.length > 0 && selectedChordBoxIndex < availableBassChordBoxes.length && onChordShapeSelect) {
+      // Check if "Entire Fretboard" is selected (index equals array length)
+      if (availableBassChordBoxes.length > 0 && selectedChordBoxIndex === availableBassChordBoxes.length && onChordShapeSelect) {
+        // Apply all chord position boxes that aren't already applied
+        availableBassChordBoxes.forEach((chordBox, index) => {
+          const chordName = `${selectedChordRoot} ${selectedBassChord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`
+          const isAlreadyApplied = appliedChords.some(c => c.displayName === chordName)
+          if (!isAlreadyApplied) {
+            const bassChordShapeFromBox = {
+              name: chordName,
+              minFret: chordBox.minFret,
+              maxFret: chordBox.maxFret,
+              positions: chordBox.positions,
+              difficulty: 'Medium' as const,
+              root: selectedChordRoot,
+              fretZone: index
+            }
+            onChordShapeSelect(bassChordShapeFromBox as any)
+          }
+        })
+      } else if (showChordPositions && availableBassChordBoxes.length > 0 && selectedChordBoxIndex < availableBassChordBoxes.length && onChordShapeSelect) {
         // Use chord box (fret-based position) - convert to BassChordShape format for compatibility
         const chordBox = availableBassChordBoxes[selectedChordBoxIndex]
         const bassChordShapeFromBox = {
