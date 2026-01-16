@@ -26,7 +26,7 @@ import {
   getBassNoteById,
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
-import { PiTrashFill } from 'react-icons/pi'
+import { PiTrashFill, PiChatCircleFill } from 'react-icons/pi'
 import styles from '../../styles/Classroom.module.css'
 import practiceStyles from '../../styles/Practice.module.css'
 
@@ -2178,50 +2178,50 @@ function Classroom() {
           </button>
         </div>
 
-        {/* Header with classroom selector, instrument, title input, and assign button */}
-        <div className={practiceStyles.assignmentModeBar}>
-          <select
-            className={practiceStyles.classroomSelector}
-            value={assigningToClassroomId || ''}
-            onChange={(e) => setAssigningToClassroomId(e.target.value || null)}
-          >
-            <option value="">Select Classroom</option>
-            {userClassrooms.map((classroom) => (
-              <option key={classroom.id} value={classroom.id}>
-                {classroom.title}
-              </option>
-            ))}
-          </select>
-          <select
-            className={practiceStyles.classroomSelector}
-            value={instrument}
-            onChange={(e) => handleInstrumentChange(e.target.value as 'keyboard' | 'guitar' | 'bass')}
-          >
-            <option value="keyboard">Keyboard</option>
-            <option value="guitar">Guitar</option>
-            <option value="bass">Bass</option>
-          </select>
-          <input
-            type="text"
-            className={practiceStyles.assignmentTitleInput}
-            style={{ flex: 1 }}
-            value={assignmentTitle}
-            onChange={(e) => setAssignmentTitle(e.target.value)}
-            placeholder="Assignment title"
-          />
-          <button
-            className={practiceStyles.assignmentAssignButton}
-            onClick={handleSaveAssignment}
-            disabled={!assigningToClassroomId || !assignmentTitle.trim() || !allExercisesHaveContent || isSavingAssignment}
-            style={{ opacity: (assigningToClassroomId && assignmentTitle.trim() && allExercisesHaveContent) ? 1 : 0.5 }}
-          >
-            {isSavingAssignment ? 'Saving...' : 'Assign'}
-          </button>
-        </div>
-
-        {/* Timeline and Transcript Combined */}
+        {/* Assignment Editor Header - All options in one bar */}
         <div className={practiceStyles.exerciseTimelineBar} style={{ flexDirection: 'column', gap: '0.75rem' }}>
-          {/* Row 1: Timeline */}
+          {/* Row 1: Classroom, Instrument, Title, Assign */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%' }}>
+            <select
+              className={practiceStyles.classroomSelector}
+              value={assigningToClassroomId || ''}
+              onChange={(e) => setAssigningToClassroomId(e.target.value || null)}
+            >
+              <option value="">Select Classroom</option>
+              {userClassrooms.map((classroom) => (
+                <option key={classroom.id} value={classroom.id}>
+                  {classroom.title}
+                </option>
+              ))}
+            </select>
+            <select
+              className={practiceStyles.classroomSelector}
+              value={instrument}
+              onChange={(e) => handleInstrumentChange(e.target.value as 'keyboard' | 'guitar' | 'bass')}
+              style={{ color: instrument === 'keyboard' ? '#3b82f6' : instrument === 'guitar' ? '#22c55e' : '#ef4444' }}
+            >
+              <option value="keyboard">Keyboard</option>
+              <option value="guitar">Guitar</option>
+              <option value="bass">Bass</option>
+            </select>
+            <input
+              type="text"
+              className={practiceStyles.assignmentTitleInput}
+              style={{ flex: 1 }}
+              value={assignmentTitle}
+              onChange={(e) => setAssignmentTitle(e.target.value)}
+              placeholder="Assignment title"
+            />
+            <button
+              className={practiceStyles.assignmentAssignButton}
+              onClick={handleSaveAssignment}
+              disabled={!assigningToClassroomId || !assignmentTitle.trim() || !allExercisesHaveContent || isSavingAssignment}
+              style={{ opacity: (assigningToClassroomId && assignmentTitle.trim() && allExercisesHaveContent) ? 1 : 0.5 }}
+            >
+              {isSavingAssignment ? 'Saving...' : 'Assign'}
+            </button>
+          </div>
+          {/* Row 2: Timeline */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
             <span className={practiceStyles.exerciseTimelineLabel} style={{ minWidth: '70px' }}>Timeline</span>
             <div className={practiceStyles.exerciseTimeline}>
@@ -2232,6 +2232,10 @@ function Classroom() {
                   const hasContent = index === currentExerciseIndex
                     ? currentHasContent
                     : exerciseHasNotes(exercise)
+                  // Check if this exercise has a transcript
+                  const hasTranscript = index === currentExerciseIndex
+                    ? currentExerciseTranscript.trim().length > 0
+                    : (exercise.transcript || '').trim().length > 0
                   return (
                     <div key={exercise.id} className={practiceStyles.exerciseCircleWrapper}>
                       <button
@@ -2241,6 +2245,11 @@ function Classroom() {
                       >
                         {index + 1}
                       </button>
+                      {hasTranscript && (
+                        <span className={practiceStyles.exerciseCircleTranscript} title="Has transcript">
+                          <PiChatCircleFill size={12} />
+                        </span>
+                      )}
                       {exercises.length > 1 && index === currentExerciseIndex && (
                         <button
                           className={practiceStyles.exerciseCircleRemove}
@@ -2257,18 +2266,20 @@ function Classroom() {
                   )
                 })}
                 {exercises.length < 10 && (
-                  <button
-                    className={practiceStyles.exerciseCircleAdd}
-                    onClick={handleAddExercise}
-                    title="Add new exercise"
-                  >
-                    +
-                  </button>
+                  <div className={practiceStyles.exerciseCircleWrapper}>
+                    <button
+                      className={practiceStyles.exerciseCircle}
+                      onClick={handleAddExercise}
+                      title="Add new exercise"
+                    >
+                      +
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
           </div>
-          {/* Row 2: Transcript */}
+          {/* Row 3: Transcript */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
             <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--primary-purple)', whiteSpace: 'nowrap', minWidth: '70px' }}>
               Transcript

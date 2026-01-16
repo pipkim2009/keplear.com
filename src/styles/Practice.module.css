@@ -1553,7 +1553,6 @@
 }
 
 .exerciseTimeline {
-  flex: 1;
   position: relative;
   display: flex;
   align-items: center;
@@ -1563,7 +1562,7 @@
 .exerciseTimelineLine {
   position: absolute;
   left: 18px;
-  right: 56px;
+  right: 18px;
   top: 50%;
   height: 3px;
   background: var(--primary-purple-alpha-30);
@@ -1575,16 +1574,11 @@
   background: var(--primary-purple-alpha-40);
 }
 
-/* Lesson mode - line extends to last circle (no add button) */
-.exerciseTimelineLesson .exerciseTimelineLine {
-  right: 18px;
-}
 
 .exerciseCircles {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  gap: 1.5rem;
   position: relative;
   z-index: 1;
 }
@@ -1637,6 +1631,7 @@
   cursor: default;
   transform: scale(1.1);
   box-shadow: 0 2px 12px rgba(139, 92, 246, 0.4);
+  opacity: 1;
 }
 
 :global(.dark) .exerciseCircleActive,
@@ -1645,55 +1640,17 @@
   border-color: var(--primary-purple-light);
   color: white;
   box-shadow: 0 2px 12px rgba(139, 92, 246, 0.5);
+  opacity: 1;
 }
 
-/* Empty exercise - no notes selected */
 .exerciseCircleEmpty {
   opacity: 0.6;
-  border-color: var(--red-500) !important;
-  border-width: 2px;
   border-style: dashed;
-  background: rgba(239, 68, 68, 0.08);
-  color: var(--red-600);
-  animation: emptyExercisePulse 2s ease-in-out infinite;
-}
-
-@keyframes emptyExercisePulse {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-  }
-  50% {
-    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2);
-  }
-}
-
-:global(.dark) .exerciseCircleEmpty {
-  border-color: var(--red-400) !important;
-  background: rgba(239, 68, 68, 0.12);
-  color: var(--white);
 }
 
 .exerciseCircleEmpty.exerciseCircleActive {
   opacity: 1;
-  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-darker) 100%);
-  border-color: var(--primary-purple) !important;
   border-style: solid;
-  color: white;
-  animation: activeEmptyRedFlash 1.5s ease-in-out infinite;
-}
-
-@keyframes activeEmptyRedFlash {
-  0%, 100% {
-    box-shadow: 0 2px 12px rgba(139, 92, 246, 0.4);
-  }
-  50% {
-    box-shadow: 0 2px 20px rgba(239, 68, 68, 0.7), 0 0 30px rgba(239, 68, 68, 0.4);
-  }
-}
-
-:global(.dark) .exerciseCircleEmpty.exerciseCircleActive {
-  background: linear-gradient(135deg, var(--primary-purple-lighter) 0%, var(--primary-purple) 100%);
-  border-color: var(--primary-purple-light) !important;
 }
 
 .exerciseCircleRemove {
@@ -1719,6 +1676,25 @@
 .exerciseCircleRemove:hover {
   background: var(--red-600);
   transform: scale(1.1);
+}
+
+.exerciseCircleTranscript {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--primary-purple);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+:global(.dark) .exerciseCircleTranscript {
+  background: var(--primary-purple-light);
 }
 
 .exerciseCircleAdd {
