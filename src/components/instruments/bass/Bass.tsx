@@ -51,6 +51,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const [currentChord, setCurrentChord] = useState<{ root: string; chord: BassChord } | null>(null)
   const [chordSelectedNotes, setChordSelectedNotes] = useState<Set<string>>(() => new Set())
   const chordSelectedNotesRef = useRef<Set<string>>(new Set())
+  const prevExternalNoteIds = useRef<string[]>([]) // Track external note IDs to detect changes
   const [hoveredString, setHoveredString] = useState<number | null>(null)
   const [hoveredFret, setHoveredFret] = useState<number | null>(null)
   const [hoveredNote, setHoveredNote] = useState<{ string: number; fret: number } | null>(null)
@@ -531,6 +532,10 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     setCurrentChord(null)
     setChordSelectedNotes(new Set())
     chordSelectedNotesRef.current = new Set()
+    // Clear manual selections
+    setManualSelectedNotes(new Set())
+    // Clear external note tracking so notes can be re-applied after instrument switch
+    prevExternalNoteIds.current = []
     setBassNotes([])
   }, [setBassNotes])
 
@@ -797,10 +802,36 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     }
   }, [onNoteHandlersReady, handleSetManualNotes])
 
-  // Sync internal state from appliedScales/appliedChords props (for assignment loading)
+  // Refs for tracking previous values to detect changes
   const prevAppliedScalesLength = useRef(0)
   const prevAppliedChordsLength = useRef(0)
+  const prevClearTrigger = useRef(clearTrigger)
 
+  // Clear all selections when clearTrigger changes (not on initial mount)
+  // IMPORTANT: This effect must run FIRST, before appliedScales/appliedChords/externalSelectedNoteIds effects
+  // so that notes can be properly re-applied after clearing
+  useEffect(() => {
+    if (clearTrigger !== undefined && clearTrigger > 0 && clearTrigger !== prevClearTrigger.current) {
+      setStringCheckboxes(new Array(4).fill(false))
+      setFretCheckboxes(new Array(25).fill(false))
+      setSelectedNotes(new Set())
+      setManualSelectedNotes(new Set())
+      setScaleSelectedNotes(new Set())
+      scaleSelectedNotesRef.current = new Set()
+      setCurrentScale(null)
+      setChordSelectedNotes(new Set())
+      chordSelectedNotesRef.current = new Set()
+      setCurrentChord(null)
+      // Clear tracking refs so scales/chords/notes can be re-applied after clearing
+      prevExternalNoteIds.current = []
+      prevAppliedScalesLength.current = 0
+      prevAppliedChordsLength.current = 0
+    }
+    prevClearTrigger.current = clearTrigger
+  }, [clearTrigger])
+
+  // Sync internal state from appliedScales prop (for assignment loading)
+  // This effect runs AFTER clearTrigger effect
   useEffect(() => {
     // Only sync when scales are added (not when cleared)
     if (appliedScales && appliedScales.length > 0 && appliedScales.length !== prevAppliedScalesLength.current) {
@@ -826,6 +857,8 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     prevAppliedScalesLength.current = appliedScales?.length || 0
   }, [appliedScales])
 
+  // Sync internal state from appliedChords prop (for assignment loading)
+  // This effect runs AFTER clearTrigger effect
   useEffect(() => {
     // Only sync when chords are added (not when cleared)
     if (appliedChords && appliedChords.length > 0 && appliedChords.length !== prevAppliedChordsLength.current) {
@@ -856,42 +889,29 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   }, [appliedChords])
 
   // Sync internal state from externalSelectedNoteIds prop (for assignment loading)
-  const prevExternalNoteIds = useRef<string[]>([])
-
+  // This effect runs whenever externalSelectedNoteIds changes and applies notes directly
   useEffect(() => {
-    // Only sync when notes are provided and different from previous
+    // Apply notes when they're provided and either:
+    // 1. It's the first time (prevExternalNoteIds is empty but we have notes)
+    // 2. The notes have changed from previous
     if (externalSelectedNoteIds && externalSelectedNoteIds.length > 0) {
       const prevIds = prevExternalNoteIds.current
       const currentIds = externalSelectedNoteIds
       // Check if arrays are different (different length or different content)
       const isDifferent = prevIds.length !== currentIds.length ||
         currentIds.some((id, idx) => prevIds[idx] !== id)
-      if (isDifferent) {
+
+      // Also apply if internal state is empty but we have external notes
+      // This handles the case where component remounts after instrument change
+      const internalIsEmpty = selectedNotes.size === 0 && manualSelectedNotes.size === 0
+
+      if (isDifferent || internalIsEmpty) {
         // Use the handleSetManualNotes function to apply the notes
         handleSetManualNotes(externalSelectedNoteIds)
       }
     }
     prevExternalNoteIds.current = externalSelectedNoteIds || []
-  }, [externalSelectedNoteIds, handleSetManualNotes])
-
-  // Track previous clearTrigger to only clear on actual changes
-  const prevClearTrigger = useRef(clearTrigger)
-
-  useEffect(() => {
-    if (clearTrigger !== undefined && clearTrigger > 0 && clearTrigger !== prevClearTrigger.current) {
-      setStringCheckboxes(new Array(4).fill(false))
-      setFretCheckboxes(new Array(25).fill(false))
-      setSelectedNotes(new Set())
-      setManualSelectedNotes(new Set())
-      setScaleSelectedNotes(new Set())
-      scaleSelectedNotesRef.current = new Set()
-      setCurrentScale(null)
-      setChordSelectedNotes(new Set())
-      chordSelectedNotesRef.current = new Set()
-      setCurrentChord(null)
-    }
-    prevClearTrigger.current = clearTrigger
-  }, [clearTrigger])
+  }, [externalSelectedNoteIds, handleSetManualNotes, selectedNotes.size, manualSelectedNotes.size])
 
   return (
     <div className={`bass-container ${disableNoteSelection ? 'practice-mode' : ''}`}>

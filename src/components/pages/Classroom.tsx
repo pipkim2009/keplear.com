@@ -91,7 +91,6 @@ interface ExerciseData {
   id: string
   name: string
   transcript: string
-  instrument: 'keyboard' | 'guitar' | 'bass'
   bpm: number
   beats: number
   chordMode: 'single' | 'progression'
@@ -598,7 +597,6 @@ function Classroom() {
               id: `exercise-${Date.now()}`,
               name: 'Exercise 1',
               transcript: '',
-              instrument: data.instrument as 'keyboard' | 'guitar' | 'bass' || 'keyboard',
               bpm: data.bpm || 120,
               beats: data.beats || 4,
               chordMode: data.chordMode || 'single',
@@ -618,7 +616,6 @@ function Classroom() {
             id: `exercise-${Date.now()}`,
             name: 'Exercise 1',
             transcript: '',
-            instrument: data.instrument as 'keyboard' | 'guitar' | 'bass' || 'keyboard',
             bpm: data.bpm || 120,
             beats: data.beats || 4,
             chordMode: data.chordMode || 'single',
@@ -859,7 +856,6 @@ function Classroom() {
       id: `exercise-${Date.now()}`,
       name: 'Exercise 1',
       transcript: '',
-      instrument: instrument,
       bpm: bpm,
       beats: numberOfBeats,
       chordMode: chordMode,
@@ -927,7 +923,6 @@ function Classroom() {
         updated[currentExerciseIndex] = {
           ...existingExercise,
           transcript: currentExerciseTranscript,
-          instrument: instrument,
           bpm: currentData.bpm,
           beats: currentData.beats,
           chordMode: currentData.chordMode,
@@ -950,7 +945,6 @@ function Classroom() {
         id: `exercise-${Date.now()}`,
         name: `Exercise ${updated.length + 1}`,
         transcript: '',
-        instrument: instrument,
         bpm: bpm,
         beats: numberOfBeats,
         chordMode: chordMode,
@@ -963,7 +957,7 @@ function Classroom() {
       return [...updated, newExercise]
     })
 
-    // Clear instrument for new exercise
+    // Clear notes for new exercise
     clearSelection()
     triggerClearChordsAndScales()
     setCurrentExerciseTranscript('')
@@ -985,7 +979,6 @@ function Classroom() {
     updatedExercises[currentExerciseIndex] = {
       ...existingExercise,
       transcript: currentExerciseTranscript,
-      instrument: instrument,
       bpm: currentData.bpm,
       beats: currentData.beats,
       chordMode: currentData.chordMode,
@@ -1014,8 +1007,7 @@ function Classroom() {
     // Load the target exercise data from the UPDATED array
     const targetExercise = updatedExercises[index]
     if (targetExercise) {
-      // Apply instrument, BPM, beats, chord mode, transcript, and octave range
-      if (targetExercise.instrument) handleInstrumentChange(targetExercise.instrument)
+      // Apply BPM, beats, chord mode, transcript, and octave range (instrument is assignment-level)
       if (targetExercise.bpm) setBpm(targetExercise.bpm)
       if (targetExercise.beats) setNumberOfBeats(targetExercise.beats)
       if (targetExercise.chordMode) setChordMode(targetExercise.chordMode)
@@ -1025,7 +1017,8 @@ function Classroom() {
       const targetHigher = targetExercise.higherOctaves ?? 0
       handleOctaveRangeChange(targetLower, targetHigher)
 
-      const targetInstrument = targetExercise.instrument || instrument
+      // Use assignment-level instrument (same for all exercises)
+      const targetInstrument = instrument
 
       setTimeout(() => {
         // Apply scales from exercise
@@ -1195,10 +1188,19 @@ function Classroom() {
               if (noteObj) selectNote(noteObj, 'multi')
             })
           } else {
-            // Guitar/Bass - use external note IDs
+            // Guitar/Bass - use direct handler call like keyboard does
             const validNoteIds = targetExercise.selectedNoteIds.filter((id: string | null) => id !== null) as string[]
             if (validNoteIds.length > 0) {
+              // Also set external IDs as fallback
               setExternalSelectedNoteIds(validNoteIds)
+              // Try to call handlers directly after a short delay for component to mount
+              setTimeout(() => {
+                if (targetInstrument === 'guitar' && scaleChordManagement.noteHandlers?.handleSetManualNotes) {
+                  scaleChordManagement.noteHandlers.handleSetManualNotes(validNoteIds)
+                } else if (targetInstrument === 'bass' && scaleChordManagement.bassNoteHandlers?.handleSetManualNotes) {
+                  scaleChordManagement.bassNoteHandlers.handleSetManualNotes(validNoteIds)
+                }
+              }, 50)
             }
           }
         }
@@ -1206,7 +1208,7 @@ function Classroom() {
     }
 
     setCurrentExerciseIndex(index)
-  }, [currentExerciseIndex, exercises, saveCurrentToExercise, clearSelection, scaleChordManagement, instrument, setChordMode, selectNote, handleOctaveRangeChange, currentExerciseTranscript, handleInstrumentChange])
+  }, [currentExerciseIndex, exercises, saveCurrentToExercise, clearSelection, scaleChordManagement, instrument, setChordMode, selectNote, handleOctaveRangeChange, currentExerciseTranscript])
 
   // Remove an exercise
   const handleRemoveExercise = useCallback((index: number) => {
@@ -1263,7 +1265,6 @@ function Classroom() {
         ...existingExercise,
         // Use current state if it has content, otherwise keep original
         transcript: currentExerciseTranscript,
-        instrument: instrument,
         bpm: currentData.bpm,
         beats: currentData.beats,
         chordMode: currentData.chordMode,
@@ -1304,12 +1305,11 @@ function Classroom() {
       selectedNoteIds: firstExercise?.selectedNoteIds || [],
       appliedScales: firstExercise?.appliedScales || [],
       appliedChords: firstExercise?.appliedChords || [],
-      // Exercise timeline array
+      // Exercise timeline array (instrument is assignment-level, not per-exercise)
       exercises: updatedExercises.map(exercise => ({
         id: exercise.id,
         name: exercise.name,
         transcript: exercise.transcript,
-        instrument: exercise.instrument,
         bpm: exercise.bpm,
         beats: exercise.beats,
         chordMode: exercise.chordMode,
@@ -1389,12 +1389,8 @@ function Classroom() {
     setMelodySetupMessage('')
     setCongratulationsMessage('')
 
-    // Initialize exercises from assignment first to get first exercise's instrument
-    const selectionData = assignment.selection_data
-    const firstExerciseInstrument = selectionData?.exercises?.[0]?.instrument || assignment.instrument
-
-    // Set up instrument (use first exercise's instrument if available)
-    setInstrument(firstExerciseInstrument as 'keyboard' | 'guitar' | 'bass')
+    // Set up instrument (assignment-level, same for all exercises)
+    setInstrument(assignment.instrument as 'keyboard' | 'guitar' | 'bass')
     setBpm(assignment.bpm)
     setNumberOfBeats(assignment.beats)
 
@@ -1405,12 +1401,12 @@ function Classroom() {
     setExternalSelectedNoteIds([])
 
     // Initialize exercises from assignment
+    const selectionData = assignment.selection_data
     if (selectionData?.exercises && selectionData.exercises.length > 0) {
-      // Map exercises with fallback for bpm/beats, transcript, and instrument
+      // Map exercises with fallback for bpm/beats, transcript
       setLessonExercises(selectionData.exercises.map((ex: any) => ({
         ...ex,
         transcript: ex.transcript || '',
-        instrument: ex.instrument || assignment.instrument,
         bpm: ex.bpm || assignment.bpm,
         beats: ex.beats || assignment.beats
       })))
@@ -1420,7 +1416,6 @@ function Classroom() {
         id: 'legacy-exercise',
         name: 'Exercise 1',
         transcript: '',
-        instrument: assignment.instrument as 'keyboard' | 'guitar' | 'bass',
         bpm: assignment.bpm,
         beats: assignment.beats,
         chordMode: 'single',
@@ -1482,8 +1477,7 @@ function Classroom() {
     }
 
     if (targetExercise) {
-      // Apply instrument, BPM, beats, and chord mode from exercise
-      if (targetExercise.instrument) setInstrument(targetExercise.instrument)
+      // Apply BPM, beats, and chord mode from exercise (instrument is assignment-level)
       if (targetExercise.bpm) setBpm(targetExercise.bpm)
       if (targetExercise.beats) setNumberOfBeats(targetExercise.beats)
       if (targetExercise.chordMode) setChordMode(targetExercise.chordMode)
@@ -1493,7 +1487,8 @@ function Classroom() {
       handleOctaveRangeChange(targetLower, targetHigher)
     }
 
-    const exerciseInstrument = targetExercise?.instrument || currentAssignment.instrument
+    // Use assignment-level instrument (same for all exercises)
+    const exerciseInstrument = currentAssignment.instrument
     if (targetExercise) {
       // Use exercise-level octave range or fall back to assignment-level
       const targetLower = targetExercise.lowerOctaves ?? 0
@@ -1540,7 +1535,7 @@ function Classroom() {
     }
 
     setLessonExerciseIndex(index)
-  }, [lessonExerciseIndex, lessonExercises, currentAssignment, clearSelection, scaleChordManagement, setChordMode, selectNote, handleOctaveRangeChange, setInstrument])
+  }, [lessonExerciseIndex, lessonExercises, currentAssignment, clearSelection, scaleChordManagement, setChordMode, selectNote, handleOctaveRangeChange])
 
   // Auto-advance to next exercise or end lesson
   const handleExerciseComplete = useCallback(() => {
@@ -2183,7 +2178,7 @@ function Classroom() {
           </button>
         </div>
 
-        {/* Header with classroom selector, title input, and assign button */}
+        {/* Header with classroom selector, instrument, title input, and assign button */}
         <div className={practiceStyles.assignmentModeBar}>
           <select
             className={practiceStyles.classroomSelector}
@@ -2196,6 +2191,15 @@ function Classroom() {
                 {classroom.title}
               </option>
             ))}
+          </select>
+          <select
+            className={practiceStyles.classroomSelector}
+            value={instrument}
+            onChange={(e) => handleInstrumentChange(e.target.value as 'keyboard' | 'guitar' | 'bass')}
+          >
+            <option value="keyboard">Keyboard</option>
+            <option value="guitar">Guitar</option>
+            <option value="bass">Bass</option>
           </select>
           <input
             type="text"
@@ -2326,6 +2330,7 @@ function Classroom() {
           currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
           onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
           externalSelectedNoteIds={externalSelectedNoteIds}
+          hideInstrumentSelector={true}
         />
       </>
     )
