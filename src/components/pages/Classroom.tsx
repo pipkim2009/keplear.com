@@ -26,7 +26,7 @@ import {
   getBassNoteById,
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
-import { PiTrashFill, PiChatCircleFill } from 'react-icons/pi'
+import { PiTrashFill, PiChatCircleFill, PiPencilSimpleFill } from 'react-icons/pi'
 import styles from '../../styles/Classroom.module.css'
 import practiceStyles from '../../styles/Practice.module.css'
 
@@ -76,6 +76,7 @@ interface AssignmentData {
 interface ClassroomData {
   id: string
   title: string
+  description: string | null
   created_by: string | null
   created_at: string
   is_public: boolean
@@ -230,6 +231,7 @@ function Classroom() {
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [newTitle, setNewTitle] = useState('')
+  const [newDescription, setNewDescription] = useState('')
   const [isPublic, setIsPublic] = useState(true)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -244,6 +246,12 @@ function Classroom() {
 
   // Copy feedback state
   const [codeCopied, setCodeCopied] = useState(false)
+
+  // Edit classroom state
+  const [isEditingClassroom, setIsEditingClassroom] = useState(false)
+  const [editTitle, setEditTitle] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [isSavingEdit, setIsSavingEdit] = useState(false)
 
   // Search state
   const [searchQuery, setSearchQuery] = useState('')
@@ -659,6 +667,53 @@ function Classroom() {
     }
   }
 
+  // Start editing classroom
+  const handleStartEditClassroom = () => {
+    if (!selectedClassroom) return
+    setEditTitle(selectedClassroom.title)
+    setEditDescription(selectedClassroom.description || '')
+    setIsEditingClassroom(true)
+  }
+
+  // Cancel editing classroom
+  const handleCancelEditClassroom = () => {
+    setIsEditingClassroom(false)
+    setEditTitle('')
+    setEditDescription('')
+  }
+
+  // Save classroom edits
+  const handleSaveClassroom = async () => {
+    if (!user || !selectedClassroom) return
+    if (!editTitle.trim()) return
+
+    try {
+      setIsSavingEdit(true)
+      const { error: updateError } = await supabase
+        .from('classrooms')
+        .update({
+          title: editTitle.trim(),
+          description: editDescription.trim() || null
+        })
+        .eq('id', selectedClassroom.id)
+        .eq('created_by', user.id)
+
+      if (updateError) {
+        console.error('Error updating classroom:', updateError)
+        return
+      }
+
+      setIsEditingClassroom(false)
+      setEditTitle('')
+      setEditDescription('')
+      fetchClassrooms()
+    } catch (err) {
+      console.error('Error updating classroom:', err)
+    } finally {
+      setIsSavingEdit(false)
+    }
+  }
+
   // Delete assignment
   const handleDeleteAssignment = async (assignmentId: string) => {
     if (!user) return
@@ -766,6 +821,7 @@ function Classroom() {
         .from('classrooms')
         .insert({
           title: newTitle.trim(),
+          description: newDescription.trim() || null,
           created_by: user.id,
           is_public: isPublic,
           join_code: joinCodeValue
@@ -775,6 +831,7 @@ function Classroom() {
         return
       }
       setNewTitle('')
+      setNewDescription('')
       setIsPublic(true)
       setIsModalOpen(false)
       fetchClassrooms()
@@ -1910,6 +1967,18 @@ function Classroom() {
             />
           </div>
           <div className={styles.formGroup}>
+            <label className={styles.formLabel} htmlFor="classroomDescription">Description</label>
+            <textarea
+              id="classroomDescription"
+              className={styles.formTextarea}
+              value={newDescription}
+              onChange={(e) => setNewDescription(e.target.value)}
+              placeholder="Describe what this class is about (optional)"
+              disabled={creating}
+              rows={3}
+            />
+          </div>
+          <div className={styles.formGroup}>
             <label className={styles.formLabel}>Visibility</label>
             <div className={styles.visibilityOptions}>
               <label className={styles.checkboxLabel}>
@@ -2389,22 +2458,95 @@ function Classroom() {
           </button>
 
           <div className={styles.fullPageHeader}>
-            <div className={styles.fullPageTitleRow}>
-              <h1 className={styles.fullPageTitle}>{selectedClassroom.title}</h1>
-              {isOwner && (
-                <button
-                  className={styles.deleteButton}
-                  onClick={() => handleDeleteClassroom(selectedClassroom.id)}
-                  title="Delete classroom"
-                >
-                  <PiTrashFill size={16} />
-                </button>
-              )}
-            </div>
-            <p className={styles.fullPageAuthor}>by {selectedClassroom.profiles?.username ?? 'Unknown'}</p>
-            <p className={styles.fullPageMeta}>Created {formatDate(selectedClassroom.created_at)}</p>
+            {isEditingClassroom ? (
+              <>
+                <div className={styles.editFormGroup}>
+                  <label className={styles.editLabel}>Class Name</label>
+                  <input
+                    type="text"
+                    className={styles.editInput}
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    placeholder="Enter class name"
+                    autoFocus
+                    disabled={isSavingEdit}
+                  />
+                </div>
+                <div className={styles.editFormGroup}>
+                  <label className={styles.editLabel}>Description</label>
+                  <textarea
+                    className={styles.editTextarea}
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    placeholder="Describe what this class is about (optional)"
+                    disabled={isSavingEdit}
+                    rows={3}
+                  />
+                </div>
+                <div className={styles.editActions}>
+                  <button
+                    className={styles.editCancelButton}
+                    onClick={handleCancelEditClassroom}
+                    disabled={isSavingEdit}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className={styles.editSaveButton}
+                    onClick={handleSaveClassroom}
+                    disabled={isSavingEdit || !editTitle.trim()}
+                  >
+                    {isSavingEdit ? 'Saving...' : 'Save'}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className={styles.fullPageTitleRow}>
+                  <h1 className={styles.fullPageTitle}>{selectedClassroom.title}</h1>
+                  {isOwner && (
+                    <div className={styles.titleActions}>
+                      <button
+                        className={styles.editButton}
+                        onClick={handleStartEditClassroom}
+                        title="Edit classroom"
+                      >
+                        <PiPencilSimpleFill size={16} />
+                      </button>
+                      <button
+                        className={styles.deleteButton}
+                        onClick={() => handleDeleteClassroom(selectedClassroom.id)}
+                        title="Delete classroom"
+                      >
+                        <PiTrashFill size={16} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <p className={styles.fullPageAuthor}>by {selectedClassroom.profiles?.username ?? 'Unknown'}</p>
+                {selectedClassroom.description && (
+                  <p className={styles.fullPageDescription}>{selectedClassroom.description}</p>
+                )}
+                {(() => {
+                  const classInstruments = [...new Set(selectedClassroom.assignments?.map(a => a.instrument).filter(Boolean) || [])]
+                  return classInstruments.length > 0 ? (
+                    <div className={styles.instrumentTags} style={{ marginTop: '0.75rem' }}>
+                      {classInstruments.map(inst => (
+                        <span
+                          key={inst}
+                          className={`${styles.instrumentTag} ${styles[`instrument${inst.charAt(0).toUpperCase() + inst.slice(1)}`]}`}
+                        >
+                          {inst}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null
+                })()}
+                <p className={styles.fullPageMeta}>Created {formatDate(selectedClassroom.created_at)}</p>
+              </>
+            )}
 
-            {isOwner && !selectedClassroom.is_public && selectedClassroom.join_code && (
+            {!isEditingClassroom && isOwner && !selectedClassroom.is_public && selectedClassroom.join_code && (
               <div className={styles.joinCodeDisplay}>
                 <span className={styles.joinCodeLabel}>Class Code:</span>
                 <span className={styles.joinCodeValue}>{selectedClassroom.join_code}</span>
@@ -2495,6 +2637,13 @@ function Classroom() {
                     <div key={assignment.id} className={styles.fullPageAssignmentItem}>
                       <div className={styles.fullPageAssignmentInfo}>
                         <h3 className={styles.fullPageAssignmentTitle}>{assignment.title}</h3>
+                        {assignment.instrument && (
+                          <span
+                            className={`${styles.instrumentTag} ${styles[`instrument${assignment.instrument.charAt(0).toUpperCase() + assignment.instrument.slice(1)}`]}`}
+                          >
+                            {assignment.instrument}
+                          </span>
+                        )}
                       </div>
                       <div className={styles.fullPageAssignmentActions}>
                         {user && (
@@ -2545,11 +2694,12 @@ function Classroom() {
   })
 
   const renderClassCard = (classroom: ClassroomData, showOwnershipBadge: boolean = false) => {
-    const studentCount = classroom.classroom_students?.length ?? 0
-    const assignmentCount = classroom.assignments?.length ?? 0
     const isPrivate = !classroom.is_public
     const isOwner = user && classroom.created_by === user.id
     const isJoined = user && classroom.classroom_students?.some(s => s.user_id === user.id)
+
+    // Get unique instruments from assignments
+    const instruments = [...new Set(classroom.assignments?.map(a => a.instrument).filter(Boolean) || [])]
 
     return (
       <div
@@ -2570,12 +2720,21 @@ function Classroom() {
           </div>
         </div>
         <p className={styles.classAuthor}>by {classroom.profiles?.username ?? 'Unknown'}</p>
-        <p className={styles.classMeta}>Created {formatDate(classroom.created_at)}</p>
-        <div className={styles.classCardStats}>
-          <span className={styles.statItem}>{studentCount} {studentCount === 1 ? 'student' : 'students'}</span>
-          <span className={styles.statDivider}>•</span>
-          <span className={styles.statItem}>{assignmentCount} {assignmentCount === 1 ? 'assignment' : 'assignments'}</span>
-        </div>
+        {classroom.description && (
+          <p className={styles.classDescription}>{classroom.description}</p>
+        )}
+        {instruments.length > 0 && (
+          <div className={styles.instrumentTags}>
+            {instruments.map(inst => (
+              <span
+                key={inst}
+                className={`${styles.instrumentTag} ${styles[`instrument${inst.charAt(0).toUpperCase() + inst.slice(1)}`]}`}
+              >
+                {inst}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     )
   }
