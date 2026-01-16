@@ -144,6 +144,118 @@
   gap: 1rem;
 }
 
+/* Language Selector */
+.language-selector {
+  position: relative;
+}
+
+.language-button {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.light .language-button {
+  background: rgba(147, 51, 234, 0.1);
+}
+
+.dark .language-button {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.language-button:hover {
+  background: rgba(147, 51, 234, 0.2);
+}
+
+.dark .language-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.language-flag {
+  font-size: 1.25rem;
+  line-height: 1;
+  border-radius: 3px;
+}
+
+.language-option-flag {
+  font-size: 1.125rem;
+  border-radius: 2px;
+}
+
+.language-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 160px;
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 1000;
+  animation: fadeInDown 0.2s ease;
+}
+
+.dark .language-menu {
+  background: var(--gray-800);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.language-option {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  text-align: left;
+}
+
+.language-option:hover {
+  background: rgba(147, 51, 234, 0.1);
+}
+
+.dark .language-option:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.language-option-active {
+  background: rgba(147, 51, 234, 0.15);
+}
+
+.dark .language-option-active {
+  background: rgba(147, 51, 234, 0.25);
+}
+
+.language-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--light-text-primary);
+}
+
+.dark .language-name {
+  color: var(--dark-text-primary);
+}
+
 .auth-section {
   display: flex;
   align-items: center;

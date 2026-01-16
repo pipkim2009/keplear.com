@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
+import { useTranslation } from '../../contexts/TranslationContext'
 import { containsScriptInjection } from '../../utils/security'
 import logo from '/Keplear-logo.png'
 import styles from './AuthForms.module.css'
@@ -27,6 +28,7 @@ interface TouchedFields {
 }
 
 const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess }: LoginFormProps) => {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState<FormData>({
     username: '',
     password: ''
@@ -37,6 +39,7 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [errorKey, setErrorKey] = useState('')
   const { signIn, signOut } = useAuth()
 
   // Real-time field validation with security checks
@@ -46,19 +49,19 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
     // Username validation with injection check
     if (formData.username) {
       if (containsScriptInjection(formData.username)) {
-        errors.username = 'Invalid characters detected'
+        errors.username = t('errors.invalidCharacters')
       } else if (formData.username.length < 3) {
-        errors.username = 'Username must be at least 3 characters'
+        errors.username = t('errors.usernameTooShort')
       }
     }
 
     // Password validation (basic check for login - user may have old password)
     if (formData.password && formData.password.length < 6) {
-      errors.password = 'Password too short'
+      errors.password = t('errors.passwordTooShort')
     }
 
     return errors
-  }, [formData])
+  }, [formData, t])
 
   // Check if field is valid
   const isFieldValid = useCallback((field: keyof FormData): boolean => {
@@ -106,27 +109,28 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
 
     // Check for validation errors
     if (Object.keys(fieldErrors).length > 0) {
-      setError('Please fix the errors above')
+      setErrorKey('errors.fixErrorsAbove')
       return
     }
 
     // Check required fields
     if (!formData.username || !formData.password) {
-      setError('Please fill in all fields')
+      setErrorKey('errors.fillAllFields')
       return
     }
 
     setLoading(true)
     setError('')
+    setErrorKey('')
 
     try {
       const { error: signInError } = await signIn(formData.username, formData.password)
       if (signInError) {
-        setError(
-          typeof signInError === 'object' && signInError && 'message' in signInError
-            ? String((signInError as { message: string }).message)
-            : 'Invalid username or password'
-        )
+        if (typeof signInError === 'object' && signInError && 'message' in signInError) {
+          setError(String((signInError as { message: string }).message))
+        } else {
+          setErrorKey('errors.invalidCredentials')
+        }
       } else {
         // If this is a gate login (onAuthSuccess provided), sign out and grant site access
         if (onAuthSuccess) {
@@ -137,7 +141,7 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
         }
       }
     } catch {
-      setError('An unexpected error occurred')
+      setErrorKey('errors.unexpectedError')
     }
 
     setLoading(false)
@@ -148,17 +152,17 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
       <div className={styles.authBrand}>
         <img src={logo} alt="Keplear" className={styles.authLogo} />
       </div>
-      <p className={styles.formDescription}>Sign in to your account</p>
+      <p className={styles.formDescription}>{t('auth.signInToAccount')}</p>
 
-      {error && (
+      {(error || errorKey) && (
         <div className={styles.errorMessage} role="alert" aria-live="polite">
-          {error}
+          {error || t(errorKey)}
         </div>
       )}
 
       <form onSubmit={handleSubmit} autoComplete="on" noValidate>
         <div className={styles.formGroup}>
-          <label htmlFor="login-username">Username</label>
+          <label htmlFor="login-username">{t('auth.username')}</label>
           <input
             id="login-username"
             name="username"
@@ -166,7 +170,7 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
             value={formData.username}
             onChange={handleChange}
             onBlur={() => handleBlur('username')}
-            placeholder="Enter your username"
+            placeholder={t('auth.enterUsername')}
             disabled={loading}
             autoComplete="username"
             className={getInputClassName('username')}
@@ -181,7 +185,7 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="login-password">Password</label>
+          <label htmlFor="login-password">{t('auth.password')}</label>
           <input
             id="login-password"
             name="password"
@@ -189,7 +193,7 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
             value={formData.password}
             onChange={handleChange}
             onBlur={() => handleBlur('password')}
-            placeholder="Enter your password"
+            placeholder={t('auth.enterPassword')}
             disabled={loading}
             autoComplete="current-password"
             className={getInputClassName('password')}
@@ -208,20 +212,20 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
           className={`${styles.authButton} ${styles.primary}`}
           disabled={loading}
         >
-          {loading ? 'Signing in...' : 'Sign In'}
+          {loading ? t('auth.signingIn') : t('auth.signIn')}
         </button>
       </form>
 
       {!disableSignup && (
         <div className={styles.authFooter}>
           <p>
-            Don't have an account?{' '}
+            {t('auth.dontHaveAccount')}{' '}
             <button
               type="button"
               className={styles.linkButton}
               onClick={() => onToggleForm('signup')}
             >
-              Sign up
+              {t('auth.signUp')}
             </button>
           </p>
         </div>

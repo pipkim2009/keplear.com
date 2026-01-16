@@ -1,9 +1,11 @@
 import logo from '/Keplear-logo.png'
+import { useTranslation } from '../../contexts/TranslationContext'
 import '../../styles/Footer.css'
 
 function Footer() {
+  const { t } = useTranslation()
   const currentYear = new Date().getFullYear()
-  
+
   return (
     <footer className="footer">
       <div className="footer-content">
@@ -18,9 +20,9 @@ function Footer() {
                 e4ellis09@gmail.com
               </a>
             </div>
-            
+
             <div className="footer-copyright">
-              <p>&copy; {currentYear} All Rights Reserved</p>
+              <p>&copy; {currentYear} {t('footer.allRightsReserved')}</p>
               <p className="footer-author">Ellis Mark Hughes</p>
             </div>
           </div>

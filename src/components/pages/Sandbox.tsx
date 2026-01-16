@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import { type LessonSettings } from './PracticeOptionsModal'
 import { useInstrument } from '../../contexts/InstrumentContext'
+import { useTranslation } from '../../contexts/TranslationContext'
 import AuthContext from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { useDSPPitchDetection, usePerformanceGrading } from '../../hooks'
@@ -29,11 +30,7 @@ import {
 import type { AppliedScale, AppliedChord } from '../common/ScaleChordOptions'
 import styles from '../../styles/Practice.module.css'
 
-const instrumentNames: Record<string, string> = {
-  keyboard: 'Keyboard',
-  guitar: 'Guitar',
-  bass: 'Bass'
-}
+// Moved to component to access translations
 
 // Welcome Subtitle Component with Text-to-Speech
 interface WelcomeSubtitleProps {
@@ -90,9 +87,17 @@ const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd 
 }
 
 function Sandbox() {
+  const { t } = useTranslation()
   const authContext = useContext(AuthContext)
   const user = authContext?.user ?? null
   const { navigateToClassroom } = useInstrument()
+
+  // Translated instrument names
+  const instrumentNames: Record<string, string> = useMemo(() => ({
+    keyboard: t('instruments.keyboard'),
+    guitar: t('instruments.guitar'),
+    bass: t('instruments.bass')
+  }), [t])
 
   const {
     handleNoteClick,
@@ -530,10 +535,10 @@ function Sandbox() {
     navigateToClassroom()
   }
 
-  const handleLessonComplete = () => {
-    const message = "Congratulations on completing today's lesson!"
+  const handleLessonComplete = useCallback(() => {
+    const message = t('sandbox.congratulations')
     setCongratulationsMessage(message)
-  }
+  }, [t])
 
   // Helper function to filter scales based on user selection
   const getFilteredScales = (scales: typeof KEYBOARD_SCALES, selectedScales: string[] | undefined) => {
@@ -1326,9 +1331,9 @@ function Sandbox() {
   useEffect(() => {
     if (welcomeSpeechDone && generatedMelody.length > 0 && recordedAudioBlob && !hasAnnouncedMelody.current && setupDetails) {
       hasAnnouncedMelody.current = true
-      setMelodySetupMessage('I have set up a melody for you to attempt')
+      setMelodySetupMessage(t('sandbox.melodySetup'))
     }
-  }, [welcomeSpeechDone, generatedMelody, recordedAudioBlob, setupDetails])
+  }, [welcomeSpeechDone, generatedMelody, recordedAudioBlob, setupDetails, t])
 
 
   // If loading from assignment, show nothing (prevents flash of sandbox mode)
@@ -1339,7 +1344,7 @@ function Sandbox() {
   // If session started, show the practice session UI
   if (sessionStarted && selectedInstrument) {
     const instrumentName = instrumentNames[selectedInstrument] || 'Instrument'
-    const welcomeMessage = `Welcome to your ${instrumentName} lesson`
+    const welcomeMessage = t('sandbox.welcomeToLesson', { instrument: instrumentName })
 
     // Calculate octave range for keyboard based on lesson settings
     // Default keyboard range is 4-5
@@ -1364,16 +1369,16 @@ function Sandbox() {
           <button
             className={styles.backButton}
             onClick={handleBackToSelection}
-            aria-label="End practice session"
+            aria-label={t('sandbox.endSession')}
           >
-            End Session
+            {t('sandbox.endSession')}
           </button>
           <button
             className={styles.doneButton}
             onClick={handleBackToSelection}
-            aria-label="Done with lesson"
+            aria-label={t('sandbox.done')}
           >
-            Done
+            {t('sandbox.done')}
           </button>
         </div>
 
@@ -1482,11 +1487,11 @@ function Sandbox() {
     >
       <div className={styles.assignModal}>
         <div className={styles.assignModalHeader}>
-          <h2 className={styles.assignModalTitle}>Create Assignment</h2>
+          <h2 className={styles.assignModalTitle}>{t('sandbox.createAssignment')}</h2>
           <button
             className={styles.assignModalClose}
             onClick={handleCloseAssignModal}
-            aria-label="Close"
+            aria-label={t('common.close')}
           >
             ×
           </button>
@@ -1497,7 +1502,7 @@ function Sandbox() {
 
           <div className={styles.assignModalField}>
             <label className={styles.assignModalLabel} htmlFor="assignmentTitle">
-              Assignment Title
+              {t('sandbox.assignmentTitle')}
             </label>
             <input
               id="assignmentTitle"
@@ -1505,17 +1510,17 @@ function Sandbox() {
               className={styles.assignModalInput}
               value={assignmentTitle}
               onChange={(e) => setAssignmentTitle(e.target.value)}
-              placeholder="Enter assignment title"
+              placeholder={t('sandbox.enterAssignmentTitle')}
               autoFocus
               disabled={isSavingAssignment}
             />
           </div>
 
           <div className={styles.assignModalInfo}>
-            <p><strong>Instrument:</strong> {instrumentNames[instrument]}</p>
-            <p><strong>BPM:</strong> {bpm}</p>
-            <p><strong>Beats:</strong> {numberOfBeats}</p>
-            <p><strong>Type:</strong> {scaleChordManagement.appliedChords.length > 0 ? 'Chords' : 'Melodies'}</p>
+            <p><strong>{t('sandbox.instrument')}:</strong> {instrumentNames[instrument]}</p>
+            <p><strong>{t('sandbox.bpm')}:</strong> {bpm}</p>
+            <p><strong>{t('sandbox.beats')}:</strong> {numberOfBeats}</p>
+            <p><strong>{t('sandbox.type')}:</strong> {scaleChordManagement.appliedChords.length > 0 ? t('sandbox.chords') : t('sandbox.melodies')}</p>
           </div>
 
           <button
@@ -1523,7 +1528,7 @@ function Sandbox() {
             onClick={handleSaveAssignment}
             disabled={isSavingAssignment || !assignmentTitle.trim()}
           >
-            {isSavingAssignment ? 'Saving...' : 'Create Assignment'}
+            {isSavingAssignment ? t('sandbox.saving') : t('sandbox.createAssignment')}
           </button>
         </div>
       </div>
@@ -1537,19 +1542,19 @@ function Sandbox() {
       {/* Assignment mode buttons - only show when coming from Classroom page */}
       {assigningToClassroomId && (
         <div className={styles.assignmentModeBar}>
-          <span className={styles.assignmentModeText}>Assignment Editor</span>
+          <span className={styles.assignmentModeText}>{t('sandbox.assignmentEditor')}</span>
           <div className={styles.assignmentModeButtons}>
             <button
               className={styles.assignmentCancelButton}
               onClick={handleCancelAssignment}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               className={styles.assignmentAssignButton}
               onClick={handleOpenAssignModal}
             >
-              Assign
+              {t('common.apply')}
             </button>
           </div>
         </div>
@@ -1619,7 +1624,7 @@ function Sandbox() {
               onClick={handleExportToClassroom}
               disabled={!hasContent}
             >
-              Export to Classroom
+              {t('sandbox.exportToClassroom')}
             </button>
           </div>
         )

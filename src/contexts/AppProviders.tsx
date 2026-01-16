@@ -4,6 +4,7 @@ import { UIProvider } from './UIContext'
 import { InstrumentConfigProvider } from './InstrumentConfigContext'
 import { MelodyProvider } from './MelodyContext'
 import { InstrumentProvider } from './InstrumentContext'
+import { TranslationProvider } from './TranslationContext'
 
 /**
  * Unified provider component that wraps all context providers
@@ -37,15 +38,17 @@ export const AppProviders: React.FC<AppProvidersProps> = ({
 
   // New split context architecture
   return (
-    <AudioProvider>
-      <UIProvider>
-        <InstrumentConfigProvider>
-          <MelodyProvider>
-            {children}
-          </MelodyProvider>
-        </InstrumentConfigProvider>
-      </UIProvider>
-    </AudioProvider>
+    <TranslationProvider>
+      <AudioProvider>
+        <UIProvider>
+          <InstrumentConfigProvider>
+            <MelodyProvider>
+              {children}
+            </MelodyProvider>
+          </InstrumentConfigProvider>
+        </UIProvider>
+      </AudioProvider>
+    </TranslationProvider>
   )
 }
 

@@ -3,6 +3,7 @@ import { PiPlayFill, PiPauseFill, PiSpeakerHighFill, PiSpeakerLowFill, PiSpeaker
 import { Eye, EyeOff, Mic, MicOff } from 'lucide-react'
 import type { Note } from '../../utils/notes'
 import type { PerformanceState } from '../../hooks/usePerformanceGrading'
+import { useTranslation } from '../../contexts/TranslationContext'
 
 interface CustomAudioPlayerProps {
   src: string
@@ -42,6 +43,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   performanceState,
   volumeLevel = 0
 }) => {
+  const { t } = useTranslation()
   const internalAudioRef = useRef<HTMLAudioElement>(null)
   const audioRef = externalAudioRef || internalAudioRef
   const progressRef = useRef<HTMLDivElement>(null)
@@ -265,8 +267,8 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           <button
             className={`reveal-btn ${showNotes ? 'active' : ''}`}
             onClick={onToggleNotes}
-            aria-label={showNotes ? 'Hide notes' : 'Reveal notes'}
-            title={showNotes ? 'Hide notes' : 'Reveal notes'}
+            aria-label={showNotes ? t('sandbox.hideNotes') : t('sandbox.revealNotes')}
+            title={showNotes ? t('sandbox.hideNotes') : t('sandbox.revealNotes')}
           >
             {showNotes ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -276,8 +278,8 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           <button
             className={`mic-btn ${isListening ? 'active' : ''}`}
             onClick={isListening ? onStopFeedback : onStartFeedback}
-            aria-label={isListening ? 'Stop feedback' : 'Start feedback'}
-            title={isListening ? 'Stop feedback' : 'Start feedback'}
+            aria-label={isListening ? t('sandbox.stopFeedback') : t('sandbox.startFeedback')}
+            title={isListening ? t('sandbox.stopFeedback') : t('sandbox.startFeedback')}
           >
             {isListening ? <MicOff size={18} /> : <Mic size={18} />}
           </button>
@@ -394,7 +396,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
                   </div>
                 ))}
               </div>
-              <span className="count-in-label">Count in...</span>
+              <span className="count-in-label">{t('sandbox.countIn')}</span>
             </div>
           )}
 
@@ -427,7 +429,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
 
           {/* Volume indicator */}
           <div className="volume-indicator">
-            <span className="volume-indicator-label">Mic Level</span>
+            <span className="volume-indicator-label">{t('sandbox.micLevel')}</span>
             <div className="volume-indicator-bar">
               <div
                 className="volume-indicator-fill"

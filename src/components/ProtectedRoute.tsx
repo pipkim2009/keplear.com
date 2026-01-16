@@ -1,5 +1,6 @@
 import { ReactNode, useState, useEffect } from 'react'
 import AuthModal from './auth/AuthModal'
+import { useTranslation } from '../contexts/TranslationContext'
 
 const SITE_ACCESS_KEY = 'keplear_site_access'
 
@@ -14,6 +15,7 @@ interface ProtectedRouteProps {
  * and test the real login/signup flow
  */
 function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const { t } = useTranslation()
   const [hasAccess, setHasAccess] = useState<boolean | null>(null)
   const [showGateModal, setShowGateModal] = useState(false)
 
@@ -46,7 +48,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
         fontSize: '1.2rem',
         color: 'var(--text-primary)'
       }}>
-        Loading...
+        {t('common.loading')}
       </div>
     )
   }
@@ -73,7 +75,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
           marginBottom: '1rem',
           color: 'var(--text-primary)'
         }}>
-          Access Required
+          {t('protectedRoute.accessRequired')}
         </h2>
         <p style={{
           fontSize: '1.1rem',
@@ -81,7 +83,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
           color: 'var(--text-secondary)',
           maxWidth: '500px'
         }}>
-          Please sign in to access the site.
+          {t('protectedRoute.signInToAccess')}
         </p>
       </div>
 

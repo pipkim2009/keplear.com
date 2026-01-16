@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { useTranslation } from '../../contexts/TranslationContext'
 import styles from '../../styles/Home.module.css'
 import { PiPianoKeysFill, PiLightningFill, PiPlayFill } from 'react-icons/pi'
 import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
@@ -7,18 +8,23 @@ interface HomeProps {
   onNavigateToSandbox: () => void
 }
 
-const ROTATING_WORDS = ['Your Sound', 'Any Scale', 'Any Chord']
-
 function Home({ onNavigateToSandbox }: HomeProps) {
+  const { t } = useTranslation()
   const [wordIndex, setWordIndex] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
+
+  const rotatingWords = useMemo(() => [
+    t('home.yourSound'),
+    t('home.anyScale'),
+    t('home.anyChord')
+  ], [t])
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>
     const interval = setInterval(() => {
       setIsAnimating(true)
       timeoutId = setTimeout(() => {
-        setWordIndex((prev) => (prev + 1) % ROTATING_WORDS.length)
+        setWordIndex((prev) => (prev + 1) % rotatingWords.length)
         setIsAnimating(false)
       }, 300)
     }, 2500)
@@ -26,7 +32,7 @@ function Home({ onNavigateToSandbox }: HomeProps) {
       clearInterval(interval)
       clearTimeout(timeoutId)
     }
-  }, [])
+  }, [rotatingWords.length])
 
   return (
     <div className={styles.home}>
@@ -35,41 +41,41 @@ function Home({ onNavigateToSandbox }: HomeProps) {
         <div className={styles.heroContent}>
           <div className={styles.badge}>
             <PiLightningFill />
-            <span>Free to use</span>
+            <span>{t('home.freeToUse')}</span>
           </div>
 
           <h1 className={styles.heroTitle}>
-            Train Your Ear.<br />
-            Master{' '}
+            {t('home.trainYourEar')}<br />
+            {t('home.master')}{' '}
             <span className={`${styles.rotatingWord} ${isAnimating ? styles.fadeOut : styles.fadeIn}`}>
-              {ROTATING_WORDS[wordIndex]}
+              {rotatingWords[wordIndex]}
             </span>
           </h1>
 
           <p className={styles.heroSubtitle}>
-            The ear training app for serious musicians. Practice on keyboard, guitar, or bass with instant feedback.
+            {t('home.heroSubtitle')}
           </p>
 
           <div className={styles.heroCta}>
             <button className={styles.primaryButton} onClick={onNavigateToSandbox}>
               <PiPlayFill />
-              Start Training Now
+              {t('home.startTraining')}
             </button>
-            <span className={styles.ctaNote}>No signup required</span>
+            <span className={styles.ctaNote}>{t('home.noSignup')}</span>
           </div>
 
           <div className={styles.heroInstruments}>
             <div className={styles.instrumentPill}>
               <PiPianoKeysFill />
-              <span>Keyboard</span>
+              <span>{t('instruments.keyboard')}</span>
             </div>
             <div className={styles.instrumentPill}>
               <GiGuitarHead />
-              <span>Guitar</span>
+              <span>{t('instruments.guitar')}</span>
             </div>
             <div className={styles.instrumentPill}>
               <GiGuitarBassHead />
-              <span>Bass</span>
+              <span>{t('instruments.bass')}</span>
             </div>
           </div>
         </div>

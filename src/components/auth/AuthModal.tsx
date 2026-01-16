@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import LoginForm from './LoginForm'
 import SignupForm from './SignupForm'
 import { useFocusTrap, useBodyScrollLock } from '../../hooks/useFocusTrap'
+import { useTranslation } from '../../contexts/TranslationContext'
 import styles from './AuthForms.module.css'
 
 interface AuthModalProps {
@@ -24,6 +25,7 @@ const AuthModal = ({
   disableSignup = false,
   onAuthSuccess
 }: AuthModalProps) => {
+  const { t } = useTranslation()
   const [currentForm, setCurrentForm] = useState<'login' | 'signup'>(initialForm)
   const [isDarkMode, setIsDarkMode] = useState(false)
 
@@ -116,7 +118,7 @@ const AuthModal = ({
           <button
             className={styles.closeButton}
             onClick={handleClose}
-            aria-label="Close modal"
+            aria-label={t('auth.closeModal')}
             type="button"
           >
             ×

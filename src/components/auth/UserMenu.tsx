@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useTheme } from '../../hooks/useTheme'
+import { useTranslation } from '../../contexts/TranslationContext'
 import { PiCaretUpFill, PiSignOutFill, PiTrashFill } from 'react-icons/pi'
 import logo from '/Keplear-logo.png'
 import styles from './UserMenu.module.css'
@@ -13,6 +14,7 @@ interface UserProfile {
 }
 
 const UserMenu = () => {
+  const { t } = useTranslation()
   const { user, signOut, deleteAccount } = useAuth()
   const { isDarkMode } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
@@ -64,12 +66,12 @@ const UserMenu = () => {
       const { error } = await deleteAccount()
       if (error) {
         console.error('Error deleting account:', error)
-        alert('Failed to delete account. Please try again or contact support.')
+        alert(t('errors.deleteAccountFailed'))
       }
       setShowDeleteConfirm(false)
     } catch (error) {
       console.error('Error deleting account:', error)
-      alert('Failed to delete account. Please try again or contact support.')
+      alert(t('errors.deleteAccountFailed'))
     }
   }
 
@@ -96,7 +98,7 @@ const UserMenu = () => {
         <button
           className={authStyles.closeButton}
           onClick={() => setShowDeleteConfirm(false)}
-          aria-label="Close"
+          aria-label={t('common.close')}
         >
           ×
         </button>
@@ -104,9 +106,9 @@ const UserMenu = () => {
           <div className={authStyles.authBrand}>
             <img src={logo} alt="Keplear" className={authStyles.authLogo} />
           </div>
-          <h2 style={{ color: '#dc2626', marginBottom: '20px' }}>Delete Account</h2>
+          <h2 style={{ color: '#dc2626', marginBottom: '20px' }}>{t('auth.deleteAccountTitle')}</h2>
           <p className={authStyles.formDescription} style={{ marginBottom: '32px' }}>
-            <strong>This action cannot be undone.</strong> All your data will be permanently deleted.
+            <strong>{t('auth.cannotBeUndone')}</strong> {t('auth.dataWillBeDeleted')}
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <button
@@ -121,7 +123,7 @@ const UserMenu = () => {
                 marginTop: 0
               }}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <button
               onClick={confirmAccountDeletion}
@@ -142,7 +144,7 @@ const UserMenu = () => {
                 e.currentTarget.style.borderColor = '#dc2626'
               }}
             >
-              Delete Account
+              {t('auth.deleteAccount')}
             </button>
           </div>
         </div>
@@ -206,14 +208,14 @@ const UserMenu = () => {
               onClick={handleSignOut}
             >
               <PiSignOutFill size={16} />
-              Sign Out
+              {t('auth.signOut')}
             </button>
             <button
               className={`${styles.menuItem} ${styles.danger}`}
               onClick={handleDeleteAccount}
             >
               <PiTrashFill size={16} />
-              Delete Account
+              {t('auth.deleteAccount')}
             </button>
           </div>
         </div>

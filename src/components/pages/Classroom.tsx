@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback, useContext, useRef, useMemo } from 'r
 import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import AuthContext from '../../contexts/AuthContext'
+import { useTranslation } from '../../contexts/TranslationContext'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
 import { useDSPPitchDetection, usePerformanceGrading } from '../../hooks'
@@ -113,11 +114,6 @@ interface ExerciseData {
   }>
 }
 
-const instrumentNames: Record<string, string> = {
-  keyboard: 'Keyboard',
-  guitar: 'Guitar',
-  bass: 'Bass'
-}
 
 // Generate a random 6-character join code
 const generateJoinCode = (): string => {
@@ -174,6 +170,14 @@ type ViewMode = 'list' | 'classroom' | 'creating-assignment' | 'taking-lesson'
 function Classroom() {
   const authContext = useContext(AuthContext)
   const user = authContext?.user ?? null
+  const { t } = useTranslation()
+
+  // Translated instrument names
+  const instrumentNames = useMemo(() => ({
+    keyboard: t('instruments.keyboard'),
+    guitar: t('instruments.guitar'),
+    bass: t('instruments.bass')
+  }), [t])
 
   const {
     handleNoteClick,
@@ -736,7 +740,7 @@ function Classroom() {
   // Join classroom
   const handleJoinClassroom = async (classroomId: string) => {
     if (!user) {
-      setError('Please log in to join a classroom')
+      setError(t('classroom.loginRequired'))
       return
     }
     try {
@@ -806,11 +810,11 @@ function Classroom() {
   const handleCreateClassroom = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!newTitle.trim()) {
-      setError('Please enter a title')
+      setError(t('classroom.enterTitle'))
       return
     }
     if (!user) {
-      setError('You must be logged in to create a classroom')
+      setError(t('classroom.loginRequired'))
       return
     }
     try {
@@ -836,7 +840,7 @@ function Classroom() {
       setIsModalOpen(false)
       fetchClassrooms()
     } catch (err) {
-      setError('An error occurred while creating the classroom')
+      setError(t('errors.generic'))
       console.error('Error creating classroom:', err)
     } finally {
       setCreating(false)
@@ -847,11 +851,11 @@ function Classroom() {
   const handleJoinByCode = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!joinCode.trim()) {
-      setJoinError('Please enter a class code')
+      setJoinError(t('classroom.enterClassCode'))
       return
     }
     if (!user) {
-      setJoinError('You must be logged in to join a classroom')
+      setJoinError(t('classroom.loginRequired'))
       return
     }
     try {
@@ -866,7 +870,7 @@ function Classroom() {
         .single()
 
       if (findError || !classroom) {
-        setJoinError('Invalid class code. Please check and try again.')
+        setJoinError(t('classroom.invalidCode'))
         return
       }
 
@@ -879,7 +883,7 @@ function Classroom() {
         .single()
 
       if (existingMembership) {
-        setJoinError('You are already a member of this class')
+        setJoinError(t('classroom.alreadyMember'))
         return
       }
 
@@ -897,7 +901,7 @@ function Classroom() {
       setIsJoinModalOpen(false)
       fetchClassrooms()
     } catch (err) {
-      setJoinError('An error occurred while joining the classroom')
+      setJoinError(t('errors.generic'))
       console.error('Error joining classroom:', err)
     } finally {
       setIsJoining(false)
@@ -1305,11 +1309,11 @@ function Classroom() {
   // Save assignment
   const handleSaveAssignment = async () => {
     if (!assignmentTitle.trim()) {
-      setAssignmentError('Please enter a title')
+      setAssignmentError(t('classroom.enterTitle'))
       return
     }
     if (!user || !assigningToClassroomId) {
-      setAssignmentError('Invalid session')
+      setAssignmentError(t('classroom.invalidSession'))
       return
     }
 
@@ -1429,7 +1433,7 @@ function Classroom() {
       setViewMode('classroom')
       fetchClassrooms()
     } catch (err) {
-      setAssignmentError('An error occurred while saving')
+      setAssignmentError(t('errors.generic'))
       console.error('Error saving assignment:', err)
     } finally {
       setIsSavingAssignment(false)
@@ -1899,7 +1903,7 @@ function Classroom() {
 
   const handleOpenModal = () => {
     if (!user) {
-      setError('Please log in to create a classroom')
+      setError(t('classroom.loginRequired'))
       return
     }
     setError(null)
@@ -1920,7 +1924,7 @@ function Classroom() {
 
   const handleOpenJoinModal = () => {
     if (!user) {
-      setError('Please log in to join a classroom')
+      setError(t('classroom.loginRequired'))
       return
     }
     setJoinError(null)
@@ -1948,38 +1952,38 @@ function Classroom() {
     <div className={`${styles.modalOverlay} ${isDarkMode ? 'dark' : ''}`} onClick={handleBackdropClick}>
       <div className={`${styles.modal} ${isDarkMode ? 'dark' : ''}`}>
         <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>Create Classroom</h2>
-          <button className={styles.closeButton} onClick={handleCloseModal} aria-label="Close">×</button>
+          <h2 className={styles.modalTitle}>{t('classroom.createClass')}</h2>
+          <button className={styles.closeButton} onClick={handleCloseModal} aria-label={t('common.close')}>×</button>
         </div>
         <form className={styles.form} onSubmit={handleCreateClassroom}>
           {error && <div className={styles.errorMessage}>{error}</div>}
           <div className={styles.formGroup}>
-            <label className={styles.formLabel} htmlFor="classroomTitle">Title</label>
+            <label className={styles.formLabel} htmlFor="classroomTitle">{t('classroom.className')}</label>
             <input
               id="classroomTitle"
               type="text"
               className={styles.formInput}
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Enter classroom title"
+              placeholder={t('classroom.enterClassName')}
               autoFocus
               disabled={creating}
             />
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.formLabel} htmlFor="classroomDescription">Description</label>
+            <label className={styles.formLabel} htmlFor="classroomDescription">{t('classroom.classDescription')}</label>
             <textarea
               id="classroomDescription"
               className={styles.formTextarea}
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
-              placeholder="Describe what this class is about (optional)"
+              placeholder={t('classroom.enterDescription')}
               disabled={creating}
               rows={3}
             />
           </div>
           <div className={styles.formGroup}>
-            <label className={styles.formLabel}>Visibility</label>
+            <label className={styles.formLabel}>{t('classroom.visibility')}</label>
             <div className={styles.visibilityOptions}>
               <label className={styles.checkboxLabel}>
                 <input
@@ -1989,7 +1993,7 @@ function Classroom() {
                   onChange={() => setIsPublic(true)}
                   disabled={creating}
                 />
-                <span className={styles.checkboxText}>Public - Anyone can see and join this class</span>
+                <span className={styles.checkboxText}>{t('classroom.publicDescription')}</span>
               </label>
               <label className={styles.checkboxLabel}>
                 <input
@@ -1999,12 +2003,12 @@ function Classroom() {
                   onChange={() => setIsPublic(false)}
                   disabled={creating}
                 />
-                <span className={styles.checkboxText}>Private - Only users with the class code can join</span>
+                <span className={styles.checkboxText}>{t('classroom.privateDescription')}</span>
               </label>
             </div>
           </div>
           <button type="submit" className={styles.submitButton} disabled={creating || !newTitle.trim()}>
-            {creating ? 'Creating...' : 'Create Classroom'}
+            {creating ? t('classroom.creating') : t('classroom.createClass')}
           </button>
         </form>
       </div>
@@ -2017,27 +2021,27 @@ function Classroom() {
     <div className={`${styles.modalOverlay} ${isDarkMode ? 'dark' : ''}`} onClick={handleJoinBackdropClick}>
       <div className={`${styles.modal} ${isDarkMode ? 'dark' : ''}`}>
         <div className={styles.modalHeader}>
-          <h2 className={styles.modalTitle}>Join Classroom</h2>
-          <button className={styles.closeButton} onClick={handleCloseJoinModal} aria-label="Close">×</button>
+          <h2 className={styles.modalTitle}>{t('classroom.joinClass')}</h2>
+          <button className={styles.closeButton} onClick={handleCloseJoinModal} aria-label={t('common.close')}>×</button>
         </div>
         <form className={styles.form} onSubmit={handleJoinByCode}>
           {joinError && <div className={styles.errorMessage}>{joinError}</div>}
           <div className={styles.formGroup}>
-            <label className={styles.formLabel} htmlFor="joinCode">Class Code</label>
+            <label className={styles.formLabel} htmlFor="joinCode">{t('classroom.classCode')}</label>
             <input
               id="joinCode"
               type="text"
               className={`${styles.formInput} ${styles.codeInput}`}
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-              placeholder="XXXXXX"
+              placeholder={t('classroom.enterCode')}
               autoFocus
               disabled={isJoining}
               maxLength={6}
             />
           </div>
           <button type="submit" className={styles.submitButton} disabled={isJoining || !joinCode.trim()}>
-            {isJoining ? 'Joining...' : 'Join Classroom'}
+            {isJoining ? t('classroom.joining') : t('classroom.joinClass')}
           </button>
         </form>
       </div>
@@ -2050,36 +2054,36 @@ function Classroom() {
     <div className={practiceStyles.modalOverlay} onClick={(e) => e.target === e.currentTarget && handleCloseAssignModal()}>
       <div className={practiceStyles.assignModal}>
         <div className={practiceStyles.assignModalHeader}>
-          <h2 className={practiceStyles.assignModalTitle}>Create Assignment</h2>
-          <button className={practiceStyles.assignModalClose} onClick={handleCloseAssignModal} aria-label="Close">×</button>
+          <h2 className={practiceStyles.assignModalTitle}>{t('sandbox.createAssignment')}</h2>
+          <button className={practiceStyles.assignModalClose} onClick={handleCloseAssignModal} aria-label={t('common.close')}>×</button>
         </div>
         <div className={practiceStyles.assignModalContent}>
           {assignmentError && <div className={practiceStyles.assignModalError}>{assignmentError}</div>}
           <div className={practiceStyles.assignModalField}>
-            <label className={practiceStyles.assignModalLabel} htmlFor="assignmentTitle">Assignment Title</label>
+            <label className={practiceStyles.assignModalLabel} htmlFor="assignmentTitle">{t('sandbox.assignmentTitle')}</label>
             <input
               id="assignmentTitle"
               type="text"
               className={practiceStyles.assignModalInput}
               value={assignmentTitle}
               onChange={(e) => setAssignmentTitle(e.target.value)}
-              placeholder="Enter assignment title"
+              placeholder={t('sandbox.enterAssignmentTitle')}
               autoFocus
               disabled={isSavingAssignment}
             />
           </div>
           <div className={practiceStyles.assignModalInfo}>
-            <p><strong>Instrument:</strong> {instrumentNames[instrument]}</p>
-            <p><strong>BPM:</strong> {bpm}</p>
-            <p><strong>Beats:</strong> {numberOfBeats}</p>
-            <p><strong>Type:</strong> {scaleChordManagement.appliedChords.length > 0 ? 'Chords' : 'Melodies'}</p>
+            <p><strong>{t('sandbox.instrument')}:</strong> {instrumentNames[instrument]}</p>
+            <p><strong>{t('sandbox.bpm')}:</strong> {bpm}</p>
+            <p><strong>{t('sandbox.beats')}:</strong> {numberOfBeats}</p>
+            <p><strong>{t('sandbox.type')}:</strong> {scaleChordManagement.appliedChords.length > 0 ? t('sandbox.chords') : t('sandbox.melodies')}</p>
           </div>
           <button
             className={practiceStyles.assignModalSubmit}
             onClick={handleSaveAssignment}
             disabled={isSavingAssignment || !assignmentTitle.trim()}
           >
-            {isSavingAssignment ? 'Saving...' : 'Create Assignment'}
+            {isSavingAssignment ? t('sandbox.saving') : t('sandbox.createAssignment')}
           </button>
         </div>
       </div>
@@ -2090,7 +2094,7 @@ function Classroom() {
   // ========== RENDER: Taking Lesson Mode ==========
   if (viewMode === 'taking-lesson' && currentAssignment) {
     // Generic welcome message for the lesson
-    const genericWelcomeMessage = !genericWelcomeDone ? `Welcome to this lesson on ${currentAssignment.title}` : ''
+    const genericWelcomeMessage = !genericWelcomeDone ? t('sandbox.welcomeToLesson', { instrument: currentAssignment.title }) : ''
 
     // Get custom transcript from current exercise (only show after generic welcome)
     const currentExerciseForTranscript = lessonExercises[lessonExerciseIndex]
@@ -2121,16 +2125,16 @@ function Classroom() {
           <button
             className={practiceStyles.doneButton}
             onClick={lessonExerciseIndex < lessonExercises.length - 1 ? () => handleSwitchLessonExercise(lessonExerciseIndex + 1) : handleEndLesson}
-            aria-label={lessonExerciseIndex < lessonExercises.length - 1 ? "Next exercise" : "Done with lesson"}
+            aria-label={lessonExerciseIndex < lessonExercises.length - 1 ? t('classroom.lesson.nextExercise') : t('sandbox.done')}
           >
-            {lessonExerciseIndex < lessonExercises.length - 1 ? 'Next' : 'Done'}
+            {lessonExerciseIndex < lessonExercises.length - 1 ? t('common.next') : t('sandbox.done')}
           </button>
         </div>
 
         {/* Timeline for multi-exercise lessons (read-only progress indicator) */}
         {hasMultipleExercises && (
           <div className={practiceStyles.exerciseTimelineBar}>
-            <span className={practiceStyles.exerciseTimelineLabel}>Timeline</span>
+            <span className={practiceStyles.exerciseTimelineLabel}>{t('classroom.timeline')}</span>
             <div className={`${practiceStyles.exerciseTimeline} ${practiceStyles.exerciseTimelineLesson}`}>
               <div className={practiceStyles.exerciseTimelineLine} />
               <div className={practiceStyles.exerciseCircles}>
@@ -2276,7 +2280,7 @@ function Classroom() {
               value={assigningToClassroomId || ''}
               onChange={(e) => setAssigningToClassroomId(e.target.value || null)}
             >
-              <option value="">Select Classroom</option>
+              <option value="">{t('classroom.selectClassroom')}</option>
               {userClassrooms.map((classroom) => (
                 <option key={classroom.id} value={classroom.id}>
                   {classroom.title}
@@ -2289,9 +2293,9 @@ function Classroom() {
               onChange={(e) => handleInstrumentChange(e.target.value as 'keyboard' | 'guitar' | 'bass')}
               style={{ color: instrument === 'keyboard' ? '#3b82f6' : instrument === 'guitar' ? '#22c55e' : '#ef4444' }}
             >
-              <option value="keyboard">Keyboard</option>
-              <option value="guitar">Guitar</option>
-              <option value="bass">Bass</option>
+              <option value="keyboard">{t('instruments.keyboard')}</option>
+              <option value="guitar">{t('instruments.guitar')}</option>
+              <option value="bass">{t('instruments.bass')}</option>
             </select>
             <input
               type="text"
@@ -2299,7 +2303,7 @@ function Classroom() {
               style={{ flex: 1 }}
               value={assignmentTitle}
               onChange={(e) => setAssignmentTitle(e.target.value)}
-              placeholder="Assignment title"
+              placeholder={t('sandbox.assignmentTitle')}
             />
             <button
               className={practiceStyles.assignmentAssignButton}
@@ -2307,12 +2311,12 @@ function Classroom() {
               disabled={!assigningToClassroomId || !assignmentTitle.trim() || !allExercisesHaveContent || isSavingAssignment}
               style={{ opacity: (assigningToClassroomId && assignmentTitle.trim() && allExercisesHaveContent) ? 1 : 0.5 }}
             >
-              {isSavingAssignment ? 'Saving...' : 'Assign'}
+              {isSavingAssignment ? t('sandbox.saving') : t('classroom.assign')}
             </button>
           </div>
           {/* Row 2: Timeline */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
-            <span className={practiceStyles.exerciseTimelineLabel} style={{ minWidth: '70px' }}>Timeline</span>
+            <span className={practiceStyles.exerciseTimelineLabel} style={{ minWidth: '70px' }}>{t('classroom.timeline')}</span>
             <div className={practiceStyles.exerciseTimeline}>
               <div className={practiceStyles.exerciseTimelineLine} />
               <div className={practiceStyles.exerciseCircles}>
@@ -2371,7 +2375,7 @@ function Classroom() {
           {/* Row 3: Transcript */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
             <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--primary-purple)', whiteSpace: 'nowrap', minWidth: '70px' }}>
-              Transcript
+              {t('classroom.transcript')}
             </label>
             <input
               type="text"
@@ -2379,7 +2383,7 @@ function Classroom() {
               style={{ flex: 1 }}
               value={currentExerciseTranscript}
               onChange={(e) => setCurrentExerciseTranscript(e.target.value)}
-              placeholder="e.g. try out this C Major scale exercise"
+              placeholder={t('classroom.transcriptPlaceholder')}
             />
           </div>
         </div>
@@ -2461,24 +2465,24 @@ function Classroom() {
             {isEditingClassroom ? (
               <>
                 <div className={styles.editFormGroup}>
-                  <label className={styles.editLabel}>Class Name</label>
+                  <label className={styles.editLabel}>{t('classroom.className')}</label>
                   <input
                     type="text"
                     className={styles.editInput}
                     value={editTitle}
                     onChange={(e) => setEditTitle(e.target.value)}
-                    placeholder="Enter class name"
+                    placeholder={t('classroom.enterClassName')}
                     autoFocus
                     disabled={isSavingEdit}
                   />
                 </div>
                 <div className={styles.editFormGroup}>
-                  <label className={styles.editLabel}>Description</label>
+                  <label className={styles.editLabel}>{t('classroom.classDescription')}</label>
                   <textarea
                     className={styles.editTextarea}
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
-                    placeholder="Describe what this class is about (optional)"
+                    placeholder={t('classroom.enterDescription')}
                     disabled={isSavingEdit}
                     rows={3}
                   />
@@ -2489,14 +2493,14 @@ function Classroom() {
                     onClick={handleCancelEditClassroom}
                     disabled={isSavingEdit}
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button
                     className={styles.editSaveButton}
                     onClick={handleSaveClassroom}
                     disabled={isSavingEdit || !editTitle.trim()}
                   >
-                    {isSavingEdit ? 'Saving...' : 'Save'}
+                    {isSavingEdit ? t('sandbox.saving') : t('common.save')}
                   </button>
                 </div>
               </>
@@ -2523,7 +2527,7 @@ function Classroom() {
                     </div>
                   )}
                 </div>
-                <p className={styles.fullPageAuthor}>by {selectedClassroom.profiles?.username ?? 'Unknown'}</p>
+                <p className={styles.fullPageAuthor}>{t('classroom.by')} {selectedClassroom.profiles?.username ?? t('classroom.unknown')}</p>
                 {selectedClassroom.description && (
                   <p className={styles.fullPageDescription}>{selectedClassroom.description}</p>
                 )}
@@ -2542,13 +2546,13 @@ function Classroom() {
                     </div>
                   ) : null
                 })()}
-                <p className={styles.fullPageMeta}>Created {formatDate(selectedClassroom.created_at)}</p>
+                <p className={styles.fullPageMeta}>{t('classroom.created')} {formatDate(selectedClassroom.created_at)}</p>
               </>
             )}
 
             {!isEditingClassroom && isOwner && !selectedClassroom.is_public && selectedClassroom.join_code && (
               <div className={styles.joinCodeDisplay}>
-                <span className={styles.joinCodeLabel}>Class Code:</span>
+                <span className={styles.joinCodeLabel}>{t('classroom.classCode')}:</span>
                 <span className={styles.joinCodeValue}>{selectedClassroom.join_code}</span>
                 <button
                   className={`${styles.copyCodeButton} ${codeCopied ? styles.copied : ''}`}
@@ -2580,7 +2584,7 @@ function Classroom() {
                 disabled={joiningClassId === selectedClassroom.id}
                 style={{ marginTop: '1rem', width: 'auto' }}
               >
-                {joiningClassId === selectedClassroom.id ? 'Loading...' : joined ? 'Leave Class' : 'Join Class'}
+                {joiningClassId === selectedClassroom.id ? t('common.loading') : joined ? t('classroom.leaveClass') : t('classroom.joinClass')}
               </button>
             )}
           </div>
@@ -2588,11 +2592,11 @@ function Classroom() {
           <div className={styles.fullPageContent}>
             <div className={styles.fullPageColumn}>
               <div className={styles.fullPageSectionHeader}>
-                <h2 className={styles.fullPageSectionTitle}>Students</h2>
+                <h2 className={styles.fullPageSectionTitle}>{t('classroom.students')}</h2>
                 <span className={styles.fullPageCount}>{studentCount}</span>
               </div>
               {studentCount === 0 ? (
-                <p className={styles.fullPageEmpty}>No students enrolled yet</p>
+                <p className={styles.fullPageEmpty}>{t('classroom.noStudents')}</p>
               ) : (
                 <div className={styles.fullPageStudentsList}>
                   {selectedClassroom.classroom_students.map((student) => (
@@ -2600,7 +2604,7 @@ function Classroom() {
                       <div className={styles.studentAvatar}>
                         {(student.profiles?.username ?? 'U')[0].toUpperCase()}
                       </div>
-                      <span className={styles.studentName}>{student.profiles?.username ?? 'Unknown'}</span>
+                      <span className={styles.studentName}>{student.profiles?.username ?? t('classroom.unknown')}</span>
                       {isOwner && (
                         <button
                           className={styles.removeStudentButton}
@@ -2619,18 +2623,18 @@ function Classroom() {
 
             <div className={styles.fullPageColumn}>
               <div className={styles.fullPageSectionHeader}>
-                <h2 className={styles.fullPageSectionTitle}>Assignments</h2>
+                <h2 className={styles.fullPageSectionTitle}>{t('classroom.assignments')}</h2>
                 {isOwner && (
                   <button
                     className={styles.addAssignmentButtonLarge}
                     onClick={() => handleCreateAssignment(selectedClassroom.id)}
                   >
-                    + Add Assignment
+                    + {t('classroom.addAssignment')}
                   </button>
                 )}
               </div>
               {assignments.length === 0 ? (
-                <p className={styles.fullPageEmpty}>No assignments yet</p>
+                <p className={styles.fullPageEmpty}>{t('classroom.noAssignments')}</p>
               ) : (
                 <div className={styles.fullPageAssignmentsList}>
                   {assignments.map((assignment) => (
@@ -2651,7 +2655,7 @@ function Classroom() {
                             className={styles.startAssignmentButtonLarge}
                             onClick={() => handleStartAssignment(assignment)}
                           >
-                            Start
+                            {t('classroom.assignment.start')}
                           </button>
                         )}
                         {isOwner && (
@@ -2710,16 +2714,16 @@ function Classroom() {
         <div className={styles.classTitleRow}>
           <h3 className={styles.classTitle}>{classroom.title}</h3>
           <div className={styles.tagGroup}>
-            {showOwnershipBadge && isOwner && <span className={styles.ownerTag}>Owner</span>}
-            {showOwnershipBadge && !isOwner && isJoined && <span className={styles.studentTag}>Student</span>}
+            {showOwnershipBadge && isOwner && <span className={styles.ownerTag}>{t('classroom.owner')}</span>}
+            {showOwnershipBadge && !isOwner && isJoined && <span className={styles.studentTag}>{t('classroom.student')}</span>}
             {isPrivate ? (
-              <span className={styles.privateTag}>Private</span>
+              <span className={styles.privateTag}>{t('classroom.private')}</span>
             ) : (
-              <span className={styles.publicTag}>Public</span>
+              <span className={styles.publicTag}>{t('classroom.public')}</span>
             )}
           </div>
         </div>
-        <p className={styles.classAuthor}>by {classroom.profiles?.username ?? 'Unknown'}</p>
+        <p className={styles.classAuthor}>{t('classroom.by')} {classroom.profiles?.username ?? t('classroom.unknown')}</p>
         {classroom.description && (
           <p className={styles.classDescription}>{classroom.description}</p>
         )}
@@ -2742,40 +2746,40 @@ function Classroom() {
   return (
     <div className={styles.classroomContainer}>
       <section className={styles.headerSection}>
-        <h1 className={styles.pageTitle}>Classroom</h1>
-        <p className={styles.pageSubtitle}>Structured lessons and courses for learning music theory</p>
+        <h1 className={styles.pageTitle}>{t('classroom.title')}</h1>
+        <p className={styles.pageSubtitle}>{t('classroom.subtitle')}</p>
       </section>
 
       {/* My Classes Section */}
       {user && (
         <section className={styles.classesSection}>
           <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>My Classes</h2>
+            <h2 className={styles.sectionTitle}>{t('classroom.myClasses')}</h2>
             <div className={styles.sectionButtons}>
               <button
                 className={styles.joinClassButton}
                 onClick={handleOpenJoinModal}
-                aria-label="Join a classroom"
-                title="Join a classroom with code"
+                aria-label={t('classroom.joinClass')}
+                title={t('classroom.joinClass')}
               >
-                Join
+                {t('classroom.join')}
               </button>
               <button
                 className={styles.createButton}
                 onClick={handleOpenModal}
-                aria-label="Create new classroom"
-                title="Create new classroom"
+                aria-label={t('classroom.createClass')}
+                title={t('classroom.createClass')}
               >
-                Create
+                {t('classroom.create')}
               </button>
             </div>
           </div>
 
           {loading ? (
-            <div className={styles.loadingState}>Loading classrooms...</div>
+            <div className={styles.loadingState}>{t('classroom.loadingClasses')}</div>
           ) : myClasses.length === 0 ? (
             <div className={styles.emptyState}>
-              <p className={styles.emptyStateText}>You haven't created or joined any classes yet.</p>
+              <p className={styles.emptyStateText}>{t('classroom.noClassesJoined')}</p>
             </div>
           ) : (
             <div className={styles.classesGrid}>
@@ -2788,24 +2792,24 @@ function Classroom() {
       {/* Available Classes Section */}
       <section className={styles.classesSection}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>Available Classes</h2>
+          <h2 className={styles.sectionTitle}>{t('classroom.availableClasses')}</h2>
           {!user && (
             <div className={styles.sectionButtons}>
               <button
                 className={styles.joinClassButton}
                 onClick={handleOpenJoinModal}
-                aria-label="Join a classroom"
-                title="Log in to join a classroom"
+                aria-label={t('classroom.joinClass')}
+                title={t('classroom.loginToJoin')}
               >
-                Join
+                {t('classroom.join')}
               </button>
               <button
                 className={styles.createButton}
                 onClick={handleOpenModal}
-                aria-label="Create new classroom"
-                title="Log in to create a classroom"
+                aria-label={t('classroom.createClass')}
+                title={t('classroom.loginToCreate')}
               >
-                Create
+                {t('classroom.create')}
               </button>
             </div>
           )}
@@ -2819,7 +2823,7 @@ function Classroom() {
           <input
             type="text"
             className={styles.searchInput}
-            placeholder="Search classes..."
+            placeholder={t('classroom.searchClasses')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -2841,13 +2845,13 @@ function Classroom() {
           )
 
           if (loading) {
-            return <div className={styles.loadingState}>Loading classrooms...</div>
+            return <div className={styles.loadingState}>{t('classroom.loadingClasses')}</div>
           }
           if (availableClasses.length === 0) {
             return (
               <div className={styles.emptyState}>
                 <p className={styles.emptyStateText}>
-                  {user ? 'No more public classes available.' : 'No public classes yet. Be the first to create one!'}
+                  {user ? t('classroom.noMoreClasses') : t('classroom.noPublicClasses')}
                 </p>
               </div>
             )
@@ -2855,7 +2859,7 @@ function Classroom() {
           if (filteredClasses.length === 0) {
             return (
               <div className={styles.emptyState}>
-                <p className={styles.emptyStateText}>No classes found matching "{searchQuery}"</p>
+                <p className={styles.emptyStateText}>{t('classroom.noClassesFound', { query: searchQuery })}</p>
               </div>
             )
           }

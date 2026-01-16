@@ -1,10 +1,12 @@
 import React from 'react'
+import { useTranslation } from '../../contexts/TranslationContext'
 
 interface NotFoundProps {
   onNavigateToHome: () => void
 }
 
 const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
+  const { t } = useTranslation()
   return (
     <div style={{
       display: 'flex',
@@ -47,7 +49,7 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
-          Page Not Found
+          {t('notFound.title')}
         </h1>
 
         <p style={{
@@ -56,7 +58,7 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
           color: '#a0aec0',
           lineHeight: '1.6'
         }}>
-          Looks like this page hit a wrong note! The page you're looking for doesn't exist or has been moved.
+          {t('notFound.message')}
         </p>
 
         <div style={{
@@ -89,7 +91,7 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(107, 70, 193, 0.3)'
             }}
           >
-            Go Home
+            {t('notFound.goHome')}
           </button>
         </div>
 
@@ -105,7 +107,7 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
             color: '#a0aec0',
             margin: 0
           }}>
-            💡 <strong>Tip:</strong> Use the navigation menu above to explore our pages!
+            <strong>{t('notFound.tip')}:</strong> {t('notFound.tipMessage')}
           </p>
         </div>
       </div>

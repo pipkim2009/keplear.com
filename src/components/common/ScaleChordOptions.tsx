@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { IoMusicalNotes } from 'react-icons/io5'
 import { PiTrashFill } from 'react-icons/pi'
+import { useTranslation } from '../../contexts/TranslationContext'
 import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, applyScaleToGuitar, applyScaleBoxToGuitar, type GuitarScale, type ScaleBox } from '../../utils/instruments/guitar/guitarScales'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
 import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, applyScaleToBass, applyScaleBoxToBass, type BassScale, type BassScaleBox } from '../../utils/instruments/bass/bassScales'
@@ -109,6 +110,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   availableKeyboardNotes = [],
   lessonType
 }) => {
+  const { t } = useTranslation()
   const [isExpanded, setIsExpanded] = useState(false)
   const [isScaleMode, setIsScaleMode] = useState(true) // true for scales, false for chords
   const containerRef = useRef<HTMLDivElement>(null)
@@ -521,10 +523,10 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
       <button
         className={`scale-options-toggle instrument-${instrument} ${lessonType === 'melodies' ? 'type-scales' : lessonType === 'chords' ? 'type-chords' : 'type-both'}`}
         onClick={toggleExpanded}
-        title={isExpanded ? `Close ${lessonType === 'melodies' ? 'Scales' : lessonType === 'chords' ? 'Chords' : 'Scales/Chords'}` : `Open ${lessonType === 'melodies' ? 'Scales' : lessonType === 'chords' ? 'Chords' : 'Scales/Chords'}`}
+        title={isExpanded ? `Close ${lessonType === 'melodies' ? t('sandbox.scales') : lessonType === 'chords' ? t('sandbox.chords') : t('sandbox.scaleChordsToggle')}` : `Open ${lessonType === 'melodies' ? t('sandbox.scales') : lessonType === 'chords' ? t('sandbox.chords') : t('sandbox.scaleChordsToggle')}`}
       >
         <IoMusicalNotes size={16} />
-        {lessonType === 'melodies' ? 'Scales' : lessonType === 'chords' ? 'Chords' : 'Scales/Chords'}
+        {lessonType === 'melodies' ? t('sandbox.scales') : lessonType === 'chords' ? t('sandbox.chords') : t('sandbox.scaleChordsToggle')}
       </button>
 
       {isExpanded && (
@@ -545,8 +547,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                           onChange={(e) => setIsScaleMode(!e.target.checked)}
                         />
                         <span className="toggle-slider">
-                          <span className="toggle-text left">Scales</span>
-                          <span className="toggle-text right">Chords</span>
+                          <span className="toggle-text left">{t('sandbox.scales')}</span>
+                          <span className="toggle-text right">{t('sandbox.chords')}</span>
                         </span>
                       </label>
                     </div>
@@ -556,7 +558,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                 {/* Applied Scales List - show when scales only OR when in scale mode with both */}
                 {appliedScales.length > 0 && (appliedChords.length === 0 || isScaleMode) && (
                   <div className="control-section scale-theme">
-                    <label className="control-label scale-label">Applied Scales</label>
+                    <label className="control-label scale-label">{t('sandbox.appliedScales')}</label>
                     <div className="applied-scales-list">
                       {appliedScales.map((appliedScale) => (
                         <div key={appliedScale.id} className="applied-scale-item">
@@ -579,7 +581,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                 {/* Applied Chords List - show when chords only OR when in chord mode with both */}
                 {appliedChords.length > 0 && (appliedScales.length === 0 || !isScaleMode) && (
                   <div className="control-section chord-theme">
-                    <label className="control-label chord-label">Applied Chords</label>
+                    <label className="control-label chord-label">{t('sandbox.appliedChords')}</label>
                     <div className="applied-chords-list">
                       {appliedChords.map((appliedChord) => (
                         <div key={appliedChord.id} className="applied-chord-item">
@@ -602,7 +604,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                 {/* Show message if nothing applied */}
                 {appliedScales.length === 0 && appliedChords.length === 0 && (
                   <div className="control-section">
-                    <div className="empty-list-message">No scales or chords applied</div>
+                    <div className="empty-list-message">{t('sandbox.noScalesOrChordsApplied')}</div>
                   </div>
                 )}
               </>
@@ -627,7 +629,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
           <div className={`scale-controls ${!isScaleMode ? 'chord-mode' : ''}`}>
             <div className="control-section">
-              <label className="control-label">Root Note</label>
+              <label className="control-label">{t('sandbox.rootNote')}</label>
               <select
                 value={currentRoot}
                 onChange={(e) => {
@@ -648,7 +650,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
             {isScaleMode ? (
               <>
                 <div className="control-section">
-                  <label className="control-label">Scale</label>
+                  <label className="control-label">{t('sandbox.scale')}</label>
                   <select
                     value={instrument === 'guitar' ? selectedScale.name : instrument === 'bass' ? selectedBassScale.name : keyboardSelectedScale.name}
                     onChange={(e) => {
@@ -673,7 +675,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
                 {instrument === 'guitar' && availableBoxes.length > 0 && (
                   <div className="control-section">
-                    <label className="control-label">Position</label>
+                    <label className="control-label">{t('sandbox.position')}</label>
                     <select
                       value={selectedBoxIndex}
                       onChange={(e) => handleBoxChange(parseInt(e.target.value))}
@@ -685,7 +687,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                         </option>
                       ))}
                       <option key="entire" value={availableBoxes.length}>
-                        Entire Fretboard
+                        {t('sandbox.entireFretboard')}
                       </option>
                     </select>
                   </div>
@@ -693,7 +695,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
                 {instrument === 'bass' && availableBassBoxes.length > 0 && (
                   <div className="control-section">
-                    <label className="control-label">Position</label>
+                    <label className="control-label">{t('sandbox.position')}</label>
                     <select
                       value={selectedBoxIndex}
                       onChange={(e) => handleBoxChange(parseInt(e.target.value))}
@@ -705,7 +707,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                         </option>
                       ))}
                       <option key="entire" value={availableBassBoxes.length}>
-                        Entire Fretboard
+                        {t('sandbox.entireFretboard')}
                       </option>
                     </select>
                   </div>
@@ -713,7 +715,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
                 {instrument === 'keyboard' && availableOctaves.length > 0 && (
                   <div className="control-section">
-                    <label className="control-label">Position</label>
+                    <label className="control-label">{t('sandbox.position')}</label>
                     <select
                       value={selectedScaleOctave}
                       onChange={(e) => setSelectedScaleOctave(parseInt(e.target.value))}
@@ -734,13 +736,13 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     className="apply-button"
                     title={`Apply scale to ${instrument}`}
                   >
-                    Apply Scale
+                    {t('sandbox.applyScale')}
                   </button>
                 </div>
 
                 {/* Applied Scales List */}
                 <div className="control-section">
-                  <label className="control-label">Applied Scales</label>
+                  <label className="control-label">{t('sandbox.appliedScales')}</label>
                   <div className="applied-scales-list">
                     {appliedScales.length > 0 ? (
                       appliedScales.map((appliedScale) => (
@@ -756,7 +758,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                         </div>
                       ))
                     ) : (
-                      <div className="empty-list-message">Empty</div>
+                      <div className="empty-list-message">{t('sandbox.empty')}</div>
                     )}
                   </div>
                 </div>
@@ -764,7 +766,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
             ) : (
               <>
                 <div className="control-section">
-                  <label className="control-label">Chord</label>
+                  <label className="control-label">{t('sandbox.chord')}</label>
                   <select
                     value={instrument === 'guitar' ? selectedChord.name : instrument === 'bass' ? selectedBassChord.name : keyboardSelectedChord.name}
                     onChange={(e) => {
@@ -789,7 +791,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
                 {instrument === 'guitar' && availableChordBoxes.length > 0 && (
                   <div className="control-section">
-                    <label className="control-label">Position</label>
+                    <label className="control-label">{t('sandbox.position')}</label>
                     <select
                       value={selectedChordBoxIndex}
                       onChange={(e) => handleChordBoxChange(parseInt(e.target.value))}
@@ -801,7 +803,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                         </option>
                       ))}
                       <option key="entire" value={availableChordBoxes.length}>
-                        Entire Fretboard
+                        {t('sandbox.entireFretboard')}
                       </option>
                     </select>
                   </div>
@@ -809,7 +811,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
                 {instrument === 'bass' && availableBassChordBoxes.length > 0 && (
                   <div className="control-section">
-                    <label className="control-label">Position</label>
+                    <label className="control-label">{t('sandbox.position')}</label>
                     <select
                       value={selectedChordBoxIndex}
                       onChange={(e) => handleChordBoxChange(parseInt(e.target.value))}
@@ -821,7 +823,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                         </option>
                       ))}
                       <option key="entire" value={availableBassChordBoxes.length}>
-                        Entire Fretboard
+                        {t('sandbox.entireFretboard')}
                       </option>
                     </select>
                   </div>
@@ -829,7 +831,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
 
                 {instrument === 'keyboard' && availableOctaves.length > 0 && (
                   <div className="control-section">
-                    <label className="control-label">Position</label>
+                    <label className="control-label">{t('sandbox.position')}</label>
                     <select
                       value={selectedChordOctave}
                       onChange={(e) => setSelectedChordOctave(parseInt(e.target.value))}
@@ -850,13 +852,13 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     className="apply-button"
                     title={`Apply chord to ${instrument}`}
                   >
-                    Apply Chord
+                    {t('sandbox.applyChord')}
                   </button>
                 </div>
 
                 {/* Applied Chords List */}
                 <div className="control-section">
-                  <label className="control-label">Applied Chords</label>
+                  <label className="control-label">{t('sandbox.appliedChords')}</label>
                   <div className="applied-chords-list">
                     {appliedChords.length > 0 ? (
                       appliedChords.map((appliedChord) => (
@@ -872,7 +874,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                         </div>
                       ))
                     ) : (
-                      <div className="empty-list-message">Empty</div>
+                      <div className="empty-list-message">{t('sandbox.empty')}</div>
                     )}
                   </div>
                 </div>

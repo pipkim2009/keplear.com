@@ -5,6 +5,7 @@ import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleB
 import { guitarNotes } from '../../../utils/instruments/guitar/guitarNotes'
 import { KEYBOARD_SCALES, type KeyboardScale } from '../../../utils/instruments/keyboard/keyboardScales'
 import Tooltip from '../../common/Tooltip'
+import { useTranslation } from '../../../contexts/TranslationContext'
 import type { Note } from '../../../utils/notes'
 import type { ChordMode } from '../../../reducers/uiReducer'
 import CustomAudioPlayer from '../../common/CustomAudioPlayer'
@@ -145,6 +146,7 @@ const InstrumentControls = memo(function InstrumentControls({
   performanceState,
   volumeLevel = 0
 }: InstrumentControlsProps) {
+  const { t } = useTranslation()
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [beatsDisplay, setBeatsDisplay] = useState(numberOfBeats.toString())
@@ -539,7 +541,7 @@ const InstrumentControls = memo(function InstrumentControls({
             }}
           >
             <div className="instrument-icon"><PiPianoKeysFill /></div>
-            <div className="instrument-name">Keyboard</div>
+            <div className="instrument-name">{t('sandbox.keyboard')}</div>
             <div className="instrument-glow"></div>
           </div>
           <div
@@ -558,7 +560,7 @@ const InstrumentControls = memo(function InstrumentControls({
             }}
           >
             <div className="instrument-icon"><GiGuitarHead /></div>
-            <div className="instrument-name">Guitar</div>
+            <div className="instrument-name">{t('sandbox.guitar')}</div>
             <div className="instrument-glow"></div>
           </div>
           <div
@@ -577,7 +579,7 @@ const InstrumentControls = memo(function InstrumentControls({
             }}
           >
             <div className="instrument-icon"><GiGuitarBassHead /></div>
-            <div className="instrument-name">Bass</div>
+            <div className="instrument-name">{t('sandbox.bass')}</div>
             <div className="instrument-glow"></div>
           </div>
         </div>
@@ -595,9 +597,9 @@ const InstrumentControls = memo(function InstrumentControls({
                 {instrument === 'bass' && <GiGuitarBassHead />}
               </div>
               <div className="instrument-name">
-                {instrument === 'keyboard' && 'Keyboard'}
-                {instrument === 'guitar' && 'Guitar'}
-                {instrument === 'bass' && 'Bass'}
+                {instrument === 'keyboard' && t('sandbox.keyboard')}
+                {instrument === 'guitar' && t('sandbox.guitar')}
+                {instrument === 'bass' && t('sandbox.bass')}
               </div>
               <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}><IoMdArrowDropdown /></div>
             </div>
@@ -622,7 +624,7 @@ const InstrumentControls = memo(function InstrumentControls({
                     }}
                   >
                     <div className="instrument-icon"><PiPianoKeysFill /></div>
-                    <div className="instrument-name">Keyboard</div>
+                    <div className="instrument-name">{t('sandbox.keyboard')}</div>
                   </div>
                 )}
                 {instrument !== 'guitar' && (
@@ -644,7 +646,7 @@ const InstrumentControls = memo(function InstrumentControls({
                     }}
                   >
                     <div className="instrument-icon"><GiGuitarHead /></div>
-                    <div className="instrument-name">Guitar</div>
+                    <div className="instrument-name">{t('sandbox.guitar')}</div>
                   </div>
                 )}
                 {instrument !== 'bass' && (
@@ -666,7 +668,7 @@ const InstrumentControls = memo(function InstrumentControls({
                     }}
                   >
                     <div className="instrument-icon"><GiGuitarBassHead /></div>
-                    <div className="instrument-name">Bass</div>
+                    <div className="instrument-name">{t('sandbox.bass')}</div>
                   </div>
                 )}
               </div>
@@ -680,8 +682,8 @@ const InstrumentControls = memo(function InstrumentControls({
       {!hideOctaveRange && instrument === 'keyboard' && (
         <div className="control-group octave-range-control">
           <div className="label-with-tooltip">
-            <label className="control-label">Octave Range</label>
-            <Tooltip title="Octave Range" text="Select which octaves are visible in the keyboard interface">
+            <label className="control-label">{t('sandbox.octaveRange')}</label>
+            <Tooltip title={t('sandbox.octaveRange')} text={t('sandbox.octaveRangeTooltip')}>
               <div className="tooltip-icon">?</div>
             </Tooltip>
           </div>
@@ -797,8 +799,8 @@ const InstrumentControls = memo(function InstrumentControls({
         <div className="controls-container">
           <div className="modern-control-item">
             <div className="label-with-tooltip">
-              <label className="control-label">BPM</label>
-              <Tooltip title="BPM" text="Specify the speed of the melody (BEATS PER MINUTE)">
+              <label className="control-label">{t('sandbox.bpm')}</label>
+              <Tooltip title={t('sandbox.bpm')} text={t('sandbox.bpmTooltip')}>
                 <div className="tooltip-icon">?</div>
               </Tooltip>
             </div>
@@ -848,8 +850,8 @@ const InstrumentControls = memo(function InstrumentControls({
 
           <div className="modern-control-item">
             <div className="label-with-tooltip">
-              <label className="control-label">Beats</label>
-              <Tooltip title="Beats" text="Specify the number of beats within the melody">
+              <label className="control-label">{t('sandbox.beats')}</label>
+              <Tooltip title={t('sandbox.beats')} text={t('sandbox.beatsTooltip')}>
                 <div className="tooltip-icon">?</div>
               </Tooltip>
             </div>
@@ -901,12 +903,10 @@ const InstrumentControls = memo(function InstrumentControls({
           {setChordMode && !hideChordMode && (
             <div className="modern-control-item">
               <div className="label-with-tooltip">
-                <label className="control-label">Chord Mode</label>
+                <label className="control-label">{t('sandbox.chordMode')}</label>
                 <Tooltip
-                  title="Chord Mode"
-                  text="Select how chords should be used in the melody.
-Arpeggiator - Use individual chord notes
-Progression - Use entire chords"
+                  title={t('sandbox.chordMode')}
+                  text={t('sandbox.chordModeTooltip')}
                 >
                   <div className="tooltip-icon">?</div>
                 </Tooltip>
@@ -915,7 +915,7 @@ Progression - Use entire chords"
                 {disableChordMode ? (
                   <div className="chord-mode-switch single-option">
                     <span className="switch-option active">
-                      {chordMode === 'arpeggiator' ? 'Arpeggiator' : 'Progression'}
+                      {chordMode === 'arpeggiator' ? t('sandbox.arpeggiator') : t('sandbox.progression')}
                     </span>
                   </div>
                 ) : (
@@ -929,10 +929,10 @@ Progression - Use entire chords"
                           setTimeout(() => setIsChordModeFlashing(false), 500)
                         }
                       }}
-                      title={appliedChordsCount === 0 ? "Apply chords to enable" : "Progression"}
+                      title={appliedChordsCount === 0 ? t('sandbox.applyChord') : t('sandbox.progression')}
                       disabled={appliedChordsCount === 0}
                     >
-                      Progression
+                      {t('sandbox.progression')}
                     </button>
                     <button
                       className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
@@ -943,10 +943,10 @@ Progression - Use entire chords"
                           setTimeout(() => setIsChordModeFlashing(false), 500)
                         }
                       }}
-                      title={appliedChordsCount === 0 ? "Apply chords to enable" : "Arpeggiator"}
+                      title={appliedChordsCount === 0 ? t('sandbox.applyChord') : t('sandbox.arpeggiator')}
                       disabled={appliedChordsCount === 0}
                     >
-                      Arpeggiator
+                      {t('sandbox.arpeggiator')}
                     </button>
                   </div>
                 )}
@@ -972,10 +972,10 @@ Progression - Use entire chords"
               }}
               disabled={!canGenerateMelody}
               className={`modern-generate-button ${hasChanges ? 'has-changes' : ''}`}
-              title="Generate a melody from selected notes"
+              title={t('sandbox.generate')}
               style={{ position: 'relative' }}
             >
-              Generate
+              {t('sandbox.generate')}
               {hasChanges && <span className="change-badge">●</span>}
             </button>
           )}
@@ -989,7 +989,7 @@ Progression - Use entire chords"
               {(isGeneratingMelody || isAutoRecording) ? (
                 <div className="generating-indicator">
                   <div className="generating-spinner"></div>
-                  <span className="generating-text">Generating melody...</span>
+                  <span className="generating-text">{t('sandbox.generatingMelody')}</span>
                 </div>
               ) : (
                 audioFileUrl && (

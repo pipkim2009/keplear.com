@@ -1,5 +1,6 @@
 import React, { Component, type ReactNode } from 'react'
 import { logErrorToService, type ErrorInfo } from '../utils/errorHandler'
+import { getTranslation } from '../contexts/TranslationContext'
 import { IoMusicalNotes } from 'react-icons/io5'
 import styles from './ErrorBoundary.module.css'
 
@@ -97,25 +98,25 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
               <span className={styles.titleIcon}>
                 <IoMusicalNotes />
               </span>
-              Oops! Something went wrong
+              {getTranslation('errorBoundary.title')}
             </h2>
             <p className={styles.message}>
-              We're sorry, but something unexpected happened while making music.
+              {getTranslation('errorBoundary.message')}
             </p>
 
             {this.state.retryAttempts > 0 && (
               <p className={styles.retryInfo}>
-                Retry attempt {this.state.retryAttempts}/{maxRetries}
+                {getTranslation('errorBoundary.retryAttempt', { count: this.state.retryAttempts, max: maxRetries })}
               </p>
             )}
 
             <details className={styles.details}>
               <summary className={styles.detailsSummary}>
-                Error Details (click to expand)
+                {getTranslation('errorBoundary.errorDetails')}
               </summary>
               <div className={styles.detailsContent}>
-                <p><strong>Error ID:</strong> {this.state.errorId}</p>
-                <p><strong>Timestamp:</strong> {new Date().toISOString()}</p>
+                <p><strong>{getTranslation('errorBoundary.errorId')}:</strong> {this.state.errorId}</p>
+                <p><strong>{getTranslation('errorBoundary.timestamp')}:</strong> {new Date().toISOString()}</p>
                 <pre className={styles.errorStack}>
                   {this.state.error?.toString()}
                   {this.state.error?.stack && '\n\n' + this.state.error.stack}
@@ -128,7 +129,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                 onClick={this.handleReload}
                 className={styles.reloadButton}
               >
-                Reload Page
+                {getTranslation('errorBoundary.reloadPage')}
               </button>
             </div>
           </div>

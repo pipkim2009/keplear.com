@@ -19,5 +19,8 @@ export { InstrumentProvider, useInstrument } from './InstrumentContext'
 export { AuthProvider } from './AuthContext'
 export { useAuth } from '../hooks/useAuth'
 
+// Translation context
+export { TranslationProvider, useTranslation } from './TranslationContext'
+
 // Type exports
 export type { InstrumentType } from '../types/instrument'

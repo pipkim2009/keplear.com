@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, memo } from 'react'
 import { createPortal } from 'react-dom'
 import { IoSend, IoChatbubbleEllipses, IoClose, IoSparkles } from 'react-icons/io5'
 import { generateResponse, getWelcomeMessage } from '../../utils/chatAI'
+import { useTranslation } from '../../contexts/TranslationContext'
 import styles from '../../styles/ChatPanel.module.css'
 
 interface Message {
@@ -12,6 +13,7 @@ interface Message {
 }
 
 const ChatPanel = memo(function ChatPanel() {
+  const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -147,12 +149,12 @@ const ChatPanel = memo(function ChatPanel() {
         <div className={styles.chatHeader}>
           <div className={styles.chatHeaderInfo}>
             <IoSparkles className={styles.chatHeaderIcon} />
-            <span className={styles.chatHeaderTitle}>Keplear Assistant</span>
+            <span className={styles.chatHeaderTitle}>{t('chat.assistant')}</span>
           </div>
           <button
             className={styles.closeButton}
             onClick={handleToggle}
-            aria-label="Close chat"
+            aria-label={t('chat.closeChat')}
           >
             <IoClose />
           </button>
@@ -197,7 +199,7 @@ const ChatPanel = memo(function ChatPanel() {
             ref={inputRef}
             type="text"
             className={styles.chatInput}
-            placeholder="Ask me anything..."
+            placeholder={t('chat.askMeAnything')}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -207,7 +209,7 @@ const ChatPanel = memo(function ChatPanel() {
             className={styles.sendButton}
             onClick={() => handleSendMessage()}
             disabled={!inputValue.trim() || isTyping}
-            aria-label="Send message"
+            aria-label={t('chat.sendMessage')}
           >
             <IoSend />
           </button>
@@ -218,7 +220,7 @@ const ChatPanel = memo(function ChatPanel() {
       <button
         className={`${styles.chatButton} ${isOpen ? styles.hidden : ''}`}
         onClick={handleToggle}
-        aria-label="Open chat"
+        aria-label={t('chat.openChat')}
       >
         <IoChatbubbleEllipses />
       </button>

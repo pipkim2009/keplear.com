@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
+import { useTranslation } from '../../contexts/TranslationContext'
 import { validatePassword, containsScriptInjection } from '../../utils/security'
 import logo from '/Keplear-logo.png'
 import styles from './AuthForms.module.css'
@@ -37,6 +38,7 @@ function calculatePasswordStrength(password: string): PasswordStrength {
 }
 
 const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
+  const { t } = useTranslation()
   const [formData, setFormData] = useState<FormData>({
     username: '',
     password: '',
@@ -49,7 +51,9 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [errorKey, setErrorKey] = useState('')
   const [message, setMessage] = useState('')
+  const [messageKey, setMessageKey] = useState('')
   const { signUp, signIn } = useAuth()
 
   // Real-time field validation with security checks
@@ -59,13 +63,13 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
     // Username validation with injection check
     if (formData.username) {
       if (containsScriptInjection(formData.username)) {
-        errors.username = 'Invalid characters detected'
+        errors.username = t('errors.invalidCharacters')
       } else if (formData.username.length < 3) {
-        errors.username = 'Username must be at least 3 characters'
+        errors.username = t('errors.usernameTooShort')
       } else if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
-        errors.username = 'Only letters, numbers, and underscores allowed'
+        errors.username = t('errors.usernameInvalidChars')
       } else if (formData.username.length > 20) {
-        errors.username = 'Username must be 20 characters or less'
+        errors.username = t('errors.usernameTooLong')
       }
     }
 
@@ -79,11 +83,11 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
 
     // Confirm password validation
     if (formData.confirmPassword && formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = 'Passwords do not match'
+      errors.confirmPassword = t('errors.passwordsNoMatch')
     }
 
     return errors
-  }, [formData])
+  }, [formData, t])
 
   // Password strength
   const passwordStrength = useMemo<PasswordStrength>(() => {
@@ -139,19 +143,21 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
 
     // Check for validation errors
     if (Object.keys(fieldErrors).length > 0) {
-      setError('Please fix the errors above')
+      setErrorKey('errors.fixErrorsAbove')
       return
     }
 
     // Check required fields
     if (!formData.username || !formData.password || !formData.confirmPassword) {
-      setError('Please fill in all fields')
+      setErrorKey('errors.fillAllFields')
       return
     }
 
     setLoading(true)
     setError('')
+    setErrorKey('')
     setMessage('')
+    setMessageKey('')
 
     try {
       const { error: signUpError } = await signUp(
@@ -161,28 +167,28 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
       )
 
       if (signUpError) {
-        setError(
-          typeof signUpError === 'object' && signUpError && 'message' in signUpError
-            ? String((signUpError as { message: string }).message)
-            : 'An error occurred'
-        )
+        if (typeof signUpError === 'object' && signUpError && 'message' in signUpError) {
+          setError(String((signUpError as { message: string }).message))
+        } else {
+          setErrorKey('errors.unexpectedError')
+        }
         setLoading(false)
         return
       }
 
       // Auto-login after successful signup
-      setMessage('Account created successfully! Logging you in...')
+      setMessageKey('errors.accountCreatedSuccess')
       const { error: signInError } = await signIn(formData.username, formData.password)
 
       if (signInError) {
-        setError('Account created but login failed. Please sign in manually.')
+        setErrorKey('errors.accountCreatedLoginFailed')
         setLoading(false)
         return
       }
 
       onClose()
     } catch {
-      setError('An unexpected error occurred')
+      setErrorKey('errors.unexpectedError')
       setLoading(false)
     }
   }
@@ -193,9 +199,9 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
       return validation.message
     }
     switch (strength) {
-      case 'weak': return 'Weak - needs uppercase, lowercase, and number'
-      case 'medium': return 'Medium - add a special character for extra security'
-      case 'strong': return 'Strong password'
+      case 'weak': return t('passwordStrength.weak')
+      case 'medium': return t('passwordStrength.medium')
+      case 'strong': return t('passwordStrength.strong')
     }
   }
 
@@ -204,23 +210,23 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
       <div className={styles.authBrand}>
         <img src={logo} alt="Keplear" className={styles.authLogo} />
       </div>
-      <p className={styles.formDescription}>Create your account</p>
+      <p className={styles.formDescription}>{t('auth.createYourAccount')}</p>
 
-      {error && (
+      {(error || errorKey) && (
         <div className={styles.errorMessage} role="alert">
-          {error}
+          {error || t(errorKey)}
         </div>
       )}
 
-      {message && (
+      {(message || messageKey) && (
         <div className={styles.successMessage} role="status">
-          {message}
+          {message || t(messageKey)}
         </div>
       )}
 
       <form onSubmit={handleSubmit} autoComplete="on" noValidate>
         <div className={styles.formGroup}>
-          <label htmlFor="signup-username">Username</label>
+          <label htmlFor="signup-username">{t('auth.username')}</label>
           <input
             id="signup-username"
             name="username"
@@ -228,7 +234,7 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
             value={formData.username}
             onChange={handleChange}
             onBlur={() => handleBlur('username')}
-            placeholder="Username (3-20 characters)"
+            placeholder={t('auth.usernamePlaceholder')}
             disabled={loading}
             autoComplete="username"
             className={getInputClassName('username')}
@@ -242,13 +248,13 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
           )}
           {touched.username && isFieldValid('username') && (
             <div className={styles.fieldSuccess}>
-              ✓ Username available
+              ✓ {t('auth.usernameAvailable')}
             </div>
           )}
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="signup-password">Password</label>
+          <label htmlFor="signup-password">{t('auth.password')}</label>
           <input
             id="signup-password"
             name="password"
@@ -256,7 +262,7 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
             value={formData.password}
             onChange={handleChange}
             onBlur={() => handleBlur('password')}
-            placeholder="Create a password (8+ characters)"
+            placeholder={t('auth.passwordPlaceholder')}
             disabled={loading}
             autoComplete="new-password"
             className={getInputClassName('password')}
@@ -281,7 +287,7 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="signup-confirmPassword">Confirm Password</label>
+          <label htmlFor="signup-confirmPassword">{t('auth.confirmPassword')}</label>
           <input
             id="signup-confirmPassword"
             name="confirmPassword"
@@ -289,7 +295,7 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
             value={formData.confirmPassword}
             onChange={handleChange}
             onBlur={() => handleBlur('confirmPassword')}
-            placeholder="Confirm your password"
+            placeholder={t('auth.confirmPasswordPlaceholder')}
             disabled={loading}
             autoComplete="new-password"
             className={getInputClassName('confirmPassword')}
@@ -303,7 +309,7 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
           )}
           {touched.confirmPassword && isFieldValid('confirmPassword') && (
             <div className={styles.fieldSuccess}>
-              ✓ Passwords match
+              ✓ {t('auth.passwordsMatch')}
             </div>
           )}
         </div>
@@ -313,19 +319,19 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
           className={`${styles.authButton} ${styles.primary} ${styles.createAccount}`}
           disabled={loading}
         >
-          {loading ? 'Creating account...' : 'Create Account'}
+          {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
         </button>
       </form>
 
       <div className={styles.authFooter}>
         <p>
-          Already have an account?{' '}
+          {t('auth.alreadyHaveAccount')}{' '}
           <button
             type="button"
             className={styles.linkButton}
             onClick={() => onToggleForm('login')}
           >
-            Sign in
+            {t('auth.signIn')}
           </button>
         </p>
       </div>

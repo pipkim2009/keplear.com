@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from '../../contexts/TranslationContext'
 import styles from './PageLoader.module.css'
 
 /**
@@ -6,8 +7,9 @@ import styles from './PageLoader.module.css'
  * Displays a subtle loading indicator while page chunks are being loaded
  */
 const PageLoader: React.FC = () => {
+  const { t } = useTranslation()
   return (
-    <div className={styles.loaderContainer} role="status" aria-label="Loading page">
+    <div className={styles.loaderContainer} role="status" aria-label={t('aria.loadingPage')}>
       <div className={styles.loader}>
         <div className={styles.spinnerRing}>
           <div></div>
@@ -15,7 +17,7 @@ const PageLoader: React.FC = () => {
           <div></div>
           <div></div>
         </div>
-        <span className={styles.loadingText}>Loading...</span>
+        <span className={styles.loadingText}>{t('common.loading')}</span>
       </div>
     </div>
   )

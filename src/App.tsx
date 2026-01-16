@@ -1,6 +1,7 @@
 import { useEffect, useCallback, memo } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { InstrumentProvider } from './contexts/InstrumentContext'
+import { TranslationProvider } from './contexts/TranslationContext'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import Router from './components/Router'
@@ -35,9 +36,10 @@ const App = memo(function App() {
 
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <AriaLiveProvider>
-          <InstrumentProvider>
+      <TranslationProvider>
+        <AuthProvider>
+          <AriaLiveProvider>
+            <InstrumentProvider>
             <SkipLink targetId="main-content" />
             <div className={`${styles.appContainer} ${isDarkMode ? styles.dark : styles.light}`}>
               <Header
@@ -76,9 +78,10 @@ const App = memo(function App() {
               <Footer />
               <ChatPanel />
             </div>
-          </InstrumentProvider>
-        </AriaLiveProvider>
-      </AuthProvider>
+            </InstrumentProvider>
+          </AriaLiveProvider>
+        </AuthProvider>
+      </TranslationProvider>
     </ErrorBoundary>
   )
 })

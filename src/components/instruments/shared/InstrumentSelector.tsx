@@ -4,11 +4,12 @@ import type { InstrumentType } from '../../../types/instrument'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import { IoMusicalNotes } from 'react-icons/io5'
+import { useTranslation } from '../../../contexts/TranslationContext'
 
 const INSTRUMENTS = [
-  { value: 'keyboard' as const, label: 'Keyboard', icon: PiPianoKeysFill },
-  { value: 'guitar' as const, label: 'Guitar', icon: GiGuitarHead },
-  { value: 'bass' as const, label: 'Bass', icon: GiGuitarBassHead }
+  { value: 'keyboard' as const, labelKey: 'sandbox.keyboard', icon: PiPianoKeysFill },
+  { value: 'guitar' as const, labelKey: 'sandbox.guitar', icon: GiGuitarHead },
+  { value: 'bass' as const, labelKey: 'sandbox.bass', icon: GiGuitarBassHead }
 ] as const
 
 /**
@@ -17,6 +18,7 @@ const INSTRUMENTS = [
  * Optimized with memo, useMemo, and focused context hook
  */
 const InstrumentSelector = memo(function InstrumentSelector() {
+  const { t } = useTranslation()
   // Use focused instrument type hook instead of full context
   const { instrument, handleInstrumentChange } = useInstrumentType()
 
@@ -33,7 +35,7 @@ const InstrumentSelector = memo(function InstrumentSelector() {
 
   return (
     <div className="instrument-selector">
-      <h3><IoMusicalNotes /> Choose Your Instrument</h3>
+      <h3><IoMusicalNotes /> {t('sandbox.chooseInstrument')}</h3>
       <div className="instrument-options">
         {INSTRUMENTS.map((inst) => {
           const Icon = inst.icon
@@ -44,7 +46,7 @@ const InstrumentSelector = memo(function InstrumentSelector() {
               onClick={handlers[inst.value]}
             >
               <span className="instrument-emoji"><Icon /></span>
-              <span className="instrument-name">{inst.label}</span>
+              <span className="instrument-name">{t(inst.labelKey)}</span>
             </button>
           )
         })}
