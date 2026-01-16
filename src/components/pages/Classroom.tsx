@@ -1202,7 +1202,7 @@ function Classroom() {
             }
           }
         }
-      }, 100)
+      }, 0)
     }
 
     setCurrentExerciseIndex(index)
@@ -1529,7 +1529,7 @@ function Classroom() {
               if (noteObj) selectNote(noteObj, 'multi')
             })
           }
-        }, 100)
+        }, 0)
       } else {
         // Guitar/Bass - use pending selection data pattern
         setPendingSelectionData({
@@ -1603,7 +1603,7 @@ function Classroom() {
             if (noteObj) selectNote(noteObj, 'multi')
           })
         }
-      }, 300)
+      }, 0)
     } else {
       // Guitar/Bass - store pending data
       setPendingSelectionData({
@@ -1770,7 +1770,7 @@ function Classroom() {
       }
 
       setPendingSelectionData(null)
-    }, 300)
+    }, 0)
 
     return () => clearTimeout(applyTimeoutId)
   }, [pendingSelectionData, scaleChordManagement, setChordMode, selectNote])
