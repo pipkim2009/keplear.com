@@ -32,6 +32,38 @@ import styles from '../../styles/Practice.module.css'
 
 // Moved to component to access translations
 
+// Assignment Complete Animation Component
+interface AssignmentCompleteProps {
+  onComplete?: () => void
+}
+
+const AssignmentComplete: React.FC<AssignmentCompleteProps> = ({ onComplete }) => {
+  const [isVisible, setIsVisible] = useState(true)
+
+  useEffect(() => {
+    // Auto-hide after animation completes
+    const timer = setTimeout(() => {
+      setIsVisible(false)
+      if (onComplete) {
+        onComplete()
+      }
+    }, 3000)
+
+    return () => clearTimeout(timer)
+  }, [onComplete])
+
+  if (!isVisible) return null
+
+  return (
+    <div className={styles.assignmentCompleteOverlay}>
+      <div className={styles.assignmentCompleteContent}>
+        <div className={styles.assignmentCompleteIcon}>✓</div>
+        <h2 className={styles.assignmentCompleteTitle}>Assignment Complete!</h2>
+      </div>
+    </div>
+  )
+}
+
 // Welcome Subtitle Component with Text-to-Speech
 interface WelcomeSubtitleProps {
   message: string
@@ -185,6 +217,8 @@ function Sandbox() {
   const [congratulationsMessage, setCongratulationsMessage] = useState<string>('')
   const [setupDetails, setSetupDetails] = useState<{ type: string; details: any } | null>(null)
   const [autoPlayAudio, setAutoPlayAudio] = useState(false)
+  const [showAssignmentComplete, setShowAssignmentComplete] = useState(false)
+  const [isFromAssignment, setIsFromAssignment] = useState(false)
 
   // DSP-based pitch detection and performance grading hooks
   const pitchDetection = useDSPPitchDetection({ instrument: instrument as 'keyboard' | 'guitar' | 'bass' })
@@ -217,6 +251,9 @@ function Sandbox() {
 
         // Set force flag to bypass hasNoContent check
         setForceInitFromAssignment(true)
+
+        // Track that this session is from an assignment
+        setIsFromAssignment(true)
 
         // Set lesson settings - the second effect will use selectionData to apply scales/chords
         const newLessonSettings: LessonSettings = {
@@ -536,9 +573,30 @@ function Sandbox() {
   }
 
   const handleLessonComplete = useCallback(() => {
-    const message = t('sandbox.congratulations')
-    setCongratulationsMessage(message)
-  }, [t])
+    if (isFromAssignment) {
+      // Show assignment complete animation for classroom assignments
+      setShowAssignmentComplete(true)
+    } else {
+      // Show regular congratulations for free practice
+      const message = t('sandbox.congratulations')
+      setCongratulationsMessage(message)
+    }
+  }, [t, isFromAssignment])
+
+  const handleAssignmentCompleteEnd = useCallback(() => {
+    setShowAssignmentComplete(false)
+    setIsFromAssignment(false)
+    handleBackToSelection()
+  }, [handleBackToSelection])
+
+  // Handle Done button click - show animation for assignments
+  const handleDoneClick = useCallback(() => {
+    if (isFromAssignment) {
+      setShowAssignmentComplete(true)
+    } else {
+      handleBackToSelection()
+    }
+  }, [isFromAssignment, handleBackToSelection])
 
   // Helper function to filter scales based on user selection
   const getFilteredScales = (scales: typeof KEYBOARD_SCALES, selectedScales: string[] | undefined) => {
@@ -1375,7 +1433,7 @@ function Sandbox() {
           </button>
           <button
             className={styles.doneButton}
-            onClick={handleBackToSelection}
+            onClick={handleDoneClick}
             aria-label={t('sandbox.done')}
           >
             {t('sandbox.done')}
@@ -1474,6 +1532,11 @@ function Sandbox() {
             message={congratulationsMessage}
             onSpeechEnd={handleBackToSelection}
           />
+        )}
+
+        {/* Assignment Complete Animation */}
+        {showAssignmentComplete && (
+          <AssignmentComplete onComplete={handleAssignmentCompleteEnd} />
         )}
       </>
     )

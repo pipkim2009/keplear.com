@@ -176,6 +176,34 @@ const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd 
   return <div className={practiceStyles.welcomeSubtitle}>{message}</div>
 }
 
+// Assignment Complete Overlay Component
+interface AssignmentCompleteOverlayProps {
+  onComplete?: () => void
+}
+
+const AssignmentCompleteOverlay: React.FC<AssignmentCompleteOverlayProps> = ({ onComplete }) => {
+  const [isVisible, setIsVisible] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(false)
+      if (onComplete) onComplete()
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [onComplete])
+
+  if (!isVisible) return null
+
+  return (
+    <div className={practiceStyles.assignmentCompleteOverlay}>
+      <div className={practiceStyles.assignmentCompleteContent}>
+        <div className={practiceStyles.assignmentCompleteIcon}>✓</div>
+        <h2 className={practiceStyles.assignmentCompleteTitle}>Assignment Complete!</h2>
+      </div>
+    </div>
+  )
+}
+
 type ViewMode = 'list' | 'classroom' | 'creating-assignment' | 'taking-lesson'
 
 function Classroom() {
@@ -296,6 +324,7 @@ function Classroom() {
   const [autoPlayAudio, setAutoPlayAudio] = useState(false)
   const [melodySetupMessage, setMelodySetupMessage] = useState<string>('')
   const [congratulationsMessage, setCongratulationsMessage] = useState<string>('')
+  const [showAssignmentComplete, setShowAssignmentComplete] = useState(false)
   const hasInitializedNotes = useRef(false)
   const hasAnnouncedMelody = useRef(false)
 
@@ -1606,6 +1635,17 @@ function Classroom() {
     setViewMode('classroom')
   }
 
+  // Handle Done button click - show animation before ending
+  const handleDoneClick = useCallback(() => {
+    setShowAssignmentComplete(true)
+  }, [])
+
+  // Callback when assignment complete animation finishes
+  const handleAssignmentCompleteFinish = useCallback(() => {
+    setShowAssignmentComplete(false)
+    handleEndLesson()
+  }, [])
+
   // Switch to a different exercise in lesson mode
   const handleSwitchLessonExercise = useCallback((index: number) => {
     if (index === lessonExerciseIndex || index < 0 || index >= lessonExercises.length || !currentAssignment) return
@@ -2216,7 +2256,7 @@ function Classroom() {
           </button>
           <button
             className={practiceStyles.doneButton}
-            onClick={lessonExerciseIndex < lessonExercises.length - 1 ? () => handleSwitchLessonExercise(lessonExerciseIndex + 1) : handleEndLesson}
+            onClick={lessonExerciseIndex < lessonExercises.length - 1 ? () => handleSwitchLessonExercise(lessonExerciseIndex + 1) : handleDoneClick}
             aria-label={lessonExerciseIndex < lessonExercises.length - 1 ? t('classroom.lesson.nextExercise') : t('sandbox.done')}
           >
             {lessonExerciseIndex < lessonExercises.length - 1 ? t('common.next') : t('sandbox.done')}
@@ -2320,6 +2360,12 @@ function Classroom() {
         {genericWelcomeMessage && <WelcomeSubtitle message={genericWelcomeMessage} onSpeechEnd={() => setGenericWelcomeDone(true)} />}
         {customTranscript && <WelcomeSubtitle message={customTranscript} onSpeechEnd={() => setWelcomeSpeechDone(true)} />}
         {congratulationsMessage && <WelcomeSubtitle message={congratulationsMessage} onSpeechEnd={handleExerciseComplete} />}
+
+        {/* Assignment Complete Animation */}
+        {showAssignmentComplete && createPortal(
+          <AssignmentCompleteOverlay onComplete={handleAssignmentCompleteFinish} />,
+          document.body
+        )}
       </>
     )
   }

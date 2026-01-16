@@ -161,7 +161,7 @@ export const LiveFeedback: React.FC<LiveFeedbackProps> = ({
                       styles.pending
                     }`}
                   >
-                    <span className={styles.timelineNoteName}>{note.name}</span>
+                    <span className={styles.timelineNoteName}>♪</span>
                     {result && (
                       <span className={styles.timelineNoteIcon}>
                         {result.isCorrect ? <Check size={12} /> : <X size={12} />}

@@ -373,7 +373,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
                 key={index}
                 className={`melody-note-pill ${currentlyPlayingNoteIndex === index ? 'playing' : ''}`}
               >
-                {note.name}
+                ♪
               </span>
             ))}
           </div>
@@ -419,7 +419,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
                         isPast ? 'past' : 'pending'
                       }`}
                     >
-                      <span className="feedback-note-name">{note.name}</span>
+                      <span className="feedback-note-name">♪</span>
                     </div>
                   )
                 })}
