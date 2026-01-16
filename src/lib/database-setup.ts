@@ -186,6 +186,12 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
             )
           );
 
+        -- Classroom owners can update assignments
+        DROP POLICY IF EXISTS "Classroom owners can update assignments" ON public.assignments;
+        CREATE POLICY "Classroom owners can update assignments"
+          ON public.assignments FOR UPDATE
+          USING (auth.uid() = created_by);
+
         -- Classroom owners can delete assignments
         DROP POLICY IF EXISTS "Classroom owners can delete assignments" ON public.assignments;
         CREATE POLICY "Classroom owners can delete assignments"
