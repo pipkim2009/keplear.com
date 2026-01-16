@@ -303,6 +303,15 @@ function Classroom() {
     return () => observer.disconnect()
   }, [])
 
+  // Clear external note IDs when instrument changes (treat manual notes like scales/chords)
+  const prevInstrumentRef = useRef(instrument)
+  useEffect(() => {
+    if (prevInstrumentRef.current !== instrument) {
+      setExternalSelectedNoteIds([])
+      prevInstrumentRef.current = instrument
+    }
+  }, [instrument])
+
   // Fetch classrooms
   const fetchClassrooms = useCallback(async () => {
     try {
