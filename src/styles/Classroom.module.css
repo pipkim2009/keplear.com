@@ -1459,8 +1459,8 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
+  background: rgba(0, 0, 0, 0.08);
+  color: #374151;
   margin-bottom: 1.5rem;
 }
 
@@ -1470,9 +1470,9 @@
 }
 
 .backButtonCircle:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.12);
   transform: translateX(-3px);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 :global(.dark) .backButtonCircle:hover {
