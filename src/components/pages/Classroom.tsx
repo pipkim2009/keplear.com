@@ -1013,40 +1013,180 @@ function Classroom() {
       const targetHigher = targetExercise.higherOctaves ?? 0
       handleOctaveRangeChange(targetLower, targetHigher)
 
+      const targetInstrument = targetExercise.instrument || instrument
+
       setTimeout(() => {
         // Apply scales from exercise
         if (targetExercise.appliedScales?.length > 0) {
-          if (instrument === 'keyboard') {
+          if (targetInstrument === 'keyboard') {
             targetExercise.appliedScales.forEach((scaleData) => {
               const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
               if (scaleObj) {
                 scaleChordManagement.handleKeyboardScaleApply(scaleData.root, scaleObj, scaleData.octave || 4)
               }
             })
+          } else if (targetInstrument === 'guitar') {
+            const scalesToApply: AppliedScale[] = []
+            targetExercise.appliedScales.forEach((scaleData) => {
+              const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
+              const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
+              const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
+              const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
+              const scaleObj = GUITAR_SCALES.find(s => s.name === baseScaleName || s.name === scaleData.scaleName)
+              if (scaleObj) {
+                const allPositions = getScalePositions(scaleData.root, scaleObj, guitarNotes)
+                const positions = allPositions.filter(pos => pos.fret >= fretLow && pos.fret <= fretHigh)
+                const scaleNotes = positions.map(pos => {
+                  const noteId = `g-s${pos.string}-f${pos.fret}`
+                  const guitarNote = getGuitarNoteById(noteId)
+                  return {
+                    id: noteId,
+                    name: pos.note,
+                    frequency: guitarNote?.frequency || 0,
+                    isBlack: pos.note.includes('#'),
+                    position: guitarNote?.position || 0,
+                    __guitarCoord: { stringIndex: 6 - pos.string, fretIndex: pos.fret }
+                  }
+                })
+                const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
+                scalesToApply.push({
+                  id: `guitar-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
+                  root: scaleData.root,
+                  scale: scaleObj,
+                  displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
+                  notes: scaleNotes
+                })
+              }
+            })
+            if (scalesToApply.length > 0) {
+              scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
+            }
+          } else if (targetInstrument === 'bass') {
+            const scalesToApply: AppliedScale[] = []
+            targetExercise.appliedScales.forEach((scaleData) => {
+              const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
+              const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
+              const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
+              const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
+              const scaleObj = BASS_SCALES.find(s => s.name === baseScaleName || s.name === scaleData.scaleName)
+              if (scaleObj) {
+                const allPositions = getBassScalePositions(scaleData.root, scaleObj, bassNotes)
+                const positions = allPositions.filter(pos => pos.fret >= fretLow && pos.fret <= fretHigh)
+                const scaleNotes = positions.map(pos => {
+                  const noteId = `b-s${pos.string}-f${pos.fret}`
+                  const bassNote = getBassNoteById(noteId)
+                  return {
+                    id: noteId,
+                    name: pos.note,
+                    frequency: bassNote?.frequency || 0,
+                    isBlack: pos.note.includes('#'),
+                    position: bassNote?.position || 0,
+                    __bassCoord: { stringIndex: 4 - pos.string, fretIndex: pos.fret }
+                  }
+                })
+                const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
+                scalesToApply.push({
+                  id: `bass-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
+                  root: scaleData.root,
+                  scale: scaleObj as any,
+                  displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
+                  notes: scaleNotes
+                })
+              }
+            })
+            if (scalesToApply.length > 0) {
+              scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
+            }
           }
-          // TODO: Add guitar/bass scale loading similar to lesson mode
         }
 
         // Apply chords from exercise
         if (targetExercise.appliedChords?.length > 0) {
           setChordMode('progression')
-          if (instrument === 'keyboard') {
+          if (targetInstrument === 'keyboard') {
             targetExercise.appliedChords.forEach((chordData) => {
               const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
               if (chordObj) {
                 scaleChordManagement.handleKeyboardChordApply(chordData.root, chordObj, chordData.octave || 4)
               }
             })
+          } else if (targetInstrument === 'guitar') {
+            const chordsToApply: AppliedChord[] = []
+            targetExercise.appliedChords.forEach((chordData) => {
+              let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
+              baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
+              const chordObj = GUITAR_CHORDS.find(c => c.name === baseChordName || c.name === chordData.chordName)
+              if (chordObj) {
+                const chordBoxes = getChordBoxes(chordData.root, chordObj, guitarNotes)
+                if (chordBoxes.length > 0) {
+                  const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
+                  const chordBox = chordBoxes[boxIndex]
+                  const noteKeys = chordBox.positions.map(pos => {
+                    const stringIndex = 6 - pos.string
+                    const fretIndex = pos.fret
+                    return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                  })
+                  chordsToApply.push({
+                    id: `guitar-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
+                    root: chordData.root,
+                    chord: chordObj as any,
+                    displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
+                    noteKeys: noteKeys,
+                    fretZone: boxIndex
+                  })
+                }
+              }
+            })
+            if (chordsToApply.length > 0) {
+              scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
+            }
+          } else if (targetInstrument === 'bass') {
+            const chordsToApply: AppliedChord[] = []
+            targetExercise.appliedChords.forEach((chordData) => {
+              let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
+              baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
+              const chordObj = BASS_CHORDS.find(c => c.name === baseChordName || c.name === chordData.chordName)
+              if (chordObj) {
+                const chordBoxes = getBassChordBoxes(chordData.root, chordObj, bassNotes)
+                if (chordBoxes.length > 0) {
+                  const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
+                  const chordBox = chordBoxes[boxIndex]
+                  const noteKeys = chordBox.positions.map(pos => {
+                    const stringIndex = 4 - pos.string
+                    const fretIndex = pos.fret
+                    return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                  })
+                  chordsToApply.push({
+                    id: `bass-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
+                    root: chordData.root,
+                    chord: chordObj as any,
+                    displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
+                    noteKeys: noteKeys,
+                    fretZone: boxIndex
+                  })
+                }
+              }
+            })
+            if (chordsToApply.length > 0) {
+              scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
+            }
           }
-          // TODO: Add guitar/bass chord loading similar to lesson mode
         }
 
-        // Apply notes from exercise (use target exercise octave range)
-        if (targetExercise.selectedNoteIds?.length > 0 && instrument === 'keyboard') {
-          targetExercise.selectedNoteIds.forEach((noteId) => {
-            const noteObj = getKeyboardNoteById(noteId, targetLower, targetHigher)
-            if (noteObj) selectNote(noteObj, 'multi')
-          })
+        // Apply notes from exercise
+        if (targetExercise.selectedNoteIds?.length > 0) {
+          if (targetInstrument === 'keyboard') {
+            targetExercise.selectedNoteIds.forEach((noteId) => {
+              const noteObj = getKeyboardNoteById(noteId, targetLower, targetHigher)
+              if (noteObj) selectNote(noteObj, 'multi')
+            })
+          } else {
+            // Guitar/Bass - use external note IDs
+            const validNoteIds = targetExercise.selectedNoteIds.filter((id: string | null) => id !== null) as string[]
+            if (validNoteIds.length > 0) {
+              setExternalSelectedNoteIds(validNoteIds)
+            }
+          }
         }
       }, 100)
     }
@@ -1340,43 +1480,50 @@ function Classroom() {
     }
 
     const exerciseInstrument = targetExercise?.instrument || currentAssignment.instrument
-    if (targetExercise && exerciseInstrument === 'keyboard') {
+    if (targetExercise) {
       // Use exercise-level octave range or fall back to assignment-level
       const targetLower = targetExercise.lowerOctaves ?? 0
       const targetHigher = targetExercise.higherOctaves ?? 0
 
-      setTimeout(() => {
-        // Apply scales from exercise
-        if (targetExercise.appliedScales?.length > 0) {
-          targetExercise.appliedScales.forEach((scaleData) => {
-            const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
-            if (scaleObj) {
-              scaleChordManagement.handleKeyboardScaleApply(scaleData.root, scaleObj, scaleData.octave || 4)
-            }
-          })
-        }
+      if (exerciseInstrument === 'keyboard') {
+        setTimeout(() => {
+          // Apply scales from exercise
+          if (targetExercise.appliedScales?.length > 0) {
+            targetExercise.appliedScales.forEach((scaleData) => {
+              const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
+              if (scaleObj) {
+                scaleChordManagement.handleKeyboardScaleApply(scaleData.root, scaleObj, scaleData.octave || 4)
+              }
+            })
+          }
 
-        // Apply chords from exercise
-        if (targetExercise.appliedChords?.length > 0) {
-          setChordMode('progression')
-          targetExercise.appliedChords.forEach((chordData) => {
-            const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
-            if (chordObj) {
-              scaleChordManagement.handleKeyboardChordApply(chordData.root, chordObj, chordData.octave || 4)
-            }
-          })
-        }
+          // Apply chords from exercise
+          if (targetExercise.appliedChords?.length > 0) {
+            setChordMode('progression')
+            targetExercise.appliedChords.forEach((chordData) => {
+              const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
+              if (chordObj) {
+                scaleChordManagement.handleKeyboardChordApply(chordData.root, chordObj, chordData.octave || 4)
+              }
+            })
+          }
 
-        // Apply notes from exercise
-        if (targetExercise.selectedNoteIds?.length > 0) {
-          targetExercise.selectedNoteIds.forEach((noteId) => {
-            const noteObj = getKeyboardNoteById(noteId, targetLower, targetHigher)
-            if (noteObj) selectNote(noteObj, 'multi')
-          })
-        }
-      }, 100)
+          // Apply notes from exercise
+          if (targetExercise.selectedNoteIds?.length > 0) {
+            targetExercise.selectedNoteIds.forEach((noteId) => {
+              const noteObj = getKeyboardNoteById(noteId, targetLower, targetHigher)
+              if (noteObj) selectNote(noteObj, 'multi')
+            })
+          }
+        }, 100)
+      } else {
+        // Guitar/Bass - use pending selection data pattern
+        setPendingSelectionData({
+          instrument: exerciseInstrument,
+          selectionData: targetExercise
+        })
+      }
     }
-    // TODO: Add guitar/bass exercise switching
 
     setLessonExerciseIndex(index)
   }, [lessonExerciseIndex, lessonExercises, currentAssignment, clearSelection, scaleChordManagement, setChordMode, selectNote, handleOctaveRangeChange, setInstrument])
@@ -1399,9 +1546,10 @@ function Classroom() {
 
     hasInitializedNotes.current = true
     const currentExercise = lessonExercises[0] // Start with first exercise
+    const exerciseInstrument = currentExercise.instrument || currentAssignment.instrument
 
     // For keyboard, apply immediately; for guitar/bass, store as pending
-    if (currentAssignment.instrument === 'keyboard') {
+    if (exerciseInstrument === 'keyboard') {
       // Set octave range from exercise (use defaults if not set for backward compatibility)
       const exerciseLower = currentExercise.lowerOctaves ?? 0
       const exerciseHigher = currentExercise.higherOctaves ?? 0
@@ -1445,7 +1593,7 @@ function Classroom() {
     } else {
       // Guitar/Bass - store pending data
       setPendingSelectionData({
-        instrument: currentAssignment.instrument,
+        instrument: exerciseInstrument,
         selectionData: currentExercise
       })
     }
