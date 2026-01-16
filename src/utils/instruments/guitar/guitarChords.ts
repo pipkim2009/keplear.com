@@ -628,12 +628,65 @@ export const getChordBoxes = (
       pos.fret >= range.minFret && pos.fret <= range.maxFret
     )
 
-    if (boxPositions.length > 0) {
+    // Build a map of best note per string (prefer root, then lowest fret)
+    const notePerString = new Map<number, ChordPosition>()
+
+    // First pass: add root notes
+    boxPositions.forEach(pos => {
+      if (pos.isRoot && !notePerString.has(pos.string)) {
+        notePerString.set(pos.string, pos)
+      }
+    })
+
+    // Second pass: for remaining strings, pick lowest fret position
+    const remainingPositions = boxPositions
+      .filter(pos => !notePerString.has(pos.string))
+      .sort((a, b) => a.fret - b.fret)
+
+    remainingPositions.forEach(pos => {
+      if (!notePerString.has(pos.string)) {
+        notePerString.set(pos.string, pos)
+      }
+    })
+
+    // Find the largest group of consecutive strings
+    const stringsWithNotes = Array.from(notePerString.keys()).sort((a, b) => a - b)
+
+    if (stringsWithNotes.length === 0) return
+
+    // Find all consecutive groups
+    let bestGroup: number[] = []
+    let currentGroup: number[] = [stringsWithNotes[0]]
+
+    for (let i = 1; i < stringsWithNotes.length; i++) {
+      if (stringsWithNotes[i] === stringsWithNotes[i - 1] + 1) {
+        // Consecutive string
+        currentGroup.push(stringsWithNotes[i])
+      } else {
+        // Gap found - save current group if it's the best
+        if (currentGroup.length > bestGroup.length) {
+          bestGroup = currentGroup
+        }
+        currentGroup = [stringsWithNotes[i]]
+      }
+    }
+    // Check last group
+    if (currentGroup.length > bestGroup.length) {
+      bestGroup = currentGroup
+    }
+
+    // Only include positions from the largest consecutive group
+    const consecutivePositions = bestGroup
+      .map(str => notePerString.get(str)!)
+      .filter(Boolean)
+
+    // Only create a chord box if we have at least 3 notes (minimum for a chord)
+    if (consecutivePositions.length >= 3) {
       boxes.push({
         name: range.name,
         minFret: range.minFret,
         maxFret: range.maxFret,
-        positions: boxPositions
+        positions: consecutivePositions
       })
     }
   })
