@@ -77,15 +77,46 @@
     "heroSubtitle": "本格的なミュージシャンのための耳トレーニングアプリ。キーボード、ギター、ベースで練習し、即座にフィードバックを受け取れます。",
     "startTraining": "今すぐトレーニング開始",
     "noSignup": "登録不要",
+    "scrollToExplore": "スクロールして探索",
+    "whyKeplear": "Keplearを選ぶ理由",
+    "featuresTitle": "耳を鍛えるために必要なすべて",
+    "featuresSubtitle": "アクティブリスニングと練習を通じて、より良いミュージシャンになるための強力なツール。",
+    "readyToStart": "トレーニングを始める準備はできましたか？",
+    "ctaDescription": "毎日耳トレーニングスキルを向上させているミュージシャンに参加しましょう。登録不要。",
+    "stats": {
+      "instruments": "楽器",
+      "scales": "スケールとモード",
+      "free": "無料"
+    },
     "features": {
       "title": "機能",
+      "melodyTraining": {
+        "title": "メロディートレーニング",
+        "description": "ランダムなメロディーを生成し、音符、インターバル、パターンを認識する耳を鍛えましょう。"
+      },
+      "realtimeFeedback": {
+        "title": "リアルタイムフィードバック",
+        "description": "マイクを使用して、演奏や歌唱中のピッチ精度に関する即座のフィードバックを受け取れます。"
+      },
+      "multiInstrument": {
+        "title": "複数の楽器",
+        "description": "ピアノキーボード、ギター、ベースで練習。いつでも楽器を切り替えられます。"
+      },
+      "scalesChords": {
+        "title": "スケールとコード",
+        "description": "50以上のスケールとコードタイプを探求。指使いを視覚化し、音を聴くことができます。"
+      },
+      "classroom": {
+        "title": "教室モード",
+        "description": "生徒にレッスンを作成して割り当て。進捗を追跡し、構造化された学習を提供。"
+      },
+      "progress": {
+        "title": "進捗の追跡",
+        "description": "詳細なパフォーマンス指標と履歴で、時間とともに上達を確認できます。"
+      },
       "sandbox": {
         "title": "サンドボックスモード",
         "description": "自分のペースでスケール、コード、メロディーを探求"
-      },
-      "classroom": {
-        "title": "教室",
-        "description": "ガイド付き学習のための構造化されたレッスンと課題"
       },
       "instruments": {
         "title": "複数の楽器",

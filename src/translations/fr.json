@@ -77,15 +77,46 @@
     "heroSubtitle": "L'application d'entraînement de l'oreille pour les musiciens sérieux. Pratiquez au clavier, à la guitare ou à la basse avec un retour instantané.",
     "startTraining": "Commencer l'Entraînement",
     "noSignup": "Aucune inscription requise",
+    "scrollToExplore": "Faites défiler pour explorer",
+    "whyKeplear": "Pourquoi Keplear",
+    "featuresTitle": "Tout ce dont vous avez besoin pour entraîner votre oreille",
+    "featuresSubtitle": "Des outils puissants conçus pour vous aider à devenir un meilleur musicien grâce à l'écoute active et à la pratique.",
+    "readyToStart": "Prêt à commencer l'entraînement ?",
+    "ctaDescription": "Rejoignez les musiciens qui améliorent leurs compétences d'entraînement auditif chaque jour. Aucune inscription requise.",
+    "stats": {
+      "instruments": "Instruments",
+      "scales": "Gammes et Modes",
+      "free": "Gratuit"
+    },
     "features": {
       "title": "Fonctionnalités",
+      "melodyTraining": {
+        "title": "Entraînement Mélodique",
+        "description": "Générez des mélodies aléatoires et entraînez votre oreille à reconnaître les notes, intervalles et motifs."
+      },
+      "realtimeFeedback": {
+        "title": "Retour en Temps Réel",
+        "description": "Utilisez votre microphone pour obtenir un retour instantané sur la précision de votre hauteur en jouant ou chantant."
+      },
+      "multiInstrument": {
+        "title": "Instruments Multiples",
+        "description": "Pratiquez avec clavier piano, guitare ou basse. Changez d'instrument à tout moment."
+      },
+      "scalesChords": {
+        "title": "Gammes et Accords",
+        "description": "Explorez plus de 50 gammes et types d'accords. Visualisez les doigtés et écoutez comment ils sonnent."
+      },
+      "classroom": {
+        "title": "Mode Classe",
+        "description": "Créez et assignez des leçons aux étudiants. Suivez les progrès et offrez un apprentissage structuré."
+      },
+      "progress": {
+        "title": "Suivre les Progrès",
+        "description": "Voyez votre amélioration au fil du temps avec des métriques de performance détaillées et un historique."
+      },
       "sandbox": {
         "title": "Mode Bac à Sable",
         "description": "Explorez gammes, accords et mélodies à votre rythme"
-      },
-      "classroom": {
-        "title": "Classe",
-        "description": "Leçons structurées et devoirs pour un apprentissage guidé"
       },
       "instruments": {
         "title": "Instruments Multiples",

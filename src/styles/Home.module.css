@@ -1,5 +1,5 @@
 /* ===========================================
-   KEPLEAR HOME PAGE - Bold & Dynamic
+   KEPLEAR HOME PAGE - Modern & Bold
    =========================================== */
 
 .home {
@@ -15,6 +15,7 @@
   position: relative;
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 120px 24px 80px;
@@ -177,14 +178,16 @@
   border-radius: 14px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px var(--primary-purple-alpha-30);
 }
 
 .primaryButton:hover {
-  background: linear-gradient(135deg, var(--primary-purple-dark) 0%, #4a0ba8 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--primary-purple-alpha-40);
 }
 
 .primaryButton:active {
-  background: linear-gradient(135deg, var(--primary-purple-dark) 0%, #4a0ba8 100%);
+  transform: translateY(0);
 }
 
 .primaryButton svg {
@@ -223,7 +226,8 @@
 }
 
 .instrumentPill:hover {
-  background: var(--white-alpha-20);
+  background: var(--white-alpha-10);
+  border-color: var(--primary-purple-alpha-30);
 }
 
 .instrumentPill svg {
@@ -238,11 +242,51 @@
 }
 
 :global(.light) .instrumentPill:hover {
-  background: var(--black-alpha-20);
+  background: var(--black-alpha-10);
 }
 
 :global(.light) .instrumentPill svg {
   color: var(--primary-purple);
+}
+
+/* Scroll Indicator */
+.scrollIndicator {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInUp 0.6s ease-out 0.6s both;
+}
+
+.scrollIndicator span {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--dark-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+:global(.light) .scrollIndicator span {
+  color: var(--light-text-tertiary);
+}
+
+.scrollArrow {
+  width: 24px;
+  height: 24px;
+  border-right: 2px solid var(--primary-purple);
+  border-bottom: 2px solid var(--primary-purple);
+  transform: rotate(45deg);
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: rotate(45deg) translateY(0); }
+  40% { transform: rotate(45deg) translateY(6px); }
+  60% { transform: rotate(45deg) translateY(3px); }
 }
 
 /* ===========================================
@@ -250,12 +294,13 @@
    =========================================== */
 
 .features {
-  padding: 100px 24px;
-  background: linear-gradient(180deg, transparent 0%, var(--primary-purple-alpha-05) 100%);
+  padding: 120px 24px;
+  background: linear-gradient(180deg, transparent 0%, var(--primary-purple-alpha-05) 50%, transparent 100%);
 }
 
-:global(.light) .features {
-  background: linear-gradient(180deg, transparent 0%, var(--primary-purple-alpha-05) 100%);
+.featuresContainer {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .sectionHeader {
@@ -263,23 +308,55 @@
   margin-bottom: 64px;
 }
 
+.sectionLabel {
+  display: inline-block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--primary-purple);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
 .sectionHeader h2 {
-  font-size: clamp(1.75rem, 5vw, 2.5rem);
-  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
   color: var(--dark-text-primary);
-  margin: 0;
+  margin: 0 0 16px;
 }
 
 :global(.light) .sectionHeader h2 {
   color: var(--light-text-primary);
 }
 
+.sectionHeader p {
+  font-size: 1.125rem;
+  color: var(--dark-text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+:global(.light) .sectionHeader p {
+  color: var(--light-text-secondary);
+}
+
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
-  max-width: 1100px;
-  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .featureGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .featureGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .featureCard {
@@ -287,20 +364,26 @@
   background: var(--white-alpha-05);
   border: 1px solid var(--white-alpha-10);
   border-radius: 20px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInUp 0.6s ease-out both;
 }
 
 .featureCard:hover {
-  background: var(--white-alpha-15);
+  background: var(--white-alpha-10);
+  border-color: var(--primary-purple-alpha-30);
+  transform: translateY(-4px);
 }
 
 :global(.light) .featureCard {
   background: white;
   border-color: var(--black-alpha-10);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 :global(.light) .featureCard:hover {
-  background: var(--gray-100);
+  background: white;
+  border-color: var(--primary-purple-alpha-30);
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
 }
 
 .featureIconWrapper {
@@ -344,207 +427,70 @@
 }
 
 /* ===========================================
-   HOW IT WORKS SECTION
+   STATS SECTION
    =========================================== */
 
-.howItWorks {
-  padding: 100px 24px;
+.stats {
+  padding: 80px 24px;
 }
 
-.stepsGrid {
+.statsContainer {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  max-width: 1000px;
+  gap: 48px;
+  max-width: 800px;
   margin: 0 auto;
-  flex-wrap: wrap;
 }
 
-.step {
-  flex: 1;
-  min-width: 200px;
-  max-width: 280px;
-  text-align: center;
-  padding: 32px 24px;
-}
-
-.stepNumber {
-  width: 64px;
-  height: 64px;
+.statItem {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-dark) 100%);
-  border-radius: 50%;
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: white;
-  margin: 0 auto 20px;
-}
-
-.step h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--dark-text-primary);
-  margin: 0 0 12px;
-}
-
-:global(.light) .step h3 {
-  color: var(--light-text-primary);
-}
-
-.step p {
-  font-size: 0.95rem;
-  color: var(--dark-text-secondary);
-  line-height: 1.5;
-  margin: 0;
-}
-
-:global(.light) .step p {
-  color: var(--light-text-secondary);
-}
-
-.stepArrow {
-  font-size: 1.5rem;
-  color: var(--primary-purple-alpha-50);
-}
-
-@media (max-width: 768px) {
-  .stepsGrid {
-    flex-direction: column;
-  }
-
-  .stepArrow {
-    transform: rotate(90deg);
-  }
-}
-
-/* ===========================================
-   INSTRUMENTS SECTION
-   =========================================== */
-
-.instruments {
-  padding: 100px 24px;
-  background: linear-gradient(180deg, var(--primary-purple-alpha-05) 0%, transparent 100%);
-}
-
-:global(.light) .instruments {
-  background: linear-gradient(180deg, var(--primary-purple-alpha-05) 0%, transparent 100%);
-}
-
-.instrumentCards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.instrumentCard {
-  position: relative;
-  padding: 40px 32px;
-  background: var(--white-alpha-05);
-  border: 2px solid var(--white-alpha-10);
-  border-radius: 24px;
-  text-align: center;
-  overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.instrumentCard::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, transparent 50%, var(--card-glow) 100%);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.instrumentCard:hover {
-}
-
-.instrumentCard:hover::before {
-}
-
-.instrumentCard.keyboard {
-  --card-glow: var(--blue-alpha-10);
-  --card-border: var(--blue-alpha-40);
-  --card-accent: var(--blue-500);
-}
-
-.instrumentCard.guitar {
-  --card-glow: var(--green-alpha-10);
-  --card-border: var(--green-alpha-40);
-  --card-accent: var(--green-500);
-}
-
-.instrumentCard.bass {
-  --card-glow: var(--red-alpha-10);
-  --card-border: var(--red-alpha-40);
-  --card-accent: var(--red-500);
-}
-
-:global(.light) .instrumentCard {
-  background: white;
-  border-color: var(--black-alpha-10);
-}
-
-.instrumentCardIcon {
-  font-size: 4rem;
-  color: var(--card-accent);
-  margin-bottom: 20px;
-}
-
-.instrumentCard h3 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--dark-text-primary);
-  margin: 0 0 12px;
-}
-
-:global(.light) .instrumentCard h3 {
-  color: var(--light-text-primary);
-}
-
-.instrumentCard p {
-  font-size: 1rem;
-  color: var(--dark-text-secondary);
-  line-height: 1.5;
-  margin: 0 0 24px;
-}
-
-:global(.light) .instrumentCard p {
-  color: var(--light-text-secondary);
-}
-
-.instrumentButton {
-  display: inline-flex;
+  flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 12px 24px;
+}
+
+.statNumber {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.statLabel {
   font-size: 1rem;
-  font-weight: 600;
-  color: var(--card-accent);
-  background: transparent;
-  border: 2px solid var(--card-accent);
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 1;
+  font-weight: 500;
+  color: var(--dark-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.instrumentButton:hover {
-  background: var(--card-accent);
-  color: white;
+:global(.light) .statLabel {
+  color: var(--light-text-secondary);
 }
 
-.instrumentButton svg {
-  transition: transform 0.3s ease;
+.statDivider {
+  width: 1px;
+  height: 60px;
+  background: var(--white-alpha-20);
 }
 
-.instrumentButton:hover svg {
+:global(.light) .statDivider {
+  background: var(--black-alpha-20);
+}
+
+@media (max-width: 640px) {
+  .statsContainer {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .statDivider {
+    width: 60px;
+    height: 1px;
+  }
 }
 
 /* ===========================================
@@ -554,6 +500,7 @@
 .finalCta {
   padding: 120px 24px;
   text-align: center;
+  background: linear-gradient(180deg, transparent 0%, var(--primary-purple-alpha-10) 100%);
 }
 
 .ctaContent {
@@ -562,8 +509,8 @@
 }
 
 .ctaContent h2 {
-  font-size: clamp(1.75rem, 5vw, 2.5rem);
-  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 800;
   color: var(--dark-text-primary);
   margin: 0 0 16px;
 }
@@ -576,6 +523,7 @@
   font-size: 1.125rem;
   color: var(--dark-text-secondary);
   margin: 0 0 32px;
+  line-height: 1.6;
 }
 
 :global(.light) .ctaContent p {
@@ -612,7 +560,7 @@
    RESPONSIVE
    =========================================== */
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .hero {
     padding: 100px 20px 60px;
     min-height: auto;
@@ -636,23 +584,17 @@
     font-size: 0.85rem;
   }
 
+  .scrollIndicator {
+    display: none;
+  }
+
   .features,
-  .howItWorks,
-  .instruments,
   .finalCta {
-    padding: 60px 20px;
+    padding: 80px 20px;
   }
 
   .featureCard {
     padding: 24px;
-  }
-
-  .instrumentCard {
-    padding: 32px 24px;
-  }
-
-  .instrumentCardIcon {
-    font-size: 3rem;
   }
 }
 
@@ -671,7 +613,8 @@
 
   .gradientOrb1,
   .gradientOrb2,
-  .gradientOrb3 {
+  .gradientOrb3,
+  .scrollArrow {
     animation: none;
   }
 }

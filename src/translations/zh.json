@@ -77,15 +77,46 @@
     "heroSubtitle": "专为认真的音乐人设计的听力训练应用。在键盘、吉他或贝斯上练习，获得即时反馈。",
     "startTraining": "立即开始训练",
     "noSignup": "无需注册",
+    "scrollToExplore": "滚动探索",
+    "whyKeplear": "为什么选择Keplear",
+    "featuresTitle": "训练耳朵所需的一切",
+    "featuresSubtitle": "强大的工具，旨在通过主动聆听和练习帮助你成为更好的音乐人。",
+    "readyToStart": "准备好开始训练了吗？",
+    "ctaDescription": "加入每天提升听力训练技能的音乐人行列。无需注册。",
+    "stats": {
+      "instruments": "乐器",
+      "scales": "音阶和调式",
+      "free": "免费"
+    },
     "features": {
       "title": "功能特点",
+      "melodyTraining": {
+        "title": "旋律训练",
+        "description": "生成随机旋律，训练你的耳朵识别音符、音程和模式。"
+      },
+      "realtimeFeedback": {
+        "title": "实时反馈",
+        "description": "使用麦克风在演奏或歌唱时获得音准的即时反馈。"
+      },
+      "multiInstrument": {
+        "title": "多种乐器",
+        "description": "用钢琴键盘、吉他或贝斯练习。随时切换乐器。"
+      },
+      "scalesChords": {
+        "title": "音阶和和弦",
+        "description": "探索50多种音阶和和弦类型。可视化指法并聆听它们的声音。"
+      },
+      "classroom": {
+        "title": "教室模式",
+        "description": "创建并分配课程给学生。跟踪进度并提供结构化学习。"
+      },
+      "progress": {
+        "title": "追踪进度",
+        "description": "通过详细的表现指标和历史记录查看你的进步。"
+      },
       "sandbox": {
         "title": "沙盒模式",
         "description": "按自己的节奏探索音阶、和弦和旋律"
-      },
-      "classroom": {
-        "title": "教室",
-        "description": "结构化课程和作业，引导学习"
       },
       "instruments": {
         "title": "多种乐器",

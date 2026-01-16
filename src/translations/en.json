@@ -78,15 +78,46 @@
     "heroSubtitle": "The ear training app for serious musicians. Practice on keyboard, guitar, or bass with instant feedback.",
     "startTraining": "Start Training Now",
     "noSignup": "No signup required",
+    "scrollToExplore": "Scroll to explore",
+    "whyKeplear": "Why Keplear",
+    "featuresTitle": "Everything you need to train your ear",
+    "featuresSubtitle": "Powerful tools designed to help you become a better musician through active listening and practice.",
+    "readyToStart": "Ready to start training?",
+    "ctaDescription": "Join musicians who are improving their ear training skills every day. No signup required.",
+    "stats": {
+      "instruments": "Instruments",
+      "scales": "Scales & Modes",
+      "free": "Free"
+    },
     "features": {
       "title": "Features",
+      "melodyTraining": {
+        "title": "Melody Training",
+        "description": "Generate random melodies and train your ear to recognize notes, intervals, and patterns."
+      },
+      "realtimeFeedback": {
+        "title": "Real-time Feedback",
+        "description": "Use your microphone to get instant feedback on your pitch accuracy as you play or sing."
+      },
+      "multiInstrument": {
+        "title": "Multiple Instruments",
+        "description": "Practice with piano keyboard, guitar, or bass. Switch between instruments anytime."
+      },
+      "scalesChords": {
+        "title": "Scales & Chords",
+        "description": "Explore 50+ scales and chord types. Visualize fingerings and hear how they sound."
+      },
+      "classroom": {
+        "title": "Classroom Mode",
+        "description": "Create and assign lessons to students. Track progress and provide structured learning."
+      },
+      "progress": {
+        "title": "Track Progress",
+        "description": "See your improvement over time with detailed performance metrics and history."
+      },
       "sandbox": {
         "title": "Sandbox Mode",
         "description": "Explore scales, chords, and melodies at your own pace"
-      },
-      "classroom": {
-        "title": "Classroom",
-        "description": "Structured lessons and assignments for guided learning"
       },
       "instruments": {
         "title": "Multiple Instruments",

@@ -77,15 +77,46 @@
     "heroSubtitle": "진지한 뮤지션을 위한 청음 훈련 앱. 키보드, 기타 또는 베이스로 연습하고 즉각적인 피드백을 받으세요.",
     "startTraining": "지금 훈련 시작",
     "noSignup": "가입 불필요",
+    "scrollToExplore": "스크롤하여 탐색",
+    "whyKeplear": "왜 Keplear인가",
+    "featuresTitle": "귀를 훈련하는 데 필요한 모든 것",
+    "featuresSubtitle": "능동적 청취와 연습을 통해 더 나은 뮤지션이 되도록 설계된 강력한 도구.",
+    "readyToStart": "훈련을 시작할 준비가 되셨나요?",
+    "ctaDescription": "매일 청음 훈련 기술을 향상시키는 뮤지션들과 함께하세요. 가입 불필요.",
+    "stats": {
+      "instruments": "악기",
+      "scales": "스케일 & 모드",
+      "free": "무료"
+    },
     "features": {
       "title": "기능",
+      "melodyTraining": {
+        "title": "멜로디 훈련",
+        "description": "랜덤 멜로디를 생성하고 음표, 인터벌, 패턴을 인식하도록 귀를 훈련하세요."
+      },
+      "realtimeFeedback": {
+        "title": "실시간 피드백",
+        "description": "마이크를 사용하여 연주하거나 노래할 때 피치 정확도에 대한 즉각적인 피드백을 받으세요."
+      },
+      "multiInstrument": {
+        "title": "다양한 악기",
+        "description": "피아노 키보드, 기타 또는 베이스로 연습하세요. 언제든지 악기를 바꿀 수 있습니다."
+      },
+      "scalesChords": {
+        "title": "스케일 & 코드",
+        "description": "50개 이상의 스케일과 코드 유형을 탐험하세요. 운지법을 시각화하고 소리를 들어보세요."
+      },
+      "classroom": {
+        "title": "교실 모드",
+        "description": "학생에게 레슨을 만들고 할당하세요. 진행 상황을 추적하고 구조화된 학습을 제공하세요."
+      },
+      "progress": {
+        "title": "진행 상황 추적",
+        "description": "상세한 성능 지표와 기록으로 시간에 따른 향상을 확인하세요."
+      },
       "sandbox": {
         "title": "샌드박스 모드",
         "description": "자신의 속도로 스케일, 코드, 멜로디를 탐험하세요"
-      },
-      "classroom": {
-        "title": "교실",
-        "description": "가이드 학습을 위한 구조화된 레슨과 과제"
       },
       "instruments": {
         "title": "다양한 악기",

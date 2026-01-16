@@ -77,15 +77,46 @@
     "heroSubtitle": "Yr ap hyfforddi clust ar gyfer cerddorion difrifol. Ymarfer ar fysellfwrdd, gitâr, neu fas gydag adborth ar unwaith.",
     "startTraining": "Dechrau Hyfforddi Nawr",
     "noSignup": "Dim angen cofrestru",
+    "scrollToExplore": "Sgroliwch i archwilio",
+    "whyKeplear": "Pam Keplear",
+    "featuresTitle": "Popeth sydd ei angen arnoch i hyfforddi eich clust",
+    "featuresSubtitle": "Offer pwerus wedi'u cynllunio i'ch helpu i ddod yn gerddor gwell trwy wrando gweithredol ac ymarfer.",
+    "readyToStart": "Yn barod i ddechrau hyfforddi?",
+    "ctaDescription": "Ymunwch â cherddorion sy'n gwella eu sgiliau hyfforddi clust bob dydd. Dim angen cofrestru.",
+    "stats": {
+      "instruments": "Offerynnau",
+      "scales": "Graddfeydd a Moddau",
+      "free": "Am Ddim"
+    },
     "features": {
       "title": "Nodweddion",
+      "melodyTraining": {
+        "title": "Hyfforddiant Alaw",
+        "description": "Cynhyrchwch alawon ar hap a hyfforddwch eich clust i adnabod nodau, cyfyngau a phatrymau."
+      },
+      "realtimeFeedback": {
+        "title": "Adborth Amser Real",
+        "description": "Defnyddiwch eich meicroffon i gael adborth ar unwaith ar gywirdeb traw wrth chwarae neu ganu."
+      },
+      "multiInstrument": {
+        "title": "Offerynnau Lluosog",
+        "description": "Ymarfer gyda bysellfwrdd piano, gitâr neu fas. Newidiwch offerynnau unrhyw bryd."
+      },
+      "scalesChords": {
+        "title": "Graddfeydd a Chordiau",
+        "description": "Archwiliwch dros 50 o raddfeydd a mathau o gordiau. Gwelwch fyseddiadau a chlywch sut maent yn swnio."
+      },
+      "classroom": {
+        "title": "Modd Ystafell Ddosbarth",
+        "description": "Crëwch ac aseiniwch wersi i fyfyrwyr. Dilynwch gynnydd a darparu dysgu strwythuredig."
+      },
+      "progress": {
+        "title": "Olrhain Cynnydd",
+        "description": "Gwelwch eich gwelliant dros amser gyda metrigau perfformiad manwl a hanes."
+      },
       "sandbox": {
         "title": "Modd Blwch Tywod",
         "description": "Archwiliwch raddfeydd, cordiau a alawon ar eich cyflymder eich hun"
-      },
-      "classroom": {
-        "title": "Ystafell Ddosbarth",
-        "description": "Gwersi strwythuredig ac aseiniadau ar gyfer dysgu dan arweiniad"
       },
       "instruments": {
         "title": "Offerynnau Lluosog",

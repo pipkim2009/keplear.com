@@ -77,15 +77,46 @@
     "heroSubtitle": "L'app di ear training per musicisti seri. Esercitati su tastiera, chitarra o basso con feedback istantaneo.",
     "startTraining": "Inizia l'Allenamento",
     "noSignup": "Nessuna registrazione richiesta",
+    "scrollToExplore": "Scorri per esplorare",
+    "whyKeplear": "Perché Keplear",
+    "featuresTitle": "Tutto ciò di cui hai bisogno per allenare il tuo orecchio",
+    "featuresSubtitle": "Strumenti potenti progettati per aiutarti a diventare un musicista migliore attraverso l'ascolto attivo e la pratica.",
+    "readyToStart": "Pronto per iniziare l'allenamento?",
+    "ctaDescription": "Unisciti ai musicisti che migliorano le loro abilità di ear training ogni giorno. Nessuna registrazione richiesta.",
+    "stats": {
+      "instruments": "Strumenti",
+      "scales": "Scale e Modi",
+      "free": "Gratuito"
+    },
     "features": {
       "title": "Funzionalità",
+      "melodyTraining": {
+        "title": "Allenamento Melodico",
+        "description": "Genera melodie casuali e allena il tuo orecchio a riconoscere note, intervalli e pattern."
+      },
+      "realtimeFeedback": {
+        "title": "Feedback in Tempo Reale",
+        "description": "Usa il microfono per ottenere feedback istantaneo sulla precisione dell'intonazione mentre suoni o canti."
+      },
+      "multiInstrument": {
+        "title": "Strumenti Multipli",
+        "description": "Esercitati con tastiera piano, chitarra o basso. Cambia strumento in qualsiasi momento."
+      },
+      "scalesChords": {
+        "title": "Scale e Accordi",
+        "description": "Esplora oltre 50 scale e tipi di accordi. Visualizza le diteggiature e ascolta come suonano."
+      },
+      "classroom": {
+        "title": "Modalità Aula",
+        "description": "Crea e assegna lezioni agli studenti. Monitora i progressi e offri un apprendimento strutturato."
+      },
+      "progress": {
+        "title": "Monitora i Progressi",
+        "description": "Visualizza i tuoi miglioramenti nel tempo con metriche di performance dettagliate e cronologia."
+      },
       "sandbox": {
         "title": "Modalità Sandbox",
         "description": "Esplora scale, accordi e melodie al tuo ritmo"
-      },
-      "classroom": {
-        "title": "Aula",
-        "description": "Lezioni strutturate e compiti per un apprendimento guidato"
       },
       "instruments": {
         "title": "Strumenti Multipli",

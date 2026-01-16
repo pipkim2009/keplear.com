@@ -77,15 +77,46 @@
     "heroSubtitle": "Die Gehörtraining-App für ernsthafte Musiker. Übe auf Keyboard, Gitarre oder Bass mit sofortigem Feedback.",
     "startTraining": "Jetzt Training Starten",
     "noSignup": "Keine Anmeldung erforderlich",
+    "scrollToExplore": "Scrollen zum Entdecken",
+    "whyKeplear": "Warum Keplear",
+    "featuresTitle": "Alles was du brauchst, um dein Gehör zu trainieren",
+    "featuresSubtitle": "Leistungsstarke Werkzeuge, die dir helfen, durch aktives Zuhören und Üben ein besserer Musiker zu werden.",
+    "readyToStart": "Bereit mit dem Training zu beginnen?",
+    "ctaDescription": "Schließe dich Musikern an, die jeden Tag ihre Gehörtrainingsfähigkeiten verbessern. Keine Anmeldung erforderlich.",
+    "stats": {
+      "instruments": "Instrumente",
+      "scales": "Tonleitern & Modi",
+      "free": "Kostenlos"
+    },
     "features": {
       "title": "Funktionen",
+      "melodyTraining": {
+        "title": "Melodie-Training",
+        "description": "Generiere zufällige Melodien und trainiere dein Gehör, Noten, Intervalle und Muster zu erkennen."
+      },
+      "realtimeFeedback": {
+        "title": "Echtzeit-Feedback",
+        "description": "Nutze dein Mikrofon für sofortiges Feedback zur Tonhöhengenauigkeit beim Spielen oder Singen."
+      },
+      "multiInstrument": {
+        "title": "Mehrere Instrumente",
+        "description": "Übe mit Klavier-Keyboard, Gitarre oder Bass. Wechsle jederzeit zwischen Instrumenten."
+      },
+      "scalesChords": {
+        "title": "Tonleitern & Akkorde",
+        "description": "Erkunde über 50 Tonleitern und Akkordtypen. Visualisiere Fingersätze und höre, wie sie klingen."
+      },
+      "classroom": {
+        "title": "Klassenzimmer-Modus",
+        "description": "Erstelle und weise Schülern Lektionen zu. Verfolge Fortschritte und biete strukturiertes Lernen."
+      },
+      "progress": {
+        "title": "Fortschritt Verfolgen",
+        "description": "Sieh deine Verbesserung über Zeit mit detaillierten Leistungsmetriken und Verlauf."
+      },
       "sandbox": {
         "title": "Sandbox-Modus",
         "description": "Erkunde Tonleitern, Akkorde und Melodien in deinem eigenen Tempo"
-      },
-      "classroom": {
-        "title": "Klassenzimmer",
-        "description": "Strukturierte Lektionen und Aufgaben für geführtes Lernen"
       },
       "instruments": {
         "title": "Mehrere Instrumente",
