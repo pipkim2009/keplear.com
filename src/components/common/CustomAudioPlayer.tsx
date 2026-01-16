@@ -373,7 +373,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
                 key={index}
                 className={`melody-note-pill ${currentlyPlayingNoteIndex === index ? 'playing' : ''}`}
               >
-                ♪
+                {note.name}
               </span>
             ))}
           </div>
