@@ -162,7 +162,7 @@
     "assignmentTitle": "Assignment Title",
     "enterAssignmentTitle": "Enter assignment title",
     "saving": "Saving...",
-    "welcomeToLesson": "Welcome to {instrument} lesson",
+    "welcomeToLesson": "Welcome to {instrument}",
     "melodySetup": "I have set up a melody for you to attempt",
     "congratulations": "Congratulations on completing today's lesson!",
     "bpm": "BPM",
