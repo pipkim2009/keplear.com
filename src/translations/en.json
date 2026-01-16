@@ -42,6 +42,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
+    "update": "Update",
     "close": "Close",
     "loading": "Loading...",
     "error": "Error",
@@ -130,7 +131,7 @@
     "assignmentTitle": "Assignment Title",
     "enterAssignmentTitle": "Enter assignment title",
     "saving": "Saving...",
-    "welcomeToLesson": "Welcome to your {instrument} lesson",
+    "welcomeToLesson": "Welcome to {instrument} lesson",
     "melodySetup": "I have set up a melody for you to attempt",
     "congratulations": "Congratulations on completing today's lesson!",
     "bpm": "BPM",
@@ -177,7 +178,7 @@
     "className": "Class Name",
     "classDescription": "Class Description",
     "classCode": "Class Code",
-    "enterCode": "Enter class code",
+    "enterCode": "X X X X X X",
     "enterClassName": "Enter class name",
     "enterDescription": "Describe what this class is about (optional)",
     "enterTitle": "Please enter a title",
@@ -235,7 +236,8 @@
       "overdue": "Overdue",
       "submit": "Submit",
       "start": "Start",
-      "continue": "Continue"
+      "continue": "Continue",
+      "update": "Update Assignment"
     },
     "lesson": {
       "title": "Lesson",

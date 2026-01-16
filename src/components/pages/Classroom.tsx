@@ -134,32 +134,43 @@ interface WelcomeSubtitleProps {
 const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd }) => {
   const [isVisible, setIsVisible] = useState(true)
   const lastSpokenMessage = useRef<string>('')
+  const onSpeechEndRef = useRef(onSpeechEnd)
+
+  // Keep the ref updated
+  useEffect(() => {
+    onSpeechEndRef.current = onSpeechEnd
+  }, [onSpeechEnd])
 
   useEffect(() => {
-    // Reset visibility when message changes
-    setIsVisible(true)
-
-    // Only speak if message changed and is not empty
-    if ('speechSynthesis' in window && message && message !== lastSpokenMessage.current) {
-      // Cancel any ongoing speech
-      window.speechSynthesis.cancel()
-
+    // Only process if message changed
+    if (message && message !== lastSpokenMessage.current) {
+      // Reset visibility for new message
+      setIsVisible(true)
       lastSpokenMessage.current = message
-      const utterance = new SpeechSynthesisUtterance(message)
-      utterance.rate = 0.9
-      utterance.pitch = 1
-      utterance.volume = 1
-      utterance.onend = () => {
-        if (onSpeechEnd) onSpeechEnd()
-      }
-      window.speechSynthesis.speak(utterance)
-    } else if (!('speechSynthesis' in window) && onSpeechEnd) {
-      onSpeechEnd()
-    }
 
-    const timer = setTimeout(() => setIsVisible(false), 5000)
-    return () => clearTimeout(timer)
-  }, [message, onSpeechEnd])
+      if ('speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel()
+
+        const utterance = new SpeechSynthesisUtterance(message)
+        utterance.rate = 0.9
+        utterance.pitch = 1
+        utterance.volume = 1
+        utterance.onend = () => {
+          setIsVisible(false)
+          if (onSpeechEndRef.current) onSpeechEndRef.current()
+        }
+        window.speechSynthesis.speak(utterance)
+      } else {
+        // No speech synthesis - hide after a brief delay and call onSpeechEnd
+        const timer = setTimeout(() => {
+          setIsVisible(false)
+          if (onSpeechEndRef.current) onSpeechEndRef.current()
+        }, 3000)
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [message])
 
   if (!isVisible || !message) return null
   return <div className={practiceStyles.welcomeSubtitle}>{message}</div>
@@ -266,6 +277,7 @@ function Classroom() {
   const [assignmentTitle, setAssignmentTitle] = useState('')
   const [isSavingAssignment, setIsSavingAssignment] = useState(false)
   const [assignmentError, setAssignmentError] = useState<string | null>(null)
+  const [editingAssignmentId, setEditingAssignmentId] = useState<string | null>(null)
 
   // Multi-exercise state for assignment editor
   const [exercises, setExercises] = useState<ExerciseData[]>([])
@@ -928,12 +940,74 @@ function Classroom() {
       appliedChords: []
     }])
     setCurrentExerciseIndex(0)
+    setEditingAssignmentId(null)
+    setViewMode('creating-assignment')
+  }
+
+  // Edit an existing assignment
+  const handleEditAssignment = (assignment: AssignmentData, classroomId: string) => {
+    setAssigningToClassroomId(classroomId)
+    setEditingAssignmentId(assignment.id)
+    setAssignmentTitle(assignment.title)
+    clearSelection()
+    triggerClearChordsAndScales()
+
+    // Set instrument
+    setInstrument(assignment.instrument as 'keyboard' | 'guitar' | 'bass')
+    setBpm(assignment.bpm)
+    setNumberOfBeats(assignment.beats)
+
+    // Set octave range
+    const octaveLow = assignment.octave_low ?? 4
+    const octaveHigh = assignment.octave_high ?? 5
+    handleOctaveRangeChange(4 - octaveLow, octaveHigh - 5)
+
+    // Load exercises from selection_data
+    const selectionData = assignment.selection_data
+    if (selectionData?.exercises && selectionData.exercises.length > 0) {
+      setExercises(selectionData.exercises.map((ex: any) => ({
+        id: ex.id || `exercise-${Date.now()}-${Math.random()}`,
+        name: ex.name || 'Exercise',
+        transcript: ex.transcript || '',
+        bpm: ex.bpm || assignment.bpm,
+        beats: ex.beats || assignment.beats,
+        chordMode: ex.chordMode || 'single',
+        lowerOctaves: ex.lowerOctaves ?? (4 - octaveLow),
+        higherOctaves: ex.higherOctaves ?? (octaveHigh - 5),
+        selectedNoteIds: ex.selectedNoteIds || [],
+        appliedScales: ex.appliedScales || [],
+        appliedChords: ex.appliedChords || []
+      })))
+      setCurrentExerciseIndex(0)
+      // Set transcript for first exercise
+      if (selectionData.exercises[0]?.transcript) {
+        setCurrentExerciseTranscript(selectionData.exercises[0].transcript)
+      }
+    } else {
+      // No exercises, create one with legacy data
+      setExercises([{
+        id: `exercise-${Date.now()}`,
+        name: 'Exercise 1',
+        transcript: '',
+        bpm: assignment.bpm,
+        beats: assignment.beats,
+        chordMode: 'single',
+        lowerOctaves: 4 - octaveLow,
+        higherOctaves: octaveHigh - 5,
+        selectedNoteIds: selectionData?.selectedNoteIds || [],
+        appliedScales: selectionData?.appliedScales || [],
+        appliedChords: selectionData?.appliedChords || []
+      }])
+      setCurrentExerciseIndex(0)
+    }
+
     setViewMode('creating-assignment')
   }
 
   // Cancel assignment creation
   const handleCancelAssignment = () => {
     setAssigningToClassroomId(null)
+    setEditingAssignmentId(null)
     clearSelection()
     triggerClearChordsAndScales()
     setExercises([])
@@ -1390,28 +1464,45 @@ function Classroom() {
       setIsSavingAssignment(true)
       setAssignmentError(null)
 
-      const { error: insertError } = await supabase
-        .from('assignments')
-        .insert({
-          classroom_id: assigningToClassroomId,
-          title: assignmentTitle.trim(),
-          lesson_type: lessonType,
-          instrument: instrument,
-          bpm: bpm,
-          beats: numberOfBeats,
-          chord_count: hasChords ? scaleChordManagement.appliedChords.length : 4,
-          scales: appliedScaleNames.length > 0 ? appliedScaleNames : ['Major', 'Minor'],
-          chords: appliedChordNames.length > 0 ? appliedChordNames : ['Major', 'Minor'],
-          octave_low: octaveLow,
-          octave_high: octaveHigh,
-          fret_low: 0,
-          fret_high: 12,
-          selection_data: hasAnyContent ? selectionData : null,
-          created_by: user.id
-        })
+      const assignmentData = {
+        classroom_id: assigningToClassroomId,
+        title: assignmentTitle.trim(),
+        lesson_type: lessonType,
+        instrument: instrument,
+        bpm: bpm,
+        beats: numberOfBeats,
+        chord_count: hasChords ? scaleChordManagement.appliedChords.length : 4,
+        scales: appliedScaleNames.length > 0 ? appliedScaleNames : ['Major', 'Minor'],
+        chords: appliedChordNames.length > 0 ? appliedChordNames : ['Major', 'Minor'],
+        octave_low: octaveLow,
+        octave_high: octaveHigh,
+        fret_low: 0,
+        fret_high: 12,
+        selection_data: hasAnyContent ? selectionData : null
+      }
 
-      if (insertError) {
-        setAssignmentError(insertError.message)
+      let saveError: any = null
+
+      if (editingAssignmentId) {
+        // Update existing assignment
+        const { error } = await supabase
+          .from('assignments')
+          .update(assignmentData)
+          .eq('id', editingAssignmentId)
+        saveError = error
+      } else {
+        // Insert new assignment
+        const { error } = await supabase
+          .from('assignments')
+          .insert({
+            ...assignmentData,
+            created_by: user.id
+          })
+        saveError = error
+      }
+
+      if (saveError) {
+        setAssignmentError(saveError.message)
         return
       }
 
@@ -1419,6 +1510,7 @@ function Classroom() {
       const savedClassroomId = assigningToClassroomId
       setAssignmentTitle('')
       setAssigningToClassroomId(null)
+      setEditingAssignmentId(null)
       clearSelection()
       triggerClearChordsAndScales()
       setExercises([])
@@ -2054,7 +2146,7 @@ function Classroom() {
     <div className={practiceStyles.modalOverlay} onClick={(e) => e.target === e.currentTarget && handleCloseAssignModal()}>
       <div className={practiceStyles.assignModal}>
         <div className={practiceStyles.assignModalHeader}>
-          <h2 className={practiceStyles.assignModalTitle}>{t('sandbox.createAssignment')}</h2>
+          <h2 className={practiceStyles.assignModalTitle}>{editingAssignmentId ? t('classroom.assignment.update') : t('sandbox.createAssignment')}</h2>
           <button className={practiceStyles.assignModalClose} onClick={handleCloseAssignModal} aria-label={t('common.close')}>×</button>
         </div>
         <div className={practiceStyles.assignModalContent}>
@@ -2083,7 +2175,7 @@ function Classroom() {
             onClick={handleSaveAssignment}
             disabled={isSavingAssignment || !assignmentTitle.trim()}
           >
-            {isSavingAssignment ? t('sandbox.saving') : t('sandbox.createAssignment')}
+            {isSavingAssignment ? t('sandbox.saving') : (editingAssignmentId ? t('classroom.assignment.update') : t('sandbox.createAssignment'))}
           </button>
         </div>
       </div>
@@ -2311,7 +2403,7 @@ function Classroom() {
               disabled={!assigningToClassroomId || !assignmentTitle.trim() || !allExercisesHaveContent || isSavingAssignment}
               style={{ opacity: (assigningToClassroomId && assignmentTitle.trim() && allExercisesHaveContent) ? 1 : 0.5 }}
             >
-              {isSavingAssignment ? t('sandbox.saving') : t('classroom.assign')}
+              {isSavingAssignment ? t('sandbox.saving') : (editingAssignmentId ? t('common.update') : t('classroom.assign'))}
             </button>
           </div>
           {/* Row 2: Timeline */}
@@ -2656,6 +2748,15 @@ function Classroom() {
                             onClick={() => handleStartAssignment(assignment)}
                           >
                             {t('classroom.assignment.start')}
+                          </button>
+                        )}
+                        {isOwner && (
+                          <button
+                            className={styles.editAssignmentButton}
+                            onClick={() => handleEditAssignment(assignment, selectedClassroom.id)}
+                            title={t('classroom.assignment.update')}
+                          >
+                            <PiPencilSimpleFill size={14} />
                           </button>
                         )}
                         {isOwner && (

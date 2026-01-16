@@ -1000,6 +1000,37 @@
   background: #c084fc;
 }
 
+.editAssignmentButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(59, 130, 246, 0.1);
+  color: rgb(59, 130, 246);
+  flex-shrink: 0;
+}
+
+.editAssignmentButton:hover {
+  background: rgba(59, 130, 246, 0.2);
+  transform: scale(1.1);
+}
+
+:global(.dark) .editAssignmentButton {
+  background: rgba(59, 130, 246, 0.2);
+  color: rgb(147, 197, 253);
+}
+
+:global(.dark) .editAssignmentButton:hover {
+  background: rgba(59, 130, 246, 0.3);
+}
+
 .deleteAssignmentButton {
   display: flex;
   align-items: center;
