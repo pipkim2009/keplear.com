@@ -79,6 +79,10 @@ interface InstrumentDisplayProps {
   onStopFeedback?: () => void
   performanceState?: any
   volumeLevel?: number
+  // Export to Classroom props
+  onExportToClassroom?: () => void
+  canExportToClassroom?: boolean
+  hasExportableContent?: boolean
 }
 
 const InstrumentDisplay = memo(function InstrumentDisplay({
@@ -150,7 +154,10 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   onStartFeedback,
   onStopFeedback,
   performanceState,
-  volumeLevel = 0
+  volumeLevel = 0,
+  onExportToClassroom,
+  canExportToClassroom = false,
+  hasExportableContent = false
 }: InstrumentDisplayProps) {
   const [lowerOctaves, setLowerOctaves] = useState<number>(initialLowerOctaves)
   const [higherOctaves, setHigherOctaves] = useState<number>(initialHigherOctaves)
@@ -428,6 +435,9 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           onStopFeedback={onStopFeedback}
           performanceState={performanceState}
           volumeLevel={volumeLevel}
+          onExportToClassroom={onExportToClassroom}
+          canExportToClassroom={canExportToClassroom}
+          hasExportableContent={hasExportableContent}
         />
       </div>
 
@@ -465,6 +475,9 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
             onKeyboardPreviewChange={setKeyboardPreview}
             availableKeyboardNotes={availableKeyboardNotes}
             lessonType={lessonType}
+            onExportToClassroom={onExportToClassroom}
+            canExportToClassroom={canExportToClassroom}
+            hasExportableContent={hasExportableContent}
           />
         )}
 

@@ -80,6 +80,10 @@ interface InstrumentControlsProps {
   onStopFeedback?: () => void
   performanceState?: any
   volumeLevel?: number
+  // Export to Classroom props
+  onExportToClassroom?: () => void
+  canExportToClassroom?: boolean
+  hasExportableContent?: boolean
 }
 
 const InstrumentControls = memo(function InstrumentControls({
@@ -144,7 +148,10 @@ const InstrumentControls = memo(function InstrumentControls({
   onStartFeedback,
   onStopFeedback,
   performanceState,
-  volumeLevel = 0
+  volumeLevel = 0,
+  onExportToClassroom,
+  canExportToClassroom = false,
+  hasExportableContent = false
 }: InstrumentControlsProps) {
   const { t } = useTranslation()
 

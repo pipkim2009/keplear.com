@@ -2910,6 +2910,48 @@ body.dark .modern-control-item.audio-player-section audio {
 
 /*
   ===========================================
+  EXPORT TO CLASSROOM BUTTON
+  ===========================================
+*/
+
+.export-to-classroom-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgb(255, 255, 255, 0.1);
+  border: 2px solid #ffffff;
+  border-radius: 0;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+  height: 32px;
+  margin-top: 5px;
+}
+
+.export-to-classroom-button svg {
+  font-size: 14px;
+}
+
+.export-to-classroom-button:hover:not(:disabled) {
+  background: rgb(255, 255, 255, 0.2);
+}
+
+.export-to-classroom-button:active:not(:disabled) {
+  background: rgb(255, 255, 255, 0.15);
+}
+
+.export-to-classroom-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/*
+  ===========================================
   REDUCED MOTION ACCESSIBILITY
   ===========================================
   Respects user's motion preferences for accessibility

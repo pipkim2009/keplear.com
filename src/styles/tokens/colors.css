@@ -305,8 +305,11 @@
      ======================================== */
   --guitar-fretboard-primary: #3e2723;
   --guitar-fretboard-secondary: #1e1e1e;
+  --guitar-fretboard-light-primary: #d4a574;
+  --guitar-fretboard-light-secondary: #c49464;
   --guitar-surface: #2a1f1c;
   --guitar-border: #2d2d2d;
+  --guitar-border-light: #b8956a;
 
   /* Fret Colors */
   --fret-wire-primary: #c9c9c9;

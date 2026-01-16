@@ -1,6 +1,6 @@
 import { memo, useMemo } from 'react'
 import ScaleChordOptions, { type AppliedChord, type AppliedScale, type FretboardPreview, type KeyboardPreview } from '../../common/ScaleChordOptions'
-import { PiTrashFill } from 'react-icons/pi'
+import { PiTrashFill, PiExportFill } from 'react-icons/pi'
 import type { Note } from '../../../utils/notes'
 import type { KeyboardScale } from '../../../utils/instruments/keyboard/keyboardScales'
 import type { KeyboardChord } from '../../../utils/instruments/keyboard/keyboardChords'
@@ -41,6 +41,10 @@ interface InstrumentHeaderProps {
   onKeyboardPreviewChange?: (preview: KeyboardPreview | null) => void
   availableKeyboardNotes?: readonly Note[]
   lessonType?: 'melodies' | 'chords'
+  // Export to Classroom props
+  onExportToClassroom?: () => void
+  canExportToClassroom?: boolean
+  hasExportableContent?: boolean
 }
 
 const InstrumentHeader = memo(function InstrumentHeader({
@@ -74,7 +78,10 @@ const InstrumentHeader = memo(function InstrumentHeader({
   onFretboardPreviewChange,
   onKeyboardPreviewChange,
   availableKeyboardNotes = [],
-  lessonType
+  lessonType,
+  onExportToClassroom,
+  canExportToClassroom = false,
+  hasExportableContent = false
 }: InstrumentHeaderProps) {
   // Memoize computed values
   const showDeselectButton = useMemo(() => {
@@ -84,6 +91,18 @@ const InstrumentHeader = memo(function InstrumentHeader({
   return (
     <div className="instrument-header-controls">
       <div className="header-controls-left">
+        {/* Export to Classroom button */}
+        {canExportToClassroom && (
+          <button
+            className="export-to-classroom-button"
+            onClick={onExportToClassroom}
+            disabled={!hasExportableContent}
+          >
+            <PiExportFill />
+            <span>Classroom Export</span>
+          </button>
+        )}
+
         {/* Scale/Chord Options */}
         {!hideScalesChords && (
         <div className="control-group scale-chord-options">

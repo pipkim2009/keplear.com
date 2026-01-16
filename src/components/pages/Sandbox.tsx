@@ -1610,25 +1610,10 @@ function Sandbox() {
         onStopFeedback={handleStopPracticeWithFeedback}
         performanceState={performanceGrading.state}
         volumeLevel={pitchDetection.volumeLevel}
+        onExportToClassroom={handleExportToClassroom}
+        canExportToClassroom={!!user && !assigningToClassroomId}
+        hasExportableContent={selectedNotes.length > 0 || scaleChordManagement.appliedScales.length > 0 || scaleChordManagement.appliedChords.length > 0}
       />
-
-      {/* Export to Classroom button - only show when logged in and not already in assignment mode */}
-      {user && !assigningToClassroomId && (() => {
-        const hasContent = selectedNotes.length > 0 ||
-                          scaleChordManagement.appliedScales.length > 0 ||
-                          scaleChordManagement.appliedChords.length > 0
-        return (
-          <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '0.5rem', marginBottom: '1rem' }}>
-            <button
-              className={styles.exportToClassroomButton}
-              onClick={handleExportToClassroom}
-              disabled={!hasContent}
-            >
-              {t('sandbox.exportToClassroom')}
-            </button>
-          </div>
-        )
-      })()}
 
       {assignTitleModal}
     </>
