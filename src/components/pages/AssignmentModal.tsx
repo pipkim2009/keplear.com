@@ -11,7 +11,7 @@ import '../../styles/Controls.css'
 import '../../styles/Tooltip.css'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
-import { IoMdArrowDropdown } from 'react-icons/io'
+import { IoMdArrowDropdown, IoMdEye } from 'react-icons/io'
 import Tooltip from '../common/Tooltip'
 import { GUITAR_SCALES } from '../../utils/instruments/guitar/guitarScales'
 import { GUITAR_CHORDS } from '../../utils/instruments/guitar/guitarChords'
@@ -39,12 +39,14 @@ interface AssignmentModalProps {
   isDarkMode: boolean
   onSubmit: (settings: AssignmentSettings) => Promise<void>
   onCancel: () => void
+  onPreview?: (settings: AssignmentSettings) => void
 }
 
 const AssignmentModal: React.FC<AssignmentModalProps> = ({
   isDarkMode,
   onSubmit,
-  onCancel
+  onCancel,
+  onPreview
 }) => {
   const { t } = useTranslation()
   const [title, setTitle] = useState('')
@@ -129,6 +131,25 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       onCancel()
+    }
+  }
+
+  const handlePreview = () => {
+    if (onPreview) {
+      onPreview({
+        title: title.trim() || 'Preview Assignment',
+        lessonType: selectedOption,
+        instrument: selectedInstrument,
+        bpm,
+        beats,
+        chordCount,
+        scales: selectedScales,
+        chords: selectedChords,
+        octaveLow,
+        octaveHigh,
+        fretLow,
+        fretHigh
+      })
     }
   }
 
@@ -578,6 +599,16 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         </div>
 
         <div className={styles.modalActions}>
+          {onPreview && (
+            <button
+              onClick={handlePreview}
+              className={styles.previewButton}
+              disabled={submitting}
+              type="button"
+            >
+              <IoMdEye /> Preview
+            </button>
+          )}
           <button
             onClick={handleSubmit}
             className={styles.startButton}

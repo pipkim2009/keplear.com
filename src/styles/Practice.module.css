@@ -1326,6 +1326,52 @@
   background: var(--dark-bg-tertiary);
 }
 
+.assignmentPreviewButton {
+  padding: 0.625rem 1rem;
+  border: 2px solid var(--primary-purple);
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: var(--primary-purple);
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+:global(.dark) .assignmentPreviewButton {
+  border-color: var(--primary-purple-lighter);
+  color: var(--primary-purple-lighter);
+}
+
+.assignmentPreviewButton:hover:not(:disabled) {
+  background: rgba(139, 92, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.assignmentPreviewButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Preview Mode Banner */
+.previewModeBanner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  margin: 0 calc(-50vw + 50%) 0.5rem;
+  width: 100vw;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);
+}
+
 .assignmentAssignButton {
   padding: 0.625rem 1.5rem;
   border: none;

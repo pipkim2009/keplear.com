@@ -650,6 +650,42 @@
   margin-top: 8px;
 }
 
+/* Preview Button */
+.previewButton {
+  padding: 14px 24px;
+  background: transparent;
+  border: 2px solid #6600cc;
+  border-radius: 12px;
+  color: #6600cc;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.previewButton:hover:not(:disabled) {
+  background: rgba(102, 0, 204, 0.1);
+}
+
+.previewButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+:global(.dark) .previewButton {
+  border-color: #a855f7;
+  color: #a855f7;
+}
+
+:global(.dark) .previewButton:hover:not(:disabled) {
+  background: rgba(168, 85, 247, 0.1);
+}
+
 /* Start Button */
 .startButton {
   padding: 14px 28px;
@@ -664,7 +700,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 100%;
+  flex: 1;
   justify-content: center;
 }
 

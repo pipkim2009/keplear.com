@@ -27,7 +27,7 @@ import {
   getBassNoteById,
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
-import { PiTrashFill, PiChatCircleFill, PiPencilSimpleFill } from 'react-icons/pi'
+import { PiTrashFill, PiChatCircleFill, PiPencilSimpleFill, PiEyeFill } from 'react-icons/pi'
 import styles from '../../styles/Classroom.module.css'
 import practiceStyles from '../../styles/Practice.module.css'
 
@@ -306,6 +306,7 @@ function Classroom() {
   const [isSavingAssignment, setIsSavingAssignment] = useState(false)
   const [assignmentError, setAssignmentError] = useState<string | null>(null)
   const [editingAssignmentId, setEditingAssignmentId] = useState<string | null>(null)
+  const [isPreviewMode, setIsPreviewMode] = useState(false)
 
   // Multi-exercise state for assignment editor
   const [exercises, setExercises] = useState<ExerciseData[]>([])
@@ -1632,7 +1633,76 @@ function Classroom() {
     setLessonExerciseIndex(0)
     clearSelection()
     triggerClearChordsAndScales()
-    setViewMode('classroom')
+
+    // If we were in preview mode, return to assignment editor
+    if (isPreviewMode) {
+      setIsPreviewMode(false)
+      setViewMode('creating-assignment')
+    } else {
+      setViewMode('classroom')
+    }
+  }
+
+  // Preview assignment - enter lesson mode with current editor data
+  const handlePreviewAssignment = () => {
+    // Save current exercise state before previewing
+    const updatedExercises = [...exercises]
+    updatedExercises[currentExerciseIndex] = {
+      ...updatedExercises[currentExerciseIndex],
+      selectedNoteIds: selectedNotes.map(n => n.id),
+      appliedScales: scaleChordManagement.appliedScales,
+      appliedChords: scaleChordManagement.appliedChords,
+      transcript: currentExerciseTranscript,
+      bpm,
+      beats: numberOfBeats,
+      chordMode
+    }
+
+    // Build a preview assignment object
+    const previewAssignment: AssignmentData = {
+      id: 'preview',
+      title: assignmentTitle || 'Preview Assignment',
+      instrument,
+      bpm,
+      beats: numberOfBeats,
+      selection_data: {
+        exercises: updatedExercises
+      },
+      created_at: new Date().toISOString()
+    }
+
+    // Enter preview mode
+    setIsPreviewMode(true)
+
+    // Set up the lesson environment (similar to handleStartAssignment)
+    setCurrentAssignment(previewAssignment)
+    hasInitializedNotes.current = false
+    hasAnnouncedMelody.current = false
+    setWelcomeSpeechDone(false)
+    setGenericWelcomeDone(false)
+    setHasGeneratedMelody(false)
+    setAutoPlayAudio(false)
+    setMelodySetupMessage('')
+    setCongratulationsMessage('')
+
+    // Clear existing content
+    clearSelection()
+    triggerClearChordsAndScales()
+    scaleChordManagement.setAppliedScalesDirectly([])
+    scaleChordManagement.setAppliedChordsDirectly([])
+    setExternalSelectedNoteIds([])
+
+    // Set up lesson exercises from editor data
+    setLessonExercises(updatedExercises.map(ex => ({
+      ...ex,
+      transcript: ex.transcript || '',
+      bpm: ex.bpm || bpm,
+      beats: ex.beats || numberOfBeats
+    })))
+    setLessonExerciseIndex(0)
+
+    // Switch to lesson mode
+    setViewMode('taking-lesson')
   }
 
   // Handle Done button click - show animation before ending
@@ -2248,6 +2318,14 @@ function Classroom() {
 
     return (
       <>
+        {/* Preview Mode Banner */}
+        {isPreviewMode && (
+          <div className={practiceStyles.previewModeBanner}>
+            <PiEyeFill size={18} />
+            <span>{t('classroom.previewMode')}</span>
+          </div>
+        )}
+
         <div className={practiceStyles.backButtonContainer}>
           <button className={practiceStyles.backButton} onClick={handleEndLesson} aria-label="End practice session">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -2444,6 +2522,16 @@ function Classroom() {
               placeholder={t('sandbox.assignmentTitle')}
             />
             <button
+              className={practiceStyles.assignmentPreviewButton}
+              onClick={handlePreviewAssignment}
+              disabled={!assigningToClassroomId || !assignmentTitle.trim() || !allExercisesHaveContent || isSavingAssignment}
+              style={{ opacity: (assigningToClassroomId && assignmentTitle.trim() && allExercisesHaveContent) ? 1 : 0.5 }}
+              title={t('classroom.preview')}
+            >
+              <PiEyeFill size={16} />
+              {t('classroom.preview')}
+            </button>
+            <button
               className={practiceStyles.assignmentAssignButton}
               onClick={handleSaveAssignment}
               disabled={!assigningToClassroomId || !assignmentTitle.trim() || !allExercisesHaveContent || isSavingAssignment}
@@ -2573,6 +2661,7 @@ function Classroom() {
           onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
           externalSelectedNoteIds={externalSelectedNoteIds}
           hideInstrumentSelector={true}
+          hideGenerateButton={true}
         />
       </>
     )
