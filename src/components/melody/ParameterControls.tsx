@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { useMelodySettings } from '../../hooks'
+import { useTranslation } from '../../contexts/TranslationContext'
 import { IoSettingsSharp } from 'react-icons/io5'
 import { IoMusicalNotes } from 'react-icons/io5'
 import { MdMusicNote } from 'react-icons/md'
@@ -10,6 +11,7 @@ import { MdMusicNote } from 'react-icons/md'
  * Optimized with React.memo and focused context hook
  */
 const ParameterControls = memo(function ParameterControls() {
+  const { t } = useTranslation()
   // Use focused melody settings hook instead of full context
   const {
     bpm,
@@ -41,7 +43,7 @@ const ParameterControls = memo(function ParameterControls() {
       <h3><IoSettingsSharp /> Melody Settings</h3>
 
       <div className="control-group">
-        <label htmlFor="bpm-control"><IoMusicalNotes /> BPM (Beats Per Minute)</label>
+        <label htmlFor="bpm-control"><IoMusicalNotes /> {t('bpm')}</label>
         <div className="input-container">
           <input
             id="bpm-control"

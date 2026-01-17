@@ -4,6 +4,7 @@
 
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from '../../contexts/TranslationContext'
 import styles from '../../styles/PracticeOptionsModal.module.css'
 import classroomStyles from '../../styles/Classroom.module.css'
 import '../../styles/Controls.css'
@@ -45,6 +46,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   onSubmit,
   onCancel
 }) => {
+  const { t } = useTranslation()
   const [title, setTitle] = useState('')
   const [selectedInstrument, setSelectedInstrument] = useState<string>('keyboard')
   const [selectedOption, setSelectedOption] = useState<string>('melodies')
@@ -478,8 +480,8 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 20, flexWrap: 'wrap' }}>
           <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
             <div className="label-with-tooltip">
-              <label className="control-label">BPM</label>
-              <Tooltip title="BPM" text="Specify the speed of the melody (BEATS PER MINUTE)">
+              <label className="control-label">{t('bpm')}</label>
+              <Tooltip title={t('bpm')} text={t('bpmTooltip')}>
                 <div className="tooltip-icon">?</div>
               </Tooltip>
             </div>

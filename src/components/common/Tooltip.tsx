@@ -81,8 +81,28 @@ const Tooltip: React.FC<TooltipProps> = ({ title, text, children }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [isVisible, closeTooltip])
 
+  // Close this tooltip when another tooltip is hovered
+  useEffect(() => {
+    if (!isVisible) return
+
+    const handleOtherTooltipHover = (event: Event) => {
+      const customEvent = event as CustomEvent<string>
+      if (customEvent.detail !== tooltipId) {
+        closeTooltip()
+      }
+    }
+
+    document.addEventListener('tooltip-hover', handleOtherTooltipHover)
+    return () => document.removeEventListener('tooltip-hover', handleOtherTooltipHover)
+  }, [isVisible, closeTooltip, tooltipId])
+
+  // Dispatch event when hovering this tooltip
+  const handleMouseEnter = useCallback(() => {
+    document.dispatchEvent(new CustomEvent('tooltip-hover', { detail: tooltipId }))
+  }, [tooltipId])
+
   return (
-    <div className="tooltip-container" ref={containerRef}>
+    <div className="tooltip-container" ref={containerRef} onMouseEnter={handleMouseEnter}>
       <div
         ref={triggerRef}
         onClick={handleClick}

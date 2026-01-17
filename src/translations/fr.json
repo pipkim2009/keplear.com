@@ -379,5 +379,161 @@
   "aria": {
     "selectLanguage": "Sélectionner la langue",
     "loadingPage": "Chargement de la page"
+  },
+  "chatAI": {
+    "welcome": "Bonjour ! Je suis votre assistant Keplear. Je peux vous aider à naviguer dans l'application, expliquer les fonctionnalités ou répondre aux questions sur l'entraînement auditif. Que souhaitez-vous savoir ?\n\n💡 Essayez de demander des informations sur les gammes, les accords ou comment utiliser le bac à sable !",
+    "followUpTip": "Essayez de demander des informations sur les gammes, les accords ou comment utiliser le bac à sable !",
+    "greetings": {
+      "response": "Bonjour ! Je suis votre assistant Keplear. Je peux vous aider à naviguer dans l'application, expliquer les fonctionnalités ou répondre aux questions sur l'entraînement auditif. Que souhaitez-vous savoir ?"
+    },
+    "whatIsKeplear": {
+      "response": "Keplear est une application d'entraînement auditif pour les musiciens ! Voici ce que vous pouvez faire :\n\n• Pratiquez sur **Clavier**, **Guitare** ou **Basse**\n• Apprenez et appliquez des **gammes** et des **accords**\n• **Générez des mélodies** pour entraîner votre oreille\n• Utilisez votre **microphone** pour un retour en temps réel\n• Rejoignez des **classes** pour un apprentissage structuré\n\nSouhaitez-vous en savoir plus sur une fonctionnalité spécifique ?"
+    },
+    "navigation": {
+      "home": "Pour aller à la **Page d'Accueil**, cliquez sur le **logo Keplear** dans le coin supérieur gauche de l'en-tête. La page d'accueil présente un aperçu de l'application et un bouton 'Commencer l'Entraînement' pour commencer à pratiquer !",
+      "sandbox": "Pour accéder au **Bac à Sable** (mode pratique) :\n\n1. Cliquez sur **'Commencer l'Entraînement'** sur la page d'accueil, ou\n2. Cliquez sur **'Bac à Sable'** dans la navigation de l'en-tête\n\nEn mode Bac à Sable, vous pouvez sélectionner des instruments, appliquer des gammes/accords et générer des mélodies pour pratiquer !",
+      "classroom": "Pour accéder à la **Classe** :\n\n1. Cliquez sur **'Classe'** dans la navigation de l'en-tête\n2. Vous devrez **vous connecter** pour utiliser les fonctionnalités de classe\n\n**Les Professeurs** peuvent :\n• Créer des classes (publiques ou privées)\n• Créer des devoirs avec des gammes/accords spécifiques\n\n**Les Élèves** peuvent :\n• Rejoindre des classes avec un code de classe\n• Compléter des devoirs"
+    },
+    "features": {
+      "scales": "Les **Gammes** mettent en évidence des motifs de notes spécifiques sur votre instrument !\n\n**Comment utiliser :**\n1. Allez en mode **Bac à Sable**\n2. Trouvez la section **Gammes** dans les contrôles\n3. Sélectionnez une **note fondamentale** (C, D, E, etc.)\n4. Choisissez un **type de gamme** (Majeur, Mineur, Pentatonique, Blues, etc.)\n5. Cliquez sur **'Appliquer'**\n\nLes notes de la gamme seront mises en évidence sur votre instrument. Générez une mélodie pour les entendre en action !",
+      "chords": "Les **Accords** ajoutent de l'harmonie à votre pratique !\n\n**Comment utiliser :**\n1. Allez en mode **Bac à Sable**\n2. Trouvez la section **Accords**\n3. Sélectionnez une **note fondamentale** et un **type d'accord** (Majeur, Mineur, 7ème, etc.)\n4. Cliquez sur **'Appliquer'**\n\n**Conseil :** Utilisez le sélecteur **Progression/Arpégiateur** :\n• **Progression** = joue les accords complets ensemble\n• **Arpégiateur** = joue les notes d'accord une par une",
+      "melody": "Pour **générer une mélodie** :\n\n1. Allez en mode **Bac à Sable**\n2. **Appliquez d'abord des gammes ou des accords** (la mélodie utilise ces notes)\n3. Réglez votre **BPM** (tempo) et **nombre de temps**\n4. Cliquez sur le bouton **'Générer'**\n5. Cliquez sur **'Jouer'** pour écouter votre mélodie !\n\nLa mélodie générée utilisera les notes de vos gammes/accords sélectionnés. Essayez différentes combinaisons !",
+      "bpm": "**BPM (Battements Par Minute)** contrôle le tempo :\n\n• Trouvez l'entrée **BPM** dans les contrôles du mode Bac à Sable\n• Entrez un nombre entre **1-999**\n• **BPM plus élevé** = lecture plus rapide\n• **BPM plus bas** = lecture plus lente\n\n**Conseil :** Commencez lentement (60-80 BPM) lors de l'apprentissage, puis augmentez la vitesse à mesure que vous progressez !",
+      "beats": "**Nombre de Temps** contrôle la durée de la mélodie :\n\n• Trouvez l'entrée **temps** à côté du BPM dans le Bac à Sable\n• Entrez combien de notes vous voulez dans votre mélodie\n• Plus de temps = mélodie plus longue\n\n**Conseil :** Commencez avec 4-8 temps pour une pratique simple, augmentez pour plus de défi !",
+      "microphone": "**Microphone/Détection de Hauteur** vous permet de pratiquer avec un vrai instrument !\n\n**Comment utiliser :**\n1. En mode Bac à Sable, trouvez le bouton **microphone**\n2. Cliquez pour **activer** l'accès au microphone\n3. Autorisez la permission du navigateur lorsque demandé\n4. Jouez des notes sur votre vrai instrument\n5. L'application **détectera et mettra en évidence** les notes que vous jouez !\n\nIdéal pour vérifier si vous jouez les bonnes notes dans une mélodie.",
+      "instruments": "**Keplear prend en charge 3 instruments :**\n\n🎹 **Clavier** - Touches de piano avec plage d'octaves ajustable\n🎸 **Guitare** - Manche à 6 cordes\n🎸 **Basse** - Manche de basse à 4 cordes\n\n**Pour changer d'instrument :**\n1. Allez en mode Bac à Sable\n2. Cliquez sur le nom/onglet de l'instrument en haut\n3. L'affichage changera pour montrer cet instrument\n\nToutes les fonctionnalités fonctionnent avec tous les instruments !",
+      "octaveRange": "**Plage d'Octaves** (clavier uniquement) :\n\n• Cherchez les boutons **+/-** près de l'affichage du clavier\n• Cliquez sur **+** pour ajouter plus d'octaves (touches plus hautes/basses)\n• Cliquez sur **-** pour supprimer des octaves\n\nCela vous permet de vous concentrer sur des plages spécifiques ou de voir le clavier complet !",
+      "theme": "Pour **changer le thème** :\n\n• Cherchez l'**icône soleil/lune** dans l'en-tête\n• Cliquez pour basculer entre le mode **sombre** et **clair**\n\nVotre préférence est sauvegardée automatiquement !",
+      "auth": "**Pour vous connecter ou créer un compte :**\n\n1. Cliquez sur **'Connexion'** dans l'en-tête (en haut à droite)\n2. Entrez votre email et mot de passe pour vous connecter\n3. Ou cliquez sur **'Inscription'** pour créer un nouveau compte\n\n**Pourquoi se connecter ?**\n• Accédez aux fonctionnalités de **Classe**\n• Créez et rejoignez des classes\n• Sauvegardez votre progression",
+      "assignments": "Les **Devoirs** sont créés dans les Classes :\n\n**Professeurs - Créer des devoirs :**\n1. Allez dans Classe et ouvrez votre classe\n2. Cliquez sur **'Ajouter un Devoir'**\n3. Sélectionnez les gammes, accords, instrument et paramètres\n4. Donnez-lui un titre et sauvegardez\n\n**Élèves - Faire les devoirs :**\n1. Rejoignez une classe avec le code de classe\n2. Cliquez sur un devoir pour commencer\n3. Pratiquez avec les paramètres préconfigurés !"
+    },
+    "help": {
+      "response": "Je peux vous aider avec :\n\n🎵 **Fonctionnalités** - gammes, accords, génération de mélodies\n🎹 **Instruments** - clavier, guitare, basse\n📍 **Navigation** - trouver des pages et paramètres\n🎓 **Classe** - créer/rejoindre des classes\n⚙️ **Paramètres** - BPM, temps, thèmes\n\n**Essayez de demander :**\n• \"Comment générer une mélodie ?\"\n• \"Où est la classe ?\"\n• \"Comment utiliser les gammes ?\"\n• \"Quels instruments sont disponibles ?\""
+    },
+    "thanks": {
+      "response": "De rien ! Heureux de vous aider. Si vous avez d'autres questions sur Keplear, n'hésitez pas à demander ! 🎵"
+    },
+    "goodbye": {
+      "response": "Au revoir ! Bonne pratique ! 🎶 N'hésitez pas à revenir quand vous avez besoin d'aide avec Keplear."
+    },
+    "fallback": {
+      "option1": "Je ne suis pas sûr de comprendre. Pourriez-vous reformuler ? Je peux aider avec :\n• Navigation (accueil, bac à sable, classe)\n• Fonctionnalités (gammes, accords, mélodies)\n• Instruments (clavier, guitare, basse)\n• Paramètres (BPM, thèmes)",
+      "option2": "Hmm, je n'ai pas d'informations à ce sujet. Essayez de demander :\n• Comment utiliser les gammes ou accords\n• Comment générer des mélodies\n• Comment accéder à la classe\n• Comment changer d'instrument",
+      "option3": "Je n'ai pas bien compris. Je suis meilleur pour aider avec les fonctionnalités de Keplear ! Demandez-moi des informations sur les gammes, accords, mélodies ou comment naviguer dans l'application."
+    },
+    "suggestedQuestions": {
+      "melody": "Comment générer une mélodie ?",
+      "instruments": "Quels instruments sont disponibles ?",
+      "scales": "Comment utiliser les gammes ?",
+      "classroom": "Où est la classe ?"
+    },
+    "knowledgeBase": {
+      "appDescription": "Une application d'entraînement auditif pour les musiciens pour pratiquer l'identification et le jeu de gammes, accords et mélodies sur clavier, guitare ou basse.",
+      "features": {
+        "scales": {
+          "name": "Gammes",
+          "description": "Gammes musicales qui mettent en évidence des notes spécifiques sur votre instrument. Les gammes disponibles incluent Majeur, Mineur, Pentatonique, Blues et plus.",
+          "location": "En mode Bac à Sable, cherchez la section \"Gammes\" dans le panneau de contrôle.",
+          "howToUse": "Sélectionnez une note fondamentale (comme C, D, E), choisissez un type de gamme, puis cliquez sur \"Appliquer\" pour mettre en évidence ces notes sur votre instrument."
+        },
+        "chords": {
+          "name": "Accords",
+          "description": "Motifs d'accords qui peuvent être appliqués à votre instrument. Inclut Majeur, Mineur, 7ème et autres types d'accords.",
+          "location": "En mode Bac à Sable, cherchez la section \"Accords\" dans le panneau de contrôle.",
+          "howToUse": "Sélectionnez une note fondamentale, choisissez un type d'accord, puis cliquez sur \"Appliquer\". Utilisez le sélecteur Progression/Arpégiateur pour contrôler comment les accords sont joués dans les mélodies."
+        },
+        "melodyGeneration": {
+          "name": "Génération de Mélodie",
+          "description": "Génère automatiquement des mélodies basées sur vos gammes et accords sélectionnés.",
+          "location": "En mode Bac à Sable, cliquez sur le bouton \"Générer\" après avoir appliqué des gammes ou accords.",
+          "howToUse": "Appliquez d'abord des gammes ou accords, réglez votre BPM et nombre de temps, puis cliquez sur \"Générer\" pour créer une mélodie. Cliquez sur \"Jouer\" pour l'écouter."
+        },
+        "bpm": {
+          "name": "BPM (Battements Par Minute)",
+          "description": "Contrôle le tempo/vitesse de lecture de la mélodie.",
+          "location": "Dans le panneau de contrôle en mode Bac à Sable, cherchez le champ d'entrée BPM.",
+          "howToUse": "Entrez un nombre entre 1-999 pour régler le tempo. Nombres plus élevés = lecture plus rapide."
+        },
+        "beats": {
+          "name": "Nombre de Temps",
+          "description": "Contrôle combien de notes sont dans une mélodie générée.",
+          "location": "Dans le panneau de contrôle en mode Bac à Sable, à côté du paramètre BPM.",
+          "howToUse": "Entrez un nombre pour définir combien de temps/notes seront dans votre mélodie générée."
+        },
+        "microphone": {
+          "name": "Microphone / Détection de Hauteur",
+          "description": "Utilise votre microphone pour détecter quelles notes vous jouez et fournit un retour en temps réel.",
+          "location": "En mode Bac à Sable, cherchez l'icône du microphone ou le bouton \"Commencer à Écouter\".",
+          "howToUse": "Cliquez pour activer l'accès au microphone. Jouez des notes sur votre vrai instrument et l'application les détectera et mettra en évidence."
+        },
+        "instruments": {
+          "name": "Sélection d'Instrument",
+          "description": "Basculez entre les instruments Clavier, Guitare et Basse.",
+          "location": "En haut de la page Bac à Sable, vous verrez des onglets d'instruments ou un sélecteur.",
+          "howToUse": "Cliquez sur Clavier, Guitare ou Basse pour changer d'instrument. Chacun a sa propre disposition visuelle."
+        },
+        "octaveRange": {
+          "name": "Plage d'Octaves",
+          "description": "Ajustez la plage d'octaves affichées sur le clavier.",
+          "location": "En mode Bac à Sable avec le Clavier, cherchez les contrôles d'octave.",
+          "howToUse": "Utilisez les boutons +/- pour ajouter ou supprimer des octaves de l'affichage du clavier."
+        },
+        "chordMode": {
+          "name": "Mode d'Accord (Progression/Arpégiateur)",
+          "description": "Contrôle comment les accords sont joués dans les mélodies générées. Progression joue les accords complets, Arpégiateur joue les notes individuellement.",
+          "location": "Dans le panneau de contrôle quand des accords sont appliqués.",
+          "howToUse": "Basculez entre \"Progression\" et \"Arpégiateur\" pour changer comment les notes d'accord sont jouées dans les mélodies."
+        },
+        "theme": {
+          "name": "Thème Sombre/Clair",
+          "description": "Basculez entre les thèmes visuels sombre et clair.",
+          "location": "Dans l'en-tête, cherchez une icône soleil/lune.",
+          "howToUse": "Cliquez sur l'icône de changement de thème pour basculer entre les modes sombre et clair."
+        },
+        "authentication": {
+          "name": "Connexion / Inscription",
+          "description": "Créez un compte ou connectez-vous pour accéder aux fonctionnalités de Classe et sauvegarder la progression.",
+          "location": "Dans l'en-tête, cliquez sur \"Connexion\" ou l'icône utilisateur.",
+          "howToUse": "Cliquez sur Connexion pour vous connecter avec un compte existant, ou Inscription pour créer un nouveau compte."
+        }
+      },
+      "pages": {
+        "home": {
+          "name": "Page d'Accueil",
+          "description": "La page de destination avec un aperçu de Keplear et un bouton pour commencer l'entraînement.",
+          "howToAccess": "Cliquez sur le logo Keplear dans l'en-tête ou naviguez vers la page d'accueil.",
+          "features": "Bouton Commencer l'Entraînement, Aperçu de l'application, Présentation des instruments"
+        },
+        "sandbox": {
+          "name": "Bac à Sable / Mode Pratique",
+          "description": "La zone de pratique principale où vous pouvez sélectionner des instruments, appliquer des gammes et accords, générer des mélodies et entraîner votre oreille.",
+          "howToAccess": "Cliquez sur \"Commencer l'Entraînement\" sur la page d'accueil, ou cliquez sur \"Bac à Sable\" dans la navigation de l'en-tête.",
+          "features": "Sélection d'instrument, Sélection de gamme, Sélection d'accord, Génération de mélodie, Contrôle BPM et temps, Détection de hauteur par microphone, Ajustement de plage d'octaves, Sélection de zone de frettes"
+        },
+        "classroom": {
+          "name": "Classe",
+          "description": "Un espace pour que les professeurs créent des classes et devoirs, et pour que les élèves rejoignent et complètent des devoirs.",
+          "howToAccess": "Cliquez sur \"Classe\" dans la navigation de l'en-tête. Vous devez être connecté pour utiliser cette fonctionnalité.",
+          "features": "Créer des classes, Rejoindre des classes avec un code, Créer des devoirs, Faire des devoirs, Options publiques et privées"
+        }
+      },
+      "instruments": {
+        "keyboard": {
+          "name": "Clavier",
+          "description": "Une interface de clavier de piano avec plage d'octaves ajustable.",
+          "tips": "Cliquez sur les touches pour entendre les notes. Utilisez les contrôles d'octave pour afficher plus ou moins d'octaves. Les notes sélectionnées sont mises en évidence en couleur."
+        },
+        "guitar": {
+          "name": "Guitare",
+          "description": "Une interface de manche de guitare à 6 cordes.",
+          "tips": "Cliquez sur les positions de frettes pour entendre les notes. Utilisez la sélection de zone de frettes pour vous concentrer sur des zones spécifiques. Accordage standard : E-A-D-G-B-E."
+        },
+        "bass": {
+          "name": "Basse",
+          "description": "Une interface de manche de basse à 4 cordes.",
+          "tips": "Cliquez sur les positions de frettes pour entendre les notes. Accordage standard : E-A-D-G. Idéal pour pratiquer les lignes de basse et les notes fondamentales."
+        }
+      }
+    }
   }
 }

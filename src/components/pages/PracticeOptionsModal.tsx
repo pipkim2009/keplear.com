@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from '../../contexts/TranslationContext'
 import styles from '../../styles/PracticeOptionsModal.module.css'
 import '../../styles/Controls.css'
 import '../../styles/Tooltip.css'
@@ -56,6 +57,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   onStart,
   onCancel
 }) => {
+  const { t } = useTranslation()
   const [selectedInstrument, setSelectedInstrument] = useState<string>('keyboard')
   const [selectedOption, setSelectedOption] = useState<string>('melodies')
   const [difficulty, setDifficulty] = useState<number>(0) // 0 = Learn, 1 = Custom
@@ -483,8 +485,8 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
           {/* BPM control */}
           <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
             <div className="label-with-tooltip">
-              <label className="control-label">BPM</label>
-              <Tooltip title="BPM" text="Specify the speed of the melody (BEATS PER MINUTE)">
+              <label className="control-label">{t('bpm')}</label>
+              <Tooltip title={t('bpm')} text={t('bpmTooltip')}>
                 <div className="tooltip-icon">?</div>
               </Tooltip>
             </div>

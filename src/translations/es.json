@@ -379,5 +379,161 @@
   "aria": {
     "selectLanguage": "Seleccionar idioma",
     "loadingPage": "Cargando página"
+  },
+  "chatAI": {
+    "welcome": "¡Hola! Soy tu asistente de Keplear. Puedo ayudarte a navegar por la aplicación, explicar funciones o responder preguntas sobre entrenamiento auditivo. ¿Qué te gustaría saber?\n\n💡 ¡Prueba preguntar sobre escalas, acordes o cómo usar el sandbox!",
+    "followUpTip": "¡Prueba preguntar sobre escalas, acordes o cómo usar el sandbox!",
+    "greetings": {
+      "response": "¡Hola! Soy tu asistente de Keplear. Puedo ayudarte a navegar por la aplicación, explicar funciones o responder preguntas sobre entrenamiento auditivo. ¿Qué te gustaría saber?"
+    },
+    "whatIsKeplear": {
+      "response": "¡Keplear es una aplicación de entrenamiento auditivo para músicos! Esto es lo que puedes hacer:\n\n• Practica con **Teclado**, **Guitarra** o **Bajo**\n• Aprende y aplica **escalas** y **acordes**\n• **Genera melodías** para entrenar tu oído\n• Usa tu **micrófono** para retroalimentación en tiempo real\n• Únete a **aulas** para aprendizaje estructurado\n\n¿Te gustaría saber más sobre alguna función específica?"
+    },
+    "navigation": {
+      "home": "Para ir a la **Página de Inicio**, haz clic en el **logo de Keplear** en la esquina superior izquierda. ¡La página de inicio muestra una descripción de la aplicación y tiene un botón 'Comenzar Entrenamiento' para empezar a practicar!",
+      "sandbox": "Para acceder al **Sandbox** (modo práctica):\n\n1. Haz clic en **'Comenzar Entrenamiento'** en la página de inicio, o\n2. Haz clic en **'Sandbox'** en la navegación del encabezado\n\n¡En el modo Sandbox puedes seleccionar instrumentos, aplicar escalas/acordes y generar melodías para practicar!",
+      "classroom": "Para acceder al **Aula**:\n\n1. Haz clic en **'Aula'** en la navegación del encabezado\n2. Necesitarás **iniciar sesión** para usar las funciones del aula\n\n**Profesores** pueden:\n• Crear aulas (públicas o privadas)\n• Crear tareas con escalas/acordes específicos\n\n**Estudiantes** pueden:\n• Unirse a aulas usando un código de clase\n• Completar tareas"
+    },
+    "features": {
+      "scales": "¡Las **Escalas** resaltan patrones de notas específicos en tu instrumento!\n\n**Cómo usar:**\n1. Ve al modo **Sandbox**\n2. Encuentra la sección **Escalas** en los controles\n3. Selecciona una **nota raíz** (C, D, E, etc.)\n4. Elige un **tipo de escala** (Mayor, Menor, Pentatónica, Blues, etc.)\n5. Haz clic en **'Aplicar'**\n\n¡Las notas de la escala se resaltarán en tu instrumento. Genera una melodía para escucharlas en acción!",
+      "chords": "¡Los **Acordes** añaden armonía a tu práctica!\n\n**Cómo usar:**\n1. Ve al modo **Sandbox**\n2. Encuentra la sección **Acordes**\n3. Selecciona una **nota raíz** y **tipo de acorde** (Mayor, Menor, 7ma, etc.)\n4. Haz clic en **'Aplicar'**\n\n**Consejo:** Usa el interruptor **Progresión/Arpegiador**:\n• **Progresión** = toca acordes completos juntos\n• **Arpegiador** = toca notas del acorde una a una",
+      "melody": "Para **generar una melodía**:\n\n1. Ve al modo **Sandbox**\n2. **Aplica escalas o acordes** primero (la melodía usa estas notas)\n3. Configura tu **BPM** (tempo) y **número de tiempos**\n4. Haz clic en el botón **'Generar'**\n5. ¡Haz clic en **'Reproducir'** para escuchar tu melodía!\n\nLa melodía generada usará notas de tus escalas/acordes seleccionados. ¡Prueba diferentes combinaciones!",
+      "bpm": "**BPM (Pulsos Por Minuto)** controla el tempo:\n\n• Encuentra la entrada de **BPM** en los controles del modo Sandbox\n• Ingresa un número entre **1-999**\n• **Mayor BPM** = reproducción más rápida\n• **Menor BPM** = reproducción más lenta\n\n**Consejo:** ¡Comienza lento (60-80 BPM) al aprender, luego aumenta la velocidad a medida que mejores!",
+      "beats": "**Número de Tiempos** controla la duración de la melodía:\n\n• Encuentra la entrada de **tiempos** junto al BPM en Sandbox\n• Ingresa cuántas notas quieres en tu melodía\n• Más tiempos = melodía más larga\n\n**Consejo:** ¡Comienza con 4-8 tiempos para práctica simple, aumenta para más desafío!",
+      "microphone": "¡La **Detección de Tono/Micrófono** te permite practicar con un instrumento real!\n\n**Cómo usar:**\n1. En el modo Sandbox, encuentra el botón de **micrófono**\n2. Haz clic para **habilitar** el acceso al micrófono\n3. Permite el permiso del navegador cuando se solicite\n4. Toca notas en tu instrumento real\n5. ¡La aplicación **detectará y resaltará** las notas que toques!\n\nExcelente para verificar si estás tocando las notas correctas en una melodía.",
+      "instruments": "**Keplear soporta 3 instrumentos:**\n\n🎹 **Teclado** - Teclas de piano con rango de octavas ajustable\n🎸 **Guitarra** - Diapasón de 6 cuerdas\n🎸 **Bajo** - Diapasón de bajo de 4 cuerdas\n\n**Para cambiar de instrumento:**\n1. Ve al modo Sandbox\n2. Haz clic en el nombre/pestaña del instrumento en la parte superior\n3. La pantalla cambiará para mostrar ese instrumento\n\n¡Todas las funciones funcionan con todos los instrumentos!",
+      "octaveRange": "**Rango de Octavas** (solo teclado):\n\n• Busca los botones **+/-** cerca de la pantalla del teclado\n• Haz clic en **+** para añadir más octavas (teclas más altas/bajas)\n• Haz clic en **-** para quitar octavas\n\n¡Esto te permite enfocarte en rangos específicos o ver el teclado completo!",
+      "theme": "Para **cambiar el tema**:\n\n• Busca el **icono de sol/luna** en el encabezado\n• Haz clic para alternar entre modo **oscuro** y **claro**\n\n¡Tu preferencia se guarda automáticamente!",
+      "auth": "**Para iniciar sesión o crear una cuenta:**\n\n1. Haz clic en **'Iniciar Sesión'** en el encabezado (arriba a la derecha)\n2. Ingresa tu correo y contraseña para iniciar sesión\n3. O haz clic en **'Registrarse'** para crear una nueva cuenta\n\n**¿Por qué iniciar sesión?**\n• Accede a funciones del **Aula**\n• Crea y únete a clases\n• Guarda tu progreso",
+      "assignments": "Las **Tareas** se crean en las Aulas:\n\n**Profesores - Creando tareas:**\n1. Ve al Aula y abre tu clase\n2. Haz clic en **'Añadir Tarea'**\n3. Selecciona escalas, acordes, instrumento y configuración\n4. Dale un título y guarda\n\n**Estudiantes - Realizando tareas:**\n1. Únete a un aula usando el código de clase\n2. Haz clic en una tarea para comenzar\n3. ¡Practica con la configuración preestablecida!"
+    },
+    "help": {
+      "response": "Puedo ayudarte con:\n\n🎵 **Funciones** - escalas, acordes, generación de melodías\n🎹 **Instrumentos** - teclado, guitarra, bajo\n📍 **Navegación** - encontrar páginas y configuraciones\n🎓 **Aula** - crear/unirse a clases\n⚙️ **Configuración** - BPM, tiempos, temas\n\n**Prueba preguntar:**\n• \"¿Cómo genero una melodía?\"\n• \"¿Dónde está el aula?\"\n• \"¿Cómo uso las escalas?\"\n• \"¿Qué instrumentos hay disponibles?\""
+    },
+    "thanks": {
+      "response": "¡De nada! Encantado de ayudar. Si tienes más preguntas sobre Keplear, ¡solo pregunta! 🎵"
+    },
+    "goodbye": {
+      "response": "¡Adiós! ¡Feliz práctica! 🎶 Vuelve cuando necesites ayuda con Keplear."
+    },
+    "fallback": {
+      "option1": "No estoy seguro de entender. ¿Podrías reformularlo? Puedo ayudar con:\n• Navegación (inicio, sandbox, aula)\n• Funciones (escalas, acordes, melodías)\n• Instrumentos (teclado, guitarra, bajo)\n• Configuración (BPM, temas)",
+      "option2": "Hmm, no tengo información sobre eso. Prueba preguntar sobre:\n• Cómo usar escalas o acordes\n• Cómo generar melodías\n• Cómo acceder al aula\n• Cómo cambiar de instrumento",
+      "option3": "No entendí bien. ¡Soy mejor ayudando con las funciones de Keplear! Pregúntame sobre escalas, acordes, melodías o cómo navegar por la aplicación."
+    },
+    "suggestedQuestions": {
+      "melody": "¿Cómo genero una melodía?",
+      "instruments": "¿Qué instrumentos hay disponibles?",
+      "scales": "¿Cómo uso las escalas?",
+      "classroom": "¿Dónde está el aula?"
+    },
+    "knowledgeBase": {
+      "appDescription": "Una aplicación de entrenamiento auditivo para músicos para practicar identificando y tocando escalas, acordes y melodías en teclado, guitarra o bajo.",
+      "features": {
+        "scales": {
+          "name": "Escalas",
+          "description": "Escalas musicales que resaltan notas específicas en tu instrumento. Las escalas disponibles incluyen Mayor, Menor, Pentatónica, Blues y más.",
+          "location": "En el modo Sandbox, busca la sección \"Escalas\" en el panel de control.",
+          "howToUse": "Selecciona una nota raíz (como C, D, E), elige un tipo de escala, luego haz clic en \"Aplicar\" para resaltar esas notas en tu instrumento."
+        },
+        "chords": {
+          "name": "Acordes",
+          "description": "Patrones de acordes que se pueden aplicar a tu instrumento. Incluye Mayor, Menor, 7ma y otros tipos de acordes.",
+          "location": "En el modo Sandbox, busca la sección \"Acordes\" en el panel de control.",
+          "howToUse": "Selecciona una nota raíz, elige un tipo de acorde, luego haz clic en \"Aplicar\". Usa el interruptor Progresión/Arpegiador para controlar cómo se tocan los acordes en las melodías."
+        },
+        "melodyGeneration": {
+          "name": "Generación de Melodía",
+          "description": "Genera melodías automáticamente basadas en tus escalas y acordes seleccionados.",
+          "location": "En el modo Sandbox, haz clic en el botón \"Generar\" después de aplicar escalas o acordes.",
+          "howToUse": "Primero aplica algunas escalas o acordes, configura tu BPM y número de tiempos, luego haz clic en \"Generar\" para crear una melodía. Haz clic en \"Reproducir\" para escucharla."
+        },
+        "bpm": {
+          "name": "BPM (Pulsos Por Minuto)",
+          "description": "Controla el tempo/velocidad de reproducción de la melodía.",
+          "location": "En el panel de control en modo Sandbox, busca el campo de entrada BPM.",
+          "howToUse": "Ingresa un número entre 1-999 para establecer el tempo. Números más altos = reproducción más rápida."
+        },
+        "beats": {
+          "name": "Número de Tiempos",
+          "description": "Controla cuántas notas hay en una melodía generada.",
+          "location": "En el panel de control en modo Sandbox, junto a la configuración de BPM.",
+          "howToUse": "Ingresa un número para establecer cuántos tiempos/notas habrá en tu melodía generada."
+        },
+        "microphone": {
+          "name": "Micrófono / Detección de Tono",
+          "description": "Usa tu micrófono para detectar qué notas estás tocando y proporciona retroalimentación en tiempo real.",
+          "location": "En el modo Sandbox, busca el icono del micrófono o el botón \"Comenzar a Escuchar\".",
+          "howToUse": "Haz clic para habilitar el acceso al micrófono. Toca notas en tu instrumento real y la aplicación las detectará y resaltará."
+        },
+        "instruments": {
+          "name": "Selección de Instrumento",
+          "description": "Cambia entre instrumentos de Teclado, Guitarra y Bajo.",
+          "location": "En la parte superior de la página Sandbox, verás pestañas o un selector de instrumentos.",
+          "howToUse": "Haz clic en Teclado, Guitarra o Bajo para cambiar de instrumento. Cada uno tiene su propio diseño visual."
+        },
+        "octaveRange": {
+          "name": "Rango de Octavas",
+          "description": "Ajusta el rango de octavas mostradas en el teclado.",
+          "location": "En el modo Sandbox cuando uses el Teclado, busca los controles de octava.",
+          "howToUse": "Usa los botones +/- para añadir o quitar octavas de la pantalla del teclado."
+        },
+        "chordMode": {
+          "name": "Modo de Acorde (Progresión/Arpegiador)",
+          "description": "Controla cómo se tocan los acordes en las melodías generadas. Progresión toca acordes completos, Arpegiador toca notas individualmente.",
+          "location": "En el panel de control cuando se aplican acordes.",
+          "howToUse": "Alterna entre \"Progresión\" y \"Arpegiador\" para cambiar cómo se tocan las notas del acorde en las melodías."
+        },
+        "theme": {
+          "name": "Tema Oscuro/Claro",
+          "description": "Cambia entre temas visuales oscuro y claro.",
+          "location": "En el encabezado, busca un icono de sol/luna.",
+          "howToUse": "Haz clic en el icono de cambio de tema para alternar entre modos oscuro y claro."
+        },
+        "authentication": {
+          "name": "Iniciar Sesión / Registrarse",
+          "description": "Crea una cuenta o inicia sesión para acceder a las funciones del Aula y guardar el progreso.",
+          "location": "En el encabezado, haz clic en \"Iniciar Sesión\" o en el icono de usuario.",
+          "howToUse": "Haz clic en Iniciar Sesión para entrar con una cuenta existente, o Registrarse para crear una nueva cuenta."
+        }
+      },
+      "pages": {
+        "home": {
+          "name": "Página de Inicio",
+          "description": "La página de bienvenida con una descripción de Keplear y un botón para comenzar a entrenar.",
+          "howToAccess": "Haz clic en el logo de Keplear en el encabezado o navega a la página de inicio.",
+          "features": "Botón Comenzar Entrenamiento, Descripción de la app, Muestra de instrumentos"
+        },
+        "sandbox": {
+          "name": "Sandbox / Modo Práctica",
+          "description": "El área principal de práctica donde puedes seleccionar instrumentos, aplicar escalas y acordes, generar melodías y entrenar tu oído.",
+          "howToAccess": "Haz clic en \"Comenzar Entrenamiento\" en la página de inicio, o haz clic en \"Sandbox\" en la navegación del encabezado.",
+          "features": "Selección de instrumento, Selección de escala, Selección de acorde, Generación de melodía, Control de BPM y tiempos, Detección de tono con micrófono, Ajuste de rango de octavas, Selección de zona de trastes"
+        },
+        "classroom": {
+          "name": "Aula",
+          "description": "Un espacio para que los profesores creen aulas y tareas, y para que los estudiantes se unan y completen tareas.",
+          "howToAccess": "Haz clic en \"Aula\" en la navegación del encabezado. Necesitas iniciar sesión para usar esta función.",
+          "features": "Crear aulas, Unirse a aulas con un código, Crear tareas, Realizar tareas, Opciones públicas y privadas"
+        }
+      },
+      "instruments": {
+        "keyboard": {
+          "name": "Teclado",
+          "description": "Una interfaz de teclado de piano con rango de octavas ajustable.",
+          "tips": "Haz clic en las teclas para escuchar notas. Usa los controles de octava para mostrar más o menos octavas. Las notas seleccionadas se resaltan en color."
+        },
+        "guitar": {
+          "name": "Guitarra",
+          "description": "Una interfaz de diapasón de guitarra de 6 cuerdas.",
+          "tips": "Haz clic en las posiciones de los trastes para escuchar notas. Usa la selección de zona de trastes para enfocarte en áreas específicas. Afinación estándar: E-A-D-G-B-E."
+        },
+        "bass": {
+          "name": "Bajo",
+          "description": "Una interfaz de diapasón de bajo de 4 cuerdas.",
+          "tips": "Haz clic en las posiciones de los trastes para escuchar notas. Afinación estándar: E-A-D-G. Excelente para practicar líneas de bajo y notas raíz."
+        }
+      }
+    }
   }
 }
