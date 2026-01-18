@@ -13,6 +13,7 @@ import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, getBassChordBox
 import { KEYBOARD_CHORDS, type KeyboardChord, applyChordToKeyboard } from '../../utils/instruments/keyboard/keyboardChords'
 import type { Note } from '../../utils/notes'
 import MiniFretboard from './MiniFretboard'
+import MiniKeyboard from './MiniKeyboard'
 import '../../styles/ScaleOptions.css'
 
 // Preview data for guitar/bass (fret positions)
@@ -1031,22 +1032,19 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
             <div className="learn-diagram-content">
               {learnDiagramData.type === 'scale' ? (
                 <div className="scale-diagram">
-                  <div className="diagram-info">
-                    {(learnDiagramData.item as AppliedScale).scale.intervals && (
-                      <p>{(learnDiagramData.item as AppliedScale).scale.intervals.join(' - ')}</p>
-                    )}
-                  </div>
-                  {instrument === 'keyboard' ? (
-                    <div className="diagram-notes">
-                      <p><strong>{t('sandbox.notes')}:</strong></p>
-                      <div className="note-badges">
-                        {(learnDiagramData.item as AppliedScale).notes?.map((note, i) => (
-                          <span key={i} className={`note-badge ${note.name.replace(/\d+$/, '') === learnDiagramData.root ? 'root' : ''}`}>
-                            {note.name}
-                          </span>
-                        ))}
-                      </div>
+                  {instrument !== 'keyboard' && (
+                    <div className="diagram-info">
+                      {(learnDiagramData.item as AppliedScale).scale.intervals && (
+                        <p>{(learnDiagramData.item as AppliedScale).scale.intervals.join(' - ')}</p>
+                      )}
                     </div>
+                  )}
+                  {instrument === 'keyboard' ? (
+                    <MiniKeyboard
+                      notes={(learnDiagramData.item as AppliedScale).notes || []}
+                      root={learnDiagramData.root}
+                      mode="scale"
+                    />
                   ) : (
                     <MiniFretboard
                       noteKeys={(learnDiagramData.item as AppliedScale).noteKeys || []}
@@ -1057,22 +1055,19 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                 </div>
               ) : (
                 <div className="chord-diagram">
-                  <div className="diagram-info">
-                    {(learnDiagramData.item as AppliedChord).chord.intervals && (
-                      <p>{(learnDiagramData.item as AppliedChord).chord.intervals.join(' - ')}</p>
-                    )}
-                  </div>
-                  {instrument === 'keyboard' ? (
-                    <div className="diagram-notes">
-                      <p><strong>{t('sandbox.notes')}:</strong></p>
-                      <div className="note-badges">
-                        {(learnDiagramData.item as AppliedChord).notes?.map((note, i) => (
-                          <span key={i} className={`note-badge ${note.name.replace(/\d+$/, '') === learnDiagramData.root ? 'root' : ''}`}>
-                            {note.name}
-                          </span>
-                        ))}
-                      </div>
+                  {instrument !== 'keyboard' && (
+                    <div className="diagram-info">
+                      {(learnDiagramData.item as AppliedChord).chord.intervals && (
+                        <p>{(learnDiagramData.item as AppliedChord).chord.intervals.join(' - ')}</p>
+                      )}
                     </div>
+                  )}
+                  {instrument === 'keyboard' ? (
+                    <MiniKeyboard
+                      notes={(learnDiagramData.item as AppliedChord).notes || []}
+                      root={learnDiagramData.root}
+                      mode="chord"
+                    />
                   ) : (
                     <MiniFretboard
                       noteKeys={(learnDiagramData.item as AppliedChord).noteKeys || []}

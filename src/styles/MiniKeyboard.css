@@ -1,0 +1,132 @@
+/* MiniKeyboard - scaled down keyboard for diagrams */
+
+.mini-keyboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  gap: 12px;
+}
+
+.mini-keyboard-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+.mini-kb {
+  position: relative;
+}
+
+/* White keys */
+.mini-kb-white-key {
+  position: absolute;
+  top: 0;
+  background: linear-gradient(180deg, var(--keyboard-white-key), var(--keyboard-white-key-hover));
+  border-right: 1px solid var(--white);
+  border-radius: 0 0 4px 4px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 6px;
+  box-sizing: border-box;
+}
+
+.mini-kb-white-key:last-of-type {
+  border-right: none;
+}
+
+/* Black keys */
+.mini-kb-black-key {
+  position: absolute;
+  top: 0;
+  background: linear-gradient(180deg, var(--keyboard-black-key), var(--keyboard-black-key-secondary));
+  border: 1px solid var(--white);
+  border-radius: 0 0 3px 3px;
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Note label */
+.mini-kb-note-label {
+  font-size: 9px;
+  font-weight: bold;
+  color: var(--gray-500);
+  user-select: none;
+}
+
+.mini-kb-black-key .mini-kb-note-label {
+  color: var(--white);
+  font-size: 8px;
+}
+
+/* Scale mode - orange notes, red root */
+.mini-kb-white-key.scale-note {
+  background: linear-gradient(180deg, var(--note-scale), var(--note-scale-dark));
+}
+
+.mini-kb-white-key.scale-note .mini-kb-note-label {
+  color: var(--white);
+}
+
+.mini-kb-white-key.scale-root-note {
+  background: linear-gradient(180deg, var(--note-scale-root), var(--note-scale-root-dark));
+}
+
+.mini-kb-white-key.scale-root-note .mini-kb-note-label {
+  color: var(--white);
+}
+
+.mini-kb-black-key.scale-note {
+  background: linear-gradient(180deg, var(--note-scale), var(--note-scale-dark));
+}
+
+.mini-kb-black-key.scale-note .mini-kb-note-label {
+  color: var(--white);
+}
+
+.mini-kb-black-key.scale-root-note {
+  background: linear-gradient(180deg, var(--note-scale-root), var(--note-scale-root-dark));
+}
+
+.mini-kb-black-key.scale-root-note .mini-kb-note-label {
+  color: var(--white);
+}
+
+/* Chord mode - purple notes, red root */
+.mini-kb-white-key.chord-note {
+  background: linear-gradient(180deg, var(--note-chord), var(--note-chord-dark));
+}
+
+.mini-kb-white-key.chord-note .mini-kb-note-label {
+  color: var(--white);
+}
+
+.mini-kb-white-key.chord-root-note {
+  background: linear-gradient(180deg, var(--note-chord-root), var(--note-chord-root-dark));
+}
+
+.mini-kb-white-key.chord-root-note .mini-kb-note-label {
+  color: var(--white);
+}
+
+.mini-kb-black-key.chord-note {
+  background: linear-gradient(180deg, var(--note-chord), var(--note-chord-dark));
+}
+
+.mini-kb-black-key.chord-note .mini-kb-note-label {
+  color: var(--white);
+}
+
+.mini-kb-black-key.chord-root-note {
+  background: linear-gradient(180deg, var(--note-chord-root), var(--note-chord-root-dark));
+}
+
+.mini-kb-black-key.chord-root-note .mini-kb-note-label {
+  color: var(--white);
+}
