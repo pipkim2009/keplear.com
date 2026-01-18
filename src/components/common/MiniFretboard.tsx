@@ -104,11 +104,12 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
         {/* Frets */}
         {Array.from({ length: fretCount }, (_, i) => {
           const fretNum = startFret + i
+          const isLastFret = i === fretCount - 1
           return (
             <div
               key={`fret-${fretNum}`}
               className="mini-fb-fret"
-              style={{ left: `${(i + 1) * fretWidth}px` }}
+              style={{ left: `${(i + 1) * fretWidth - (isLastFret ? 6 : 0)}px` }}
             >
               <div className="mini-fb-fret-wire"></div>
               {/* Fret markers */}
@@ -182,12 +183,14 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
               ? (isRoot ? 'chord-root-note' : 'chord-note')
               : (isRoot ? 'scale-root-note' : 'scale-note')
             const noteName = getNoteName(stringIndex, fret)
+            // Push first fret notes to the right when showing frets 0-4
+            const firstFretOffset = (fretIdx === 0 && startFret === 1) ? 8 : 0
             return (
               <div
                 key={`note-${stringIndex}-${fret}`}
                 className={`mini-fb-note ${noteClass}`}
                 style={{
-                  left: `${fretIdx * fretWidth + fretWidth / 2 - 10}px`,
+                  left: `${fretIdx * fretWidth + fretWidth / 2 - 10 + firstFretOffset}px`,
                   top: `${14 + stringIndex * stringSpacing - 10}px`
                 }}
               >

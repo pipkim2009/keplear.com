@@ -112,7 +112,7 @@
 .bass-string {
   position: absolute;
   left: 0;
-  width: 1299px;
+  width: 1302px;
   background: linear-gradient(90deg, var(--string-4), var(--string-center-darker), var(--string-4));
   border-radius: 2px;
   z-index: 15;

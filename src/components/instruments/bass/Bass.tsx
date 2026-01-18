@@ -948,7 +948,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
 
         {/* Frets */}
         {[...Array(24)].map((_, index) => (
-          <div key={index} className="bass-fret" style={{ left: `${(index + 1) * 54}px` }}>
+          <div key={index} className="bass-fret" style={{ left: `${(index + 1) * 54 + (index === 23 ? 3 : 0)}px` }}>
             <div className="bass-fret-wire"></div>
             {[3, 5, 7, 9, 15, 17, 19, 21].includes(index + 1) && (
               <div className="bass-fret-marker"></div>

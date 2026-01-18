@@ -1081,7 +1081,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
 
         {/* Frets */}
         {[...Array(24)].map((_, index) => (
-          <div key={index} className="fret" style={{ left: `${(index + 1) * 54}px` }}>
+          <div key={index} className="fret" style={{ left: `${(index + 1) * 54 + (index === 23 ? 3 : 0)}px` }}>
             <div className="fret-wire"></div>
             {/* Fret markers on 3rd, 5th, 7th, 9th, 15th, 17th, 19th, 21st frets */}
             {[3, 5, 7, 9, 15, 17, 19, 21].includes(index + 1) && (
