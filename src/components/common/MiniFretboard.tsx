@@ -26,18 +26,22 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
     return <div className="mini-fretboard-empty">No positions available</div>
   }
 
-  // Determine fret range
-  const frets = positions.map(p => p.fret)
-  const minFret = Math.min(...frets)
-  const maxFret = Math.max(...frets)
+  // Separate open string notes from fretted notes
+  const openStringPositions = positions.filter(p => p.fret === 0)
+  const frettedPositions = positions.filter(p => p.fret > 0)
+  const hasOpenStrings = openStringPositions.length > 0
 
-  // Show at least 4 frets, expand range if needed
-  const hasOpenStrings = minFret === 0
-  const startFret = hasOpenStrings ? 0 : Math.max(0, minFret - 1)
-  const endFret = Math.max(startFret + 4, maxFret + 1)
+  // Determine fret range for fretted notes
+  const frettedFrets = frettedPositions.map(p => p.fret)
+  const minFret = frettedFrets.length > 0 ? Math.min(...frettedFrets) : 1
+  const maxFret = frettedFrets.length > 0 ? Math.max(...frettedFrets) : 4
 
-  // Generate fret numbers to display
-  const fretNumbers = []
+  // Show at least 4 frets
+  const startFret = Math.max(1, minFret)
+  const endFret = Math.max(startFret + 3, maxFret)
+
+  // Generate fret numbers (starting from 1, not 0)
+  const fretNumbers: number[] = []
   for (let f = startFret; f <= endFret; f++) {
     fretNumbers.push(f)
   }
@@ -61,10 +65,15 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
     return positions.some(p => p.stringIndex === stringIndex && p.fret === fret)
   }
 
-  // String labels (high to low for display)
+  // Check if open string has a note
+  const hasOpenStringNote = (stringIndex: number): boolean => {
+    return openStringPositions.some(p => p.stringIndex === stringIndex)
+  }
+
+  // String labels (high to low for display) - use numbers 6-1 for guitar, 4-1 for bass
   const stringLabels = instrument === 'guitar'
-    ? ['e', 'B', 'G', 'D', 'A', 'E']
-    : ['G', 'D', 'A', 'E']
+    ? ['6', '5', '4', '3', '2', '1']
+    : ['4', '3', '2', '1']
 
   return (
     <div className={`mini-fretboard ${mode === 'chord' ? 'chord-mode' : ''}`}>
@@ -75,12 +84,35 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
         ))}
       </div>
 
+      {/* Open strings area - small dedicated area before fret 1 */}
+      {hasOpenStrings && (
+        <div className="mini-open-area">
+          <div className="mini-open-header"></div>
+          <div className="mini-open-positions">
+            {Array.from({ length: stringCount }, (_, stringIndex) => {
+              const hasNote = hasOpenStringNote(stringIndex)
+              const isRoot = hasNote && isRootPosition(stringIndex, 0)
+              return (
+                <div key={stringIndex} className="mini-open-position">
+                  {hasNote && (
+                    <div className={`mini-note-circle ${isRoot ? 'root' : ''}`}></div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Nut - between open strings and frets */}
+      {hasOpenStrings && <div className="mini-nut"></div>}
+
       {/* Fretboard */}
       <div className="mini-fretboard-board">
         {/* Fret numbers at top */}
         <div className="mini-fret-numbers">
           {fretNumbers.map(fret => (
-            <div key={fret} className={`mini-fret-number ${fret === 0 ? 'open' : ''}`}>
+            <div key={fret} className="mini-fret-number">
               {fret}
             </div>
           ))}
@@ -95,10 +127,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
                 const hasNote = hasNoteAt(stringIndex, fret)
                 const isRoot = hasNote && isRootPosition(stringIndex, fret)
                 return (
-                  <div
-                    key={fret}
-                    className={`mini-fret-position ${fret === 0 ? 'open' : ''}`}
-                  >
+                  <div key={fret} className="mini-fret-position">
                     {hasNote && (
                       <div className={`mini-note-circle ${isRoot ? 'root' : ''}`}></div>
                     )}
@@ -112,7 +141,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
         {/* Fret wires */}
         <div className="mini-fret-wires">
           {fretNumbers.map(fret => (
-            <div key={fret} className={`mini-fret-wire ${fret === 0 ? 'nut' : ''}`}></div>
+            <div key={fret} className="mini-fret-wire"></div>
           ))}
         </div>
 
