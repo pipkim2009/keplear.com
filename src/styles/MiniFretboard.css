@@ -24,6 +24,16 @@
   border: 2px solid var(--guitar-border);
 }
 
+/* Open string positions - exact copy from Guitar.css */
+.mini-fb-open-position {
+  position: absolute;
+  left: 0px;
+  width: 14px;
+  height: 24px;
+  border-radius: 8px;
+  background: var(--white-alpha-30);
+}
+
 /* Strings - exact copy from Guitar.css */
 .mini-fb-string {
   position: absolute;

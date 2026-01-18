@@ -52,9 +52,8 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
   // Fret width and string spacing (same ratios as main fretboard)
   const fretWidth = 54
   const stringSpacing = 28
-  const openAreaWidth = 15
   const fretCount = endFret - startFret + 1
-  const totalWidth = openAreaWidth + (fretCount * fretWidth)
+  const totalWidth = fretCount * fretWidth
   const totalHeight = stringCount * stringSpacing
 
   return (
@@ -66,6 +65,15 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
           height: `${totalHeight}px`
         }}
       >
+        {/* Open string positions - individual boxes per string */}
+        {hasOpenStrings && Array.from({ length: stringCount }, (_, i) => (
+          <div
+            key={`open-pos-${i}`}
+            className="mini-fb-open-position"
+            style={{ top: `${14 + i * stringSpacing - 12}px` }}
+          />
+        ))}
+
         {/* Strings */}
         {Array.from({ length: stringCount }, (_, i) => (
           <div
@@ -82,7 +90,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
             <div
               key={`fret-${fretNum}`}
               className="mini-fb-fret"
-              style={{ left: `${openAreaWidth + (i + 1) * fretWidth}px` }}
+              style={{ left: `${(i + 1) * fretWidth}px` }}
             >
               <div className="mini-fb-fret-wire"></div>
               {/* Fret markers */}
@@ -106,7 +114,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
             <div
               key={`fret-num-${fretNum}`}
               className="mini-fb-fret-number"
-              style={{ left: `${openAreaWidth + i * fretWidth + fretWidth / 2}px` }}
+              style={{ left: `${i * fretWidth + fretWidth / 2}px` }}
             >
               {fretNum}
             </div>
@@ -133,7 +141,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
               key={`open-note-${stringIndex}`}
               className={`mini-fb-note ${isRoot ? 'root' : ''}`}
               style={{
-                left: `${openAreaWidth / 2 - 10}px`,
+                left: `-3px`,
                 top: `${14 + stringIndex * stringSpacing - 10}px`
               }}
             />
@@ -151,7 +159,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
                 key={`note-${stringIndex}-${fret}`}
                 className={`mini-fb-note ${isRoot ? 'root' : ''}`}
                 style={{
-                  left: `${openAreaWidth + fretIdx * fretWidth + fretWidth / 2 - 10}px`,
+                  left: `${fretIdx * fretWidth + fretWidth / 2 - 10}px`,
                   top: `${14 + stringIndex * stringSpacing - 10}px`
                 }}
               />
