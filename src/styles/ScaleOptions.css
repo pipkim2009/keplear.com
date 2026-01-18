@@ -1181,15 +1181,15 @@ input:checked + .toggle-slider:hover {
   position: relative;
 }
 
-.open-string-marker {
-  font-size: 16px;
+.note-marker {
+  font-size: 22px;
   font-weight: 700;
   color: #000;
   z-index: 2;
   position: relative;
 }
 
-.open-string-marker.root {
+.note-marker.root {
   color: #000;
 }
 

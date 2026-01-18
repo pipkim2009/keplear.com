@@ -140,7 +140,7 @@ const FretboardDiagram: React.FC<FretboardDiagramProps> = ({ noteKeys, stringCou
                 <div key={stringIdx} className="nut-position">
                   {hasOpenStrings && (
                     hasNote ? (
-                      <div className={`open-string-marker ${isRoot ? 'root' : ''}`}>○</div>
+                      <div className={`note-marker ${isRoot ? 'root' : ''}`}>●</div>
                     ) : !stringHasAnyNote ? (
                       <div className="muted-string-marker">×</div>
                     ) : null
@@ -166,9 +166,6 @@ const FretboardDiagram: React.FC<FretboardDiagramProps> = ({ noteKeys, stringCou
                   const isRoot = rootPositions.some(p => p.stringIndex === stringIdx && p.fret === currentFret)
                   return (
                     <div key={stringIdx} className="fret-position">
-                      {hasNote && (
-                        <div className={`fret-dot ${isRoot ? 'root' : ''}`}></div>
-                      )}
                     </div>
                   )
                 })}
