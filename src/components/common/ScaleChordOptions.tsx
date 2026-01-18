@@ -1189,24 +1189,26 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                 </div>
               ) : (
                 <div className="chord-diagram">
-                  <div className="diagram-info">
-                    <p><strong>{t('sandbox.rootNote')}:</strong> {learnDiagramData.root}</p>
-                    <p><strong>{t('sandbox.chord')}:</strong> {(learnDiagramData.item as AppliedChord).chord.name}</p>
-                    {(learnDiagramData.item as AppliedChord).chord.intervals && (
-                      <p><strong>{t('sandbox.intervals')}:</strong> {(learnDiagramData.item as AppliedChord).chord.intervals.join(' - ')}</p>
-                    )}
-                  </div>
                   {instrument === 'keyboard' ? (
-                    <div className="diagram-notes">
-                      <p><strong>{t('sandbox.notes')}:</strong></p>
-                      <div className="note-badges">
-                        {(learnDiagramData.item as AppliedChord).notes?.map((note, i) => (
-                          <span key={i} className={`note-badge ${note.name.replace(/\d+$/, '') === learnDiagramData.root ? 'root' : ''}`}>
-                            {note.name}
-                          </span>
-                        ))}
+                    <>
+                      <div className="diagram-info">
+                        <p><strong>{t('sandbox.rootNote')}:</strong> {learnDiagramData.root}</p>
+                        <p><strong>{t('sandbox.chord')}:</strong> {(learnDiagramData.item as AppliedChord).chord.name}</p>
+                        {(learnDiagramData.item as AppliedChord).chord.intervals && (
+                          <p><strong>{t('sandbox.intervals')}:</strong> {(learnDiagramData.item as AppliedChord).chord.intervals.join(' - ')}</p>
+                        )}
                       </div>
-                    </div>
+                      <div className="diagram-notes">
+                        <p><strong>{t('sandbox.notes')}:</strong></p>
+                        <div className="note-badges">
+                          {(learnDiagramData.item as AppliedChord).notes?.map((note, i) => (
+                            <span key={i} className={`note-badge ${note.name.replace(/\d+$/, '') === learnDiagramData.root ? 'root' : ''}`}>
+                              {note.name}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </>
                   ) : (
                     <FretboardDiagram
                       noteKeys={(learnDiagramData.item as AppliedChord).noteKeys || []}
