@@ -5,6 +5,7 @@ import { applyScaleToBass, applyScaleBoxToBass, BASS_SCALES, type BassScale, typ
 import { applyChordToBass, applyBassChordShapeToBass, type BassChord, type BassChordShape } from '../../../utils/instruments/bass/bassChords'
 import type { Note } from '../../../utils/notes'
 import type { AppliedChord, AppliedScale, FretboardPreview } from '../../common/ScaleChordOptions'
+import { useTranslation } from '../../../contexts/TranslationContext'
 
 interface BassProps {
   setBassNotes: (notes: Note[]) => void
@@ -41,6 +42,14 @@ interface BassProps {
 }
 
 const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, externalSelectedNoteIds, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false, fretRangeLow, fretRangeHigh }) => {
+  const { t } = useTranslation()
+
+  // Helper to get note display name (without octave number)
+  const getNoteName = useCallback((noteName: string | null): string => {
+    if (!noteName) return ''
+    return noteName.replace(/\d+$/, '')
+  }, [])
+
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(4).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -1279,7 +1288,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                 }}
               >
                 <span className="bass-note-name">
-                  {noteName}
+                  {getNoteName(noteName)}
                 </span>
               </div>
             )
@@ -1319,7 +1328,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                 }}
               >
                 <span className="bass-note-name">
-                  {noteName}
+                  {getNoteName(noteName)}
                 </span>
               </div>
             )
@@ -1364,7 +1373,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               }}
             >
               <span className="bass-note-name">
-                {noteName}
+                {getNoteName(noteName)}
               </span>
             </div>
           )

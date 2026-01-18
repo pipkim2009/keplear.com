@@ -3,6 +3,7 @@ import type { Note } from '../../../utils/notes'
 
 interface KeyboardKeyProps {
   note: Note
+  displayName?: string // Localized display name for the note
   isSelected: boolean // Now means "manually selected"
   isVisible: boolean // Should the note be visible (manual OR scale/chord)
   isInMelody: boolean
@@ -22,6 +23,7 @@ interface KeyboardKeyProps {
 
 const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
   note,
+  displayName,
   isSelected, // Manual selection
   isVisible, // Overall visibility
   isInMelody,
@@ -37,6 +39,8 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
   isPreviewRoot = false,
   isPreviewChord = false
 }) => {
+  // Use displayName if provided, otherwise fall back to note.name
+  const noteDisplayName = displayName || note.name
   const baseClass = useMemo(() => note.isBlack ? 'black-key' : 'white-key', [note.isBlack])
   const selectedClass = isSelected ? 'selected' : ''
   const melodyClass = isInMelody ? 'melody' : ''
@@ -111,10 +115,10 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
       className={classNames}
       onClick={handleClick}
       style={style}
-      aria-label={`${note.name} key`}
+      aria-label={`${noteDisplayName} key`}
       aria-pressed={isSelected}
     >
-      <span className="key-label">{note.name}</span>
+      <span className="key-label">{noteDisplayName}</span>
     </button>
   )
 }, (prevProps, nextProps) => {
@@ -122,6 +126,7 @@ const KeyboardKey: React.FC<KeyboardKeyProps> = memo(({
   return (
     prevProps.note.name === nextProps.note.name &&
     prevProps.note.position === nextProps.note.position &&
+    prevProps.displayName === nextProps.displayName &&
     prevProps.isSelected === nextProps.isSelected &&
     prevProps.isVisible === nextProps.isVisible &&
     prevProps.isInMelody === nextProps.isInMelody &&

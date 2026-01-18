@@ -1,5 +1,6 @@
 import { Sun, Moon } from 'lucide-react'
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
+import { useTranslation } from '../../contexts/TranslationContext'
 import '../../styles/ThemeToggle.css'
 
 interface ThemeToggleProps {
@@ -8,20 +9,11 @@ interface ThemeToggleProps {
 }
 
 const ThemeToggle = memo(function ThemeToggle({ isDarkMode, onToggle }: ThemeToggleProps) {
-  const ariaLabel = useMemo(() =>
-    isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode',
-    [isDarkMode]
-  )
+  const { t } = useTranslation()
 
-  const icon = useMemo(() =>
-    isDarkMode ? <Moon size={20} /> : <Sun size={20} />,
-    [isDarkMode]
-  )
-
-  const label = useMemo(() =>
-    isDarkMode ? 'Dark' : 'Light',
-    [isDarkMode]
-  )
+  const ariaLabel = isDarkMode ? t('theme.switchToLight') : t('theme.switchToDark')
+  const icon = isDarkMode ? <Moon size={20} /> : <Sun size={20} />
+  const label = isDarkMode ? t('theme.dark') : t('theme.light')
   return (
     <button
       className="theme-toggle-simple"

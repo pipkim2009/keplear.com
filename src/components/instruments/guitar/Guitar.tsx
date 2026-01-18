@@ -5,6 +5,7 @@ import { applyScaleToGuitar, applyScaleBoxToGuitar, GUITAR_SCALES, type GuitarSc
 import { applyChordToGuitar, applyChordShapeToGuitar, type GuitarChord, type ChordShape } from '../../../utils/instruments/guitar/guitarChords'
 import type { Note } from '../../../utils/notes'
 import type { AppliedChord, AppliedScale, FretboardPreview } from '../../common/ScaleChordOptions'
+import { useTranslation } from '../../../contexts/TranslationContext'
 
 interface GuitarProps {
   setGuitarNotes: (notes: Note[]) => void
@@ -41,6 +42,14 @@ interface GuitarProps {
 }
 
 const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, externalSelectedNoteIds, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false, fretRangeLow, fretRangeHigh }) => {
+  const { t } = useTranslation()
+
+  // Helper to get note display name (without octave number)
+  const getNoteName = useCallback((noteName: string | null): string => {
+    if (!noteName) return ''
+    return noteName.replace(/\d+$/, '')
+  }, [])
+
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(6).fill(false))
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -1432,7 +1441,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
                 }}
               >
                 <span className="note-name">
-                  {noteName}
+                  {getNoteName(noteName)}
                 </span>
               </div>
             )
@@ -1472,7 +1481,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
                 }}
               >
                 <span className="note-name">
-                  {noteName}
+                  {getNoteName(noteName)}
                 </span>
               </div>
             )
@@ -1517,7 +1526,7 @@ const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, 
               }}
             >
               <span className="note-name">
-                {noteName}
+                {getNoteName(noteName)}
               </span>
             </div>
           )

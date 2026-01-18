@@ -192,13 +192,16 @@
   position: absolute;
   top: calc(100% + 0.5rem);
   right: 0;
-  min-width: 160px;
+  width: 340px;
+  max-height: 400px;
   background: var(--white);
   border-radius: 12px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   z-index: 1000;
   animation: fadeInDown 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .dark .language-menu {
@@ -217,13 +220,70 @@
   }
 }
 
+.language-search-container {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.dark .language-search-container {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.language-search {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--light-text-primary);
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.language-search::placeholder {
+  color: var(--light-text-primary);
+  opacity: 0.5;
+}
+
+.language-search:focus {
+  border-color: var(--primary-purple);
+  background: var(--white);
+}
+
+.dark .language-search {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--dark-text-primary);
+}
+
+.dark .language-search::placeholder {
+  color: var(--dark-text-primary);
+  opacity: 0.5;
+}
+
+.dark .language-search:focus {
+  border-color: var(--primary-purple-light);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.language-options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 0.5rem;
+  overflow-y: auto;
+  max-height: 320px;
+}
+
 .language-option {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.5rem;
   width: 100%;
-  padding: 0.625rem 1rem;
+  padding: 0.5rem 0.625rem;
   border: none;
+  border-radius: 6px;
   background: transparent;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -247,9 +307,12 @@
 }
 
 .language-name {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--light-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .dark .language-name {

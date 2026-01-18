@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import '../../styles/MiniKeyboard.css'
 import '../../styles/Controls.css'
 import Tooltip from './Tooltip'
+import { useTranslation } from '../../contexts/TranslationContext'
 
 interface MiniKeyboardProps {
   notes: { name: string }[]
@@ -17,6 +18,8 @@ const BLACK_KEY_POSITIONS: Record<string, number> = {
 }
 
 const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale' }) => {
+  const { t } = useTranslation()
+
   // Determine available octaves from notes
   const availableOctaves = notes
     .map(n => {
@@ -31,7 +34,7 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
   const [selectedOctave, setSelectedOctave] = useState(minAvailableOctave)
 
   if (!notes || notes.length === 0) {
-    return <div className="mini-keyboard-empty">No notes available</div>
+    return <div className="mini-keyboard-empty">{t('sandbox.noNotesAvailable')}</div>
   }
 
   // Extract note names without octave numbers
@@ -75,8 +78,8 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
       {/* Octave range selector */}
       <div className="control-group octave-range-control">
         <div className="label-with-tooltip">
-          <label className="control-label">Octave Range</label>
-          <Tooltip title="Octave Range" text="Click on the keyboard to select which octave to display">
+          <label className="control-label">{t('sandbox.octaveRange')}</label>
+          <Tooltip title={t('sandbox.octaveRange')} text={t('sandbox.octaveRangeTooltip')}>
             <div className="tooltip-icon">?</div>
           </Tooltip>
         </div>
@@ -120,6 +123,7 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
         {WHITE_KEYS.map((note, keyIdx) => {
           const noteName = note
           const fullNoteName = `${note}${selectedOctave}`
+          const displayName = fullNoteName
           return (
             <div
               key={`white-${selectedOctave}-${note}`}
@@ -130,7 +134,7 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
                 height: `${whiteKeyHeight}px`
               }}
             >
-              <span className="mini-kb-note-label">{fullNoteName}</span>
+              <span className="mini-kb-note-label">{displayName}</span>
             </div>
           )
         })}
@@ -139,6 +143,7 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
         {BLACK_KEYS.map((note) => {
           const noteName = note
           const fullNoteName = `${note}${selectedOctave}`
+          const displayName = fullNoteName
           const position = BLACK_KEY_POSITIONS[note]
           // Black key position: between white keys
           const leftOffset = position * whiteKeyWidth + whiteKeyWidth - blackKeyWidth / 2
@@ -152,7 +157,7 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
                 height: `${blackKeyHeight}px`
               }}
             >
-              <span className="mini-kb-note-label">{fullNoteName}</span>
+              <span className="mini-kb-note-label">{displayName}</span>
             </div>
           )
         })}

@@ -166,8 +166,8 @@ const UserMenu = () => {
         <div className={styles.userAvatar}>
           {userProfile.avatarUrl ? (
             <img 
-              src={userProfile.avatarUrl} 
-              alt="User avatar"
+              src={userProfile.avatarUrl}
+              alt={t('aria.userAvatar')}
               onError={(e) => {
                 const img = e.target as HTMLImageElement
                 img.style.display = 'none'

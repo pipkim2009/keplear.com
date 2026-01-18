@@ -1,10 +1,11 @@
 import React from 'react'
+import { useTranslation } from '../../contexts/TranslationContext'
 import styles from './SkipLink.module.css'
 
 interface SkipLinkProps {
   /** Target element ID to skip to */
   targetId: string
-  /** Link text (defaults to "Skip to main content") */
+  /** Link text (defaults to translated "Skip to main content") */
   children?: React.ReactNode
 }
 
@@ -15,8 +16,10 @@ interface SkipLinkProps {
  */
 const SkipLink: React.FC<SkipLinkProps> = ({
   targetId,
-  children = 'Skip to main content'
+  children
 }) => {
+  const { t } = useTranslation()
+  const linkText = children || t('aria.skipToMainContent')
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault()
     const target = document.getElementById(targetId)
@@ -32,7 +35,7 @@ const SkipLink: React.FC<SkipLinkProps> = ({
       className={styles.skipLink}
       onClick={handleClick}
     >
-      {children}
+      {linkText}
     </a>
   )
 }

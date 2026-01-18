@@ -737,7 +737,7 @@ const InstrumentControls = memo(function InstrumentControls({
                   }
                 }}
                 className="range-slider range-low"
-                title="Set lowest octave"
+                title={t('sandbox.setLowestOctave')}
               />
               <input
                 type="range"
@@ -765,7 +765,7 @@ const InstrumentControls = memo(function InstrumentControls({
                   }
                 }}
                 className="range-slider range-high"
-                title="Set highest octave"
+                title={t('sandbox.setHighestOctave')}
               />
             </div>
             )}

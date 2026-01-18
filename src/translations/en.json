@@ -201,7 +201,19 @@
     "learnChord": "Learn Chord",
     "intervals": "Intervals",
     "diagram": "Diagram",
-    "notes": "Notes"
+    "notes": "Notes",
+    "noNotesAvailable": "No notes available",
+    "noPositionsAvailable": "No positions available",
+    "fretsRange": "Frets {start}-{end}",
+    "octaveNumber": "Octave {num}",
+    "setLowestOctave": "Set lowest octave",
+    "setHighestOctave": "Set highest octave"
+  },
+  "theme": {
+    "switchToLight": "Switch to Light Mode",
+    "switchToDark": "Switch to Dark Mode",
+    "dark": "Dark",
+    "light": "Light"
   },
   "classroom": {
     "title": "Classroom",
@@ -277,7 +289,8 @@
       "submit": "Submit",
       "start": "Start",
       "continue": "Continue",
-      "update": "Update Assignment"
+      "update": "Update Assignment",
+      "assignmentComplete": "Assignment Complete!"
     },
     "lesson": {
       "title": "Lesson",
@@ -318,7 +331,8 @@
       "mixolydian": "Mixolydian",
       "locrian": "Locrian",
       "harmonicMinor": "Harmonic Minor",
-      "melodicMinor": "Melodic Minor"
+      "melodicMinor": "Melodic Minor",
+      "chromatic": "Chromatic"
     },
     "chords": {
       "major": "Major",
@@ -329,7 +343,18 @@
       "minor7": "Minor 7",
       "dominant7": "Dominant 7",
       "sus2": "Sus2",
-      "sus4": "Sus4"
+      "sus4": "Sus4",
+      "add9": "Add9",
+      "major9": "Major 9",
+      "minor9": "Minor 9"
+    },
+    "positions": {
+      "openPosition": "Open Position",
+      "position2": "Position 2",
+      "position3": "Position 3",
+      "position4": "Position 4",
+      "position5": "Position 5",
+      "position6": "Position 6"
     }
   },
   "footer": {
@@ -389,7 +414,9 @@
   },
   "aria": {
     "selectLanguage": "Select language",
-    "loadingPage": "Loading page"
+    "loadingPage": "Loading page",
+    "skipToMainContent": "Skip to main content",
+    "userAvatar": "User avatar"
   },
   "chatAI": {
     "welcome": "Hello! I'm your Keplear assistant. I can help you navigate the app, explain features, or answer questions about ear training. What would you like to know?\n\n💡 Try asking about scales, chords, or how to use the sandbox!",

@@ -38,6 +38,7 @@ interface AssignmentCompleteProps {
 }
 
 const AssignmentComplete: React.FC<AssignmentCompleteProps> = ({ onComplete }) => {
+  const { t } = useTranslation()
   const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
@@ -58,7 +59,7 @@ const AssignmentComplete: React.FC<AssignmentCompleteProps> = ({ onComplete }) =
     <div className={styles.assignmentCompleteOverlay}>
       <div className={styles.assignmentCompleteContent}>
         <div className={styles.assignmentCompleteIcon}>✓</div>
-        <h2 className={styles.assignmentCompleteTitle}>Assignment Complete!</h2>
+        <h2 className={styles.assignmentCompleteTitle}>{t('classroom.assignment.assignmentComplete')}</h2>
       </div>
     </div>
   )

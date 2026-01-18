@@ -1,6 +1,7 @@
 import React from 'react'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
+import { useTranslation } from '../../contexts/TranslationContext'
 import '../../styles/MiniFretboard.css'
 
 interface MiniFretboardProps {
@@ -11,6 +12,7 @@ interface MiniFretboardProps {
 }
 
 const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, root, mode = 'scale' }) => {
+  const { t } = useTranslation()
   const stringCount = instrument === 'guitar' ? 6 : 4
   const notesData = instrument === 'guitar' ? guitarNotes : bassNotes
 
@@ -23,7 +25,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
   }).filter(p => !isNaN(p.stringIndex) && !isNaN(p.fret))
 
   if (positions.length === 0) {
-    return <div className="mini-fretboard-empty">No positions available</div>
+    return <div className="mini-fretboard-empty">{t('sandbox.noPositionsAvailable')}</div>
   }
 
   // Determine fret range
@@ -159,6 +161,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
             ? (isRoot ? 'chord-root-note' : 'chord-note')
             : (isRoot ? 'scale-root-note' : 'scale-note')
           const noteName = getNoteName(stringIndex, 0)
+          const displayName = noteName
           return (
             <div
               key={`open-note-${stringIndex}`}
@@ -168,7 +171,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
                 top: `${14 + stringIndex * stringSpacing - 10}px`
               }}
             >
-              <span className="note-name">{noteName}</span>
+              <span className="note-name">{displayName}</span>
             </div>
           )
         })}
@@ -183,6 +186,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
               ? (isRoot ? 'chord-root-note' : 'chord-note')
               : (isRoot ? 'scale-root-note' : 'scale-note')
             const noteName = getNoteName(stringIndex, fret)
+            const displayName = noteName
             // Push first fret notes to the right when showing frets 0-4
             const firstFretOffset = (fretIdx === 0 && startFret === 1) ? 8 : 0
             return (
@@ -194,7 +198,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
                   top: `${14 + stringIndex * stringSpacing - 10}px`
                 }}
               >
-                <span className="note-name">{noteName}</span>
+                <span className="note-name">{displayName}</span>
               </div>
             )
           })

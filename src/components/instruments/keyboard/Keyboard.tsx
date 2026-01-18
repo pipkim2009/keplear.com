@@ -2,6 +2,7 @@ import { memo, useMemo, useCallback } from 'react'
 import KeyboardKey from './KeyboardKey'
 import { whiteKeys, blackKeys, getBlackKeyLeft, getBlackKeyLeftDynamic, generateWhiteKeysWithSeparateOctaves, generateBlackKeysWithSeparateOctaves, type Note } from '../../../utils/notes'
 import type { KeyboardPreview } from '../../common/ScaleChordOptions'
+import { useTranslation } from '../../../contexts/TranslationContext'
 import '../../../styles/Keyboard.css'
 
 interface KeyboardProps {
@@ -38,6 +39,11 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   disableNoteSelection = false
 }) {
   const hasExtendedRange = lowerOctaves !== 0 || higherOctaves !== 0
+
+  // Helper to get note display name
+  const getDisplayName = useCallback((note: Note): string => {
+    return note.name
+  }, [])
 
   // Check if a note is in scale or chord layer
   const isInScaleChordLayer = useCallback((note: Note): boolean => {
@@ -104,6 +110,7 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
           <KeyboardKey
             key={note.name}
             note={note}
+            displayName={getDisplayName(note)}
             isSelected={isManuallySelected(note)}
             isVisible={isNoteVisible(note)}
             isInMelody={isInMelody(note, showNotes)}
@@ -129,6 +136,7 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
               <KeyboardKey
                 key={note.name}
                 note={note}
+                displayName={getDisplayName(note)}
                 isSelected={isManuallySelected(note)}
                 isVisible={isNoteVisible(note)}
                 isInMelody={isInMelody(note, showNotes)}

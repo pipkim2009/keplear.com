@@ -288,7 +288,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
         <button
           className="play-pause-btn"
           onClick={togglePlay}
-          aria-label={isPlaying ? 'Pause' : 'Play'}
+          aria-label={isPlaying ? t('sandbox.stop') : t('sandbox.play')}
         >
           {isPlaying ? <PiPauseFill size={24} /> : <PiPlayFill size={24} />}
         </button>
@@ -331,7 +331,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           <button
             className="volume-btn"
             onClick={() => setShowVolumeSlider(!showVolumeSlider)}
-            aria-label="Volume"
+            aria-label={t('sandbox.volume')}
           >
             {volume === 0 ? (
               <PiSpeakerSlashFill size={20} />
@@ -344,7 +344,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
 
           {showVolumeSlider && (
             <div className="volume-slider">
-              <label htmlFor="volume-slider" className="sr-only">Volume</label>
+              <label htmlFor="volume-slider" className="sr-only">{t('sandbox.volume')}</label>
               <input
                 id="volume-slider"
                 name="volume"
@@ -354,7 +354,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
                 step="0.1"
                 value={volume}
                 onChange={handleVolumeChange}
-                aria-label="Volume"
+                aria-label={t('sandbox.volume')}
                 style={{
                   '--volume-percentage': `${volume * 100}%`
                 } as React.CSSProperties}

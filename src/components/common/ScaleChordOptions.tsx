@@ -653,7 +653,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                               <button
                                 onClick={() => onScaleDelete?.(appliedScale.id)}
                                 className="delete-scale-button"
-                                title={`Remove ${appliedScale.displayName}`}
+                                title={t('common.delete')}
                               >
                                 <PiTrashFill size={12} />
                               </button>
@@ -690,7 +690,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                               <button
                                 onClick={() => onChordDelete?.(appliedChord.id)}
                                 className="delete-chord-button"
-                                title={`Remove ${appliedChord.displayName}`}
+                                title={t('common.delete')}
                               >
                                 <PiTrashFill size={12} />
                               </button>
@@ -721,8 +721,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                       onChange={(e) => setIsScaleMode(!e.target.checked)}
                     />
                     <span className="toggle-slider">
-                      <span className="toggle-text left">Scales</span>
-                      <span className="toggle-text right">Chords</span>
+                      <span className="toggle-text left">{t('sandbox.scales')}</span>
+                      <span className="toggle-text right">{t('sandbox.chords')}</span>
                     </span>
                   </label>
                 </div>
@@ -784,7 +784,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     >
                       {availableBoxes.map((box, index) => (
                         <option key={index} value={index}>
-                          Frets {box.minFret}-{box.maxFret}
+                          {t('sandbox.fretsRange', { start: box.minFret, end: box.maxFret })}
                         </option>
                       ))}
                       <option key="entire" value={availableBoxes.length}>
@@ -804,7 +804,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     >
                       {availableBassBoxes.map((box, index) => (
                         <option key={index} value={index}>
-                          Frets {box.minFret}-{box.maxFret}
+                          {t('sandbox.fretsRange', { start: box.minFret, end: box.maxFret })}
                         </option>
                       ))}
                       <option key="entire" value={availableBassBoxes.length}>
@@ -824,7 +824,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     >
                       {availableOctaves.map((octave) => (
                         <option key={octave} value={octave}>
-                          Octave {octave}
+                          {t('sandbox.octaveNumber', { num: octave })}
                         </option>
                       ))}
                     </select>
@@ -865,7 +865,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                             <button
                               onClick={() => onScaleDelete?.(appliedScale.id)}
                               className="delete-scale-button"
-                              title={`Remove ${appliedScale.displayName}`}
+                              title={t('common.delete')}
                             >
                               <PiTrashFill size={12} />
                             </button>
@@ -914,7 +914,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     >
                       {availableChordBoxes.map((box, index) => (
                         <option key={index} value={index}>
-                          Frets {box.minFret}-{box.maxFret}
+                          {t('sandbox.fretsRange', { start: box.minFret, end: box.maxFret })}
                         </option>
                       ))}
                       <option key="entire" value={availableChordBoxes.length}>
@@ -934,7 +934,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     >
                       {availableBassChordBoxes.map((box, index) => (
                         <option key={index} value={index}>
-                          Frets {box.minFret}-{box.maxFret}
+                          {t('sandbox.fretsRange', { start: box.minFret, end: box.maxFret })}
                         </option>
                       ))}
                       <option key="entire" value={availableBassChordBoxes.length}>
@@ -954,7 +954,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     >
                       {availableOctaves.map((octave) => (
                         <option key={octave} value={octave}>
-                          Octave {octave}
+                          {t('sandbox.octaveNumber', { num: octave })}
                         </option>
                       ))}
                     </select>
@@ -995,7 +995,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                             <button
                               onClick={() => onChordDelete?.(appliedChord.id)}
                               className="delete-chord-button"
-                              title={`Remove ${appliedChord.displayName}`}
+                              title={t('common.delete')}
                             >
                               <PiTrashFill size={12} />
                             </button>

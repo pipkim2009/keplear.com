@@ -1,4 +1,5 @@
 import { memo, useMemo } from 'react'
+import { useTranslation } from '../../../contexts/TranslationContext'
 import ScaleChordOptions, { type AppliedChord, type AppliedScale, type FretboardPreview, type KeyboardPreview } from '../../common/ScaleChordOptions'
 import { PiTrashFill, PiExportFill } from 'react-icons/pi'
 import type { Note } from '../../../utils/notes'
@@ -83,6 +84,8 @@ const InstrumentHeader = memo(function InstrumentHeader({
   canExportToClassroom = false,
   hasExportableContent = false
 }: InstrumentHeaderProps) {
+  const { t } = useTranslation()
+
   // Memoize computed values
   const showDeselectButton = useMemo(() => {
     return !hideDeselectAll && (selectedNotes.length > 0 || appliedChords.length > 0 || appliedScales.length > 0)
@@ -97,9 +100,10 @@ const InstrumentHeader = memo(function InstrumentHeader({
             className="export-to-classroom-button"
             onClick={onExportToClassroom}
             disabled={!hasExportableContent}
+            title={t('sandbox.exportToClassroom')}
           >
             <PiExportFill />
-            <span>Classroom Export</span>
+            <span>{t('sandbox.exportToClassroom')}</span>
           </button>
         )}
 
@@ -144,10 +148,10 @@ const InstrumentHeader = memo(function InstrumentHeader({
             <button
               onClick={onClearAllSelections}
               className="control-button delete-selection"
-              title="Clear selected notes, chords, and scales"
+              title={t('common.clear')}
             >
               <PiTrashFill size={16} />
-              Clear
+              {t('common.clear')}
             </button>
           </div>
         )}
