@@ -195,7 +195,11 @@
     "stopFeedback": "Detener retroalimentación",
     "startFeedback": "Iniciar retroalimentación",
     "countIn": "Cuenta...",
-    "micLevel": "Nivel de Micrófono"
+    "micLevel": "Nivel de Micrófono",
+    "learnScale": "Aprender escala",
+    "learnChord": "Aprender acorde",
+    "intervals": "Intervalos",
+    "notes": "Notas"
   },
   "classroom": {
     "title": "Aula",

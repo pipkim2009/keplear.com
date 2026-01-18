@@ -849,3 +849,402 @@ input:checked + .toggle-slider:hover {
 :global(.dark) .empty-list-message {
   color: var(--gray-500);
 }
+
+/* Applied Item Buttons Container */
+.applied-item-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+}
+
+/* Learn Scale Button - Blue Theme */
+.learn-scale-button {
+  width: 18px;
+  height: 18px;
+  background: rgb(59, 130, 246, 0.1);
+  border: 1px solid rgb(59, 130, 246, 0.4);
+  color: var(--blue-400);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.learn-scale-button:hover {
+  background: rgb(59, 130, 246, 0.2);
+  border-color: rgb(59, 130, 246, 0.6);
+  color: var(--blue-300);
+}
+
+.learn-scale-button:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 1px;
+}
+
+/* Learn Chord Button - Blue Theme */
+.learn-chord-button {
+  width: 18px;
+  height: 18px;
+  background: rgb(59, 130, 246, 0.1);
+  border: 1px solid rgb(59, 130, 246, 0.4);
+  color: var(--blue-400);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.learn-chord-button:hover {
+  background: rgb(59, 130, 246, 0.2);
+  border-color: rgb(59, 130, 246, 0.6);
+  color: var(--blue-300);
+}
+
+.learn-chord-button:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 1px;
+}
+
+/* Learn Diagram Modal Overlay */
+.learn-diagram-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+/* Learn Diagram Modal */
+.learn-diagram-modal {
+  background: var(--gray-900);
+  border: 2px solid var(--blue-500);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.learn-diagram-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--gray-700);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+}
+
+.learn-diagram-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.learn-diagram-close {
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--white);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.learn-diagram-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.learn-diagram-content {
+  padding: 20px;
+}
+
+.scale-diagram,
+.chord-diagram {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.diagram-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diagram-info p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gray-300);
+}
+
+.diagram-info strong {
+  color: var(--white);
+}
+
+.diagram-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diagram-notes p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--gray-300);
+}
+
+.note-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.note-badge {
+  padding: 4px 10px;
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--blue-300);
+}
+
+.note-badge.root {
+  background: rgba(249, 115, 22, 0.2);
+  border-color: rgba(249, 115, 22, 0.5);
+  color: var(--orange-400);
+}
+
+/* ============================================================
+   FRETBOARD DIAGRAM STYLES
+   Visual chord/scale diagrams for guitar and bass
+   ============================================================ */
+
+.fretboard-diagram {
+  display: flex;
+  gap: 2px;
+  padding: 16px;
+  background: var(--white);
+  border-radius: 8px;
+  justify-content: center;
+}
+
+.fretboard-diagram-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+/* Fret numbers column */
+.fretboard-fret-numbers {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-right: -15px;
+}
+
+.fret-number-spacer {
+  height: 20px; /* Space for string labels */
+}
+
+.fret-number-spacer.with-nut {
+  height: 52px; /* Space for string labels + nut */
+}
+
+.fret-number-spacer.no-nut {
+  height: 20px; /* Space for string labels only */
+}
+
+.fret-number {
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 2px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  transform: translateY(-3px);
+}
+
+/* Fretboard grid */
+.fretboard-grid {
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+  border-radius: 4px;
+  min-width: calc(var(--string-count, 6) * 28px);
+}
+
+/* String labels row */
+.fretboard-string-labels {
+  display: flex;
+  justify-content: space-around;
+  padding: 4px 12px;
+}
+
+.string-label {
+  width: 24px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+}
+
+/* Fretboard area - contains nut and frets */
+.fretboard-area {
+  position: relative;
+}
+
+/* Frets container with strings */
+.fretboard-frets {
+  position: relative;
+}
+
+/* Continuous strings running through frets only */
+.fretboard-strings {
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 12px;
+  bottom: 0;
+  display: flex;
+  justify-content: space-around;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.fretboard-strings .string-line {
+  width: 1px;
+  height: 100%;
+  background: #000;
+}
+
+/* Nut (top of fretboard for open strings) */
+.fretboard-nut {
+  display: flex;
+  justify-content: space-around;
+  padding: 0 12px;
+  background: transparent;
+  position: relative;
+  z-index: 2;
+}
+
+.fretboard-nut::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 24px;
+  right: 24px;
+  height: 4px;
+  background: #000;
+}
+
+.fretboard-nut.no-open-strings {
+  padding: 2px 12px;
+}
+
+.fretboard-nut.no-open-strings::after {
+  height: 2px;
+}
+
+.nut-position {
+  width: 24px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.open-string-marker {
+  font-size: 16px;
+  font-weight: 700;
+  color: #000;
+  z-index: 2;
+  position: relative;
+}
+
+.open-string-marker.root {
+  color: #000;
+}
+
+.muted-string-marker {
+  font-size: 14px;
+  font-weight: 700;
+  color: #000;
+  z-index: 2;
+  position: relative;
+}
+
+/* Fret rows */
+.fretboard-fret-row {
+  display: flex;
+  justify-content: space-around;
+  position: relative;
+  height: 36px;
+  background: transparent;
+}
+
+/* Fret position (where dots can appear) */
+.fret-position {
+  width: 24px;
+  height: 36px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+/* Fret bar (horizontal) */
+.fret-bar {
+  position: absolute;
+  bottom: 0;
+  left: 24px;
+  right: 24px;
+  height: 2px;
+  background: #000;
+  z-index: 0;
+}
+
+/* Dot markers for notes */
+.fret-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #000;
+  border: none;
+  z-index: 3;
+  position: relative;
+}
+
+.fret-dot.root {
+  background: #000;
+  width: 20px;
+  height: 20px;
+}

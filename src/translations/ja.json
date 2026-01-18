@@ -195,7 +195,11 @@
     "stopFeedback": "フィードバックを停止",
     "startFeedback": "フィードバックを開始",
     "countIn": "カウントイン...",
-    "micLevel": "マイクレベル"
+    "micLevel": "マイクレベル",
+    "learnScale": "スケールを学ぶ",
+    "learnChord": "コードを学ぶ",
+    "intervals": "音程",
+    "notes": "音符"
   },
   "classroom": {
     "title": "教室",

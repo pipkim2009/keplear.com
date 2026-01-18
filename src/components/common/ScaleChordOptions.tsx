@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { IoMusicalNotes } from 'react-icons/io5'
-import { PiTrashFill } from 'react-icons/pi'
+import { PiTrashFill, PiBrainFill } from 'react-icons/pi'
+import { createPortal } from 'react-dom'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, applyScaleToGuitar, applyScaleBoxToGuitar, type GuitarScale, type ScaleBox } from '../../utils/instruments/guitar/guitarScales'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
@@ -46,6 +47,139 @@ export interface AppliedScale {
   noteKeys?: string[] // For guitar/bass: note keys like "0-open", "1-2" etc.
   notes?: Note[] // For keyboard: actual Note objects
   octave?: number // For keyboard: specific octave position
+}
+
+// Fretboard Diagram Component for displaying chord/scale shapes
+interface FretboardDiagramProps {
+  noteKeys: string[]
+  stringCount: number
+  root: string
+  instrument: string
+}
+
+const FretboardDiagram: React.FC<FretboardDiagramProps> = ({ noteKeys, stringCount, root, instrument }) => {
+  // Parse noteKeys to get positions: format is "stringIndex-fret" or "stringIndex-open"
+  const positions = noteKeys.map(key => {
+    const parts = key.split('-')
+    const stringIndex = parseInt(parts[0], 10)
+    const fret = parts[1] === 'open' ? 0 : parseInt(parts[1], 10)
+    return { stringIndex, fret }
+  }).filter(p => !isNaN(p.stringIndex) && !isNaN(p.fret))
+
+  if (positions.length === 0) {
+    return <div className="fretboard-diagram-empty">No positions available</div>
+  }
+
+  // Determine fret range
+  const frets = positions.map(p => p.fret)
+  const minFret = Math.min(...frets)
+  const maxFret = Math.max(...frets)
+
+  // Show 5 frets minimum, starting from minFret (or 0 if there are open strings)
+  const hasOpenStrings = minFret === 0
+  const startFret = hasOpenStrings ? 0 : minFret
+  const endFret = Math.max(startFret + 4, maxFret)
+  const fretCount = endFret - startFret + 1
+
+  // Get note data to identify root notes
+  const notesData = instrument === 'guitar' ? guitarNotes : bassNotes
+
+  // Find root note positions
+  const rootPositions = positions.filter(pos => {
+    const note = notesData.find(n => {
+      if (instrument === 'guitar') {
+        const stringIdx = 6 - n.string
+        return stringIdx === pos.stringIndex && n.fret === pos.fret
+      } else {
+        const stringIdx = 4 - n.string
+        return stringIdx === pos.stringIndex && n.fret === pos.fret
+      }
+    })
+    return note && note.name.replace(/\d+$/, '') === root
+  })
+
+  // String labels (high to low for display)
+  const stringLabels = instrument === 'guitar'
+    ? ['e', 'B', 'G', 'D', 'A', 'E']
+    : ['G', 'D', 'A', 'E']
+
+  // Calculate actual fret rows to display (excluding open fret if handled by nut)
+  const fretRows = Array.from({ length: fretCount }, (_, i) => startFret + i)
+    .filter(fret => !(hasOpenStrings && fret === 0))
+
+  return (
+    <div className="fretboard-diagram">
+      {/* Fret numbers on the left */}
+      <div className="fretboard-fret-numbers">
+        <div className={`fret-number-spacer ${hasOpenStrings ? 'with-nut' : 'no-nut'}`}></div>
+        {fretRows.map((fret) => (
+          <div key={fret} className="fret-number">
+            {fret}
+          </div>
+        ))}
+      </div>
+
+      {/* Fretboard grid */}
+      <div className="fretboard-grid" style={{ '--string-count': stringCount } as React.CSSProperties}>
+        {/* String labels at top */}
+        <div className="fretboard-string-labels">
+          {stringLabels.map((label, i) => (
+            <div key={i} className="string-label">{label}</div>
+          ))}
+        </div>
+
+        {/* Fretboard area with strings */}
+        <div className="fretboard-area">
+          {/* Nut */}
+          <div className={`fretboard-nut ${!hasOpenStrings ? 'no-open-strings' : ''}`}>
+            {Array.from({ length: stringCount }, (_, stringIdx) => {
+              const hasNote = positions.some(p => p.stringIndex === stringIdx && p.fret === 0)
+              const isRoot = rootPositions.some(p => p.stringIndex === stringIdx && p.fret === 0)
+              const stringHasAnyNote = positions.some(p => p.stringIndex === stringIdx)
+              return (
+                <div key={stringIdx} className="nut-position">
+                  {hasOpenStrings && (
+                    hasNote ? (
+                      <div className={`open-string-marker ${isRoot ? 'root' : ''}`}>○</div>
+                    ) : !stringHasAnyNote ? (
+                      <div className="muted-string-marker">×</div>
+                    ) : null
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Fret rows with strings */}
+          <div className="fretboard-frets">
+            {/* Continuous strings running through frets only */}
+            <div className="fretboard-strings">
+              {Array.from({ length: stringCount }, (_, stringIdx) => (
+                <div key={stringIdx} className="string-line"></div>
+              ))}
+            </div>
+
+            {fretRows.map((currentFret) => (
+              <div key={currentFret} className="fretboard-fret-row">
+                {Array.from({ length: stringCount }, (_, stringIdx) => {
+                  const hasNote = positions.some(p => p.stringIndex === stringIdx && p.fret === currentFret)
+                  const isRoot = rootPositions.some(p => p.stringIndex === stringIdx && p.fret === currentFret)
+                  return (
+                    <div key={stringIdx} className="fret-position">
+                      {hasNote && (
+                        <div className={`fret-dot ${isRoot ? 'root' : ''}`}></div>
+                      )}
+                    </div>
+                  )
+                })}
+                <div className="fret-bar"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 interface ScaleChordOptionsProps {
@@ -143,6 +277,14 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
   // Keyboard position (octave) states
   const [selectedScaleOctave, setSelectedScaleOctave] = useState<number>(4)
   const [selectedChordOctave, setSelectedChordOctave] = useState<number>(4)
+
+  // Learn diagram modal state
+  const [learnDiagramData, setLearnDiagramData] = useState<{
+    type: 'scale' | 'chord'
+    displayName: string
+    root: string
+    item: AppliedScale | AppliedChord
+  } | null>(null)
 
   // Calculate available octaves based on octave range
   const minOctave = Math.max(1, 4 - lowerOctaves)
@@ -625,15 +767,29 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                       {appliedScales.map((appliedScale) => (
                         <div key={appliedScale.id} className="applied-scale-item">
                           <span className="scale-name">{appliedScale.displayName}</span>
-                          {!disableDelete && (
+                          <div className="applied-item-buttons">
                             <button
-                              onClick={() => onScaleDelete?.(appliedScale.id)}
-                              className="delete-scale-button"
-                              title={`Remove ${appliedScale.displayName}`}
+                              onClick={() => setLearnDiagramData({
+                                type: 'scale',
+                                displayName: appliedScale.displayName,
+                                root: appliedScale.root,
+                                item: appliedScale
+                              })}
+                              className="learn-scale-button"
+                              title={t('sandbox.learnScale')}
                             >
-                              <PiTrashFill size={12} />
+                              <PiBrainFill size={12} />
                             </button>
-                          )}
+                            {!disableDelete && (
+                              <button
+                                onClick={() => onScaleDelete?.(appliedScale.id)}
+                                className="delete-scale-button"
+                                title={`Remove ${appliedScale.displayName}`}
+                              >
+                                <PiTrashFill size={12} />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -648,15 +804,29 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                       {appliedChords.map((appliedChord) => (
                         <div key={appliedChord.id} className="applied-chord-item">
                           <span className="chord-name">{appliedChord.displayName}</span>
-                          {!disableDelete && (
+                          <div className="applied-item-buttons">
                             <button
-                              onClick={() => onChordDelete?.(appliedChord.id)}
-                              className="delete-chord-button"
-                              title={`Remove ${appliedChord.displayName}`}
+                              onClick={() => setLearnDiagramData({
+                                type: 'chord',
+                                displayName: appliedChord.displayName,
+                                root: appliedChord.root,
+                                item: appliedChord
+                              })}
+                              className="learn-chord-button"
+                              title={t('sandbox.learnChord')}
                             >
-                              <PiTrashFill size={12} />
+                              <PiBrainFill size={12} />
                             </button>
-                          )}
+                            {!disableDelete && (
+                              <button
+                                onClick={() => onChordDelete?.(appliedChord.id)}
+                                className="delete-chord-button"
+                                title={`Remove ${appliedChord.displayName}`}
+                              >
+                                <PiTrashFill size={12} />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -810,13 +980,27 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                       appliedScales.map((appliedScale) => (
                         <div key={appliedScale.id} className="applied-scale-item">
                           <span className="scale-name">{appliedScale.displayName}</span>
-                          <button
-                            onClick={() => onScaleDelete?.(appliedScale.id)}
-                            className="delete-scale-button"
-                            title={`Remove ${appliedScale.displayName}`}
-                          >
-                            <PiTrashFill size={12} />
-                          </button>
+                          <div className="applied-item-buttons">
+                            <button
+                              onClick={() => setLearnDiagramData({
+                                type: 'scale',
+                                displayName: appliedScale.displayName,
+                                root: appliedScale.root,
+                                item: appliedScale
+                              })}
+                              className="learn-scale-button"
+                              title={t('sandbox.learnScale')}
+                            >
+                              <PiBrainFill size={12} />
+                            </button>
+                            <button
+                              onClick={() => onScaleDelete?.(appliedScale.id)}
+                              className="delete-scale-button"
+                              title={`Remove ${appliedScale.displayName}`}
+                            >
+                              <PiTrashFill size={12} />
+                            </button>
+                          </div>
                         </div>
                       ))
                     ) : (
@@ -926,13 +1110,27 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                       appliedChords.map((appliedChord) => (
                         <div key={appliedChord.id} className="applied-chord-item">
                           <span className="chord-name">{appliedChord.displayName}</span>
-                          <button
-                            onClick={() => onChordDelete?.(appliedChord.id)}
-                            className="delete-chord-button"
-                            title={`Remove ${appliedChord.displayName}`}
-                          >
-                            <PiTrashFill size={12} />
-                          </button>
+                          <div className="applied-item-buttons">
+                            <button
+                              onClick={() => setLearnDiagramData({
+                                type: 'chord',
+                                displayName: appliedChord.displayName,
+                                root: appliedChord.root,
+                                item: appliedChord
+                              })}
+                              className="learn-chord-button"
+                              title={t('sandbox.learnChord')}
+                            >
+                              <PiBrainFill size={12} />
+                            </button>
+                            <button
+                              onClick={() => onChordDelete?.(appliedChord.id)}
+                              className="delete-chord-button"
+                              title={`Remove ${appliedChord.displayName}`}
+                            >
+                              <PiTrashFill size={12} />
+                            </button>
+                          </div>
                         </div>
                       ))
                     ) : (
@@ -947,6 +1145,85 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
             )}
           </div>
         </div>
+      )}
+
+      {/* Learn Diagram Modal */}
+      {learnDiagramData && createPortal(
+        <div className="learn-diagram-overlay" onClick={() => setLearnDiagramData(null)}>
+          <div className="learn-diagram-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="learn-diagram-header">
+              <h3>{learnDiagramData.displayName}</h3>
+              <button
+                className="learn-diagram-close"
+                onClick={() => setLearnDiagramData(null)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="learn-diagram-content">
+              {learnDiagramData.type === 'scale' ? (
+                <div className="scale-diagram">
+                  <div className="diagram-info">
+                    <p><strong>{t('sandbox.rootNote')}:</strong> {learnDiagramData.root}</p>
+                    <p><strong>{t('sandbox.scale')}:</strong> {(learnDiagramData.item as AppliedScale).scale.name}</p>
+                    {(learnDiagramData.item as AppliedScale).scale.intervals && (
+                      <p><strong>{t('sandbox.intervals')}:</strong> {(learnDiagramData.item as AppliedScale).scale.intervals.join(' - ')}</p>
+                    )}
+                  </div>
+                  {instrument === 'keyboard' ? (
+                    <div className="diagram-notes">
+                      <p><strong>{t('sandbox.notes')}:</strong></p>
+                      <div className="note-badges">
+                        {(learnDiagramData.item as AppliedScale).notes?.map((note, i) => (
+                          <span key={i} className={`note-badge ${note.name.replace(/\d+$/, '') === learnDiagramData.root ? 'root' : ''}`}>
+                            {note.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <FretboardDiagram
+                      noteKeys={(learnDiagramData.item as AppliedScale).noteKeys || []}
+                      stringCount={instrument === 'guitar' ? 6 : 4}
+                      root={learnDiagramData.root}
+                      instrument={instrument}
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="chord-diagram">
+                  <div className="diagram-info">
+                    <p><strong>{t('sandbox.rootNote')}:</strong> {learnDiagramData.root}</p>
+                    <p><strong>{t('sandbox.chord')}:</strong> {(learnDiagramData.item as AppliedChord).chord.name}</p>
+                    {(learnDiagramData.item as AppliedChord).chord.intervals && (
+                      <p><strong>{t('sandbox.intervals')}:</strong> {(learnDiagramData.item as AppliedChord).chord.intervals.join(' - ')}</p>
+                    )}
+                  </div>
+                  {instrument === 'keyboard' ? (
+                    <div className="diagram-notes">
+                      <p><strong>{t('sandbox.notes')}:</strong></p>
+                      <div className="note-badges">
+                        {(learnDiagramData.item as AppliedChord).notes?.map((note, i) => (
+                          <span key={i} className={`note-badge ${note.name.replace(/\d+$/, '') === learnDiagramData.root ? 'root' : ''}`}>
+                            {note.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <FretboardDiagram
+                      noteKeys={(learnDiagramData.item as AppliedChord).noteKeys || []}
+                      stringCount={instrument === 'guitar' ? 6 : 4}
+                      root={learnDiagramData.root}
+                      instrument={instrument}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   )

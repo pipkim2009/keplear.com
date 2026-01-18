@@ -196,7 +196,11 @@
     "stopFeedback": "Stop feedback",
     "startFeedback": "Start feedback",
     "countIn": "Count in...",
-    "micLevel": "Mic Level"
+    "micLevel": "Mic Level",
+    "learnScale": "Learn Scale",
+    "learnChord": "Learn Chord",
+    "intervals": "Intervals",
+    "notes": "Notes"
   },
   "classroom": {
     "title": "Classroom",

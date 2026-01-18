@@ -195,7 +195,11 @@
     "stopFeedback": "停止反馈",
     "startFeedback": "开始反馈",
     "countIn": "倒计时...",
-    "micLevel": "麦克风音量"
+    "micLevel": "麦克风音量",
+    "learnScale": "学习音阶",
+    "learnChord": "学习和弦",
+    "intervals": "音程",
+    "notes": "音符"
   },
   "classroom": {
     "title": "教室",

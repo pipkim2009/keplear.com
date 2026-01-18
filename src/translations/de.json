@@ -195,7 +195,11 @@
     "stopFeedback": "Feedback stoppen",
     "startFeedback": "Feedback starten",
     "countIn": "Einzählen...",
-    "micLevel": "Mikrofonpegel"
+    "micLevel": "Mikrofonpegel",
+    "learnScale": "Tonleiter lernen",
+    "learnChord": "Akkord lernen",
+    "intervals": "Intervalle",
+    "notes": "Noten"
   },
   "classroom": {
     "title": "Klassenzimmer",

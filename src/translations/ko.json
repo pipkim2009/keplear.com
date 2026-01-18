@@ -195,7 +195,11 @@
     "stopFeedback": "피드백 중지",
     "startFeedback": "피드백 시작",
     "countIn": "카운트 인...",
-    "micLevel": "마이크 레벨"
+    "micLevel": "마이크 레벨",
+    "learnScale": "스케일 배우기",
+    "learnChord": "코드 배우기",
+    "intervals": "음정",
+    "notes": "음표"
   },
   "classroom": {
     "title": "교실",

@@ -195,7 +195,11 @@
     "stopFeedback": "Arrêter le retour",
     "startFeedback": "Démarrer le retour",
     "countIn": "Décompte...",
-    "micLevel": "Niveau Micro"
+    "micLevel": "Niveau Micro",
+    "learnScale": "Apprendre la gamme",
+    "learnChord": "Apprendre l'accord",
+    "intervals": "Intervalles",
+    "notes": "Notes"
   },
   "classroom": {
     "title": "Classe",

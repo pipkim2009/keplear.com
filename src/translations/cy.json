@@ -195,7 +195,11 @@
     "stopFeedback": "Stopio adborth",
     "startFeedback": "Dechrau adborth",
     "countIn": "Cyfri i mewn...",
-    "micLevel": "Lefel Meic"
+    "micLevel": "Lefel Meic",
+    "learnScale": "Dysgu Graddfa",
+    "learnChord": "Dysgu Cord",
+    "intervals": "Cyfyngau",
+    "notes": "Nodiadau"
   },
   "classroom": {
     "title": "Ystafell Ddosbarth",
