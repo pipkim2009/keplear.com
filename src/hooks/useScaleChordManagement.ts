@@ -315,13 +315,19 @@ export const useScaleChordManagement = ({
       // Convert selections to Note objects for storage
       const scaleNotes = convertSelectionsToNotes(scaleSelections, 'guitar')
 
+      // Convert selections to noteKeys for MiniFretboard
+      const noteKeys = scaleSelections.map(sel =>
+        sel.fretIndex === 0 ? `${sel.stringIndex}-open` : `${sel.stringIndex}-${sel.fretIndex - 1}`
+      )
+
       // Add to applied scales list with actual notes
       const newAppliedScale: AppliedScale = {
         id: `guitar-${rootNote}-${scale.name}-${Date.now()}`,
         root: rootNote,
         scale: scale,
         displayName: `${rootNote} ${scale.name}`,
-        notes: scaleNotes // Store the actual notes for removal
+        notes: scaleNotes, // Store the actual notes for removal
+        noteKeys: noteKeys // Store noteKeys for MiniFretboard
       }
       setAppliedScales(prev => {
         const newList = [...prev, newAppliedScale]
@@ -337,13 +343,19 @@ export const useScaleChordManagement = ({
       // Convert selections to Note objects for storage
       const scaleNotes = convertSelectionsToNotes(scaleSelections, 'bass')
 
+      // Convert selections to noteKeys for MiniFretboard
+      const noteKeys = scaleSelections.map(sel =>
+        sel.fretIndex === 0 ? `${sel.stringIndex}-open` : `${sel.stringIndex}-${sel.fretIndex - 1}`
+      )
+
       // Add to applied scales list with actual notes
       const newAppliedScale: AppliedScale = {
         id: `bass-${rootNote}-${scale.name}-${Date.now()}`,
         root: rootNote,
         scale: scale,
         displayName: `${rootNote} ${scale.name}`,
-        notes: scaleNotes // Store the actual notes for removal
+        notes: scaleNotes, // Store the actual notes for removal
+        noteKeys: noteKeys // Store noteKeys for MiniFretboard
       }
       setAppliedScales(prev => {
         const newList = [...prev, newAppliedScale]
@@ -369,6 +381,11 @@ export const useScaleChordManagement = ({
       // Convert selections to Note objects for storage
       const scaleNotes = convertSelectionsToNotes(scaleSelections, 'guitar')
 
+      // Convert selections to noteKeys for MiniFretboard
+      const noteKeys = scaleSelections.map(sel =>
+        sel.fretIndex === 0 ? `${sel.stringIndex}-open` : `${sel.stringIndex}-${sel.fretIndex - 1}`
+      )
+
       // Get root note - prefer isRoot position, fallback to first position
       const rootPosition = scaleBox.positions.find(pos => pos.isRoot) || scaleBox.positions[0]
       if (rootPosition) {
@@ -386,7 +403,8 @@ export const useScaleChordManagement = ({
           root: rootNote,
           scale: scaleFromBox,
           displayName: `${rootNote} ${scaleFromBox.name}`,
-          notes: scaleNotes // Store the actual notes for removal
+          notes: scaleNotes, // Store the actual notes for removal
+          noteKeys: noteKeys // Store noteKeys for MiniFretboard
         }
 
         // Check for duplicates by scale name (fret range makes each unique)
@@ -408,6 +426,11 @@ export const useScaleChordManagement = ({
       // Convert selections to Note objects for storage
       const scaleNotes = convertSelectionsToNotes(scaleSelections, 'bass')
 
+      // Convert selections to noteKeys for MiniFretboard
+      const noteKeys = scaleSelections.map(sel =>
+        sel.fretIndex === 0 ? `${sel.stringIndex}-open` : `${sel.stringIndex}-${sel.fretIndex - 1}`
+      )
+
       // Get root note - prefer isRoot position, fallback to first position
       const rootPosition = scaleBox.positions.find(pos => pos.isRoot) || scaleBox.positions[0]
       if (rootPosition) {
@@ -425,7 +448,8 @@ export const useScaleChordManagement = ({
           root: rootNote,
           scale: scaleFromBox,
           displayName: `${rootNote} ${scaleFromBox.name}`,
-          notes: scaleNotes // Store the actual notes for removal
+          notes: scaleNotes, // Store the actual notes for removal
+          noteKeys: noteKeys // Store noteKeys for MiniFretboard
         }
 
         // Check for duplicates by scale name (fret range makes each unique)

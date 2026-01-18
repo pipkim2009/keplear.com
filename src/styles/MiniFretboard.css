@@ -138,21 +138,36 @@
   position: absolute;
   width: 20px;
   height: 20px;
-  background: linear-gradient(145deg, var(--note-scale), var(--note-scale-dark));
   border: 1px solid var(--white);
   border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 20;
+  pointer-events: none;
 }
 
-.mini-fb-note.root {
-  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord-root-dark));
+.mini-fb-note .note-name {
+  font-size: 9px;
+  font-weight: bold;
+  color: var(--white);
+  user-select: none;
 }
 
-/* Chord mode - purple notes */
-.mini-fretboard.chord-mode .mini-fb-note {
+/* Scale mode (default) - orange notes, red root */
+.mini-fb-note.scale-note {
+  background: linear-gradient(145deg, var(--note-scale), var(--note-scale-dark));
+}
+
+.mini-fb-note.scale-root-note {
+  background: linear-gradient(145deg, var(--note-scale-root), var(--note-scale-root-dark));
+}
+
+/* Chord mode - purple notes, red root */
+.mini-fb-note.chord-note {
   background: linear-gradient(145deg, var(--note-chord), var(--note-chord-dark));
 }
 
-.mini-fretboard.chord-mode .mini-fb-note.root {
+.mini-fb-note.chord-root-note {
   background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord-root-dark));
 }

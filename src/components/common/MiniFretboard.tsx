@@ -33,8 +33,12 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
   const hasOpenStrings = minFret === 0
 
   // Calculate display range - always show at least 4 frets
+  // For scales (which span all frets), limit to first position (frets 0-4)
   const startFret = hasOpenStrings ? 1 : Math.max(1, minFret)
-  const endFret = Math.max(startFret + 3, maxFret)
+  const maxDisplayFrets = 4
+  const endFret = mode === 'scale' && (maxFret - startFret) > maxDisplayFrets
+    ? startFret + maxDisplayFrets - 1
+    : Math.max(startFret + 3, maxFret)
 
   // Find root positions
   const isRootPosition = (stringIndex: number, fret: number): boolean => {
@@ -45,8 +49,22 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
     return note ? note.name.replace(/\d+$/, '') === root : false
   }
 
+  // Filter positions to only include those within the display range
+  const displayPositions = positions.filter(p =>
+    p.fret === 0 || (p.fret >= startFret && p.fret <= endFret)
+  )
+
   const hasNoteAt = (stringIndex: number, fret: number): boolean => {
-    return positions.some(p => p.stringIndex === stringIndex && p.fret === fret)
+    return displayPositions.some(p => p.stringIndex === stringIndex && p.fret === fret)
+  }
+
+  // Get note name for a position (includes octave number)
+  const getNoteName = (stringIndex: number, fret: number): string => {
+    const note = notesData.find(n => {
+      const stringIdx = instrument === 'guitar' ? 6 - n.string : 4 - n.string
+      return stringIdx === stringIndex && n.fret === fret
+    })
+    return note ? note.name : ''
   }
 
   // Fret width and string spacing (same ratios as main fretboard)
@@ -57,7 +75,7 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
   const totalHeight = stringCount * stringSpacing
 
   return (
-    <div className={`mini-fretboard ${mode === 'chord' ? 'chord-mode' : ''}`}>
+    <div className="mini-fretboard">
       <div
         className="mini-fb"
         style={{
@@ -136,15 +154,21 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
         {hasOpenStrings && Array.from({ length: stringCount }, (_, stringIndex) => {
           if (!hasNoteAt(stringIndex, 0)) return null
           const isRoot = isRootPosition(stringIndex, 0)
+          const noteClass = mode === 'chord'
+            ? (isRoot ? 'chord-root-note' : 'chord-note')
+            : (isRoot ? 'scale-root-note' : 'scale-note')
+          const noteName = getNoteName(stringIndex, 0)
           return (
             <div
               key={`open-note-${stringIndex}`}
-              className={`mini-fb-note ${isRoot ? 'root' : ''}`}
+              className={`mini-fb-note ${noteClass}`}
               style={{
                 left: `-3px`,
                 top: `${14 + stringIndex * stringSpacing - 10}px`
               }}
-            />
+            >
+              <span className="note-name">{noteName}</span>
+            </div>
           )
         })}
 
@@ -154,15 +178,21 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
             const fret = startFret + fretIdx
             if (!hasNoteAt(stringIndex, fret)) return null
             const isRoot = isRootPosition(stringIndex, fret)
+            const noteClass = mode === 'chord'
+              ? (isRoot ? 'chord-root-note' : 'chord-note')
+              : (isRoot ? 'scale-root-note' : 'scale-note')
+            const noteName = getNoteName(stringIndex, fret)
             return (
               <div
                 key={`note-${stringIndex}-${fret}`}
-                className={`mini-fb-note ${isRoot ? 'root' : ''}`}
+                className={`mini-fb-note ${noteClass}`}
                 style={{
                   left: `${fretIdx * fretWidth + fretWidth / 2 - 10}px`,
                   top: `${14 + stringIndex * stringSpacing - 10}px`
                 }}
-              />
+              >
+                <span className="note-name">{noteName}</span>
+              </div>
             )
           })
         )}
