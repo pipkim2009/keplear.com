@@ -1,0 +1,227 @@
+/* MiniFretboard - Compact fretboard diagram for scale/chord display */
+
+.mini-fretboard {
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+  background: linear-gradient(
+    145deg,
+    var(--guitar-fretboard-primary),
+    var(--guitar-fretboard-secondary)
+  );
+  border-radius: 8px;
+  border: 2px solid var(--guitar-border);
+  overflow: hidden;
+}
+
+.mini-fretboard-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+/* String labels on the left */
+.mini-fretboard-string-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  padding: 24px 0 8px 0;
+}
+
+.mini-string-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--white);
+  text-align: center;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Main fretboard area */
+.mini-fretboard-board {
+  position: relative;
+  flex: 1;
+  min-width: 150px;
+}
+
+/* Fret numbers at top */
+.mini-fret-numbers {
+  display: flex;
+  height: 20px;
+  margin-bottom: 4px;
+}
+
+.mini-fret-number {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-400);
+}
+
+.mini-fret-number.open {
+  color: var(--orange-400);
+}
+
+/* Strings container */
+.mini-fretboard-strings {
+  position: relative;
+  z-index: 2;
+}
+
+.mini-string-row {
+  position: relative;
+  display: flex;
+  height: 24px;
+  align-items: center;
+}
+
+.mini-string-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--string-4), var(--string-center-dark), var(--string-4));
+  z-index: 1;
+}
+
+/* String thickness variations */
+.mini-string-row:nth-child(1) .mini-string-line {
+  height: 1px;
+  background: linear-gradient(90deg, var(--string-1), var(--string-center), var(--string-1));
+}
+
+.mini-string-row:nth-child(2) .mini-string-line {
+  height: 1.5px;
+  background: linear-gradient(90deg, var(--string-2), var(--string-center), var(--string-2));
+}
+
+.mini-string-row:nth-child(3) .mini-string-line {
+  height: 2px;
+  background: linear-gradient(90deg, var(--string-3), var(--fret-wire-secondary), var(--string-3));
+}
+
+.mini-string-row:nth-child(4) .mini-string-line {
+  height: 2.5px;
+  background: linear-gradient(90deg, var(--string-4), var(--string-center-dark), var(--string-4));
+}
+
+.mini-string-row:nth-child(5) .mini-string-line {
+  height: 3px;
+  background: linear-gradient(90deg, var(--string-5), var(--string-center-darker), var(--string-5));
+}
+
+.mini-string-row:nth-child(6) .mini-string-line {
+  height: 4px;
+  background: linear-gradient(90deg, var(--string-6), var(--string-center-darkest), var(--string-6));
+}
+
+/* Fret positions */
+.mini-fret-position {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 3;
+}
+
+/* Note circles */
+.mini-note-circle {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--note-scale), var(--note-scale-dark));
+  border: 2px solid var(--white);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.mini-note-circle.root {
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord-root-dark));
+  width: 20px;
+  height: 20px;
+}
+
+/* Fret wires */
+.mini-fret-wires {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  display: flex;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.mini-fret-wire {
+  flex: 1;
+  position: relative;
+}
+
+.mini-fret-wire::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(145deg, var(--fret-wire-primary), var(--fret-wire-secondary));
+}
+
+.mini-fret-wire.nut::after {
+  width: 4px;
+  background: linear-gradient(145deg, var(--white), var(--gray-300));
+}
+
+/* Fret markers */
+.mini-fret-markers {
+  position: absolute;
+  top: 24px;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  display: flex;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.mini-marker-slot {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mini-fret-marker {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(145deg, var(--fret-marker), var(--fret-marker-secondary));
+  border-radius: 50%;
+  border: 1px solid var(--fret-marker-border);
+}
+
+.mini-fret-marker.double-1 {
+  position: absolute;
+  top: 25%;
+  transform: translateY(-50%);
+}
+
+.mini-fret-marker.double-2 {
+  position: absolute;
+  bottom: 25%;
+  transform: translateY(50%);
+}
+
+/* Chord mode - purple notes instead of orange */
+.mini-fretboard.chord-mode .mini-note-circle {
+  background: linear-gradient(145deg, var(--note-chord), var(--note-chord-dark));
+}
+
+.mini-fretboard.chord-mode .mini-note-circle.root {
+  background: linear-gradient(145deg, var(--note-chord-root), var(--note-chord-root-dark));
+}

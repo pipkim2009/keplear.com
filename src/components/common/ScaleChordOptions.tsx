@@ -12,6 +12,7 @@ import { CHORD_ROOT_NOTES, GUITAR_CHORDS, getChordShapes, getChordBoxes, applyCh
 import { BASS_CHORD_ROOT_NOTES, BASS_CHORDS, getBassChordShapes, getBassChordBoxes, applyChordToBass, applyBassChordBoxToBass, type BassChord, type BassChordShape, type BassChordBox } from '../../utils/instruments/bass/bassChords'
 import { KEYBOARD_CHORDS, type KeyboardChord, applyChordToKeyboard } from '../../utils/instruments/keyboard/keyboardChords'
 import type { Note } from '../../utils/notes'
+import MiniFretboard from './MiniFretboard'
 import '../../styles/ScaleOptions.css'
 
 // Preview data for guitar/bass (fret positions)
@@ -1035,7 +1036,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                       <p>{(learnDiagramData.item as AppliedScale).scale.intervals.join(' - ')}</p>
                     )}
                   </div>
-                  {instrument === 'keyboard' && (
+                  {instrument === 'keyboard' ? (
                     <div className="diagram-notes">
                       <p><strong>{t('sandbox.notes')}:</strong></p>
                       <div className="note-badges">
@@ -1046,6 +1047,12 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                         ))}
                       </div>
                     </div>
+                  ) : (
+                    <MiniFretboard
+                      noteKeys={(learnDiagramData.item as AppliedScale).noteKeys || []}
+                      instrument={instrument as 'guitar' | 'bass'}
+                      root={learnDiagramData.root}
+                    />
                   )}
                 </div>
               ) : (
@@ -1055,7 +1062,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                       <p>{(learnDiagramData.item as AppliedChord).chord.intervals.join(' - ')}</p>
                     )}
                   </div>
-                  {instrument === 'keyboard' && (
+                  {instrument === 'keyboard' ? (
                     <div className="diagram-notes">
                       <p><strong>{t('sandbox.notes')}:</strong></p>
                       <div className="note-badges">
@@ -1066,6 +1073,13 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                         ))}
                       </div>
                     </div>
+                  ) : (
+                    <MiniFretboard
+                      noteKeys={(learnDiagramData.item as AppliedChord).noteKeys || []}
+                      instrument={instrument as 'guitar' | 'bass'}
+                      root={learnDiagramData.root}
+                      mode="chord"
+                    />
                   )}
                 </div>
               )}
