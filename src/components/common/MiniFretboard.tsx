@@ -14,11 +14,11 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
   const stringCount = instrument === 'guitar' ? 6 : 4
   const notesData = instrument === 'guitar' ? guitarNotes : bassNotes
 
-  // Parse noteKeys to get positions: format is "stringIndex-fret" or "stringIndex-open"
+  // Parse noteKeys to get positions
   const positions = noteKeys.map(key => {
     const parts = key.split('-')
     const stringIndex = parseInt(parts[0], 10)
-    const fret = parts[1] === 'open' ? 0 : parseInt(parts[1], 10) + 1 // +1 because noteKey uses 0-indexed frets
+    const fret = parts[1] === 'open' ? 0 : parseInt(parts[1], 10) + 1
     return { stringIndex, fret }
   }).filter(p => !isNaN(p.stringIndex) && !isNaN(p.fret))
 
@@ -26,143 +26,138 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
     return <div className="mini-fretboard-empty">No positions available</div>
   }
 
-  // Separate open string notes from fretted notes
-  const openStringPositions = positions.filter(p => p.fret === 0)
-  const frettedPositions = positions.filter(p => p.fret > 0)
-  const hasOpenStrings = openStringPositions.length > 0
+  // Determine fret range
+  const frets = positions.map(p => p.fret)
+  const minFret = Math.min(...frets)
+  const maxFret = Math.max(...frets)
+  const hasOpenStrings = minFret === 0
 
-  // Determine fret range for fretted notes
-  const frettedFrets = frettedPositions.map(p => p.fret)
-  const minFret = frettedFrets.length > 0 ? Math.min(...frettedFrets) : 1
-  const maxFret = frettedFrets.length > 0 ? Math.max(...frettedFrets) : 4
-
-  // Show at least 4 frets
-  const startFret = Math.max(1, minFret)
+  // Calculate display range - always show at least 4 frets
+  const startFret = hasOpenStrings ? 1 : Math.max(1, minFret)
   const endFret = Math.max(startFret + 3, maxFret)
 
-  // Generate fret numbers (starting from 1, not 0)
-  const fretNumbers: number[] = []
-  for (let f = startFret; f <= endFret; f++) {
-    fretNumbers.push(f)
-  }
-
-  // Find root note positions
+  // Find root positions
   const isRootPosition = (stringIndex: number, fret: number): boolean => {
     const note = notesData.find(n => {
-      if (instrument === 'guitar') {
-        const stringIdx = 6 - n.string
-        return stringIdx === stringIndex && n.fret === fret
-      } else {
-        const stringIdx = 4 - n.string
-        return stringIdx === stringIndex && n.fret === fret
-      }
+      const stringIdx = instrument === 'guitar' ? 6 - n.string : 4 - n.string
+      return stringIdx === stringIndex && n.fret === fret
     })
     return note ? note.name.replace(/\d+$/, '') === root : false
   }
 
-  // Check if a position has a note
   const hasNoteAt = (stringIndex: number, fret: number): boolean => {
     return positions.some(p => p.stringIndex === stringIndex && p.fret === fret)
   }
 
-  // Check if open string has a note
-  const hasOpenStringNote = (stringIndex: number): boolean => {
-    return openStringPositions.some(p => p.stringIndex === stringIndex)
-  }
-
-  // String labels (high to low for display) - use numbers 6-1 for guitar, 4-1 for bass
-  const stringLabels = instrument === 'guitar'
-    ? ['6', '5', '4', '3', '2', '1']
-    : ['4', '3', '2', '1']
+  // Fret width and string spacing (same ratios as main fretboard)
+  const fretWidth = 54
+  const stringSpacing = 28
+  const openAreaWidth = 15
+  const fretCount = endFret - startFret + 1
+  const totalWidth = openAreaWidth + (fretCount * fretWidth)
+  const totalHeight = stringCount * stringSpacing
 
   return (
     <div className={`mini-fretboard ${mode === 'chord' ? 'chord-mode' : ''}`}>
-      {/* String labels on the left */}
-      <div className="mini-fretboard-string-labels">
-        {stringLabels.map((label, i) => (
-          <div key={i} className="mini-string-label">{label}</div>
+      <div
+        className="mini-fb"
+        style={{
+          width: `${totalWidth}px`,
+          height: `${totalHeight}px`
+        }}
+      >
+        {/* Strings */}
+        {Array.from({ length: stringCount }, (_, i) => (
+          <div
+            key={`string-${i}`}
+            className={`mini-fb-string mini-fb-string-${i + 1}`}
+            style={{ top: `${14 + i * stringSpacing}px` }}
+          />
         ))}
-      </div>
 
-      {/* Open strings area - small dedicated area before fret 1 */}
-      {hasOpenStrings && (
-        <div className="mini-open-area">
-          <div className="mini-open-header"></div>
-          <div className="mini-open-positions">
-            {Array.from({ length: stringCount }, (_, stringIndex) => {
-              const hasNote = hasOpenStringNote(stringIndex)
-              const isRoot = hasNote && isRootPosition(stringIndex, 0)
-              return (
-                <div key={stringIndex} className="mini-open-position">
-                  {hasNote && (
-                    <div className={`mini-note-circle ${isRoot ? 'root' : ''}`}></div>
-                  )}
-                </div>
-              )
-            })}
+        {/* Frets */}
+        {Array.from({ length: fretCount }, (_, i) => {
+          const fretNum = startFret + i
+          return (
+            <div
+              key={`fret-${fretNum}`}
+              className="mini-fb-fret"
+              style={{ left: `${openAreaWidth + (i + 1) * fretWidth}px` }}
+            >
+              <div className="mini-fb-fret-wire"></div>
+              {/* Fret markers */}
+              {[3, 5, 7, 9, 15, 17, 19, 21].includes(fretNum) && (
+                <div className="mini-fb-fret-marker"></div>
+              )}
+              {[12, 24].includes(fretNum) && (
+                <>
+                  <div className="mini-fb-fret-marker mini-fb-double-1"></div>
+                  <div className="mini-fb-fret-marker mini-fb-double-2"></div>
+                </>
+              )}
+            </div>
+          )
+        })}
+
+        {/* Fret numbers */}
+        {Array.from({ length: fretCount }, (_, i) => {
+          const fretNum = startFret + i
+          return (
+            <div
+              key={`fret-num-${fretNum}`}
+              className="mini-fb-fret-number"
+              style={{ left: `${openAreaWidth + i * fretWidth + fretWidth / 2}px` }}
+            >
+              {fretNum}
+            </div>
+          )
+        })}
+
+        {/* String numbers */}
+        {Array.from({ length: stringCount }, (_, i) => (
+          <div
+            key={`string-num-${i}`}
+            className="mini-fb-string-number"
+            style={{ top: `${14 + i * stringSpacing}px` }}
+          >
+            {instrument === 'guitar' ? 6 - i : 4 - i}
           </div>
-        </div>
-      )}
+        ))}
 
-      {/* Nut - between open strings and frets */}
-      {hasOpenStrings && <div className="mini-nut"></div>}
+        {/* Open string notes */}
+        {hasOpenStrings && Array.from({ length: stringCount }, (_, stringIndex) => {
+          if (!hasNoteAt(stringIndex, 0)) return null
+          const isRoot = isRootPosition(stringIndex, 0)
+          return (
+            <div
+              key={`open-note-${stringIndex}`}
+              className={`mini-fb-note ${isRoot ? 'root' : ''}`}
+              style={{
+                left: `${openAreaWidth / 2 - 10}px`,
+                top: `${14 + stringIndex * stringSpacing - 10}px`
+              }}
+            />
+          )
+        })}
 
-      {/* Fretboard */}
-      <div className="mini-fretboard-board">
-        {/* Fret numbers at top */}
-        <div className="mini-fret-numbers">
-          {fretNumbers.map(fret => (
-            <div key={fret} className="mini-fret-number">
-              {fret}
-            </div>
-          ))}
-        </div>
-
-        {/* Strings and notes */}
-        <div className="mini-fretboard-strings">
-          {Array.from({ length: stringCount }, (_, stringIndex) => (
-            <div key={stringIndex} className="mini-string-row">
-              <div className="mini-string-line"></div>
-              {fretNumbers.map(fret => {
-                const hasNote = hasNoteAt(stringIndex, fret)
-                const isRoot = hasNote && isRootPosition(stringIndex, fret)
-                return (
-                  <div key={fret} className="mini-fret-position">
-                    {hasNote && (
-                      <div className={`mini-note-circle ${isRoot ? 'root' : ''}`}></div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          ))}
-        </div>
-
-        {/* Fret wires */}
-        <div className="mini-fret-wires">
-          {fretNumbers.map(fret => (
-            <div key={fret} className="mini-fret-wire"></div>
-          ))}
-        </div>
-
-        {/* Fret markers */}
-        <div className="mini-fret-markers">
-          {fretNumbers.map(fret => {
-            const showSingleMarker = [3, 5, 7, 9, 15, 17, 19, 21].includes(fret)
-            const showDoubleMarker = [12, 24].includes(fret)
+        {/* Fretted notes */}
+        {Array.from({ length: stringCount }, (_, stringIndex) =>
+          Array.from({ length: fretCount }, (_, fretIdx) => {
+            const fret = startFret + fretIdx
+            if (!hasNoteAt(stringIndex, fret)) return null
+            const isRoot = isRootPosition(stringIndex, fret)
             return (
-              <div key={fret} className="mini-marker-slot">
-                {showSingleMarker && <div className="mini-fret-marker"></div>}
-                {showDoubleMarker && (
-                  <>
-                    <div className="mini-fret-marker double-1"></div>
-                    <div className="mini-fret-marker double-2"></div>
-                  </>
-                )}
-              </div>
+              <div
+                key={`note-${stringIndex}-${fret}`}
+                className={`mini-fb-note ${isRoot ? 'root' : ''}`}
+                style={{
+                  left: `${openAreaWidth + fretIdx * fretWidth + fretWidth / 2 - 10}px`,
+                  top: `${14 + stringIndex * stringSpacing - 10}px`
+                }}
+              />
             )
-          })}
-        </div>
+          })
+        )}
       </div>
     </div>
   )
