@@ -2,4 +2,5 @@
  * Practice components for real-time performance grading
  */
 
-export { LiveFeedback } from './LiveFeedback'
+// Melody feedback system (rhythm-ignored, polyphonic transcription)
+export { MelodyFeedback } from './MelodyFeedback'

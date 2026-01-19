@@ -1,0 +1,626 @@
+/* ========================================
+   MELODY FEEDBACK COMPONENT
+   Live instrument practice feedback UI
+   ======================================== */
+
+/* ========================================
+   CONTAINER
+   ======================================== */
+
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: var(--white-alpha-80);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgb(210, 210, 249, 0.3);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+:global(.dark) .container {
+  background: linear-gradient(135deg, rgb(26, 32, 44, 0.9) 0%, rgb(45, 55, 72, 0.8) 100%);
+  border: 1px solid rgb(210, 210, 249, 0.2);
+}
+
+/* ========================================
+   ERROR DISPLAY
+   ======================================== */
+
+.error {
+  padding: 0.875rem 1.25rem;
+  background: rgb(239, 68, 68, 0.15);
+  border: 2px solid rgb(239, 68, 68, 0.4);
+  border-radius: 12px;
+  color: rgb(220, 38, 38);
+  font-weight: 600;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+:global(.dark) .error {
+  background: rgb(239, 68, 68, 0.2);
+  color: rgb(252, 165, 165);
+}
+
+/* ========================================
+   PERMISSION DENIED
+   ======================================== */
+
+.permissionDenied {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.permissionIcon {
+  color: var(--primary-purple);
+  opacity: 0.7;
+}
+
+:global(.dark) .permissionIcon {
+  color: var(--primary-purple-light);
+}
+
+.permissionText {
+  font-size: 0.95rem;
+  color: var(--light-text-secondary);
+  max-width: 400px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+:global(.dark) .permissionText {
+  color: var(--dark-text-secondary);
+}
+
+/* ========================================
+   CONTROLS
+   ======================================== */
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.mainButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 0.875rem 1.75rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: var(--primary-purple);
+  color: var(--white);
+}
+
+:global(.dark) .mainButton {
+  background: var(--primary-purple-light);
+}
+
+.mainButton:hover:not(:disabled) {
+  background: var(--primary-purple-dark);
+  transform: translateY(-2px);
+}
+
+:global(.dark) .mainButton:hover:not(:disabled) {
+  background: var(--primary-purple);
+}
+
+.mainButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.mainButton.active {
+  background: rgb(239, 68, 68);
+  animation: pulse 2s infinite;
+}
+
+:global(.dark) .mainButton.active {
+  background: rgb(248, 113, 113);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+}
+
+.resetButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: 2px solid rgba(148, 163, 184, 0.3);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--light-text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:global(.dark) .resetButton {
+  border-color: rgba(148, 163, 184, 0.2);
+  color: var(--dark-text-secondary);
+}
+
+.resetButton:hover {
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+  background: var(--primary-purple-alpha-10);
+}
+
+/* ========================================
+   PROGRESS DISPLAY
+   ======================================== */
+
+.progressDisplay {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progressText {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.progressCount {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--primary-purple);
+}
+
+:global(.dark) .progressCount {
+  color: var(--primary-purple-light);
+}
+
+.progressSeparator {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .progressSeparator {
+  color: var(--dark-text-secondary);
+}
+
+.progressTotal {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .progressTotal {
+  color: var(--dark-text-primary);
+}
+
+.progressLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--light-text-secondary);
+  margin-left: 0.25rem;
+}
+
+:global(.dark) .progressLabel {
+  color: var(--dark-text-secondary);
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-purple) 0%, rgb(34, 197, 94) 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease-out;
+}
+
+:global(.dark) .progressFill {
+  background: linear-gradient(90deg, var(--primary-purple-light) 0%, rgb(74, 222, 128) 100%);
+}
+
+/* ========================================
+   COMPLETION MESSAGE
+   ======================================== */
+
+.completeMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.25) 100%);
+  border: 2px solid rgba(34, 197, 94, 0.4);
+  border-radius: 12px;
+  color: rgb(22, 163, 74);
+  font-size: 1.125rem;
+  font-weight: 700;
+  animation: completeSlideIn 0.4s ease-out;
+}
+
+:global(.dark) .completeMessage {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.3) 100%);
+  color: rgb(74, 222, 128);
+}
+
+@keyframes completeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ========================================
+   DETECTED NOTE DISPLAY
+   ======================================== */
+
+.detectedNote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border-radius: 12px;
+  border: 2px solid rgba(139, 92, 246, 0.2);
+}
+
+:global(.dark) .detectedNote {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
+}
+
+.detectedLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .detectedLabel {
+  color: var(--dark-text-secondary);
+}
+
+.detectedNoteName {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary-purple);
+  animation: noteAppear 0.15s ease-out;
+}
+
+:global(.dark) .detectedNoteName {
+  color: var(--primary-purple-light);
+}
+
+@keyframes noteAppear {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   VOLUME INDICATOR
+   ======================================== */
+
+.volumeIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: rgba(148, 163, 184, 0.08);
+  border-radius: 10px;
+}
+
+:global(.dark) .volumeIndicator {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.volumeIcon {
+  color: var(--light-text-secondary);
+  flex-shrink: 0;
+}
+
+:global(.dark) .volumeIcon {
+  color: var(--dark-text-secondary);
+}
+
+.volumeBar {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+.volumeSegment {
+  flex: 1;
+  height: 16px;
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 3px;
+  transition: background-color 0.05s ease-out;
+}
+
+:global(.dark) .volumeSegment {
+  background: rgba(148, 163, 184, 0.15);
+}
+
+.volumeSegment.active.green {
+  background: rgb(34, 197, 94);
+  box-shadow: 0 0 4px rgba(34, 197, 94, 0.4);
+}
+
+.volumeSegment.active.yellow {
+  background: rgb(245, 158, 11);
+  box-shadow: 0 0 4px rgba(245, 158, 11, 0.4);
+}
+
+.volumeSegment.active.red {
+  background: rgb(239, 68, 68);
+  box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);
+}
+
+/* ========================================
+   MELODY DISPLAY
+   ======================================== */
+
+.melodyDisplay {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.noteSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sectionLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--light-text-secondary);
+}
+
+:global(.dark) .sectionLabel {
+  color: var(--dark-text-secondary);
+}
+
+.noteGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+/* ========================================
+   NOTE CHIP
+   ======================================== */
+
+.noteChip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--light-text-secondary);
+  border: 2px solid transparent;
+}
+
+:global(.dark) .noteChip {
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--dark-text-secondary);
+}
+
+.noteChipName {
+  z-index: 1;
+}
+
+/* Current note (next to play) */
+.noteChip.current {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+  color: var(--primary-purple);
+  border-color: var(--primary-purple);
+  transform: scale(1.05);
+}
+
+:global(.dark) .noteChip.current {
+  color: var(--primary-purple-light);
+  border-color: var(--primary-purple-light);
+}
+
+/* Played note */
+.noteChip.played {
+  background: rgba(34, 197, 94, 0.2);
+  color: rgb(22, 163, 74);
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+:global(.dark) .noteChip.played {
+  background: rgba(34, 197, 94, 0.25);
+  color: rgb(74, 222, 128);
+}
+
+.noteChipCheck {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: rgb(34, 197, 94);
+  border-radius: 50%;
+  color: white;
+  animation: checkAppear 0.2s ease-out;
+}
+
+@keyframes checkAppear {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.noteChipPulse {
+  position: absolute;
+  inset: -2px;
+  border-radius: 12px;
+  border: 2px solid var(--primary-purple);
+  animation: chipPulse 1.5s ease-in-out infinite;
+}
+
+:global(.dark) .noteChipPulse {
+  border-color: var(--primary-purple-light);
+}
+
+@keyframes chipPulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.1);
+  }
+}
+
+/* ========================================
+   INSTRUCTIONS
+   ======================================== */
+
+.instructions {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(148, 163, 184, 0.08);
+  border-radius: 12px;
+}
+
+:global(.dark) .instructions {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.instructions p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--light-text-secondary);
+  line-height: 1.5;
+}
+
+:global(.dark) .instructions p {
+  color: var(--dark-text-secondary);
+}
+
+.instructions p + p {
+  margin-top: 0.5rem;
+}
+
+.instructionNote {
+  font-size: 0.8rem !important;
+  opacity: 0.8;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 767px) {
+  .container {
+    padding: 1rem;
+    border-radius: 16px;
+  }
+
+  .mainButton {
+    width: 100%;
+    padding: 1rem 1.5rem;
+  }
+
+  .resetButton {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .controls {
+    flex-direction: column;
+  }
+
+  .noteChip {
+    min-width: 42px;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .progressCount {
+    font-size: 1.5rem;
+  }
+
+  .detectedNoteName {
+    font-size: 1.25rem;
+  }
+}
+
+/* ========================================
+   REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .mainButton,
+  .resetButton,
+  .noteChip,
+  .progressFill,
+  .completeMessage,
+  .detectedNoteName,
+  .noteChipCheck,
+  .noteChipPulse,
+  .volumeSegment {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+
+  .mainButton.active {
+    animation: none !important;
+  }
+}

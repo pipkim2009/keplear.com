@@ -1552,3 +1552,298 @@
 .light .volume-indicator-value {
   color: var(--light-text-secondary);
 }
+
+/* ========================================
+   NEW MELODY FEEDBACK STYLES
+   Rhythm-ignored, polyphonic feedback system
+   ======================================== */
+
+/* Reset button next to mic button */
+.reset-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: 6px;
+  border: none;
+  background: var(--gray-700);
+  color: var(--white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+  background: var(--gray-600);
+  transform: scale(1.05);
+}
+
+.reset-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.light .reset-btn {
+  background: var(--light-bg-secondary);
+  color: var(--light-text-primary);
+}
+
+.light .reset-btn:hover {
+  background: var(--gray-300);
+}
+
+/* Feedback completion message */
+.feedback-complete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.3) 100%);
+  border: 2px solid rgba(34, 197, 94, 0.4);
+  border-radius: 10px;
+  color: #4ade80;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  animation: completeSlideIn 0.4s ease-out;
+}
+
+.light .feedback-complete {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.25) 100%);
+  color: #16a34a;
+}
+
+@keyframes completeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Progress count display */
+.feedback-progress-count {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--primary-purple-light);
+  letter-spacing: -0.5px;
+}
+
+.light .feedback-progress-count {
+  color: var(--primary-purple);
+}
+
+/* Progress bar */
+.feedback-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--gray-700);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.light .feedback-progress-bar {
+  background: var(--light-bg-secondary);
+}
+
+.feedback-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-purple-light) 0%, #4ade80 100%);
+  border-radius: 3px;
+  transition: width 0.3s ease-out;
+}
+
+/* Detected note display */
+.feedback-detected {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+  border-radius: 10px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  margin-bottom: 12px;
+}
+
+.light .feedback-detected {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(59, 130, 246, 0.08) 100%);
+}
+
+.feedback-detected-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray-400);
+}
+
+.light .feedback-detected-label {
+  color: var(--light-text-secondary);
+}
+
+.feedback-detected-note {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary-purple-light);
+  animation: noteAppear 0.15s ease-out;
+}
+
+.light .feedback-detected-note {
+  color: var(--primary-purple);
+}
+
+@keyframes noteAppear {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Note chips container */
+.feedback-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+/* Individual note chip */
+.feedback-note-chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  background: var(--gray-700);
+  color: var(--gray-400);
+  border: 2px solid transparent;
+}
+
+.light .feedback-note-chip {
+  background: var(--light-bg-secondary);
+  color: var(--light-text-secondary);
+}
+
+/* Current note (next to play) */
+.feedback-note-chip.current {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
+  color: var(--primary-purple-light);
+  border-color: var(--primary-purple-light);
+  transform: scale(1.1);
+  animation: chipPulse 1.5s ease-in-out infinite;
+}
+
+.light .feedback-note-chip.current {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(59, 130, 246, 0.2) 100%);
+  color: var(--primary-purple);
+  border-color: var(--primary-purple);
+}
+
+@keyframes chipPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(139, 92, 246, 0);
+  }
+}
+
+/* Played note */
+.feedback-note-chip.played {
+  background: rgba(34, 197, 94, 0.25);
+  color: #4ade80;
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+.light .feedback-note-chip.played {
+  background: rgba(34, 197, 94, 0.2);
+  color: #16a34a;
+}
+
+/* Check icon on played notes */
+.feedback-note-check {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: #22c55e;
+  border-radius: 50%;
+  color: white;
+  animation: checkAppear 0.2s ease-out;
+}
+
+@keyframes checkAppear {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Feedback instructions */
+.feedback-instructions {
+  text-align: center;
+  padding: 8px;
+  font-size: 12px;
+  color: var(--gray-500);
+}
+
+.light .feedback-instructions {
+  color: var(--light-text-secondary);
+}
+
+/* Responsive adjustments for new feedback */
+@media (max-width: 480px) {
+  .feedback-note-chip {
+    min-width: 36px;
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  .feedback-detected-note {
+    font-size: 18px;
+  }
+
+  .feedback-progress-count {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feedback-note-chip.current {
+    animation: none !important;
+  }
+
+  .feedback-complete {
+    animation: none !important;
+  }
+
+  .feedback-detected-note {
+    animation: none !important;
+  }
+
+  .feedback-note-check {
+    animation: none !important;
+  }
+}

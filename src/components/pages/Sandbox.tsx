@@ -11,8 +11,7 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import AuthContext from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
-import { useDSPPitchDetection, usePerformanceGrading } from '../../hooks'
-import type { PitchDetectionResult } from '../../hooks/usePitchDetection'
+// Old feedback system removed - now using useMelodyFeedback in CustomAudioPlayer
 import type { Note } from '../../utils/notes'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
 import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
@@ -221,9 +220,7 @@ function Sandbox() {
   const [showAssignmentComplete, setShowAssignmentComplete] = useState(false)
   const [isFromAssignment, setIsFromAssignment] = useState(false)
 
-  // DSP-based pitch detection and performance grading hooks
-  const pitchDetection = useDSPPitchDetection({ instrument: instrument as 'keyboard' | 'guitar' | 'bass' })
-  const performanceGrading = usePerformanceGrading()
+  // Feedback system now handled internally by CustomAudioPlayer using useMelodyFeedback
 
   // Check for assignment settings from Classroom page
   useEffect(() => {
@@ -303,63 +300,7 @@ function Sandbox() {
     }
   }, [])
 
-  // Convert DSP pitch result to the format expected by grading system
-  const currentPitchForGrading = useMemo((): PitchDetectionResult | null => {
-    if (!pitchDetection.currentPitch) return null
-    return {
-      frequency: pitchDetection.currentPitch.frequency,
-      note: pitchDetection.currentPitch.note,
-      confidence: pitchDetection.currentPitch.confidence,
-      centsOffset: pitchDetection.currentPitch.cents,
-      timestamp: pitchDetection.currentPitch.timestamp,
-      isOnset: pitchDetection.currentPitch.isOnset
-    }
-  }, [pitchDetection.currentPitch])
-
-  // Keep pitch detection in sync with current instrument
-  useEffect(() => {
-    pitchDetection.setInstrument(instrument as 'keyboard' | 'guitar' | 'bass')
-  }, [instrument, pitchDetection.setInstrument])
-
-  // Pass pitch detection results to grading system
-  useEffect(() => {
-    if (currentPitchForGrading && performanceGrading.state.isActive) {
-      performanceGrading.processPitch(currentPitchForGrading)
-    }
-  }, [currentPitchForGrading, performanceGrading.state.isActive, performanceGrading.processPitch])
-
-  // Stop listening when a new melody is being generated
-  useEffect(() => {
-    if (isGeneratingMelody) {
-      pitchDetection.stopListening()
-      performanceGrading.stopPerformance()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isGeneratingMelody])
-
-  // Start performance grading when user starts listening and melody is ready
-  const handleStartPracticeWithFeedback = useCallback(() => {
-    if (generatedMelody.length > 0) {
-      // Set the correct instrument for pitch detection filtering
-      if (sessionStarted && selectedInstrument) {
-        pitchDetection.setInstrument(selectedInstrument as 'keyboard' | 'guitar' | 'bass')
-      }
-      // Use melodyBpm (BPM when melody was generated) not current bpm
-      performanceGrading.startPerformance(generatedMelody, melodyBpm)
-      pitchDetection.startListening()
-    } else {
-      // Just start listening without grading if no melody
-      pitchDetection.startListening()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [generatedMelody, sessionStarted, selectedInstrument, melodyBpm])
-
-  // Stop practice session
-  const handleStopPracticeWithFeedback = useCallback(() => {
-    pitchDetection.stopListening()
-    performanceGrading.stopPerformance()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  // Feedback system is now self-contained in CustomAudioPlayer
 
   // Practice options modal handlers
   const handleOptionsStart = (instrumentId: string, selectedOptions: string[], selectedDifficulty: number, settings: LessonSettings) => {
@@ -1506,11 +1447,6 @@ function Sandbox() {
           fretRangeLow={fretLow}
           fretRangeHigh={fretHigh}
           lessonType={lessonSettings?.lessonType as 'melodies' | 'chords' | undefined}
-          isListening={pitchDetection.isListening}
-          onStartFeedback={handleStartPracticeWithFeedback}
-          onStopFeedback={handleStopPracticeWithFeedback}
-          performanceState={performanceGrading.state}
-          volumeLevel={pitchDetection.volumeLevel}
         />
 
         {/* Welcome Subtitle Overlay */}
@@ -1669,11 +1605,6 @@ function Sandbox() {
         isAutoRecording={isAutoRecording}
         currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
         onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
-        isListening={pitchDetection.isListening}
-        onStartFeedback={handleStartPracticeWithFeedback}
-        onStopFeedback={handleStopPracticeWithFeedback}
-        performanceState={performanceGrading.state}
-        volumeLevel={pitchDetection.volumeLevel}
         onExportToClassroom={handleExportToClassroom}
         canExportToClassroom={!!user && !assigningToClassroomId}
         hasExportableContent={selectedNotes.length > 0 || scaleChordManagement.appliedScales.length > 0 || scaleChordManagement.appliedChords.length > 0}

@@ -73,12 +73,7 @@ interface InstrumentDisplayProps {
   lessonType?: 'melodies' | 'chords'
   externalSelectedNoteIds?: string[]
   hideScalesChords?: boolean
-  // Feedback props
-  isListening?: boolean
-  onStartFeedback?: () => void
-  onStopFeedback?: () => void
-  performanceState?: any
-  volumeLevel?: number
+  // Feedback now handled internally by CustomAudioPlayer
   // Export to Classroom props
   onExportToClassroom?: () => void
   canExportToClassroom?: boolean
@@ -150,11 +145,6 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   lessonType,
   externalSelectedNoteIds,
   hideScalesChords = false,
-  isListening = false,
-  onStartFeedback,
-  onStopFeedback,
-  performanceState,
-  volumeLevel = 0,
   onExportToClassroom,
   canExportToClassroom = false,
   hasExportableContent = false
@@ -430,11 +420,6 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           disableChordMode={disableChordMode}
           onLessonComplete={onLessonComplete}
           autoPlayAudio={autoPlayAudio}
-          isListening={isListening}
-          onStartFeedback={onStartFeedback}
-          onStopFeedback={onStopFeedback}
-          performanceState={performanceState}
-          volumeLevel={volumeLevel}
           onExportToClassroom={onExportToClassroom}
           canExportToClassroom={canExportToClassroom}
           hasExportableContent={hasExportableContent}

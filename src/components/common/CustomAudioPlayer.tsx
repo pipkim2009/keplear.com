@@ -1,8 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import { PiPlayFill, PiPauseFill, PiSpeakerHighFill, PiSpeakerLowFill, PiSpeakerSlashFill } from 'react-icons/pi'
-import { Eye, EyeOff, Mic, MicOff } from 'lucide-react'
+import { Eye, EyeOff, Mic, MicOff, Check, RotateCcw } from 'lucide-react'
 import type { Note } from '../../utils/notes'
-import type { PerformanceState } from '../../hooks/usePerformanceGrading'
+import { useMelodyFeedback } from '../../hooks/useMelodyFeedback'
 import { useTranslation } from '../../contexts/TranslationContext'
 
 interface CustomAudioPlayerProps {
@@ -17,12 +17,10 @@ interface CustomAudioPlayerProps {
   onToggleNotes?: () => void
   melody?: Note[]
   currentlyPlayingNoteIndex?: number | null
-  // Feedback props
-  isListening?: boolean
-  onStartFeedback?: () => void
-  onStopFeedback?: () => void
-  performanceState?: PerformanceState
-  volumeLevel?: number
+  /** Instrument type for optimized detection */
+  instrument?: 'keyboard' | 'guitar' | 'bass'
+  /** Whether to require exact octave match */
+  strictOctave?: boolean
 }
 
 const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
@@ -37,11 +35,8 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   onToggleNotes,
   melody = [],
   currentlyPlayingNoteIndex = null,
-  isListening = false,
-  onStartFeedback,
-  onStopFeedback,
-  performanceState,
-  volumeLevel = 0
+  instrument = 'keyboard',
+  strictOctave = false
 }) => {
   const { t } = useTranslation()
   const internalAudioRef = useRef<HTMLAudioElement>(null)
@@ -59,6 +54,33 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   const [hoverTime, setHoverTime] = useState<number | null>(null)
   const [showHoverTime, setShowHoverTime] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
+
+  // New melody feedback system - rhythm ignored, polyphonic transcription
+  const melodyFeedback = useMelodyFeedback({
+    instrument,
+    strictOctave
+  })
+
+  // Update melody in feedback system when it changes
+  useEffect(() => {
+    if (melody.length > 0) {
+      melodyFeedback.setMelody(melody)
+    }
+  }, [melody])
+
+  // Toggle feedback listening
+  const handleToggleFeedback = useCallback(() => {
+    if (melodyFeedback.state.isActive) {
+      melodyFeedback.stop()
+    } else {
+      melodyFeedback.start()
+    }
+  }, [melodyFeedback])
+
+  // Reset feedback
+  const handleResetFeedback = useCallback(() => {
+    melodyFeedback.reset()
+  }, [melodyFeedback])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -274,14 +296,27 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           </button>
         )}
 
-        {(onStartFeedback || onStopFeedback) && (
+        {melody.length > 0 && (
           <button
-            className={`mic-btn ${isListening ? 'active' : ''}`}
-            onClick={isListening ? onStopFeedback : onStartFeedback}
-            aria-label={isListening ? t('sandbox.stopFeedback') : t('sandbox.startFeedback')}
-            title={isListening ? t('sandbox.stopFeedback') : t('sandbox.startFeedback')}
+            className={`mic-btn ${melodyFeedback.state.isActive ? 'active' : ''}`}
+            onClick={handleToggleFeedback}
+            disabled={melodyFeedback.modelStatus === 'loading'}
+            aria-label={melodyFeedback.state.isActive ? t('sandbox.stopFeedback') : t('sandbox.startFeedback')}
+            title={melodyFeedback.state.isActive ? t('sandbox.stopFeedback') : t('sandbox.startFeedback')}
           >
-            {isListening ? <MicOff size={18} /> : <Mic size={18} />}
+            {melodyFeedback.state.isActive ? <MicOff size={18} /> : <Mic size={18} />}
+          </button>
+        )}
+
+        {/* Reset button - show after practice */}
+        {melody.length > 0 && !melodyFeedback.state.isActive && melodyFeedback.state.playedCount > 0 && (
+          <button
+            className="reset-btn"
+            onClick={handleResetFeedback}
+            aria-label={t('sandbox.reset')}
+            title={t('sandbox.reset')}
+          >
+            <RotateCcw size={16} />
           </button>
         )}
 
@@ -380,64 +415,74 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
         </div>
       )}
 
-      {/* Feedback Expansion - shows when listening */}
-      {isListening && performanceState && (
+      {/* Feedback Expansion - New rhythm-ignored system */}
+      {(melodyFeedback.state.isActive || melodyFeedback.state.playedCount > 0) && melody.length > 0 && (
         <div className="feedback-expansion">
-          {/* Count-in display */}
-          {performanceState.guided.isCountingIn && (
-            <div className="count-in-container">
-              <div className="count-in-beats">
-                {[1, 2, 3, 4].map(beat => (
-                  <div
-                    key={beat}
-                    className={`count-in-beat ${performanceState.guided.countInBeat >= beat ? 'active' : ''} ${performanceState.guided.countInBeat === beat ? 'current' : ''}`}
-                  >
-                    {beat}
-                  </div>
-                ))}
-              </div>
-              <span className="count-in-label">{t('sandbox.countIn')}</span>
+          {/* Completion message */}
+          {melodyFeedback.state.isComplete && (
+            <div className="feedback-complete">
+              <Check size={20} />
+              <span>{t('sandbox.melodyComplete')}</span>
             </div>
           )}
 
-          {/* Note Timeline with results */}
-          {((!performanceState.guided.isCountingIn && performanceState.guided.currentBeat > 4) || performanceState.noteResults.length > 0) && melody.length > 0 && (
-            <div className="feedback-timeline">
-              <div className="feedback-timeline-track">
-                {melody.map((note, index) => {
-                  const result = performanceState.noteResults.find(r => r.noteIndex === index)
-                  const isCurrent = index === performanceState.currentNoteIndex
-                  const isPast = index < performanceState.currentNoteIndex
-
-                  return (
-                    <div
-                      key={index}
-                      className={`feedback-note ${
-                        result?.isCorrect ? 'correct' :
-                        result && !result.isCorrect ? 'missed' :
-                        isCurrent ? 'current' :
-                        isPast ? 'past' : 'pending'
-                      }`}
-                    >
-                      <span className="feedback-note-name">♪</span>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Volume indicator */}
-          <div className="volume-indicator">
-            <span className="volume-indicator-label">{t('sandbox.micLevel')}</span>
-            <div className="volume-indicator-bar">
+          {/* Progress display */}
+          <div className="feedback-progress">
+            <span className="feedback-progress-count">
+              {melodyFeedback.state.playedCount}/{melodyFeedback.state.totalNotes}
+            </span>
+            <div className="feedback-progress-bar">
               <div
-                className="volume-indicator-fill"
-                style={{ width: `${Math.min(100, volumeLevel * 100)}%` }}
+                className="feedback-progress-fill"
+                style={{ width: `${melodyFeedback.state.progress}%` }}
               />
             </div>
-            <span className="volume-indicator-value">{Math.round(volumeLevel * 100)}%</span>
           </div>
+
+          {/* Detected note display */}
+          {melodyFeedback.state.isActive && melodyFeedback.state.lastDetectedNote && (
+            <div className="feedback-detected">
+              <span className="feedback-detected-label">{t('sandbox.detected')}:</span>
+              <span className="feedback-detected-note">{melodyFeedback.state.lastDetectedNote}</span>
+            </div>
+          )}
+
+          {/* Note chips - shows played vs remaining */}
+          <div className="feedback-notes">
+            {melodyFeedback.state.notes.map((note, index) => (
+              <div
+                key={index}
+                className={`feedback-note-chip ${
+                  note.isPlayed ? 'played' :
+                  note.isCurrent ? 'current' : 'pending'
+                }`}
+              >
+                <span className="feedback-note-name">{note.name}</span>
+                {note.isPlayed && <Check size={12} className="feedback-note-check" />}
+              </div>
+            ))}
+          </div>
+
+          {/* Volume indicator */}
+          {melodyFeedback.state.isActive && (
+            <div className="volume-indicator">
+              <span className="volume-indicator-label">{t('sandbox.micLevel')}</span>
+              <div className="volume-indicator-bar">
+                <div
+                  className="volume-indicator-fill"
+                  style={{ width: `${Math.min(100, melodyFeedback.state.volumeLevel * 100)}%` }}
+                />
+              </div>
+              <span className="volume-indicator-value">{Math.round(melodyFeedback.state.volumeLevel * 100)}%</span>
+            </div>
+          )}
+
+          {/* Instructions when not active */}
+          {!melodyFeedback.state.isActive && melodyFeedback.state.playedCount === 0 && (
+            <div className="feedback-instructions">
+              <p>{t('sandbox.feedbackInstructions')}</p>
+            </div>
+          )}
         </div>
       )}
     </div>

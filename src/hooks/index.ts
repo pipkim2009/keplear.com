@@ -16,16 +16,12 @@ export { useMelodyPlayer } from './useMelodyPlayer'
 export { useScaleChordManagement } from './useScaleChordManagement'
 export { useTheme } from './useTheme'
 export { useUIState } from './useUIState'
-export { usePitchDetection } from './usePitchDetection'
-export type { PitchDetectionResult, MicrophonePermission } from './usePitchDetection'
 export { useAudioInput } from './useAudioInput'
 export type { AudioInputConfig, AudioInputState, UseAudioInputReturn } from './useAudioInput'
-export { useAIPitchDetection } from './useAIPitchDetection'
-export type { AIPitchDetectionResult, ModelStatus } from './useAIPitchDetection'
-export { useDSPPitchDetection } from './useDSPPitchDetection'
-export type { DSPPitchResult } from './useDSPPitchDetection'
-export { usePerformanceGrading } from './usePerformanceGrading'
-export type { NoteResult, PerformanceResult, PerformanceState } from './usePerformanceGrading'
+
+// Melody feedback system (rhythm-ignored, polyphonic transcription)
+export { useMelodyFeedback } from './useMelodyFeedback'
+export type { MelodyFeedbackConfig, FeedbackNote, MelodyFeedbackState, UseMelodyFeedbackReturn } from './useMelodyFeedback'
 
 // Database hooks
 export { useQueryCache, invalidateCache, clearCache, setCache } from './useQueryCache'

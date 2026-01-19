@@ -10,8 +10,7 @@ import AuthContext from '../../contexts/AuthContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
-import { useDSPPitchDetection, usePerformanceGrading } from '../../hooks'
-import type { PitchDetectionResult } from '../../hooks/usePitchDetection'
+// Old feedback system removed - now using useMelodyFeedback in CustomAudioPlayer
 import type { Note } from '../../utils/notes'
 import type { AppliedScale, AppliedChord } from '../common/ScaleChordOptions'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
@@ -329,22 +328,7 @@ function Classroom() {
   const hasInitializedNotes = useRef(false)
   const hasAnnouncedMelody = useRef(false)
 
-  // DSP-based pitch detection and performance grading hooks
-  const pitchDetection = useDSPPitchDetection({ instrument: instrument as 'keyboard' | 'guitar' | 'bass' })
-  const performanceGrading = usePerformanceGrading()
-
-  // Convert DSP pitch result to the format expected by grading system
-  const currentPitchForGrading = useMemo((): PitchDetectionResult | null => {
-    if (!pitchDetection.currentPitch) return null
-    return {
-      frequency: pitchDetection.currentPitch.frequency,
-      note: pitchDetection.currentPitch.note,
-      confidence: pitchDetection.currentPitch.confidence,
-      centsOffset: pitchDetection.currentPitch.cents,
-      timestamp: pitchDetection.currentPitch.timestamp,
-      isOnset: pitchDetection.currentPitch.isOnset
-    }
-  }, [pitchDetection.currentPitch])
+  // Feedback system now handled internally by CustomAudioPlayer using useMelodyFeedback
 
   // Check for dark mode
   useEffect(() => {
@@ -1624,8 +1608,7 @@ function Classroom() {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel()
     }
-    pitchDetection.stopListening()
-    performanceGrading.stopPerformance()
+    // Feedback cleanup now handled by CustomAudioPlayer
     setCurrentAssignment(null)
     setPendingSelectionData(null)
     setExternalSelectedNoteIds([])
@@ -2076,32 +2059,7 @@ function Classroom() {
     }
   }, [viewMode, welcomeSpeechDone, generatedMelody, recordedAudioBlob])
 
-  // Pitch detection handlers
-  const handleStartPracticeWithFeedback = useCallback(() => {
-    if (generatedMelody.length > 0) {
-      if (currentAssignment) {
-        pitchDetection.setInstrument(currentAssignment.instrument as 'keyboard' | 'guitar' | 'bass')
-      }
-      performanceGrading.startPerformance(generatedMelody, melodyBpm)
-      pitchDetection.startListening()
-    } else {
-      pitchDetection.startListening()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [generatedMelody, currentAssignment, melodyBpm])
-
-  const handleStopPracticeWithFeedback = useCallback(() => {
-    pitchDetection.stopListening()
-    performanceGrading.stopPerformance()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  // Pass pitch detection results to grading system
-  useEffect(() => {
-    if (currentPitchForGrading && performanceGrading.state.isActive) {
-      performanceGrading.processPitch(currentPitchForGrading)
-    }
-  }, [currentPitchForGrading, performanceGrading.state.isActive, performanceGrading.processPitch])
+  // Feedback handling now done internally by CustomAudioPlayer
 
   const handleOpenModal = () => {
     if (!user) {
@@ -2428,11 +2386,6 @@ function Classroom() {
           lessonType={hasBothScalesAndChords ? undefined : (currentAssignment.lesson_type as 'melodies' | 'chords' | undefined)}
           externalSelectedNoteIds={externalSelectedNoteIds}
           hideScalesChords={hasNoScalesOrChords}
-          isListening={pitchDetection.isListening}
-          onStartFeedback={handleStartPracticeWithFeedback}
-          onStopFeedback={handleStopPracticeWithFeedback}
-          performanceState={performanceGrading.state}
-          volumeLevel={pitchDetection.volumeLevel}
         />
 
         {genericWelcomeMessage && <WelcomeSubtitle message={genericWelcomeMessage} onSpeechEnd={() => setGenericWelcomeDone(true)} />}
