@@ -114,7 +114,7 @@ const DEFAULT_CONFIG: MelodyFeedbackConfig = {
   hopSizeMs: 100,
   onsetThreshold: 0.5,
   strictOctave: false,
-  pitchTolerance: 1,
+  pitchTolerance: 0,
   instrument: 'keyboard'
 }
 

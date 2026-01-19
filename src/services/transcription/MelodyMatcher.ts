@@ -67,7 +67,7 @@ export interface MelodyMatcherConfig {
 
 const DEFAULT_CONFIG: MelodyMatcherConfig = {
   strictOctave: false, // Pitch class only by default
-  pitchToleranceSemitones: 1, // ±1 semitone tolerance
+  pitchToleranceSemitones: 0, // Exact pitch match required
   lookAhead: 2 // Can match up to 2 notes ahead
 }
 
