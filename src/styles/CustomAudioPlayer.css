@@ -1627,6 +1627,35 @@
   }
 }
 
+/* Restart button in completion message */
+.feedback-restart-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin-left: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.feedback-restart-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.light .feedback-restart-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.light .feedback-restart-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
 /* Progress count display */
 .feedback-progress-count {
   font-size: 16px;

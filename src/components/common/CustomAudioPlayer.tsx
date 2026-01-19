@@ -77,7 +77,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
     }
   }, [melodyFeedback])
 
-  // Reset feedback
+  // Reset feedback to start over
   const handleResetFeedback = useCallback(() => {
     melodyFeedback.reset()
   }, [melodyFeedback])
@@ -308,18 +308,6 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           </button>
         )}
 
-        {/* Reset button - show after practice */}
-        {melody.length > 0 && !melodyFeedback.state.isActive && melodyFeedback.state.playedCount > 0 && (
-          <button
-            className="reset-btn"
-            onClick={handleResetFeedback}
-            aria-label={t('sandbox.reset')}
-            title={t('sandbox.reset')}
-          >
-            <RotateCcw size={16} />
-          </button>
-        )}
-
         <button
           className="play-pause-btn"
           onClick={togglePlay}
@@ -416,31 +404,26 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
       )}
 
       {/* Feedback Expansion - New rhythm-ignored system */}
-      {(melodyFeedback.state.isActive || melodyFeedback.state.playedCount > 0) && melody.length > 0 && (
+      {melodyFeedback.state.isActive && melody.length > 0 && (
         <div className="feedback-expansion">
-          {/* Completion message */}
+          {/* Completion message with restart */}
           {melodyFeedback.state.isComplete && (
             <div className="feedback-complete">
               <Check size={20} />
-              <span>{t('sandbox.melodyComplete')}</span>
+              <span>{t('sandbox.complete')}</span>
+              <button
+                className="feedback-restart-btn"
+                onClick={handleResetFeedback}
+                aria-label={t('sandbox.reset')}
+                title={t('sandbox.reset')}
+              >
+                <RotateCcw size={16} />
+              </button>
             </div>
           )}
 
-          {/* Progress display */}
-          <div className="feedback-progress">
-            <span className="feedback-progress-count">
-              {melodyFeedback.state.playedCount}/{melodyFeedback.state.totalNotes}
-            </span>
-            <div className="feedback-progress-bar">
-              <div
-                className="feedback-progress-fill"
-                style={{ width: `${melodyFeedback.state.progress}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Detected note display */}
-          {melodyFeedback.state.isActive && melodyFeedback.state.lastDetectedNote && (
+          {/* Detected note display - hide when complete */}
+          {melodyFeedback.state.isActive && melodyFeedback.state.lastDetectedNote && !melodyFeedback.state.isComplete && (
             <div className="feedback-detected">
               <span className="feedback-detected-label">{t('sandbox.detected')}:</span>
               <span className="feedback-detected-note">{melodyFeedback.state.lastDetectedNote}</span>

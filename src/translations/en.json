@@ -207,7 +207,10 @@
     "fretsRange": "Frets {start}-{end}",
     "octaveNumber": "Octave {num}",
     "setLowestOctave": "Set lowest octave",
-    "setHighestOctave": "Set highest octave"
+    "setHighestOctave": "Set highest octave",
+    "complete": "Complete",
+    "detected": "Detected",
+    "reset": "Reset"
   },
   "theme": {
     "switchToLight": "Switch to Light Mode",
