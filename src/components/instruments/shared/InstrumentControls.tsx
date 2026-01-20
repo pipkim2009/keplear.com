@@ -74,7 +74,9 @@ interface InstrumentControlsProps {
   disableBeatsInput?: boolean
   disableChordMode?: boolean
   autoPlayAudio?: boolean
-  // Feedback now handled internally by CustomAudioPlayer
+  // Feedback callbacks
+  onMelodyComplete?: () => void
+  autoStartFeedback?: boolean
   // Export to Classroom props
   onExportToClassroom?: () => void
   canExportToClassroom?: boolean
@@ -139,6 +141,8 @@ const InstrumentControls = memo(function InstrumentControls({
   disableBeatsInput = false,
   disableChordMode = false,
   autoPlayAudio = false,
+  onMelodyComplete,
+  autoStartFeedback = false,
   onExportToClassroom,
   canExportToClassroom = false,
   hasExportableContent = false
@@ -1002,6 +1006,8 @@ const InstrumentControls = memo(function InstrumentControls({
                     onToggleNotes={onToggleNotes}
                     melody={generatedMelody}
                     currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
+                    onMelodyComplete={onMelodyComplete}
+                    autoStartFeedback={autoStartFeedback}
                   />
                 )
               )}

@@ -68,6 +68,7 @@ interface InstrumentDisplayProps {
   practiceMode?: boolean
   onLessonComplete?: () => void
   autoPlayAudio?: boolean
+  autoStartFeedback?: boolean
   fretRangeLow?: number
   fretRangeHigh?: number
   lessonType?: 'melodies' | 'chords'
@@ -140,6 +141,7 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   practiceMode = false,
   onLessonComplete,
   autoPlayAudio = false,
+  autoStartFeedback = false,
   fretRangeLow,
   fretRangeHigh,
   lessonType,
@@ -418,8 +420,9 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
           disableBpmInput={disableBpmInput}
           disableBeatsInput={disableBeatsInput}
           disableChordMode={disableChordMode}
-          onLessonComplete={onLessonComplete}
+          onMelodyComplete={onLessonComplete}
           autoPlayAudio={autoPlayAudio}
+          autoStartFeedback={autoStartFeedback}
           onExportToClassroom={onExportToClassroom}
           canExportToClassroom={canExportToClassroom}
           hasExportableContent={hasExportableContent}

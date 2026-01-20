@@ -133,8 +133,19 @@ export class MagentaTranscriber {
   // Note tracking for persistence filtering
   private noteHistory: Map<number, { count: number; lastSeen: number; totalDuration: number }> = new Map()
   private lastDetectedPitch: number = -1
-  private readonly PERSISTENCE_FRAMES = 2
-  private readonly MIN_DURATION_MS = 50
+  private lastPitchTimestamp: number = 0
+  private silenceFrameCount: number = 0
+  private readonly PERSISTENCE_FRAMES = 1 // Reduced for faster response
+  private readonly MIN_DURATION_MS = 30 // Reduced for faster detection
+  private readonly SILENCE_FRAMES_FOR_RESET = 2 // Reset after 2 frames of silence (~200ms)
+
+  // Amplitude envelope tracking for detecting note re-attacks
+  private recentRmsValues: number[] = []
+  private readonly RMS_HISTORY_SIZE = 5
+  private peakRms: number = 0
+  private inDip: boolean = false
+  private readonly DIP_THRESHOLD = 0.4 // RMS must drop to 40% of peak to count as a dip
+  private readonly RISE_THRESHOLD = 1.5 // RMS must rise 50% from dip to count as re-attack
 
   // Callbacks
   private onStatusChange?: (status: TranscriberStatus) => void
@@ -238,8 +249,49 @@ export class MagentaTranscriber {
 
       // Check if we have enough signal
       const rms = this.calculateRMS(orderedAudio)
+
+      // Track RMS history for envelope detection
+      this.recentRmsValues.push(rms)
+      if (this.recentRmsValues.length > this.RMS_HISTORY_SIZE) {
+        this.recentRmsValues.shift()
+      }
+
+      // Detect amplitude dips and rises for note re-attack detection
+      let isNewAttack = false
+      if (rms > this.peakRms) {
+        this.peakRms = rms
+      }
+
+      if (rms < this.peakRms * this.DIP_THRESHOLD) {
+        // We're in a dip - amplitude dropped significantly
+        this.inDip = true
+      } else if (this.inDip && this.recentRmsValues.length >= 2) {
+        // Check if we're rising from a dip
+        const prevRms = this.recentRmsValues[this.recentRmsValues.length - 2]
+        if (rms > prevRms * this.RISE_THRESHOLD && rms > 0.02) {
+          // Rising from dip - this is a new attack!
+          isNewAttack = true
+          this.inDip = false
+          this.peakRms = rms // Reset peak for next note
+        }
+      }
+
+      // Decay peak over time to adapt to volume changes
+      this.peakRms *= 0.995
+
       if (rms < 0.01) {
-        // Too quiet, emit empty result
+        // Too quiet - increment silence counter
+        this.silenceFrameCount++
+
+        // After enough silence, reset note history so next same-pitch detection is a new onset
+        if (this.silenceFrameCount >= this.SILENCE_FRAMES_FOR_RESET) {
+          this.noteHistory.clear()
+          this.lastDetectedPitch = -1
+          this.peakRms = 0
+          this.inDip = false
+        }
+
+        // Emit empty result
         if (this.onTranscription) {
           this.onTranscription({
             activeNotes: [],
@@ -251,6 +303,9 @@ export class MagentaTranscriber {
         return
       }
 
+      // We have signal - reset silence counter
+      this.silenceFrameCount = 0
+
       // Detect pitch using YIN
       const { frequency, confidence } = this.computePitchYIN(orderedAudio, this.actualSampleRate)
 
@@ -261,6 +316,22 @@ export class MagentaTranscriber {
 
         if (frequency >= range.min && frequency <= range.max) {
           const midiPitch = frequencyToMidi(frequency)
+
+          // Check if pitch changed from last detection - this indicates a note boundary
+          if (this.lastDetectedPitch !== -1 && this.lastDetectedPitch !== midiPitch) {
+            // Different pitch detected - clear history for the old pitch
+            // so if it's played again, it will be detected as a new onset
+            this.noteHistory.delete(this.lastDetectedPitch)
+          }
+
+          // If we detected a new attack (amplitude dip then rise) on the same pitch,
+          // clear the history so it's treated as a new note
+          if (isNewAttack && this.lastDetectedPitch === midiPitch) {
+            this.noteHistory.delete(midiPitch)
+          }
+
+          this.lastDetectedPitch = midiPitch
+          this.lastPitchTimestamp = startTime
 
           detectedNotes.push({
             pitch: midiPitch,
@@ -468,6 +539,11 @@ export class MagentaTranscriber {
     this.lastInferenceTime = 0
     this.samplesReceived = 0
     this.lastDetectedPitch = -1
+    this.lastPitchTimestamp = 0
+    this.silenceFrameCount = 0
+    this.recentRmsValues = []
+    this.peakRms = 0
+    this.inDip = false
   }
 
   dispose(): void {

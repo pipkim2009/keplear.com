@@ -1793,10 +1793,10 @@ function Classroom() {
       // More exercises available - advance to next
       handleSwitchLessonExercise(lessonExerciseIndex + 1)
     } else {
-      // Last exercise - end lesson
-      handleEndLesson()
+      // Last exercise - show completion animation then end lesson
+      setShowAssignmentComplete(true)
     }
-  }, [lessonExerciseIndex, lessonExercises.length, handleSwitchLessonExercise, handleEndLesson])
+  }, [lessonExerciseIndex, lessonExercises.length, handleSwitchLessonExercise])
 
   // Apply assignment selection data when in lesson mode (first exercise)
   useEffect(() => {
@@ -2290,13 +2290,7 @@ function Classroom() {
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
-          <button
-            className={practiceStyles.doneButton}
-            onClick={lessonExerciseIndex < lessonExercises.length - 1 ? () => handleSwitchLessonExercise(lessonExerciseIndex + 1) : handleDoneClick}
-            aria-label={lessonExerciseIndex < lessonExercises.length - 1 ? t('classroom.lesson.nextExercise') : t('sandbox.done')}
-          >
-            {lessonExerciseIndex < lessonExercises.length - 1 ? t('common.next') : t('sandbox.done')}
-          </button>
+          {/* Next button removed - user must complete melody feedback to advance */}
         </div>
 
         {/* Timeline for multi-exercise lessons (read-only progress indicator) */}
@@ -2386,6 +2380,8 @@ function Classroom() {
           lessonType={hasBothScalesAndChords ? undefined : (currentAssignment.lesson_type as 'melodies' | 'chords' | undefined)}
           externalSelectedNoteIds={externalSelectedNoteIds}
           hideScalesChords={hasNoScalesOrChords}
+          onLessonComplete={handleExerciseComplete}
+          autoStartFeedback={true}
         />
 
         {genericWelcomeMessage && <WelcomeSubtitle message={genericWelcomeMessage} onSpeechEnd={() => setGenericWelcomeDone(true)} />}

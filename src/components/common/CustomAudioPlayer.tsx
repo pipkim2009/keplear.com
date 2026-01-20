@@ -21,6 +21,10 @@ interface CustomAudioPlayerProps {
   instrument?: 'keyboard' | 'guitar' | 'bass'
   /** Whether to require exact octave match */
   strictOctave?: boolean
+  /** Callback when melody feedback is completed */
+  onMelodyComplete?: () => void
+  /** Auto-start feedback when component mounts */
+  autoStartFeedback?: boolean
 }
 
 const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
@@ -36,7 +40,9 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   melody = [],
   currentlyPlayingNoteIndex = null,
   instrument = 'keyboard',
-  strictOctave = false
+  strictOctave = false,
+  onMelodyComplete,
+  autoStartFeedback = false
 }) => {
   const { t } = useTranslation()
   const internalAudioRef = useRef<HTMLAudioElement>(null)
@@ -61,6 +67,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
     strictOctave
   })
 
+
   // Update melody in feedback system when it changes
   useEffect(() => {
     if (melody.length > 0) {
@@ -81,6 +88,73 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
   const handleResetFeedback = useCallback(() => {
     melodyFeedback.reset()
   }, [melodyFeedback])
+
+  // Track if we've already called onMelodyComplete for this completion
+  const hasCalledCompleteRef = useRef(false)
+  const onMelodyCompleteRef = useRef(onMelodyComplete)
+  const completionTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Keep callback ref updated
+  useEffect(() => {
+    onMelodyCompleteRef.current = onMelodyComplete
+  }, [onMelodyComplete])
+
+  // Refs for audio ended handler to avoid stale closures
+  const autoStartFeedbackRef = useRef(autoStartFeedback)
+  const melodyLengthRef = useRef(melody.length)
+  const melodyFeedbackRef = useRef(melodyFeedback)
+
+  useEffect(() => {
+    autoStartFeedbackRef.current = autoStartFeedback
+  }, [autoStartFeedback])
+
+  useEffect(() => {
+    melodyLengthRef.current = melody.length
+  }, [melody.length])
+
+  useEffect(() => {
+    melodyFeedbackRef.current = melodyFeedback
+  }, [melodyFeedback])
+
+  // Call onMelodyComplete when melody is completed
+  useEffect(() => {
+    if (melodyFeedback.state.isComplete && !hasCalledCompleteRef.current) {
+      hasCalledCompleteRef.current = true
+      // Small delay to let the user see the completion state
+      completionTimerRef.current = setTimeout(() => {
+        if (onMelodyCompleteRef.current) {
+          onMelodyCompleteRef.current()
+        }
+      }, 1500)
+    }
+  }, [melodyFeedback.state.isComplete])
+
+  // Reset the completion flag when melody changes or feedback is reset
+  useEffect(() => {
+    if (!melodyFeedback.state.isComplete) {
+      hasCalledCompleteRef.current = false
+    }
+  }, [melodyFeedback.state.isComplete])
+
+  // Cleanup timer on unmount only
+  useEffect(() => {
+    return () => {
+      if (completionTimerRef.current) {
+        clearTimeout(completionTimerRef.current)
+      }
+    }
+  }, [])
+
+  // Stop and reset feedback when melody changes (new exercise)
+  useEffect(() => {
+    if (melody.length > 0) {
+      // Reset feedback for new melody
+      if (melodyFeedback.state.isActive) {
+        melodyFeedback.stop()
+      }
+      melodyFeedback.reset()
+    }
+  }, [melody])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -110,6 +184,12 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
       setIsPlaying(false)
       if (onNoteIndexChange) {
         onNoteIndexChange(null)
+      }
+      // Auto-start feedback after playback ends (in lesson mode)
+      if (autoStartFeedbackRef.current && melodyLengthRef.current > 0 && !melodyFeedbackRef.current.state.isActive) {
+        melodyFeedbackRef.current.start().catch(err => {
+          console.error('[CustomAudioPlayer] Failed to start feedback after playback:', err)
+        })
       }
     }
 
@@ -406,19 +486,21 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
       {/* Feedback Expansion - New rhythm-ignored system */}
       {melodyFeedback.state.isActive && melody.length > 0 && (
         <div className="feedback-expansion">
-          {/* Completion message with restart */}
+          {/* Completion message with restart (hide restart in lesson mode) */}
           {melodyFeedback.state.isComplete && (
             <div className="feedback-complete">
               <Check size={20} />
               <span>{t('sandbox.complete')}</span>
-              <button
-                className="feedback-restart-btn"
-                onClick={handleResetFeedback}
-                aria-label={t('sandbox.reset')}
-                title={t('sandbox.reset')}
-              >
-                <RotateCcw size={16} />
-              </button>
+              {!autoStartFeedback && (
+                <button
+                  className="feedback-restart-btn"
+                  onClick={handleResetFeedback}
+                  aria-label={t('sandbox.reset')}
+                  title={t('sandbox.reset')}
+                >
+                  <RotateCcw size={16} />
+                </button>
+              )}
             </div>
           )}
 

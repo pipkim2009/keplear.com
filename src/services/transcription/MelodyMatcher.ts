@@ -137,8 +137,8 @@ export class MelodyMatcher {
   private config: MelodyMatcherConfig
   private melody: MelodyNote[] = []
   private state: MelodyMatchState
-  private recentlyMatchedPitches: Set<number> = new Set()
-  private matchCooldownMs: number = 200 // Prevent double-matching same note
+  private recentlyMatchedIndices: Set<number> = new Set() // Track matched melody indices instead of pitches
+  private matchCooldownMs: number = 100 // Short cooldown - only prevents double-triggering same melody note
 
   // Callbacks
   private onNoteMatched?: (note: MelodyNote, detectedNote: TranscribedNote) => void
@@ -212,22 +212,17 @@ export class MelodyMatcher {
     const newMatches: MelodyNote[] = []
     const now = performance.now()
 
-    // Clean up cooldown set
-    for (const pitch of this.recentlyMatchedPitches) {
-      // Cooldown is managed per-match, we'll clear old entries
-    }
-
     // Check each detected note
     for (const detected of detectedNotes) {
-      // Skip if this pitch was just matched (prevent double-counting)
-      if (this.recentlyMatchedPitches.has(detected.pitch)) {
-        continue
-      }
-
       // Try to match against current note and look-ahead notes
       const matchIndex = this.findMatch(detected)
 
       if (matchIndex >= 0) {
+        // Skip if this melody index was just matched (prevent double-triggering)
+        if (this.recentlyMatchedIndices.has(matchIndex)) {
+          continue
+        }
+
         const matchedNote = this.melody[matchIndex]
 
         // Mark all notes up to and including the match as played
@@ -248,10 +243,11 @@ export class MelodyMatcher {
         // Update current index to next unplayed note
         this.state.currentIndex = matchIndex + 1
 
-        // Add to cooldown
-        this.recentlyMatchedPitches.add(detected.pitch)
+        // Add melody index to cooldown (not the pitch!)
+        // This allows the same pitch to match a different melody note
+        this.recentlyMatchedIndices.add(matchIndex)
         setTimeout(() => {
-          this.recentlyMatchedPitches.delete(detected.pitch)
+          this.recentlyMatchedIndices.delete(matchIndex)
         }, this.matchCooldownMs)
 
         // Track the match
@@ -322,7 +318,7 @@ export class MelodyMatcher {
       isComplete: false
     }
 
-    this.recentlyMatchedPitches.clear()
+    this.recentlyMatchedIndices.clear()
 
     if (this.onStateChange) {
       this.onStateChange(this.getState())
