@@ -26,7 +26,8 @@ import {
   getBassNoteById,
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
-import { PiTrashFill, PiChatCircleFill, PiPencilSimpleFill, PiEyeFill } from 'react-icons/pi'
+import { PiTrashFill, PiChatCircleFill, PiPencilSimpleFill, PiEyeFill, PiCheckCircleFill, PiXCircleFill } from 'react-icons/pi'
+import { useRecordCompletion, useUserCompletions, useAssignmentCompletions } from '../../hooks/useClassrooms'
 import styles from '../../styles/Classroom.module.css'
 import practiceStyles from '../../styles/Practice.module.css'
 
@@ -327,6 +328,16 @@ function Classroom() {
   const [showAssignmentComplete, setShowAssignmentComplete] = useState(false)
   const hasInitializedNotes = useRef(false)
   const hasAnnouncedMelody = useRef(false)
+
+  // Assignment completion tracking
+  const recordCompletion = useRecordCompletion()
+  const userCompletions = useUserCompletions(user?.id)
+  const completedAssignmentIds = useMemo(() => {
+    if (!userCompletions.data) return new Set<string>()
+    return new Set(userCompletions.data.map(c => c.assignment_id))
+  }, [userCompletions.data])
+  const [viewingCompletionsForAssignment, setViewingCompletionsForAssignment] = useState<string | null>(null)
+  const assignmentCompletions = useAssignmentCompletions(viewingCompletionsForAssignment)
 
   // Feedback system now handled internally by CustomAudioPlayer using useMelodyFeedback
 
@@ -1795,8 +1806,12 @@ function Classroom() {
     } else {
       // Last exercise - show completion animation then end lesson
       setShowAssignmentComplete(true)
+      // Record completion to database
+      if (currentAssignment && user?.id) {
+        recordCompletion.mutate({ assignmentId: currentAssignment.id, userId: user.id })
+      }
     }
-  }, [lessonExerciseIndex, lessonExercises.length, handleSwitchLessonExercise])
+  }, [lessonExerciseIndex, lessonExercises.length, handleSwitchLessonExercise, currentAssignment, user?.id, recordCompletion])
 
   // Apply assignment selection data when in lesson mode (first exercise)
   useEffect(() => {
@@ -2816,7 +2831,12 @@ function Classroom() {
                   {assignments.map((assignment) => (
                     <div key={assignment.id} className={styles.fullPageAssignmentItem}>
                       <div className={styles.fullPageAssignmentInfo}>
-                        <h3 className={styles.fullPageAssignmentTitle}>{assignment.title}</h3>
+                        <h3 className={styles.fullPageAssignmentTitle}>
+                          {assignment.title}
+                          {completedAssignmentIds.has(assignment.id) && (
+                            <PiCheckCircleFill className={styles.completedTick} size={18} />
+                          )}
+                        </h3>
                         {assignment.instrument && (
                           <span
                             className={`${styles.instrumentTag} ${styles[`instrument${assignment.instrument.charAt(0).toUpperCase() + assignment.instrument.slice(1)}`]}`}
@@ -2832,6 +2852,17 @@ function Classroom() {
                             onClick={() => handleStartAssignment(assignment)}
                           >
                             {t('classroom.assignment.start')}
+                          </button>
+                        )}
+                        {isOwner && (
+                          <button
+                            className={styles.viewCompletionsButton}
+                            onClick={() => setViewingCompletionsForAssignment(
+                              viewingCompletionsForAssignment === assignment.id ? null : assignment.id
+                            )}
+                            title="View completions"
+                          >
+                            <PiEyeFill size={14} />
                           </button>
                         )}
                         {isOwner && (
@@ -2853,6 +2884,69 @@ function Classroom() {
                           </button>
                         )}
                       </div>
+                      {viewingCompletionsForAssignment === assignment.id && (() => {
+                        const completionsMap = new Map(
+                          (assignmentCompletions.data ?? []).map(c => [c.user_id, c])
+                        )
+                        // Include owner and all students
+                        const allMembers: Array<{ user_id: string; profiles: { username: string | null } | null; isOwner?: boolean; completion?: typeof assignmentCompletions.data extends (infer T)[] | null | undefined ? T : never }> = []
+
+                        // Add owner first
+                        if (selectedClassroom.created_by) {
+                          allMembers.push({
+                            user_id: selectedClassroom.created_by,
+                            profiles: selectedClassroom.profiles,
+                            isOwner: true,
+                            completion: completionsMap.get(selectedClassroom.created_by)
+                          })
+                        }
+
+                        // Add students
+                        selectedClassroom.classroom_students.forEach(student => {
+                          allMembers.push({
+                            ...student,
+                            completion: completionsMap.get(student.user_id)
+                          })
+                        })
+
+                        const completedCount = allMembers.filter(s => s.completion).length
+                        return (
+                          <div className={styles.completionsList}>
+                            <h4 className={styles.completionsListTitle}>
+                              Progress ({completedCount}/{allMembers.length})
+                            </h4>
+                            {assignmentCompletions.isLoading ? (
+                              <p className={styles.completionsLoading}>Loading...</p>
+                            ) : allMembers.length > 0 ? (
+                              <ul className={styles.completionsListItems}>
+                                {allMembers.map((member) => (
+                                  <li key={member.user_id} className={styles.completionItem}>
+                                    {member.completion ? (
+                                      <PiCheckCircleFill className={styles.completedIcon} size={18} />
+                                    ) : (
+                                      <PiXCircleFill className={styles.notCompletedIcon} size={18} />
+                                    )}
+                                    <div className={styles.completionAvatar}>
+                                      {(member.profiles?.username ?? 'U')[0].toUpperCase()}
+                                    </div>
+                                    <span className={styles.completionName}>
+                                      {member.profiles?.username || 'Unknown user'}
+                                      {member.isOwner && ' (Owner)'}
+                                    </span>
+                                    {member.completion && (
+                                      <span className={styles.completionDate}>
+                                        {new Date(member.completion.completed_at).toLocaleDateString()}
+                                      </span>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className={styles.noCompletions}>No members in class</p>
+                            )}
+                          </div>
+                        )
+                      })()}
                     </div>
                   ))}
                 </div>

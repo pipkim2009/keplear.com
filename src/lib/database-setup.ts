@@ -197,6 +197,30 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
         CREATE POLICY "Classroom owners can delete assignments"
           ON public.assignments FOR DELETE
           USING (auth.uid() = created_by);
+
+        -- Create assignment_completions table to track student progress
+        CREATE TABLE IF NOT EXISTS public.assignment_completions (
+          id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+          assignment_id UUID REFERENCES public.assignments(id) ON DELETE CASCADE,
+          user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+          completed_at TIMESTAMPTZ DEFAULT NOW(),
+          UNIQUE(assignment_id, user_id)
+        );
+
+        -- Enable RLS on assignment_completions table
+        ALTER TABLE public.assignment_completions ENABLE ROW LEVEL SECURITY;
+
+        -- Anyone can view completions (needed for classroom owners to see student progress)
+        DROP POLICY IF EXISTS "Anyone can view completions" ON public.assignment_completions;
+        CREATE POLICY "Anyone can view completions"
+          ON public.assignment_completions FOR SELECT
+          USING (true);
+
+        -- Users can insert their own completions
+        DROP POLICY IF EXISTS "Users can insert own completions" ON public.assignment_completions;
+        CREATE POLICY "Users can insert own completions"
+          ON public.assignment_completions FOR INSERT
+          WITH CHECK (auth.uid() = user_id);
       `
     })
 

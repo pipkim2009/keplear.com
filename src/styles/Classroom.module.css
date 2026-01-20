@@ -1062,6 +1062,37 @@
   background: rgba(239, 68, 68, 0.3);
 }
 
+.viewCompletionsButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: rgba(34, 197, 94, 0.1);
+  color: rgb(34, 197, 94);
+  flex-shrink: 0;
+}
+
+.viewCompletionsButton:hover {
+  background: rgba(34, 197, 94, 0.2);
+  transform: scale(1.1);
+}
+
+:global(.dark) .viewCompletionsButton {
+  background: rgba(34, 197, 94, 0.2);
+  color: rgb(134, 239, 172);
+}
+
+:global(.dark) .viewCompletionsButton:hover {
+  background: rgba(34, 197, 94, 0.3);
+}
+
 /* ========================================
    EMPTY STATE
    ======================================== */
@@ -1976,6 +2007,7 @@
 
 .fullPageAssignmentItem {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
@@ -2002,6 +2034,114 @@
 
 :global(.dark) .fullPageAssignmentTitle {
   color: var(--dark-text-primary);
+}
+
+.completedTick {
+  color: #22c55e;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.completionsList {
+  width: 100%;
+  margin-top: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--primary-purple-alpha-20);
+}
+
+.completionsListTitle {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-text-primary);
+  margin: 0 0 0.75rem 0;
+}
+
+:global(.dark) .completionsListTitle {
+  color: var(--dark-text-primary);
+}
+
+.completedIcon {
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
+.notCompletedIcon {
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.completionsListItems {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.completionItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.completionItem:hover {
+  background: var(--primary-purple-alpha-10);
+}
+
+:global(.dark) .completionItem:hover {
+  background: var(--primary-purple-alpha-15);
+}
+
+.completionAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.completionName {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--light-text-primary);
+}
+
+:global(.dark) .completionName {
+  color: var(--dark-text-primary);
+}
+
+.completionDate {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--light-text-tertiary);
+}
+
+:global(.dark) .completionDate {
+  color: var(--dark-text-tertiary);
+}
+
+.completionsLoading,
+.noCompletions {
+  font-size: 0.875rem;
+  color: var(--light-text-tertiary);
+  margin: 0;
+  font-style: italic;
+}
+
+:global(.dark) .completionsLoading,
+:global(.dark) .noCompletions {
+  color: var(--dark-text-tertiary);
 }
 
 .fullPageAssignmentDetails {

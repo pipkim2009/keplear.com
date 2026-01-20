@@ -74,6 +74,17 @@ export interface CreateAssignmentData {
   created_by: string
 }
 
+export interface AssignmentCompletion {
+  id: string
+  assignment_id: string
+  user_id: string
+  completed_at: string
+  profiles?: {
+    username: string | null
+    avatar_url: string | null
+  } | null
+}
+
 /**
  * Hook to fetch paginated list of classrooms
  */
@@ -301,6 +312,72 @@ export async function prefetchClassroom(classroomId: string): Promise<void> {
   }
 }
 
+/**
+ * Hook to record an assignment completion
+ */
+export function useRecordCompletion() {
+  return useSupabaseMutation<AssignmentCompletion, { assignmentId: string; userId: string }>(
+    async ({ assignmentId, userId }) => {
+      const { data, error } = await supabase
+        .from('assignment_completions')
+        .upsert(
+          { assignment_id: assignmentId, user_id: userId },
+          { onConflict: 'assignment_id,user_id' }
+        )
+        .select()
+        .single()
+
+      if (error) throw error
+      return data as AssignmentCompletion
+    },
+    {
+      invalidateTables: ['assignment_completions']
+    }
+  )
+}
+
+/**
+ * Hook to fetch all completed assignment IDs for a user
+ */
+export function useUserCompletions(userId: string | null, options: {
+  enabled?: boolean
+} = {}) {
+  const { enabled = true } = options
+
+  return useSupabaseQuery<AssignmentCompletion[]>(
+    'assignment_completions',
+    (q) => q
+      .select('*')
+      .eq('user_id', userId!),
+    {
+      enabled: enabled && !!userId,
+      staleTime: 30000,
+      dependencies: [userId]
+    }
+  )
+}
+
+/**
+ * Hook to fetch all completions for a specific assignment (for classroom owners)
+ */
+export function useAssignmentCompletions(assignmentId: string | null, options: {
+  enabled?: boolean
+} = {}) {
+  const { enabled = true } = options
+
+  return useSupabaseQuery<AssignmentCompletion[]>(
+    'assignment_completions',
+    (q) => q
+      .select('*, profiles(username, avatar_url)')
+      .eq('assignment_id', assignmentId!),
+    {
+      enabled: enabled && !!assignmentId,
+      staleTime: 30000,
+      dependencies: [assignmentId]
+    }
+  )
+}
+
 export default {
   useClassroomsList,
   useClassroom,
@@ -312,5 +389,8 @@ export default {
   useDeleteAssignment,
   useUpdateAssignment,
   useClassroomsWithRealtime,
-  prefetchClassroom
+  prefetchClassroom,
+  useRecordCompletion,
+  useUserCompletions,
+  useAssignmentCompletions
 }
