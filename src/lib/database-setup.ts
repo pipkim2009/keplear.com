@@ -154,7 +154,7 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
           lesson_type TEXT NOT NULL,
           instrument TEXT NOT NULL,
           bpm INTEGER NOT NULL DEFAULT 120,
-          beats INTEGER NOT NULL DEFAULT 4,
+          beats INTEGER NOT NULL DEFAULT 5,
           chord_count INTEGER DEFAULT 4,
           scales TEXT[] DEFAULT ARRAY['Major', 'Minor'],
           chords TEXT[] DEFAULT ARRAY['Major', 'Minor'],

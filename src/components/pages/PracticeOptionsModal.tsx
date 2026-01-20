@@ -62,7 +62,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   const [selectedOption, setSelectedOption] = useState<string>('melodies')
   const [difficulty, setDifficulty] = useState<number>(0) // 0 = Learn, 1 = Custom
   const [bpm, setBpm] = useState<number>(120)
-  const [beats, setBeats] = useState<number>(4)
+  const [beats, setBeats] = useState<number>(5)
   const [chordCount, setChordCount] = useState<number>(4)
   const [selectedScales, setSelectedScales] = useState<string[]>(['Major', 'Minor'])
   const [selectedChords, setSelectedChords] = useState<string[]>(['Major', 'Minor'])
@@ -75,7 +75,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   // Preset for Learn mode
   const learnPreset = {
     bpm: 120,
-    beats: 4,
+    beats: 5,
     chordCount: 4,
     scales: ['Major', 'Minor'],
     chords: ['Major', 'Minor'],

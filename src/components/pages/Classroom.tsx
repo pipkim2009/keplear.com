@@ -648,7 +648,7 @@ function Classroom() {
               name: 'Exercise 1',
               transcript: '',
               bpm: data.bpm || 120,
-              beats: data.beats || 4,
+              beats: data.beats || 5,
               chordMode: data.chordMode || 'single',
               lowerOctaves: lowerOct,
               higherOctaves: higherOct,
@@ -667,7 +667,7 @@ function Classroom() {
             name: 'Exercise 1',
             transcript: '',
             bpm: data.bpm || 120,
-            beats: data.beats || 4,
+            beats: data.beats || 5,
             chordMode: data.chordMode || 'single',
             lowerOctaves: lowerOct,
             higherOctaves: higherOct,
@@ -1372,11 +1372,26 @@ function Classroom() {
   }, [currentExerciseIndex, exercises, saveCurrentToExercise, clearSelection, scaleChordManagement, instrument, setChordMode, selectNote, handleOctaveRangeChange, currentExerciseTranscript])
 
   // Remove an exercise
-  const handleRemoveExercise = useCallback((index: number) => {
+  const handleRemoveExercise = useCallback((indexToRemove: number) => {
     if (exercises.length <= 1) return // Keep at least one exercise
 
+    // First, save the current exercise state before removing
+    const currentData = saveCurrentToExercise()
+
     setExercises(prev => {
-      const updated = prev.filter((_, i) => i !== index)
+      // Update current exercise with latest data first
+      const withCurrentSaved = [...prev]
+      if (withCurrentSaved[currentExerciseIndex]) {
+        withCurrentSaved[currentExerciseIndex] = {
+          ...withCurrentSaved[currentExerciseIndex],
+          ...currentData,
+          transcript: currentExerciseTranscript
+        }
+      }
+
+      // Now filter out the exercise to remove
+      const updated = withCurrentSaved.filter((_, i) => i !== indexToRemove)
+
       // Rename exercises sequentially
       return updated.map((exercise, i) => ({
         ...exercise,
@@ -1385,12 +1400,19 @@ function Classroom() {
     })
 
     // Adjust current index if needed
-    if (currentExerciseIndex >= exercises.length - 1) {
-      setCurrentExerciseIndex(Math.max(0, exercises.length - 2))
-    } else if (index < currentExerciseIndex) {
-      setCurrentExerciseIndex(prev => prev - 1)
+    const newLength = exercises.length - 1
+    if (indexToRemove <= currentExerciseIndex && currentExerciseIndex > 0) {
+      setCurrentExerciseIndex(currentExerciseIndex - 1)
+    } else if (currentExerciseIndex >= newLength) {
+      setCurrentExerciseIndex(Math.max(0, newLength - 1))
     }
-  }, [exercises.length, currentExerciseIndex])
+
+    // Clear current state and load the new current exercise
+    setTimeout(() => {
+      clearSelection()
+      triggerClearChordsAndScales()
+    }, 50)
+  }, [exercises.length, currentExerciseIndex, saveCurrentToExercise, currentExerciseTranscript, clearSelection, triggerClearChordsAndScales])
 
   // Open assignment title modal
   const handleOpenAssignModal = () => {
@@ -2528,6 +2550,11 @@ function Classroom() {
                       >
                         {index + 1}
                       </button>
+                      {hasContent && (
+                        <span className={practiceStyles.exerciseCircleReady} title="Ready for assignment">
+                          <PiCheckCircleFill size={12} />
+                        </span>
+                      )}
                       {hasTranscript && (
                         <span className={practiceStyles.exerciseCircleTranscript} title="Has transcript">
                           <PiChatCircleFill size={12} />
@@ -2597,6 +2624,8 @@ function Classroom() {
           selectedNotes={selectedNotes}
           selectNote={selectNote}
           onOctaveRangeChange={handleOctaveRangeChange}
+          initialLowerOctaves={lowerOctaves}
+          initialHigherOctaves={higherOctaves}
           flashingInputs={{
             bpm: flashingInputs.bpm || activeInputs.bpm,
             beats: flashingInputs.beats || activeInputs.beats,

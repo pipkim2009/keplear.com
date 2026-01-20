@@ -1743,6 +1743,21 @@
   background: var(--primary-purple-light);
 }
 
+.exerciseCircleReady {
+  position: absolute;
+  bottom: -4px;
+  left: -4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
 .exerciseCircleAdd {
   width: 36px;
   height: 36px;
