@@ -243,7 +243,7 @@
 
 .fret-checkbox:checked {
   background: linear-gradient(145deg, var(--green-500), var(--green-600));
-  border-color: var(--green-400);
+  border-color: var(--green-100);
 }
 
 .fret-checkbox:hover {
@@ -264,7 +264,7 @@
   font-weight: 700;
   cursor: pointer;
   text-align: center;
-  color: var(--green-light);
+  color: var(--green-100);
   pointer-events: none;
   user-select: none;
 }
@@ -322,7 +322,7 @@
 
 .string-checkbox:checked {
   background: linear-gradient(145deg, var(--green-500), var(--green-600));
-  border-color: var(--green-400);
+  border-color: var(--green-100);
 }
 
 .string-checkbox:hover {
@@ -343,7 +343,7 @@
   font-weight: 700;
   cursor: pointer;
   text-align: center;
-  color: var(--green-light);
+  color: var(--green-100);
   pointer-events: none;
   user-select: none;
 }
@@ -428,8 +428,8 @@
 
 /* Gold styling for currently playing notes */
 .note-circle.currently-playing {
-  background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
-  border-color: var(--amber-200) !important;
+  background: linear-gradient(145deg, var(--orange-500), var(--orange-500)) !important;
+  border-color: var(--orange-100) !important;
 }
 
 /* Note: @keyframes pulse-playing-fretboard is defined in enhanced-effects.css */
@@ -572,7 +572,7 @@
 }
 
 .apply-scale-button:hover {
-  background: linear-gradient(145deg, var(--green-light), var(--note-melody));
+  background: linear-gradient(145deg, var(--green-100), var(--note-melody));
 }
 
 .clear-scale-button {

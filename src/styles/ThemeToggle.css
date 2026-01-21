@@ -84,13 +84,13 @@
 
 .toggle-thumb.light {
   left: var(--space-1);
-  background: var(--amber-400);
+  background: var(--orange-500);
   color: var(--white);
 }
 
 .toggle-thumb.dark {
   left: var(--space-5);
-  background: var(--purple-6366f1);
+  background: var(--purple-700);
   color: var(--white);
 }
 

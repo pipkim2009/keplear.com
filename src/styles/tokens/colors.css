@@ -44,7 +44,7 @@
   --dark-bg-tertiary: var(--purple-bg);
   --dark-bg-quaternary: var(--black);
   --dark-bg-surface: var(--black);
-  --dark-text-primary: var(--purple-100);
+  --dark-text-primary: var(--white);
   --dark-text-secondary: var(--white);
   --dark-text-tertiary: var(--gray-200);
   --dark-border-primary: var(--gray-600);

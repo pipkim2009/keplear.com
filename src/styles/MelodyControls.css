@@ -32,8 +32,8 @@
 /* Chord Mode Select - matches BPM and Beats input colors */
 .chord-mode-select {
   background: rgb(0, 123, 255, 0.1) !important;
-  border: 2px solid var(--blue-007bff) !important;
-  color: var(--blue-007bff) !important;
+  border: 2px solid var(--blue-500) !important;
+  color: var(--blue-500) !important;
   font-weight: 600 !important;
   text-align: center !important;
   text-align-last: center !important;
@@ -48,16 +48,16 @@
 
 .chord-mode-select:hover:not(:disabled) {
   background: rgb(0, 123, 255, 0.15) !important;
-  border-color: var(--blue-007bff) !important;
+  border-color: var(--blue-500) !important;
 }
 
 .chord-mode-select:disabled:hover {
   background: rgb(0, 123, 255, 0.1) !important;
-  border-color: var(--blue-007bff) !important;
+  border-color: var(--blue-500) !important;
 }
 
 .chord-mode-select:focus {
-  border-color: var(--blue-007bff) !important;
+  border-color: var(--blue-500) !important;
 }
 
 .chord-mode-select option {
@@ -76,8 +76,8 @@
 /* Chord Mode Toggle - matches BPM and Beats input colors */
 .chord-mode-toggle {
   background: rgb(0, 123, 255, 0.1);
-  border: 2px solid var(--blue-007bff);
-  color: var(--blue-007bff);
+  border: 2px solid var(--blue-500);
+  color: var(--blue-500);
   font-weight: 600;
   text-align: center;
   min-width: 120px;
@@ -97,17 +97,17 @@
 
 .chord-mode-toggle:hover:not(:disabled) {
   background: rgb(0, 123, 255, 0.15);
-  border-color: var(--blue-007bff);
+  border-color: var(--blue-500);
 }
 
 .chord-mode-toggle:disabled:hover {
   background: rgb(0, 123, 255, 0.1);
-  border-color: var(--blue-007bff);
+  border-color: var(--blue-500);
   transform: none;
 }
 
 .chord-mode-toggle:focus {
-  border-color: var(--blue-007bff);
+  border-color: var(--blue-500);
 }
 
 .chord-mode-toggle:active {
@@ -116,7 +116,7 @@
 
 /* Green flash for chord mode toggle when mode changes */
 .chord-mode-toggle.flashing {
-  border-color: var(--green-550) !important;
+  border-color: var(--green-500) !important;
   border-width: 4px !important;
   background: var(--green-alpha-40) !important;
   transition: none !important;
@@ -160,12 +160,12 @@
 }
 
 .button-stop {
-  background: var(--red-e53e3e) !important;
+  background: var(--red-500) !important;
   color: var(--white) !important;
 }
 
 .button-stop:not(:disabled):hover {
-  background: var(--red-c53030) !important;
+  background: var(--red-700) !important;
 }
 
 @media (max-width: 768px) {
@@ -200,7 +200,7 @@
   right: -6px;
   width: 18px;
   height: 18px;
-  background: linear-gradient(45deg, var(--red-ff0066), var(--red-ff4444));
+  background: linear-gradient(45deg, var(--red-500), var(--red-500));
   border: 3px solid var(--white);
   border-radius: 50%;
   font-size: 12px;

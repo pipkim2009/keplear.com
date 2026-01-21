@@ -6,7 +6,7 @@
 
 /* Green border for input changes */
 .control-input.flashing {
-  border-color: var(--green-550) !important;
+  border-color: var(--green-500) !important;
 }
 
 /* Notes toggle row styling */

@@ -163,7 +163,7 @@
 
 .inputFlashing {
   composes: input;
-  border-color: var(--green-border) !important;
+  border-color: var(--green-500) !important;
   animation: input-flash 1s ease;
 }
 
@@ -173,7 +173,7 @@
   }
 
   50% {
-    border-color: var(--green-border);
+    border-color: var(--green-500);
   }
 }
 
@@ -351,7 +351,7 @@
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, var(--blue-500), var(--blue-300));
+  background: linear-gradient(90deg, var(--blue-500), var(--blue-100));
   transition: width 0.15s ease-out;
   border-radius: var(--radius-xs);
 }
@@ -373,7 +373,7 @@
 .progressHead:hover {
   width: 14px;
   height: 14px;
-  border-color: var(--blue-300);
+  border-color: var(--blue-100);
 }
 
 .progressHead:active {

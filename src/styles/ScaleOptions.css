@@ -313,8 +313,8 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
   width: 100%;
   padding: 5px 10px;
   background: rgb(76, 175, 80, 0.1);
-  border: 2px solid var(--green-4caf50);
-  color: var(--green-a5d6a7);
+  border: 2px solid var(--green-500);
+  color: var(--green-100);
   border-radius: 6px;
   font-size: 11px;
   font-weight: 600;
@@ -740,7 +740,7 @@ input:checked + .toggle-slider:hover {
 .scale-name {
   font-size: 11px;
   font-weight: 600;
-  color: var(--orange-400);
+  color: var(--orange-100);
   flex: 1;
 }
 
@@ -827,7 +827,7 @@ input:checked + .toggle-slider:hover {
 .chord-name {
   font-size: 11px;
   font-weight: 600;
-  color: var(--purple-400);
+  color: var(--purple-500);
   flex: 1;
 }
 
@@ -912,7 +912,7 @@ input:checked + .toggle-slider:hover {
   margin-left: 43px;
   background: rgb(76, 175, 80, 0.1);
   border: 1px solid rgb(76, 175, 80, 0.4);
-  color: var(--green-4caf50);
+  color: var(--green-500);
   border-radius: 50%;
   cursor: pointer;
   font-size: 12px;
@@ -927,7 +927,7 @@ input:checked + .toggle-slider:hover {
 .learn-scale-button:hover {
   background: rgb(76, 175, 80, 0.2);
   border-color: rgb(76, 175, 80, 0.6);
-  color: var(--green-a5d6a7);
+  color: var(--green-100);
 }
 
 .learn-scale-button:focus-visible {
@@ -942,7 +942,7 @@ input:checked + .toggle-slider:hover {
   margin-left: 43px;
   background: rgb(76, 175, 80, 0.1);
   border: 1px solid rgb(76, 175, 80, 0.4);
-  color: var(--green-4caf50);
+  color: var(--green-500);
   border-radius: 50%;
   cursor: pointer;
   font-size: 12px;
@@ -957,7 +957,7 @@ input:checked + .toggle-slider:hover {
 .learn-chord-button:hover {
   background: rgb(76, 175, 80, 0.2);
   border-color: rgb(76, 175, 80, 0.6);
-  color: var(--green-a5d6a7);
+  color: var(--green-100);
 }
 
 .learn-chord-button:focus-visible {

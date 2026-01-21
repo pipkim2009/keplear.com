@@ -107,8 +107,8 @@
 /* Scale options specific styling */
 .scale-dropdown .custom-dropbtn {
   background: rgb(255, 152, 0, 0.1);
-  border: 2px solid var(--amber-ffcc02);
-  color: var(--amber-ffcc02);
+  border: 2px solid var(--orange-100);
+  color: var(--orange-100);
   width: 100%;
   min-width: auto;
 }
@@ -123,9 +123,9 @@
 
 /* Guitar mode styling */
 .guitar-mode .custom-dropdown .custom-dropbtn {
-  background: var(--green-alpha-10);
+  background: var(--green-alpha-20);
   border: 2px solid var(--green-500);
-  color: var(--green-400);
+  color: var(--green-100);
 }
 
 .guitar-mode .custom-dropdown .custom-dropbtn:hover {

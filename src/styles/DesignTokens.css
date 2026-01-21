@@ -66,7 +66,7 @@
 
   /* Interactive Colors */
   --interactive-primary: var(--blue-500);
-  --interactive-primary-hover: var(--blue-600);
+  --interactive-primary-hover: var(--blue-700);
   --interactive-primary-active: var(--blue-700);
   --interactive-secondary: var(--purple-500);
   --interactive-secondary-hover: var(--purple-600);
@@ -74,7 +74,7 @@
 
   /* Status Colors */
   --status-success: var(--green-500);
-  --status-warning: var(--yellow-400);
+  --status-warning: var(--orange-100);
   --status-error: var(--red-500);
   --status-info: var(--blue-500);
 
@@ -130,10 +130,10 @@
   --key-black-text: var(--white);
 
   /* Key States */
-  --key-selected-bg: var(--blue-200);
+  --key-selected-bg: var(--blue-100);
   --key-selected-border: var(--blue-500);
   --key-melody-bg: var(--green-200);
-  --key-melody-border: var(--green-border);
+  --key-melody-border: var(--green-500);
 
   /* Scale/Chord Highlighting */
   --scale-note-bg: var(--orange-scale);

@@ -18,7 +18,7 @@
 /* Control Inputs */
 .control-input {
   background: var(--primary-purple-alpha-15);
-  border: 2px solid var(--purple-800);
+  border: 2px solid var(--purple-700);
   color: var(--white);
   padding: 6px 10px;
   border-radius: 6px;
@@ -168,8 +168,8 @@
 /* Delete selection button */
 .control-button.delete-selection {
   background: rgb(220, 53, 69, 0.1);
-  border: 2px solid var(--red-600);
-  color: var(--red-f5c2c7);
+  border: 2px solid var(--red-700);
+  color: var(--red-100);
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 12px;
@@ -183,7 +183,7 @@
   height: 32px;
   min-width: 120px;
   margin-top: 0;
-  border-color: var(--red-600); /* Original red border color */
+  border-color: var(--red-700); /* Original red border color */
 }
 
 .control-button.delete-selection:hover {

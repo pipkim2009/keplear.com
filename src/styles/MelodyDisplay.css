@@ -33,9 +33,9 @@
 
 /* Golden highlight for currently playing note - matches keyboard styling */
 .melody-note.currently-playing {
-  background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
+  background: linear-gradient(145deg, var(--orange-100), var(--orange-500)) !important;
   color: var(--gray-800) !important;
-  border: 2px solid var(--amber-200) !important;
+  border: 2px solid var(--orange-100) !important;
   transition: none !important;
 }
 
@@ -43,23 +43,23 @@
 @media (prefers-color-scheme: dark) {
   .melody-display {
     background: rgb(32, 201, 151, 0.1);
-    border-color: var(--green-20c997);
+    border-color: var(--green-500);
   }
 
   .melody-title {
-    color: var(--green-20c997);
+    color: var(--green-500);
   }
 
   .melody-note {
-    background: var(--green-20c997) !important;
-    color: var(--gray-212529) !important;
+    background: var(--green-500) !important;
+    color: var(--gray-900) !important;
   }
 
   /* Golden highlight in dark mode - matches keyboard styling */
   .melody-note.currently-playing {
-    background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
+    background: linear-gradient(145deg, var(--orange-100), var(--orange-500)) !important;
     color: var(--gray-800) !important;
-    border: 2px solid var(--amber-200) !important;
+    border: 2px solid var(--orange-100) !important;
     transition: none !important;
   }
 }

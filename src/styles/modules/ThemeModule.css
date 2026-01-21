@@ -36,12 +36,12 @@
 .buttonLight {
   background: var(--light-bg-secondary);
   color: var(--light-text-primary);
-  border: 2px solid var(--gray-300);
+  border: 2px solid var(--gray-200);
 }
 
 .buttonLight:hover {
-  background: var(--gray-100);
-  border-color: var(--gray-400);
+  background: var(--gray-200);
+  border-color: var(--gray-500);
 }
 
 .buttonDark {
@@ -59,7 +59,7 @@
 .inputLight {
   background: var(--light-bg-primary);
   color: var(--light-text-primary);
-  border: 2px solid var(--gray-300);
+  border: 2px solid var(--gray-200);
 }
 
 .inputLight:focus {
@@ -129,7 +129,7 @@
 }
 
 .textMutedDark {
-  color: var(--gray-400);
+  color: var(--gray-500);
 }
 
 /*
@@ -139,7 +139,7 @@
 */
 
 .interactiveLight {
-  color: var(--blue-600);
+  color: var(--blue-700);
   cursor: pointer;
   transition: var(--transition-fast);
 }
@@ -150,13 +150,13 @@
 }
 
 .interactiveDark {
-  color: var(--blue-400);
+  color: var(--blue-100);
   cursor: pointer;
   transition: var(--transition-fast);
 }
 
 .interactiveDark:hover {
-  color: var(--blue-300);
+  color: var(--blue-100);
   text-decoration: underline;
 }
 
@@ -167,7 +167,7 @@
 */
 
 .borderLight {
-  border-color: var(--gray-300);
+  border-color: var(--gray-200);
 }
 
 .borderDark {
@@ -179,7 +179,7 @@
 }
 
 .borderAccentDark {
-  border-color: var(--blue-400);
+  border-color: var(--blue-100);
 }
 
 /*
@@ -189,38 +189,38 @@
 */
 
 .successLight {
-  background: var(--green-50);
-  color: var(--green-800);
-  border: 1px solid var(--green-200);
+  background: var(--green-alpha-20);
+  color: var(--green-700);
+  border: 1px solid var(--green-100);
 }
 
 .successDark {
   background: var(--green-alpha-10);
-  color: var(--green-300);
+  color: var(--green-100);
   border: 1px solid var(--green-700);
 }
 
 .warningLight {
-  background: var(--yellow-50);
-  color: var(--yellow-800);
-  border: 1px solid var(--yellow-200);
+  background: var(--orange-alpha-50);
+  color: var(--orange-700);
+  border: 1px solid var(--orange-100);
 }
 
 .warningDark {
   background: rgb(251, 191, 36, 0.1);
-  color: var(--yellow-300);
-  border: 1px solid var(--yellow-700);
+  color: var(--orange-100);
+  border: 1px solid var(--orange-700);
 }
 
 .errorLight {
-  background: var(--red-50);
-  color: var(--red-800);
-  border: 1px solid var(--red-200);
+  background: var(--red-alpha-20);
+  color: var(--red-700);
+  border: 1px solid var(--red-100);
 }
 
 .errorDark {
   background: var(--red-alpha-10);
-  color: var(--red-300);
+  color: var(--red-100);
   border: 1px solid var(--red-700);
 }
 
@@ -237,7 +237,7 @@
 @keyframes fade-in-light {
   from {
     opacity: 0;
-    background: var(--gray-50);
+    background: var(--gray-200);
   }
 
   to {
