@@ -176,6 +176,43 @@
   --large-min: 1025px;
 }
 
+/*
+  ===========================================
+  LIGHT THEME OVERRIDES
+  ===========================================
+  Applied when body has 'light' class
+*/
+
+body.light {
+  /* Text Colors */
+  --text-primary: var(--light-text-primary);
+  --text-secondary: var(--light-text-secondary);
+  --text-muted: var(--gray-600);
+  --text-disabled: var(--gray-500);
+
+  /* Background Colors */
+  --bg-primary: var(--light-bg-primary);
+  --bg-secondary: var(--light-bg-secondary);
+  --bg-tertiary: var(--light-bg-tertiary);
+  --bg-elevated: var(--white);
+
+  /* Border Colors */
+  --border-primary: var(--light-border-primary);
+  --border-secondary: var(--gray-500);
+  --border-muted: var(--gray-200);
+
+  /* Input System - Light mode */
+  --input-bg: var(--white-alpha-80);
+  --input-border: var(--purple-500);
+  --input-border-hover: var(--purple-700);
+  --input-border-focus: var(--primary-purple);
+
+  /* Surface System - Light mode */
+  --surface-elevated: var(--white);
+  --surface-secondary: var(--light-bg-secondary);
+  --surface-primary: var(--light-bg-primary);
+}
+
 /**
  * ===========================================
  * DESIGN TOKEN SYSTEM SUMMARY

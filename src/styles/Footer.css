@@ -8,6 +8,11 @@
   background: rgb(18, 18, 18, 0.8);
 }
 
+.light .footer {
+  background: rgb(255, 255, 255, 0.85);
+  border-top: 1px solid var(--gray-200);
+}
+
 .footer-content {
   max-width: 1200px;
   margin: 0 auto;
@@ -76,7 +81,7 @@
 .footer-copyright {
   text-align: right;
   font-size: 0.75rem;
-  color: var(--dark-text-primary);
+  color: var(--text-primary);
   opacity: 0.6;
   line-height: 1.4;
 }

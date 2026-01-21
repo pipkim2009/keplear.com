@@ -154,11 +154,11 @@
 
 /* Common text styles */
 .text-primary {
-  color: var(--dark-text-primary);
+  color: var(--text-primary);
 }
 
 .text-secondary {
-  color: var(--dark-text-secondary);
+  color: var(--text-secondary);
 }
 
 .text-accent {

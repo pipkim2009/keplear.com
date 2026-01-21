@@ -123,7 +123,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   background: transparent;
-  color: var(--purple-100);
+  color: var(--purple-500);
 }
 
 .joinClassButton:hover {
@@ -1710,4 +1710,30 @@
   .startAssignmentButtonLarge {
     flex: 1;
   }
+}
+
+/* ========================================
+   LIGHT MODE OVERRIDES
+   Text on background (not in dark containers)
+   ======================================== */
+
+:global(body.light) .pageSubtitle {
+  color: var(--gray-700);
+}
+
+:global(body.light) .sectionTitle {
+  color: var(--gray-900);
+}
+
+:global(body.light) .emptyStateText {
+  color: var(--gray-600);
+}
+
+:global(body.light) .loadingState {
+  color: var(--gray-600);
+}
+
+:global(body.light) .joinClassButton {
+  color: var(--purple-700);
+  border-color: var(--purple-500);
 }

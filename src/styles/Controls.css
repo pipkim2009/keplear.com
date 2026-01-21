@@ -744,7 +744,7 @@
 .control-button.delete-selection {
   background: var(--red-alpha-10);
   border: 2px solid var(--red-700);
-  color: var(--red-lighter);
+  color: var(--red-100);
   padding: 6px 12px;
   border-radius: 0;
   font-size: 12px;

@@ -10,6 +10,11 @@
   background: rgb(18, 18, 18, 0.8);
 }
 
+.light .header {
+  background: rgb(255, 255, 255, 0.85);
+  border-bottom: 1px solid var(--gray-200);
+}
+
 /* Ensure full width on mobile landscape */
 @media screen and (orientation: landscape) and (max-height: 500px) {
   .header {
@@ -55,7 +60,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
-  color: var(--dark-text-primary);
+  color: var(--text-primary);
   text-decoration: none;
   transition: color 0.3s ease;
 }
@@ -84,7 +89,7 @@
   text-decoration: none;
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--dark-text-primary);
+  color: var(--text-primary);
   opacity: 0.7;
   transition: all 0.3s ease;
   padding: 0.5rem 0;
@@ -140,6 +145,14 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
+.light .language-button {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.light .language-button:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
 .language-flag {
   font-size: 1.25rem;
   line-height: 1;
@@ -167,6 +180,12 @@
   flex-direction: column;
 }
 
+.light .language-menu {
+  background: var(--white);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--gray-200);
+}
+
 @keyframes fadeInDown {
   from {
     opacity: 0;
@@ -190,19 +209,29 @@
   border-radius: 8px;
   font-size: 0.875rem;
   background: rgba(255, 255, 255, 0.05);
-  color: var(--dark-text-primary);
+  color: var(--text-primary);
   outline: none;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .language-search::placeholder {
-  color: var(--dark-text-primary);
+  color: var(--text-primary);
   opacity: 0.5;
 }
 
 .language-search:focus {
   border-color: var(--primary-purple-light);
   background: rgba(255, 255, 255, 0.1);
+}
+
+.light .language-search {
+  border: 1px solid var(--gray-200);
+  background: var(--white);
+}
+
+.light .language-search:focus {
+  border-color: var(--primary-purple);
+  background: var(--white);
 }
 
 .language-options-grid {
@@ -232,6 +261,10 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+.light .language-option:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
 .language-option-active {
   background: rgba(147, 51, 234, 0.25);
 }
@@ -239,7 +272,7 @@
 .language-name {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--dark-text-primary);
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -280,6 +313,16 @@
 
 .login-btn:hover {
   background: var(--gray-600);
+}
+
+.light .login-btn {
+  background: var(--gray-200);
+  color: var(--gray-900);
+}
+
+.light .login-btn:hover {
+  background: var(--gray-500);
+  color: var(--white);
 }
 
 .signup-btn {
