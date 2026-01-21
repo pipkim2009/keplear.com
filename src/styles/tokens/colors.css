@@ -10,14 +10,14 @@
 
 :root {
   /* ========================================
-     PRIMARY BRAND COLORS (6)
+     PRIMARY BRAND COLORS (5)
      ======================================== */
   --primary-purple: #751aff;
   --primary-purple-dark: #5a0fd6;
   --primary-purple-darker: #6600cc;
   --primary-purple-light: #9d5cff;
   --primary-purple-lighter: #c49dff;
-  --primary-purple-darkest: #4a0cb0;
+  --primary-purple-darkest: var(--primary-purple-darker);
 
   /* Primary Purple Alpha Variations */
   --primary-purple-alpha-5: rgb(117, 26, 255, 0.05);
@@ -46,13 +46,13 @@
   --dark-border-secondary: #374151;
 
   /* ========================================
-     BLUES (5 base + alphas)
+     BLUES (3 base + alphas)
      ======================================== */
   --blue-100: #93c5fd;
-  --blue-300: #60a5fa;
   --blue-500: #3b82f6;
   --blue-700: #1d4ed8;
-  --blue-900: #1e3a8a;
+  --blue-300: var(--blue-100);
+  --blue-900: var(--blue-700);
 
   --blue-alpha-20: rgb(59, 130, 246, 0.2);
   --blue-alpha-40: rgb(59, 130, 246, 0.4);
@@ -159,10 +159,10 @@
   --white-alpha-90: rgb(255, 255, 255, 0.9);
 
   /* ========================================
-     SPECIAL COLORS
+     SPECIAL COLORS (aliases)
      ======================================== */
-  --cyan-accent: #60d5f8;
-  --beige: #f5f5dc;
+  --cyan-accent: var(--blue-100);
+  --beige: var(--gray-200);
 
   /* ========================================
      INSTRUMENT COLORS - KEYBOARD
