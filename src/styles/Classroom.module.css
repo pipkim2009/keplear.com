@@ -1131,7 +1131,7 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: transparent;
+  background: black;
   color: var(--white);
   margin-bottom: 1.5rem;
 }
@@ -1174,7 +1174,7 @@
 
 .fullPageMeta {
   font-size: 0.9375rem;
-  color: var(--gray-200);
+  color: white;
   margin: 0.25rem 0 0 0;
 }
 
@@ -1737,3 +1737,26 @@
   color: var(--purple-700);
   border-color: var(--purple-500);
 }
+
+:global(body.light) .emptyStateText {
+  color: black;
+}
+
+:global(body.light) .fullPageMeta {
+  color: black;
+}
+
+:global(body.light) .fullPageDescription {
+  color: black;
+}
+
+:global(body.light) .backButtonCircle {
+  background: white;
+  border-color: black;
+  color: black;
+}
+
+:global(body.light) .backButtonCircle:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
