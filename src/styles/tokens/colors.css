@@ -56,10 +56,16 @@
   --blue-100: #93c5fd;
   --blue-500: #3b82f6;
   --blue-700: #1d4ed8;
+  --blue-200: var(--blue-100);
   --blue-300: var(--blue-100);
+  --blue-600: var(--blue-700);
+  --blue-800: var(--blue-700);
   --blue-900: var(--blue-700);
 
+  --blue-alpha-05: rgb(59, 130, 246, 0.05);
+  --blue-alpha-10: rgb(59, 130, 246, 0.1);
   --blue-alpha-20: rgb(59, 130, 246, 0.2);
+  --blue-alpha-30: rgb(59, 130, 246, 0.3);
   --blue-alpha-40: rgb(59, 130, 246, 0.4);
   --blue-alpha-60: rgb(59, 130, 246, 0.6);
 
@@ -69,10 +75,16 @@
   --green-100: #86efac;
   --green-500: #22c55e;
   --green-700: #15803d;
+  --green-200: var(--green-100);
   --green-300: var(--green-100);
+  --green-600: var(--green-700);
+  --green-800: var(--green-700);
   --green-neon: var(--green-500);
 
+  --green-alpha-05: rgb(34, 197, 94, 0.05);
+  --green-alpha-10: rgb(34, 197, 94, 0.1);
   --green-alpha-20: rgb(34, 197, 94, 0.2);
+  --green-alpha-30: rgb(34, 197, 94, 0.3);
   --green-alpha-40: rgb(34, 197, 94, 0.4);
   --green-alpha-60: rgb(34, 197, 94, 0.6);
 
@@ -83,9 +95,15 @@
   --red-500: #ef4444;
   --red-700: #b91c1c;
   --red-300: var(--red-100);
+  --red-400: var(--red-500);
+  --red-600: var(--red-500);
+  --red-800: var(--red-700);
   --red-900: var(--red-700);
 
+  --red-alpha-05: rgb(239, 68, 68, 0.05);
+  --red-alpha-10: rgb(239, 68, 68, 0.1);
   --red-alpha-20: rgb(239, 68, 68, 0.2);
+  --red-alpha-30: rgb(239, 68, 68, 0.3);
   --red-alpha-40: rgb(239, 68, 68, 0.4);
   --red-alpha-60: rgb(239, 68, 68, 0.6);
 
@@ -96,9 +114,17 @@
   --orange-500: #f97316;
   --orange-700: #c2410c;
   --orange-300: var(--orange-100);
+  --orange-400: var(--orange-500);
+  --orange-600: var(--orange-700);
   --orange-fretboard: var(--orange-100);
+  --orange-scale: var(--orange-500);
+  --orange-scale-dark: var(--orange-700);
+  --orange-scale-darker: var(--orange-700);
 
+  --orange-alpha-40: rgb(249, 115, 22, 0.4);
   --orange-alpha-50: rgb(249, 115, 22, 0.5);
+  --orange-400-alpha-60: rgb(249, 115, 22, 0.6);
+  --orange-600-alpha-60: rgb(194, 65, 12, 0.6);
 
   /* ========================================
      AMBERS/YELLOWS (aliases to orange)
@@ -122,10 +148,15 @@
   --purple-200: var(--purple-100);
   --purple-300: var(--purple-100);
   --purple-400: var(--purple-500);
+  --purple-600: var(--purple-700);
   --purple-indigo: var(--purple-700);
+
+  --purple-chord: var(--purple-500);
+  --purple-chord-dark: var(--purple-700);
 
   --purple-alpha-40: rgb(168, 85, 247, 0.4);
   --purple-alpha-60: rgb(168, 85, 247, 0.6);
+  --purple-600-alpha-60: rgb(147, 51, 234, 0.6);
 
   /* ========================================
      GRAYS (7 base)
@@ -137,9 +168,12 @@
   --gray-700: #374151;
   --gray-900: #121212;
   --black: #000000;
+  --gray-50: var(--white);
   --gray-100: var(--gray-200);
+  --gray-300: var(--gray-200);
   --gray-400: var(--gray-500);
   --gray-800: var(--gray-900);
+  --gray-111111: var(--gray-900);
 
   --gray-alpha-30: rgb(156, 163, 175, 0.3);
 
@@ -183,7 +217,7 @@
   --keyboard-black-key-border: var(--gray-600);
 
   /* ========================================
-     INSTRUMENT COLORS - GUITAR
+     INSTRUMENT COLORS - GUITAR/BASS
      ======================================== */
   --guitar-fretboard: #3e2723;
   --guitar-fretboard-primary: var(--guitar-fretboard);
@@ -193,6 +227,7 @@
   --guitar-surface: var(--guitar-fretboard);
   --guitar-border: var(--metal-color);
   --guitar-border-light: var(--orange-fretboard);
+  --bass-surface: var(--guitar-fretboard);
 
   /* Fret & String Color (unified) */
   --metal-color: #bbbbbb;
