@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { IoMusicalNotes } from 'react-icons/io5'
-import { PiTrashFill, PiBrainFill } from 'react-icons/pi'
+import { PiTrashFill, PiEyeFill } from 'react-icons/pi'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, applyScaleToGuitar, applyScaleBoxToGuitar, type GuitarScale, type ScaleBox } from '../../utils/instruments/guitar/guitarScales'
@@ -634,9 +634,33 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     <label className="control-label scale-label">{t('sandbox.appliedScales')}</label>
                     <div className="applied-scales-list">
                       {appliedScales.map((appliedScale) => (
-                        <div key={appliedScale.id} className="applied-scale-item">
-                          <span className="scale-name">{appliedScale.displayName}</span>
-                          <div className="applied-item-buttons">
+                        <div key={appliedScale.id} className={`applied-scale-item instrument-${instrument}`}>
+                          <div className="applied-item-info">
+                            <span className="scale-name">{appliedScale.displayName}</span>
+                            {!disableDelete && (
+                              <button
+                                onClick={() => onScaleDelete?.(appliedScale.id)}
+                                className="delete-scale-button"
+                                title={t('common.delete')}
+                              >
+                                <PiTrashFill size={16} />
+                              </button>
+                            )}
+                          </div>
+                          <div className="applied-item-preview">
+                            {instrument === 'keyboard' ? (
+                              <MiniKeyboard
+                                notes={appliedScale.notes || []}
+                                root={appliedScale.root}
+                                mode="scale"
+                              />
+                            ) : (
+                              <MiniFretboard
+                                noteKeys={appliedScale.noteKeys || []}
+                                instrument={instrument as 'guitar' | 'bass'}
+                                root={appliedScale.root}
+                              />
+                            )}
                             <button
                               onClick={() => setLearnDiagramData({
                                 type: 'scale',
@@ -647,17 +671,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                               className="learn-scale-button"
                               title={t('sandbox.learnScale')}
                             >
-                              <PiBrainFill size={12} />
+                              <PiEyeFill size={16} />
                             </button>
-                            {!disableDelete && (
-                              <button
-                                onClick={() => onScaleDelete?.(appliedScale.id)}
-                                className="delete-scale-button"
-                                title={t('common.delete')}
-                              >
-                                <PiTrashFill size={12} />
-                              </button>
-                            )}
                           </div>
                         </div>
                       ))}
@@ -671,9 +686,34 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                     <label className="control-label chord-label">{t('sandbox.appliedChords')}</label>
                     <div className="applied-chords-list">
                       {appliedChords.map((appliedChord) => (
-                        <div key={appliedChord.id} className="applied-chord-item">
-                          <span className="chord-name">{appliedChord.displayName}</span>
-                          <div className="applied-item-buttons">
+                        <div key={appliedChord.id} className={`applied-chord-item instrument-${instrument}`}>
+                          <div className="applied-item-info">
+                            <span className="chord-name">{appliedChord.displayName}</span>
+                            {!disableDelete && (
+                              <button
+                                onClick={() => onChordDelete?.(appliedChord.id)}
+                                className="delete-chord-button"
+                                title={t('common.delete')}
+                              >
+                                <PiTrashFill size={16} />
+                              </button>
+                            )}
+                          </div>
+                          <div className="applied-item-preview">
+                            {instrument === 'keyboard' ? (
+                              <MiniKeyboard
+                                notes={appliedChord.notes || []}
+                                root={appliedChord.root}
+                                mode="chord"
+                              />
+                            ) : (
+                              <MiniFretboard
+                                noteKeys={appliedChord.noteKeys || []}
+                                instrument={instrument as 'guitar' | 'bass'}
+                                root={appliedChord.root}
+                                mode="chord"
+                              />
+                            )}
                             <button
                               onClick={() => setLearnDiagramData({
                                 type: 'chord',
@@ -684,17 +724,8 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                               className="learn-chord-button"
                               title={t('sandbox.learnChord')}
                             >
-                              <PiBrainFill size={12} />
+                              <PiEyeFill size={16} />
                             </button>
-                            {!disableDelete && (
-                              <button
-                                onClick={() => onChordDelete?.(appliedChord.id)}
-                                className="delete-chord-button"
-                                title={t('common.delete')}
-                              >
-                                <PiTrashFill size={12} />
-                              </button>
-                            )}
                           </div>
                         </div>
                       ))}
@@ -847,9 +878,31 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                   <div className="applied-scales-list">
                     {appliedScales.length > 0 ? (
                       appliedScales.map((appliedScale) => (
-                        <div key={appliedScale.id} className="applied-scale-item">
-                          <span className="scale-name">{appliedScale.displayName}</span>
-                          <div className="applied-item-buttons">
+                        <div key={appliedScale.id} className={`applied-scale-item instrument-${instrument}`}>
+                          <div className="applied-item-info">
+                            <span className="scale-name">{appliedScale.displayName}</span>
+                            <button
+                              onClick={() => onScaleDelete?.(appliedScale.id)}
+                              className="delete-scale-button"
+                              title={t('common.delete')}
+                            >
+                              <PiTrashFill size={16} />
+                            </button>
+                          </div>
+                          <div className="applied-item-preview">
+                            {instrument === 'keyboard' ? (
+                              <MiniKeyboard
+                                notes={appliedScale.notes || []}
+                                root={appliedScale.root}
+                                mode="scale"
+                              />
+                            ) : (
+                              <MiniFretboard
+                                noteKeys={appliedScale.noteKeys || []}
+                                instrument={instrument as 'guitar' | 'bass'}
+                                root={appliedScale.root}
+                              />
+                            )}
                             <button
                               onClick={() => setLearnDiagramData({
                                 type: 'scale',
@@ -860,14 +913,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                               className="learn-scale-button"
                               title={t('sandbox.learnScale')}
                             >
-                              <PiBrainFill size={12} />
-                            </button>
-                            <button
-                              onClick={() => onScaleDelete?.(appliedScale.id)}
-                              className="delete-scale-button"
-                              title={t('common.delete')}
-                            >
-                              <PiTrashFill size={12} />
+                              <PiEyeFill size={16} />
                             </button>
                           </div>
                         </div>
@@ -977,9 +1023,32 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                   <div className="applied-chords-list">
                     {appliedChords.length > 0 ? (
                       appliedChords.map((appliedChord) => (
-                        <div key={appliedChord.id} className="applied-chord-item">
-                          <span className="chord-name">{appliedChord.displayName}</span>
-                          <div className="applied-item-buttons">
+                        <div key={appliedChord.id} className={`applied-chord-item instrument-${instrument}`}>
+                          <div className="applied-item-info">
+                            <span className="chord-name">{appliedChord.displayName}</span>
+                            <button
+                              onClick={() => onChordDelete?.(appliedChord.id)}
+                              className="delete-chord-button"
+                              title={t('common.delete')}
+                            >
+                              <PiTrashFill size={16} />
+                            </button>
+                          </div>
+                          <div className="applied-item-preview">
+                            {instrument === 'keyboard' ? (
+                              <MiniKeyboard
+                                notes={appliedChord.notes || []}
+                                root={appliedChord.root}
+                                mode="chord"
+                              />
+                            ) : (
+                              <MiniFretboard
+                                noteKeys={appliedChord.noteKeys || []}
+                                instrument={instrument as 'guitar' | 'bass'}
+                                root={appliedChord.root}
+                                mode="chord"
+                              />
+                            )}
                             <button
                               onClick={() => setLearnDiagramData({
                                 type: 'chord',
@@ -990,14 +1059,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                               className="learn-chord-button"
                               title={t('sandbox.learnChord')}
                             >
-                              <PiBrainFill size={12} />
-                            </button>
-                            <button
-                              onClick={() => onChordDelete?.(appliedChord.id)}
-                              className="delete-chord-button"
-                              title={t('common.delete')}
-                            >
-                              <PiTrashFill size={12} />
+                              <PiEyeFill size={16} />
                             </button>
                           </div>
                         </div>

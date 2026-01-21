@@ -57,9 +57,9 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-contai
   margin-top: 0 !important;
   padding: 16px;
   padding-top: 16px !important;
-  width: 200px !important;
-  max-width: 200px !important;
-  min-width: 200px !important;
+  width: 300px !important;
+  max-width: 300px !important;
+  min-width: 300px !important;
   box-sizing: border-box;
   z-index: 102 !important;
   background: rgb(0, 0, 0, 0.95);
@@ -667,7 +667,7 @@ input:checked + .toggle-slider:hover {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  max-height: 120px;
+  max-height: 200px;
   overflow-y: auto;
   padding: 4px;
   background: rgb(0, 0, 0, 0.3);
@@ -677,9 +677,9 @@ input:checked + .toggle-slider:hover {
 
 .applied-scale-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 8px;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
   background: rgb(249, 115, 22, 0.1);
   border: 1px solid rgb(249, 115, 22, 0.3);
   border-radius: 4px;
@@ -691,6 +691,64 @@ input:checked + .toggle-slider:hover {
   border-color: rgb(249, 115, 22, 0.5);
 }
 
+.applied-item-preview {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.applied-item-preview .mini-fretboard {
+  transform: scale(0.28);
+  transform-origin: top left;
+  margin-top: -8px;
+  margin-left: -3px;
+  margin-right: -200px;
+  margin-bottom: -140px;
+  pointer-events: none;
+}
+
+.applied-item-preview .mini-fretboard + .learn-scale-button,
+.applied-item-preview .mini-fretboard + .learn-chord-button {
+  margin-left: 83px;
+}
+
+/* Bass entries need more height */
+.instrument-bass .mini-fretboard {
+  margin-bottom: -105px !important;
+}
+
+/* Keyboard entries height adjustment */
+.instrument-keyboard .mini-keyboard {
+  margin-bottom: -80px !important;
+}
+
+.applied-item-preview .mini-keyboard {
+  transform: scale(0.38);
+  transform-origin: top left;
+  margin-top: -5px;
+  margin-left: -8px;
+  margin-right: -140px;
+  margin-bottom: -140px;
+  pointer-events: none;
+}
+
+.applied-item-preview .octave-range-control {
+  display: none !important;
+}
+
+.applied-item-preview .mini-fretboard-empty,
+.applied-item-preview .mini-keyboard-empty {
+  font-size: 8px;
+  padding: 4px;
+}
+
+.applied-item-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .scale-name {
   font-size: 11px;
   font-weight: 600;
@@ -699,8 +757,8 @@ input:checked + .toggle-slider:hover {
 }
 
 .delete-scale-button {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   background: rgb(220, 38, 38, 0.1);
   border: 1px solid rgb(220, 38, 38, 0.4);
   color: var(--red-light);
@@ -754,7 +812,7 @@ input:checked + .toggle-slider:hover {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  max-height: 120px;
+  max-height: 200px;
   overflow-y: auto;
   padding: 4px;
   background: rgb(0, 0, 0, 0.3);
@@ -764,9 +822,9 @@ input:checked + .toggle-slider:hover {
 
 .applied-chord-item {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 4px 8px;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
   background: rgb(168, 85, 247, 0.1);
   border: 1px solid rgb(168, 85, 247, 0.3);
   border-radius: 4px;
@@ -786,8 +844,8 @@ input:checked + .toggle-slider:hover {
 }
 
 .delete-chord-button {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   background: rgb(220, 38, 38, 0.1);
   border: 1px solid rgb(220, 38, 38, 0.4);
   color: var(--red-light);
@@ -853,6 +911,7 @@ input:checked + .toggle-slider:hover {
 /* Applied Item Buttons Container */
 .applied-item-buttons {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 4px;
   margin-left: 8px;
@@ -860,8 +919,9 @@ input:checked + .toggle-slider:hover {
 
 /* Learn Scale Button - Blue Theme */
 .learn-scale-button {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
+  margin-left: 43px;
   background: rgb(59, 130, 246, 0.1);
   border: 1px solid rgb(59, 130, 246, 0.4);
   color: var(--blue-400);
@@ -889,8 +949,9 @@ input:checked + .toggle-slider:hover {
 
 /* Learn Chord Button - Blue Theme */
 .learn-chord-button {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
+  margin-left: 43px;
   background: rgb(59, 130, 246, 0.1);
   border: 1px solid rgb(59, 130, 246, 0.4);
   color: var(--blue-400);
