@@ -271,17 +271,6 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
   color: var(--purple-600);
 }
 
-.dark .control-select {
-  background: rgb(249, 115, 22, 0.1);
-  border-color: var(--orange-500);
-  color: var(--orange-500);
-}
-
-.dark .control-select.chord-mode {
-  background: rgb(168, 85, 247, 0.1);
-  border-color: var(--purple-600);
-  color: var(--purple-600);
-}
 
 .control-select:hover {
   background: rgb(249, 115, 22, 0.3);
@@ -316,7 +305,7 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 
 .control-select option:checked {
   background: var(--blue-500) !important;
-  color: var(--black) !important;
+  color: var(--white) !important;
   font-weight: 600;
 }
 

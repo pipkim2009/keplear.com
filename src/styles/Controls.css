@@ -632,7 +632,7 @@
 
 /* Custom dropdown options styling */
 .control-input option {
-  background: var(--dark-bg-primary);
+  background: var(--black);
   color: var(--white);
   text-align: center;
   text-align-last: center;
@@ -648,7 +648,7 @@
 
 .control-input option:checked {
   background: var(--blue-500) !important;
-  color: var(--dark-bg-primary) !important;
+  color: var(--white) !important;
   font-weight: 600;
 }
 

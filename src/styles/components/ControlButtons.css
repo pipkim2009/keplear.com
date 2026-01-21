@@ -67,7 +67,7 @@
 
 /* Custom dropdown options styling */
 .control-input option {
-  background: var(--gray-800) !important;
+  background: var(--black) !important;
   color: var(--white) !important;
   padding: 5px 10px;
   font-weight: 600;
@@ -81,7 +81,7 @@
 
 .control-input option:checked {
   background: var(--blue-500) !important;
-  color: var(--black) !important;
+  color: var(--white) !important;
   font-weight: 600;
 }
 

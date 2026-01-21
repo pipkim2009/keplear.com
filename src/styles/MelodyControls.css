@@ -28,10 +28,6 @@
 .notes-toggle-container:focus {
 }
 
-.dark .notes-toggle-container {
-  background: var(--primary-purple-alpha-15);
-}
-
 
 /* Chord Mode Select - matches BPM and Beats input colors */
 .chord-mode-select {
@@ -65,10 +61,15 @@
 }
 
 .chord-mode-select option {
-  background: var(--gray-1a1a1a) !important;
+  background: var(--black) !important;
   color: var(--white) !important;
   padding: 8px !important;
   text-align: center !important;
+}
+
+.chord-mode-select option:checked {
+  background: var(--blue-500) !important;
+  color: var(--white) !important;
 }
 
 
@@ -127,10 +128,6 @@
   font-size: 18px;
   font-weight: 600;
   margin-bottom: 20px;
-  color: var(--dark-bg-primary);
-}
-
-.dark .selected-notes {
   color: var(--dark-text-primary);
 }
 

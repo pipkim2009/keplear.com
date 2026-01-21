@@ -100,7 +100,7 @@
 
 .custom-dropdown-item.selected {
   background: var(--blue-500) !important;
-  color: var(--black) !important;
+  color: var(--white) !important;
   font-weight: 700;
 }
 
@@ -180,23 +180,4 @@
   }
 }
 
-/* Dark mode support */
-.dark .custom-dropdown-content {
-  background: var(--black);
-  border-color: var(--gray-800);
-}
-
-.dark .custom-dropdown-item {
-  background: var(--black);
-  color: var(--white);
-}
-
-.dark .custom-dropdown-item:hover {
-  background: var(--gray-800);
-}
-
-.dark .custom-dropdown-item.selected {
-  background: var(--blue-500) !important;
-  color: var(--black) !important;
-}
 
