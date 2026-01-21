@@ -95,17 +95,17 @@
   --orange-alpha-50: rgb(249, 115, 22, 0.5);
 
   /* ========================================
-     AMBERS/YELLOWS (6 base)
+     AMBERS/YELLOWS (3 base)
      ======================================== */
   --amber-100: #fef3c7;
-  --amber-300: #fcd34d;
-  --amber-400: #fbbf24;
   --amber-500: #f59e0b;
   --amber-gold: #ffd700;
-  --yellow-400: #facc15;
+  --amber-300: var(--amber-gold);
+  --amber-400: var(--amber-gold);
+  --yellow-400: var(--amber-gold);
 
   --amber-alpha-60: rgb(245, 158, 11, 0.6);
-  --amber-alpha-80: rgb(251, 191, 36, 0.8);
+  --amber-alpha-80: rgb(245, 158, 11, 0.8);
 
   /* ========================================
      PURPLES - SEMANTIC (6 base)
@@ -178,13 +178,14 @@
   /* ========================================
      INSTRUMENT COLORS - GUITAR
      ======================================== */
-  --guitar-fretboard-primary: #3e2723;
-  --guitar-fretboard-secondary: #1e1e1e;
-  --guitar-fretboard-light-primary: #d4a574;
-  --guitar-fretboard-light-secondary: #c49464;
-  --guitar-surface: #2a1f1c;
-  --guitar-border: #2d2d2d;
-  --guitar-border-light: #b8956a;
+  --guitar-fretboard: #3e2723;
+  --guitar-fretboard-primary: var(--guitar-fretboard);
+  --guitar-fretboard-secondary: var(--gray-900);
+  --guitar-fretboard-light-primary: var(--orange-fretboard);
+  --guitar-fretboard-light-secondary: var(--orange-fretboard);
+  --guitar-surface: var(--guitar-fretboard);
+  --guitar-border: var(--gray-700);
+  --guitar-border-light: var(--orange-fretboard);
 
   /* Fret Colors */
   --fret-color: #bbbbbb;
@@ -384,12 +385,12 @@
   --gray-888: var(--fret-color);
   --gray-111111: var(--gray-900);
   --gray-1a1a1a: var(--gray-850);
-  --gray-1e1e1e: var(--guitar-fretboard-secondary);
+  --gray-1e1e1e: var(--guitar-fretboard);
   --gray-212529: var(--gray-800);
-  --gray-2a1a14: var(--guitar-surface);
-  --gray-2d2d2d: var(--guitar-border);
+  --gray-2a1a14: var(--guitar-fretboard);
+  --gray-2d2d2d: var(--gray-700);
   --gray-2d3338: var(--gray-750);
-  --gray-3e2723: var(--guitar-fretboard-primary);
+  --gray-3e2723: var(--guitar-fretboard);
   --gray-343a40: var(--gray-700);
   --gray-999: var(--string-color);
   --gray-c9c9c9: var(--fret-color);
