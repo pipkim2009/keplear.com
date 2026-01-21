@@ -1,44 +1,23 @@
 /**
- * 🎨 Keplear Color System
+ * 🎨 Keplear Color System (Consolidated)
  * Single source of truth for all colors in the application
+ * Reduced from ~140 to ~90 unique base colors
  *
  * WCAG 2.1 Compliance Notes:
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * All color combinations meet WCAG 2.1 Level AA standards (4.5:1 for normal text, 3:1 for large text)
- * Key contrast ratios have been verified for accessibility:
- *
- * Light Mode:
- *   - Primary text (#121212) on white background: 17.5:1 (AAA ✓)
- *   - Secondary text (#374151) on white background: 11.3:1 (AAA ✓)
- *   - Tertiary text (#6b7280) on white background: 5.4:1 (AA ✓)
- *
- * Dark Mode:
- *   - Primary text (#d2d2f9) on dark background (#121212): 12.8:1 (AAA ✓)
- *   - White text (#ffffff) on dark background (#121212): 17.5:1 (AAA ✓)
- *
- * Interactive Elements:
- *   - Focus indicators: 3px solid outline with 3:1 minimum contrast (AA ✓)
- *   - Button text: All buttons meet 4.5:1 contrast minimum (AA ✓)
- *   - Links and controls: 4.5:1 against background (AA ✓)
- *
- * State Indicators:
- *   - Error states (red): Sufficient contrast maintained
- *   - Success states (green): Sufficient contrast maintained
- *   - Warning states (amber): Sufficient contrast maintained
- *
- * For detailed contrast testing, use: https://webaim.org/resources/contrastchecker/
+ * All color combinations meet WCAG 2.1 Level AA standards
  */
 
 :root {
   /* ========================================
-     PRIMARY BRAND COLORS
+     PRIMARY BRAND COLORS (6)
      ======================================== */
   --primary-purple: #751aff;
   --primary-purple-dark: #5a0fd6;
-  --primary-purple-darker: #4a0cb0;
-  --primary-purple-6600cc: #6600cc;
+  --primary-purple-darker: #6600cc;
   --primary-purple-light: #9d5cff;
   --primary-purple-lighter: #c49dff;
+  --primary-purple-darkest: #4a0cb0;
 
   /* Primary Purple Alpha Variations */
   --primary-purple-alpha-5: rgb(117, 26, 255, 0.05);
@@ -56,53 +35,43 @@
      THEME COLORS - LIGHT MODE
      ======================================== */
   --light-bg-primary: #ffffff;
-  --light-bg-secondary: #f8f9fa;
+  --light-bg-secondary: #f9fafb;
   --light-bg-tertiary: #f3e8ff;
   --light-bg-quaternary: #faf5ff;
-  --light-bg-gradient-1: #f3e8ff;
-  --light-bg-gradient-2: #e9d5ff;
-  --light-bg-gradient-3: #faf5ff;
-  --light-bg-gradient-4: #ede9fe;
   --light-text-primary: #121212;
   --light-text-secondary: #374151;
   --light-text-tertiary: #6b7280;
-  --light-border-primary: #e2e8f0;
+  --light-border-primary: #e5e7eb;
   --light-border-secondary: #d1d5db;
 
   /* ========================================
      THEME COLORS - DARK MODE
      ======================================== */
   --dark-bg-primary: #121212;
-  --dark-bg-secondary: #1a202c;
+  --dark-bg-secondary: #1f2937;
   --dark-bg-tertiary: #2d1566;
   --dark-bg-quaternary: #1a0d40;
   --dark-bg-surface: #0a0a0a;
   --dark-text-primary: #d4c4ff;
   --dark-text-secondary: #ffffff;
-  --dark-text-tertiary: #e9ecef;
-  --dark-border-primary: #4a5568;
-  --dark-border-secondary: #2d3748;
+  --dark-text-tertiary: #e5e7eb;
+  --dark-border-primary: #4b5563;
+  --dark-border-secondary: #374151;
 
   /* ========================================
-     SEMANTIC COLORS - BLUE (INFO)
+     BLUES (10 base + alphas)
      ======================================== */
-  --blue-007bff: #007bff;
-  --blue-0056b3: #0056b3;
-  --blue-003d7a: #003d7a;
-  --blue-100: #dbeafe;
-  --blue-200: #bfdbfe;
-  --blue-300: #93c5fd;
-  --blue-400: #60a5fa;
-  --blue-450: #4a90e2;  /* Audio player blue */
+  --blue-50: #dbeafe;
+  --blue-100: #bfdbfe;
+  --blue-200: #93c5fd;
+  --blue-300: #60a5fa;
+  --blue-400: #4a90e2;
   --blue-500: #3b82f6;
-  --blue-550: #357abd;  /* Audio player blue dark */
-  --blue-580: #4589cd;  /* Audio player blue hover */
-  --blue-590: #5a9ff2;  /* Audio player blue hover light */
   --blue-600: #2563eb;
-  --blue-650: #2969a3;  /* Audio player blue gradient end */
   --blue-700: #1d4ed8;
   --blue-800: #1e40af;
   --blue-900: #1e3a8a;
+
   --blue-alpha-05: rgb(59, 130, 246, 0.05);
   --blue-alpha-10: rgb(59, 130, 246, 0.1);
   --blue-alpha-20: rgb(59, 130, 246, 0.2);
@@ -112,40 +81,22 @@
   --blue-alpha-60: rgb(59, 130, 246, 0.6);
   --blue-alpha-80: rgb(59, 130, 246, 0.8);
 
-  /* Audio Player Blue Alpha Variations */
-  --blue-450-alpha-30: rgb(74, 144, 226, 0.3);
-  --blue-450-alpha-40: rgb(74, 144, 226, 0.4);
-  --blue-450-alpha-50: rgb(74, 144, 226, 0.5);
-  --blue-450-alpha-60: rgb(74, 144, 226, 0.6);
-  --blue-450-alpha-80: rgb(74, 144, 226, 0.8);
-
   /* ========================================
-     SEMANTIC COLORS - CYAN (BRIGHT ACCENT)
+     GREENS (10 base + alphas)
      ======================================== */
-  --cyan-60d5f8: #60d5f8;
-
-  /* ========================================
-     SEMANTIC COLORS - GREEN (SUCCESS)
-     ======================================== */
-  --green-28a745: #28a745;
-  --green-218838: #218838;
-  --green-20c997: #20c997;
-  --green-1ba085: #1ba085;
-  --green-1a9977: #1a9977;
-  --green-100: #dcfce7;
+  --green-50: #dcfce7;
+  --green-100: #d1fae5;
   --green-200: #bbf7d0;
-  --green-4caf50: #4caf50;
-  --green-a5d6a7: #a5d6a7;
+  --green-300: #86efac;
   --green-400: #4ade80;
-  --green-449d44: #449d44;  /* Green dark */
   --green-500: #22c55e;
-  --green-550: #10b981;
-  --green-5cb85c: #5cb85c;  /* Green light */
   --green-600: #16a34a;
   --green-700: #15803d;
   --green-800: #166534;
-  --green-light: #86efac;
-  --green-border: #22c55e;  /* Semantic green border */
+  --green-900: #065f46;
+  --green-teal: #10b981;
+  --green-neon: #00b359;
+
   --green-alpha-05: rgb(34, 197, 94, 0.05);
   --green-alpha-10: rgb(34, 197, 94, 0.1);
   --green-alpha-20: rgb(34, 197, 94, 0.2);
@@ -154,24 +105,19 @@
   --green-alpha-50: rgb(34, 197, 94, 0.5);
   --green-alpha-60: rgb(34, 197, 94, 0.6);
   --green-alpha-80: rgb(34, 197, 94, 0.8);
-  --green-light-alpha-50: rgb(134, 239, 172, 0.5);
 
   /* ========================================
-     SEMANTIC COLORS - RED (ERROR/DANGER)
+     REDS (8 base + alphas)
      ======================================== */
-  --red-991b1b: #991b1b;
-  --red-c53030: #c53030;
-  --red-c82333: #c82333;  /* Red dark */
-  --red-dc3545: #dc3545;  /* Red primary */
-  --red-e53e3e: #e53e3e;
+  --red-50: #fee2e2;
+  --red-100: #fecaca;
+  --red-200: #fca5a5;
+  --red-300: #f87171;
   --red-500: #ef4444;
   --red-600: #dc2626;
   --red-700: #b91c1c;
-  --red-light: #f87171;
-  --red-lighter: #fca5a5;
-  --red-f5c2c7: #f5c2c7;
-  --red-ff0066: #ff0066;
-  --red-ff4444: #ff4444;
+  --red-900: #991b1b;
+
   --red-alpha-05: rgb(239, 68, 68, 0.05);
   --red-alpha-10: rgb(239, 68, 68, 0.1);
   --red-alpha-20: rgb(239, 68, 68, 0.2);
@@ -180,206 +126,66 @@
   --red-alpha-50: rgb(239, 68, 68, 0.5);
   --red-alpha-60: rgb(239, 68, 68, 0.6);
   --red-alpha-80: rgb(239, 68, 68, 0.8);
-  --red-light-alpha-60: rgb(248, 113, 113, 0.6);
-
-  /* Red dc3545 alpha variations for animations */
-  --red-dc3545-alpha-0: rgb(220, 53, 69, 0);
-  --red-dc3545-alpha-70: rgb(220, 53, 69, 0.7);
 
   /* ========================================
-     SEMANTIC COLORS - ORANGE (SCALES)
+     ORANGES (5 base + alphas)
      ======================================== */
-  --orange-b45309: #b45309;
-  --orange-d97706: #d97706;
-  --orange-400: #fb923c;
+  --orange-300: #fb923c;
   --orange-500: #f97316;
   --orange-600: #ea580c;
   --orange-700: #c2410c;
-  --orange-ff7700: #ff7700;  /* Orange dark */
-  --orange-ff8c00: #ff8c00;  /* Orange bright */
-  --orange-scale: #f97316;  /* Semantic scale note */
-  --orange-scale-dark: #ea580c;  /* Semantic scale note dark */
+  --orange-800: #b45309;
+  --orange-fretboard: #e2a76f;
+
   --orange-alpha-40: rgb(249, 115, 22, 0.4);
-  --orange-400-alpha-60: rgb(251, 146, 60, 0.6);
-  --orange-600-alpha-60: rgb(217, 119, 6, 0.6);
+  --orange-alpha-60: rgb(249, 115, 22, 0.6);
 
   /* ========================================
-     SEMANTIC COLORS - AMBER/YELLOW (PLAYING)
+     AMBERS/YELLOWS (6 base)
      ======================================== */
-  --amber-200: #fef3c7;
+  --amber-100: #fef3c7;
+  --amber-300: #fcd34d;
   --amber-400: #fbbf24;
   --amber-500: #f59e0b;
-  --amber-ffcc02: #ffcc02;
-  --amber-ffd700: #ffd700;  /* Gold */
-  --amber-ffed4e: #ffed4e;  /* Gold light */
+  --amber-gold: #ffd700;
+  --yellow-400: #facc15;
+
   --amber-alpha-60: rgb(245, 158, 11, 0.6);
   --amber-alpha-80: rgb(251, 191, 36, 0.8);
-  --yellow-400: #facc15;  /* Missing semantic token for warnings */
 
   /* ========================================
-     SEMANTIC COLORS - PURPLE (CHORDS)
+     PURPLES - SEMANTIC (6 base)
      ======================================== */
+  --purple-200: #e9d5ff;
   --purple-300: #d8b4fe;
   --purple-400: #c084fc;
   --purple-500: #a855f7;
-  --purple-600: #a855f7;
-  --purple-6366f1: #6366f1;
-  --purple-6d28d9: #6d28d9;
   --purple-700: #9333ea;
-  --purple-800: #7e22ce;
-  --purple-8e44ad: #8e44ad;
-  --purple-9333ea: #9333ea;
-  --purple-9b59b6: #9b59b6;
-  --purple-chord: #a855f7;  /* Semantic chord note */
-  --purple-chord-dark: #9333ea;  /* Semantic chord note dark */
+  --purple-indigo: #6366f1;
+
   --purple-alpha-40: rgb(168, 85, 247, 0.4);
-  --purple-600-alpha-60: rgb(168, 85, 247, 0.6);
+  --purple-alpha-60: rgb(168, 85, 247, 0.6);
 
   /* ========================================
-     NEUTRAL GRAYS
+     GRAYS (15 base)
      ======================================== */
   --white: #ffffff;
-  --white-e5e5e5: #e5e5e5;
-  --black: #000000;
   --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
-  --gray-f8f9fa: #f8f9fa;
-  --gray-e9ecef: #e9ecef;
   --gray-200: #e5e7eb;
   --gray-300: #d1d5db;
-  --gray-333: #333333;
   --gray-400: #9ca3af;
-  --gray-404040: #404040;
-  --gray-400-alpha-30: rgb(156, 163, 175, 0.3);
-  --gray-444: #444444;
-  --gray-neutral: #808080;
   --gray-500: #6b7280;
-  --gray-555: #555555;
-  --gray-6c757d: #6c757d;
   --gray-600: #4b5563;
-  --gray-666: #666666;
   --gray-700: #374151;
-  --gray-777: #777777;
+  --gray-750: #2d3748;
   --gray-800: #1f2937;
-  --gray-888: #888888;
-  --gray-111111: #111111;
-  --gray-1a1a1a: #1a1a1a;
-  --gray-1e1e1e: #1e1e1e;
-  --gray-212529: #212529;
-  --gray-2a1a14: #2a1a14;
-  --gray-2d2d2d: #2d2d2d;
-  --gray-2d3338: #2d3338;
-  --gray-3e2723: #3e2723;
-  --gray-343a40: #343a40;
-  --gray-850: #2d3748;
-  --gray-900: #111827;
-  --gray-999: #999999;
-  --gray-c9c9c9: #c9c9c9;
-  --gray-ccc: #cccccc;
-  --gray-d5d5d5: #d5d5d5;
-  --gray-dee2e6: #dee2e6;
-  --gray-ddd: #dddddd;
-  --gray-e0e0e0: #e0e0e0;
-  --gray-f0f0dc: #f0f0dc;
-  --gray-f0f9ff: #f0f9ff;
-  --gray-f5f5f5: #f5f5f5;
-  --gray-f5f5dc: #f5f5dc;
+  --gray-850: #1a1a1a;
+  --gray-900: #121212;
+  --gray-950: #0a0a0a;
+  --black: #000000;
 
-  /* Gray Alpha Variations for Audio Player */
-  --gray-1a1a1a-alpha-90: rgb(26, 26, 26, 0.9);
-  --gray-1a1a1a-alpha-95: rgb(26, 26, 26, 0.95);
-
-  /* ========================================
-     INSTRUMENT COLORS - KEYBOARD
-     ======================================== */
-  --keyboard-white-key: #ffffff;
-  --keyboard-white-key-secondary: #f9fafb;  /* Secondary white key color */
-  --keyboard-white-key-hover: #f7fafc;
-  --keyboard-white-key-border: #e2e8f0;
-  --keyboard-black-key: #374151;
-  --keyboard-black-key-secondary: #111827;
-  --keyboard-black-key-border: #4b5563;
-
-  /* ========================================
-     INSTRUMENT COLORS - GUITAR
-     ======================================== */
-  --guitar-fretboard-primary: #3e2723;
-  --guitar-fretboard-secondary: #1e1e1e;
-  --guitar-fretboard-light-primary: #d4a574;
-  --guitar-fretboard-light-secondary: #c49464;
-  --guitar-surface: #2a1f1c;
-  --guitar-border: #2d2d2d;
-  --guitar-border-light: #b8956a;
-
-  /* Fret Colors */
-  --fret-wire-primary: #c9c9c9;
-  --fret-wire-secondary: #888888;
-  --fret-marker: #f5f5dc;
-  --fret-marker-secondary: #dddddd;
-  --fret-marker-border: #bbbbbb;
-
-  /* String Colors (High E to Low E) */
-  --string-1: #e6e6e6;
-  --string-2: #d9d9d9;
-  --string-3: #d0d0d0;
-  --string-4: #c8c8c8;
-  --string-5: #b0b0b0;
-  --string-6: #a0a0a0;
-
-  /* String Center Gradients */
-  --string-center: #999999;
-  --string-center-dark: #808080;
-  --string-center-darker: #707070;
-  --string-center-darkest: #606060;
-
-
-  /* ========================================
-     NOTE CIRCLE COLORS
-     ======================================== */
-
-  /* Selected Notes */
-  --note-selected: #3b82f6;
-  --note-selected-dark: #1d4ed8;
-
-  /* Melody Notes */
-  --note-melody: #4caf50;
-  --note-melody-dark: #2e7d32;
-
-  /* Scale Notes */
-  --note-scale: #f97316;
-  --note-scale-dark: #ea580c;
-  --note-scale-root: #dc2626;
-  --note-scale-root-dark: #b91c1c;
-
-  /* Chord Notes */
-  --note-chord: #a855f7;
-  --note-chord-dark: #9333ea;
-  --note-chord-root: #dc2626;
-  --note-chord-root-dark: #b91c1c;
-
-  /* ========================================
-     SCROLLBAR COLORS
-     ======================================== */
-  --scrollbar-track: #1a1a1a;
-  --scrollbar-thumb-primary: #5a0fd6;
-  --scrollbar-thumb-secondary: #751aff;
-  --scrollbar-thumb-hover-primary: #9d5cff;
-  --scrollbar-thumb-hover-secondary: #c49dff;
-  --scrollbar-thumb-active-primary: #6600cc;
-  --scrollbar-thumb-active-secondary: #5a0fd6;
-
-  /* Guitar Scrollbar (Purple theme) */
-  --scrollbar-guitar-track: #2d2d2d;
-  --scrollbar-guitar-track-secondary: #1a1a1a;
-  --scrollbar-guitar-thumb-primary: #751aff;
-  --scrollbar-guitar-thumb-secondary: #5a0fd6;
-  --scrollbar-guitar-thumb-border: #9d5cff;
-  --scrollbar-guitar-thumb-hover-primary: #5a0fd6;
-  --scrollbar-guitar-thumb-hover-secondary: #6600cc;
-
-  /* ========================================
-     ALPHA COLORS (TRANSPARENCY)
-     ======================================== */
+  --gray-alpha-30: rgb(156, 163, 175, 0.3);
 
   /* Black Alpha */
   --black-alpha-05: rgb(0, 0, 0, 0.05);
@@ -404,16 +210,207 @@
   --white-alpha-90: rgb(255, 255, 255, 0.9);
 
   /* ========================================
+     SPECIAL COLORS
+     ======================================== */
+  --cyan-accent: #60d5f8;
+  --beige: #f5f5dc;
+
+  /* ========================================
+     INSTRUMENT COLORS - KEYBOARD
+     ======================================== */
+  --keyboard-white-key: var(--white);
+  --keyboard-white-key-secondary: var(--gray-50);
+  --keyboard-white-key-hover: var(--gray-50);
+  --keyboard-white-key-border: var(--gray-200);
+  --keyboard-black-key: var(--gray-700);
+  --keyboard-black-key-secondary: var(--gray-900);
+  --keyboard-black-key-border: var(--gray-600);
+
+  /* ========================================
+     INSTRUMENT COLORS - GUITAR
+     ======================================== */
+  --guitar-fretboard-primary: #3e2723;
+  --guitar-fretboard-secondary: #1e1e1e;
+  --guitar-fretboard-light-primary: #d4a574;
+  --guitar-fretboard-light-secondary: #c49464;
+  --guitar-surface: #2a1f1c;
+  --guitar-border: #2d2d2d;
+  --guitar-border-light: #b8956a;
+
+  /* Fret Colors */
+  --fret-wire-primary: #c9c9c9;
+  --fret-wire-secondary: #888888;
+  --fret-marker: var(--beige);
+  --fret-marker-secondary: #dddddd;
+  --fret-marker-border: #bbbbbb;
+
+  /* String Colors (High E to Low E) */
+  --string-1: #e6e6e6;
+  --string-2: #d9d9d9;
+  --string-3: #d0d0d0;
+  --string-4: #c8c8c8;
+  --string-5: #b0b0b0;
+  --string-6: #a0a0a0;
+
+  /* String Center Gradients */
+  --string-center: #999999;
+  --string-center-dark: #808080;
+  --string-center-darker: #707070;
+  --string-center-darkest: #606060;
+
+  /* ========================================
+     NOTE CIRCLE COLORS (semantic)
+     ======================================== */
+  --note-selected: var(--blue-500);
+  --note-selected-dark: var(--blue-700);
+  --note-melody: var(--green-400);
+  --note-melody-dark: #2e7d32;
+  --note-scale: var(--orange-500);
+  --note-scale-dark: var(--orange-600);
+  --note-scale-root: var(--red-600);
+  --note-scale-root-dark: var(--red-700);
+  --note-chord: var(--purple-500);
+  --note-chord-dark: var(--purple-700);
+  --note-chord-root: var(--red-600);
+  --note-chord-root-dark: var(--red-700);
+
+  /* ========================================
+     SCROLLBAR COLORS
+     ======================================== */
+  --scrollbar-track: var(--gray-850);
+  --scrollbar-thumb-primary: var(--primary-purple-dark);
+  --scrollbar-thumb-secondary: var(--primary-purple);
+  --scrollbar-thumb-hover-primary: var(--primary-purple-light);
+  --scrollbar-thumb-hover-secondary: var(--primary-purple-lighter);
+  --scrollbar-thumb-active-primary: var(--primary-purple-darker);
+  --scrollbar-thumb-active-secondary: var(--primary-purple-dark);
+  --scrollbar-guitar-track: var(--guitar-border);
+  --scrollbar-guitar-track-secondary: var(--gray-850);
+  --scrollbar-guitar-thumb-primary: var(--primary-purple);
+  --scrollbar-guitar-thumb-secondary: var(--primary-purple-dark);
+  --scrollbar-guitar-thumb-border: var(--primary-purple-light);
+  --scrollbar-guitar-thumb-hover-primary: var(--primary-purple-dark);
+  --scrollbar-guitar-thumb-hover-secondary: var(--primary-purple-darker);
+
+  /* ========================================
      BUTTON COLORS
      ======================================== */
-  --btn-primary-bg: #751aff;
-  --btn-primary-bg-hover: #5a0fd6;
-  --btn-primary-border: #751aff;
-  --btn-primary-text: #ffffff;
+  --btn-primary-bg: var(--primary-purple);
+  --btn-primary-bg-hover: var(--primary-purple-dark);
+  --btn-primary-border: var(--primary-purple);
+  --btn-primary-text: var(--white);
   --btn-secondary-bg-light: rgb(255, 255, 255, 0.9);
   --btn-secondary-bg-dark: rgb(45, 21, 102, 0.8);
   --btn-secondary-border-light: rgb(212, 196, 255, 0.4);
   --btn-secondary-border-dark: rgb(212, 196, 255, 0.3);
-  --btn-secondary-text-light: #6600cc;
-  --btn-secondary-text-dark: #d4c4ff;
+  --btn-secondary-text-light: var(--primary-purple-darker);
+  --btn-secondary-text-dark: var(--dark-text-primary);
+
+  /* ========================================
+     LEGACY ALIASES (for backwards compatibility)
+     Will be removed in future update
+     ======================================== */
+  --primary-purple-6600cc: var(--primary-purple-darker);
+  --blue-007bff: var(--blue-500);
+  --blue-0056b3: var(--blue-600);
+  --blue-003d7a: var(--blue-900);
+  --blue-100: var(--blue-100);
+  --blue-450: var(--blue-400);
+  --blue-550: var(--blue-600);
+  --blue-580: var(--blue-400);
+  --blue-590: var(--blue-300);
+  --blue-650: var(--blue-600);
+  --blue-450-alpha-30: var(--blue-alpha-30);
+  --blue-450-alpha-40: var(--blue-alpha-40);
+  --blue-450-alpha-50: var(--blue-alpha-50);
+  --blue-450-alpha-60: var(--blue-alpha-60);
+  --blue-450-alpha-80: var(--blue-alpha-80);
+  --green-28a745: var(--green-500);
+  --green-218838: var(--green-600);
+  --green-20c997: var(--green-teal);
+  --green-1ba085: var(--green-teal);
+  --green-1a9977: var(--green-teal);
+  --green-100: var(--green-50);
+  --green-200: var(--green-200);
+  --green-4caf50: var(--green-400);
+  --green-a5d6a7: var(--green-300);
+  --green-449d44: var(--green-600);
+  --green-550: var(--green-teal);
+  --green-5cb85c: var(--green-500);
+  --green-light: var(--green-300);
+  --green-border: var(--green-500);
+  --green-light-alpha-50: rgb(134, 239, 172, 0.5);
+  --red-991b1b: var(--red-900);
+  --red-c53030: var(--red-700);
+  --red-c82333: var(--red-700);
+  --red-dc3545: var(--red-600);
+  --red-e53e3e: var(--red-500);
+  --red-light: var(--red-300);
+  --red-lighter: var(--red-200);
+  --red-f5c2c7: var(--red-100);
+  --red-ff0066: var(--red-500);
+  --red-ff4444: var(--red-500);
+  --red-light-alpha-60: rgb(248, 113, 113, 0.6);
+  --red-dc3545-alpha-0: rgb(220, 53, 69, 0);
+  --red-dc3545-alpha-70: rgb(220, 53, 69, 0.7);
+  --orange-b45309: var(--orange-800);
+  --orange-d97706: var(--orange-600);
+  --orange-400: var(--orange-300);
+  --orange-ff7700: var(--orange-500);
+  --orange-ff8c00: var(--orange-500);
+  --orange-scale: var(--orange-500);
+  --orange-scale-dark: var(--orange-600);
+  --orange-400-alpha-60: var(--orange-alpha-60);
+  --orange-600-alpha-60: var(--orange-alpha-60);
+  --amber-200: var(--amber-100);
+  --amber-ffcc02: var(--amber-gold);
+  --amber-ffd700: var(--amber-gold);
+  --amber-ffed4e: var(--amber-300);
+  --purple-600: var(--purple-500);
+  --purple-6366f1: var(--purple-indigo);
+  --purple-6d28d9: var(--primary-purple-darker);
+  --purple-800: var(--purple-700);
+  --purple-8e44ad: var(--purple-700);
+  --purple-9333ea: var(--purple-700);
+  --purple-9b59b6: var(--purple-700);
+  --purple-chord: var(--purple-500);
+  --purple-chord-dark: var(--purple-700);
+  --purple-600-alpha-60: var(--purple-alpha-60);
+  --white-e5e5e5: var(--gray-200);
+  --gray-f8f9fa: var(--gray-50);
+  --gray-e9ecef: var(--gray-200);
+  --gray-333: var(--gray-700);
+  --gray-404040: var(--gray-600);
+  --gray-400-alpha-30: var(--gray-alpha-30);
+  --gray-444: var(--gray-600);
+  --gray-neutral: var(--string-center-dark);
+  --gray-555: var(--gray-600);
+  --gray-6c757d: var(--gray-500);
+  --gray-666: var(--gray-500);
+  --gray-777: var(--gray-500);
+  --gray-888: var(--fret-wire-secondary);
+  --gray-111111: var(--gray-900);
+  --gray-1a1a1a: var(--gray-850);
+  --gray-1e1e1e: var(--guitar-fretboard-secondary);
+  --gray-212529: var(--gray-800);
+  --gray-2a1a14: var(--guitar-surface);
+  --gray-2d2d2d: var(--guitar-border);
+  --gray-2d3338: var(--gray-750);
+  --gray-3e2723: var(--guitar-fretboard-primary);
+  --gray-343a40: var(--gray-700);
+  --gray-850: var(--gray-750);
+  --gray-999: var(--string-center);
+  --gray-c9c9c9: var(--fret-wire-primary);
+  --gray-ccc: var(--gray-300);
+  --gray-d5d5d5: var(--gray-300);
+  --gray-dee2e6: var(--gray-200);
+  --gray-ddd: var(--fret-marker-secondary);
+  --gray-e0e0e0: var(--gray-200);
+  --gray-f0f0dc: var(--beige);
+  --gray-f0f9ff: var(--blue-50);
+  --gray-f5f5f5: var(--gray-100);
+  --gray-f5f5dc: var(--beige);
+  --gray-1a1a1a-alpha-90: rgb(26, 26, 26, 0.9);
+  --gray-1a1a1a-alpha-95: rgb(26, 26, 26, 0.95);
+  --cyan-60d5f8: var(--cyan-accent);
 }
