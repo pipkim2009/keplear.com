@@ -176,34 +176,6 @@
   --large-min: 1025px;
 }
 
-/*
-  ===========================================
-  LIGHT THEME OVERRIDES
-  ===========================================
-  When light mode is active, override semantic tokens
-*/
-
-.light {
-  /* Text Colors */
-  --text-primary: var(--light-text-primary);
-  --text-secondary: var(--light-text-secondary);
-
-  /* Background Colors */
-  --bg-primary: var(--light-bg-primary);
-  --bg-secondary: var(--light-bg-secondary);
-  --bg-tertiary: var(--light-bg-tertiary);
-
-  /* Border Colors */
-  --light-border: var(--light-border-primary);  /* Define missing border token */
-  --border-primary: var(--light-border-primary);
-  --border-secondary: var(--gray-300);
-  --border-muted: var(--gray-200);
-
-  /* Keyboard in Light Mode */
-  --keyboard-bg: var(--light-bg-secondary);
-  --keyboard-border: var(--light-border);
-}
-
 /**
  * ===========================================
  * DESIGN TOKEN SYSTEM SUMMARY

@@ -64,31 +64,3 @@
   }
 }
 
-/*
-  ===========================================
-  LIGHT THEME SUPPORT
-  ===========================================
-  Keep green theme consistent across all modes
-*/
-
-.light .melody-display {
-  background: rgb(32, 201, 151, 0.1);
-  border-color: var(--green-20c997);
-}
-
-.light .melody-title {
-  color: var(--green-20c997);
-}
-
-.light .melody-note {
-  background: var(--green-20c997) !important;
-  color: var(--gray-212529) !important;
-}
-
-/* Golden highlight stays the same in light mode */
-.light .melody-note.currently-playing {
-  background: linear-gradient(145deg, var(--amber-400), var(--amber-500)) !important;
-  color: var(--gray-800) !important;
-  border: 2px solid var(--amber-200) !important;
-  transition: none !important;
-}

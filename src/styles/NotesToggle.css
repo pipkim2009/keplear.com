@@ -35,13 +35,6 @@
   font-weight: 600;
 }
 
-.light .notes-toggle-content {
-  color: var(--dark-text-primary);
-}
-
-.light .notes-toggle-content .toggle-label {
-  color: var(--dark-text-primary);
-}
 
 .notes-toggle-content .toggle-label {
   font-size: 12px;

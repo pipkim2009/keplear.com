@@ -106,10 +106,6 @@
   color: var(--primary-purple);
 }
 
-:global(.light) .badge {
-  background: var(--primary-purple-alpha-10);
-  color: var(--primary-purple);
-}
 
 .heroTitle {
   font-size: clamp(2.5rem, 8vw, 5rem);
@@ -120,9 +116,6 @@
   animation: fadeInUp 0.6s ease-out 0.1s both;
 }
 
-:global(.light) .heroTitle {
-  color: var(--light-text-primary);
-}
 
 .rotatingWord {
   display: inline-block;
@@ -152,9 +145,6 @@
   animation: fadeInUp 0.6s ease-out 0.2s both;
 }
 
-:global(.light) .heroSubtitle {
-  color: var(--light-text-secondary);
-}
 
 .heroCta {
   display: flex;
@@ -199,9 +189,6 @@
   color: var(--dark-text-tertiary);
 }
 
-:global(.light) .ctaNote {
-  color: var(--light-text-tertiary);
-}
 
 .heroInstruments {
   display: flex;
@@ -235,19 +222,6 @@
   color: var(--primary-purple-light);
 }
 
-:global(.light) .instrumentPill {
-  background: var(--black-alpha-05);
-  border-color: var(--black-alpha-10);
-  color: var(--light-text-secondary);
-}
-
-:global(.light) .instrumentPill:hover {
-  background: var(--black-alpha-10);
-}
-
-:global(.light) .instrumentPill svg {
-  color: var(--primary-purple);
-}
 
 /* Scroll Indicator */
 .scrollIndicator {
@@ -270,9 +244,6 @@
   letter-spacing: 1px;
 }
 
-:global(.light) .scrollIndicator span {
-  color: var(--light-text-tertiary);
-}
 
 .scrollArrow {
   width: 24px;
@@ -325,9 +296,6 @@
   margin: 0 0 16px;
 }
 
-:global(.light) .sectionHeader h2 {
-  color: var(--light-text-primary);
-}
 
 .sectionHeader p {
   font-size: 1.125rem;
@@ -337,9 +305,6 @@
   line-height: 1.6;
 }
 
-:global(.light) .sectionHeader p {
-  color: var(--light-text-secondary);
-}
 
 .featureGrid {
   display: grid;
@@ -374,17 +339,6 @@
   transform: translateY(-4px);
 }
 
-:global(.light) .featureCard {
-  background: white;
-  border-color: var(--black-alpha-10);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-}
-
-:global(.light) .featureCard:hover {
-  background: white;
-  border-color: var(--primary-purple-alpha-30);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1);
-}
 
 .featureIconWrapper {
   width: 56px;
@@ -399,10 +353,6 @@
   color: var(--primary-purple-light);
 }
 
-:global(.light) .featureIconWrapper {
-  background: linear-gradient(135deg, var(--primary-purple-alpha-15) 0%, var(--primary-purple-alpha-05) 100%);
-  color: var(--primary-purple);
-}
 
 .featureCard h3 {
   font-size: 1.25rem;
@@ -411,9 +361,6 @@
   margin: 0 0 12px;
 }
 
-:global(.light) .featureCard h3 {
-  color: var(--light-text-primary);
-}
 
 .featureCard p {
   font-size: 1rem;
@@ -422,9 +369,6 @@
   margin: 0;
 }
 
-:global(.light) .featureCard p {
-  color: var(--light-text-secondary);
-}
 
 /* ===========================================
    STATS SECTION
@@ -467,9 +411,6 @@
   letter-spacing: 1px;
 }
 
-:global(.light) .statLabel {
-  color: var(--light-text-secondary);
-}
 
 .statDivider {
   width: 1px;
@@ -477,9 +418,6 @@
   background: var(--white-alpha-20);
 }
 
-:global(.light) .statDivider {
-  background: var(--black-alpha-20);
-}
 
 @media (max-width: 640px) {
   .statsContainer {
@@ -515,9 +453,6 @@
   margin: 0 0 16px;
 }
 
-:global(.light) .ctaContent h2 {
-  color: var(--light-text-primary);
-}
 
 .ctaContent p {
   font-size: 1.125rem;
@@ -526,9 +461,6 @@
   line-height: 1.6;
 }
 
-:global(.light) .ctaContent p {
-  color: var(--light-text-secondary);
-}
 
 /* ===========================================
    ANIMATIONS

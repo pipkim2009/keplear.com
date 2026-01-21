@@ -232,13 +232,6 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
   color: var(--purple-600) !important;
 }
 
-.light .scale-options-content .control-label {
-  color: var(--orange-500) !important;
-}
-
-.light .scale-options-content.chord-mode .control-label {
-  color: var(--purple-600) !important;
-}
 
 .dark .scale-options-content .control-label {
   color: var(--orange-500) !important;

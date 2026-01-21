@@ -120,42 +120,6 @@
   border-top-color: var(--purple-500);
 }
 
-/*
-  ===========================================
-  LIGHT THEME SUPPORT
-  ===========================================
-  Tooltip styling for light mode
-*/
-
-.light .tooltip-icon {
-  border-color: var(--white);
-  color: var(--white);
-}
-
-.light .tooltip-icon:hover,
-.light .active .tooltip-icon {
-  background: var(--white);
-  color: var(--dark-bg-primary);
-  border-color: var(--white);
-}
-
-.light .tooltip-box {
-  background: var(--white);
-  color: var(--light-text-primary);
-  border-color: var(--primary-purple);
-}
-
-.light .tooltip-title {
-  color: var(--blue-400);
-}
-
-.light .tooltip-text {
-  color: var(--light-text-secondary);
-}
-
-.light .tooltip-box::after {
-  border-top-color: var(--primary-purple);
-}
 
 /* Mobile adjustments */
 @media (max-width: 768px) {

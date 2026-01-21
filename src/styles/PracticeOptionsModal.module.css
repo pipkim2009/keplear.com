@@ -52,12 +52,6 @@
   animation: slideIn 0.3s ease-out;
 }
 
-:global(.light) .modalContent {
-  background: linear-gradient(145deg,
-    rgb(255, 255, 255, 0.95) 0%,
-    rgb(240, 240, 255, 0.98) 100%);
-  border: 2px solid rgb(210, 210, 249, 0.3);
-}
 
 /* Close Button */
 .closeButton {
@@ -86,15 +80,6 @@
   background: rgb(0, 0, 0, 0.5);
 }
 
-:global(.light) .closeButton {
-  background: rgb(255, 255, 255, 0.1);
-  border: 2px solid rgb(168, 85, 247, 0.3);
-  color: #7c3aed;
-}
-
-:global(.light) .closeButton:hover {
-  background: rgb(255, 255, 255, 0.2);
-}
 
 @keyframes slideIn {
   from {
@@ -116,9 +101,6 @@
   text-align: center;
 }
 
-:global(.light) .modalTitle {
-  color: #6600cc;
-}
 
 /* Modal Subtitle */
 .modalSubtitle {
@@ -129,9 +111,6 @@
   text-align: center;
 }
 
-:global(.light) .modalSubtitle {
-  color: rgb(102, 0, 204, 0.7);
-}
 
 /* Form Group */
 .formGroup {
@@ -150,9 +129,6 @@
   text-align: center;
 }
 
-:global(.light) .formLabel {
-  color: rgb(102, 0, 204, 0.8);
-}
 
 /* Select Dropdown */
 .selectWrapper {
@@ -191,26 +167,6 @@
   padding: 12px;
 }
 
-:global(.light) .select {
-  background: rgb(255, 255, 255, 0.9);
-  border-color: rgb(117, 26, 255, 0.3);
-  color: #121212;
-}
-
-:global(.light) .select:hover {
-  background: rgb(255, 255, 255, 1);
-  border-color: rgb(117, 26, 255, 0.5);
-}
-
-:global(.light) .select:focus {
-  border-color: #751aff;
-  box-shadow: 0 0 0 3px rgb(117, 26, 255, 0.15);
-}
-
-:global(.light) .select option {
-  background: #ffffff;
-  color: #121212;
-}
 
 .selectArrow {
   position: absolute;
@@ -221,9 +177,6 @@
   color: rgb(212, 196, 255, 0.7);
 }
 
-:global(.light) .selectArrow {
-  color: rgb(102, 0, 204, 0.7);
-}
 
 /* Lesson Type Switch */
 .lessonTypeSwitch {
@@ -235,10 +188,6 @@
   gap: 4px;
 }
 
-:global(.light) .lessonTypeSwitch {
-  background: rgb(255, 255, 255, 0.9);
-  border-color: rgb(117, 26, 255, 0.3);
-}
 
 .switchOption {
   flex: 1;
@@ -269,24 +218,6 @@
   color: white;
 }
 
-:global(.light) .switchOption {
-  color: rgb(102, 0, 204, 0.6);
-}
-
-:global(.light) .switchOption:hover {
-  color: rgb(102, 0, 204, 0.9);
-  background: rgb(117, 26, 255, 0.08);
-}
-
-:global(.light) .switchOptionActive {
-  background: linear-gradient(135deg, #751aff, #9d5cff);
-  color: white;
-}
-
-:global(.light) .switchOptionActive:hover {
-  background: linear-gradient(135deg, #8533ff, #a66dff);
-  color: white;
-}
 
 /* Option Description */
 .optionDescription {
@@ -297,9 +228,6 @@
   padding-left: 2px;
 }
 
-:global(.light) .optionDescription {
-  color: rgb(102, 0, 204, 0.5);
-}
 
 /* Difficulty Slider */
 .difficultyValue {
@@ -307,9 +235,6 @@
   font-weight: 700;
 }
 
-:global(.light) .difficultyValue {
-  color: #7c3aed;
-}
 
 .sliderContainer {
   padding: 0 4px;
@@ -358,23 +283,6 @@
   background: rgb(255, 255, 255, 0.1);
 }
 
-:global(.light) .slider {
-  background: rgb(117, 26, 255, 0.15);
-}
-
-:global(.light) .slider::-webkit-slider-thumb {
-  border-color: #ffffff;
-  box-shadow: 0 2px 8px rgb(117, 26, 255, 0.3);
-}
-
-:global(.light) .slider::-moz-range-thumb {
-  border-color: #ffffff;
-  box-shadow: 0 2px 8px rgb(117, 26, 255, 0.3);
-}
-
-:global(.light) .slider::-moz-range-track {
-  background: rgb(117, 26, 255, 0.15);
-}
 
 /* Dual Range Slider */
 .dualSliderContainer {
@@ -385,9 +293,6 @@
   border-radius: 4px;
 }
 
-:global(.light) .dualSliderContainer {
-  background: rgb(117, 26, 255, 0.15);
-}
 
 .sliderFill {
   position: absolute;
@@ -439,13 +344,6 @@
   box-shadow: 0 2px 8px rgb(117, 26, 255, 0.4);
 }
 
-:global(.light) .dualSlider::-webkit-slider-thumb {
-  border-color: #ffffff;
-}
-
-:global(.light) .dualSlider::-moz-range-thumb {
-  border-color: #ffffff;
-}
 
 /* Offset thumbs when at same position */
 .sliderLow.samePosition::-webkit-slider-thumb {
@@ -482,13 +380,6 @@
   font-weight: 600;
 }
 
-:global(.light) .sliderLabel {
-  color: rgb(102, 0, 204, 0.35);
-}
-
-:global(.light) .sliderLabel.activeLabel {
-  color: #7c3aed;
-}
 
 /* Settings Grid */
 .settingsGrid {
@@ -538,10 +429,6 @@
   }
 }
 
-:global(.light) .checkboxGrid {
-  background: rgb(255, 255, 255, 0.8);
-  border-color: rgb(117, 26, 255, 0.2);
-}
 
 .checkboxLabel {
   display: flex;
@@ -567,20 +454,6 @@
   border-color: rgb(117, 26, 255, 0.5);
 }
 
-:global(.light) .checkboxLabel {
-  background: rgb(255, 255, 255, 0.9);
-  border-color: rgb(0, 0, 0, 0.1);
-}
-
-:global(.light) .checkboxLabel:hover {
-  background: rgb(255, 255, 255, 1);
-  border-color: rgb(117, 26, 255, 0.4);
-}
-
-:global(.light) .checkboxLabel:has(.checkbox:checked) {
-  background: rgb(117, 26, 255, 0.1);
-  border-color: rgb(117, 26, 255, 0.5);
-}
 
 .checkboxText {
   font-size: 12px;
@@ -590,9 +463,6 @@
   order: -1;
 }
 
-:global(.light) .checkboxText {
-  color: rgb(50, 50, 50, 0.9);
-}
 
 .checkbox {
   appearance: none;
@@ -628,19 +498,6 @@
   border-radius: 50%;
 }
 
-:global(.light) .checkbox {
-  border-color: rgb(117, 26, 255, 0.3);
-  background: rgb(255, 255, 255, 0.5);
-}
-
-:global(.light) .checkbox:hover {
-  border-color: rgb(117, 26, 255, 0.6);
-}
-
-:global(.light) .checkbox:checked {
-  background: linear-gradient(135deg, #751aff, #9d5cff);
-  border-color: #751aff;
-}
 
 /* Modal Actions */
 .modalActions {

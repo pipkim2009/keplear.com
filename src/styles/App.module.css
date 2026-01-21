@@ -18,14 +18,6 @@
   }
 }
 
-.light {
-  background: linear-gradient(135deg,
-    var(--light-bg-gradient-1) 0%,
-    var(--light-bg-gradient-2) 25%,
-    var(--light-bg-gradient-3) 50%,
-    var(--light-bg-gradient-4) 75%,
-    var(--light-bg-gradient-2) 100%);
-}
 
 .dark {
   background: linear-gradient(135deg,

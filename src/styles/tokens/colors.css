@@ -32,20 +32,7 @@
   --primary-purple-alpha-80: rgb(117, 26, 255, 0.8);
 
   /* ========================================
-     THEME COLORS - LIGHT MODE
-     ======================================== */
-  --light-bg-primary: #ffffff;
-  --light-bg-secondary: #f9fafb;
-  --light-bg-tertiary: #f3e8ff;
-  --light-bg-quaternary: #faf5ff;
-  --light-text-primary: #121212;
-  --light-text-secondary: #374151;
-  --light-text-tertiary: #6b7280;
-  --light-border-primary: #e5e7eb;
-  --light-border-secondary: #d1d5db;
-
-  /* ========================================
-     THEME COLORS - DARK MODE
+     THEME COLORS (Dark Mode Only)
      ======================================== */
   --dark-bg-primary: #121212;
   --dark-bg-secondary: #1f2937;
@@ -299,12 +286,9 @@
   --btn-primary-bg-hover: var(--primary-purple-dark);
   --btn-primary-border: var(--primary-purple);
   --btn-primary-text: var(--white);
-  --btn-secondary-bg-light: rgb(255, 255, 255, 0.9);
-  --btn-secondary-bg-dark: rgb(45, 21, 102, 0.8);
-  --btn-secondary-border-light: rgb(212, 196, 255, 0.4);
-  --btn-secondary-border-dark: rgb(212, 196, 255, 0.3);
-  --btn-secondary-text-light: var(--primary-purple-darker);
-  --btn-secondary-text-dark: var(--dark-text-primary);
+  --btn-secondary-bg: rgb(45, 21, 102, 0.8);
+  --btn-secondary-border: rgb(212, 196, 255, 0.3);
+  --btn-secondary-text: var(--dark-text-primary);
 
   /* ========================================
      LEGACY ALIASES (for backwards compatibility)

@@ -1364,9 +1364,6 @@ body:has([data-instrument='keyboard']) .control-group.scale-chord-options {
   padding: 4px 12px;
 }
 
-.light .range-label-center {
-  color: var(--white);
-}
 
 .dual-range-container {
   position: relative;
@@ -1740,17 +1737,6 @@ select.control-input.flashing {
   color: var(--dark-text-primary);
 }
 
-/* Light mode styles for notes toggle */
-.light .notes-toggle-container.control-input {
-  background: var(--primary-purple-alpha-15);
-  border: 2px solid var(--purple-800);
-  color: var(--dark-text-primary);
-}
-
-.light .notes-toggle-container.control-input:hover {
-  background: var(--primary-purple-alpha-25);
-  border-color: var(--purple-700);
-}
 
 @media (max-width: 480px) {
   .control-group.notes-toggle-row {
