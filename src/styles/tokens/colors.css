@@ -191,7 +191,7 @@
   --guitar-fretboard-light-primary: var(--orange-fretboard);
   --guitar-fretboard-light-secondary: var(--orange-fretboard);
   --guitar-surface: var(--guitar-fretboard);
-  --guitar-border: var(--gray-700);
+  --guitar-border: var(--metal-color);
   --guitar-border-light: var(--orange-fretboard);
 
   /* Fret & String Color (unified) */
@@ -233,15 +233,15 @@
   /* ========================================
      SCROLLBAR COLORS
      ======================================== */
-  --scrollbar-track: var(--gray-900);
+  --scrollbar-track: var(--black);
   --scrollbar-thumb-primary: var(--primary-purple-dark);
   --scrollbar-thumb-secondary: var(--primary-purple);
   --scrollbar-thumb-hover-primary: var(--primary-purple-light);
   --scrollbar-thumb-hover-secondary: var(--primary-purple-lighter);
   --scrollbar-thumb-active-primary: var(--primary-purple-darker);
   --scrollbar-thumb-active-secondary: var(--primary-purple-dark);
-  --scrollbar-guitar-track: var(--guitar-border);
-  --scrollbar-guitar-track-secondary: var(--gray-900);
+  --scrollbar-guitar-track: var(--black);
+  --scrollbar-guitar-track-secondary: var(--black);
   --scrollbar-guitar-thumb-primary: var(--primary-purple);
   --scrollbar-guitar-thumb-secondary: var(--primary-purple-dark);
   --scrollbar-guitar-thumb-border: var(--primary-purple-light);

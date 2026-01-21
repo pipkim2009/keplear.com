@@ -32,7 +32,7 @@
   margin: 4px;
   border: 4px solid transparent;
   border-radius: 50%;
-  border-top-color: #7c3aed;
+  border-top-color: var(--purple-500);
   animation: spinnerRing 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }
 
@@ -60,16 +60,8 @@
 .loadingText {
   font-size: 14px;
   font-weight: 500;
-  color: #7c3aed;
+  color: var(--purple-500);
   opacity: 0.8;
-}
-
-:global(.dark) .spinnerRing div {
-  border-top-color: #a78bfa;
-}
-
-:global(.dark) .loadingText {
-  color: #a78bfa;
 }
 
 /* Reduced motion support */

@@ -793,7 +793,7 @@ input:checked + .toggle-slider:hover {
 }
 
 .applied-scales-list::-webkit-scrollbar-track {
-  background: rgb(0, 0, 0, 0.2);
+  background: var(--black);
   border-radius: 2px;
 }
 
@@ -880,7 +880,7 @@ input:checked + .toggle-slider:hover {
 }
 
 .applied-chords-list::-webkit-scrollbar-track {
-  background: rgb(0, 0, 0, 0.2);
+  background: var(--black);
   border-radius: 2px;
 }
 

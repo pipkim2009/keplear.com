@@ -761,7 +761,7 @@
 }
 
 .bass-container::-webkit-scrollbar-track {
-  background: linear-gradient(145deg, var(--dark-bg-secondary), var(--dark-bg-tertiary));
+  background: var(--black);
   border-radius: 6px;
 }
 

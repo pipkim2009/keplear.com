@@ -18,14 +18,6 @@
   animation: fadeIn 0.2s ease-out;
 }
 
-:global(.dark) .modalOverlay {
-  background: linear-gradient(135deg,
-    rgb(18, 18, 18, 0.9) 0%,
-    rgb(30, 30, 30, 0.8) 30%,
-    rgb(40, 40, 40, 0.9) 70%,
-    rgb(18, 18, 18, 0.9) 100%);
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -65,7 +57,7 @@
   height: 40px;
   font-size: 20px;
   cursor: pointer;
-  color: #f8f9fa;
+  color: var(--gray-200);
   z-index: 10;
   display: flex;
   align-items: center;
@@ -96,7 +88,7 @@
 .modalTitle {
   font-size: 28px;
   font-weight: 700;
-  color: #f8f9fa;
+  color: var(--gray-200);
   margin: 0 0 12px 0;
   text-align: center;
 }
@@ -142,7 +134,7 @@
   background: rgb(255, 255, 255, 0.08);
   border: 2px solid rgb(117, 26, 255, 0.3);
   border-radius: 12px;
-  color: #f8f9fa;
+  color: var(--gray-200);
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
@@ -157,13 +149,13 @@
 
 .select:focus {
   outline: none;
-  border-color: #751aff;
+  border-color: var(--primary-purple);
   box-shadow: 0 0 0 3px rgb(117, 26, 255, 0.2);
 }
 
 .select option {
-  background: #2a2a2a;
-  color: #f8f9fa;
+  background: var(--gray-900);
+  color: var(--gray-200);
   padding: 12px;
 }
 
@@ -208,13 +200,13 @@
 }
 
 .switchOptionActive {
-  background: linear-gradient(135deg, #751aff, #9d5cff);
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-light));
   color: white;
   font-weight: 600;
 }
 
 .switchOptionActive:hover {
-  background: linear-gradient(135deg, #8533ff, #a66dff);
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-light));
   color: white;
 }
 
@@ -231,7 +223,7 @@
 
 /* Difficulty Slider */
 .difficultyValue {
-  color: #a78bfa;
+  color: var(--purple-500);
   font-weight: 700;
 }
 
@@ -244,7 +236,7 @@
   width: 100%;
   height: 8px;
   border-radius: 4px;
-  background: rgb(255, 255, 255, 0.1);
+  background: var(--black);
   appearance: none;
   cursor: pointer;
   margin-bottom: 12px;
@@ -255,8 +247,8 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #751aff, #9d5cff);
-  border: 3px solid #f8f9fa;
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-light));
+  border: 3px solid var(--gray-200);
   cursor: pointer;
   box-shadow: 0 2px 8px rgb(117, 26, 255, 0.4);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -271,8 +263,8 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #751aff, #9d5cff);
-  border: 3px solid #f8f9fa;
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-light));
+  border: 3px solid var(--gray-200);
   cursor: pointer;
   box-shadow: 0 2px 8px rgb(117, 26, 255, 0.4);
 }
@@ -280,7 +272,7 @@
 .slider::-moz-range-track {
   height: 8px;
   border-radius: 4px;
-  background: rgb(255, 255, 255, 0.1);
+  background: var(--black);
 }
 
 
@@ -289,7 +281,7 @@
   position: relative;
   height: 8px;
   margin-bottom: 12px;
-  background: rgb(255, 255, 255, 0.1);
+  background: var(--black);
   border-radius: 4px;
 }
 
@@ -298,7 +290,7 @@
   position: absolute;
   top: 0;
   height: 100%;
-  background: linear-gradient(135deg, #751aff, #9d5cff);
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-light));
   border-radius: 4px;
   pointer-events: none;
 }
@@ -320,8 +312,8 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #751aff, #9d5cff);
-  border: 3px solid #f8f9fa;
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-light));
+  border: 3px solid var(--gray-200);
   cursor: pointer;
   pointer-events: auto;
   box-shadow: 0 2px 8px rgb(117, 26, 255, 0.4);
@@ -337,8 +329,8 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #751aff, #9d5cff);
-  border: 3px solid #f8f9fa;
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-light));
+  border: 3px solid var(--gray-200);
   cursor: pointer;
   pointer-events: auto;
   box-shadow: 0 2px 8px rgb(117, 26, 255, 0.4);
@@ -376,7 +368,7 @@
 }
 
 .sliderLabel.activeLabel {
-  color: #a78bfa;
+  color: var(--purple-500);
   font-weight: 600;
 }
 
@@ -482,8 +474,8 @@
 }
 
 .checkbox:checked {
-  background: linear-gradient(135deg, #751aff, #9d5cff);
-  border-color: #751aff;
+  background: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-light));
+  border-color: var(--primary-purple);
 }
 
 .checkbox:checked::after {
@@ -511,9 +503,9 @@
 .previewButton {
   padding: 14px 24px;
   background: transparent;
-  border: 2px solid #6600cc;
+  border: 2px solid var(--primary-purple-darker);
   border-radius: 12px;
-  color: #6600cc;
+  color: var(--primary-purple-darker);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -534,19 +526,10 @@
   cursor: not-allowed;
 }
 
-:global(.dark) .previewButton {
-  border-color: #a855f7;
-  color: #a855f7;
-}
-
-:global(.dark) .previewButton:hover:not(:disabled) {
-  background: rgba(168, 85, 247, 0.1);
-}
-
 /* Start Button */
 .startButton {
   padding: 14px 28px;
-  background: #6600cc;
+  background: var(--primary-purple-darker);
   border: none;
   border-radius: 12px;
   color: white;
@@ -562,7 +545,7 @@
 }
 
 .startButton:hover:not(:disabled) {
-  background: #5a0fd6;
+  background: var(--primary-purple-dark);
 }
 
 .startButton:disabled {

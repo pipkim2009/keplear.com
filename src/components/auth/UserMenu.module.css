@@ -9,10 +9,10 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: rgb(255, 255, 255, 0.95);
-  border: 2px solid rgb(210, 210, 249, 0.3);
+  background: rgb(40, 40, 40, 0.95);
+  border: 2px solid rgb(117, 26, 255, 0.3);
   border-radius: 12px;
-  color: #7c3aed;
+  color: var(--gray-200);
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
@@ -20,17 +20,6 @@
 }
 
 .userMenuTrigger:hover {
-  background: rgb(230, 230, 230, 1);
-}
-
-/* Dark mode overrides */
-:global(.dark) .userMenuTrigger {
-  background: rgb(40, 40, 40, 0.95);
-  border-color: rgb(117, 26, 255, 0.3);
-  color: #f8f9fa;
-}
-
-:global(.dark) .userMenuTrigger:hover {
   background: rgb(55, 55, 55, 1);
 }
 
@@ -52,7 +41,7 @@
 .avatarInitials {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
   color: white;
   display: flex;
   align-items: center;
@@ -83,9 +72,9 @@
   top: 100%;
   right: 0;
   margin-top: 8px;
-  background: rgb(255, 255, 255, 0.95);
+  background: rgb(40, 40, 40, 0.98);
   backdrop-filter: blur(10px);
-  border: 2px solid rgb(210, 210, 249, 0.3);
+  border: 2px solid rgb(117, 26, 255, 0.3);
   border-radius: 16px;
   min-width: 240px;
   overflow: hidden;
@@ -93,20 +82,10 @@
   animation: dropdownFadeIn 0.2s ease-out;
 }
 
-:global(.dark) .userMenuDropdown {
-  background: rgb(40, 40, 40, 0.98);
-  border-color: rgb(117, 26, 255, 0.3);
-}
-
 .userMenuHeader {
   padding: 20px;
-  background: linear-gradient(135deg, rgb(232, 228, 255, 0.8), rgb(210, 210, 249, 0.6));
-  border-bottom: 1px solid rgb(210, 210, 249, 0.3);
-}
-
-:global(.dark) .userMenuHeader {
   background: linear-gradient(135deg, rgb(50, 50, 50, 0.8), rgb(30, 30, 30, 0.6));
-  border-bottom-color: rgb(117, 26, 255, 0.2);
+  border-bottom: 1px solid rgb(117, 26, 255, 0.2);
 }
 
 .userInfo {
@@ -115,28 +94,20 @@
 
 .userNameLarge {
   font-weight: 700;
-  color: #7c3aed;
+  color: var(--purple-100);
   font-size: 16px;
   margin-bottom: 4px;
 }
 
-:global(.dark) .userNameLarge {
-  color: #d2d2f9;
-}
-
 .userEmail {
-  color: #a855f7;
+  color: var(--purple-100);
   font-size: 13px;
   font-weight: 500;
 }
 
-:global(.dark) .userEmail {
-  color: #d8b4fe;
-}
-
 .userMenuDivider {
   height: 1px;
-  background: #e1e5e9;
+  background: var(--gray-700);
 }
 
 .userMenuActions {
@@ -151,7 +122,7 @@
   padding: 14px 20px;
   background: none;
   border: none;
-  color: #7c3aed;
+  color: var(--purple-100);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -159,31 +130,15 @@
   text-align: left;
 }
 
-:global(.dark) .menuItem {
-  color: #d2d2f9;
-}
-
 .menuItem:hover {
-  background: rgb(232, 228, 255, 0.8);
-}
-
-:global(.dark) .menuItem:hover {
   background: rgb(60, 60, 60, 0.8);
 }
 
 .menuItem.danger {
-  color: #dc2626;
-}
-
-:global(.dark) .menuItem.danger {
-  color: #fca5a5;
+  color: var(--red-100);
 }
 
 .menuItem.danger:hover {
-  background: rgb(220, 38, 38, 0.1);
-}
-
-:global(.dark) .menuItem.danger:hover {
   background: rgb(220, 38, 38, 0.2);
 }
 

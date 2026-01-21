@@ -38,24 +38,13 @@
   line-height: 1.2;
 }
 
-:global(.dark) .pageTitle {
-  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 .pageSubtitle {
   font-size: 1.25rem;
   font-weight: 500;
-  color: var(--light-text-secondary);
+  color: var(--dark-text-secondary);
   margin: 0;
   max-width: 700px;
   line-height: 1.6;
-}
-
-:global(.dark) .pageSubtitle {
-  color: var(--dark-text-secondary);
 }
 
 /* ========================================
@@ -79,12 +68,8 @@
 .sectionTitle {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--light-text-primary);
-  margin: 0;
-}
-
-:global(.dark) .sectionTitle {
   color: var(--dark-text-primary);
+  margin: 0;
 }
 
 /* ========================================
@@ -103,29 +88,19 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: #9333ea;
+  background: var(--purple-700);
   color: white;
   box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
 }
 
-:global(.dark) .addButton {
-  background: #a855f7;
-  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
-}
-
 .addButton:hover {
-  background: #a855f7;
+  background: var(--purple-500);
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
 }
 
-:global(.dark) .addButton:hover {
-  background: #c084fc;
-  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
-}
-
 .addButton:focus-visible {
-  outline: 3px solid #9333ea;
+  outline: 3px solid var(--purple-700);
   outline-offset: 2px;
 }
 
@@ -141,28 +116,19 @@
 
 .joinClassButton {
   padding: 0.625rem 1.25rem;
-  border: 2px solid #9333ea;
+  border: 2px solid var(--purple-700);
   border-radius: 10px;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   background: transparent;
-  color: #9333ea;
-}
-
-:global(.dark) .joinClassButton {
-  border-color: #a855f7;
-  color: #a855f7;
+  color: var(--purple-700);
 }
 
 .joinClassButton:hover {
   background: rgba(147, 51, 234, 0.15);
   transform: translateY(-1px);
-}
-
-:global(.dark) .joinClassButton:hover {
-  background: rgba(168, 85, 247, 0.25);
 }
 
 .createButton {
@@ -173,25 +139,15 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: #9333ea;
+  background: var(--purple-700);
   color: white;
   box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
 }
 
-:global(.dark) .createButton {
-  background: #a855f7;
-  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
-}
-
 .createButton:hover {
-  background: #a855f7;
+  background: var(--purple-500);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
-}
-
-:global(.dark) .createButton:hover {
-  background: #c084fc;
-  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
 }
 
 /* ========================================
@@ -231,18 +187,9 @@
   position: relative;
 }
 
-:global(.dark) .checkbox {
-  border-color: rgb(120, 120, 120, 0.6);
-}
-
 .checkbox:checked {
-  background: #9333ea;
-  border-color: #9333ea;
-}
-
-:global(.dark) .checkbox:checked {
-  background: #a855f7;
-  border-color: #a855f7;
+  background: var(--purple-700);
+  border-color: var(--purple-700);
 }
 
 .checkbox:checked::after {
@@ -264,12 +211,8 @@
 
 .checkboxText {
   font-size: 0.9375rem;
-  color: #9333ea;
+  color: var(--purple-700);
   line-height: 1.4;
-}
-
-:global(.dark) .checkboxText {
-  color: #f8f9fa;
 }
 
 /* ========================================
@@ -306,11 +249,6 @@
   letter-spacing: 0.025em;
 }
 
-:global(.dark) .privateTag {
-  background: rgba(239, 68, 68, 0.2);
-  color: rgb(252, 165, 165);
-}
-
 .publicTag {
   display: inline-block;
   padding: 0.25rem 0.5rem;
@@ -321,11 +259,6 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.025em;
-}
-
-:global(.dark) .publicTag {
-  background: rgba(34, 197, 94, 0.2);
-  color: rgb(134, 239, 172);
 }
 
 .tagGroup {
@@ -347,11 +280,6 @@
   letter-spacing: 0.025em;
 }
 
-:global(.dark) .ownerTag {
-  background: rgba(147, 51, 234, 0.25);
-  color: var(--primary-purple-light);
-}
-
 .studentTag {
   display: inline-block;
   padding: 0.25rem 0.5rem;
@@ -362,11 +290,6 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.025em;
-}
-
-:global(.dark) .studentTag {
-  background: rgba(59, 130, 246, 0.2);
-  color: rgb(147, 197, 253);
 }
 
 /* ========================================
@@ -384,17 +307,9 @@
   border: 1px dashed var(--primary-purple-alpha-50);
 }
 
-:global(.dark) .joinCodeDisplay {
-  background: var(--primary-purple-alpha-15);
-}
-
 .joinCodeLabel {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--light-text-secondary);
-}
-
-:global(.dark) .joinCodeLabel {
   color: var(--dark-text-secondary);
 }
 
@@ -407,11 +322,6 @@
   background: var(--white-alpha-80);
   padding: 0.25rem 0.75rem;
   border-radius: 6px;
-}
-
-:global(.dark) .joinCodeValue {
-  color: var(--primary-purple-light);
-  background: rgba(0, 0, 0, 0.3);
 }
 
 .copyCodeButton {
@@ -434,23 +344,9 @@
   transform: scale(1.05);
 }
 
-:global(.dark) .copyCodeButton {
-  background: var(--primary-purple-alpha-25);
-  color: var(--primary-purple-light);
-}
-
-:global(.dark) .copyCodeButton:hover {
-  background: var(--primary-purple-alpha-35);
-}
-
 .copyCodeButton.copied {
   background: rgba(34, 197, 94, 0.2);
   color: rgb(22, 163, 74);
-}
-
-:global(.dark) .copyCodeButton.copied {
-  background: rgba(34, 197, 94, 0.3);
-  color: rgb(134, 239, 172);
 }
 
 /* ========================================
@@ -472,10 +368,6 @@
   pointer-events: none;
 }
 
-:global(.dark) .searchIcon {
-  color: var(--dark-text-tertiary);
-}
-
 .searchInput {
   width: 100%;
   padding: 0.75rem 2.5rem 0.75rem 2.75rem;
@@ -486,14 +378,8 @@
   transition: all 0.3s ease;
   background: rgb(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
-  color: #9333ea;
+  color: var(--purple-700);
   box-sizing: border-box;
-}
-
-:global(.dark) .searchInput {
-  background: rgb(60, 60, 60, 0.8);
-  border-color: rgb(80, 80, 80, 0.4);
-  color: #f8f9fa;
 }
 
 .searchInput::placeholder {
@@ -501,20 +387,11 @@
   font-weight: 500;
 }
 
-:global(.dark) .searchInput::placeholder {
-  color: rgb(248, 249, 250, 0.6);
-}
-
 .searchInput:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--blue-500);
   background: rgb(255, 255, 255, 0.95);
   transform: translateY(-2px);
-}
-
-:global(.dark) .searchInput:focus {
-  border-color: #3b82f6;
-  background: rgb(70, 70, 70, 0.9);
 }
 
 .searchClear {
@@ -541,14 +418,6 @@
 .searchClear:hover {
   opacity: 1;
   background: var(--primary-purple);
-}
-
-:global(.dark) .searchClear {
-  background: var(--dark-text-tertiary);
-}
-
-:global(.dark) .searchClear:hover {
-  background: var(--primary-purple-light);
 }
 
 /* ========================================
@@ -580,19 +449,10 @@
   cursor: pointer;
 }
 
-:global(.dark) .classCard {
-  background: linear-gradient(135deg, rgb(30, 30, 35, 0.95) 0%, rgb(45, 40, 60, 0.9) 100%);
-  border: 1px solid rgb(147, 51, 234, 0.2);
-}
-
 .classCard:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(147, 51, 234, 0.15);
   border-color: var(--primary-purple-alpha-50);
-}
-
-:global(.dark) .classCard:hover {
-  box-shadow: 0 8px 25px rgba(147, 51, 234, 0.25);
 }
 
 .classCardHeader {
@@ -605,13 +465,9 @@
 .classTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--light-text-primary);
+  color: var(--dark-text-primary);
   margin: 0;
   flex: 1;
-}
-
-:global(.dark) .classTitle {
-  color: var(--dark-text-primary);
 }
 
 .deleteButton {
@@ -636,24 +492,11 @@
   transform: scale(1.1);
 }
 
-:global(.dark) .deleteButton {
-  background: rgba(239, 68, 68, 0.2);
-  color: rgb(252, 165, 165);
-}
-
-:global(.dark) .deleteButton:hover {
-  background: rgba(239, 68, 68, 0.3);
-}
-
 .classAuthor {
   font-size: 0.9375rem;
   font-weight: 600;
   color: var(--primary-purple);
   margin: 0;
-}
-
-:global(.dark) .classAuthor {
-  color: var(--primary-purple-light);
 }
 
 .classMeta {
@@ -662,23 +505,15 @@
   margin: 0;
 }
 
-:global(.dark) .classMeta {
-  color: var(--dark-text-tertiary);
-}
-
 .classDescription {
   font-size: 0.875rem;
-  color: var(--light-text-secondary);
+  color: var(--dark-text-secondary);
   margin: 0.25rem 0 0 0;
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-:global(.dark) .classDescription {
-  color: var(--dark-text-secondary);
 }
 
 /* ========================================
@@ -706,29 +541,14 @@
   color: rgb(59, 130, 246);
 }
 
-:global(.dark) .instrumentKeyboard {
-  background: rgba(59, 130, 246, 0.25);
-  color: rgb(147, 197, 253);
-}
-
 .instrumentGuitar {
   background: rgba(34, 197, 94, 0.15);
   color: rgb(22, 163, 74);
 }
 
-:global(.dark) .instrumentGuitar {
-  background: rgba(34, 197, 94, 0.25);
-  color: rgb(134, 239, 172);
-}
-
 .instrumentBass {
   background: rgba(239, 68, 68, 0.15);
   color: rgb(220, 38, 38);
-}
-
-:global(.dark) .instrumentBass {
-  background: rgba(239, 68, 68, 0.25);
-  color: rgb(252, 165, 165);
 }
 
 /* ========================================
@@ -741,19 +561,11 @@
   border-top: 1px solid rgb(210, 210, 249, 0.2);
 }
 
-:global(.dark) .studentsSection {
-  border-top-color: rgb(210, 210, 249, 0.1);
-}
-
 .studentCount {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--light-text-secondary);
-  margin: 0 0 0.5rem 0;
-}
-
-:global(.dark) .studentCount {
   color: var(--dark-text-secondary);
+  margin: 0 0 0.5rem 0;
 }
 
 .studentsList {
@@ -772,11 +584,6 @@
   font-weight: 600;
 }
 
-:global(.dark) .studentTag {
-  background: var(--primary-purple-alpha-25);
-  color: var(--primary-purple-light);
-}
-
 /* ========================================
    JOIN/LEAVE BUTTONS
    ======================================== */
@@ -791,22 +598,14 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: #9333ea;
+  background: var(--purple-700);
   color: white;
 }
 
-:global(.dark) .joinButton {
-  background: #a855f7;
-}
-
 .joinButton:hover:not(:disabled) {
-  background: #a855f7;
+  background: var(--purple-500);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
-}
-
-:global(.dark) .joinButton:hover:not(:disabled) {
-  background: #c084fc;
 }
 
 .joinButton:disabled {
@@ -828,19 +627,9 @@
   color: rgb(220, 38, 38);
 }
 
-:global(.dark) .leaveButton {
-  background: rgba(239, 68, 68, 0.15);
-  border-color: rgb(239, 68, 68, 0.3);
-  color: rgb(252, 165, 165);
-}
-
 .leaveButton:hover:not(:disabled) {
   background: rgba(239, 68, 68, 0.2);
   border-color: rgb(239, 68, 68, 0.6);
-}
-
-:global(.dark) .leaveButton:hover:not(:disabled) {
-  background: rgba(239, 68, 68, 0.25);
 }
 
 .leaveButton:disabled {
@@ -858,10 +647,6 @@
   border-top: 1px solid rgb(210, 210, 249, 0.2);
 }
 
-:global(.dark) .assignmentsSection {
-  border-top-color: rgb(210, 210, 249, 0.1);
-}
-
 .assignmentsHeader {
   display: flex;
   justify-content: space-between;
@@ -872,12 +657,8 @@
 .assignmentsLabel {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: var(--light-text-secondary);
-  margin: 0;
-}
-
-:global(.dark) .assignmentsLabel {
   color: var(--dark-text-secondary);
+  margin: 0;
 }
 
 .addAssignmentButton {
@@ -892,17 +673,8 @@
   color: var(--primary-purple);
 }
 
-:global(.dark) .addAssignmentButton {
-  background: var(--primary-purple-alpha-25);
-  color: var(--primary-purple-light);
-}
-
 .addAssignmentButton:hover {
   background: var(--primary-purple-alpha-25);
-}
-
-:global(.dark) .addAssignmentButton:hover {
-  background: var(--primary-purple-alpha-35);
 }
 
 .noAssignments {
@@ -910,10 +682,6 @@
   color: var(--light-text-tertiary);
   margin: 0;
   font-style: italic;
-}
-
-:global(.dark) .noAssignments {
-  color: var(--dark-text-tertiary);
 }
 
 .assignmentsList {
@@ -932,10 +700,6 @@
   gap: 0.5rem;
 }
 
-:global(.dark) .assignmentItem {
-  background: var(--primary-purple-alpha-15);
-}
-
 .assignmentInfo {
   display: flex;
   flex-direction: column;
@@ -947,24 +711,16 @@
 .assignmentTitle {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--light-text-primary);
+  color: var(--dark-text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-:global(.dark) .assignmentTitle {
-  color: var(--dark-text-primary);
 }
 
 .assignmentMeta {
   font-size: 0.6875rem;
   color: var(--light-text-tertiary);
   text-transform: capitalize;
-}
-
-:global(.dark) .assignmentMeta {
-  color: var(--dark-text-tertiary);
 }
 
 .assignmentActions {
@@ -982,22 +738,14 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: #9333ea;
+  background: var(--purple-700);
   color: white;
 }
 
-:global(.dark) .startAssignmentButton {
-  background: #a855f7;
-}
-
 .startAssignmentButton:hover {
-  background: #a855f7;
+  background: var(--purple-500);
   transform: scale(1.05);
   box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
-}
-
-:global(.dark) .startAssignmentButton:hover {
-  background: #c084fc;
 }
 
 .editAssignmentButton {
@@ -1022,15 +770,6 @@
   transform: scale(1.1);
 }
 
-:global(.dark) .editAssignmentButton {
-  background: rgba(59, 130, 246, 0.2);
-  color: rgb(147, 197, 253);
-}
-
-:global(.dark) .editAssignmentButton:hover {
-  background: rgba(59, 130, 246, 0.3);
-}
-
 .deleteAssignmentButton {
   display: flex;
   align-items: center;
@@ -1051,15 +790,6 @@
 .deleteAssignmentButton:hover {
   background: rgba(239, 68, 68, 0.2);
   transform: scale(1.1);
-}
-
-:global(.dark) .deleteAssignmentButton {
-  background: rgba(239, 68, 68, 0.2);
-  color: rgb(252, 165, 165);
-}
-
-:global(.dark) .deleteAssignmentButton:hover {
-  background: rgba(239, 68, 68, 0.3);
 }
 
 .viewCompletionsButton {
@@ -1084,15 +814,6 @@
   transform: scale(1.1);
 }
 
-:global(.dark) .viewCompletionsButton {
-  background: rgba(34, 197, 94, 0.2);
-  color: rgb(134, 239, 172);
-}
-
-:global(.dark) .viewCompletionsButton:hover {
-  background: rgba(34, 197, 94, 0.3);
-}
-
 /* ========================================
    EMPTY STATE
    ======================================== */
@@ -1108,19 +829,10 @@
   width: 100%;
 }
 
-:global(.dark) .emptyState {
-  background: linear-gradient(135deg, rgb(30, 30, 35, 0.7) 0%, rgb(45, 40, 60, 0.5) 100%);
-  border-color: rgb(147, 51, 234, 0.2);
-}
-
 .emptyStateText {
   font-size: 1.125rem;
-  color: var(--light-text-secondary);
-  margin: 0;
-}
-
-:global(.dark) .emptyStateText {
   color: var(--dark-text-secondary);
+  margin: 0;
 }
 
 /* ========================================
@@ -1143,14 +855,6 @@
   padding: 20px;
 }
 
-:global(.dark) .modalOverlay {
-  background: linear-gradient(135deg,
-    rgb(18, 18, 18, 0.9) 0%,
-    rgb(30, 30, 30, 0.8) 30%,
-    rgb(40, 40, 40, 0.9) 70%,
-    rgb(18, 18, 18, 0.9) 100%);
-}
-
 /* ========================================
    MODAL
    ======================================== */
@@ -1169,13 +873,6 @@
   animation: slideIn 0.3s ease-out;
 }
 
-:global(.dark) .modal {
-  background: linear-gradient(145deg,
-    rgb(40, 40, 40, 0.98) 0%,
-    rgb(30, 30, 30, 0.98) 100%);
-  border: 2px solid rgb(80, 80, 80, 0.3);
-}
-
 .modalHeader {
   display: flex;
   justify-content: space-between;
@@ -1186,12 +883,8 @@
 .modalTitle {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #9333ea;
+  color: var(--purple-700);
   margin: 0;
-}
-
-:global(.dark) .modalTitle {
-  color: #f8f9fa;
 }
 
 .closeButton {
@@ -1202,7 +895,7 @@
   height: 36px;
   font-size: 18px;
   cursor: pointer;
-  color: #9333ea;
+  color: var(--purple-700);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1214,16 +907,6 @@
 
 .closeButton:hover {
   background: rgb(255, 255, 255, 0.3);
-}
-
-:global(.dark) .closeButton {
-  background: rgb(0, 0, 0, 0.3);
-  border-color: rgb(255, 255, 255, 0.3);
-  color: #f8f9fa;
-}
-
-:global(.dark) .closeButton:hover {
-  background: rgb(0, 0, 0, 0.5);
 }
 
 /* ========================================
@@ -1244,12 +927,8 @@
 
 .formLabel {
   font-weight: 700;
-  color: #9333ea;
+  color: var(--purple-700);
   font-size: 0.9375rem;
-}
-
-:global(.dark) .formLabel {
-  color: #f8f9fa;
 }
 
 .formInput {
@@ -1262,14 +941,8 @@
   transition: all 0.3s ease;
   background: rgb(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
-  color: #9333ea;
+  color: var(--purple-700);
   box-sizing: border-box;
-}
-
-:global(.dark) .formInput {
-  background: rgb(60, 60, 60, 0.8);
-  border-color: rgb(80, 80, 80, 0.4);
-  color: #f8f9fa;
 }
 
 .formInput::placeholder {
@@ -1277,20 +950,11 @@
   font-weight: 500;
 }
 
-:global(.dark) .formInput::placeholder {
-  color: rgb(248, 249, 250, 0.6);
-}
-
 .formInput:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--blue-500);
   background: rgb(255, 255, 255, 0.95);
   transform: translateY(-2px);
-}
-
-:global(.dark) .formInput:focus {
-  border-color: #3b82f6;
-  background: rgb(70, 70, 70, 0.9);
 }
 
 .formTextarea {
@@ -1304,16 +968,10 @@
   transition: all 0.3s ease;
   background: rgb(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
-  color: #9333ea;
+  color: var(--purple-700);
   box-sizing: border-box;
   resize: vertical;
   min-height: 80px;
-}
-
-:global(.dark) .formTextarea {
-  background: rgb(60, 60, 60, 0.8);
-  border-color: rgb(80, 80, 80, 0.4);
-  color: #f8f9fa;
 }
 
 .formTextarea::placeholder {
@@ -1321,19 +979,10 @@
   font-weight: 500;
 }
 
-:global(.dark) .formTextarea::placeholder {
-  color: rgb(248, 249, 250, 0.6);
-}
-
 .formTextarea:focus {
   outline: none;
-  border-color: #3b82f6;
+  border-color: var(--blue-500);
   background: rgb(255, 255, 255, 0.95);
-}
-
-:global(.dark) .formTextarea:focus {
-  border-color: #3b82f6;
-  background: rgb(70, 70, 70, 0.9);
 }
 
 .formTextarea:disabled {
@@ -1354,23 +1003,15 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: #9333ea;
+  background: var(--purple-700);
   color: white;
   margin-top: 0.5rem;
 }
 
-:global(.dark) .submitButton {
-  background: #a855f7;
-}
-
 .submitButton:hover:not(:disabled) {
-  background: #a855f7;
+  background: var(--purple-500);
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
-}
-
-:global(.dark) .submitButton:hover:not(:disabled) {
-  background: #c084fc;
 }
 
 .submitButton:disabled {
@@ -1384,18 +1025,12 @@
    ======================================== */
 
 .errorMessage {
-  background: #fee2e2;
-  color: #dc2626;
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--red-500);
   padding: 0.75rem 1rem;
   border-radius: 8px;
   font-size: 0.875rem;
-  border: 1px solid #fecaca;
-}
-
-:global(.dark) .errorMessage {
-  background: rgb(239, 68, 68, 0.1);
-  color: #fca5a5;
-  border-color: rgb(239, 68, 68, 0.3);
+  border: 1px solid var(--red-100);
 }
 
 /* ========================================
@@ -1405,10 +1040,6 @@
 .loadingState {
   text-align: center;
   padding: 2rem;
-  color: var(--light-text-secondary);
-}
-
-:global(.dark) .loadingState {
   color: var(--dark-text-secondary);
 }
 
@@ -1454,19 +1085,10 @@
   cursor: pointer;
 }
 
-:global(.dark) .classCardClickable {
-  background: linear-gradient(135deg, rgb(30, 30, 35, 0.95) 0%, rgb(45, 40, 60, 0.9) 100%);
-  border: 1px solid rgb(147, 51, 234, 0.2);
-}
-
 .classCardClickable:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 30px rgba(147, 51, 234, 0.2);
   border-color: var(--primary-purple-alpha-50);
-}
-
-:global(.dark) .classCardClickable:hover {
-  box-shadow: 0 12px 30px rgba(147, 51, 234, 0.3);
 }
 
 .classCardStats {
@@ -1478,26 +1100,14 @@
   border-top: 1px solid rgb(210, 210, 249, 0.2);
 }
 
-:global(.dark) .classCardStats {
-  border-top-color: rgb(210, 210, 249, 0.1);
-}
-
 .statItem {
   font-size: 0.8125rem;
   color: var(--light-text-tertiary);
 }
 
-:global(.dark) .statItem {
-  color: var(--dark-text-tertiary);
-}
-
 .statDivider {
   color: var(--light-text-tertiary);
   opacity: 0.5;
-}
-
-:global(.dark) .statDivider {
-  color: var(--dark-text-tertiary);
 }
 
 /* ========================================
@@ -1522,13 +1132,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   background: rgba(0, 0, 0, 0.08);
-  color: #374151;
+  color: var(--gray-700);
   margin-bottom: 1.5rem;
-}
-
-:global(.dark) .backButtonCircle {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
 }
 
 .backButtonCircle:hover {
@@ -1537,19 +1142,10 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-:global(.dark) .backButtonCircle:hover {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-}
-
 .fullPageHeader {
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid rgb(210, 210, 249, 0.2);
-}
-
-:global(.dark) .fullPageHeader {
-  border-bottom-color: rgb(210, 210, 249, 0.1);
 }
 
 .fullPageTitleRow {
@@ -1569,22 +1165,11 @@
   background-clip: text;
 }
 
-:global(.dark) .fullPageTitle {
-  background: linear-gradient(135deg, var(--primary-purple-light) 0%, var(--primary-purple-lighter) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 .fullPageAuthor {
   font-size: 1.125rem;
   font-weight: 600;
   color: var(--primary-purple);
   margin: 0;
-}
-
-:global(.dark) .fullPageAuthor {
-  color: var(--primary-purple-light);
 }
 
 .fullPageMeta {
@@ -1593,20 +1178,12 @@
   margin: 0.25rem 0 0 0;
 }
 
-:global(.dark) .fullPageMeta {
-  color: var(--dark-text-tertiary);
-}
-
 .fullPageDescription {
   font-size: 1rem;
-  color: var(--light-text-secondary);
+  color: var(--dark-text-secondary);
   margin: 0.75rem 0 0 0;
   line-height: 1.6;
   max-width: 600px;
-}
-
-:global(.dark) .fullPageDescription {
-  color: var(--dark-text-secondary);
 }
 
 /* ========================================
@@ -1639,15 +1216,6 @@
   transform: scale(1.1);
 }
 
-:global(.dark) .editButton {
-  background: var(--primary-purple-alpha-25);
-  color: var(--primary-purple-light);
-}
-
-:global(.dark) .editButton:hover {
-  background: var(--primary-purple-alpha-35);
-}
-
 .editFormGroup {
   display: flex;
   flex-direction: column;
@@ -1658,10 +1226,6 @@
 .editLabel {
   font-weight: 600;
   font-size: 0.875rem;
-  color: var(--light-text-secondary);
-}
-
-:global(.dark) .editLabel {
   color: var(--dark-text-secondary);
 }
 
@@ -1678,28 +1242,14 @@
   box-sizing: border-box;
 }
 
-:global(.dark) .editInput {
-  background: rgb(60, 60, 60, 0.8);
-  border-color: rgb(80, 80, 80, 0.4);
-  color: var(--dark-text-primary);
-}
-
 .editInput:focus {
   outline: none;
   border-color: var(--primary-purple);
 }
 
-:global(.dark) .editInput:focus {
-  border-color: var(--primary-purple-light);
-}
-
 .editInput::placeholder {
   color: rgb(147, 51, 234, 0.5);
   font-weight: 500;
-}
-
-:global(.dark) .editInput::placeholder {
-  color: rgb(248, 249, 250, 0.5);
 }
 
 .editInput:disabled {
@@ -1717,16 +1267,10 @@
   font-family: inherit;
   transition: all 0.2s ease;
   background: var(--white-alpha-80);
-  color: var(--light-text-primary);
+  color: var(--dark-text-primary);
   box-sizing: border-box;
   resize: vertical;
   min-height: 80px;
-}
-
-:global(.dark) .editTextarea {
-  background: rgb(60, 60, 60, 0.8);
-  border-color: rgb(80, 80, 80, 0.4);
-  color: var(--dark-text-primary);
 }
 
 .editTextarea:focus {
@@ -1734,17 +1278,9 @@
   border-color: var(--primary-purple);
 }
 
-:global(.dark) .editTextarea:focus {
-  border-color: var(--primary-purple-light);
-}
-
 .editTextarea::placeholder {
   color: rgb(147, 51, 234, 0.5);
   font-weight: 500;
-}
-
-:global(.dark) .editTextarea::placeholder {
-  color: rgb(248, 249, 250, 0.5);
 }
 
 .editTextarea:disabled {
@@ -1767,22 +1303,12 @@
   cursor: pointer;
   transition: all 0.2s ease;
   background: transparent;
-  color: var(--light-text-secondary);
-}
-
-:global(.dark) .editCancelButton {
-  border-color: rgb(80, 80, 80, 0.4);
   color: var(--dark-text-secondary);
 }
 
 .editCancelButton:hover:not(:disabled) {
   background: rgba(0, 0, 0, 0.05);
   border-color: rgb(210, 210, 249, 0.6);
-}
-
-:global(.dark) .editCancelButton:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgb(80, 80, 80, 0.6);
 }
 
 .editCancelButton:disabled {
@@ -1798,22 +1324,14 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: #9333ea;
+  background: var(--purple-700);
   color: white;
 }
 
-:global(.dark) .editSaveButton {
-  background: #a855f7;
-}
-
 .editSaveButton:hover:not(:disabled) {
-  background: #a855f7;
+  background: var(--purple-500);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
-}
-
-:global(.dark) .editSaveButton:hover:not(:disabled) {
-  background: #c084fc;
 }
 
 .editSaveButton:disabled {
@@ -1836,11 +1354,6 @@
   padding: 1.5rem;
 }
 
-:global(.dark) .fullPageColumn {
-  background: linear-gradient(135deg, rgb(30, 30, 35, 0.95) 0%, rgb(45, 40, 60, 0.9) 100%);
-  border: 1px solid rgb(147, 51, 234, 0.2);
-}
-
 .fullPageSectionHeader {
   display: flex;
   justify-content: space-between;
@@ -1850,19 +1363,11 @@
   border-bottom: 1px solid rgb(210, 210, 249, 0.2);
 }
 
-:global(.dark) .fullPageSectionHeader {
-  border-bottom-color: rgb(210, 210, 249, 0.1);
-}
-
 .fullPageSectionTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--light-text-primary);
-  margin: 0;
-}
-
-:global(.dark) .fullPageSectionTitle {
   color: var(--dark-text-primary);
+  margin: 0;
 }
 
 .fullPageCount {
@@ -1879,20 +1384,11 @@
   color: var(--primary-purple);
 }
 
-:global(.dark) .fullPageCount {
-  background: var(--primary-purple-alpha-25);
-  color: var(--primary-purple-light);
-}
-
 .fullPageEmpty {
   font-size: 0.9375rem;
   color: var(--light-text-tertiary);
   font-style: italic;
   margin: 0;
-}
-
-:global(.dark) .fullPageEmpty {
-  color: var(--dark-text-tertiary);
 }
 
 .fullPageStudentsList {
@@ -1914,10 +1410,6 @@
   background: var(--primary-purple-alpha-10);
 }
 
-:global(.dark) .fullPageStudentItem:hover {
-  background: var(--primary-purple-alpha-15);
-}
-
 .studentAvatar {
   width: 36px;
   height: 36px;
@@ -1934,12 +1426,8 @@
 .studentName {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--light-text-primary);
-  flex: 1;
-}
-
-:global(.dark) .studentName {
   color: var(--dark-text-primary);
+  flex: 1;
 }
 
 .removeStudentButton {
@@ -1964,15 +1452,6 @@
   transform: scale(1.1);
 }
 
-:global(.dark) .removeStudentButton {
-  background: rgba(239, 68, 68, 0.2);
-  color: rgb(252, 165, 165);
-}
-
-:global(.dark) .removeStudentButton:hover {
-  background: rgba(239, 68, 68, 0.3);
-}
-
 .addAssignmentButtonLarge {
   padding: 0.5rem 1rem;
   border: none;
@@ -1981,22 +1460,14 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: #9333ea;
+  background: var(--purple-700);
   color: white;
 }
 
-:global(.dark) .addAssignmentButtonLarge {
-  background: #a855f7;
-}
-
 .addAssignmentButtonLarge:hover {
-  background: #a855f7;
+  background: var(--purple-500);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(147, 51, 234, 0.3);
-}
-
-:global(.dark) .addAssignmentButtonLarge:hover {
-  background: #c084fc;
 }
 
 .fullPageAssignmentsList {
@@ -2016,10 +1487,6 @@
   gap: 1rem;
 }
 
-:global(.dark) .fullPageAssignmentItem {
-  background: var(--primary-purple-alpha-15);
-}
-
 .fullPageAssignmentInfo {
   flex: 1;
   min-width: 0;
@@ -2028,16 +1495,12 @@
 .fullPageAssignmentTitle {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--light-text-primary);
+  color: var(--dark-text-primary);
   margin: 0 0 0.5rem 0;
 }
 
-:global(.dark) .fullPageAssignmentTitle {
-  color: var(--dark-text-primary);
-}
-
 .completedTick {
-  color: #22c55e;
+  color: var(--green-500);
   margin-left: 0.5rem;
   vertical-align: middle;
 }
@@ -2052,21 +1515,17 @@
 .completionsListTitle {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--light-text-primary);
+  color: var(--dark-text-primary);
   margin: 0 0 0.75rem 0;
 }
 
-:global(.dark) .completionsListTitle {
-  color: var(--dark-text-primary);
-}
-
 .completedIcon {
-  color: #22c55e;
+  color: var(--green-500);
   flex-shrink: 0;
 }
 
 .notCompletedIcon {
-  color: #ef4444;
+  color: var(--red-500);
   flex-shrink: 0;
 }
 
@@ -2092,10 +1551,6 @@
   background: var(--primary-purple-alpha-10);
 }
 
-:global(.dark) .completionItem:hover {
-  background: var(--primary-purple-alpha-15);
-}
-
 .completionAvatar {
   width: 32px;
   height: 32px;
@@ -2114,10 +1569,6 @@
 .completionName {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--light-text-primary);
-}
-
-:global(.dark) .completionName {
   color: var(--dark-text-primary);
 }
 
@@ -2127,21 +1578,12 @@
   color: var(--light-text-tertiary);
 }
 
-:global(.dark) .completionDate {
-  color: var(--dark-text-tertiary);
-}
-
 .completionsLoading,
 .noCompletions {
   font-size: 0.875rem;
   color: var(--light-text-tertiary);
   margin: 0;
   font-style: italic;
-}
-
-:global(.dark) .completionsLoading,
-:global(.dark) .noCompletions {
-  color: var(--dark-text-tertiary);
 }
 
 .fullPageAssignmentDetails {
@@ -2157,13 +1599,8 @@
   border-radius: 6px;
   font-size: 0.75rem;
   font-weight: 500;
-  color: var(--light-text-secondary);
-  text-transform: capitalize;
-}
-
-:global(.dark) .assignmentDetailTag {
-  background: rgba(255, 255, 255, 0.1);
   color: var(--dark-text-secondary);
+  text-transform: capitalize;
 }
 
 .fullPageAssignmentActions {
@@ -2181,22 +1618,14 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: #9333ea;
+  background: var(--purple-700);
   color: white;
 }
 
-:global(.dark) .startAssignmentButtonLarge {
-  background: #a855f7;
-}
-
 .startAssignmentButtonLarge:hover {
-  background: #a855f7;
+  background: var(--purple-500);
   transform: translateY(-2px);
   box-shadow: 0 6px 15px rgba(147, 51, 234, 0.3);
-}
-
-:global(.dark) .startAssignmentButtonLarge:hover {
-  background: #c084fc;
 }
 
 /* ========================================

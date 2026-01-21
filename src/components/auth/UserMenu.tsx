@@ -106,7 +106,7 @@ const UserMenu = () => {
           <div className={authStyles.authBrand}>
             <img src={logo} alt="Keplear" className={authStyles.authLogo} />
           </div>
-          <h2 style={{ color: '#dc2626', marginBottom: '20px' }}>{t('auth.deleteAccountTitle')}</h2>
+          <h2 style={{ color: '#ef4444', marginBottom: '20px' }}>{t('auth.deleteAccountTitle')}</h2>
           <p className={authStyles.formDescription} style={{ marginBottom: '32px' }}>
             <strong>{t('auth.cannotBeUndone')}</strong> {t('auth.dataWillBeDeleted')}
           </p>
@@ -118,8 +118,8 @@ const UserMenu = () => {
                 width: 'auto',
                 minWidth: '120px',
                 background: 'transparent',
-                color: isDarkMode ? '#f8f9fa' : '#1b6940',
-                border: `2px solid ${isDarkMode ? '#f8f9fa' : '#1b6940'}`,
+                color: '#e5e7eb',
+                border: '2px solid #e5e7eb',
                 marginTop: 0
               }}
             >
@@ -131,8 +131,8 @@ const UserMenu = () => {
               style={{
                 width: 'auto',
                 minWidth: '120px',
-                background: '#dc2626',
-                border: '2px solid #dc2626',
+                background: '#ef4444',
+                border: '2px solid #ef4444',
                 marginTop: 0
               }}
               onMouseOver={(e) => {
@@ -140,8 +140,8 @@ const UserMenu = () => {
                 e.currentTarget.style.borderColor = '#b91c1c'
               }}
               onMouseOut={(e) => {
-                e.currentTarget.style.background = '#dc2626'
-                e.currentTarget.style.borderColor = '#dc2626'
+                e.currentTarget.style.background = '#ef4444'
+                e.currentTarget.style.borderColor = '#ef4444'
               }}
             >
               {t('auth.deleteAccount')}

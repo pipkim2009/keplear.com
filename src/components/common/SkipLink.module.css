@@ -7,13 +7,13 @@
   transform: translateX(-50%);
   z-index: 10000;
   padding: 12px 24px;
-  background: #7c3aed;
+  background: var(--purple-700);
   color: white;
   font-weight: 600;
   font-size: 14px;
   text-decoration: none;
   border-radius: 0 0 8px 8px;
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  box-shadow: 0 4px 12px rgba(76, 29, 149, 0.4);
   transition: top 0.2s ease-in-out;
 }
 
@@ -24,15 +24,6 @@
 
 .skipLink:focus-visible {
   top: 0;
-  outline: 3px solid #3b82f6;
+  outline: 3px solid var(--blue-500);
   outline-offset: 2px;
-}
-
-:global(.dark) .skipLink {
-  background: #4c1d95;
-  box-shadow: 0 4px 12px rgba(76, 29, 149, 0.4);
-}
-
-:global(.dark) .skipLink:focus-visible {
-  outline-color: #60a5fa;
 }
