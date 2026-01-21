@@ -77,6 +77,24 @@
 
   /*
     ===========================================
+    BORDER WIDTH SCALE
+    ===========================================
+  */
+  --border-0: 0;
+  --border-1: 1px;
+  --border-2: 2px;
+  --border-3: 3px;
+  --border-4: 4px;
+  --border-5: 5px;
+
+  /* Semantic Border Widths */
+  --border-thin: var(--border-1);
+  --border-default: var(--border-2);
+  --border-thick: var(--border-3);
+  --border-focus: var(--border-3);
+
+  /*
+    ===========================================
     BORDER RADIUS SCALE
     ===========================================
   */
