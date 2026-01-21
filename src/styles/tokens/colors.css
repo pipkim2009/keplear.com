@@ -59,26 +59,26 @@
   --blue-alpha-60: rgb(59, 130, 246, 0.6);
 
   /* ========================================
-     GREENS (5 base + alphas)
+     GREENS (3 base + alphas)
      ======================================== */
   --green-100: #86efac;
-  --green-300: #4ade80;
   --green-500: #22c55e;
   --green-700: #15803d;
-  --green-neon: #00b359;
+  --green-300: var(--green-100);
+  --green-neon: var(--green-500);
 
   --green-alpha-20: rgb(34, 197, 94, 0.2);
   --green-alpha-40: rgb(34, 197, 94, 0.4);
   --green-alpha-60: rgb(34, 197, 94, 0.6);
 
   /* ========================================
-     REDS (5 base + alphas)
+     REDS (3 base + alphas)
      ======================================== */
   --red-100: #fca5a5;
-  --red-300: #f87171;
   --red-500: #ef4444;
   --red-700: #b91c1c;
-  --red-900: #991b1b;
+  --red-300: var(--red-100);
+  --red-900: var(--red-700);
 
   --red-alpha-20: rgb(239, 68, 68, 0.2);
   --red-alpha-40: rgb(239, 68, 68, 0.4);
@@ -95,27 +95,27 @@
   --orange-alpha-50: rgb(249, 115, 22, 0.5);
 
   /* ========================================
-     AMBERS/YELLOWS (3 base)
+     AMBERS/YELLOWS (aliases to orange)
      ======================================== */
-  --amber-100: #fef3c7;
-  --amber-500: #f59e0b;
-  --amber-gold: #ffd700;
-  --amber-300: var(--amber-gold);
-  --amber-400: var(--amber-gold);
-  --yellow-400: var(--amber-gold);
+  --amber-100: var(--orange-300);
+  --amber-300: var(--orange-300);
+  --amber-400: var(--orange-500);
+  --amber-500: var(--orange-500);
+  --amber-gold: var(--orange-300);
+  --yellow-400: var(--orange-300);
 
-  --amber-alpha-60: rgb(245, 158, 11, 0.6);
-  --amber-alpha-80: rgb(245, 158, 11, 0.8);
+  --amber-alpha-60: var(--orange-alpha-50);
+  --amber-alpha-80: var(--orange-alpha-50);
 
   /* ========================================
-     PURPLES - SEMANTIC (6 base)
+     PURPLES - SEMANTIC (3 base)
      ======================================== */
   --purple-200: #e9d5ff;
-  --purple-300: #d8b4fe;
-  --purple-400: #c084fc;
   --purple-500: #a855f7;
   --purple-700: #9333ea;
-  --purple-indigo: #6366f1;
+  --purple-300: var(--purple-200);
+  --purple-400: var(--purple-500);
+  --purple-indigo: var(--purple-700);
 
   --purple-alpha-40: rgb(168, 85, 247, 0.4);
   --purple-alpha-60: rgb(168, 85, 247, 0.6);
