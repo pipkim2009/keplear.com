@@ -121,22 +121,17 @@
   --purple-alpha-60: rgb(168, 85, 247, 0.6);
 
   /* ========================================
-     GRAYS (15 base)
+     GRAYS (10 base)
      ======================================== */
   --white: #ffffff;
-  --gray-50: #f9fafb;
   --gray-100: #f3f4f6;
   --gray-200: #e5e7eb;
-  --gray-300: #d1d5db;
   --gray-400: #9ca3af;
   --gray-500: #6b7280;
   --gray-600: #4b5563;
   --gray-700: #374151;
-  --gray-750: #2d3748;
   --gray-800: #1f2937;
-  --gray-850: #1a1a1a;
   --gray-900: #121212;
-  --gray-950: #0a0a0a;
   --black: #000000;
 
   --gray-alpha-30: rgb(156, 163, 175, 0.3);
@@ -173,8 +168,8 @@
      INSTRUMENT COLORS - KEYBOARD
      ======================================== */
   --keyboard-white-key: var(--white);
-  --keyboard-white-key-secondary: var(--gray-50);
-  --keyboard-white-key-hover: var(--gray-50);
+  --keyboard-white-key-secondary: var(--gray-100);
+  --keyboard-white-key-hover: var(--gray-100);
   --keyboard-white-key-border: var(--gray-200);
   --keyboard-black-key: var(--gray-700);
   --keyboard-black-key-secondary: var(--gray-900);
@@ -231,7 +226,7 @@
   /* ========================================
      SCROLLBAR COLORS
      ======================================== */
-  --scrollbar-track: var(--gray-850);
+  --scrollbar-track: var(--gray-900);
   --scrollbar-thumb-primary: var(--primary-purple-dark);
   --scrollbar-thumb-secondary: var(--primary-purple);
   --scrollbar-thumb-hover-primary: var(--primary-purple-light);
@@ -239,7 +234,7 @@
   --scrollbar-thumb-active-primary: var(--primary-purple-darker);
   --scrollbar-thumb-active-secondary: var(--primary-purple-dark);
   --scrollbar-guitar-track: var(--guitar-border);
-  --scrollbar-guitar-track-secondary: var(--gray-850);
+  --scrollbar-guitar-track-secondary: var(--gray-900);
   --scrollbar-guitar-thumb-primary: var(--primary-purple);
   --scrollbar-guitar-thumb-secondary: var(--primary-purple-dark);
   --scrollbar-guitar-thumb-border: var(--primary-purple-light);
@@ -369,8 +364,13 @@
   --purple-600-alpha-60: var(--purple-alpha-60);
 
   /* Gray aliases */
+  --gray-50: var(--gray-100);
+  --gray-300: var(--gray-200);
+  --gray-750: var(--gray-700);
+  --gray-850: var(--gray-900);
+  --gray-950: var(--gray-900);
   --white-e5e5e5: var(--gray-200);
-  --gray-f8f9fa: var(--gray-50);
+  --gray-f8f9fa: var(--gray-100);
   --gray-e9ecef: var(--gray-200);
   --gray-333: var(--gray-700);
   --gray-404040: var(--gray-600);
