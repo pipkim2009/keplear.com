@@ -101,6 +101,7 @@
   --red-600: var(--red-500);
   --red-800: var(--red-700);
   --red-900: var(--red-700);
+  --red-light: var(--red-100);
 
   --red-alpha-05: rgb(239, 68, 68, 0.05);
   --red-alpha-10: rgb(239, 68, 68, 0.1);
@@ -178,6 +179,7 @@
   --gray-400: var(--gray-500);
   --gray-800: var(--gray-900);
   --gray-111111: var(--gray-900);
+  --gray-neutral: var(--gray-500);
 
   --gray-alpha-30: rgb(156, 163, 175, 0.3);
 
@@ -232,6 +234,7 @@
   --guitar-border: var(--metal-color);
   --guitar-border-light: var(--orange-fretboard);
   --bass-surface: var(--guitar-fretboard);
+  --bass-border: var(--red-500);
 
   /* Fret & String Color (unified) */
   --metal-color: #bbbbbb;
