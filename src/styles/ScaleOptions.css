@@ -697,6 +697,10 @@ input:checked + .toggle-slider:hover {
   gap: 8px;
 }
 
+.applied-item-preview > div {
+  cursor: pointer;
+}
+
 .applied-item-preview .mini-fretboard {
   transform: scale(0.28);
   transform-origin: top left;
@@ -704,11 +708,13 @@ input:checked + .toggle-slider:hover {
   margin-left: -3px;
   margin-right: -200px;
   margin-bottom: -140px;
-  pointer-events: none;
+  cursor: pointer;
 }
 
-.applied-item-preview .mini-fretboard + .learn-scale-button,
-.applied-item-preview .mini-fretboard + .learn-chord-button {
+.instrument-guitar .applied-item-preview .learn-scale-button,
+.instrument-guitar .applied-item-preview .learn-chord-button,
+.instrument-bass .applied-item-preview .learn-scale-button,
+.instrument-bass .applied-item-preview .learn-chord-button {
   margin-left: 83px;
 }
 
@@ -729,7 +735,7 @@ input:checked + .toggle-slider:hover {
   margin-left: -8px;
   margin-right: -140px;
   margin-bottom: -140px;
-  pointer-events: none;
+  cursor: pointer;
 }
 
 .applied-item-preview .octave-range-control {
@@ -917,14 +923,14 @@ input:checked + .toggle-slider:hover {
   margin-left: 8px;
 }
 
-/* Learn Scale Button - Blue Theme */
+/* Learn Scale Button - Green Theme */
 .learn-scale-button {
   width: 24px;
   height: 24px;
   margin-left: 43px;
-  background: rgb(59, 130, 246, 0.1);
-  border: 1px solid rgb(59, 130, 246, 0.4);
-  color: var(--blue-400);
+  background: rgb(76, 175, 80, 0.1);
+  border: 1px solid rgb(76, 175, 80, 0.4);
+  color: var(--green-4caf50);
   border-radius: 50%;
   cursor: pointer;
   font-size: 12px;
@@ -937,9 +943,9 @@ input:checked + .toggle-slider:hover {
 }
 
 .learn-scale-button:hover {
-  background: rgb(59, 130, 246, 0.2);
-  border-color: rgb(59, 130, 246, 0.6);
-  color: var(--blue-300);
+  background: rgb(76, 175, 80, 0.2);
+  border-color: rgb(76, 175, 80, 0.6);
+  color: var(--green-a5d6a7);
 }
 
 .learn-scale-button:focus-visible {
@@ -947,14 +953,14 @@ input:checked + .toggle-slider:hover {
   outline-offset: 1px;
 }
 
-/* Learn Chord Button - Blue Theme */
+/* Learn Chord Button - Green Theme */
 .learn-chord-button {
   width: 24px;
   height: 24px;
   margin-left: 43px;
-  background: rgb(59, 130, 246, 0.1);
-  border: 1px solid rgb(59, 130, 246, 0.4);
-  color: var(--blue-400);
+  background: rgb(76, 175, 80, 0.1);
+  border: 1px solid rgb(76, 175, 80, 0.4);
+  color: var(--green-4caf50);
   border-radius: 50%;
   cursor: pointer;
   font-size: 12px;
@@ -967,9 +973,9 @@ input:checked + .toggle-slider:hover {
 }
 
 .learn-chord-button:hover {
-  background: rgb(59, 130, 246, 0.2);
-  border-color: rgb(59, 130, 246, 0.6);
-  color: var(--blue-300);
+  background: rgb(76, 175, 80, 0.2);
+  border-color: rgb(76, 175, 80, 0.6);
+  color: var(--green-a5d6a7);
 }
 
 .learn-chord-button:focus-visible {

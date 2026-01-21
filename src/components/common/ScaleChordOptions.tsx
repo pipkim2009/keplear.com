@@ -648,19 +648,28 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                             )}
                           </div>
                           <div className="applied-item-preview">
-                            {instrument === 'keyboard' ? (
-                              <MiniKeyboard
-                                notes={appliedScale.notes || []}
-                                root={appliedScale.root}
-                                mode="scale"
-                              />
-                            ) : (
-                              <MiniFretboard
-                                noteKeys={appliedScale.noteKeys || []}
-                                instrument={instrument as 'guitar' | 'bass'}
-                                root={appliedScale.root}
-                              />
-                            )}
+                            <div
+                              onClick={() => setLearnDiagramData({
+                                type: 'scale',
+                                displayName: appliedScale.displayName,
+                                root: appliedScale.root,
+                                item: appliedScale
+                              })}
+                            >
+                              {instrument === 'keyboard' ? (
+                                <MiniKeyboard
+                                  notes={appliedScale.notes || []}
+                                  root={appliedScale.root}
+                                  mode="scale"
+                                />
+                              ) : (
+                                <MiniFretboard
+                                  noteKeys={appliedScale.noteKeys || []}
+                                  instrument={instrument as 'guitar' | 'bass'}
+                                  root={appliedScale.root}
+                                />
+                              )}
+                            </div>
                             <button
                               onClick={() => setLearnDiagramData({
                                 type: 'scale',
@@ -700,20 +709,29 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                             )}
                           </div>
                           <div className="applied-item-preview">
-                            {instrument === 'keyboard' ? (
-                              <MiniKeyboard
-                                notes={appliedChord.notes || []}
-                                root={appliedChord.root}
-                                mode="chord"
-                              />
-                            ) : (
-                              <MiniFretboard
-                                noteKeys={appliedChord.noteKeys || []}
-                                instrument={instrument as 'guitar' | 'bass'}
-                                root={appliedChord.root}
-                                mode="chord"
-                              />
-                            )}
+                            <div
+                              onClick={() => setLearnDiagramData({
+                                type: 'chord',
+                                displayName: appliedChord.displayName,
+                                root: appliedChord.root,
+                                item: appliedChord
+                              })}
+                            >
+                              {instrument === 'keyboard' ? (
+                                <MiniKeyboard
+                                  notes={appliedChord.notes || []}
+                                  root={appliedChord.root}
+                                  mode="chord"
+                                />
+                              ) : (
+                                <MiniFretboard
+                                  noteKeys={appliedChord.noteKeys || []}
+                                  instrument={instrument as 'guitar' | 'bass'}
+                                  root={appliedChord.root}
+                                  mode="chord"
+                                />
+                              )}
+                            </div>
                             <button
                               onClick={() => setLearnDiagramData({
                                 type: 'chord',
@@ -890,19 +908,28 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                             </button>
                           </div>
                           <div className="applied-item-preview">
-                            {instrument === 'keyboard' ? (
-                              <MiniKeyboard
-                                notes={appliedScale.notes || []}
-                                root={appliedScale.root}
-                                mode="scale"
-                              />
-                            ) : (
-                              <MiniFretboard
-                                noteKeys={appliedScale.noteKeys || []}
-                                instrument={instrument as 'guitar' | 'bass'}
-                                root={appliedScale.root}
-                              />
-                            )}
+                            <div
+                              onClick={() => setLearnDiagramData({
+                                type: 'scale',
+                                displayName: appliedScale.displayName,
+                                root: appliedScale.root,
+                                item: appliedScale
+                              })}
+                            >
+                              {instrument === 'keyboard' ? (
+                                <MiniKeyboard
+                                  notes={appliedScale.notes || []}
+                                  root={appliedScale.root}
+                                  mode="scale"
+                                />
+                              ) : (
+                                <MiniFretboard
+                                  noteKeys={appliedScale.noteKeys || []}
+                                  instrument={instrument as 'guitar' | 'bass'}
+                                  root={appliedScale.root}
+                                />
+                              )}
+                            </div>
                             <button
                               onClick={() => setLearnDiagramData({
                                 type: 'scale',
@@ -1035,20 +1062,29 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                             </button>
                           </div>
                           <div className="applied-item-preview">
-                            {instrument === 'keyboard' ? (
-                              <MiniKeyboard
-                                notes={appliedChord.notes || []}
-                                root={appliedChord.root}
-                                mode="chord"
-                              />
-                            ) : (
-                              <MiniFretboard
-                                noteKeys={appliedChord.noteKeys || []}
-                                instrument={instrument as 'guitar' | 'bass'}
-                                root={appliedChord.root}
-                                mode="chord"
-                              />
-                            )}
+                            <div
+                              onClick={() => setLearnDiagramData({
+                                type: 'chord',
+                                displayName: appliedChord.displayName,
+                                root: appliedChord.root,
+                                item: appliedChord
+                              })}
+                            >
+                              {instrument === 'keyboard' ? (
+                                <MiniKeyboard
+                                  notes={appliedChord.notes || []}
+                                  root={appliedChord.root}
+                                  mode="chord"
+                                />
+                              ) : (
+                                <MiniFretboard
+                                  noteKeys={appliedChord.noteKeys || []}
+                                  instrument={instrument as 'guitar' | 'bass'}
+                                  root={appliedChord.root}
+                                  mode="chord"
+                                />
+                              )}
+                            </div>
                             <button
                               onClick={() => setLearnDiagramData({
                                 type: 'chord',

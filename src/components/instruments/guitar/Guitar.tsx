@@ -44,10 +44,10 @@ interface GuitarProps {
 const Guitar: React.FC<GuitarProps> = ({ setGuitarNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, externalSelectedNoteIds, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false, fretRangeLow, fretRangeHigh }) => {
   const { t } = useTranslation()
 
-  // Helper to get note display name (without octave number)
+  // Helper to get note display name (with octave number)
   const getNoteName = useCallback((noteName: string | null): string => {
     if (!noteName) return ''
-    return noteName.replace(/\d+$/, '')
+    return noteName
   }, [])
 
   const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(6).fill(false))
