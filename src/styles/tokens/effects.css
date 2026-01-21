@@ -59,6 +59,115 @@
   --shadow-inner-sm: inset 0 1px 2px rgba(0, 0, 0, 0.1);
   --shadow-inner-md: inset 0 2px 4px rgba(0, 0, 0, 0.15);
   --shadow-none: none;
+
+  /*
+    ===========================================
+    GRADIENT SYSTEM
+    ===========================================
+  */
+
+  /* Surface Gradients (145deg - 3D effect) */
+  --gradient-surface-dark: linear-gradient(145deg, var(--gray-700), var(--gray-900));
+  --gradient-surface-light: linear-gradient(145deg, var(--white), var(--gray-200));
+  --gradient-surface-white: linear-gradient(145deg, var(--white), var(--gray-300));
+
+  /* Primary Brand Gradients */
+  --gradient-primary: linear-gradient(145deg, var(--primary-purple), var(--primary-purple-dark));
+  --gradient-primary-hover: linear-gradient(145deg, var(--primary-purple-dark), var(--primary-purple-darker));
+  --gradient-primary-light: linear-gradient(135deg, var(--primary-purple), var(--primary-purple-light));
+  --gradient-primary-soft: linear-gradient(145deg, var(--primary-purple-alpha-25), var(--primary-purple-alpha-20));
+
+  /* Purple Gradients */
+  --gradient-purple: linear-gradient(145deg, var(--purple-700), var(--purple-500));
+  --gradient-purple-soft: linear-gradient(145deg, var(--purple-500), var(--purple-700));
+
+  /* Note/State Gradients */
+  --gradient-note-selected: linear-gradient(145deg, var(--note-selected), var(--note-selected-dark));
+  --gradient-note-melody: linear-gradient(145deg, var(--note-melody), var(--note-melody-dark));
+  --gradient-note-scale: linear-gradient(145deg, var(--note-scale), var(--note-scale-dark));
+  --gradient-note-scale-root: linear-gradient(145deg, var(--note-scale-root), var(--note-scale-root-dark));
+  --gradient-note-chord: linear-gradient(145deg, var(--note-chord), var(--note-chord-dark));
+  --gradient-note-chord-root: linear-gradient(145deg, var(--note-chord-root), var(--note-chord-root-dark));
+
+  /* Combination Gradients (for overlapping states) */
+  --gradient-chord-scale: linear-gradient(145deg, var(--note-chord), var(--note-scale));
+  --gradient-root-chord: linear-gradient(145deg, var(--note-scale-root), var(--note-chord));
+  --gradient-root-scale: linear-gradient(145deg, var(--note-chord-root), var(--note-scale));
+
+  /* Color Gradients */
+  --gradient-red: linear-gradient(145deg, var(--red-500), var(--red-700));
+  --gradient-red-dark: linear-gradient(145deg, var(--red-700), var(--red-800));
+  --gradient-green: linear-gradient(145deg, var(--green-500), var(--green-600));
+  --gradient-blue: linear-gradient(145deg, var(--blue-500), var(--blue-700));
+  --gradient-orange: linear-gradient(145deg, var(--orange-500), var(--orange-700));
+
+  /* Instrument Card Gradients (subtle alpha backgrounds) */
+  --gradient-card-blue: linear-gradient(145deg, var(--blue-alpha-10), var(--blue-alpha-05));
+  --gradient-card-blue-hover: linear-gradient(145deg, var(--blue-alpha-15), var(--blue-alpha-10));
+  --gradient-card-blue-active: linear-gradient(145deg, var(--blue-alpha-30), var(--blue-alpha-20));
+  --gradient-card-green: linear-gradient(145deg, var(--green-alpha-10), var(--green-alpha-05));
+  --gradient-card-green-hover: linear-gradient(145deg, var(--green-alpha-15), var(--green-alpha-10));
+  --gradient-card-green-active: linear-gradient(145deg, var(--green-alpha-30), var(--green-alpha-20));
+  --gradient-card-red: linear-gradient(145deg, var(--red-alpha-10), var(--red-alpha-05));
+  --gradient-card-red-hover: linear-gradient(145deg, var(--red-alpha-15), var(--red-alpha-10));
+  --gradient-card-red-active: linear-gradient(145deg, var(--red-alpha-30), var(--red-alpha-20));
+
+  /* Horizontal Gradients */
+  --gradient-progress: linear-gradient(90deg, var(--blue-500), var(--blue-100));
+
+  /* Radial Glow Gradients */
+  --gradient-glow-purple: radial-gradient(circle, var(--primary-purple-alpha-30) 0%, transparent 70%);
+  --gradient-glow-purple-soft: radial-gradient(circle, var(--primary-purple-alpha-20) 0%, transparent 70%);
+  --gradient-glow-blue: radial-gradient(circle, var(--blue-alpha-20) 0%, transparent 70%);
+  --gradient-glow-green: radial-gradient(circle, var(--green-alpha-20) 0%, transparent 70%);
+  --gradient-glow-red: radial-gradient(circle, var(--red-alpha-20) 0%, transparent 70%);
+
+  /*
+    ===========================================
+    TRANSFORM SYSTEM
+    ===========================================
+  */
+
+  /* Scale - Hover/Active States */
+  --scale-hover-sm: scale(1.02);
+  --scale-hover: scale(1.05);
+  --scale-hover-lg: scale(1.1);
+  --scale-hover-xl: scale(1.15);
+  --scale-active: scale(0.98);
+  --scale-active-sm: scale(0.95);
+  --scale-pressed: scale(0.9);
+  --scale-hidden: scale(0);
+  --scale-visible: scale(1);
+
+  /* Lift Effects (translateY negative = lift up) */
+  --lift-xs: translateY(-2px);
+  --lift-sm: translateY(-4px);
+  --lift-md: translateY(-6px);
+  --lift-lg: translateY(-8px);
+  --lift-xl: translateY(-10px);
+  --drop-sm: translateY(4px);
+  --drop-md: translateY(8px);
+  --lift-none: translateY(0);
+
+  /* Centering Transforms */
+  --center-xy: translate(-50%, -50%);
+  --center-x: translateX(-50%);
+  --center-y: translateY(-50%);
+
+  /* Rotation */
+  --rotate-0: rotate(0deg);
+  --rotate-45: rotate(45deg);
+  --rotate-90: rotate(90deg);
+  --rotate-180: rotate(180deg);
+  --rotate-270: rotate(270deg);
+  --rotate-full: rotate(360deg);
+
+  /* Combined Transforms (common patterns) */
+  --transform-modal-enter: scale(0.8) translateY(20px);
+  --transform-modal-visible: scale(1) translateY(0);
+  --transform-bounce-start: scale(0.8) rotate(-5deg);
+  --transform-bounce-mid: scale(1.1) rotate(5deg);
+  --transform-bounce-end: scale(1) rotate(0deg);
   /*
     ===========================================
     TRANSITION SYSTEM
