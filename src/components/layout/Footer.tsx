@@ -1,5 +1,8 @@
 import logo from '/Keplear-logo.png'
 import { useTranslation } from '../../contexts/TranslationContext'
+import { FaInstagram, FaTiktok, FaFacebook } from 'react-icons/fa'
+import { FaXTwitter } from 'react-icons/fa6'
+import { SiThreads } from 'react-icons/si'
 import '../../styles/Footer.css'
 
 function Footer() {
@@ -18,6 +21,24 @@ function Footer() {
             <div className="footer-contact">
               <a href="mailto:e4ellis09@gmail.com" className="footer-email">
                 e4ellis09@gmail.com
+              </a>
+            </div>
+
+            <div className="footer-social">
+              <a href="https://www.instagram.com/keplearofficial/" target="_blank" rel="noopener noreferrer" className="social-link">
+                <FaInstagram />
+              </a>
+              <a href="https://www.tiktok.com/@keplearofficial" target="_blank" rel="noopener noreferrer" className="social-link">
+                <FaTiktok />
+              </a>
+              <a href="#" className="social-link">
+                <SiThreads />
+              </a>
+              <a href="#" className="social-link">
+                <FaFacebook />
+              </a>
+              <a href="https://x.com/keplearofficial" target="_blank" rel="noopener noreferrer" className="social-link">
+                <FaXTwitter />
               </a>
             </div>
 

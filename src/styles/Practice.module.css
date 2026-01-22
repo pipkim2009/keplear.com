@@ -41,7 +41,7 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: transparent;
+  background: black;
   color: var(--white);
 }
 
@@ -49,6 +49,16 @@
   background: var(--white-alpha-10);
   transform: translateX(-3px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+:global(body.light) .backButton {
+  background: white;
+  border-color: black;
+  color: black;
+}
+
+:global(body.light) .backButton:hover {
+  background: rgba(0, 0, 0, 0.1);
 }
 
 .backButton:focus-visible {

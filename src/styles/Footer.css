@@ -78,6 +78,31 @@
   text-decoration: underline;
 }
 
+.footer-social {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.social-link {
+  color: var(--text-primary);
+  opacity: 0.7;
+  font-size: 1.25rem;
+  transition: all 0.2s ease;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-link:hover {
+  opacity: 1;
+  color: var(--primary-purple-light);
+  background: var(--primary-purple-alpha-10);
+  transform: translateY(-2px);
+}
+
 .footer-copyright {
   text-align: right;
   font-size: 0.75rem;
@@ -116,6 +141,10 @@
 
   .footer-copyright {
     text-align: center;
+  }
+
+  .footer-social {
+    justify-content: center;
   }
 
   .footer-logo {

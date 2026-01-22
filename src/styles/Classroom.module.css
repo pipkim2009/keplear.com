@@ -1296,19 +1296,19 @@
 
 .editCancelButton {
   padding: 0.625rem 1.25rem;
-  border: 2px solid rgb(210, 210, 249, 0.4);
+  border: 2px solid var(--purple-500);
   border-radius: 8px;
   font-size: 0.9375rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   background: transparent;
-  color: var(--dark-text-secondary);
+  color: var(--purple-500);
 }
 
 .editCancelButton:hover:not(:disabled) {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgb(210, 210, 249, 0.6);
+  background: rgba(147, 51, 234, 0.15);
+  transform: translateY(-1px);
 }
 
 .editCancelButton:disabled {
@@ -1739,7 +1739,7 @@
 }
 
 :global(body.light) .emptyStateText {
-  color: black;
+  color: white;
 }
 
 :global(body.light) .fullPageMeta {
@@ -1758,5 +1758,13 @@
 
 :global(body.light) .backButtonCircle:hover {
   background: rgba(0, 0, 0, 0.1);
+}
+
+:global(body.light) .editLabel {
+  color: black;
+}
+
+:global(body.light) .editCancelButton {
+  color: var(--purple-700);
 }
 
