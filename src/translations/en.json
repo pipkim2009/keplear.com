@@ -177,6 +177,8 @@
     "progression": "Progression",
     "arpeggiator": "Arpeggiator",
     "generate": "Generate",
+    "warning": "Warning",
+    "notEnoughBeats": "To avoid missing notes from your selection, increase the number of beats to {count}.",
     "generatingMelody": "Generating melody...",
     "chooseInstrument": "Choose Your Instrument",
     "scaleChordsToggle": "Scales/Chords",

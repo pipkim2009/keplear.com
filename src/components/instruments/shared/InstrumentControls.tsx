@@ -13,6 +13,7 @@ import '../../../styles/CustomAudioPlayer.css'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import { IoMdArrowDropdown } from 'react-icons/io'
+import { IoWarning } from 'react-icons/io5'
 import { useIncrementDecrement } from '../../../hooks/useHoldButton'
 import { sanitizeNumericInput } from '../../../utils/inputValidation'
 
@@ -859,6 +860,13 @@ const InstrumentControls = memo(function InstrumentControls({
               <Tooltip title={t('sandbox.beats')} text={t('sandbox.beatsTooltip')}>
                 <div className="tooltip-icon">?</div>
               </Tooltip>
+              {!hasEnoughBeats && hasContent && (
+                <Tooltip title={t('sandbox.warning')} text={t('sandbox.notEnoughBeats', { count: totalNotesCount })}>
+                  <div className="beats-warning">
+                    <IoWarning />
+                  </div>
+                </Tooltip>
+              )}
             </div>
             <div className="input-with-buttons">
               <input
@@ -867,7 +875,7 @@ const InstrumentControls = memo(function InstrumentControls({
                 onChange={(e) => !disableBeatsInput && handleNotesChange(e.target.value)}
                 onKeyPress={(e) => !disableBeatsInput && handleNotesKeyPress(e)}
                 onBlur={(e) => !disableBeatsInput && handleNotesBlur(e)}
-                className={`control-input ${hideBeatsButtons ? '' : 'with-internal-buttons'} ${flashingInputs.beats ? 'flashing' : ''}`}
+                className={`control-input ${hideBeatsButtons ? '' : 'with-internal-buttons'} ${flashingInputs.beats ? 'flashing' : ''} ${!hasEnoughBeats && hasContent ? 'warning' : ''}`}
                 disabled={disableBeatsInput}
                 readOnly={disableBeatsInput}
               />

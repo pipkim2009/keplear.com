@@ -612,6 +612,29 @@
   background: var(--gray-700);
 }
 
+/* Warning state for beats input */
+.control-input.warning {
+  border-color: var(--orange-500, #f97316) !important;
+}
+
+.beats-warning {
+  display: flex;
+  align-items: center;
+  color: var(--orange-500, #f97316);
+  font-size: 16px;
+  margin-left: 4px;
+  animation: pulse-warning 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 .control-input:disabled,
 .control-input[readonly] {
   cursor: not-allowed;
@@ -2395,6 +2418,10 @@ select.control-input.flashing {
 
 .modern-control-item .input-with-buttons:focus-within {
   border-color: var(--blue-500);
+}
+
+.modern-control-item .input-with-buttons:has(.control-input.warning) {
+  border-color: var(--orange-500, #f97316) !important;
 }
 
 .modern-control-item .control-input {
