@@ -55,11 +55,11 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-contai
   left: 0 !important;
   margin: 0 !important;
   margin-top: 0 !important;
-  padding: 16px;
-  padding-top: 16px !important;
-  width: 300px !important;
-  max-width: 300px !important;
-  min-width: 300px !important;
+  padding: 4px;
+  padding-top: 4px !important;
+  width: 185px !important;
+  max-width: 185px !important;
+  min-width: 185px !important;
   box-sizing: border-box;
   z-index: 102 !important;
   background: rgb(0, 0, 0, 0.95);
@@ -69,6 +69,7 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-contai
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   transform: none !important;
+  overflow-x: hidden;
 }
 
 /* Purple styling for chord mode */
@@ -182,14 +183,16 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 
 .scale-controls {
   margin: 0 auto;
-  padding: 8px;
+  padding: 3px;
   background: rgb(249, 115, 22, 0.05);
   border-radius: 6px;
   border: 1px solid rgb(249, 115, 22, 0.3);
-  width: calc(100% - 16px);
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 /* Purple styling for chord mode */
@@ -252,21 +255,22 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 
 .control-select {
   width: 100%;
-  padding: 5px 8px;
-  border: 2px solid var(--orange-500);
+  padding: 5px 2px;
+  border: 1px solid var(--orange-500);
   border-radius: 6px;
   background: rgb(249, 115, 22, 0.1);
   color: var(--orange-500);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
+  box-sizing: border-box;
 }
 
 /* Purple styling for chord mode */
 .control-select.chord-mode {
-  border: 2px solid var(--purple-600);
+  border: 1px solid var(--purple-600);
   background: rgb(168, 85, 247, 0.1);
   color: var(--purple-600);
 }
@@ -311,17 +315,18 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 
 .apply-button {
   width: 100%;
-  padding: 5px 10px;
+  padding: 5px 2px;
   background: rgb(76, 175, 80, 0.1);
-  border: 2px solid var(--green-500);
+  border: 1px solid var(--green-500);
   color: var(--green-100);
   border-radius: 6px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   outline: none;
   height: 28px;
+  box-sizing: border-box;
 }
 
 .apply-button:hover {
@@ -339,7 +344,10 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 /* Mobile styles applied to all screen sizes - remove conflicting min-width */
 
 .scale-options-content {
-  padding: 10px;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .scale-options-header h3 {
@@ -355,13 +363,13 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 120px;
+  width: 110px;
   height: 32px;
 }
 
@@ -387,7 +395,7 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 8px;
+  padding: 0 6px;
 }
 
 .toggle-text {
@@ -412,7 +420,7 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
   position: absolute;
   content: '';
   height: 29px;
-  width: 58px;
+  width: 53px;
   left: -1px;
   top: 0;
   background-color: var(--orange-500);
@@ -441,7 +449,7 @@ input:checked + .toggle-slider {
 }
 
 input:checked + .toggle-slider::before {
-  transform: translateX(60px);
+  transform: translateX(55px);
   background-color: var(--purple-600);
 }
 
@@ -566,12 +574,12 @@ input:checked + .toggle-slider:hover {
 
   /* Content sizing */
   .scale-options-content {
-    padding: 10px 8px !important;
+    padding: 0 !important;
   }
 
   .scale-controls {
-    padding: 6px !important;
-    width: calc(100% - 16px) !important;
+    padding: 3px !important;
+    width: 100% !important;
   }
 
   /* Toggle switch sizing */
@@ -648,12 +656,14 @@ input:checked + .toggle-slider:hover {
 .applied-scales-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   max-height: 200px;
   overflow-y: auto;
-  padding: 4px;
+  padding: 2px;
   background: rgb(0, 0, 0, 0.3);
   border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--gray-333);
 }
 
@@ -661,11 +671,12 @@ input:checked + .toggle-slider:hover {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 4px;
+  padding: 2px;
   background: rgb(249, 115, 22, 0.1);
   border: 1px solid rgb(249, 115, 22, 0.3);
   border-radius: 4px;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .applied-scale-item:hover {
@@ -697,7 +708,7 @@ input:checked + .toggle-slider:hover {
 .instrument-guitar .applied-item-preview .learn-chord-button,
 .instrument-bass .applied-item-preview .learn-scale-button,
 .instrument-bass .applied-item-preview .learn-chord-button {
-  margin-left: 83px;
+  margin-left: 8px;
 }
 
 /* Bass entries need more height */
@@ -799,12 +810,14 @@ input:checked + .toggle-slider:hover {
 .applied-chords-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   max-height: 200px;
   overflow-y: auto;
-  padding: 4px;
+  padding: 2px;
   background: rgb(0, 0, 0, 0.3);
   border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--gray-333);
 }
 
@@ -812,11 +825,12 @@ input:checked + .toggle-slider:hover {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 4px;
+  padding: 2px;
   background: rgb(168, 85, 247, 0.1);
   border: 1px solid rgb(168, 85, 247, 0.3);
   border-radius: 4px;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .applied-chord-item:hover {
@@ -909,7 +923,7 @@ input:checked + .toggle-slider:hover {
 .learn-scale-button {
   width: 24px;
   height: 24px;
-  margin-left: 43px;
+  margin-left: 8px;
   background: rgb(76, 175, 80, 0.1);
   border: 1px solid rgb(76, 175, 80, 0.4);
   color: var(--green-500);
@@ -939,7 +953,7 @@ input:checked + .toggle-slider:hover {
 .learn-chord-button {
   width: 24px;
   height: 24px;
-  margin-left: 43px;
+  margin-left: 8px;
   background: rgb(76, 175, 80, 0.1);
   border: 1px solid rgb(76, 175, 80, 0.4);
   color: var(--green-500);
