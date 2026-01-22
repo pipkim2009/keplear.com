@@ -2,7 +2,7 @@
  * Assignment Modal - Create assignments with practice settings
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../../contexts/TranslationContext'
 import styles from '../../styles/PracticeOptionsModal.module.css'
@@ -32,6 +32,7 @@ export interface AssignmentSettings {
   octaveHigh: number
   fretLow: number
   fretHigh: number
+  ttsVoice?: string
 }
 
 interface AssignmentModalProps {
@@ -64,6 +65,40 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   const [isInstrumentDropdownOpen, setIsInstrumentDropdownOpen] = useState<boolean>(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([])
+  const [selectedVoice, setSelectedVoice] = useState<string>('')
+
+  // Load available TTS voices
+  useEffect(() => {
+    const loadVoices = () => {
+      if ('speechSynthesis' in window) {
+        const voices = window.speechSynthesis.getVoices()
+        // Filter to English voices for better quality
+        const englishVoices = voices.filter(v => v.lang.startsWith('en'))
+        setAvailableVoices(englishVoices.length > 0 ? englishVoices : voices)
+        // Set default voice if not already set
+        if (!selectedVoice && englishVoices.length > 0) {
+          // Prefer voices with "Google" or "Microsoft" for better quality
+          const preferredVoice = englishVoices.find(v =>
+            v.name.includes('Google') || v.name.includes('Microsoft')
+          ) || englishVoices[0]
+          setSelectedVoice(preferredVoice.name)
+        }
+      }
+    }
+
+    loadVoices()
+    // Voices may load asynchronously
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = loadVoices
+    }
+
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = null
+      }
+    }
+  }, [selectedVoice])
 
   const toggleScale = (scaleName: string) => {
     setSelectedScales(prev =>
@@ -118,7 +153,8 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         octaveLow,
         octaveHigh,
         fretLow,
-        fretHigh
+        fretHigh,
+        ttsVoice: selectedVoice || undefined
       })
     } catch (err) {
       setError('Failed to create assignment')
@@ -148,7 +184,8 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         octaveLow,
         octaveHigh,
         fretLow,
-        fretHigh
+        fretHigh,
+        ttsVoice: selectedVoice || undefined
       })
     }
   }
@@ -597,6 +634,30 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             </div>
           )}
         </div>
+
+        {/* TTS Voice Selection */}
+        {availableVoices.length > 0 && (
+          <div className={styles.formGroup} style={{ marginBottom: 20 }}>
+            <div className="label-with-tooltip">
+              <label className={styles.formLabel}>Text-to-Speech Voice</label>
+              <Tooltip title="TTS Voice" text="Select a voice for reading assignment instructions aloud">
+                <div className="tooltip-icon">?</div>
+              </Tooltip>
+            </div>
+            <select
+              value={selectedVoice}
+              onChange={(e) => setSelectedVoice(e.target.value)}
+              className={classroomStyles.formInput}
+              style={{ width: '100%', cursor: 'pointer' }}
+            >
+              {availableVoices.map((voice) => (
+                <option key={voice.name} value={voice.name}>
+                  {voice.name} ({voice.lang})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         <div className={styles.modalActions}>
           {onPreview && (

@@ -53,6 +53,7 @@ interface SelectionData {
     fretZone?: number
     displayName: string
   }>
+  ttsVoice?: string
 }
 
 interface AssignmentData {
@@ -129,9 +130,10 @@ const generateJoinCode = (): string => {
 interface WelcomeSubtitleProps {
   message: string
   onSpeechEnd?: () => void
+  voiceName?: string
 }
 
-const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd }) => {
+const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd, voiceName }) => {
   const [isVisible, setIsVisible] = useState(true)
   const lastSpokenMessage = useRef<string>('')
   const onSpeechEndRef = useRef(onSpeechEnd)
@@ -156,6 +158,16 @@ const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd 
         utterance.rate = 0.9
         utterance.pitch = 1
         utterance.volume = 1
+
+        // Set the specified voice if provided
+        if (voiceName) {
+          const voices = window.speechSynthesis.getVoices()
+          const selectedVoice = voices.find(v => v.name === voiceName)
+          if (selectedVoice) {
+            utterance.voice = selectedVoice
+          }
+        }
+
         utterance.onend = () => {
           setIsVisible(false)
           if (onSpeechEndRef.current) onSpeechEndRef.current()
@@ -170,7 +182,7 @@ const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd 
         return () => clearTimeout(timer)
       }
     }
-  }, [message])
+  }, [message, voiceName])
 
   if (!isVisible || !message) return null
   return <div className={practiceStyles.welcomeSubtitle}>{message}</div>
@@ -306,6 +318,8 @@ function Classroom() {
   const [isSavingAssignment, setIsSavingAssignment] = useState(false)
   const [assignmentError, setAssignmentError] = useState<string | null>(null)
   const [editingAssignmentId, setEditingAssignmentId] = useState<string | null>(null)
+  const [availableVoices, setAvailableVoices] = useState<SpeechSynthesisVoice[]>([])
+  const [selectedTtsVoice, setSelectedTtsVoice] = useState<string>('')
   const [isPreviewMode, setIsPreviewMode] = useState(false)
 
   // Multi-exercise state for assignment editor
@@ -326,6 +340,7 @@ function Classroom() {
   const [melodySetupMessage, setMelodySetupMessage] = useState<string>('')
   const [congratulationsMessage, setCongratulationsMessage] = useState<string>('')
   const [showAssignmentComplete, setShowAssignmentComplete] = useState(false)
+  const [lessonTtsVoice, setLessonTtsVoice] = useState<string>('')
   const hasInitializedNotes = useRef(false)
   const hasAnnouncedMelody = useRef(false)
 
@@ -351,6 +366,38 @@ function Classroom() {
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] })
     return () => observer.disconnect()
   }, [])
+
+  // Load available TTS voices
+  useEffect(() => {
+    const loadVoices = () => {
+      if ('speechSynthesis' in window) {
+        const voices = window.speechSynthesis.getVoices()
+        // Filter to English voices for better quality
+        const englishVoices = voices.filter(v => v.lang.startsWith('en'))
+        setAvailableVoices(englishVoices.length > 0 ? englishVoices : voices)
+        // Set default voice if not already set
+        if (!selectedTtsVoice && englishVoices.length > 0) {
+          // Prefer voices with "Google" or "Microsoft" for better quality
+          const preferredVoice = englishVoices.find(v =>
+            v.name.includes('Google') || v.name.includes('Microsoft')
+          ) || englishVoices[0]
+          setSelectedTtsVoice(preferredVoice.name)
+        }
+      }
+    }
+
+    loadVoices()
+    // Voices may load asynchronously
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = loadVoices
+    }
+
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = null
+      }
+    }
+  }, [selectedTtsVoice])
 
   // Clear external note IDs when instrument changes (treat manual notes like scales/chords)
   const prevInstrumentRef = useRef(instrument)
@@ -989,6 +1036,12 @@ function Classroom() {
 
     // Load exercises from selection_data
     const selectionData = assignment.selection_data
+
+    // Load TTS voice if available
+    if (selectionData?.ttsVoice) {
+      setSelectedTtsVoice(selectionData.ttsVoice)
+    }
+
     if (selectionData?.exercises && selectionData.exercises.length > 0) {
       setExercises(selectionData.exercises.map((ex: any) => ({
         id: ex.id || `exercise-${Date.now()}-${Math.random()}`,
@@ -1488,6 +1541,8 @@ function Classroom() {
       selectedNoteIds: firstExercise?.selectedNoteIds || [],
       appliedScales: firstExercise?.appliedScales || [],
       appliedChords: firstExercise?.appliedChords || [],
+      // TTS voice for speech synthesis
+      ttsVoice: selectedTtsVoice || undefined,
       // Exercise timeline array (instrument is assignment-level, not per-exercise)
       exercises: updatedExercises.map(exercise => ({
         id: exercise.id,
@@ -1605,6 +1660,14 @@ function Classroom() {
 
     // Initialize exercises from assignment
     const selectionData = assignment.selection_data
+
+    // Set TTS voice from assignment if available
+    if (selectionData?.ttsVoice) {
+      setLessonTtsVoice(selectionData.ttsVoice)
+    } else {
+      setLessonTtsVoice('')
+    }
+
     if (selectionData?.exercises && selectionData.exercises.length > 0) {
       // Map exercises with fallback for bpm/beats, transcript
       setLessonExercises(selectionData.exercises.map((ex: any) => ({
@@ -2421,9 +2484,9 @@ function Classroom() {
           autoStartFeedback={true}
         />
 
-        {genericWelcomeMessage && <WelcomeSubtitle message={genericWelcomeMessage} onSpeechEnd={() => setGenericWelcomeDone(true)} />}
-        {customTranscript && <WelcomeSubtitle message={customTranscript} onSpeechEnd={() => setWelcomeSpeechDone(true)} />}
-        {congratulationsMessage && <WelcomeSubtitle message={congratulationsMessage} onSpeechEnd={handleExerciseComplete} />}
+        {genericWelcomeMessage && <WelcomeSubtitle message={genericWelcomeMessage} onSpeechEnd={() => setGenericWelcomeDone(true)} voiceName={lessonTtsVoice} />}
+        {customTranscript && <WelcomeSubtitle message={customTranscript} onSpeechEnd={() => setWelcomeSpeechDone(true)} voiceName={lessonTtsVoice} />}
+        {congratulationsMessage && <WelcomeSubtitle message={congratulationsMessage} onSpeechEnd={handleExerciseComplete} voiceName={lessonTtsVoice} />}
 
         {/* Assignment Complete Animation */}
         {showAssignmentComplete && createPortal(
@@ -2603,6 +2666,26 @@ function Classroom() {
               placeholder={t('classroom.transcriptPlaceholder')}
             />
           </div>
+          {/* Row 4: TTS Voice */}
+          {availableVoices.length > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
+              <label style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--primary-purple)', whiteSpace: 'nowrap', minWidth: '70px' }}>
+                {t('classroom.ttsVoice')}
+              </label>
+              <select
+                className={practiceStyles.classroomSelector}
+                value={selectedTtsVoice}
+                onChange={(e) => setSelectedTtsVoice(e.target.value)}
+                style={{ flex: 1 }}
+              >
+                {availableVoices.map((voice) => (
+                  <option key={voice.name} value={voice.name}>
+                    {voice.name} ({voice.lang})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         <InstrumentDisplay
