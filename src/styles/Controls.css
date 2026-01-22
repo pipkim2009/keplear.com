@@ -2192,30 +2192,37 @@ select.control-input.flashing {
 
 .modern-generate-button {
   background: var(--primary-purple);
-  color: var(--white);
+  color: white;
   border: none;
   border-radius: 6px;
   padding: 9.5px 24px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   transition: all 0.2s ease;
   cursor: pointer;
   width: 100%;
   min-width: auto;
-  margin-top: 0;
+  margin-top: 25px;
+  align-self: center;
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
 }
 
 .modern-generate-button:hover:not(:disabled) {
-  background: var(--primary-purple-6600cc);
+  background: var(--purple-500);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
 }
 
 .modern-generate-button:active:not(:disabled) {
-  background: var(--primary-purple-dark);
+  background: var(--primary-purple);
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
 }
 
 .modern-generate-button:disabled {
   background: var(--gray-500);
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Desktop - add margin when in flex row layout */
@@ -2226,7 +2233,8 @@ select.control-input.flashing {
   }
 
   .modern-generate-button {
-    margin-top: 29px;
+    align-self: center;
+    margin-top: 25px;
   }
 }
 
@@ -2561,6 +2569,7 @@ body.dark .modern-control-item.audio-player-section audio {
 
   .modern-generate-button {
     min-width: 200px;
+    margin-top: 0;
   }
 
   .modern-notes-toggle-button {
@@ -2605,6 +2614,7 @@ body.dark .modern-control-item.audio-player-section audio {
     grid-area: generate;
     min-width: auto;
     width: 100%;
+    margin-top: 0;
   }
 
   .modern-notes-toggle-button {
@@ -2644,6 +2654,7 @@ body.dark .modern-control-item.audio-player-section audio {
     grid-area: generate;
     width: 100%;
     min-width: auto;
+    margin-top: 0;
   }
 
   .modern-notes-toggle-button {
@@ -2679,6 +2690,7 @@ body.dark .modern-control-item.audio-player-section audio {
 
   .modern-generate-button {
     width: 100%;
+    margin-top: 0;
   }
 
   .controls-container {
@@ -2882,7 +2894,7 @@ body.dark .modern-control-item.audio-player-section audio {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 25px;
   margin-bottom: 20px;
   z-index: 100;
 }

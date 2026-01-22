@@ -48,7 +48,7 @@ interface MelodyContextType {
 
   // High-level Actions
   handleNoteClick: (note: Note) => Promise<void>
-  handleGenerateMelody: () => void
+  handleGenerateMelody: (inclusiveMode?: boolean) => void
   handlePlayMelody: () => void
 }
 
@@ -166,7 +166,7 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
   }, [config.instrument, audio, melodyGen, isGeneratingMelody, melodyPlayer.isAutoRecording])
 
   // Handle melody generation
-  const handleGenerateMelody = useCallback((): void => {
+  const handleGenerateMelody = useCallback((inclusiveMode?: boolean): void => {
     setIsGeneratingMelody(true)
 
     // Store the BPM used for this melody
@@ -181,14 +181,14 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
 
     const selectedNotesSnapshot = [...melodyGen.selectedNotes]
 
-    melodyGen.generateMelody(melodyNotes, ui.numberOfBeats, config.instrument, 'multi', selectedNotesSnapshot)
+    melodyGen.generateMelody(melodyNotes, ui.numberOfBeats, config.instrument, 'multi', selectedNotesSnapshot, ui.chordMode, appliedChords, appliedScales, inclusiveMode)
 
     const duration = melodyPlayer.calculateMelodyDuration(ui.numberOfBeats, ui.bpm, config.instrument)
     melodyPlayer.setMelodyDuration(duration)
     melodyPlayer.setPlaybackProgress(0)
     melodyPlayer.handleClearRecordedAudio()
     changes.clearChanges()
-  }, [melodyGen, ui, config, melodyPlayer, changes])
+  }, [melodyGen, ui, config, melodyPlayer, changes, appliedChords, appliedScales])
 
   // Handle melody playback
   const handlePlayMelody = useCallback((): void => {

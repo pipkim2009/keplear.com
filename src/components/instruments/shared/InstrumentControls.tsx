@@ -44,7 +44,7 @@ interface InstrumentControlsProps {
   selectedNotesCount?: number
   appliedChordsCount?: number
   appliedScalesCount?: number
-  onGenerateMelody?: () => void
+  onGenerateMelody?: (inclusiveMode?: boolean) => void
   onPlayMelody?: () => void
   onRecordMelody?: () => Promise<Blob | null>
   isPlaying?: boolean
@@ -167,6 +167,10 @@ const InstrumentControls = memo(function InstrumentControls({
   const [isChordModeFlashing, setIsChordModeFlashing] = useState<boolean>(false)
 
   const audioPlayerRef = useRef<HTMLAudioElement>(null)
+
+  // Calculate total notes count - generation requires beats >= total notes
+  const totalNotesCount = selectedNotesCount + appliedChordsCount + appliedScalesCount
+  const hasEnoughBeats = numberOfBeats >= totalNotesCount
 
   // Original default values
   const DEFAULT_BPM = 120
@@ -516,9 +520,9 @@ const InstrumentControls = memo(function InstrumentControls({
   }, [audioFileUrl])
 
   // Determine if melody can be generated
-  const canGenerateMelody = appliedChordsCount > 0 || // Can always generate with applied chords
-    appliedScalesCount > 0 || // Can always generate with applied scales
-    selectedNotesCount > 0    // Need at least 1 note selected
+  // Need at least 1 note/chord/scale AND beats must be >= total notes
+  const hasContent = appliedChordsCount > 0 || appliedScalesCount > 0 || selectedNotesCount > 0
+  const canGenerateMelody = hasContent && hasEnoughBeats
   return (
     <div className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
       {/* Top row: Instrument selector */}
@@ -968,16 +972,16 @@ const InstrumentControls = memo(function InstrumentControls({
                   onClearRecordedAudio()
                 }
                 if (onGenerateMelody) {
-                  onGenerateMelody()
+                  onGenerateMelody(true) // Always use inclusive mode
                 }
               }}
               disabled={!canGenerateMelody}
-              className={`modern-generate-button ${hasChanges ? 'has-changes' : ''}`}
+              className={`modern-generate-button ${hasChanges && canGenerateMelody ? 'has-changes' : ''}`}
               title={t('sandbox.generate')}
               style={{ position: 'relative' }}
             >
               {t('sandbox.generate')}
-              {hasChanges && <span className="change-badge">●</span>}
+              {hasChanges && canGenerateMelody && <span className="change-badge">●</span>}
             </button>
           )}
 

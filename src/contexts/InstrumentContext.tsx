@@ -54,7 +54,7 @@ interface InstrumentContextType {
   selectedNotes: Note[]
   generatedMelody: Note[]
   selectNote: (note: Note, mode?: 'range' | 'multi') => void
-  generateMelody: (notes: Note[], count: number, instrument: InstrumentType, mode: 'range' | 'multi', notesToUse?: readonly Note[]) => void
+  generateMelody: (notes: Note[], count: number, instrument: InstrumentType, mode: 'range' | 'multi', notesToUse?: readonly Note[], chordMode?: 'arpeggiator' | 'progression', appliedChords?: any[], appliedScales?: any[], inclusiveMode?: boolean) => void
   setGuitarNotes: (notes: Note[]) => void
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
@@ -86,7 +86,7 @@ interface InstrumentContextType {
 
   // Handlers
   handleNoteClick: (note: Note) => Promise<void>
-  handleGenerateMelody: () => void
+  handleGenerateMelody: (inclusiveMode?: boolean) => void
   handlePlayMelody: () => void
   handleInstrumentChange: (newInstrument: InstrumentType) => void
   handleOctaveRangeChange: (lowerOctaves: number, higherOctaves: number) => void
@@ -282,7 +282,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     }
   }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, isGeneratingMelody, isAutoRecording])
 
-  const handleGenerateMelody = useCallback((): void => {
+  const handleGenerateMelody = useCallback((inclusiveMode?: boolean): void => {
     setIsGeneratingMelody(true)
 
     // Store the BPM used for this melody
@@ -297,8 +297,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     // Take a snapshot of currently selected notes to prevent interference from note clicks during generation
     const selectedNotesSnapshot = [...selectedNotes]
 
-    // Pass chordMode, appliedChords, and appliedScales to generateMelody (always use 'multi' mode)
-    generateMelody(melodyNotes, numberOfBeats, instrument, 'multi', selectedNotesSnapshot, chordMode, appliedChords, appliedScales)
+    // Pass chordMode, appliedChords, appliedScales, and inclusiveMode to generateMelody (always use 'multi' mode)
+    generateMelody(melodyNotes, numberOfBeats, instrument, 'multi', selectedNotesSnapshot, chordMode, appliedChords, appliedScales, inclusiveMode)
 
     const duration = calculateMelodyDuration(numberOfBeats, bpm, instrument)
     setMelodyDuration(duration)
