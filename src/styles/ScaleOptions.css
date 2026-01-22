@@ -1087,3 +1087,16 @@ input:checked + .toggle-slider:hover {
   color: var(--orange-400);
 }
 
+/* ========================================
+   LIGHT MODE OVERRIDES
+   ======================================== */
+
+/* Toggle switch unselected text - white in light mode */
+body.light .toggle-slider .toggle-text.right {
+  color: white;
+}
+
+body.light input:checked + .toggle-slider .toggle-text.left {
+  color: white;
+}
+
