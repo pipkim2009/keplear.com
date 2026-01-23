@@ -9,7 +9,20 @@ import AuthContext from '../../contexts/AuthContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useNavigation } from '../../hooks/useInstrumentSelectors'
 import { useInstrument } from '../../contexts/InstrumentContext'
-import { PiPlayFill, PiMagnifyingGlassFill, PiCheckCircleFill, PiUsersFill } from 'react-icons/pi'
+import {
+  PiPlayFill,
+  PiMagnifyingGlassFill,
+  PiCheckCircleFill,
+  PiUsersFill,
+  PiChartBarFill,
+  PiTrophyFill,
+  PiBookOpenFill,
+  PiCrownFill,
+  PiArrowRightBold,
+  PiSparkle,
+  PiMusicNotesFill,
+  PiClockFill
+} from 'react-icons/pi'
 import styles from '../../styles/Dashboard.module.css'
 
 interface ClassroomData {
@@ -324,7 +337,15 @@ function Dashboard() {
   if (loading || isLoading) {
     return (
       <div className={styles.dashboardContainer}>
-        <div className={styles.loadingState}>{t('common.loading')}</div>
+        <div className={styles.backgroundEffects}>
+          <div className={styles.gradientOrb1} />
+          <div className={styles.gradientOrb2} />
+          <div className={styles.gradientOrb3} />
+        </div>
+        <div className={styles.loadingState}>
+          <div className={styles.loadingSpinner} />
+          {t('common.loading')}
+        </div>
       </div>
     )
   }
@@ -332,6 +353,11 @@ function Dashboard() {
   if (!user) {
     return (
       <div className={styles.dashboardContainer}>
+        <div className={styles.backgroundEffects}>
+          <div className={styles.gradientOrb1} />
+          <div className={styles.gradientOrb2} />
+          <div className={styles.gradientOrb3} />
+        </div>
         <div className={styles.loadingState}>{t('profile.loginRequired')}</div>
       </div>
     )
@@ -339,146 +365,202 @@ function Dashboard() {
 
   return (
     <div className={styles.dashboardContainer}>
-      {/* Welcome Section */}
-      <section className={styles.welcomeSection}>
-        <div className={styles.welcomeText}>
-          <h1>{t('dashboard.welcome')}, {username || 'User'}!</h1>
-          <p>{t('dashboard.title')}</p>
-        </div>
-        <div className={styles.quickActions}>
-          <button className={styles.actionButton} onClick={navigateToSandbox}>
-            <PiPlayFill />
-            {t('dashboard.goToSandbox')}
-          </button>
-          <button className={styles.actionButtonSecondary} onClick={navigateToClassroom}>
-            <PiMagnifyingGlassFill />
-            {t('dashboard.browseClasses')}
-          </button>
-        </div>
-      </section>
+      {/* Animated Background */}
+      <div className={styles.backgroundEffects}>
+        <div className={styles.gradientOrb1} />
+        <div className={styles.gradientOrb2} />
+        <div className={styles.gradientOrb3} />
+      </div>
 
-      {/* Stats Section */}
-      <section className={styles.statsSection}>
-        <h2 className={styles.sectionTitle}>{t('dashboard.quickStats')}</h2>
-        <div className={styles.statsGrid}>
-          <div className={styles.statCard}>
-            <p className={styles.statValue}>{completedCount}</p>
-            <p className={styles.statLabel}>{t('dashboard.assignmentsCompleted')}</p>
-          </div>
-          <div className={styles.statCard}>
-            <p className={styles.statValue}>{classesJoinedCount}</p>
-            <p className={styles.statLabel}>{t('dashboard.classesJoined')}</p>
-          </div>
-          <div className={styles.statCard}>
-            <p className={styles.statValue}>{classesOwnedCount}</p>
-            <p className={styles.statLabel}>{t('dashboard.classesOwned')}</p>
-          </div>
-        </div>
-      </section>
-
-      {/* My Classrooms Section */}
-      <section className={styles.classroomsSection}>
-        <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>{t('dashboard.myClassrooms')}</h2>
-          {myClassrooms.length > 0 && (
-            <button className={styles.viewAllButton} onClick={navigateToClassroom}>
-              {t('dashboard.viewAll')}
-            </button>
-          )}
-        </div>
-        {myClassrooms.length > 0 ? (
-          <div className={styles.classroomsGrid}>
-            {myClassrooms.map((classroom) => (
-              <div
-                key={classroom.id}
-                className={styles.classroomCard}
-                onClick={handleClassroomClick}
-              >
-                <h3 className={styles.classroomTitle}>{classroom.title}</h3>
-                <div className={styles.classroomMeta}>
-                  <span className={styles.metaItem}>
-                    <PiUsersFill />
-                    {classroom.student_count} {t('dashboard.students')}
-                  </span>
-                  <span className={styles.metaItem}>
-                    {classroom.assignment_count} {t('dashboard.assignments')}
-                  </span>
-                </div>
+      {/* Main Content */}
+      <div className={styles.mainContent}>
+        {/* Welcome Banner */}
+        <section className={styles.welcomeBanner}>
+          <div className={styles.welcomeContent}>
+            <div className={styles.welcomeText}>
+              <div className={styles.welcomeBadge}>
+                <PiSparkle />
+                {t('dashboard.title')}
               </div>
-            ))}
+              <h1>{t('dashboard.welcome')}, {username || 'User'}!</h1>
+              <p>Ready to continue your musical journey?</p>
+            </div>
+            <div className={styles.quickActions}>
+              <button className={styles.actionButton} onClick={navigateToSandbox}>
+                <PiPlayFill />
+                {t('dashboard.goToSandbox')}
+              </button>
+              <button className={styles.actionButtonSecondary} onClick={navigateToClassroom}>
+                <PiMagnifyingGlassFill />
+                {t('dashboard.browseClasses')}
+              </button>
+            </div>
           </div>
-        ) : (
-          <div className={styles.emptyClassrooms}>
-            <p className={styles.emptyText}>{t('dashboard.noClassrooms')}</p>
-            <button className={styles.actionButtonSecondary} onClick={navigateToClassroom}>
-              <PiMagnifyingGlassFill />
-              {t('dashboard.browseClasses')}
-            </button>
-          </div>
-        )}
-      </section>
+        </section>
 
-      {/* Two Column Layout for Assignments and Activity */}
-      <div className={styles.twoColumnLayout}>
-        {/* Pending Assignments Section */}
-        <section className={styles.assignmentsSection}>
-          <h2 className={styles.sectionTitle}>{t('dashboard.pendingAssignments')}</h2>
-          {pendingAssignments.length > 0 ? (
-            <div className={styles.assignmentsList}>
-              {pendingAssignments.map((assignment) => (
-                <div key={assignment.id} className={styles.assignmentItem}>
-                  <div className={styles.assignmentInfo}>
-                    <p className={styles.assignmentTitle}>{assignment.title}</p>
-                    <p className={styles.assignmentMeta}>
-                      {assignment.classroom_title} &middot;{' '}
-                      <span className={`${styles.instrumentTag} ${getInstrumentTagClass(assignment.instrument)}`}>
-                        {assignment.instrument}
-                      </span>
-                    </p>
+        {/* Stats Section */}
+        <section className={styles.statsSection}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}><PiChartBarFill /></span>
+              {t('dashboard.quickStats')}
+            </h2>
+          </div>
+          <div className={styles.statsGrid}>
+            <div className={styles.statCard}>
+              <div className={`${styles.statCardIcon} ${styles.purple}`}>
+                <PiTrophyFill />
+              </div>
+              <p className={styles.statValue}>{completedCount}</p>
+              <p className={styles.statLabel}>{t('dashboard.assignmentsCompleted')}</p>
+            </div>
+            <div className={styles.statCard}>
+              <div className={`${styles.statCardIcon} ${styles.blue}`}>
+                <PiBookOpenFill />
+              </div>
+              <p className={styles.statValue}>{classesJoinedCount}</p>
+              <p className={styles.statLabel}>{t('dashboard.classesJoined')}</p>
+            </div>
+            <div className={styles.statCard}>
+              <div className={`${styles.statCardIcon} ${styles.green}`}>
+                <PiCrownFill />
+              </div>
+              <p className={styles.statValue}>{classesOwnedCount}</p>
+              <p className={styles.statLabel}>{t('dashboard.classesOwned')}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* My Classrooms Section */}
+        <section className={styles.classroomsSection}>
+          <div className={styles.sectionHeader}>
+            <h2 className={styles.sectionTitle}>
+              <span className={styles.sectionIcon}><PiBookOpenFill /></span>
+              {t('dashboard.myClassrooms')}
+            </h2>
+            {myClassrooms.length > 0 && (
+              <button className={styles.viewAllButton} onClick={navigateToClassroom}>
+                {t('dashboard.viewAll')}
+                <PiArrowRightBold />
+              </button>
+            )}
+          </div>
+          {myClassrooms.length > 0 ? (
+            <div className={styles.classroomsGrid}>
+              {myClassrooms.map((classroom) => (
+                <div
+                  key={classroom.id}
+                  className={styles.classroomCard}
+                  onClick={handleClassroomClick}
+                >
+                  <h3 className={styles.classroomTitle}>{classroom.title}</h3>
+                  <div className={styles.classroomMeta}>
+                    <span className={styles.metaItem}>
+                      <PiUsersFill />
+                      {classroom.student_count} {t('dashboard.students')}
+                    </span>
+                    <span className={styles.metaItem}>
+                      <PiMusicNotesFill />
+                      {classroom.assignment_count} {t('dashboard.assignments')}
+                    </span>
                   </div>
-                  <button
-                    className={styles.startButton}
-                    onClick={() => handleStartAssignment(assignment)}
-                  >
-                    {t('dashboard.start')}
-                  </button>
                 </div>
               ))}
             </div>
           ) : (
-            <div className={styles.emptyAssignments}>
-              <p className={styles.emptyText}>{t('dashboard.noPendingAssignments')}</p>
+            <div className={styles.emptyState}>
+              <div className={styles.emptyStateIcon}>
+                <PiBookOpenFill />
+              </div>
+              <p className={styles.emptyText}>{t('dashboard.noClassrooms')}</p>
+              <button className={styles.actionButtonSecondary} onClick={navigateToClassroom}>
+                <PiMagnifyingGlassFill />
+                {t('dashboard.browseClasses')}
+              </button>
             </div>
           )}
         </section>
 
-        {/* Recent Activity Section */}
-        <section className={styles.activitySection}>
-          <h2 className={styles.sectionTitle}>{t('dashboard.recentActivity')}</h2>
-          {recentActivity.length > 0 ? (
-            <div className={styles.activityList}>
-              {recentActivity.map((activity) => (
-                <div key={activity.id} className={styles.activityItem}>
-                  <div className={`${styles.activityIcon} ${activity.type === 'completion' ? styles.completion : styles.classJoin}`}>
-                    {activity.type === 'completion' ? <PiCheckCircleFill /> : <PiUsersFill />}
+        {/* Two Column Layout for Assignments and Activity */}
+        <div className={styles.twoColumnLayout}>
+          {/* Pending Assignments Section */}
+          <section className={styles.assignmentsSection}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>
+                <span className={styles.sectionIcon}><PiClockFill /></span>
+                {t('dashboard.pendingAssignments')}
+              </h2>
+            </div>
+            {pendingAssignments.length > 0 ? (
+              <div className={styles.assignmentsList}>
+                {pendingAssignments.map((assignment) => (
+                  <div key={assignment.id} className={styles.assignmentItem}>
+                    <div className={styles.assignmentInfo}>
+                      <p className={styles.assignmentTitle}>{assignment.title}</p>
+                      <p className={styles.assignmentMeta}>
+                        {assignment.classroom_title}
+                        <span className={`${styles.instrumentTag} ${getInstrumentTagClass(assignment.instrument)}`}>
+                          {assignment.instrument}
+                        </span>
+                      </p>
+                    </div>
+                    <button
+                      className={styles.startButton}
+                      onClick={() => handleStartAssignment(assignment)}
+                    >
+                      <PiPlayFill />
+                      {t('dashboard.start')}
+                    </button>
                   </div>
-                  <div className={styles.activityContent}>
-                    <p className={styles.activityTitle}>
-                      {activity.type === 'completion' ? t('dashboard.completedAssignment') : t('dashboard.joinedClass')}: {activity.title}
-                    </p>
-                    <p className={styles.activityMeta}>
-                      {activity.type === 'completion' ? activity.subtitle : ''} &middot; {formatRelativeTime(activity.timestamp)}
-                    </p>
-                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyStateIcon}>
+                  <PiCheckCircleFill />
                 </div>
-              ))}
+                <p className={styles.emptyText}>{t('dashboard.noPendingAssignments')}</p>
+              </div>
+            )}
+          </section>
+
+          {/* Recent Activity Section */}
+          <section className={styles.activitySection}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>
+                <span className={styles.sectionIcon}><PiClockFill /></span>
+                {t('dashboard.recentActivity')}
+              </h2>
             </div>
-          ) : (
-            <div className={styles.emptyActivity}>
-              <p className={styles.emptyText}>{t('dashboard.noRecentActivity')}</p>
-            </div>
-          )}
-        </section>
+            {recentActivity.length > 0 ? (
+              <div className={styles.activityList}>
+                {recentActivity.map((activity) => (
+                  <div key={activity.id} className={styles.activityItem}>
+                    <div className={`${styles.activityIcon} ${activity.type === 'completion' ? styles.completion : styles.classJoin}`}>
+                      {activity.type === 'completion' ? <PiCheckCircleFill /> : <PiUsersFill />}
+                    </div>
+                    <div className={styles.activityContent}>
+                      <p className={styles.activityTitle}>
+                        {activity.type === 'completion' ? t('dashboard.completedAssignment') : t('dashboard.joinedClass')}: {activity.title}
+                      </p>
+                      <p className={styles.activityMeta}>
+                        {activity.type === 'completion' && `${activity.subtitle} · `}
+                        {formatRelativeTime(activity.timestamp)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyStateIcon}>
+                  <PiClockFill />
+                </div>
+                <p className={styles.emptyText}>{t('dashboard.noRecentActivity')}</p>
+              </div>
+            )}
+          </section>
+        </div>
       </div>
     </div>
   )
