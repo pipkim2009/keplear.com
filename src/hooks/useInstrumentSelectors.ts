@@ -24,6 +24,7 @@ export const useNavigation = () => {
     navigateToSandbox: context.navigateToSandbox,
     navigateToClassroom: context.navigateToClassroom,
     navigateToProfile: context.navigateToProfile,
+    navigateToDashboard: context.navigateToDashboard,
     setCurrentPage: context.setCurrentPage,
     profileUserId: context.profileUserId
   }), [
@@ -32,6 +33,7 @@ export const useNavigation = () => {
     context.navigateToSandbox,
     context.navigateToClassroom,
     context.navigateToProfile,
+    context.navigateToDashboard,
     context.setCurrentPage,
     context.profileUserId
   ])

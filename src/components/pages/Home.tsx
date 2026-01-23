@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useContext } from 'react'
+import AuthContext from '../../contexts/AuthContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import styles from '../../styles/Home.module.css'
 import {
@@ -16,12 +17,24 @@ import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
 
 interface HomeProps {
   onNavigateToSandbox: () => void
+  onNavigateToDashboard: () => void
 }
 
-function Home({ onNavigateToSandbox }: HomeProps) {
+function Home({ onNavigateToSandbox, onNavigateToDashboard }: HomeProps) {
+  const authContext = useContext(AuthContext)
+  const user = authContext?.user
+  const loading = authContext?.loading
+
   const { t } = useTranslation()
   const [wordIndex, setWordIndex] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
+
+  // Redirect logged-in users to dashboard
+  useEffect(() => {
+    if (user && !loading) {
+      onNavigateToDashboard()
+    }
+  }, [user, loading, onNavigateToDashboard])
 
   const rotatingWords = useMemo(() => [
     t('home.yourSound'),

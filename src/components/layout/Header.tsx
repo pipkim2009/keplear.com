@@ -21,6 +21,7 @@ const Header = memo(function Header({
   const {
     currentPage,
     navigateToHome,
+    navigateToDashboard,
     navigateToSandbox,
     navigateToClassroom
   } = useNavigation()
@@ -53,12 +54,21 @@ const Header = memo(function Header({
         </div>
 
         <nav className="header-nav">
-          <button
-            className={`nav-link ${currentPage === 'home' ? 'nav-link-active' : ''}`}
-            onClick={navigateToHome}
-          >
-            {t('nav.home')}
-          </button>
+          {user ? (
+            <button
+              className={`nav-link ${currentPage === 'dashboard' ? 'nav-link-active' : ''}`}
+              onClick={navigateToDashboard}
+            >
+              {t('nav.dashboard')}
+            </button>
+          ) : (
+            <button
+              className={`nav-link ${currentPage === 'home' ? 'nav-link-active' : ''}`}
+              onClick={navigateToHome}
+            >
+              {t('nav.home')}
+            </button>
+          )}
           <button
             className={`nav-link ${currentPage === 'sandbox' ? 'nav-link-active' : ''}`}
             onClick={navigateToSandbox}

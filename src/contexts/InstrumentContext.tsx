@@ -37,6 +37,7 @@ interface InstrumentContextType {
   navigateToSandbox: () => void
   navigateToClassroom: () => void
   navigateToProfile: (userId?: string) => void
+  navigateToDashboard: () => void
   profileUserId: string | null
   setBpm: (bpm: number) => void
   setNumberOfBeats: (beats: number) => void
@@ -152,6 +153,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     navigateToSandbox: navigateToSandboxOriginal,
     navigateToClassroom,
     navigateToProfile,
+    navigateToDashboard,
     profileUserId,
     setBpm,
     setNumberOfBeats,
@@ -432,6 +434,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     navigateToSandbox,
     navigateToClassroom,
     navigateToProfile,
+    navigateToDashboard,
     profileUserId,
     setBpm,
     setNumberOfBeats,

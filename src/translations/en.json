@@ -1,6 +1,7 @@
 {
   "nav": {
     "home": "Home",
+    "dashboard": "Dashboard",
     "sandbox": "Sandbox",
     "classroom": "Classroom"
   },
@@ -362,6 +363,28 @@
       "position5": "Position 5",
       "position6": "Position 6"
     }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "quickStats": "Quick Stats",
+    "assignmentsCompleted": "Assignments Completed",
+    "classesJoined": "Classes Joined",
+    "classesOwned": "Classes Owned",
+    "myClassrooms": "My Classrooms",
+    "noClassrooms": "You haven't joined any classrooms yet.",
+    "browseClasses": "Browse Classes",
+    "students": "students",
+    "assignments": "assignments",
+    "pendingAssignments": "Pending Assignments",
+    "noPendingAssignments": "You're all caught up! No pending assignments.",
+    "start": "Start",
+    "recentActivity": "Recent Activity",
+    "noRecentActivity": "No recent activity yet.",
+    "completedAssignment": "Completed",
+    "joinedClass": "Joined",
+    "goToSandbox": "Go to Sandbox",
+    "viewAll": "View All"
   },
   "profile": {
     "title": "Profile",

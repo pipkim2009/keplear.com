@@ -23,6 +23,7 @@ interface UseUIStateReturn {
   navigateToSandbox: () => void
   navigateToClassroom: () => void
   navigateToProfile: (userId?: string) => void
+  navigateToDashboard: () => void
   setCurrentPage: (page: PageType) => void
   profileUserId: string | null
 
@@ -70,6 +71,10 @@ export const useUIState = (): UseUIStateReturn => {
   const navigateToProfile = useCallback((userId?: string) => {
     setProfileUserId(userId || null)
     dispatch({ type: 'SET_CURRENT_PAGE', payload: 'profile' })
+  }, [])
+
+  const navigateToDashboard = useCallback(() => {
+    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'dashboard' })
   }, [])
 
   const setCurrentPage = useCallback((page: PageType) => {
@@ -148,6 +153,7 @@ export const useUIState = (): UseUIStateReturn => {
     navigateToSandbox,
     navigateToClassroom,
     navigateToProfile,
+    navigateToDashboard,
     setCurrentPage,
     profileUserId,
 

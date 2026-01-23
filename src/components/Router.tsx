@@ -7,6 +7,7 @@ import PageLoader from './common/PageLoader'
  * Each page is loaded on-demand, reducing initial bundle size
  */
 const Home = lazy(() => import('./pages/Home'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Sandbox = lazy(() => import('./pages/Sandbox'))
 const Classroom = lazy(() => import('./pages/Classroom'))
 const Profile = lazy(() => import('./pages/Profile'))
@@ -20,7 +21,8 @@ function Router() {
   const {
     currentPage,
     navigateToHome,
-    navigateToSandbox
+    navigateToSandbox,
+    navigateToDashboard
   } = useInstrument()
 
   const renderPage = () => {
@@ -29,8 +31,12 @@ function Router() {
         return (
           <Home
             onNavigateToSandbox={navigateToSandbox}
+            onNavigateToDashboard={navigateToDashboard}
           />
         )
+
+      case 'dashboard':
+        return <Dashboard />
 
       case 'sandbox':
         return <Sandbox />
