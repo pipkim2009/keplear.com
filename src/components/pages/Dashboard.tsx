@@ -484,10 +484,6 @@ function Dashboard() {
       <div className={styles.mainContent}>
         {/* Welcome Banner */}
         <section className={styles.welcomeBanner}>
-          <button className={styles.profileLink} onClick={() => navigateToProfile()}>
-            <PiUserCircleFill className={styles.profileIcon} />
-            <span>{username || 'Profile'}</span>
-          </button>
           <div className={styles.welcomeContent}>
             <div className={styles.welcomeText}>
               <div className={styles.welcomeBadge}>
@@ -495,7 +491,10 @@ function Dashboard() {
                 {t('dashboard.title')}
               </div>
               <h1>{t('dashboard.welcome')}, {username || 'User'}!</h1>
-              <p>Ready to continue your musical journey?</p>
+              <button className={styles.profileLink} onClick={() => navigateToProfile()}>
+                <PiUserCircleFill className={styles.profileIcon} />
+                <span>{username || 'Profile'}</span>
+              </button>
             </div>
             <div className={styles.quickActions}>
               <button className={styles.actionButton} onClick={navigateToSandbox}>
@@ -503,8 +502,8 @@ function Dashboard() {
                 {t('dashboard.goToSandbox')}
               </button>
               <button className={styles.actionButtonSecondary} onClick={navigateToClassroom}>
-                <PiMagnifyingGlassFill />
-                {t('dashboard.browseClasses')}
+                <PiBookOpenFill />
+                Go to Classroom
               </button>
             </div>
           </div>
@@ -565,13 +564,12 @@ function Dashboard() {
                 {/* SVG Line Chart */}
                 {practiceStats && practiceStats.weeklyData.length > 0 && (() => {
                   const data = practiceStats.weeklyData
-                  const padding = 4 // padding from edges
-                  const xStep = (100 - padding * 2) / (data.length - 1 || 1)
+                  const xStep = 100 / (data.length - 1 || 1)
 
                   // Generate points for total (sandbox + classroom combined)
                   const totalPoints = data.map((d, i) => ({
-                    x: padding + i * xStep,
-                    y: Math.min(96, Math.max(4, 100 - ((d.sandbox + d.classroom) / maxChartValue) * 92)),
+                    x: i * xStep,
+                    y: 100 - ((d.sandbox + d.classroom) / maxChartValue) * 84,
                     total: d.sandbox + d.classroom
                   }))
 
@@ -589,7 +587,7 @@ function Dashboard() {
 
                   // Area fill path
                   const lastPoint = totalPoints[totalPoints.length - 1]
-                  const areaPath = `${linePath} L ${lastPoint.x} 100 L ${padding} 100 Z`
+                  const areaPath = `${linePath} L ${lastPoint.x} 100 L 0 100 Z`
 
                   return (
                     <>
@@ -780,8 +778,8 @@ function Dashboard() {
                 </div>
                 <p className={styles.emptyText}>{t('dashboard.noClassrooms')}</p>
                 <button className={styles.actionButtonSecondary} onClick={navigateToClassroom}>
-                  <PiMagnifyingGlassFill />
-                  {t('dashboard.browseClasses')}
+                  <PiBookOpenFill />
+                  Go to Classroom
                 </button>
               </div>
             )}

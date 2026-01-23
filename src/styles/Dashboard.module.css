@@ -104,13 +104,11 @@
 }
 
 .profileLink {
-  position: absolute;
-  top: 1.25rem;
-  right: 1.25rem;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
+  margin-top: 0.5rem;
   background: var(--white-alpha-10);
   border: 1px solid var(--white-alpha-15);
   border-radius: 100px;
@@ -119,6 +117,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  width: fit-content;
 }
 
 .profileLink:hover {
@@ -389,18 +388,22 @@
 
 .yAxisWrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: stretch;
   padding-right: 0.5rem;
 }
 
 .yAxisLabel {
+  display: flex;
+  align-items: center;
   font-size: 0.5625rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--text-muted);
-  text-align: right;
-  margin-bottom: 0.25rem;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  margin-right: 0.5rem;
 }
 
 .chartYAxis {
@@ -414,13 +417,24 @@
   min-width: 24px;
   text-align: right;
   opacity: 0.6;
+  padding-top: 0.4em;
+  padding-bottom: 0.4em;
+}
+
+.chartYAxis span {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 0;
 }
 
 .chartArea {
   flex: 1;
   position: relative;
   margin-left: 4px;
+  margin-right: 5px;
   z-index: 1;
+  overflow: visible;
 }
 
 /* Grid lines */
@@ -483,7 +497,8 @@
 .chartXAxis {
   display: flex;
   justify-content: space-between;
-  padding: 0.5rem 0 0 28px;
+  padding: 0.5rem 0 0 0;
+  margin-left: 52px;
 }
 
 .xAxisLabel {
@@ -563,10 +578,17 @@
   font-weight: 600;
   color: var(--text-muted);
   text-align: center;
-  flex: 1;
   opacity: 0.7;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.chartLabel:first-child {
+  text-align: left;
+}
+
+.chartLabel:last-child {
+  text-align: right;
 }
 
 
@@ -1268,17 +1290,6 @@
   .welcomeContent {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .profileLink {
-    top: 1rem;
-    right: 1rem;
-    padding: 0.375rem 0.75rem;
-    font-size: 0.8125rem;
-  }
-
-  .profileLink span {
-    display: none;
   }
 
   .welcomeText h1 {
