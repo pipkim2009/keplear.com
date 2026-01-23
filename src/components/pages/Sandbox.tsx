@@ -529,6 +529,11 @@ function Sandbox() {
       const message = t('sandbox.congratulations')
       setCongratulationsMessage(message)
 
+      // Ensure user ID is set before recording (fixes timing issues with useEffect)
+      if (user?.id) {
+        setCurrentUserId(user.id)
+      }
+
       // Record sandbox practice session
       recordPracticeSession({
         type: 'sandbox',
@@ -536,7 +541,7 @@ function Sandbox() {
         melodiesCompleted: 1
       })
     }
-  }, [t, isFromAssignment, instrument])
+  }, [t, isFromAssignment, instrument, user?.id])
 
   const handleAssignmentCompleteEnd = useCallback(() => {
     setShowAssignmentComplete(false)

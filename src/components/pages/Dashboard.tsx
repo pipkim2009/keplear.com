@@ -12,18 +12,13 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import { getPracticeStats, getRecentSessions, setCurrentUserId, type PracticeSession, type PracticeStats } from '../../utils/practiceTracker'
 import {
   PiPlayFill,
-  PiMagnifyingGlassFill,
   PiCheckCircleFill,
   PiUsersFill,
   PiChartBarFill,
-  PiTrophyFill,
   PiBookOpenFill,
-  PiCrownFill,
   PiArrowRightBold,
   PiSparkle,
   PiMusicNotesFill,
-  PiClockFill,
-  PiPlusBold,
   PiMusicNoteFill,
   PiPianoKeysFill,
   PiGuitarFill,
@@ -76,15 +71,12 @@ function Dashboard() {
 
   // State
   const [username, setUsername] = useState<string>('')
-  const [accountCreatedAt, setAccountCreatedAt] = useState<string | null>(null)
   const [practiceStats, setPracticeStats] = useState<PracticeStats | null>(null)
   const [completedAssignmentsCount, setCompletedAssignmentsCount] = useState<number>(0)
   const [myClassrooms, setMyClassrooms] = useState<ClassroomData[]>([])
-  const [availableClassrooms, setAvailableClassrooms] = useState<ClassroomData[]>([])
   const [pendingAssignments, setPendingAssignments] = useState<PendingAssignment[]>([])
   const [recentActivity, setRecentActivity] = useState<ActivityItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [joiningClassroom, setJoiningClassroom] = useState<string | null>(null)
 
   // Fetch dashboard data
   const fetchDashboardData = useCallback(async () => {
@@ -95,11 +87,6 @@ function Dashboard() {
     try {
       // Set user ID for user-specific practice data
       setCurrentUserId(user.id)
-
-      // Get account creation date
-      if (user.created_at) {
-        setAccountCreatedAt(user.created_at.split('T')[0])
-      }
 
       // Get practice stats from localStorage
       const stats = getPracticeStats()
@@ -205,48 +192,6 @@ function Dashboard() {
 
       setMyClassrooms(Array.from(classroomMap.values()).slice(0, 6))
 
-      // If user has no classrooms, fetch available public classrooms
-      if (classroomMap.size === 0) {
-        const { data: publicClassrooms } = await supabase
-          .from('classrooms')
-          .select(`
-            id,
-            title,
-            description,
-            is_public,
-            created_by,
-            profiles (username)
-          `)
-          .eq('is_public', true)
-          .neq('created_by', user.id)
-          .limit(6)
-
-        const availableWithCounts: ClassroomData[] = []
-        for (const pc of publicClassrooms || []) {
-          const { count: studentCount } = await supabase
-            .from('classroom_students')
-            .select('*', { count: 'exact', head: true })
-            .eq('classroom_id', pc.id)
-
-          const { count: assignmentCount } = await supabase
-            .from('assignments')
-            .select('*', { count: 'exact', head: true })
-            .eq('classroom_id', pc.id)
-
-          availableWithCounts.push({
-            id: pc.id,
-            title: pc.title,
-            description: pc.description || undefined,
-            is_public: pc.is_public,
-            created_by: pc.created_by,
-            owner_username: (pc.profiles as any)?.username || 'Unknown',
-            student_count: studentCount || 0,
-            assignment_count: assignmentCount || 0
-          })
-        }
-        setAvailableClassrooms(availableWithCounts)
-      }
-
       // Fetch pending assignments
       if (classroomIds.length > 0) {
         const { data: allAssignments } = await supabase
@@ -350,27 +295,6 @@ function Dashboard() {
     }
   }, [user, loading, fetchDashboardData])
 
-  // Handle joining a classroom
-  const handleJoinClassroom = async (classroomId: string) => {
-    if (!user) return
-
-    setJoiningClassroom(classroomId)
-    try {
-      const { error } = await supabase
-        .from('classroom_students')
-        .insert({ user_id: user.id, classroom_id: classroomId })
-
-      if (!error) {
-        // Refresh data
-        fetchDashboardData()
-      }
-    } catch (err) {
-      console.error('Error joining classroom:', err)
-    } finally {
-      setJoiningClassroom(null)
-    }
-  }
-
   // Handle starting an assignment
   const handleStartAssignment = (assignment: PendingAssignment) => {
     setInstrument(assignment.instrument as 'keyboard' | 'guitar' | 'bass')
@@ -439,14 +363,8 @@ function Dashboard() {
 
   // Format day name
   const formatDayName = (dateStr: string): string => {
-    const date = new Date(dateStr)
-    const today = new Date()
-    const yesterday = new Date(today)
-    yesterday.setDate(yesterday.getDate() - 1)
-
-    if (dateStr === today.toISOString().split('T')[0]) return 'Today'
-    if (dateStr === yesterday.toISOString().split('T')[0]) return 'Yest'
-    return date.toLocaleDateString('en', { weekday: 'short' }).slice(0, 3)
+    const date = new Date(dateStr + 'T00:00:00') // Ensure consistent parsing
+    return date.toLocaleDateString('en', { weekday: 'short' })
   }
 
   if (loading || isLoading) {
@@ -570,74 +488,31 @@ function Dashboard() {
                   <div className={styles.gridLine} />
                 </div>
 
-                {/* SVG Line Chart */}
-                {practiceStats && practiceStats.weeklyData.length > 0 && (() => {
-                  // Filter to only show days since account creation
-                  const data = accountCreatedAt
-                    ? practiceStats.weeklyData.filter(d => d.date >= accountCreatedAt)
-                    : practiceStats.weeklyData
-
-                  if (data.length === 0) return null
-                  const xStep = 100 / (data.length - 1 || 1)
-
-                  // Generate points for total (sandbox + classroom combined)
-                  const totalPoints = data.map((d, i) => ({
-                    x: i * xStep,
-                    y: 100 - ((d.sandbox + d.classroom) / maxChartValue) * 84,
-                    total: d.sandbox + d.classroom
-                  }))
-
-                  // Straight line path helper
-                  const createLinePath = (points: {x: number, y: number}[]) => {
-                    if (points.length < 2) return ''
-                    let path = `M ${points[0].x} ${points[0].y}`
-                    for (let i = 1; i < points.length; i++) {
-                      path += ` L ${points[i].x} ${points[i].y}`
-                    }
-                    return path
-                  }
-
-                  const linePath = createLinePath(totalPoints)
-
-                  // Area fill path
-                  const lastPoint = totalPoints[totalPoints.length - 1]
-                  const areaPath = `${linePath} L ${lastPoint.x} 100 L 0 100 Z`
-
-                  return (
-                    <>
-                      <svg className={styles.chartSvg} viewBox="0 0 100 100" preserveAspectRatio="none">
-                        <defs>
-                          <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stopColor="var(--primary-purple)" stopOpacity="0.3" />
-                            <stop offset="100%" stopColor="var(--primary-purple)" stopOpacity="0" />
-                          </linearGradient>
-                        </defs>
-                        {/* Area fill */}
-                        <path className={`${styles.chartAreaFill} ${styles.chartAreaFillSandbox}`} d={areaPath} />
-                        {/* Line */}
-                        <path className={`${styles.chartLine} ${styles.chartLineSandbox}`} d={linePath} vectorEffect="non-scaling-stroke" />
-                      </svg>
-                      {/* Data points - rendered outside SVG to keep them circular */}
-                      {totalPoints.map((p, i) => (
-                        <div
-                          key={`point-${i}`}
-                          className={styles.chartPoint}
-                          style={{ left: `${p.x}%`, top: `${p.y}%` }}
-                          title={`${p.total} melodies`}
-                        />
-                      ))}
-                    </>
-                  )
-                })()}
+                {/* Bar Chart */}
+                {practiceStats && practiceStats.weeklyData.length > 0 && (
+                  <div className={styles.barChartContainer}>
+                    {practiceStats.weeklyData.map((d, i) => {
+                      const total = d.sandbox + d.classroom
+                      const heightPercent = (total / maxChartValue) * 100
+                      return (
+                        <div key={i} className={styles.barWrapper}>
+                          <div
+                            className={styles.bar}
+                            style={{ height: `${heightPercent}%` }}
+                            title={`${total} melodies`}
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             </div>
             {/* X-axis labels */}
             <div className={styles.chartXAxis}>
-              {practiceStats?.weeklyData
-                .filter(d => !accountCreatedAt || d.date >= accountCreatedAt)
-                .map((day) => (
-                  <span key={day.date} className={styles.chartLabel}>{formatDayName(day.date)}</span>
-                ))}
+              {practiceStats?.weeklyData.map((day) => (
+                <span key={day.date} className={styles.chartLabel}>{formatDayName(day.date)}</span>
+              ))}
             </div>
             <span className={styles.xAxisLabel}>Day</span>
           </div>
@@ -698,47 +573,15 @@ function Dashboard() {
             </h2>
           </div>
 
-          <div className={styles.classroomsAssignmentsRow}>
-            {/* Pending Assignments */}
-            <div className={styles.assignmentsPanel}>
-              <h3 className={styles.panelTitle}>Pending Assignments</h3>
-              {pendingAssignments.length > 0 ? (
-                <div className={styles.assignmentsList}>
-                  {pendingAssignments.map((assignment) => (
-                    <div key={assignment.id} className={styles.assignmentItem}>
-                      <div className={styles.assignmentInfo}>
-                        <p className={styles.assignmentTitle}>{assignment.title}</p>
-                        <p className={styles.assignmentMeta}>
-                          {assignment.classroom_title}
-                          <span className={`${styles.instrumentTag} ${getInstrumentTagClass(assignment.instrument)}`}>
-                            {assignment.instrument}
-                          </span>
-                        </p>
-                      </div>
-                      <button
-                        className={styles.startButton}
-                        onClick={() => handleStartAssignment(assignment)}
-                      >
-                        <PiPlayFill />
-                        {t('dashboard.start')}
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className={styles.panelEmptyState}>
-                  <PiCheckCircleFill className={styles.panelEmptyIcon} />
-                  <p>{t('dashboard.noPendingAssignments')}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Classrooms */}
-            <div className={styles.classroomsSection}>
-              {myClassrooms.length > 0 ? (
+          {/* Classrooms with Pending Assignments */}
+          <div className={styles.classroomsSection}>
+            {myClassrooms.length > 0 ? (
               <div className={classroomStyles.classesGrid}>
                 {myClassrooms.map((classroom) => {
                   const isOwner = user && classroom.created_by === user.id
+                  const classroomPendingAssignments = pendingAssignments.filter(
+                    a => a.classroom_id === classroom.id
+                  )
                   return (
                     <div
                       key={classroom.id}
@@ -766,40 +609,46 @@ function Dashboard() {
                       {classroom.description && (
                         <p className={classroomStyles.classDescription}>{classroom.description}</p>
                       )}
+                      {classroomPendingAssignments.length > 0 && (
+                        <div className={styles.classroomAssignments}>
+                          <span className={styles.pendingLabel}>
+                            {classroomPendingAssignments.length} pending
+                          </span>
+                          <div className={styles.assignmentChips}>
+                            {classroomPendingAssignments.slice(0, 2).map((assignment) => (
+                              <button
+                                key={assignment.id}
+                                className={styles.assignmentChip}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleStartAssignment(assignment)
+                                }}
+                              >
+                                <PiPlayFill />
+                                {assignment.title}
+                              </button>
+                            ))}
+                            {classroomPendingAssignments.length > 2 && (
+                              <span className={styles.moreAssignments}>
+                                +{classroomPendingAssignments.length - 2} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )
                 })}
               </div>
-            ) : availableClassrooms.length > 0 ? (
-              <div className={classroomStyles.classesGrid}>
-                {availableClassrooms.map((classroom) => (
-                  <div key={classroom.id} className={classroomStyles.classCardClickable} onClick={() => handleJoinClassroom(classroom.id)}>
-                    <div className={classroomStyles.classTitleRow}>
-                      <h3 className={classroomStyles.classTitle}>{classroom.title}</h3>
-                      <div className={classroomStyles.tagGroup}>
-                        <span className={classroomStyles.publicTag}>{t('classroom.public')}</span>
-                      </div>
-                    </div>
-                    <p className={classroomStyles.classAuthor}>{t('classroom.by')} {classroom.owner_username}</p>
-                    {classroom.description && (
-                      <p className={classroomStyles.classDescription}>{classroom.description}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
             ) : (
-              <div className={styles.emptyState}>
-                <div className={styles.emptyStateIcon}>
+              <div className={styles.noClassesMessage}>
+                <p>You haven't joined any classes yet</p>
+                <button className={styles.browseClassesButton} onClick={navigateToClassroom}>
                   <PiBookOpenFill />
-                </div>
-                <p className={styles.emptyText}>{t('dashboard.noClassrooms')}</p>
-                <button className={styles.actionButtonSecondary} onClick={navigateToClassroom}>
-                  <PiBookOpenFill />
-                  Go to Classroom
+                  Browse Classes
                 </button>
               </div>
             )}
-            </div>
           </div>
         </section>
       </div>

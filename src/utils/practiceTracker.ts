@@ -116,13 +116,20 @@ export function getPracticeStats(): PracticeStats {
     }
   })
 
-  // Calculate weekly data (last 7 days)
+  // Calculate weekly data (Monday to Sunday of current week)
   const weeklyData: PracticeStats['weeklyData'] = []
   const today = new Date()
 
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today)
-    date.setDate(date.getDate() - i)
+  // Find Monday of current week (0 = Sunday, 1 = Monday, etc.)
+  const dayOfWeek = today.getDay()
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek // If Sunday, go back 6 days
+  const monday = new Date(today)
+  monday.setDate(today.getDate() + mondayOffset)
+
+  // Generate data for Mon through Sun
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(monday)
+    date.setDate(monday.getDate() + i)
     const dateStr = date.toISOString().split('T')[0]
 
     let sandbox = 0
