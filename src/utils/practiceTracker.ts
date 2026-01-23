@@ -32,15 +32,32 @@ export interface PracticeStats {
   }[]
 }
 
-const STORAGE_KEY = 'keplear-practice-sessions'
+const STORAGE_KEY_PREFIX = 'keplear-practice-sessions'
 const MAX_SESSIONS = 100 // Keep last 100 sessions
+
+// Current user ID for storage key
+let currentUserId: string | null = null
+
+/**
+ * Set the current user ID for user-specific storage
+ */
+export function setCurrentUserId(userId: string | null): void {
+  currentUserId = userId
+}
+
+/**
+ * Get the storage key for the current user
+ */
+function getStorageKey(): string {
+  return currentUserId ? `${STORAGE_KEY_PREFIX}-${currentUserId}` : STORAGE_KEY_PREFIX
+}
 
 /**
  * Get all practice sessions from localStorage
  */
 export function getPracticeSessions(): PracticeSession[] {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = localStorage.getItem(getStorageKey())
     if (!stored) return []
     return JSON.parse(stored) as PracticeSession[]
   } catch {
@@ -67,7 +84,7 @@ export function recordPracticeSession(session: Omit<PracticeSession, 'id' | 'tim
   const trimmed = sessions.slice(0, MAX_SESSIONS)
 
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed))
+    localStorage.setItem(getStorageKey(), JSON.stringify(trimmed))
   } catch {
     // Handle quota exceeded
     console.warn('Failed to save practice session')
@@ -145,5 +162,5 @@ export function getRecentSessions(limit: number = 10): PracticeSession[] {
  * Clear all practice sessions (for testing/reset)
  */
 export function clearPracticeSessions(): void {
-  localStorage.removeItem(STORAGE_KEY)
+  localStorage.removeItem(getStorageKey())
 }

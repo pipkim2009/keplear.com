@@ -26,7 +26,7 @@ import {
   getBassNoteById,
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
-import { recordPracticeSession } from '../../utils/practiceTracker'
+import { recordPracticeSession, setCurrentUserId } from '../../utils/practiceTracker'
 import { PiTrashFill, PiChatCircleFill, PiPencilSimpleFill, PiEyeFill, PiCheckCircleFill, PiXCircleFill } from 'react-icons/pi'
 import { useRecordCompletion, useUserCompletions, useAssignmentCompletions } from '../../hooks/useClassrooms'
 import styles from '../../styles/Classroom.module.css'
@@ -223,6 +223,11 @@ function Classroom() {
   const authContext = useContext(AuthContext)
   const user = authContext?.user ?? null
   const { t } = useTranslation()
+
+  // Set user ID for user-specific practice tracking
+  useEffect(() => {
+    setCurrentUserId(user?.id ?? null)
+  }, [user?.id])
 
   // Translated instrument names
   const instrumentNames = useMemo(() => ({

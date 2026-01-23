@@ -9,7 +9,7 @@ import AuthContext from '../../contexts/AuthContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useNavigation } from '../../hooks/useInstrumentSelectors'
 import { useInstrument } from '../../contexts/InstrumentContext'
-import { getPracticeStats, getRecentSessions, type PracticeSession, type PracticeStats } from '../../utils/practiceTracker'
+import { getPracticeStats, getRecentSessions, setCurrentUserId, type PracticeSession, type PracticeStats } from '../../utils/practiceTracker'
 import {
   PiPlayFill,
   PiMagnifyingGlassFill,
@@ -76,6 +76,7 @@ function Dashboard() {
 
   // State
   const [username, setUsername] = useState<string>('')
+  const [accountCreatedAt, setAccountCreatedAt] = useState<string | null>(null)
   const [practiceStats, setPracticeStats] = useState<PracticeStats | null>(null)
   const [completedAssignmentsCount, setCompletedAssignmentsCount] = useState<number>(0)
   const [myClassrooms, setMyClassrooms] = useState<ClassroomData[]>([])
@@ -92,6 +93,14 @@ function Dashboard() {
     setIsLoading(true)
 
     try {
+      // Set user ID for user-specific practice data
+      setCurrentUserId(user.id)
+
+      // Get account creation date
+      if (user.created_at) {
+        setAccountCreatedAt(user.created_at.split('T')[0])
+      }
+
       // Get practice stats from localStorage
       const stats = getPracticeStats()
       setPracticeStats(stats)
@@ -563,7 +572,12 @@ function Dashboard() {
 
                 {/* SVG Line Chart */}
                 {practiceStats && practiceStats.weeklyData.length > 0 && (() => {
-                  const data = practiceStats.weeklyData
+                  // Filter to only show days since account creation
+                  const data = accountCreatedAt
+                    ? practiceStats.weeklyData.filter(d => d.date >= accountCreatedAt)
+                    : practiceStats.weeklyData
+
+                  if (data.length === 0) return null
                   const xStep = 100 / (data.length - 1 || 1)
 
                   // Generate points for total (sandbox + classroom combined)
@@ -619,9 +633,11 @@ function Dashboard() {
             </div>
             {/* X-axis labels */}
             <div className={styles.chartXAxis}>
-              {practiceStats?.weeklyData.map((day) => (
-                <span key={day.date} className={styles.chartLabel}>{formatDayName(day.date)}</span>
-              ))}
+              {practiceStats?.weeklyData
+                .filter(d => !accountCreatedAt || d.date >= accountCreatedAt)
+                .map((day) => (
+                  <span key={day.date} className={styles.chartLabel}>{formatDayName(day.date)}</span>
+                ))}
             </div>
             <span className={styles.xAxisLabel}>Day</span>
           </div>

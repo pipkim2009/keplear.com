@@ -26,7 +26,7 @@ import {
   getBassNoteById,
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
-import { recordPracticeSession } from '../../utils/practiceTracker'
+import { recordPracticeSession, setCurrentUserId } from '../../utils/practiceTracker'
 import type { AppliedScale, AppliedChord } from '../common/ScaleChordOptions'
 import styles from '../../styles/Practice.module.css'
 
@@ -124,6 +124,11 @@ function Sandbox() {
   const authContext = useContext(AuthContext)
   const user = authContext?.user ?? null
   const { navigateToClassroom } = useInstrument()
+
+  // Set user ID for user-specific practice tracking
+  useEffect(() => {
+    setCurrentUserId(user?.id ?? null)
+  }, [user?.id])
 
   // Translated instrument names
   const instrumentNames: Record<string, string> = useMemo(() => ({
