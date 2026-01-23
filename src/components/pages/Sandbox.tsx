@@ -26,6 +26,7 @@ import {
   getBassNoteById,
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
+import { recordPracticeSession } from '../../utils/practiceTracker'
 import type { AppliedScale, AppliedChord } from '../common/ScaleChordOptions'
 import styles from '../../styles/Practice.module.css'
 
@@ -522,8 +523,15 @@ function Sandbox() {
       // Show regular congratulations for free practice
       const message = t('sandbox.congratulations')
       setCongratulationsMessage(message)
+
+      // Record sandbox practice session
+      recordPracticeSession({
+        type: 'sandbox',
+        instrument: instrument,
+        melodiesCompleted: 1
+      })
     }
-  }, [t, isFromAssignment])
+  }, [t, isFromAssignment, instrument])
 
   const handleAssignmentCompleteEnd = useCallback(() => {
     setShowAssignmentComplete(false)

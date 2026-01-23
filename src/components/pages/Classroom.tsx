@@ -26,6 +26,7 @@ import {
   getBassNoteById,
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
+import { recordPracticeSession } from '../../utils/practiceTracker'
 import { PiTrashFill, PiChatCircleFill, PiPencilSimpleFill, PiEyeFill, PiCheckCircleFill, PiXCircleFill } from 'react-icons/pi'
 import { useRecordCompletion, useUserCompletions, useAssignmentCompletions } from '../../hooks/useClassrooms'
 import styles from '../../styles/Classroom.module.css'
@@ -2473,6 +2474,15 @@ function Classroom() {
       // Record completion to database
       if (currentAssignment && user?.id) {
         recordCompletion.mutate({ assignmentId: currentAssignment.id, userId: user.id })
+
+        // Also record to localStorage for dashboard stats
+        recordPracticeSession({
+          type: 'classroom',
+          instrument: currentAssignment.instrument,
+          melodiesCompleted: lessonExercises.length,
+          assignmentId: currentAssignment.id,
+          assignmentTitle: currentAssignment.title
+        })
       }
     }
   }, [lessonExerciseIndex, lessonExercises.length, handleSwitchLessonExercise, currentAssignment, user?.id, recordCompletion])

@@ -1,8 +1,7 @@
 import logo from '/Keplear-logo.png'
 import { useTranslation } from '../../contexts/TranslationContext'
-import { FaInstagram, FaTiktok, FaFacebook } from 'react-icons/fa'
+import { FaInstagram, FaTiktok } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
-import { SiThreads } from 'react-icons/si'
 import '../../styles/Footer.css'
 
 function Footer() {
@@ -30,12 +29,6 @@ function Footer() {
               </a>
               <a href="https://www.tiktok.com/@keplearofficial" target="_blank" rel="noopener noreferrer" className="social-link">
                 <FaTiktok />
-              </a>
-              <a href="#" className="social-link">
-                <SiThreads />
-              </a>
-              <a href="#" className="social-link">
-                <FaFacebook />
               </a>
               <a href="https://x.com/keplearofficial" target="_blank" rel="noopener noreferrer" className="social-link">
                 <FaXTwitter />
