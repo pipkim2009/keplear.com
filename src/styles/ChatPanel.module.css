@@ -351,7 +351,7 @@
   font-size: 0.9375rem;
   font-weight: 500;
   background: rgb(50, 50, 50);
-  color: var(--gray-200);
+  color: var(--white);
   transition: all 0.2s ease;
 }
 

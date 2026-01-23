@@ -225,6 +225,7 @@
   letter-spacing: 0.5rem;
   font-family: monospace;
   text-transform: uppercase;
+  color: var(--white);
 }
 
 /* ========================================
@@ -378,7 +379,7 @@
   transition: all 0.3s ease;
   background: linear-gradient(145deg, var(--gray-700), var(--gray-900));
   backdrop-filter: blur(10px);
-  color: var(--gray-200);
+  color: var(--white);
   box-sizing: border-box;
 }
 
@@ -941,7 +942,7 @@
   transition: all 0.3s ease;
   background: linear-gradient(145deg, var(--gray-700), var(--gray-900));
   backdrop-filter: blur(10px);
-  color: var(--gray-200);
+  color: var(--white);
   box-sizing: border-box;
 }
 
@@ -968,7 +969,7 @@
   transition: all 0.3s ease;
   background: linear-gradient(145deg, var(--gray-700), var(--gray-900));
   backdrop-filter: blur(10px);
-  color: var(--gray-200);
+  color: var(--white);
   box-sizing: border-box;
   resize: vertical;
   min-height: 80px;
@@ -1238,7 +1239,7 @@
   font-weight: 700;
   transition: all 0.2s ease;
   background: linear-gradient(145deg, var(--gray-700), var(--gray-900));
-  color: var(--primary-purple);
+  color: var(--white);
   box-sizing: border-box;
 }
 
@@ -1267,7 +1268,7 @@
   font-family: inherit;
   transition: all 0.2s ease;
   background: linear-gradient(145deg, var(--gray-700), var(--gray-900));
-  color: var(--dark-text-primary);
+  color: var(--white);
   box-sizing: border-box;
   resize: vertical;
   min-height: 80px;

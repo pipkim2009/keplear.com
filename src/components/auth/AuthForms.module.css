@@ -129,7 +129,7 @@
   background: var(--gray-700);
   backdrop-filter: blur(10px);
   box-sizing: border-box;
-  color: var(--purple-100);
+  color: var(--white);
 }
 
 .formGroup input::placeholder {

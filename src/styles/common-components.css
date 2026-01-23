@@ -71,7 +71,7 @@
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   box-sizing: border-box;
-  color: var(--gray-200);
+  color: var(--white);
 }
 
 .form-input-base:focus {
