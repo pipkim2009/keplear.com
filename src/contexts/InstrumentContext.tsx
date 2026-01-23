@@ -36,6 +36,8 @@ interface InstrumentContextType {
   navigateToHome: () => void
   navigateToSandbox: () => void
   navigateToClassroom: () => void
+  navigateToProfile: (userId?: string) => void
+  profileUserId: string | null
   setBpm: (bpm: number) => void
   setNumberOfBeats: (beats: number) => void
   setChordMode: (mode: ChordMode) => void
@@ -149,6 +151,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     navigateToHome,
     navigateToSandbox: navigateToSandboxOriginal,
     navigateToClassroom,
+    navigateToProfile,
+    profileUserId,
     setBpm,
     setNumberOfBeats,
     setChordMode,
@@ -427,6 +431,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     navigateToHome,
     navigateToSandbox,
     navigateToClassroom,
+    navigateToProfile,
+    profileUserId,
     setBpm,
     setNumberOfBeats,
     setChordMode,

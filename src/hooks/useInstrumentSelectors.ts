@@ -23,13 +23,17 @@ export const useNavigation = () => {
     navigateToHome: context.navigateToHome,
     navigateToSandbox: context.navigateToSandbox,
     navigateToClassroom: context.navigateToClassroom,
-    setCurrentPage: context.setCurrentPage
+    navigateToProfile: context.navigateToProfile,
+    setCurrentPage: context.setCurrentPage,
+    profileUserId: context.profileUserId
   }), [
     context.currentPage,
     context.navigateToHome,
     context.navigateToSandbox,
     context.navigateToClassroom,
-    context.setCurrentPage
+    context.navigateToProfile,
+    context.setCurrentPage,
+    context.profileUserId
   ])
 }
 

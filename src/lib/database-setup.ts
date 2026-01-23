@@ -22,6 +22,7 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
           full_name TEXT,
           username TEXT UNIQUE,
           avatar_url TEXT,
+          is_public BOOLEAN DEFAULT false,
           created_at TIMESTAMPTZ DEFAULT NOW(),
           updated_at TIMESTAMPTZ DEFAULT NOW(),
           PRIMARY KEY (id)
@@ -32,9 +33,9 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
 
         -- Create RLS policies
         DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
-        CREATE POLICY "Users can view own profile" 
-          ON public.profiles FOR SELECT 
-          USING (auth.uid() = id);
+        CREATE POLICY "Users can view own profile"
+          ON public.profiles FOR SELECT
+          USING (auth.uid() = id OR is_public = true);
 
         DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
         CREATE POLICY "Users can update own profile" 

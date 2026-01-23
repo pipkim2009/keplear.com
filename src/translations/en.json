@@ -363,6 +363,27 @@
       "position6": "Position 6"
     }
   },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "enterUsername": "Enter username",
+    "publicProfile": "Public Profile",
+    "publicProfileDescription": "Allow others to view your profile and stats",
+    "stats": "Stats",
+    "assignmentsCompleted": "Assignments Completed",
+    "classesJoined": "Classes Joined",
+    "classesCreated": "Classes Created",
+    "recentActivity": "Recent Activity",
+    "noActivity": "No recent activity",
+    "memberSince": "Member since",
+    "anonymous": "Anonymous",
+    "privateProfile": "Private Profile",
+    "privateProfileMessage": "This user's profile is private.",
+    "notFound": "Profile Not Found",
+    "profileNotFoundMessage": "The profile you're looking for doesn't exist.",
+    "loginRequired": "Login Required",
+    "loginToViewProfile": "Please log in to view your profile."
+  },
   "footer": {
     "allRightsReserved": "All Rights Reserved"
   },

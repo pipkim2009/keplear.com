@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useTheme } from '../../hooks/useTheme'
 import { useTranslation } from '../../contexts/TranslationContext'
-import { PiCaretUpFill, PiSignOutFill, PiTrashFill } from 'react-icons/pi'
+import { PiCaretUpFill, PiSignOutFill, PiTrashFill, PiUserFill } from 'react-icons/pi'
+import { useInstrument } from '../../contexts/InstrumentContext'
 import logo from '/Keplear-logo.png'
 import styles from './UserMenu.module.css'
 import authStyles from './AuthForms.module.css'
@@ -17,6 +18,7 @@ const UserMenu = () => {
   const { t } = useTranslation()
   const { user, signOut, deleteAccount } = useAuth()
   const { isDarkMode } = useTheme()
+  const { navigateToProfile } = useInstrument()
   const [isOpen, setIsOpen] = useState(false)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -54,6 +56,11 @@ const UserMenu = () => {
     } catch (error) {
       console.error('Error signing out:', error)
     }
+  }
+
+  const handleViewProfile = () => {
+    navigateToProfile()
+    setIsOpen(false)
   }
 
   const handleDeleteAccount = () => {
@@ -203,6 +210,13 @@ const UserMenu = () => {
           <div className={styles.userMenuDivider}></div>
 
           <div className={styles.userMenuActions}>
+            <button
+              className={styles.menuItem}
+              onClick={handleViewProfile}
+            >
+              <PiUserFill size={16} />
+              {t('auth.profile')}
+            </button>
             <button
               className={`${styles.menuItem} ${styles.danger}`}
               onClick={handleSignOut}

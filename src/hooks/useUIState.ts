@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useEffect, useRef } from 'react'
+import { useReducer, useCallback, useEffect, useRef, useState } from 'react'
 import {
   uiReducer,
   initialUIState,
@@ -22,7 +22,9 @@ interface UseUIStateReturn {
   navigateToHome: () => void
   navigateToSandbox: () => void
   navigateToClassroom: () => void
+  navigateToProfile: (userId?: string) => void
   setCurrentPage: (page: PageType) => void
+  profileUserId: string | null
 
   // Settings actions
   setBpm: (bpm: number) => void
@@ -45,6 +47,7 @@ interface UseUIStateReturn {
  */
 export const useUIState = (): UseUIStateReturn => {
   const [state, dispatch] = useReducer(uiReducer, initialUIState)
+  const [profileUserId, setProfileUserId] = useState<string | null>(null)
 
   // Refs to track initial render for flash prevention
   const isInitialBpm = useRef(true)
@@ -62,6 +65,11 @@ export const useUIState = (): UseUIStateReturn => {
 
   const navigateToClassroom = useCallback(() => {
     dispatch({ type: 'SET_CURRENT_PAGE', payload: 'classroom' })
+  }, [])
+
+  const navigateToProfile = useCallback((userId?: string) => {
+    setProfileUserId(userId || null)
+    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'profile' })
   }, [])
 
   const setCurrentPage = useCallback((page: PageType) => {
@@ -139,7 +147,9 @@ export const useUIState = (): UseUIStateReturn => {
     navigateToHome,
     navigateToSandbox,
     navigateToClassroom,
+    navigateToProfile,
     setCurrentPage,
+    profileUserId,
 
     // Settings actions
     setBpm,

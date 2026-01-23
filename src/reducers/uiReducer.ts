@@ -3,7 +3,7 @@
  * Consolidates UI interaction state like page navigation, input flashing, and settings
  */
 
-export type PageType = 'home' | 'sandbox' | 'classroom'
+export type PageType = 'home' | 'sandbox' | 'classroom' | 'profile'
 export type InputType = 'bpm' | 'beats' | 'mode'
 export type ChordMode = 'arpeggiator' | 'progression'
 
