@@ -222,6 +222,31 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
         CREATE POLICY "Users can insert own completions"
           ON public.assignment_completions FOR INSERT
           WITH CHECK (auth.uid() = user_id);
+
+        -- Create practice_sessions table for sandbox activity tracking
+        CREATE TABLE IF NOT EXISTS public.practice_sessions (
+          id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+          user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+          type TEXT NOT NULL DEFAULT 'sandbox',
+          instrument TEXT NOT NULL,
+          melodies_completed INTEGER NOT NULL DEFAULT 1,
+          created_at TIMESTAMPTZ DEFAULT NOW()
+        );
+
+        -- Enable RLS on practice_sessions table
+        ALTER TABLE public.practice_sessions ENABLE ROW LEVEL SECURITY;
+
+        -- Users can view their own practice sessions
+        DROP POLICY IF EXISTS "Users can view own practice sessions" ON public.practice_sessions;
+        CREATE POLICY "Users can view own practice sessions"
+          ON public.practice_sessions FOR SELECT
+          USING (auth.uid() = user_id);
+
+        -- Users can insert their own practice sessions
+        DROP POLICY IF EXISTS "Users can insert own practice sessions" ON public.practice_sessions;
+        CREATE POLICY "Users can insert own practice sessions"
+          ON public.practice_sessions FOR INSERT
+          WITH CHECK (auth.uid() = user_id);
       `
     })
 

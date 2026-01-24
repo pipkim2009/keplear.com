@@ -9,7 +9,7 @@ import AuthContext from '../../contexts/AuthContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useNavigation } from '../../hooks/useInstrumentSelectors'
 import { useInstrument } from '../../contexts/InstrumentContext'
-import { getPracticeStats, getRecentSessions, setCurrentUserId, type PracticeSession, type PracticeStats } from '../../utils/practiceTracker'
+import { fetchRecentPracticeSessions, fetchPracticeStats, type PracticeSession, type PracticeStats } from '../../hooks/usePracticeSessions'
 import {
   PiPlayFill,
   PiCheckCircleFill,
@@ -21,9 +21,9 @@ import {
   PiMusicNotesFill,
   PiMusicNoteFill,
   PiPianoKeysFill,
-  PiGuitarFill,
   PiUserCircleFill
 } from 'react-icons/pi'
+import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
 import styles from '../../styles/Dashboard.module.css'
 import classroomStyles from '../../styles/Classroom.module.css'
 
@@ -85,11 +85,8 @@ function Dashboard() {
     setIsLoading(true)
 
     try {
-      // Set user ID for user-specific practice data
-      setCurrentUserId(user.id)
-
-      // Get practice stats from localStorage
-      const stats = getPracticeStats()
+      // Get practice stats from Supabase
+      const stats = await fetchPracticeStats(user.id)
       setPracticeStats(stats)
 
       // Fetch username from profiles
@@ -235,27 +232,52 @@ function Dashboard() {
       // Build recent activity from sandbox sessions and classroom completions
       const activities: ActivityItem[] = []
 
-      // Get recent sandbox sessions
-      const recentSessions = getRecentSessions(10)
+      // Get recent sandbox sessions from Supabase and merge by day + instrument
+      const recentSessions = await fetchRecentPracticeSessions(user.id, 50)
+      const sandboxByDayInstrument = new Map<string, { count: number, timestamp: string, instrument: string }>()
+
       recentSessions.forEach((session: PracticeSession) => {
+        if (session.type === 'sandbox') {
+          const day = session.created_at.split('T')[0]
+          const key = `${day}-${session.instrument}`
+          const existing = sandboxByDayInstrument.get(key)
+          if (existing) {
+            existing.count += session.melodies_completed
+            // Keep the most recent timestamp
+            if (session.created_at > existing.timestamp) {
+              existing.timestamp = session.created_at
+            }
+          } else {
+            sandboxByDayInstrument.set(key, {
+              count: session.melodies_completed,
+              timestamp: session.created_at,
+              instrument: session.instrument
+            })
+          }
+        }
+      })
+
+      // Convert merged sandbox sessions to activities
+      sandboxByDayInstrument.forEach((data, key) => {
         activities.push({
-          id: session.id,
+          id: `sandbox-${key}`,
           type: 'sandbox',
-          title: `Completed ${session.melodiesCompleted} ${session.melodiesCompleted === 1 ? 'melody' : 'melodies'}`,
-          subtitle: `${session.instrument} in Sandbox`,
-          timestamp: session.timestamp,
-          count: session.melodiesCompleted,
-          instrument: session.instrument
+          title: `Completed ${data.count} ${data.count === 1 ? 'melody' : 'melodies'}`,
+          subtitle: `${data.instrument} in Sandbox`,
+          timestamp: data.timestamp,
+          count: data.count,
+          instrument: data.instrument
         })
       })
 
-      // Get recent classroom completions
+      // Get recent classroom completions and merge by day + assignment
       const { data: recentCompletions } = await supabase
         .from('assignment_completions')
         .select(`
           id,
           completed_at,
           assignments (
+            id,
             title,
             instrument,
             classrooms (title)
@@ -263,19 +285,43 @@ function Dashboard() {
         `)
         .eq('user_id', user.id)
         .order('completed_at', { ascending: false })
-        .limit(5)
+        .limit(20)
+
+      const classroomByDayAssignment = new Map<string, { count: number, timestamp: string, title: string, classroom: string, instrument: string }>()
 
       recentCompletions?.forEach((rc: any) => {
         if (rc.assignments) {
-          activities.push({
-            id: `completion-${rc.id}`,
-            type: 'completion',
-            title: rc.assignments.title,
-            subtitle: rc.assignments.classrooms?.title || 'Unknown',
-            timestamp: rc.completed_at,
-            instrument: rc.assignments.instrument
-          })
+          const day = rc.completed_at.split('T')[0]
+          const key = `${day}-${rc.assignments.id}`
+          const existing = classroomByDayAssignment.get(key)
+          if (existing) {
+            existing.count += 1
+            if (rc.completed_at > existing.timestamp) {
+              existing.timestamp = rc.completed_at
+            }
+          } else {
+            classroomByDayAssignment.set(key, {
+              count: 1,
+              timestamp: rc.completed_at,
+              title: rc.assignments.title,
+              classroom: rc.assignments.classrooms?.title || 'Unknown',
+              instrument: rc.assignments.instrument
+            })
+          }
         }
+      })
+
+      // Convert merged classroom sessions to activities
+      classroomByDayAssignment.forEach((data, key) => {
+        activities.push({
+          id: `completion-${key}`,
+          type: 'completion',
+          title: `Completed ${data.count} ${data.count === 1 ? 'melody' : 'melodies'} in ${data.title}`,
+          subtitle: data.classroom,
+          timestamp: data.timestamp,
+          count: data.count,
+          instrument: data.instrument
+        })
       })
 
       // Sort by timestamp and limit
@@ -330,8 +376,9 @@ function Dashboard() {
       case 'keyboard':
         return <PiPianoKeysFill />
       case 'guitar':
+        return <GiGuitarHead />
       case 'bass':
-        return <PiGuitarFill />
+        return <GiGuitarBassHead />
       default:
         return <PiMusicNoteFill />
     }
@@ -534,7 +581,7 @@ function Dashboard() {
                       <span className={styles.activityDayHeader}>{formatDayName(dateKey)}</span>
                       {activities.map((activity) => (
                         <div key={activity.id} className={styles.activityItem}>
-                          <div className={`${styles.activityIcon} ${activity.type === 'sandbox' ? styles.sandbox : activity.type === 'completion' ? styles.completion : styles.classJoin}`}>
+                          <div className={`${styles.activityIcon} ${activity.type === 'sandbox' ? getInstrumentTagClass(activity.instrument || 'keyboard') : activity.type === 'completion' ? styles.completion : styles.classJoin}`}>
                             {activity.type === 'sandbox' ? (
                               getInstrumentIcon(activity.instrument || 'keyboard')
                             ) : activity.type === 'completion' ? (

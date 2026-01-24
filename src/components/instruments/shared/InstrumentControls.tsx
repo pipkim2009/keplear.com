@@ -1020,6 +1020,7 @@ const InstrumentControls = memo(function InstrumentControls({
                     currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
                     onMelodyComplete={onMelodyComplete}
                     autoStartFeedback={autoStartFeedback}
+                    instrument={instrument as 'keyboard' | 'guitar' | 'bass'}
                   />
                 )
               )}

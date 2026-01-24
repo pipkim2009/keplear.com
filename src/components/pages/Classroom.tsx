@@ -26,7 +26,7 @@ import {
   getBassNoteById,
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
-import { recordPracticeSession, setCurrentUserId } from '../../utils/practiceTracker'
+import { useRecordPracticeSession } from '../../hooks/usePracticeSessions'
 import { PiTrashFill, PiChatCircleFill, PiPencilSimpleFill, PiEyeFill, PiCheckCircleFill, PiXCircleFill } from 'react-icons/pi'
 import { useRecordCompletion, useUserCompletions, useAssignmentCompletions } from '../../hooks/useClassrooms'
 import styles from '../../styles/Classroom.module.css'
@@ -224,10 +224,8 @@ function Classroom() {
   const user = authContext?.user ?? null
   const { t } = useTranslation()
 
-  // Set user ID for user-specific practice tracking
-  useEffect(() => {
-    setCurrentUserId(user?.id ?? null)
-  }, [user?.id])
+  // Hook to record practice sessions to Supabase
+  const recordPracticeSession = useRecordPracticeSession()
 
   // Translated instrument names
   const instrumentNames = useMemo(() => ({
@@ -2480,17 +2478,15 @@ function Classroom() {
       if (currentAssignment && user?.id) {
         recordCompletion.mutate({ assignmentId: currentAssignment.id, userId: user.id })
 
-        // Also record to localStorage for dashboard stats
-        recordPracticeSession({
+        // Also record to Supabase practice_sessions for dashboard stats
+        recordPracticeSession.mutate({
           type: 'classroom',
           instrument: currentAssignment.instrument,
-          melodiesCompleted: lessonExercises.length,
-          assignmentId: currentAssignment.id,
-          assignmentTitle: currentAssignment.title
+          melodiesCompleted: lessonExercises.length
         })
       }
     }
-  }, [lessonExerciseIndex, lessonExercises.length, handleSwitchLessonExercise, currentAssignment, user?.id, recordCompletion])
+  }, [lessonExerciseIndex, lessonExercises.length, handleSwitchLessonExercise, currentAssignment, user?.id, recordCompletion, recordPracticeSession])
 
   // Apply assignment selection data when in lesson mode (first exercise)
   useEffect(() => {

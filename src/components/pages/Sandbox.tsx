@@ -26,7 +26,7 @@ import {
   getBassNoteById,
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
-import { recordPracticeSession, setCurrentUserId } from '../../utils/practiceTracker'
+import { useRecordPracticeSession } from '../../hooks/usePracticeSessions'
 import type { AppliedScale, AppliedChord } from '../common/ScaleChordOptions'
 import styles from '../../styles/Practice.module.css'
 
@@ -125,10 +125,8 @@ function Sandbox() {
   const user = authContext?.user ?? null
   const { navigateToClassroom } = useInstrument()
 
-  // Set user ID for user-specific practice tracking
-  useEffect(() => {
-    setCurrentUserId(user?.id ?? null)
-  }, [user?.id])
+  // Hook to record practice sessions to Supabase
+  const recordPracticeSession = useRecordPracticeSession()
 
   // Translated instrument names
   const instrumentNames: Record<string, string> = useMemo(() => ({
@@ -529,19 +527,16 @@ function Sandbox() {
       const message = t('sandbox.congratulations')
       setCongratulationsMessage(message)
 
-      // Ensure user ID is set before recording (fixes timing issues with useEffect)
+      // Record sandbox practice session to Supabase
       if (user?.id) {
-        setCurrentUserId(user.id)
+        recordPracticeSession.mutate({
+          type: 'sandbox',
+          instrument: instrument,
+          melodiesCompleted: 1
+        })
       }
-
-      // Record sandbox practice session
-      recordPracticeSession({
-        type: 'sandbox',
-        instrument: instrument,
-        melodiesCompleted: 1
-      })
     }
-  }, [t, isFromAssignment, instrument, user?.id])
+  }, [t, isFromAssignment, instrument, user?.id, recordPracticeSession])
 
   const handleAssignmentCompleteEnd = useCallback(() => {
     setShowAssignmentComplete(false)
@@ -549,14 +544,22 @@ function Sandbox() {
     handleBackToSelection()
   }, [handleBackToSelection])
 
-  // Handle Done button click - show animation for assignments
+  // Handle Done button click - show animation for assignments, record for sandbox
   const handleDoneClick = useCallback(() => {
     if (isFromAssignment) {
       setShowAssignmentComplete(true)
     } else {
+      // Record sandbox practice session to Supabase when user clicks Done
+      if (user?.id) {
+        recordPracticeSession.mutate({
+          type: 'sandbox',
+          instrument: instrument,
+          melodiesCompleted: 1
+        })
+      }
       handleBackToSelection()
     }
-  }, [isFromAssignment, handleBackToSelection])
+  }, [isFromAssignment, handleBackToSelection, user?.id, instrument, recordPracticeSession])
 
   // Helper function to filter scales based on user selection
   const getFilteredScales = (scales: typeof KEYBOARD_SCALES, selectedScales: string[] | undefined) => {
@@ -1462,6 +1465,7 @@ function Sandbox() {
           practiceMode={true}
           onLessonComplete={handleLessonComplete}
           autoPlayAudio={autoPlayAudio}
+          autoStartFeedback={true}
           fretRangeLow={fretLow}
           fretRangeHigh={fretHigh}
           lessonType={lessonSettings?.lessonType as 'melodies' | 'chords' | undefined}
@@ -1626,6 +1630,8 @@ function Sandbox() {
         onExportToClassroom={handleExportToClassroom}
         canExportToClassroom={!!user && !assigningToClassroomId}
         hasExportableContent={selectedNotes.length > 0 || scaleChordManagement.appliedScales.length > 0 || scaleChordManagement.appliedChords.length > 0}
+        onLessonComplete={handleLessonComplete}
+        autoStartFeedback={true}
       />
 
       {assignTitleModal}
