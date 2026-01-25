@@ -405,7 +405,9 @@ function Dashboard() {
       ...practiceStats.weeklyData.map(d => d.sandbox + d.classroom),
       1
     )
-    return Math.ceil(max / 5) * 5 || 10 // Round up to nearest 5
+    // Round up to nearest even number for clean middle label
+    const rounded = Math.ceil(max / 2) * 2
+    return rounded || 10
   }
 
   // Format day name
@@ -523,7 +525,7 @@ function Dashboard() {
                 <span className={styles.yAxisLabel}>Melodies</span>
                 <div className={styles.chartYAxis}>
                   <span>{maxChartValue}</span>
-                  <span>{Math.round(maxChartValue / 2)}</span>
+                  <span>{maxChartValue / 2}</span>
                   <span>0</span>
                 </div>
               </div>
