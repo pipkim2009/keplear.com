@@ -40,7 +40,6 @@ export interface PracticeStats {
     keyboard: number
     guitar: number
     bass: number
-    classroom: number
   }[]
   dateRange: {
     start: string
@@ -128,7 +127,7 @@ export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 
         date.setDate(startDate.getDate() + i)
         const dateStr = date.toISOString().split('T')[0]
         const label = date.toLocaleDateString('en', { weekday: 'short' })
-        timeData.push({ date: dateStr, label, keyboard: 0, guitar: 0, bass: 0, classroom: 0 })
+        timeData.push({ date: dateStr, label, keyboard: 0, guitar: 0, bass: 0 })
       }
       endDate = new Date(startDate)
       endDate.setDate(startDate.getDate() + 6)
@@ -142,7 +141,7 @@ export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 
         const date = new Date(today.getFullYear(), today.getMonth(), i)
         const dateStr = date.toISOString().split('T')[0]
         const label = i.toString()
-        timeData.push({ date: dateStr, label, keyboard: 0, guitar: 0, bass: 0, classroom: 0 })
+        timeData.push({ date: dateStr, label, keyboard: 0, guitar: 0, bass: 0 })
       }
     } else if (timeRange === 'year') {
       // Months of current year
@@ -153,7 +152,7 @@ export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 
         const date = new Date(today.getFullYear(), i, 1)
         const dateStr = `${today.getFullYear()}-${String(i + 1).padStart(2, '0')}`
         const label = date.toLocaleDateString('en', { month: 'short' })
-        timeData.push({ date: dateStr, label, keyboard: 0, guitar: 0, bass: 0, classroom: 0 })
+        timeData.push({ date: dateStr, label, keyboard: 0, guitar: 0, bass: 0 })
       }
     } else {
       // All time - group by month, going back up to 12 months or to first session
@@ -166,7 +165,7 @@ export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 
         date.setMonth(startDate.getMonth() + i)
         const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
         const label = date.toLocaleDateString('en', { month: 'short', year: '2-digit' })
-        timeData.push({ date: dateStr, label, keyboard: 0, guitar: 0, bass: 0, classroom: 0 })
+        timeData.push({ date: dateStr, label, keyboard: 0, guitar: 0, bass: 0 })
       }
     }
 
@@ -208,37 +207,21 @@ export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 
       byInstrument[session.instrument as keyof typeof byInstrument] += session.melodies_completed
     }
 
-    // Add to time data
+    // Add to time data - categorize by instrument regardless of sandbox/classroom
     const sessionDate = session.created_at.split('T')[0]
 
     if (timeRange === 'year' || timeRange === 'all') {
       // Group by month
       const monthKey = sessionDate.substring(0, 7) // YYYY-MM
       const dayData = timeData.find(d => d.date === monthKey)
-      if (dayData) {
-        if (session.type === 'classroom') {
-          dayData.classroom += session.melodies_completed
-        } else if (session.instrument === 'keyboard') {
-          dayData.keyboard += session.melodies_completed
-        } else if (session.instrument === 'guitar') {
-          dayData.guitar += session.melodies_completed
-        } else if (session.instrument === 'bass') {
-          dayData.bass += session.melodies_completed
-        }
+      if (dayData && session.instrument in dayData) {
+        dayData[session.instrument as 'keyboard' | 'guitar' | 'bass'] += session.melodies_completed
       }
     } else {
       // Group by day
       const dayData = timeData.find(d => d.date === sessionDate)
-      if (dayData) {
-        if (session.type === 'classroom') {
-          dayData.classroom += session.melodies_completed
-        } else if (session.instrument === 'keyboard') {
-          dayData.keyboard += session.melodies_completed
-        } else if (session.instrument === 'guitar') {
-          dayData.guitar += session.melodies_completed
-        } else if (session.instrument === 'bass') {
-          dayData.bass += session.melodies_completed
-        }
+      if (dayData && session.instrument in dayData) {
+        dayData[session.instrument as 'keyboard' | 'guitar' | 'bass'] += session.melodies_completed
       }
     }
   })

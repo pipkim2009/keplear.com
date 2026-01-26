@@ -233,92 +233,37 @@ function Dashboard() {
       // Build recent activity from sandbox sessions and classroom completions
       const activities: ActivityItem[] = []
 
-      // Get recent sandbox sessions from Supabase and merge by day + instrument
+      // Get recent practice sessions from Supabase and merge by day + instrument + type
       const recentSessions = await fetchRecentPracticeSessions(user.id, 50)
-      const sandboxByDayInstrument = new Map<string, { count: number, timestamp: string, instrument: string }>()
+      const sessionsByDayInstrumentType = new Map<string, { count: number, timestamp: string, instrument: string, type: 'sandbox' | 'classroom' }>()
 
       recentSessions.forEach((session: PracticeSession) => {
-        if (session.type === 'sandbox') {
-          const day = session.created_at.split('T')[0]
-          const key = `${day}-${session.instrument}`
-          const existing = sandboxByDayInstrument.get(key)
-          if (existing) {
-            existing.count += session.melodies_completed
-            // Keep the most recent timestamp
-            if (session.created_at > existing.timestamp) {
-              existing.timestamp = session.created_at
-            }
-          } else {
-            sandboxByDayInstrument.set(key, {
-              count: session.melodies_completed,
-              timestamp: session.created_at,
-              instrument: session.instrument
-            })
+        const day = session.created_at.split('T')[0]
+        const key = `${day}-${session.instrument}-${session.type}`
+        const existing = sessionsByDayInstrumentType.get(key)
+        if (existing) {
+          existing.count += session.melodies_completed
+          // Keep the most recent timestamp
+          if (session.created_at > existing.timestamp) {
+            existing.timestamp = session.created_at
           }
+        } else {
+          sessionsByDayInstrumentType.set(key, {
+            count: session.melodies_completed,
+            timestamp: session.created_at,
+            instrument: session.instrument,
+            type: session.type
+          })
         }
       })
 
-      // Convert merged sandbox sessions to activities
-      sandboxByDayInstrument.forEach((data, key) => {
+      // Convert merged sessions to activities
+      sessionsByDayInstrumentType.forEach((data, key) => {
         activities.push({
-          id: `sandbox-${key}`,
-          type: 'sandbox',
+          id: `${data.type}-${key}`,
+          type: data.type === 'sandbox' ? 'sandbox' : 'completion',
           title: `Completed ${data.count} ${data.count === 1 ? 'melody' : 'melodies'}`,
-          subtitle: `${data.instrument} in Sandbox`,
-          timestamp: data.timestamp,
-          count: data.count,
-          instrument: data.instrument
-        })
-      })
-
-      // Get recent classroom completions and merge by day + assignment
-      const { data: recentCompletions } = await supabase
-        .from('assignment_completions')
-        .select(`
-          id,
-          completed_at,
-          assignments (
-            id,
-            title,
-            instrument,
-            classrooms (title)
-          )
-        `)
-        .eq('user_id', user.id)
-        .order('completed_at', { ascending: false })
-        .limit(20)
-
-      const classroomByDayAssignment = new Map<string, { count: number, timestamp: string, title: string, classroom: string, instrument: string }>()
-
-      recentCompletions?.forEach((rc: any) => {
-        if (rc.assignments) {
-          const day = rc.completed_at.split('T')[0]
-          const key = `${day}-${rc.assignments.id}`
-          const existing = classroomByDayAssignment.get(key)
-          if (existing) {
-            existing.count += 1
-            if (rc.completed_at > existing.timestamp) {
-              existing.timestamp = rc.completed_at
-            }
-          } else {
-            classroomByDayAssignment.set(key, {
-              count: 1,
-              timestamp: rc.completed_at,
-              title: rc.assignments.title,
-              classroom: rc.assignments.classrooms?.title || 'Unknown',
-              instrument: rc.assignments.instrument
-            })
-          }
-        }
-      })
-
-      // Convert merged classroom sessions to activities
-      classroomByDayAssignment.forEach((data, key) => {
-        activities.push({
-          id: `completion-${key}`,
-          type: 'completion',
-          title: `Completed ${data.count} ${data.count === 1 ? 'melody' : 'melodies'} in ${data.title}`,
-          subtitle: data.classroom,
+          subtitle: `${data.instrument} in ${data.type === 'sandbox' ? 'Sandbox' : 'Classroom'}`,
           timestamp: data.timestamp,
           count: data.count,
           instrument: data.instrument
@@ -403,7 +348,7 @@ function Dashboard() {
   const getMaxChartValue = () => {
     if (!practiceStats) return 10
     const max = Math.max(
-      ...practiceStats.weeklyData.map(d => d.keyboard + d.guitar + d.bass + d.classroom),
+      ...practiceStats.weeklyData.map(d => d.keyboard + d.guitar + d.bass),
       1
     )
     // Round up to nearest even number for clean middle label
@@ -554,13 +499,12 @@ function Dashboard() {
                 {practiceStats && practiceStats.weeklyData.length > 0 && (
                   <div className={`${styles.barChartContainer} ${timeRange === 'month' ? styles.barChartMonth : ''}`}>
                     {practiceStats.weeklyData.map((d, i) => {
-                      const total = d.keyboard + d.guitar + d.bass + d.classroom
+                      const total = d.keyboard + d.guitar + d.bass
                       const heightPercent = (total / maxChartValue) * 100
                       // Calculate individual segment heights as percentage of total bar
                       const keyboardPct = total > 0 ? (d.keyboard / total) * 100 : 0
                       const guitarPct = total > 0 ? (d.guitar / total) * 100 : 0
                       const bassPct = total > 0 ? (d.bass / total) * 100 : 0
-                      const classroomPct = total > 0 ? (d.classroom / total) * 100 : 0
                       return (
                         <div key={i} className={styles.barWrapper}>
                           <div
@@ -568,9 +512,6 @@ function Dashboard() {
                             style={{ height: `${heightPercent}%` }}
                             title={`${d.label}: ${total} melodies`}
                           >
-                            {d.classroom > 0 && (
-                              <div className={`${styles.barSegment} ${styles.barClassroom}`} style={{ height: `${classroomPct}%` }} />
-                            )}
                             {d.bass > 0 && (
                               <div className={`${styles.barSegment} ${styles.barBass}`} style={{ height: `${bassPct}%` }} />
                             )}
@@ -619,10 +560,6 @@ function Dashboard() {
                   <span className={`${styles.legendDot} ${styles.legendBass}`} />
                   <span className={styles.legendLabel}>Bass</span>
                 </div>
-                <div className={styles.legendItem}>
-                  <span className={`${styles.legendDot} ${styles.legendClassroom}`} />
-                  <span className={styles.legendLabel}>Classroom</span>
-                </div>
               </div>
             </div>
           </div>
@@ -670,11 +607,9 @@ function Dashboard() {
                       <span className={styles.activityDayHeader}>{formatActivityDate(dateKey)}</span>
                       {activities.map((activity) => (
                         <div key={activity.id} className={styles.activityItem}>
-                          <div className={`${styles.activityIcon} ${activity.type === 'sandbox' ? getInstrumentTagClass(activity.instrument || 'keyboard') : activity.type === 'completion' ? styles.completion : styles.classJoin}`}>
-                            {activity.type === 'sandbox' ? (
+                          <div className={`${styles.activityIcon} ${(activity.type === 'sandbox' || activity.type === 'completion') ? getInstrumentTagClass(activity.instrument || 'keyboard') : styles.classJoin}`}>
+                            {(activity.type === 'sandbox' || activity.type === 'completion') ? (
                               getInstrumentIcon(activity.instrument || 'keyboard')
-                            ) : activity.type === 'completion' ? (
-                              <PiCheckCircleFill />
                             ) : (
                               <PiUsersFill />
                             )}

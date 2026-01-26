@@ -2282,11 +2282,85 @@ function Classroom() {
     setViewMode('taking-lesson')
   }
 
+  // Track if we've already recorded progress for the current lesson session
+  const hasRecordedProgressRef = useRef(false)
+  // Track completed exercises synchronously (state updates are async)
+  const completedExercisesRef = useRef(0)
+
+  // Reset the flags when starting a new lesson
+  useEffect(() => {
+    if (viewMode === 'taking-lesson' && currentAssignment) {
+      hasRecordedProgressRef.current = false
+      completedExercisesRef.current = 0
+    }
+  }, [viewMode, currentAssignment])
+
+  // Track lesson state in refs for cleanup (closures capture stale state)
+  const lessonStateRef = useRef({
+    inLesson: false,
+    isPreview: false,
+    userId: undefined as string | undefined,
+    instrument: ''
+  })
+
+  // Keep lesson state ref in sync
+  useEffect(() => {
+    lessonStateRef.current = {
+      inLesson: viewMode === 'taking-lesson',
+      isPreview: isPreviewMode,
+      userId: user?.id,
+      instrument: currentAssignment?.instrument || ''
+    }
+  }, [viewMode, isPreviewMode, user?.id, currentAssignment])
+
+  // Save partial progress when leaving the page (browser close/refresh) or navigating away
+  useEffect(() => {
+    const saveProgress = () => {
+      if (hasRecordedProgressRef.current) return
+      const state = lessonStateRef.current
+      if (!state.inLesson || state.isPreview || !state.userId || !state.instrument) return
+      if (completedExercisesRef.current === 0) return
+
+      hasRecordedProgressRef.current = true
+
+      // Use sendBeacon for reliable delivery
+      navigator.sendBeacon(
+        `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/practice_sessions?apikey=${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        JSON.stringify({
+          user_id: state.userId,
+          type: 'classroom',
+          instrument: state.instrument,
+          melodies_completed: completedExercisesRef.current
+        })
+      )
+    }
+
+    window.addEventListener('beforeunload', saveProgress)
+
+    // Cleanup runs on unmount (navigation to other pages)
+    return () => {
+      window.removeEventListener('beforeunload', saveProgress)
+      saveProgress()
+    }
+  }, [])
+
   // End lesson
   const handleEndLesson = () => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel()
     }
+
+    // Record partial progress if user completed any melodies before leaving
+    // Only record for actual lessons (not preview mode) and if not already recorded
+    if (!hasRecordedProgressRef.current && !isPreviewMode && user?.id && currentAssignment && completedExercisesRef.current > 0) {
+      hasRecordedProgressRef.current = true
+      recordPracticeSession.mutate({
+        type: 'classroom',
+        instrument: currentAssignment.instrument,
+        melodiesCompleted: completedExercisesRef.current
+      })
+    }
+
     // Feedback cleanup now handled by CustomAudioPlayer
     setCurrentAssignment(null)
     setPendingSelectionData(null)
@@ -2468,6 +2542,9 @@ function Classroom() {
 
   // Auto-advance to next exercise or end lesson
   const handleExerciseComplete = useCallback(() => {
+    // Track completed exercise synchronously
+    completedExercisesRef.current += 1
+
     if (lessonExerciseIndex < lessonExercises.length - 1) {
       // More exercises available - advance to next
       handleSwitchLessonExercise(lessonExerciseIndex + 1)
@@ -2479,6 +2556,8 @@ function Classroom() {
         recordCompletion.mutate({ assignmentId: currentAssignment.id, userId: user.id })
 
         // Also record to Supabase practice_sessions for dashboard stats
+        // Mark as recorded to prevent duplicate in handleEndLesson
+        hasRecordedProgressRef.current = true
         recordPracticeSession.mutate({
           type: 'classroom',
           instrument: currentAssignment.instrument,
