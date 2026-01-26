@@ -2295,54 +2295,58 @@ function Classroom() {
     }
   }, [viewMode, currentAssignment])
 
-  // Track lesson state in refs for cleanup (closures capture stale state)
-  const lessonStateRef = useRef({
-    inLesson: false,
-    isPreview: false,
-    userId: undefined as string | undefined,
-    instrument: ''
-  })
-
-  // Keep lesson state ref in sync
+  // Save partial progress on component unmount (in-app navigation)
   useEffect(() => {
-    lessonStateRef.current = {
-      inLesson: viewMode === 'taking-lesson',
-      isPreview: isPreviewMode,
-      userId: user?.id,
-      instrument: currentAssignment?.instrument || ''
-    }
-  }, [viewMode, isPreviewMode, user?.id, currentAssignment])
-
-  // Save partial progress when leaving the page (browser close/refresh) or navigating away
-  useEffect(() => {
-    const saveProgress = () => {
+    return () => {
       if (hasRecordedProgressRef.current) return
-      const state = lessonStateRef.current
-      if (!state.inLesson || state.isPreview || !state.userId || !state.instrument) return
+      if (!currentAssignment || isPreviewMode || !user?.id) return
       if (completedExercisesRef.current === 0) return
+      if (viewMode !== 'taking-lesson') return
+
+      hasRecordedProgressRef.current = true
+      recordPracticeSession.mutate({
+        type: 'classroom',
+        instrument: currentAssignment.instrument,
+        melodiesCompleted: completedExercisesRef.current
+      })
+    }
+  }, [currentAssignment, isPreviewMode, user?.id, viewMode, recordPracticeSession])
+
+  // Save partial progress on browser close/refresh using direct Supabase insert
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (hasRecordedProgressRef.current) return
+      if (!currentAssignment || isPreviewMode || !user?.id) return
+      if (completedExercisesRef.current === 0) return
+      if (viewMode !== 'taking-lesson') return
 
       hasRecordedProgressRef.current = true
 
-      // Use sendBeacon for reliable delivery
-      navigator.sendBeacon(
-        `${import.meta.env.VITE_SUPABASE_URL}/rest/v1/practice_sessions?apikey=${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-        JSON.stringify({
-          user_id: state.userId,
-          type: 'classroom',
-          instrument: state.instrument,
-          melodies_completed: completedExercisesRef.current
-        })
-      )
+      // Synchronous insert for beforeunload
+      const data = {
+        user_id: user.id,
+        type: 'classroom',
+        instrument: currentAssignment.instrument,
+        melodies_completed: completedExercisesRef.current
+      }
+
+      // Use fetch with keepalive for browser close
+      fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/practice_sessions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(data),
+        keepalive: true
+      })
     }
 
-    window.addEventListener('beforeunload', saveProgress)
-
-    // Cleanup runs on unmount (navigation to other pages)
-    return () => {
-      window.removeEventListener('beforeunload', saveProgress)
-      saveProgress()
-    }
-  }, [])
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [currentAssignment, isPreviewMode, user?.id, viewMode])
 
   // End lesson
   const handleEndLesson = () => {
