@@ -183,47 +183,47 @@ body:has(.instrument-container[data-practice-mode="true"]) .scale-options-toggle
 
 .scale-controls {
   margin: 0 auto;
-  padding: 3px;
-  background: rgb(249, 115, 22, 0.05);
-  border-radius: 6px;
-  border: 1px solid rgb(249, 115, 22, 0.3);
+  padding: 0;
+  background: transparent;
+  border: none;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 3px !important;
   box-sizing: border-box;
   overflow-x: hidden;
 }
 
-/* Purple styling for chord mode */
+/* Purple styling for chord mode - no longer needed but keep for consistency */
 .scale-controls.chord-mode {
-  background: rgb(168, 85, 247, 0.05);
-  border: 1px solid rgb(168, 85, 247, 0.3);
+  background: transparent;
+  border: none;
 }
 
 .dark .scale-controls {
-  background: rgb(249, 115, 22, 0.05);
-  border-color: rgb(249, 115, 22, 0.3);
+  background: transparent;
+  border: none;
 }
 
 .dark .scale-controls.chord-mode {
-  background: rgb(168, 85, 247, 0.05);
-  border-color: rgb(168, 85, 247, 0.3);
+  background: transparent;
+  border: none;
 }
 
-.control-section {
-  margin-bottom: 0;
+.scale-controls .control-section {
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.control-section:last-child {
-  margin-bottom: 0;
+.scale-controls .control-section:last-child {
+  margin-bottom: 0 !important;
 }
 
 .scale-options-content .control-label {
   display: block;
   font-size: 11px;
   font-weight: 600;
-  margin-bottom: 6px;
+  margin-bottom: 0 !important;
   color: var(--orange-500) !important;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -1038,6 +1038,54 @@ input:checked + .toggle-slider:hover {
 .learn-diagram-close:hover {
   background: rgba(255, 255, 255, 0.2);
   border-color: rgba(255, 255, 255, 0.3);
+}
+
+.learn-diagram-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.learn-diagram-play {
+  width: 28px;
+  height: 28px;
+  background: rgba(168, 85, 247, 0.2);
+  border: 1px solid var(--purple-500);
+  color: var(--purple-300);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.learn-diagram-play:hover {
+  background: rgba(168, 85, 247, 0.3);
+  border-color: var(--purple-400);
+  color: var(--purple-200);
+}
+
+.learn-diagram-play.playing {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: var(--red-500);
+  color: var(--red-400);
+  animation: pulse-glow 1s ease-in-out infinite;
+}
+
+.learn-diagram-play.playing:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: var(--red-400);
+  color: var(--red-300);
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 8px 2px rgba(239, 68, 68, 0.3);
+  }
 }
 
 .learn-diagram-content {

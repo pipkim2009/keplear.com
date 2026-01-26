@@ -138,3 +138,32 @@
 .mini-kb-black-key.chord-root-note .mini-kb-note-label {
   color: var(--white);
 }
+
+/* Playing state - bright glow effect */
+.mini-kb-white-key.playing,
+.mini-kb-black-key.playing {
+  box-shadow: 0 0 12px 4px rgba(255, 255, 255, 0.8), 0 0 20px 8px rgba(255, 255, 255, 0.4);
+  transform: scale(1.05);
+  z-index: 30;
+  transition: all 0.1s ease-out;
+}
+
+.mini-kb-white-key.scale-note.playing,
+.mini-kb-black-key.scale-note.playing {
+  box-shadow: 0 0 12px 4px rgba(249, 115, 22, 0.8), 0 0 20px 8px rgba(249, 115, 22, 0.4);
+}
+
+.mini-kb-white-key.scale-root-note.playing,
+.mini-kb-black-key.scale-root-note.playing {
+  box-shadow: 0 0 12px 4px rgba(239, 68, 68, 0.8), 0 0 20px 8px rgba(239, 68, 68, 0.4);
+}
+
+.mini-kb-white-key.chord-note.playing,
+.mini-kb-black-key.chord-note.playing {
+  box-shadow: 0 0 12px 4px rgba(168, 85, 247, 0.8), 0 0 20px 8px rgba(168, 85, 247, 0.4);
+}
+
+.mini-kb-white-key.chord-root-note.playing,
+.mini-kb-black-key.chord-root-note.playing {
+  box-shadow: 0 0 12px 4px rgba(239, 68, 68, 0.8), 0 0 20px 8px rgba(239, 68, 68, 0.4);
+}

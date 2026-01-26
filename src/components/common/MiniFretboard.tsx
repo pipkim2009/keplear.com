@@ -9,9 +9,10 @@ interface MiniFretboardProps {
   instrument: 'guitar' | 'bass'
   root: string
   mode?: 'scale' | 'chord'
+  playingNotes?: string[]  // Note names that are currently playing
 }
 
-const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, root, mode = 'scale' }) => {
+const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, root, mode = 'scale', playingNotes = [] }) => {
   const { t } = useTranslation()
   const stringCount = instrument === 'guitar' ? 6 : 4
   const notesData = instrument === 'guitar' ? guitarNotes : bassNotes
@@ -162,10 +163,11 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
             : (isRoot ? 'scale-root-note' : 'scale-note')
           const noteName = getNoteName(stringIndex, 0)
           const displayName = noteName
+          const isPlaying = playingNotes.includes(noteName)
           return (
             <div
               key={`open-note-${stringIndex}`}
-              className={`mini-fb-note ${noteClass}`}
+              className={`mini-fb-note ${noteClass}${isPlaying ? ' playing' : ''}`}
               style={{
                 left: `-3px`,
                 top: `${14 + stringIndex * stringSpacing - 10}px`
@@ -187,12 +189,13 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
               : (isRoot ? 'scale-root-note' : 'scale-note')
             const noteName = getNoteName(stringIndex, fret)
             const displayName = noteName
+            const isPlaying = playingNotes.includes(noteName)
             // Push first fret notes to the right when showing frets 0-4
             const firstFretOffset = (fretIdx === 0 && startFret === 1) ? 8 : 0
             return (
               <div
                 key={`note-${stringIndex}-${fret}`}
-                className={`mini-fb-note ${noteClass}`}
+                className={`mini-fb-note ${noteClass}${isPlaying ? ' playing' : ''}`}
                 style={{
                   left: `${fretIdx * fretWidth + fretWidth / 2 - 10 + firstFretOffset}px`,
                   top: `${14 + stringIndex * stringSpacing - 10}px`

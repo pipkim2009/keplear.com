@@ -8,6 +8,7 @@ interface MiniKeyboardProps {
   notes: { name: string }[]
   root: string
   mode?: 'scale' | 'chord'
+  playingNotes?: string[]  // Note names that are currently playing
 }
 
 // Standard piano key pattern for one octave
@@ -17,7 +18,7 @@ const BLACK_KEY_POSITIONS: Record<string, number> = {
   'C#': 0, 'D#': 1, 'F#': 3, 'G#': 4, 'A#': 5
 }
 
-const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale' }) => {
+const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale', playingNotes = [] }) => {
   const { t } = useTranslation()
 
   // Determine available octaves from notes
@@ -56,17 +57,32 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
     return noteName === root
   }
 
+  // Check if a note is currently playing
+  const isNotePlaying = (noteName: string, octave: number): boolean => {
+    const fullNoteName = `${noteName}${octave}`
+    return playingNotes.includes(fullNoteName)
+  }
+
   // Get class for a key
-  const getKeyClass = (noteName: string, isBlack: boolean): string => {
+  const getKeyClass = (noteName: string, isBlack: boolean, octave: number): string => {
     const baseClass = isBlack ? 'mini-kb-black-key' : 'mini-kb-white-key'
     if (!isNoteActive(noteName)) return baseClass
 
     const isRoot = isRootNote(noteName)
+    const isPlaying = isNotePlaying(noteName, octave)
+    let classes = baseClass
+
     if (mode === 'chord') {
-      return `${baseClass} ${isRoot ? 'chord-root-note' : 'chord-note'}`
+      classes += ` ${isRoot ? 'chord-root-note' : 'chord-note'}`
     } else {
-      return `${baseClass} ${isRoot ? 'scale-root-note' : 'scale-note'}`
+      classes += ` ${isRoot ? 'scale-root-note' : 'scale-note'}`
     }
+
+    if (isPlaying) {
+      classes += ' playing'
+    }
+
+    return classes
   }
 
   // Calculate dim percentages for keyboard visual
@@ -127,7 +143,7 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
           return (
             <div
               key={`white-${selectedOctave}-${note}`}
-              className={getKeyClass(noteName, false)}
+              className={getKeyClass(noteName, false, selectedOctave)}
               style={{
                 left: `${keyIdx * whiteKeyWidth}px`,
                 width: `${whiteKeyWidth}px`,
@@ -150,7 +166,7 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
           return (
             <div
               key={`black-${selectedOctave}-${note}`}
-              className={getKeyClass(noteName, true)}
+              className={getKeyClass(noteName, true, selectedOctave)}
               style={{
                 left: `${leftOffset}px`,
                 width: `${blackKeyWidth}px`,

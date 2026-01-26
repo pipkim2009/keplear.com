@@ -63,7 +63,8 @@
     "ok": "OK",
     "apply": "Apply",
     "clear": "Clear",
-    "selectLanguage": "Select language"
+    "selectLanguage": "Select language",
+    "stop": "Stop"
   },
   "home": {
     "title": "Learn Music Your Way",
@@ -202,6 +203,7 @@
     "micLevel": "Mic Level",
     "learnScale": "Learn Scale",
     "learnChord": "Learn Chord",
+    "playSound": "Play Sound",
     "intervals": "Intervals",
     "diagram": "Diagram",
     "notes": "Notes",

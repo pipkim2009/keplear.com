@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { IoMusicalNotes } from 'react-icons/io5'
-import { PiTrashFill, PiEyeFill } from 'react-icons/pi'
+import { PiTrashFill, PiEyeFill, PiSpeakerHighFill, PiStopFill } from 'react-icons/pi'
 import { createPortal } from 'react-dom'
 import { useTranslation } from '../../contexts/TranslationContext'
+import { useAudio } from '../../hooks/useAudio'
 import { ROOT_NOTES, GUITAR_SCALES, getScaleBoxes, applyScaleToGuitar, applyScaleBoxToGuitar, type GuitarScale, type ScaleBox } from '../../utils/instruments/guitar/guitarScales'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
 import { BASS_ROOT_NOTES, BASS_SCALES, getBassScaleBoxes, applyScaleToBass, applyScaleBoxToBass, type BassScale, type BassScaleBox } from '../../utils/instruments/bass/bassScales'
@@ -154,6 +155,139 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
     root: string
     item: AppliedScale | AppliedChord
   } | null>(null)
+
+  // Audio playback for diagrams
+  const { playNote, playGuitarNote, playBassNote, stopMelody } = useAudio()
+  const [isDiagramPlaying, setIsDiagramPlaying] = useState(false)
+  const [playingNotes, setPlayingNotes] = useState<string[]>([])
+  const playbackTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const shouldStopRef = useRef(false)
+
+  // Play diagram notes (scales play sequentially, chords play together)
+  const playDiagramSound = useCallback(async () => {
+    if (!learnDiagramData || isDiagramPlaying) return
+
+    const { type, item } = learnDiagramData
+    const isScale = type === 'scale'
+    const appliedItem = item as (AppliedScale | AppliedChord)
+
+    // Get notes based on instrument type
+    let noteNames: string[] = []
+
+    if (instrument === 'keyboard') {
+      // Keyboard notes - already have Note objects with names
+      const notes = appliedItem.notes || []
+      noteNames = notes.map(n => n.name).sort((a, b) => {
+        // Sort by pitch (octave first, then note)
+        const octaveA = parseInt(a.replace(/[^0-9]/g, ''), 10)
+        const octaveB = parseInt(b.replace(/[^0-9]/g, ''), 10)
+        if (octaveA !== octaveB) return octaveA - octaveB
+        const noteOrder = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+        const noteA = a.replace(/\d+$/, '')
+        const noteB = b.replace(/\d+$/, '')
+        return noteOrder.indexOf(noteA) - noteOrder.indexOf(noteB)
+      })
+    } else {
+      // Guitar/Bass notes - need to convert noteKeys to note names
+      const noteKeys = appliedItem.noteKeys || []
+      const notesData = instrument === 'guitar' ? guitarNotes : bassNotes
+      const stringCount = instrument === 'guitar' ? 6 : 4
+
+      // Parse noteKeys and get note names with position info
+      const parsedNotes = noteKeys.map(key => {
+        const parts = key.split('-')
+        const stringIndex = parseInt(parts[0], 10)
+        const fret = parts[1] === 'open' ? 0 : parseInt(parts[1], 10) + 1
+
+        // Find the note in notesData
+        const note = notesData.find(n => {
+          const noteStringIdx = instrument === 'guitar' ? 6 - n.string : 4 - n.string
+          return noteStringIdx === stringIndex && n.fret === fret
+        })
+
+        return {
+          name: note?.name || '',
+          stringIndex,
+          fret,
+          string: note?.string || (stringCount - stringIndex) // Convert back to 1-indexed string number
+        }
+      }).filter(n => n.name)
+
+      // Sort for scales: string 6 to 1 (low to high), then by fret within each string
+      parsedNotes.sort((a, b) => {
+        // Sort by string (6 to 1 = low to high pitch)
+        if (a.string !== b.string) return a.string - b.string
+        // Then by fret (lower frets first = left to right)
+        return a.fret - b.fret
+      })
+
+      noteNames = parsedNotes.map(n => n.name)
+    }
+
+    if (noteNames.length === 0) return
+
+    setIsDiagramPlaying(true)
+    shouldStopRef.current = false
+
+    const playFn = instrument === 'guitar' ? playGuitarNote :
+                   instrument === 'bass' ? playBassNote : playNote
+
+    try {
+      if (isScale) {
+        // Play notes sequentially for scales
+        const noteDuration = 300 // ms between notes
+
+        for (let i = 0; i < noteNames.length; i++) {
+          if (shouldStopRef.current) break
+          setPlayingNotes([noteNames[i]])  // Light up current note
+          await playFn(noteNames[i])
+          if (i < noteNames.length - 1 && !shouldStopRef.current) {
+            await new Promise<void>(resolve => {
+              playbackTimeoutRef.current = setTimeout(resolve, noteDuration)
+            })
+          }
+        }
+      } else {
+        // Play all notes together for chords - light up all at once
+        setPlayingNotes(noteNames)
+        for (const noteName of noteNames) {
+          await playFn(noteName)
+        }
+      }
+    } finally {
+      // Reset playing state after a delay
+      if (!shouldStopRef.current) {
+        playbackTimeoutRef.current = setTimeout(() => {
+          setIsDiagramPlaying(false)
+          setPlayingNotes([])  // Clear highlighted notes
+        }, 500)
+      }
+    }
+  }, [learnDiagramData, isDiagramPlaying, instrument, playNote, playGuitarNote, playBassNote])
+
+  // Stop diagram playback
+  const stopDiagramSound = useCallback(() => {
+    shouldStopRef.current = true
+    if (playbackTimeoutRef.current) {
+      clearTimeout(playbackTimeoutRef.current)
+      playbackTimeoutRef.current = null
+    }
+    setIsDiagramPlaying(false)
+    setPlayingNotes([])
+    stopMelody()
+  }, [stopMelody])
+
+  // Cleanup on unmount or when modal closes
+  useEffect(() => {
+    if (!learnDiagramData) {
+      stopDiagramSound()
+    }
+    return () => {
+      if (playbackTimeoutRef.current) {
+        clearTimeout(playbackTimeoutRef.current)
+      }
+    }
+  }, [learnDiagramData, stopDiagramSound])
 
   // Calculate available octaves based on octave range
   const minOctave = Math.max(1, 4 - lowerOctaves)
@@ -1120,12 +1254,21 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
           <div className="learn-diagram-modal" onClick={(e) => e.stopPropagation()}>
             <div className="learn-diagram-header">
               <h3>{learnDiagramData.displayName}</h3>
-              <button
-                className="learn-diagram-close"
-                onClick={() => setLearnDiagramData(null)}
-              >
-                ×
-              </button>
+              <div className="learn-diagram-actions">
+                <button
+                  className={`learn-diagram-play ${isDiagramPlaying ? 'playing' : ''}`}
+                  onClick={isDiagramPlaying ? stopDiagramSound : playDiagramSound}
+                  title={isDiagramPlaying ? t('common.stop') : t('sandbox.playSound')}
+                >
+                  {isDiagramPlaying ? <PiStopFill size={16} /> : <PiSpeakerHighFill size={16} />}
+                </button>
+                <button
+                  className="learn-diagram-close"
+                  onClick={() => setLearnDiagramData(null)}
+                >
+                  ×
+                </button>
+              </div>
             </div>
             <div className="learn-diagram-content">
               {learnDiagramData.type === 'scale' ? (
@@ -1142,12 +1285,14 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                       notes={(learnDiagramData.item as AppliedScale).notes || []}
                       root={learnDiagramData.root}
                       mode="scale"
+                      playingNotes={playingNotes}
                     />
                   ) : (
                     <MiniFretboard
                       noteKeys={(learnDiagramData.item as AppliedScale).noteKeys || []}
                       instrument={instrument as 'guitar' | 'bass'}
                       root={learnDiagramData.root}
+                      playingNotes={playingNotes}
                     />
                   )}
                 </div>
@@ -1165,6 +1310,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                       notes={(learnDiagramData.item as AppliedChord).notes || []}
                       root={learnDiagramData.root}
                       mode="chord"
+                      playingNotes={playingNotes}
                     />
                   ) : (
                     <MiniFretboard
@@ -1172,6 +1318,7 @@ const ScaleChordOptions: React.FC<ScaleChordOptionsProps> = ({
                       instrument={instrument as 'guitar' | 'bass'}
                       root={learnDiagramData.root}
                       mode="chord"
+                      playingNotes={playingNotes}
                     />
                   )}
                 </div>
