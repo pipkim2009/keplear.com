@@ -101,13 +101,21 @@ function Dashboard() {
         setUsername(profileData.username)
       }
 
-      // Fetch completed assignments count
-      const { count: completedCount } = await supabase
+      // Fetch completed assignments with dates for time-range filtering
+      const { data: completionsData } = await supabase
         .from('assignment_completions')
-        .select('*', { count: 'exact', head: true })
+        .select('completed_at')
         .eq('user_id', user.id)
 
-      setCompletedAssignmentsCount(completedCount || 0)
+      // Filter by date range from practice stats
+      const startDate = stats.dateRange?.start || ''
+      const endDate = stats.dateRange?.end || ''
+      const filteredCompletions = completionsData?.filter((c: any) => {
+        const completedDate = c.completed_at?.split('T')[0] || ''
+        return completedDate >= startDate && completedDate <= endDate
+      }) || []
+
+      setCompletedAssignmentsCount(filteredCompletions.length)
 
       // Fetch my classrooms (joined or owned)
       const { data: studentClassrooms } = await supabase
@@ -440,33 +448,27 @@ function Dashboard() {
             </h2>
           </div>
 
-          {/* Summary Stats Row */}
-          <div className={styles.statsSummaryTwo}>
-            <div className={styles.summaryCard}>
-              <div className={`${styles.summaryIcon} ${styles.purple}`}>
-                <PiMusicNotesFill />
+          {/* Unified Activity Container */}
+          <div className={styles.activityContainer}>
+            {/* Stats Row at top */}
+            <div className={styles.activityStatsRow}>
+              <div className={styles.activityStat}>
+                <div className={`${styles.activityStatIcon} ${styles.purple}`}>
+                  <PiMusicNotesFill />
+                </div>
+                <span className={styles.activityStatValue}>
+                  {practiceStats?.weeklyData.reduce((sum, d) => sum + d.keyboard + d.guitar + d.bass, 0) || 0}
+                </span>
+                <span className={styles.activityStatLabel}>Melodies</span>
               </div>
-              <div className={styles.summaryContent}>
-                <span className={styles.summaryValue}>{practiceStats?.totalMelodies || 0}</span>
-                <span className={styles.summaryLabel}>Total Melodies</span>
+              <div className={styles.activityStat}>
+                <div className={`${styles.activityStatIcon} ${styles.green}`}>
+                  <PiCheckCircleFill />
+                </div>
+                <span className={styles.activityStatValue}>{completedAssignmentsCount}</span>
+                <span className={styles.activityStatLabel}>Assignments</span>
               </div>
-            </div>
-            <div className={styles.summaryCard}>
-              <div className={`${styles.summaryIcon} ${styles.green}`}>
-                <PiCheckCircleFill />
-              </div>
-              <div className={styles.summaryContent}>
-                <span className={styles.summaryValue}>{completedAssignmentsCount}</span>
-                <span className={styles.summaryLabel}>Completed Assignments</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Chart and Activity Row */}
-          <div className={styles.chartActivityRow}>
-          {/* Line Chart */}
-          <div className={styles.chartContainer}>
-            <div className={styles.chartHeader}>
+              <div className={styles.activityStatSpacer} />
               <select
                 className={styles.timeRangeSelect}
                 value={timeRange}
@@ -478,6 +480,11 @@ function Dashboard() {
                 <option value="all">All Time</option>
               </select>
             </div>
+
+            {/* Chart and Activity Row */}
+            <div className={styles.chartActivityRow}>
+              {/* Chart */}
+              <div className={styles.chartContainer}>
             <div className={styles.chartInner}>
               <div className={styles.yAxisWrapper}>
                 <span className={styles.yAxisLabel}>Melodies</span>
@@ -625,6 +632,7 @@ function Dashboard() {
                 </div>
               )
             })()}
+          </div>
           </div>
           </div>
         </section>
