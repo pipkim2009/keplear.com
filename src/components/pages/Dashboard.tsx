@@ -9,7 +9,7 @@ import AuthContext from '../../contexts/AuthContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useNavigation } from '../../hooks/useInstrumentSelectors'
 import { useInstrument } from '../../contexts/InstrumentContext'
-import { fetchRecentPracticeSessions, fetchPracticeStats, type PracticeSession, type PracticeStats } from '../../hooks/usePracticeSessions'
+import { fetchRecentPracticeSessions, fetchPracticeStats, type PracticeSession, type PracticeStats, type TimeRange } from '../../hooks/usePracticeSessions'
 import {
   PiPlayFill,
   PiCheckCircleFill,
@@ -71,6 +71,7 @@ function Dashboard() {
 
   // State
   const [username, setUsername] = useState<string>('')
+  const [timeRange, setTimeRange] = useState<TimeRange>('week')
   const [practiceStats, setPracticeStats] = useState<PracticeStats | null>(null)
   const [completedAssignmentsCount, setCompletedAssignmentsCount] = useState<number>(0)
   const [myClassrooms, setMyClassrooms] = useState<ClassroomData[]>([])
@@ -86,7 +87,7 @@ function Dashboard() {
 
     try {
       // Get practice stats from Supabase
-      const stats = await fetchPracticeStats(user.id)
+      const stats = await fetchPracticeStats(user.id, timeRange)
       setPracticeStats(stats)
 
       // Fetch username from profiles
@@ -333,7 +334,7 @@ function Dashboard() {
     } finally {
       setIsLoading(false)
     }
-  }, [user])
+  }, [user, timeRange])
 
   useEffect(() => {
     if (user && !loading) {
@@ -402,7 +403,7 @@ function Dashboard() {
   const getMaxChartValue = () => {
     if (!practiceStats) return 10
     const max = Math.max(
-      ...practiceStats.weeklyData.map(d => d.sandbox + d.classroom),
+      ...practiceStats.weeklyData.map(d => d.keyboard + d.guitar + d.bass + d.classroom),
       1
     )
     // Round up to nearest even number for clean middle label
@@ -520,7 +521,19 @@ function Dashboard() {
           <div className={styles.chartActivityRow}>
           {/* Line Chart */}
           <div className={styles.chartContainer}>
-                        <div className={styles.chartInner}>
+            <div className={styles.chartHeader}>
+              <select
+                className={styles.timeRangeSelect}
+                value={timeRange}
+                onChange={(e) => setTimeRange(e.target.value as TimeRange)}
+              >
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="year">This Year</option>
+                <option value="all">All Time</option>
+              </select>
+            </div>
+            <div className={styles.chartInner}>
               <div className={styles.yAxisWrapper}>
                 <span className={styles.yAxisLabel}>Melodies</span>
                 <div className={styles.chartYAxis}>
@@ -539,17 +552,35 @@ function Dashboard() {
 
                 {/* Bar Chart */}
                 {practiceStats && practiceStats.weeklyData.length > 0 && (
-                  <div className={styles.barChartContainer}>
+                  <div className={`${styles.barChartContainer} ${timeRange === 'month' ? styles.barChartMonth : ''}`}>
                     {practiceStats.weeklyData.map((d, i) => {
-                      const total = d.sandbox + d.classroom
+                      const total = d.keyboard + d.guitar + d.bass + d.classroom
                       const heightPercent = (total / maxChartValue) * 100
+                      // Calculate individual segment heights as percentage of total bar
+                      const keyboardPct = total > 0 ? (d.keyboard / total) * 100 : 0
+                      const guitarPct = total > 0 ? (d.guitar / total) * 100 : 0
+                      const bassPct = total > 0 ? (d.bass / total) * 100 : 0
+                      const classroomPct = total > 0 ? (d.classroom / total) * 100 : 0
                       return (
                         <div key={i} className={styles.barWrapper}>
                           <div
-                            className={styles.bar}
+                            className={styles.barStack}
                             style={{ height: `${heightPercent}%` }}
-                            title={`${total} melodies`}
-                          />
+                            title={`${d.label}: ${total} melodies`}
+                          >
+                            {d.classroom > 0 && (
+                              <div className={`${styles.barSegment} ${styles.barClassroom}`} style={{ height: `${classroomPct}%` }} />
+                            )}
+                            {d.bass > 0 && (
+                              <div className={`${styles.barSegment} ${styles.barBass}`} style={{ height: `${bassPct}%` }} />
+                            )}
+                            {d.guitar > 0 && (
+                              <div className={`${styles.barSegment} ${styles.barGuitar}`} style={{ height: `${guitarPct}%` }} />
+                            )}
+                            {d.keyboard > 0 && (
+                              <div className={`${styles.barSegment} ${styles.barKeyboard}`} style={{ height: `${keyboardPct}%` }} />
+                            )}
+                          </div>
                         </div>
                       )
                     })}
@@ -558,29 +589,85 @@ function Dashboard() {
               </div>
             </div>
             {/* X-axis labels */}
-            <div className={styles.chartXAxis}>
-              {practiceStats?.weeklyData.map((day) => (
-                <span key={day.date} className={styles.chartLabel}>{formatDayName(day.date)}</span>
-              ))}
+            <div className={`${styles.chartXAxis} ${timeRange === 'month' ? styles.chartXAxisMonth : ''}`}>
+              {practiceStats?.weeklyData.map((day) => {
+                const todayStr = new Date().toISOString().split('T')[0]
+                const isCurrent = (timeRange === 'week' && day.date === todayStr) ||
+                  (timeRange === 'month' && day.date === todayStr) ||
+                  ((timeRange === 'year' || timeRange === 'all') && day.date === todayStr.substring(0, 7))
+                return (
+                  <div key={day.date} className={styles.chartLabelContainer}>
+                    <span className={`${styles.chartLabel} ${isCurrent ? styles.chartLabelCurrent : ''}`}>{day.label}</span>
+                  </div>
+                )
+              })}
             </div>
-            <span className={styles.xAxisLabel}>Day</span>
+            <div className={styles.chartFooter}>
+              <span className={styles.xAxisLabel}>
+                {timeRange === 'week' ? 'Day' : timeRange === 'month' ? 'Date' : 'Month'}
+              </span>
+              <div className={styles.chartLegend}>
+                <div className={styles.legendItem}>
+                  <span className={`${styles.legendDot} ${styles.legendKeyboard}`} />
+                  <span className={styles.legendLabel}>Keyboard</span>
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={`${styles.legendDot} ${styles.legendGuitar}`} />
+                  <span className={styles.legendLabel}>Guitar</span>
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={`${styles.legendDot} ${styles.legendBass}`} />
+                  <span className={styles.legendLabel}>Bass</span>
+                </div>
+                <div className={styles.legendItem}>
+                  <span className={`${styles.legendDot} ${styles.legendClassroom}`} />
+                  <span className={styles.legendLabel}>Classroom</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Recent Activity - beside chart */}
           <div className={styles.activitySide}>
-            {recentActivity.length > 0 ? (
-              <div className={styles.activityList}>
-                {(() => {
-                  const grouped: { [key: string]: typeof recentActivity } = {}
-                  recentActivity.slice(0, 8).forEach((activity) => {
-                    const dateKey = activity.timestamp.split('T')[0]
-                    if (!grouped[dateKey]) grouped[dateKey] = []
-                    grouped[dateKey].push(activity)
-                  })
+            {(() => {
+              // Get the date range from the graph
+              const startDate = practiceStats?.dateRange?.start || ''
+              const endDate = practiceStats?.dateRange?.end || ''
 
-                  return Object.entries(grouped).map(([dateKey, activities]) => (
+              // Filter activities to only those within the graph's date range
+              const filteredActivity = recentActivity.filter((activity) => {
+                const dateKey = activity.timestamp.split('T')[0]
+                return dateKey >= startDate && dateKey <= endDate
+              })
+
+              if (filteredActivity.length === 0) {
+                const periodText = timeRange === 'week' ? 'this week' : timeRange === 'month' ? 'this month' : timeRange === 'year' ? 'this year' : 'yet'
+                return <p className={styles.emptyActivityText}>No activity {periodText}</p>
+              }
+
+              const grouped: { [key: string]: typeof recentActivity } = {}
+              filteredActivity.slice(0, 8).forEach((activity) => {
+                const dateKey = activity.timestamp.split('T')[0]
+                if (!grouped[dateKey]) grouped[dateKey] = []
+                grouped[dateKey].push(activity)
+              })
+
+              const formatActivityDate = (dateStr: string) => {
+                const date = new Date(dateStr + 'T00:00:00')
+                if (timeRange === 'week') {
+                  return date.toLocaleDateString('en', { weekday: 'short' })
+                } else if (timeRange === 'month') {
+                  return date.toLocaleDateString('en', { weekday: 'short', day: 'numeric' })
+                } else {
+                  return date.toLocaleDateString('en', { month: 'short', day: 'numeric' })
+                }
+              }
+
+              return (
+                <div className={styles.activityList}>
+                  {Object.entries(grouped).map(([dateKey, activities]) => (
                     <div key={dateKey} className={styles.activityDayGroup}>
-                      <span className={styles.activityDayHeader}>{formatDayName(dateKey)}</span>
+                      <span className={styles.activityDayHeader}>{formatActivityDate(dateKey)}</span>
                       {activities.map((activity) => (
                         <div key={activity.id} className={styles.activityItem}>
                           <div className={`${styles.activityIcon} ${activity.type === 'sandbox' ? getInstrumentTagClass(activity.instrument || 'keyboard') : activity.type === 'completion' ? styles.completion : styles.classJoin}`}>
@@ -599,12 +686,10 @@ function Dashboard() {
                         </div>
                       ))}
                     </div>
-                  ))
-                })()}
-              </div>
-            ) : (
-              <p className={styles.emptyActivityText}>No recent activity</p>
-            )}
+                  ))}
+                </div>
+              )
+            })()}
           </div>
           </div>
         </section>
