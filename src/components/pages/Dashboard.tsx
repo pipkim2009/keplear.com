@@ -542,7 +542,8 @@ function Dashboard() {
                 const todayStr = new Date().toISOString().split('T')[0]
                 const isCurrent = (timeRange === 'week' && day.date === todayStr) ||
                   (timeRange === 'month' && day.date === todayStr) ||
-                  ((timeRange === 'year' || timeRange === 'all') && day.date === todayStr.substring(0, 7))
+                  (timeRange === 'year' && day.date === todayStr.substring(0, 7)) ||
+                  (timeRange === 'all' && day.date === todayStr.substring(0, 4))
                 return (
                   <div key={day.date} className={styles.chartLabelContainer}>
                     <span className={`${styles.chartLabel} ${isCurrent ? styles.chartLabelCurrent : ''}`}>{day.label}</span>
@@ -552,7 +553,7 @@ function Dashboard() {
             </div>
             <div className={styles.chartFooter}>
               <span className={styles.xAxisLabel}>
-                {timeRange === 'week' ? 'Day' : timeRange === 'month' ? 'Date' : 'Month'}
+                {timeRange === 'week' ? 'Day' : timeRange === 'month' ? 'Date' : timeRange === 'year' ? 'Month' : 'Year'}
               </span>
               <div className={styles.chartLegend}>
                 <div className={styles.legendItem}>

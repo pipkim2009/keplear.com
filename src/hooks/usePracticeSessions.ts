@@ -155,16 +155,15 @@ export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 
         timeData.push({ date: dateStr, label, keyboard: 0, guitar: 0, bass: 0 })
       }
     } else {
-      // All time - group by month, going back up to 12 months or to first session
-      startDate = new Date(today)
-      startDate.setMonth(today.getMonth() - 11)
-      startDate.setDate(1)
+      // All time - group by year, showing last 5 years
+      const currentYear = today.getFullYear()
+      startDate = new Date(currentYear - 4, 0, 1)
+      endDate = new Date(currentYear, 11, 31)
 
-      for (let i = 0; i < 12; i++) {
-        const date = new Date(startDate)
-        date.setMonth(startDate.getMonth() + i)
-        const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
-        const label = date.toLocaleDateString('en', { month: 'short', year: '2-digit' })
+      for (let i = 0; i < 5; i++) {
+        const year = currentYear - 4 + i
+        const dateStr = `${year}`
+        const label = `${year}`
         timeData.push({ date: dateStr, label, keyboard: 0, guitar: 0, bass: 0 })
       }
     }
@@ -210,7 +209,14 @@ export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 
     // Add to time data - categorize by instrument regardless of sandbox/classroom
     const sessionDate = session.created_at.split('T')[0]
 
-    if (timeRange === 'year' || timeRange === 'all') {
+    if (timeRange === 'all') {
+      // Group by year
+      const yearKey = sessionDate.substring(0, 4) // YYYY
+      const dayData = timeData.find(d => d.date === yearKey)
+      if (dayData && session.instrument in dayData) {
+        dayData[session.instrument as 'keyboard' | 'guitar' | 'bass'] += session.melodies_completed
+      }
+    } else if (timeRange === 'year') {
       // Group by month
       const monthKey = sessionDate.substring(0, 7) // YYYY-MM
       const dayData = timeData.find(d => d.date === monthKey)
