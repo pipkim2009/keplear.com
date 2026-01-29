@@ -45,7 +45,7 @@ export interface UseTutorialResult {
 export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'instrument',
-    target: '.instrument-selector-group',
+    target: '.keyboard-container, .guitar-container, .bass-container',
     title: 'Select Notes',
     description: 'Click on keys or frets to choose notes for your melody',
     position: 'bottom'

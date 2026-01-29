@@ -43,10 +43,13 @@ function getSpotlightPosition(target: string): SpotlightPosition | null {
   // Fallback selectors for different steps
   if (!element) {
     const fallbackSelectors: Record<string, string[]> = {
-      '.instrument-selector-group': [
-        '.instrument-controls',
-        '.instrument-selector',
-        '[class*="instrument"]'
+      '.keyboard-container, .guitar-container, .bass-container': [
+        '.keyboard-container',
+        '.guitar-container',
+        '.bass-container',
+        '.keyboard',
+        '.guitar-fretboard',
+        '.bass-fretboard'
       ],
       '.bpm-input': [
         '[class*="bpm"]',
@@ -78,9 +81,10 @@ function getSpotlightPosition(target: string): SpotlightPosition | null {
   const rect = element.getBoundingClientRect()
   const padding = 8 // Padding around the element
 
+  // Use viewport-relative coords since overlay is position:fixed
   return {
-    top: rect.top - padding + window.scrollY,
-    left: rect.left - padding + window.scrollX,
+    top: rect.top - padding,
+    left: rect.left - padding,
     width: rect.width + padding * 2,
     height: rect.height + padding * 2
   }
