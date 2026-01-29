@@ -34,8 +34,19 @@ export const DEFAULT_SETTINGS = {
   chordMode: 'progression' as ChordMode
 } as const
 
+// Determine initial page from URL
+const getInitialPage = (): PageType => {
+  if (typeof window === 'undefined') return 'home'
+  const path = window.location.pathname
+  if (path === '/sandbox' || path.startsWith('/sandbox')) return 'sandbox'
+  if (path === '/dashboard' || path.startsWith('/dashboard')) return 'dashboard'
+  if (path === '/classroom' || path.startsWith('/classroom')) return 'classroom'
+  if (path === '/profile' || path.startsWith('/profile')) return 'profile'
+  return 'home'
+}
+
 export const initialUIState: UIState = {
-  currentPage: 'home',
+  currentPage: getInitialPage(),
   bpm: DEFAULT_SETTINGS.bpm,
   numberOfBeats: DEFAULT_SETTINGS.numberOfBeats,
   chordMode: DEFAULT_SETTINGS.chordMode,

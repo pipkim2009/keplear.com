@@ -316,6 +316,7 @@ const TutorialOverlay = ({
 
   // Show welcome modal if shouldShowWelcome
   if (shouldShowWelcome && !isActive) {
+    console.log('[TutorialOverlay] Showing welcome modal')
     return createPortal(
       <WelcomeModal onStart={onStartTutorial} onSkip={onSkip} />,
       document.body

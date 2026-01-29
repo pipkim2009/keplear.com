@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
 export interface TutorialStep {
   id: string
@@ -11,12 +12,6 @@ export interface TutorialStep {
   title: string
   description: string
   position: 'top' | 'bottom' | 'left' | 'right'
-}
-
-export interface TutorialState {
-  isActive: boolean
-  currentStep: number
-  steps: TutorialStep[]
 }
 
 export interface UseTutorialResult {
@@ -43,8 +38,6 @@ export interface UseTutorialResult {
   /** Check if tutorial should show */
   shouldShowTutorial: boolean
 }
-
-const TUTORIAL_STORAGE_KEY = 'keplear_tutorial_completed'
 
 /**
  * Tutorial steps configuration
@@ -87,6 +80,8 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   }
 ]
 
+const TUTORIAL_IN_PROGRESS_KEY = 'keplear_tutorial_in_progress'
+
 /**
  * Hook to manage tutorial state
  */
@@ -94,26 +89,87 @@ export function useTutorial(): UseTutorialResult {
   const [isActive, setIsActive] = useState(false)
   const [currentStep, setCurrentStep] = useState(0)
   const [shouldShowTutorial, setShouldShowTutorial] = useState(false)
+  const [tutorialCompleted, setTutorialCompleted] = useState<boolean | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
-  // Check URL params for tutorial trigger
+  // Get current user and check tutorial completion status
   useEffect(() => {
+    const checkTutorialStatus = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (!user) {
+        setTutorialCompleted(null)
+        setUserId(null)
+        return
+      }
+
+      setUserId(user.id)
+
+      // Fetch tutorial_completed from profiles
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('tutorial_completed')
+        .eq('id', user.id)
+        .single()
+
+      if (error) {
+        console.warn('Could not fetch tutorial status:', error)
+        setTutorialCompleted(false)
+      } else {
+        setTutorialCompleted(data?.tutorial_completed ?? false)
+      }
+    }
+
+    checkTutorialStatus()
+  }, [])
+
+  // Check URL params or session storage for tutorial trigger
+  useEffect(() => {
+    if (tutorialCompleted === null) return // Still loading
+
     const params = new URLSearchParams(window.location.search)
     const startTutorial = params.get('tutorial')
-    const completed = localStorage.getItem(TUTORIAL_STORAGE_KEY)
+    const inProgress = sessionStorage.getItem(TUTORIAL_IN_PROGRESS_KEY)
 
-    if (startTutorial === 'start' && completed !== 'true') {
-      setShouldShowTutorial(true)
-      // Remove the param from URL without refresh
+    // Start directly from URL param (skip welcome modal)
+    if (startTutorial === 'start' && !tutorialCompleted) {
+      setIsActive(true)
+      setCurrentStep(0)
+      sessionStorage.setItem(TUTORIAL_IN_PROGRESS_KEY, 'true')
       const newUrl = window.location.pathname
       window.history.replaceState({}, '', newUrl)
     }
-  }, [])
+    // Resume if was in progress (page refresh)
+    else if (inProgress === 'true' && !tutorialCompleted) {
+      setIsActive(true)
+      setCurrentStep(0)
+    }
+  }, [tutorialCompleted])
+
+  // Mark tutorial as completed in Supabase
+  const markTutorialComplete = useCallback(async () => {
+    sessionStorage.removeItem(TUTORIAL_IN_PROGRESS_KEY)
+
+    if (!userId) return
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({ tutorial_completed: true })
+      .eq('id', userId)
+
+    if (error) {
+      console.warn('Could not save tutorial completion:', error)
+    }
+
+    setTutorialCompleted(true)
+  }, [userId])
 
   // Start the tutorial
   const startTutorial = useCallback(() => {
     setIsActive(true)
     setCurrentStep(0)
     setShouldShowTutorial(false)
+    sessionStorage.setItem(TUTORIAL_IN_PROGRESS_KEY, 'true')
   }, [])
 
   // Advance to next step
@@ -123,9 +179,9 @@ export function useTutorial(): UseTutorialResult {
     } else {
       // Tutorial complete
       setIsActive(false)
-      localStorage.setItem(TUTORIAL_STORAGE_KEY, 'true')
+      markTutorialComplete()
     }
-  }, [currentStep])
+  }, [currentStep, markTutorialComplete])
 
   // Go back to previous step
   const prevStep = useCallback(() => {
@@ -145,14 +201,14 @@ export function useTutorial(): UseTutorialResult {
   const skipTutorial = useCallback(() => {
     setIsActive(false)
     setShouldShowTutorial(false)
-    localStorage.setItem(TUTORIAL_STORAGE_KEY, 'true')
-  }, [])
+    markTutorialComplete()
+  }, [markTutorialComplete])
 
   // Complete tutorial
   const completeTutorial = useCallback(() => {
     setIsActive(false)
-    localStorage.setItem(TUTORIAL_STORAGE_KEY, 'true')
-  }, [])
+    markTutorialComplete()
+  }, [markTutorialComplete])
 
   // Get current step data
   const currentStepData = isActive ? TUTORIAL_STEPS[currentStep] : null
@@ -175,8 +231,14 @@ export function useTutorial(): UseTutorialResult {
 /**
  * Clear tutorial completion (for testing)
  */
-export function resetTutorial() {
-  localStorage.removeItem(TUTORIAL_STORAGE_KEY)
+export async function resetTutorial() {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) {
+    await supabase
+      .from('profiles')
+      .update({ tutorial_completed: false })
+      .eq('id', user.id)
+  }
 }
 
 export default useTutorial
