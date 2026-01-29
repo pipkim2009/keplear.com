@@ -11,6 +11,8 @@ import { useInstrument } from '../../contexts/InstrumentContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import AuthContext from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
+import TutorialOverlay from '../onboarding/TutorialOverlay'
+import { useTutorial } from '../../hooks/useTutorial'
 // Old feedback system removed - now using useMelodyFeedback in CustomAudioPlayer
 import type { Note } from '../../utils/notes'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
@@ -123,7 +125,25 @@ function Sandbox() {
   const { t } = useTranslation()
   const authContext = useContext(AuthContext)
   const user = authContext?.user ?? null
-  const { navigateToClassroom } = useInstrument()
+  const { navigateToClassroom, navigateToDashboard } = useInstrument()
+
+  // Tutorial overlay state
+  const {
+    isActive: isTutorialActive,
+    currentStep: tutorialStep,
+    nextStep: tutorialNextStep,
+    prevStep: tutorialPrevStep,
+    skipTutorial,
+    completeTutorial,
+    shouldShowTutorial,
+    startTutorial
+  } = useTutorial()
+
+  // Handle tutorial completion - navigate to dashboard
+  const handleTutorialComplete = useCallback(() => {
+    completeTutorial()
+    navigateToDashboard()
+  }, [completeTutorial, navigateToDashboard])
 
   // Hook to record practice sessions to Supabase
   const recordPracticeSession = useRecordPracticeSession()
@@ -1635,6 +1655,18 @@ function Sandbox() {
       />
 
       {assignTitleModal}
+
+      {/* Tutorial Overlay */}
+      <TutorialOverlay
+        isActive={isTutorialActive}
+        currentStep={tutorialStep}
+        onNext={tutorialNextStep}
+        onPrev={tutorialPrevStep}
+        onSkip={skipTutorial}
+        onComplete={handleTutorialComplete}
+        shouldShowWelcome={shouldShowTutorial}
+        onStartTutorial={startTutorial}
+      />
     </>
   )
 }

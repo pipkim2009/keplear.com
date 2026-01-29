@@ -27,6 +27,10 @@ interface AuthContextType {
   readonly user: User | null
   /** Loading state for authentication operations */
   readonly loading: boolean
+  /** Flag indicating if the user just signed up (for onboarding) */
+  readonly isNewUser: boolean
+  /** Clear the isNewUser flag after onboarding completes */
+  clearNewUserFlag: () => void
   /** Sign up a new user with username and password */
   signUp: (username: string, password: string, metadata?: Record<string, unknown>) => Promise<AuthResult>
   /** Sign in an existing user */
@@ -86,6 +90,7 @@ const createPlaceholderEmail = (username: string): string => {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
+  const [isNewUser, setIsNewUser] = useState<boolean>(false)
 
   useEffect(() => {
     const getSession = async () => {
@@ -157,7 +162,12 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
           data: { ...metadata, username, display_name: username }
         }
       })
-      
+
+      // Set isNewUser flag on successful signup
+      if (!error && data?.user) {
+        setIsNewUser(true)
+      }
+
       return { data, error }
     } catch (error) {
       return { 
@@ -271,15 +281,24 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       }
       return { error }
     } catch (error) {
-      return { 
+      return {
         error: error instanceof Error ? error : new Error('Unknown account deletion error')
       }
     }
   }, [])
 
+  /**
+   * Clear the isNewUser flag after onboarding completes
+   */
+  const clearNewUserFlag = useCallback(() => {
+    setIsNewUser(false)
+  }, [])
+
   const value: AuthContextType = {
     user,
     loading,
+    isNewUser,
+    clearNewUserFlag,
     signUp,
     signIn,
     signOut,

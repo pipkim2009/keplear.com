@@ -1,0 +1,606 @@
+/* Onboarding Modal Overlay */
+.onboardingOverlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: linear-gradient(135deg,
+    rgb(117, 26, 255, 0.75) 0%,
+    rgb(102, 0, 204, 0.85) 50%,
+    rgb(18, 18, 18, 0.9) 100%);
+  backdrop-filter: blur(10px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999 !important;
+  animation: fadeIn 0.2s ease-out;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.onboardingModal {
+  background: linear-gradient(145deg,
+    rgb(55, 65, 81, 0.95) 0%,
+    rgb(18, 18, 18, 0.98) 100%);
+  backdrop-filter: blur(20px);
+  border: 2px solid var(--gray-600);
+  border-radius: 20px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  position: relative;
+  animation: slideIn 0.3s ease-out;
+  margin: auto;
+}
+
+/* Step Content */
+.stepContent {
+  padding: 40px;
+}
+
+.stepHeader {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.stepIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.stepTitle {
+  margin: 0 0 8px;
+  color: var(--purple-100);
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.stepDescription {
+  color: var(--gray-400);
+  font-size: 16px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Progress Indicator */
+.progressIndicator {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.progressDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--gray-600);
+  transition: all 0.3s ease;
+}
+
+.progressDot.active {
+  background: var(--purple-500);
+  transform: scale(1.2);
+}
+
+.progressDot.completed {
+  background: var(--green-500);
+}
+
+/* Instrument Selection */
+.instrumentGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.instrumentButton {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--gray-700);
+  border: 2px solid var(--gray-600);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.instrumentButton:hover {
+  background: var(--gray-600);
+  transform: translateY(-2px);
+}
+
+.instrumentButton.selected {
+  background: var(--purple-alpha-20);
+  border-color: var(--purple-500);
+}
+
+.instrumentButton.selected:hover {
+  background: var(--purple-alpha-30);
+}
+
+.instrumentIcon {
+  font-size: 28px;
+  color: var(--purple-300);
+}
+
+.instrumentButton.selected .instrumentIcon {
+  color: var(--purple-100);
+}
+
+.instrumentInfo {
+  flex: 1;
+}
+
+.instrumentName {
+  color: var(--white);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.instrumentDesc {
+  color: var(--gray-400);
+  font-size: 14px;
+  margin: 0;
+}
+
+.instrumentButton.selected .instrumentDesc {
+  color: var(--purple-200);
+}
+
+.checkmark {
+  font-size: 24px;
+  color: var(--green-500);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.instrumentButton.selected .checkmark {
+  opacity: 1;
+}
+
+/* Join Class Form */
+.joinClassForm {
+  margin-bottom: 24px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: var(--purple-100);
+  font-size: 15px;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 2px solid rgb(210, 210, 249, 0.4);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background: linear-gradient(145deg, var(--gray-700), var(--gray-900));
+  backdrop-filter: blur(10px);
+  box-sizing: border-box;
+  color: var(--white);
+}
+
+.formGroup input::placeholder {
+  color: var(--primary-purple-alpha-60, var(--gray-500));
+  font-weight: 500;
+}
+
+.formGroup input:focus {
+  outline: none;
+  border-color: var(--blue-500);
+  background: var(--black-alpha-90, var(--gray-800));
+  transform: translateY(-2px);
+}
+
+/* Code input - monospace centered style */
+.codeInput {
+  text-align: center;
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  font-family: monospace;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.formGroup input.inputError {
+  border-color: var(--red-500);
+  background: var(--red-alpha-20);
+}
+
+.formGroup input.inputValid {
+  border-color: var(--green-500);
+  background: var(--green-alpha-20);
+}
+
+/* Class Preview */
+.classPreview {
+  background: var(--green-alpha-20);
+  border: 1px solid var(--green-alpha-40);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.classPreviewLabel {
+  color: var(--green-100);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.classPreviewName {
+  color: var(--white);
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.classPreviewTeacher {
+  color: var(--gray-400);
+  font-size: 14px;
+  margin: 4px 0 0;
+}
+
+/* Error Message */
+.errorMessage {
+  background: var(--red-alpha-20);
+  color: var(--red-100);
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  font-size: 14px;
+  border: 1px solid var(--red-alpha-40);
+}
+
+/* Available Classrooms */
+.availableClassrooms {
+  margin-top: 24px;
+}
+
+.availableClassroomsLabel {
+  color: var(--gray-400);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.classroomList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.classroomItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--gray-700);
+  border: 2px solid var(--gray-600);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.classroomItem:hover {
+  background: var(--gray-600);
+  border-color: var(--gray-500);
+}
+
+.classroomItem.selected {
+  background: var(--purple-alpha-20);
+  border-color: var(--purple-500);
+}
+
+.classroomItem.selectedGreen {
+  background: var(--green-alpha-20, rgba(34, 197, 94, 0.2));
+  border-color: var(--green-500);
+}
+
+.classroomItem.selectedGreen:hover {
+  background: var(--green-alpha-30, rgba(34, 197, 94, 0.3));
+  border-color: var(--green-400);
+}
+
+.classroomInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.classroomTitle {
+  color: var(--white);
+  font-weight: 600;
+  font-size: 15px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.classroomTeacher {
+  color: var(--gray-400);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.classroomMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.classroomInstruments {
+  display: flex;
+  gap: 4px;
+}
+
+.instrumentIcon {
+  color: var(--purple-300);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.studentCount {
+  color: var(--gray-400);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.noClassrooms {
+  color: var(--gray-500);
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+  background: var(--gray-800);
+  border-radius: 10px;
+  margin-top: 16px;
+}
+
+/* Tutorial Step */
+.tutorialContent {
+  text-align: center;
+}
+
+.tutorialSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.tutorialItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--gray-700);
+  border-radius: 12px;
+  text-align: left;
+  transition: all 0.3s ease;
+}
+
+.tutorialItem.active {
+  background: var(--purple-alpha-20);
+  border: 2px solid var(--purple-500);
+}
+
+.tutorialNumber {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--gray-600);
+  color: var(--gray-300);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tutorialItem.active .tutorialNumber {
+  background: var(--purple-500);
+  color: var(--white);
+}
+
+.tutorialText {
+  flex: 1;
+}
+
+.tutorialText strong {
+  color: var(--white);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.tutorialText span {
+  color: var(--gray-400);
+  font-size: 14px;
+}
+
+/* Buttons */
+.buttonGroup {
+  display: flex;
+  gap: 12px;
+}
+
+.primaryButton {
+  flex: 1;
+  padding: 16px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--purple-500);
+  color: var(--white);
+}
+
+.primaryButton:hover:not(:disabled) {
+  background: var(--purple-700);
+}
+
+.primaryButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondaryButton {
+  padding: 16px 24px;
+  border: 2px solid var(--gray-600);
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: var(--gray-300);
+}
+
+.secondaryButton:hover {
+  background: var(--gray-700);
+  border-color: var(--gray-500);
+}
+
+.skipButton {
+  width: 100%;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: var(--gray-400);
+  margin-top: 12px;
+}
+
+.skipButton:hover {
+  color: var(--gray-200);
+  background: var(--gray-700);
+}
+
+/* Loading State */
+.loadingSpinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--white-alpha-30);
+  border-radius: 50%;
+  border-top-color: var(--white);
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .onboardingOverlay {
+    padding: 10px;
+    align-items: flex-start;
+    padding-top: 60px;
+  }
+
+  .onboardingModal {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    max-height: calc(100vh - 80px);
+  }
+
+  .stepContent {
+    padding: 24px 20px;
+  }
+
+  .stepTitle {
+    font-size: 24px;
+  }
+
+  .instrumentButton {
+    padding: 14px 16px;
+  }
+
+  .instrumentIcon {
+    font-size: 24px;
+  }
+
+  .instrumentName {
+    font-size: 16px;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+  }
+
+  .secondaryButton {
+    order: 1;
+  }
+}
+
+@media (max-height: 600px) {
+  .onboardingOverlay {
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+
+  .onboardingModal {
+    max-height: calc(100vh - 40px);
+  }
+}

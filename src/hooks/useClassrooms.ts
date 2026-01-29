@@ -378,6 +378,30 @@ export function useAssignmentCompletions(assignmentId: string | null, options: {
   )
 }
 
+/**
+ * Hook to find a classroom by its join code (ID)
+ * Used during onboarding to preview a classroom before joining
+ */
+export function useFindClassroomByCode(code: string | null, options: {
+  enabled?: boolean
+} = {}) {
+  const { enabled = true } = options
+
+  return useSupabaseQuery<Classroom>(
+    'classrooms',
+    (q) => q
+      .select('*, profiles(username), classroom_students(user_id, profiles(username)), assignments(*)')
+      .eq('id', code!)
+      .single(),
+    {
+      enabled: enabled && !!code && code.length > 0,
+      staleTime: 30000,
+      dependencies: [code],
+      retry: { maxRetries: 2, baseDelay: 500, maxDelay: 2000, backoffFactor: 2 }
+    }
+  )
+}
+
 export default {
   useClassroomsList,
   useClassroom,
@@ -392,5 +416,6 @@ export default {
   prefetchClassroom,
   useRecordCompletion,
   useUserCompletions,
-  useAssignmentCompletions
+  useAssignmentCompletions,
+  useFindClassroomByCode
 }

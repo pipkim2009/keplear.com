@@ -23,6 +23,8 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
           username TEXT UNIQUE,
           avatar_url TEXT,
           is_public BOOLEAN DEFAULT false,
+          onboarding_completed BOOLEAN DEFAULT false,
+          preferred_instruments TEXT[] DEFAULT ARRAY[]::TEXT[],
           created_at TIMESTAMPTZ DEFAULT NOW(),
           updated_at TIMESTAMPTZ DEFAULT NOW(),
           PRIMARY KEY (id)
@@ -51,8 +53,8 @@ export const setupDatabase = async (): Promise<{ success: boolean; error?: unkno
         CREATE OR REPLACE FUNCTION public.handle_new_user()
         RETURNS TRIGGER AS $$
         BEGIN
-          INSERT INTO public.profiles (id, email, full_name)
-          VALUES (NEW.id, NEW.email, NEW.raw_user_meta_data->>'full_name');
+          INSERT INTO public.profiles (id, email, full_name, onboarding_completed, preferred_instruments)
+          VALUES (NEW.id, NEW.email, NEW.raw_user_meta_data->>'full_name', false, ARRAY[]::TEXT[]);
           RETURN NEW;
         END;
         $$ LANGUAGE plpgsql SECURITY DEFINER;

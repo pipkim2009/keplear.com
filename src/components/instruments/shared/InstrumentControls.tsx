@@ -817,7 +817,7 @@ const InstrumentControls = memo(function InstrumentControls({
                 onChange={(e) => !disableBpmInput && handleBpmChange(e.target.value)}
                 onKeyPress={(e) => !disableBpmInput && handleBpmKeyPress(e)}
                 onBlur={(e) => !disableBpmInput && handleBpmBlur(e)}
-                className={`control-input ${hideBpmButtons ? '' : 'with-internal-buttons'} ${flashingInputs.bpm ? 'flashing' : ''}`}
+                className={`control-input bpm-input ${hideBpmButtons ? '' : 'with-internal-buttons'} ${flashingInputs.bpm ? 'flashing' : ''}`}
                 disabled={disableBpmInput}
                 readOnly={disableBpmInput}
               />
@@ -875,7 +875,7 @@ const InstrumentControls = memo(function InstrumentControls({
                 onChange={(e) => !disableBeatsInput && handleNotesChange(e.target.value)}
                 onKeyPress={(e) => !disableBeatsInput && handleNotesKeyPress(e)}
                 onBlur={(e) => !disableBeatsInput && handleNotesBlur(e)}
-                className={`control-input ${hideBeatsButtons ? '' : 'with-internal-buttons'} ${flashingInputs.beats ? 'flashing' : ''} ${!hasEnoughBeats && hasContent ? 'warning' : ''}`}
+                className={`control-input beats-input ${hideBeatsButtons ? '' : 'with-internal-buttons'} ${flashingInputs.beats ? 'flashing' : ''} ${!hasEnoughBeats && hasContent ? 'warning' : ''}`}
                 disabled={disableBeatsInput}
                 readOnly={disableBeatsInput}
               />

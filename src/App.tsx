@@ -1,4 +1,4 @@
-import { useEffect, useCallback, memo } from 'react'
+import { useEffect, useCallback, memo, useState } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { InstrumentProvider } from './contexts/InstrumentContext'
 import { TranslationProvider } from './contexts/TranslationContext'
@@ -11,9 +11,48 @@ import SkipLink from './components/common/SkipLink'
 import ChatPanel from './components/common/ChatPanel'
 import { AriaLiveProvider } from './components/common/AriaLive'
 import { useTheme } from './hooks/useTheme'
+import { useAuth } from './hooks/useAuth'
+import { useOnboarding } from './hooks/useOnboarding'
+import OnboardingWizard from './components/onboarding/OnboardingWizard'
 import styles from './styles/App.module.css'
 import { IoMusicalNotes } from 'react-icons/io5'
 import { MdRefresh } from 'react-icons/md'
+
+/**
+ * Onboarding controller component
+ * Shows the onboarding wizard for new users who haven't completed onboarding
+ */
+const OnboardingController = memo(function OnboardingController() {
+  const { user, isNewUser, clearNewUserFlag, loading: authLoading } = useAuth()
+  const { onboardingCompleted, isLoading: onboardingLoading } = useOnboarding(user?.id ?? null)
+  const [completedThisSession, setCompletedThisSession] = useState(false)
+
+  // Show onboarding if:
+  // 1. User is logged in
+  // 2. Auth is not loading
+  // 3. User is new (show immediately) OR onboarding is not completed (after fetch)
+  // 4. Not already completed this session
+  const shouldShowOnboarding =
+    user &&
+    !authLoading &&
+    !completedThisSession &&
+    (isNewUser || (!onboardingLoading && onboardingCompleted === false))
+
+  const handleOnboardingComplete = useCallback(() => {
+    setCompletedThisSession(true)
+    clearNewUserFlag()
+  }, [clearNewUserFlag])
+
+  if (!shouldShowOnboarding || !user) return null
+
+  return (
+    <OnboardingWizard
+      isOpen={true}
+      userId={user.id}
+      onComplete={handleOnboardingComplete}
+    />
+  )
+})
 
 /**
  * Main application component
@@ -77,6 +116,7 @@ const App = memo(function App() {
 
               <Footer />
               <ChatPanel />
+              <OnboardingController />
             </div>
             </InstrumentProvider>
           </AriaLiveProvider>

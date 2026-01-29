@@ -1,0 +1,381 @@
+/* Tutorial Overlay - Spotlight Effect */
+.tutorialOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.tutorialBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  pointer-events: auto;
+  transition: opacity 0.3s ease;
+}
+
+/* Spotlight cutout around the target element */
+.spotlight {
+  position: absolute;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
+  border-radius: 8px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  z-index: 10001;
+}
+
+.spotlightRing {
+  position: absolute;
+  inset: -4px;
+  border: 2px solid var(--purple-500);
+  border-radius: 12px;
+  animation: pulseRing 2s ease-in-out infinite;
+}
+
+@keyframes pulseRing {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.02);
+  }
+}
+
+/* Tooltip Container */
+.tooltip {
+  position: absolute;
+  z-index: 10002;
+  pointer-events: auto;
+  width: 280px;
+  max-width: calc(100vw - 40px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: tooltipFadeIn 0.3s ease-out;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tooltip Card */
+.tooltipCard {
+  background: linear-gradient(145deg,
+    rgb(55, 65, 81, 0.98) 0%,
+    rgb(18, 18, 18, 0.99) 100%);
+  backdrop-filter: blur(20px);
+  border: 2px solid var(--purple-500);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(139, 92, 246, 0.15);
+}
+
+/* Tooltip Arrow */
+.tooltipArrow {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(145deg, rgb(55, 65, 81) 0%, rgb(18, 18, 18) 100%);
+  border: 2px solid var(--purple-500);
+  transform: rotate(45deg);
+}
+
+.tooltip.positionTop .tooltipArrow {
+  bottom: -9px;
+  left: 50%;
+  margin-left: -8px;
+  border-top: none;
+  border-left: none;
+}
+
+.tooltip.positionBottom .tooltipArrow {
+  top: -9px;
+  left: 50%;
+  margin-left: -8px;
+  border-bottom: none;
+  border-right: none;
+}
+
+.tooltip.positionLeft .tooltipArrow {
+  right: -9px;
+  top: 50%;
+  margin-top: -8px;
+  border-top: none;
+  border-left: none;
+}
+
+.tooltip.positionRight .tooltipArrow {
+  left: -9px;
+  top: 50%;
+  margin-top: -8px;
+  border-bottom: none;
+  border-right: none;
+}
+
+/* Tooltip Header */
+.tooltipHeader {
+  margin-bottom: 12px;
+}
+
+.tooltipStepLabel {
+  color: var(--purple-300);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.tooltipTitle {
+  color: var(--white);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Tooltip Content */
+.tooltipDescription {
+  color: var(--gray-300);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+/* Step Indicator Dots */
+.stepIndicator {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.stepDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gray-600);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.stepDot:hover {
+  background: var(--gray-500);
+}
+
+.stepDot.active {
+  background: var(--purple-500);
+  transform: scale(1.25);
+}
+
+.stepDot.completed {
+  background: var(--green-500);
+}
+
+/* Tooltip Actions */
+.tooltipActions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.nextButton {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--purple-500);
+  color: var(--white);
+}
+
+.nextButton:hover {
+  background: var(--purple-600);
+  transform: translateY(-1px);
+}
+
+.nextButton:active {
+  transform: translateY(0);
+}
+
+.skipButton {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: var(--gray-400);
+}
+
+.skipButton:hover {
+  color: var(--gray-200);
+  background: var(--gray-700);
+}
+
+.backButton {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: var(--gray-400);
+}
+
+.backButton:hover {
+  color: var(--gray-200);
+  background: var(--gray-700);
+}
+
+/* Welcome Modal */
+.welcomeModal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.welcomeCard {
+  background: linear-gradient(145deg,
+    rgb(55, 65, 81, 0.95) 0%,
+    rgb(18, 18, 18, 0.98) 100%);
+  backdrop-filter: blur(20px);
+  border: 2px solid var(--purple-500);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.welcomeIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.welcomeTitle {
+  color: var(--purple-100);
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+.welcomeDescription {
+  color: var(--gray-400);
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.welcomeActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.startButton {
+  width: 100%;
+  padding: 16px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: var(--purple-500);
+  color: var(--white);
+}
+
+.startButton:hover {
+  background: var(--purple-600);
+  transform: translateY(-2px);
+}
+
+.skipWelcomeButton {
+  width: 100%;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: transparent;
+  color: var(--gray-400);
+}
+
+.skipWelcomeButton:hover {
+  color: var(--gray-200);
+  background: var(--gray-700);
+}
+
+/* Mobile Responsive */
+@media (max-width: 480px) {
+  .tooltip {
+    width: calc(100vw - 32px);
+    max-width: none;
+  }
+
+  .tooltipCard {
+    padding: 16px;
+  }
+
+  .tooltipTitle {
+    font-size: 18px;
+  }
+
+  .tooltipDescription {
+    font-size: 13px;
+  }
+
+  .welcomeCard {
+    padding: 24px;
+    margin: 16px;
+  }
+
+  .welcomeTitle {
+    font-size: 20px;
+  }
+
+  .welcomeDescription {
+    font-size: 14px;
+  }
+}
