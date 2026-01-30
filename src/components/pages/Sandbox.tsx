@@ -131,6 +131,7 @@ function Sandbox() {
   const {
     isActive: isTutorialActive,
     currentStep: tutorialStep,
+    currentStepData: tutorialStepData,
     nextStep: tutorialNextStep,
     prevStep: tutorialPrevStep,
     skipTutorial,
@@ -139,11 +140,10 @@ function Sandbox() {
     startTutorial
   } = useTutorial()
 
-  // Handle tutorial completion - navigate to dashboard
+  // Handle tutorial completion
   const handleTutorialComplete = useCallback(() => {
     completeTutorial()
-    navigateToDashboard()
-  }, [completeTutorial, navigateToDashboard])
+  }, [completeTutorial])
 
   // Hook to record practice sessions to Supabase
   const recordPracticeSession = useRecordPracticeSession()
@@ -203,6 +203,103 @@ function Sandbox() {
     lowerOctaves,
     higherOctaves
   } = useInstrument()
+
+  // Generate demo melody when tutorial reaches the play step
+  const tutorialDemoGenerated = useRef(false)
+  useEffect(() => {
+    if (
+      isTutorialActive &&
+      tutorialStepData?.id === 'sandbox-play' &&
+      !tutorialDemoGenerated.current &&
+      generatedMelody.length === 0 &&
+      selectedNotes.length > 0
+    ) {
+      tutorialDemoGenerated.current = true
+      // Generate melody from already selected notes
+      handleGenerateMelody()
+    }
+    // Reset flag when tutorial becomes inactive
+    if (!isTutorialActive) {
+      tutorialDemoGenerated.current = false
+    }
+  }, [isTutorialActive, tutorialStepData, generatedMelody.length, selectedNotes.length, handleGenerateMelody])
+
+  // Auto-play melody when tutorial reaches 'sandbox-play' step
+  const tutorialAutoPlayed = useRef(false)
+  useEffect(() => {
+    if (
+      isTutorialActive &&
+      tutorialStepData?.id === 'sandbox-play' &&
+      !tutorialAutoPlayed.current &&
+      generatedMelody.length > 0 &&
+      recordedAudioBlob &&
+      !isPlaying
+    ) {
+      tutorialAutoPlayed.current = true
+      // Small delay to ensure UI is ready
+      const timeoutId = setTimeout(() => {
+        handlePlayMelody()
+      }, 500)
+      return () => clearTimeout(timeoutId)
+    }
+    // Reset flag when tutorial becomes inactive
+    if (!isTutorialActive) {
+      tutorialAutoPlayed.current = false
+    }
+  }, [isTutorialActive, tutorialStepData, generatedMelody.length, recordedAudioBlob, isPlaying, handlePlayMelody])
+
+  // Track if melody finished playing during tutorial
+  const [melodyFinishedInTutorial, setMelodyFinishedInTutorial] = useState(false)
+  const wasPlayingRef = useRef(false)
+  useEffect(() => {
+    // Detect when melody stops playing (was playing, now not playing)
+    if (wasPlayingRef.current && !isPlaying && isTutorialActive && tutorialStepData?.id === 'sandbox-play') {
+      setMelodyFinishedInTutorial(true)
+    }
+    wasPlayingRef.current = isPlaying
+
+    if (!isTutorialActive) {
+      setMelodyFinishedInTutorial(false)
+    }
+  }, [isPlaying, isTutorialActive, tutorialStepData])
+
+  // Calculate if current tutorial step interaction is complete
+  const tutorialInteractionComplete = useMemo(() => {
+    if (!isTutorialActive || !tutorialStepData) return false
+
+    switch (tutorialStepData.id) {
+      case 'sandbox-instrument':
+        return selectedNotes.length > 0
+      case 'sandbox-tempo-beats':
+        // Always complete - user can adjust if they want
+        return true
+      case 'sandbox-generate':
+        return generatedMelody.length > 0
+      case 'sandbox-play':
+        // Show Next when playing or finished
+        return isPlaying || melodyFinishedInTutorial
+      default:
+        return false
+    }
+  }, [isTutorialActive, tutorialStepData, selectedNotes.length, generatedMelody.length, melodyFinishedInTutorial])
+
+  // Auto-advance for Generate and Play steps
+  const lastAutoAdvancedStep = useRef<string | null>(null)
+  useEffect(() => {
+    if (!isTutorialActive || !tutorialStepData) return
+
+    const shouldAutoAdvance =
+      (tutorialStepData.id === 'sandbox-generate' && generatedMelody.length > 0) ||
+      (tutorialStepData.id === 'sandbox-play' && melodyFinishedInTutorial)
+
+    if (shouldAutoAdvance && lastAutoAdvancedStep.current !== tutorialStepData.id) {
+      lastAutoAdvancedStep.current = tutorialStepData.id
+      const timeoutId = setTimeout(() => {
+        tutorialNextStep()
+      }, 800)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [isTutorialActive, tutorialStepData, generatedMelody.length, melodyFinishedInTutorial, tutorialNextStep])
 
   // Assignment creation state
   const [assigningToClassroomId, setAssigningToClassroomId] = useState<string | null>(null)
@@ -1651,7 +1748,7 @@ function Sandbox() {
         canExportToClassroom={!!user && !assigningToClassroomId}
         hasExportableContent={selectedNotes.length > 0 || scaleChordManagement.appliedScales.length > 0 || scaleChordManagement.appliedChords.length > 0}
         onLessonComplete={handleLessonComplete}
-        autoStartFeedback={true}
+        autoStartFeedback={isTutorialActive && tutorialStepData?.id === 'sandbox-play'}
       />
 
       {assignTitleModal}
@@ -1666,6 +1763,7 @@ function Sandbox() {
         onComplete={handleTutorialComplete}
         shouldShowWelcome={shouldShowTutorial}
         onStartTutorial={startTutorial}
+        interactionComplete={tutorialInteractionComplete}
       />
     </>
   )

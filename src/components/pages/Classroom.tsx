@@ -31,6 +31,8 @@ import { PiTrashFill, PiChatCircleFill, PiPencilSimpleFill, PiEyeFill, PiCheckCi
 import { useRecordCompletion, useUserCompletions, useAssignmentCompletions } from '../../hooks/useClassrooms'
 import styles from '../../styles/Classroom.module.css'
 import practiceStyles from '../../styles/Practice.module.css'
+import TutorialOverlay from '../onboarding/TutorialOverlay'
+import { useTutorial } from '../../hooks/useTutorial'
 
 interface StudentData {
   user_id: string
@@ -212,6 +214,18 @@ function Classroom() {
   const authContext = useContext(AuthContext)
   const user = authContext?.user ?? null
   const { t } = useTranslation()
+
+  // Tutorial
+  const {
+    isActive: isTutorialActive,
+    currentStep: tutorialStep,
+    nextStep: tutorialNextStep,
+    prevStep: tutorialPrevStep,
+    skipTutorial,
+    completeTutorial,
+    shouldShowTutorial,
+    startTutorial
+  } = useTutorial()
 
   // Hook to record practice sessions to Supabase
   const recordPracticeSession = useRecordPracticeSession()
@@ -3860,6 +3874,18 @@ function Classroom() {
       {modal}
       {joinModal}
       {assignTitleModal}
+
+      {/* Tutorial Overlay */}
+      <TutorialOverlay
+        isActive={isTutorialActive}
+        currentStep={tutorialStep}
+        onNext={tutorialNextStep}
+        onPrev={tutorialPrevStep}
+        onSkip={skipTutorial}
+        onComplete={completeTutorial}
+        shouldShowWelcome={shouldShowTutorial}
+        onStartTutorial={startTutorial}
+      />
     </div>
   )
 }

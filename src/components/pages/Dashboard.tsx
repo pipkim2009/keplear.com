@@ -26,6 +26,8 @@ import {
 import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
 import styles from '../../styles/Dashboard.module.css'
 import classroomStyles from '../../styles/Classroom.module.css'
+import TutorialOverlay from '../onboarding/TutorialOverlay'
+import { useTutorial } from '../../hooks/useTutorial'
 
 interface ClassroomData {
   id: string
@@ -68,6 +70,18 @@ function Dashboard() {
   const { t } = useTranslation()
   const { navigateToSandbox, navigateToClassroom, navigateToProfile } = useNavigation()
   const { setInstrument, setBpm, setNumberOfBeats } = useInstrument()
+
+  // Tutorial
+  const {
+    isActive: isTutorialActive,
+    currentStep: tutorialStep,
+    nextStep: tutorialNextStep,
+    prevStep: tutorialPrevStep,
+    skipTutorial,
+    completeTutorial,
+    shouldShowTutorial,
+    startTutorial
+  } = useTutorial()
 
   // State
   const [username, setUsername] = useState<string>('')
@@ -730,6 +744,18 @@ function Dashboard() {
           </div>
         </section>
       </div>
+
+      {/* Tutorial Overlay */}
+      <TutorialOverlay
+        isActive={isTutorialActive}
+        currentStep={tutorialStep}
+        onNext={tutorialNextStep}
+        onPrev={tutorialPrevStep}
+        onSkip={skipTutorial}
+        onComplete={completeTutorial}
+        shouldShowWelcome={shouldShowTutorial}
+        onStartTutorial={startTutorial}
+      />
     </div>
   )
 }

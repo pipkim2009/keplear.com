@@ -6,183 +6,68 @@
   pointer-events: none;
 }
 
-.tutorialBackdrop {
-  position: absolute;
-  inset: 0;
+/* Dark overlay rectangles - visual only, clicks blocked via JS */
+.overlayRect {
+  position: fixed;
   background: rgba(0, 0, 0, 0.75);
-  pointer-events: auto;
-  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
-/* Spotlight cutout around the target element */
-.spotlight {
-  position: absolute;
-  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
-  border-radius: 8px;
+/* Spotlight border ring */
+.spotlightRing {
+  position: fixed;
+  border: 2px solid var(--purple-500);
+  border-radius: 12px;
   pointer-events: none;
   z-index: 10001;
 }
 
-.spotlightRing {
-  position: absolute;
-  inset: -4px;
-  border: 2px solid var(--purple-500);
-  border-radius: 12px;
-  animation: pulseRing 2s ease-in-out infinite;
-}
-
-@keyframes pulseRing {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: scale(1.02);
-  }
-}
-
-/* Tooltip Container */
-.tooltip {
-  position: absolute;
+/* Subtitle Container - bottom bar with buttons and text */
+.subtitleContainer {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   z-index: 10002;
   pointer-events: auto;
-  width: 280px;
-  max-width: calc(100vw - 40px);
-  animation: tooltipFadeIn 0.3s ease-out;
+  animation: subtitleSlideUp 0.4s ease-out;
 }
 
-@keyframes tooltipFadeIn {
+@keyframes subtitleSlideUp {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateX(-50%) translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
   }
 }
 
-/* Tooltip Card */
-.tooltipCard {
-  background: linear-gradient(145deg,
-    rgb(55, 65, 81, 0.98) 0%,
-    rgb(18, 18, 18, 0.99) 100%);
-  backdrop-filter: blur(20px);
-  border: 2px solid var(--purple-500);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.4),
-    0 0 40px rgba(139, 92, 246, 0.15);
-}
-
-/* Tooltip Arrow */
-.tooltipArrow {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  background: linear-gradient(145deg, rgb(55, 65, 81) 0%, rgb(18, 18, 18) 100%);
-  border: 2px solid var(--purple-500);
-  transform: rotate(45deg);
-}
-
-.tooltip.positionTop .tooltipArrow {
-  bottom: -9px;
-  left: 50%;
-  margin-left: -8px;
-  border-top: none;
-  border-left: none;
-}
-
-.tooltip.positionBottom .tooltipArrow {
-  top: -9px;
-  left: 50%;
-  margin-left: -8px;
-  border-bottom: none;
-  border-right: none;
-}
-
-.tooltip.positionLeft .tooltipArrow {
-  right: -9px;
-  top: 50%;
-  margin-top: -8px;
-  border-top: none;
-  border-left: none;
-}
-
-.tooltip.positionRight .tooltipArrow {
-  left: -9px;
-  top: 50%;
-  margin-top: -8px;
-  border-bottom: none;
-  border-right: none;
-}
-
-/* Tooltip Header */
-.tooltipHeader {
-  margin-bottom: 12px;
-}
-
-.tooltipStepLabel {
-  color: var(--purple-300);
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
-}
-
-.tooltipTitle {
-  color: var(--white);
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0;
-}
-
-/* Tooltip Content */
-.tooltipDescription {
-  color: var(--gray-300);
-  font-size: 14px;
-  line-height: 1.5;
-  margin-bottom: 16px;
-}
-
-/* Step Indicator Dots */
-.stepIndicator {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.stepDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--gray-600);
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.stepDot:hover {
-  background: var(--gray-500);
-}
-
-.stepDot.active {
-  background: var(--purple-500);
-  transform: scale(1.25);
-}
-
-.stepDot.completed {
-  background: var(--green-500);
-}
-
-/* Tooltip Actions */
-.tooltipActions {
+/* Buttons row above subtitle */
+.subtitleButtons {
   display: flex;
   gap: 12px;
   align-items: center;
+}
+
+/* Subtitle text bar */
+.subtitle {
+  padding: 1.25rem 2.5rem;
+  background: var(--black);
+  color: var(--white);
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 500;
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  max-width: 90vw;
+  line-height: 1.5;
 }
 
 .nextButton {
@@ -215,13 +100,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: transparent;
-  color: var(--gray-400);
+  background: rgba(55, 65, 81, 0.9);
+  color: var(--gray-300);
 }
 
 .skipButton:hover {
-  color: var(--gray-200);
-  background: var(--gray-700);
+  color: var(--white);
+  background: rgba(75, 85, 99, 0.95);
 }
 
 .backButton {
@@ -232,13 +117,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: transparent;
-  color: var(--gray-400);
+  background: rgba(55, 65, 81, 0.9);
+  color: var(--gray-300);
 }
 
 .backButton:hover {
-  color: var(--gray-200);
-  background: var(--gray-700);
+  color: var(--white);
+  background: rgba(75, 85, 99, 0.95);
 }
 
 /* Welcome Modal */
