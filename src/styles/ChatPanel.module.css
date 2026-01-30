@@ -82,7 +82,7 @@
     rgb(30, 30, 35, 0.98) 100%);
   backdrop-filter: blur(20px);
   border: 2px solid rgba(168, 85, 247, 0.3);
-  border-radius: 20px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -350,7 +350,7 @@
   border-radius: 24px;
   font-size: 0.9375rem;
   font-weight: 500;
-  background: rgb(50, 50, 50);
+  background: var(--gray-700);
   color: var(--white);
   transition: all 0.2s ease;
 }

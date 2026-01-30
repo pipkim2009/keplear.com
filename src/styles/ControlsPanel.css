@@ -13,7 +13,7 @@
 
 .dark .controls-panel {
   background: rgb(18, 18, 18, 0.6);
-  border: 1px solid rgb(210, 210, 249, 0.1);
+  border: 1px solid var(--white-alpha-10);
 }
 
 .controls-content {

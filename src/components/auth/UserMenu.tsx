@@ -125,8 +125,8 @@ const UserMenu = () => {
                 width: 'auto',
                 minWidth: '120px',
                 background: 'transparent',
-                color: '#e5e7eb',
-                border: '2px solid #e5e7eb',
+                color: 'var(--gray-100)',
+                border: '2px solid var(--gray-100)',
                 marginTop: 0
               }}
             >

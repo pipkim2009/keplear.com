@@ -182,20 +182,22 @@
   --purple-600-alpha-60: rgb(147, 51, 234, 0.6);
 
   /* ========================================
-     GRAYS (7 base)
+     GRAYS (3 base + white/black)
      ======================================== */
   --white: #ffffff;
-  --gray-200: #e5e7eb;
+  --gray-100: #e5e7eb;
   --gray-500: #6b7280;
-  --gray-600: #4b5563;
   --gray-700: #374151;
-  --gray-900: #121212;
+  --gray-900: var(--black);
   --black: #000000;
+
+  /* Gray Aliases (map to 3-grey system) */
   --gray-50: var(--white);
-  --gray-100: var(--gray-200);
-  --gray-300: var(--gray-200);
+  --gray-200: var(--gray-100);
+  --gray-300: var(--gray-100);
   --gray-400: var(--gray-500);
-  --gray-800: var(--gray-900);
+  --gray-600: var(--gray-500);
+  --gray-800: var(--gray-700);
   --gray-111111: var(--gray-900);
   --gray-neutral: var(--gray-500);
 

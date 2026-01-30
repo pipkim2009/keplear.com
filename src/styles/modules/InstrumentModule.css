@@ -11,11 +11,17 @@
 */
 
 .instrumentContainer {
+  /* Uses container-instrument pattern */
+  background: linear-gradient(145deg, var(--gray-700), var(--gray-900));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--white-alpha-10);
+  border-radius: 16px;
+  padding: 1.5rem;
   position: relative;
   display: flex;
   flex-direction: column;
   transition: var(--transition-slow);
-  border-radius: var(--radius-3xl);
   width: auto;
   max-width: var(--max-width-screen);
   overflow-y: visible;
@@ -23,24 +29,21 @@
 
 .keyboardContainer {
   composes: instrumentcontainer;
-  background: linear-gradient(145deg, var(--dark-bg-tertiary), var(--dark-bg-secondary));
-  border: 4px solid var(--dark-border);
+  border-color: var(--blue-alpha-30);
   min-height: var(--min-height-keyboard);
   margin-top: 1rem;
 }
 
 .guitarContainer {
   composes: instrumentcontainer;
-  background: linear-gradient(145deg, var(--guitar-surface), var(--gray-900));
-  border: 4px solid var(--guitar-border);
+  border-color: var(--green-alpha-30);
   min-height: var(--min-height-guitar);
   padding: 0;
 }
 
 .bassContainer {
   composes: instrumentcontainer;
-  background: linear-gradient(145deg, var(--bass-surface), var(--gray-111111));
-  border: 4px solid var(--bass-border);
+  border-color: var(--red-alpha-30);
   min-height: var(--min-height-bass);
   padding: 0;
 }
@@ -85,8 +88,8 @@
 
 .guitarCard {
   composes: instrumentcard;
-  background: linear-gradient(145deg, rgb(34, 197, 94, 0.1), rgb(34, 197, 94, 0.05));
-  border: 2px solid rgb(34, 197, 94, 0.3);
+  background: linear-gradient(145deg, var(--green-alpha-10), var(--green-alpha-05));
+  border: 2px solid var(--green-alpha-30);
 }
 
 .guitarCard:hover {
@@ -94,14 +97,14 @@
 
 .guitarCardActive {
   composes: guitarcard;
-  background: linear-gradient(145deg, rgb(34, 197, 94, 0.3), rgb(34, 197, 94, 0.2));
+  background: linear-gradient(145deg, var(--green-alpha-30), var(--green-alpha-20));
   border-color: var(--green-500);
 }
 
 .bassCard {
   composes: instrumentcard;
-  background: linear-gradient(145deg, rgb(239, 68, 68, 0.1), rgb(239, 68, 68, 0.05));
-  border: 2px solid rgb(239, 68, 68, 0.3);
+  background: linear-gradient(145deg, var(--red-alpha-10), var(--red-alpha-05));
+  border: 2px solid var(--red-alpha-30);
 }
 
 .bassCard:hover {
@@ -109,7 +112,7 @@
 
 .bassCardActive {
   composes: basscard;
-  background: linear-gradient(145deg, rgb(239, 68, 68, 0.3), rgb(239, 68, 68, 0.2));
+  background: linear-gradient(145deg, var(--red-alpha-30), var(--red-alpha-20));
   border-color: var(--red-500);
 }
 
@@ -295,4 +298,27 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/*
+  ===========================================
+  LIGHT MODE
+  ===========================================
+*/
+
+:global(body.light) .instrumentContainer {
+  background: var(--white);
+  border-color: var(--gray-200);
+}
+
+:global(body.light) .keyboardContainer {
+  border-color: var(--blue-alpha-30);
+}
+
+:global(body.light) .guitarContainer {
+  border-color: var(--green-alpha-30);
+}
+
+:global(body.light) .bassContainer {
+  border-color: var(--red-alpha-30);
 }

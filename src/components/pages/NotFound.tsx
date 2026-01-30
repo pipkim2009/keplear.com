@@ -18,19 +18,19 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
       textAlign: 'center'
     }}>
       <div style={{
-        background: 'linear-gradient(145deg, #374151, #121212)',
-        border: '2px solid #22c55e',
+        background: 'linear-gradient(145deg, var(--gray-700), var(--gray-900))',
+        border: '2px solid var(--green-500)',
         borderRadius: '20px',
         padding: '60px 40px',
         maxWidth: '600px',
         width: '100%',
         boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
-        color: '#e5e7eb'
+        color: 'var(--gray-100)'
       }}>
         <div style={{
           fontSize: '8rem',
           fontWeight: 'bold',
-          background: 'linear-gradient(145deg, #22c55e, #86efac)',
+          background: 'linear-gradient(145deg, var(--green-500), var(--green-100))',
           backgroundClip: 'text',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
@@ -44,7 +44,7 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
           fontSize: '2.5rem',
           fontWeight: 'bold',
           marginBottom: '1rem',
-          background: 'linear-gradient(145deg, #22c55e, #86efac)',
+          background: 'linear-gradient(145deg, var(--green-500), var(--green-100))',
           backgroundClip: 'text',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
@@ -55,7 +55,7 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
         <p style={{
           fontSize: '1.2rem',
           marginBottom: '2rem',
-          color: '#6b7280',
+          color: 'var(--gray-500)',
           lineHeight: '1.6'
         }}>
           {t('notFound.message')}
@@ -69,15 +69,15 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
             onClick={onNavigateToHome}
             style={{
               padding: '15px 30px',
-              background: 'linear-gradient(145deg, #22c55e, #86efac)',
-              color: 'white',
+              background: 'linear-gradient(145deg, var(--green-500), var(--green-100))',
+              color: 'var(--white)',
               border: 'none',
               borderRadius: '12px',
               cursor: 'pointer',
               fontWeight: '600',
               fontSize: '16px',
               transition: 'all 0.2s ease',
-              boxShadow: '0 4px 12px rgba(34, 197, 94, 0.3)',
+              boxShadow: '0 4px 12px var(--green-alpha-30)',
               display: 'flex',
               alignItems: 'center',
               gap: '8px'
@@ -104,7 +104,7 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
         }}>
           <p style={{
             fontSize: '0.9rem',
-            color: '#6b7280',
+            color: 'var(--gray-500)',
             margin: 0
           }}>
             <strong>{t('notFound.tip')}:</strong> {t('notFound.tipMessage')}

@@ -285,7 +285,7 @@
   --focus-ring-offset: 2px;
 
   /* Alternative Focus Colors for Different Contexts */
-  --focus-ring-color-light: rgb(0, 217, 111);
-  --focus-ring-color-dark: rgb(46, 232, 141);
-  --focus-ring-color-high-contrast: rgb(0, 179, 89);
+  --focus-ring-color-light: var(--green-500);
+  --focus-ring-color-dark: var(--green-100);
+  --focus-ring-color-high-contrast: var(--green-700);
 }
