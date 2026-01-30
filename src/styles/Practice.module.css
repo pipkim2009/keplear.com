@@ -80,8 +80,7 @@
 }
 
 .doneButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
 }
 
 .doneButton:focus-visible {
@@ -364,8 +363,7 @@
 }
 
 .startSessionButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(102, 0, 204, 0.4);
+    box-shadow: 0 6px 24px rgba(102, 0, 204, 0.4);
 }
 
 .startSessionButton:focus-visible {
@@ -1113,8 +1111,7 @@
 }
 
 .assignmentAssignButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
 }
 
 .instrumentSelector {
@@ -1199,12 +1196,13 @@
 
 .assignmentTitleInput {
   padding: 0.625rem 1rem;
-  border: 2px solid var(--primary-purple-alpha-30);
-  border-radius: 10px;
+  border: 2px solid var(--white-alpha-20);
+  border-radius: 12px;
   font-size: 0.9375rem;
   font-weight: 500;
   transition: all 0.3s ease;
   background: linear-gradient(145deg, var(--gray-700), var(--gray-900));
+  backdrop-filter: blur(10px);
   color: var(--white);
   min-width: 200px;
 }
@@ -1214,15 +1212,14 @@
 }
 
 .assignmentTitleInput:hover {
-  border-color: var(--primary-purple);
-  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15);
+  border-color: var(--white-alpha-30);
 }
 
 .assignmentTitleInput:focus {
   outline: none;
-  border-color: var(--primary-purple);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-}
+  border-color: var(--blue-500);
+  background: var(--black-alpha-90);
+  }
 
 /* ========================================
    EXERCISE TIMELINE
@@ -1519,21 +1516,23 @@
 
 .assignModalInput {
   padding: 0.875rem 1rem;
-  border: 2px solid var(--white-alpha-10);
+  border: 2px solid var(--white-alpha-20);
   border-radius: 12px;
   font-size: 1rem;
-  background: var(--gray-700);
+  background: linear-gradient(145deg, var(--gray-700), var(--gray-900));
+  backdrop-filter: blur(10px);
   color: var(--white);
   transition: all 0.2s ease;
 }
 
 .assignModalInput:focus {
   outline: none;
-  border-color: var(--primary-purple);
-}
+  border-color: var(--blue-500);
+  background: var(--black-alpha-90);
+  }
 
 .assignModalInput::placeholder {
-  color: var(--gray-200);
+  color: var(--gray-400);
 }
 
 .assignModalInfo {
@@ -1569,8 +1568,7 @@
 }
 
 .assignModalSubmit:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
 }
 
 .assignModalSubmit:disabled {
@@ -1798,7 +1796,7 @@
   height: 36px;
   font-size: 18px;
   cursor: pointer;
-  color: var(--purple-100);
+  color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1891,8 +1889,7 @@
 }
 
 .exportModalCreateButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
 }
 
 /* Classroom List */

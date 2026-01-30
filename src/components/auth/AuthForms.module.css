@@ -2,10 +2,7 @@
 .authModalOverlay {
   position: fixed !important;
   inset: 0 !important;
-  background: linear-gradient(135deg,
-    rgb(117, 26, 255, 0.75) 0%,
-    rgb(102, 0, 204, 0.85) 50%,
-    rgb(18, 18, 18, 0.9) 100%);
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
@@ -45,7 +42,7 @@
   height: 40px;
   font-size: 20px;
   cursor: pointer;
-  color: var(--purple-100);
+  color: var(--white);
   z-index: 10;
   display: flex;
   align-items: center;
@@ -91,14 +88,14 @@
 
 .authForm h2 {
   margin: 0 0 12px;
-  color: var(--purple-100);
+  color: var(--white);
   font-size: 28px;
   font-weight: 700;
   text-align: center;
 }
 
 .formDescription {
-  color: var(--purple-100);
+  color: var(--white);
   font-size: 18px;
   font-weight: 600;
   text-align: center;
@@ -114,35 +111,34 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 700;
-  color: var(--purple-100);
+  color: var(--white);
   font-size: 15px;
 }
 
 .formGroup input {
   width: 100%;
   padding: 16px 20px;
-  border: 2px solid var(--gray-600);
+  border: 2px solid var(--white-alpha-20);
   border-radius: 12px;
   font-size: 16px;
   font-weight: 500;
   transition: all 0.3s ease;
-  background: var(--gray-700);
+  background: linear-gradient(145deg, var(--gray-700), var(--gray-900));
   backdrop-filter: blur(10px);
   box-sizing: border-box;
   color: var(--white);
 }
 
 .formGroup input::placeholder {
-  color: var(--gray-500);
+  color: var(--gray-400);
   font-weight: 500;
 }
 
 .formGroup input:focus {
   outline: none;
   border-color: var(--blue-500);
-  background: var(--gray-600);
-  transform: translateY(-2px);
-}
+  background: var(--black-alpha-90);
+  }
 
 .formGroup input:disabled {
   background: var(--gray-700);

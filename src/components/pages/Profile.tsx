@@ -9,7 +9,7 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import { useTranslation } from '../../contexts/TranslationContext'
-import { PiPencilSimpleFill, PiCheckCircleFill, PiUsersFill, PiLockFill, PiCaretLeftBold } from 'react-icons/pi'
+import { PiPencilSimpleFill, PiCheckCircleFill, PiUsersFill, PiCaretLeftBold, PiWarningCircleFill } from 'react-icons/pi'
 import styles from '../../styles/Profile.module.css'
 
 interface ProfileData {
@@ -17,9 +17,17 @@ interface ProfileData {
   username: string | null
   full_name: string | null
   avatar_url: string | null
-  is_public: boolean
+  profile_color: string | null
   created_at: string
 }
+
+const PROFILE_COLORS = [
+  { id: 'purple', label: 'Purple', gradient: 'linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%)' },
+  { id: 'blue', label: 'Blue', gradient: 'linear-gradient(135deg, var(--blue-500) 0%, var(--blue-700) 100%)' },
+  { id: 'green', label: 'Green', gradient: 'linear-gradient(135deg, var(--green-500) 0%, var(--green-700) 100%)' },
+  { id: 'red', label: 'Red', gradient: 'linear-gradient(135deg, var(--red-500) 0%, var(--red-700) 100%)' },
+  { id: 'orange', label: 'Orange', gradient: 'linear-gradient(135deg, var(--orange-500) 0%, var(--orange-700) 100%)' },
+]
 
 interface ActivityItem {
   id: string
@@ -49,7 +57,7 @@ const Profile = () => {
 
   // Edit form state
   const [editUsername, setEditUsername] = useState('')
-  const [editIsPublic, setEditIsPublic] = useState(false)
+  const [editProfileColor, setEditProfileColor] = useState('purple')
   const [editError, setEditError] = useState('')
   const [saving, setSaving] = useState(false)
 
@@ -85,23 +93,18 @@ const Profile = () => {
             username: user.user_metadata?.username || null,
             full_name: user.user_metadata?.display_name || user.user_metadata?.full_name || null,
             avatar_url: user.user_metadata?.avatar_url || null,
-            is_public: false,
+            profile_color: null,
             created_at: user.created_at
           })
         } else {
           setProfile(null)
         }
       } else {
-        // If not own profile and profile is private, don't show
-        if (!viewingOwnProfile && !profileData.is_public) {
-          setProfile({ ...profileData, username: profileData.username || 'User' })
-        } else {
-          setProfile(profileData)
-        }
+        setProfile(profileData)
       }
 
-      // Fetch stats if own profile or public profile
-      if (viewingOwnProfile || profileData?.is_public) {
+      // Fetch stats for profile
+      if (viewingOwnProfile || profileData) {
         // Assignments completed
         const { count: completedCount } = await supabase
           .from('assignment_completions')
@@ -215,7 +218,7 @@ const Profile = () => {
   const openEditModal = () => {
     if (profile) {
       setEditUsername(profile.username || '')
-      setEditIsPublic(profile.is_public)
+      setEditProfileColor(profile.profile_color || 'purple')
       setEditError('')
     }
     setShowEditModal(true)
@@ -236,7 +239,7 @@ const Profile = () => {
         .upsert({
           id: user.id,
           username: editUsername || null,
-          is_public: editIsPublic,
+          profile_color: editProfileColor,
           email: user.email || ''
         })
 
@@ -280,6 +283,11 @@ const Profile = () => {
       .slice(0, 2)
   }
 
+  const getProfileGradient = (colorId: string | null): string => {
+    const color = PROFILE_COLORS.find(c => c.id === colorId) || PROFILE_COLORS[0]
+    return color.gradient
+  }
+
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
     return date.toLocaleDateString('en-US', {
@@ -320,52 +328,35 @@ const Profile = () => {
         <button className={styles.backButton} onClick={navigateToHome}>
           <PiCaretLeftBold />
         </button>
-        <div className={styles.privateMessage}>
-          <div className={styles.privateIcon}>
-            <PiLockFill />
+        <div className={styles.messageBox}>
+          <div className={styles.messageIcon}>
+            <PiWarningCircleFill />
           </div>
-          <h2 className={styles.privateTitle}>{t('profile.loginRequired')}</h2>
-          <p className={styles.privateText}>{t('profile.loginToViewProfile')}</p>
+          <h2 className={styles.messageTitle}>{t('profile.loginRequired')}</h2>
+          <p className={styles.messageText}>{t('profile.loginToViewProfile')}</p>
         </div>
       </div>
     )
   }
 
-  // Profile not found or private (for other users)
+  // Profile not found
   if (!profile) {
     return (
       <div className={styles.profileContainer}>
         <button className={styles.backButton} onClick={navigateToClassroom}>
           <PiCaretLeftBold />
         </button>
-        <div className={styles.privateMessage}>
-          <div className={styles.privateIcon}>
-            <PiLockFill />
+        <div className={styles.messageBox}>
+          <div className={styles.messageIcon}>
+            <PiWarningCircleFill />
           </div>
-          <h2 className={styles.privateTitle}>{t('profile.notFound')}</h2>
-          <p className={styles.privateText}>{t('profile.profileNotFoundMessage')}</p>
+          <h2 className={styles.messageTitle}>{t('profile.notFound')}</h2>
+          <p className={styles.messageText}>{t('profile.profileNotFoundMessage')}</p>
         </div>
       </div>
     )
   }
 
-  // Private profile message for other users
-  if (!isOwnProfile && !profile.is_public) {
-    return (
-      <div className={styles.profileContainer}>
-        <button className={styles.backButton} onClick={navigateToClassroom}>
-          <PiCaretLeftBold />
-        </button>
-        <div className={styles.privateMessage}>
-          <div className={styles.privateIcon}>
-            <PiLockFill />
-          </div>
-          <h2 className={styles.privateTitle}>{t('profile.privateProfile')}</h2>
-          <p className={styles.privateText}>{t('profile.privateProfileMessage')}</p>
-        </div>
-      </div>
-    )
-  }
 
   // Edit modal
   const editModal = showEditModal ? (
@@ -398,19 +389,24 @@ const Profile = () => {
             />
           </div>
 
-          <div className={styles.toggleGroup}>
-            <div className={styles.toggleLabel}>
-              <span className={styles.toggleLabelText}>{t('profile.publicProfile')}</span>
-              <span className={styles.toggleDescription}>{t('profile.publicProfileDescription')}</span>
+          <div className={styles.formGroup}>
+            <label className={styles.formLabel}>Profile Color</label>
+            <div className={styles.colorPicker}>
+              {PROFILE_COLORS.map((color) => (
+                <div
+                  key={color.id}
+                  role="button"
+                  tabIndex={0}
+                  className={`${styles.colorOption} ${editProfileColor === color.id ? styles.colorOptionSelected : ''}`}
+                  onClick={() => setEditProfileColor(color.id)}
+                  onKeyDown={(e) => e.key === 'Enter' && setEditProfileColor(color.id)}
+                  aria-label={color.label}
+                  title={color.label}
+                >
+                  <span className={styles.colorOptionInner} style={{ background: color.gradient }} />
+                </div>
+              ))}
             </div>
-            <label className={styles.toggle}>
-              <input
-                type="checkbox"
-                checked={editIsPublic}
-                onChange={(e) => setEditIsPublic(e.target.checked)}
-              />
-              <span className={styles.toggleSlider}></span>
-            </label>
           </div>
 
           {editError && (
@@ -441,7 +437,10 @@ const Profile = () => {
         {/* Profile Header */}
         <div className={styles.profileHeader}>
           <div className={styles.avatar}>
-            <div className={styles.avatarInitials}>
+            <div
+              className={styles.avatarInitials}
+              style={{ background: getProfileGradient(profile.profile_color) }}
+            >
               {getInitials(profile.username)}
             </div>
           </div>
@@ -452,13 +451,6 @@ const Profile = () => {
               {t('profile.memberSince')} {formatDate(profile.created_at)}
             </p>
 
-            <div className={styles.badges}>
-              {profile.is_public ? (
-                <span className={styles.publicBadge}>{t('classroom.public')}</span>
-              ) : (
-                <span className={styles.privateBadge}>{t('classroom.private')}</span>
-              )}
-            </div>
           </div>
 
           {isOwnProfile && (

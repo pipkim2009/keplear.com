@@ -5,6 +5,7 @@ import { useTheme } from '../../hooks/useTheme'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { PiCaretUpFill, PiSignOutFill, PiTrashFill, PiUserFill } from 'react-icons/pi'
 import { useInstrument } from '../../contexts/InstrumentContext'
+import { supabase } from '../../lib/supabase'
 import logo from '/Keplear-logo.png'
 import styles from './UserMenu.module.css'
 import authStyles from './AuthForms.module.css'
@@ -12,6 +13,15 @@ import authStyles from './AuthForms.module.css'
 interface UserProfile {
   username: string
   avatarUrl?: string
+  profileColor?: string
+}
+
+const PROFILE_COLOR_GRADIENTS: Record<string, string> = {
+  purple: 'linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%)',
+  blue: 'linear-gradient(135deg, var(--blue-500) 0%, var(--blue-700) 100%)',
+  green: 'linear-gradient(135deg, var(--green-500) 0%, var(--green-700) 100%)',
+  red: 'linear-gradient(135deg, var(--red-500) 0%, var(--red-700) 100%)',
+  orange: 'linear-gradient(135deg, var(--orange-500) 0%, var(--orange-700) 100%)',
 }
 
 const UserMenu = () => {
@@ -41,12 +51,32 @@ const UserMenu = () => {
   }, [isOpen])
 
   useEffect(() => {
-    if (user) {
-      setUserProfile({
-        username: user.user_metadata?.username || user.user_metadata?.full_name || 'User',
-        avatarUrl: user.user_metadata?.avatar_url
-      })
+    const fetchProfile = async () => {
+      if (user) {
+        // Set initial values from auth metadata
+        setUserProfile({
+          username: user.user_metadata?.username || user.user_metadata?.full_name || 'User',
+          avatarUrl: user.user_metadata?.avatar_url,
+          profileColor: 'purple'
+        })
+
+        // Fetch profile color from database
+        const { data } = await supabase
+          .from('profiles')
+          .select('profile_color, username')
+          .eq('id', user.id)
+          .single()
+
+        if (data) {
+          setUserProfile(prev => prev ? {
+            ...prev,
+            username: data.username || prev.username,
+            profileColor: data.profile_color || 'purple'
+          } : null)
+        }
+      }
     }
+    fetchProfile()
   }, [user])
 
   const handleSignOut = async () => {
@@ -172,7 +202,7 @@ const UserMenu = () => {
         >
         <div className={styles.userAvatar}>
           {userProfile.avatarUrl ? (
-            <img 
+            <img
               src={userProfile.avatarUrl}
               alt={t('aria.userAvatar')}
               onError={(e) => {
@@ -183,9 +213,12 @@ const UserMenu = () => {
               }}
             />
           ) : null}
-          <div 
+          <div
             className={styles.avatarInitials}
-            style={{ display: userProfile.avatarUrl ? 'none' : 'flex' }}
+            style={{
+              display: userProfile.avatarUrl ? 'none' : 'flex',
+              background: PROFILE_COLOR_GRADIENTS[userProfile.profileColor || 'purple']
+            }}
           >
             {getInitials(userProfile.username)}
           </div>

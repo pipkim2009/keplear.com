@@ -19,8 +19,8 @@ const NotFound: React.FC<NotFoundProps> = ({ onNavigateToHome }) => {
     }}>
       <div style={{
         background: 'linear-gradient(145deg, var(--gray-700), var(--gray-900))',
-        border: '2px solid var(--green-500)',
-        borderRadius: '20px',
+        border: '1px solid var(--white-alpha-10)',
+        borderRadius: '16px',
         padding: '60px 40px',
         maxWidth: '600px',
         width: '100%',
