@@ -900,14 +900,14 @@ input:checked + .toggle-slider:hover {
 .empty-list-message {
   padding: 8px;
   text-align: center;
-  color: var(--gray-400);
+  color: var(--gray-900);
   font-size: 0.875rem;
   font-style: italic;
   opacity: 0.7;
 }
 
 :global(.dark) .empty-list-message {
-  color: var(--gray-500);
+  color: var(--gray-900);
 }
 
 /* Applied Item Buttons Container */
@@ -1160,5 +1160,22 @@ body.light .toggle-slider .toggle-text.right {
 
 body.light input:checked + .toggle-slider .toggle-text.left {
   color: white;
+}
+
+/* Scale/Chord toggle button text - black on light mode */
+body.light .scale-options-toggle.type-scales,
+body.light .scale-options-toggle.type-chords,
+body.light .scale-options-toggle.type-both {
+  color: var(--black);
+}
+
+/* Scale name in applied list - black on light mode */
+body.light .scale-name {
+  color: var(--black);
+}
+
+/* Chord name in applied list - black on light mode */
+body.light .chord-name {
+  color: var(--black);
 }
 

@@ -151,3 +151,13 @@
     height: 35px;
   }
 }
+
+/* Light mode comprehensive text color overrides */
+.light .footer-slogan,
+.light .footer-copyright,
+.light .footer-copyright p,
+.light .footer-author,
+.light .social-link,
+.light .footer-text {
+  color: var(--gray-900);
+}

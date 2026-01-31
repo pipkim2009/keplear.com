@@ -41,7 +41,7 @@
 
 .buttonLight:hover {
   background: var(--gray-200);
-  border-color: var(--gray-500);
+  border-color: var(--gray-900);
 }
 
 .buttonDark {
@@ -52,7 +52,7 @@
 
 .buttonDark:hover {
   background: var(--gray-700);
-  border-color: var(--gray-500);
+  border-color: var(--gray-900);
 }
 
 /* Input Theme Variants */
@@ -125,11 +125,11 @@
 }
 
 .textMutedLight {
-  color: var(--gray-600);
+  color: var(--gray-900);
 }
 
 .textMutedDark {
-  color: var(--gray-500);
+  color: var(--gray-900);
 }
 
 /*
@@ -167,11 +167,11 @@
 */
 
 .borderLight {
-  border-color: var(--gray-200);
+  border-color: var(--gray-900);
 }
 
 .borderDark {
-  border-color: var(--gray-600);
+  border-color: var(--gray-900);
 }
 
 .borderAccentLight {

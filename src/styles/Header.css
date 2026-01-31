@@ -11,7 +11,7 @@
 }
 
 .light .header {
-  background: rgb(255, 255, 255, 0.85);
+  background: linear-gradient(145deg, rgba(248, 249, 252, 0.95), rgba(208, 212, 220, 0.95));
   border-bottom: 1px solid var(--gray-200);
 }
 
@@ -181,9 +181,9 @@
 }
 
 .light .language-menu {
-  background: var(--white);
+  background: linear-gradient(145deg, var(--silver-light), var(--silver-dark));
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  border: 1px solid var(--gray-200);
+  border: 1px solid var(--gray-900);
 }
 
 @keyframes fadeInDown {
@@ -225,13 +225,17 @@
 }
 
 .light .language-search {
-  border: 1px solid var(--gray-200);
-  background: var(--white);
+  border: 1px solid var(--gray-900);
+  background: linear-gradient(145deg, var(--silver-light), var(--silver-dark));
+}
+
+.light .language-search:hover {
+  background: linear-gradient(145deg, var(--silver-mid), var(--silver-dark));
 }
 
 .light .language-search:focus {
   border-color: var(--primary-purple);
-  background: var(--white);
+  background: linear-gradient(145deg, var(--white), var(--silver-light));
 }
 
 .language-options-grid {
@@ -262,7 +266,7 @@
 }
 
 .light .language-option:hover {
-  background: rgba(0, 0, 0, 0.05);
+  background: linear-gradient(145deg, var(--silver-mid), var(--silver-dark));
 }
 
 .language-option-active {
@@ -379,4 +383,25 @@
   .auth-buttons {
     gap: 0.5rem;
   }
+}
+
+/* Light mode comprehensive text color overrides */
+.light .header-brand,
+.light .header-nav a,
+.light .nav-link,
+.light .nav-item,
+.light .header-title,
+.light .header-subtitle,
+.light .language-option,
+.light .language-option span,
+.light .language-name {
+  color: var(--gray-900);
+}
+
+.light .language-search {
+  color: var(--gray-900);
+}
+
+.light .language-search::placeholder {
+  color: var(--gray-700);
 }

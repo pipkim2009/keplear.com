@@ -74,3 +74,41 @@
   The header and footer now have absolutely stunning,
   production-ready styling with premium visual effects.
 */
+
+/*
+  ===========================================
+  GLOBAL LIGHT MODE TEXT COLOR OVERRIDE
+  ===========================================
+  Ensures all text is black/dark on silver backgrounds
+*/
+body.light {
+  color: var(--gray-900);
+}
+
+body.light h1,
+body.light h2,
+body.light h3,
+body.light h4,
+body.light h5,
+body.light h6,
+body.light p,
+body.light span,
+body.light label,
+body.light a,
+body.light li,
+body.light td,
+body.light th,
+body.light div,
+body.light button,
+body.light input,
+body.light select,
+body.light textarea {
+  color: inherit;
+}
+
+/* Override white text in light mode */
+body.light [style*="color: white"],
+body.light [style*="color: #fff"],
+body.light [style*="color: #ffffff"] {
+  color: var(--gray-900) !important;
+}

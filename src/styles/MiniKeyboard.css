@@ -11,7 +11,7 @@
 .mini-keyboard-empty {
   padding: 20px;
   text-align: center;
-  color: var(--gray-500);
+  color: var(--gray-900);
   font-style: italic;
 }
 
@@ -56,7 +56,7 @@
 .mini-kb-note-label {
   font-size: 9px;
   font-weight: bold;
-  color: var(--gray-500);
+  color: var(--gray-900);
   user-select: none;
 }
 

@@ -120,6 +120,18 @@
   border-top-color: var(--purple-500);
 }
 
+/* Light mode - black tooltip icon */
+body.light .tooltip-icon {
+  border-color: var(--black);
+  color: var(--black);
+}
+
+body.light .tooltip-icon:hover,
+body.light .active .tooltip-icon {
+  background: var(--black);
+  color: var(--white);
+  border-color: var(--black);
+}
 
 /* Mobile adjustments */
 @media (max-width: 768px) {

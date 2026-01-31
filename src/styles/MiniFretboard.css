@@ -9,7 +9,7 @@
 .mini-fretboard-empty {
   padding: 20px;
   text-align: center;
-  color: var(--gray-500);
+  color: var(--gray-900);
   font-style: italic;
 }
 

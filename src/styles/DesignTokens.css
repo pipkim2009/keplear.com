@@ -184,11 +184,11 @@
 */
 
 body.light {
-  /* Text Colors */
-  --text-primary: var(--light-text-primary);
-  --text-secondary: var(--light-text-secondary);
-  --text-muted: var(--gray-600);
-  --text-disabled: var(--gray-500);
+  /* Text Colors - all dark for readability on silver */
+  --text-primary: var(--gray-900);
+  --text-secondary: var(--gray-900);
+  --text-muted: var(--gray-900);
+  --text-disabled: var(--gray-700);
 
   /* Background Colors */
   --bg-primary: var(--light-bg-primary);

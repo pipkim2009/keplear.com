@@ -251,7 +251,7 @@
 
 .progress-bar.dragging .progress-track {
   background: var(--gray-600);
-  border-color: var(--gray-500);
+  border-color: var(--gray-900);
 }
 
 .progress-bar.dragging .progress-fill {
@@ -707,7 +707,7 @@
 .checkbox-label {
   font-size: 11px;
   font-weight: 600;
-  color: var(--gray-400);
+  color: var(--gray-900);
   text-align: center;
 }
 
@@ -749,7 +749,7 @@
 
 .note-checkbox.pending .checkbox-box {
   background: var(--gray-900);
-  border-color: var(--gray-500);
+  border-color: var(--gray-900);
 }
 
 
@@ -1104,7 +1104,7 @@
   font-weight: 700;
   background: var(--gray-800);
   border: 2px solid var(--gray-600);
-  color: var(--gray-500);
+  color: var(--gray-900);
   transition: all 0.15s ease;
 }
 
@@ -1158,7 +1158,7 @@
 .feedback-note-name {
   font-size: 14px;
   font-weight: 700;
-  color: var(--gray-500);
+  color: var(--gray-900);
 }
 
 .feedback-note-icon {
@@ -1173,7 +1173,7 @@
 }
 
 .feedback-note.pending .feedback-note-name {
-  color: var(--gray-500);
+  color: var(--gray-900);
 }
 
 .feedback-note.current {
@@ -1200,12 +1200,12 @@
 
 .feedback-note.past {
   background: var(--gray-700);
-  border-color: var(--gray-500);
+  border-color: var(--gray-900);
   opacity: 0.7;
 }
 
 .feedback-note.past .feedback-note-name {
-  color: var(--gray-400);
+  color: var(--gray-900);
 }
 
 .feedback-note.correct {
@@ -1246,7 +1246,7 @@
 .volume-indicator-label {
   font-size: 11px;
   font-weight: 600;
-  color: var(--gray-400);
+  color: var(--gray-900);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   min-width: 60px;
@@ -1270,7 +1270,7 @@
 .volume-indicator-value {
   font-size: 11px;
   font-weight: 600;
-  color: var(--gray-400);
+  color: var(--gray-900);
   min-width: 35px;
   text-align: right;
 }
@@ -1468,7 +1468,7 @@
 .feedback-detected-label {
   font-size: 12px;
   font-weight: 600;
-  color: var(--gray-400);
+  color: var(--gray-900);
 }
 
 .feedback-detected-note {
@@ -1511,7 +1511,7 @@
   font-size: 12px;
   transition: all 0.2s ease;
   background: var(--gray-700);
-  color: var(--gray-400);
+  color: var(--gray-900);
   border: 2px solid transparent;
 }
 
@@ -1570,7 +1570,7 @@
   text-align: center;
   padding: 8px;
   font-size: 12px;
-  color: var(--gray-500);
+  color: var(--gray-900);
 }
 
 /* Responsive adjustments for new feedback */
