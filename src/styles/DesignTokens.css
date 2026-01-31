@@ -61,8 +61,8 @@
   /* Border Colors */
   --dark-border: var(--dark-border-primary);  /* Define missing border token */
   --border-primary: var(--dark-border-primary);
-  --border-secondary: var(--gray-600);
-  --border-muted: var(--gray-700);
+  --border-secondary: var(--white);
+  --border-muted: var(--white);
 
   /* Interactive Colors */
   --interactive-primary: var(--blue-500);

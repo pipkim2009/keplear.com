@@ -5,7 +5,7 @@
   z-index: 1000;
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--white-alpha-10);
+  border-bottom: 1px solid var(--white);
   transition: all 0.3s ease;
   background: rgb(18, 18, 18, 0.8);
 }

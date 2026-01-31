@@ -23,7 +23,7 @@ html, body, #root {
 }
 
 body.light, body.light #root {
-  background: var(--white);
+  background: linear-gradient(145deg, var(--silver-light), var(--silver-dark));
   color: var(--gray-900);
 }
 

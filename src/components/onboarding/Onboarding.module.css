@@ -181,7 +181,7 @@
 .formGroup input {
   width: 100%;
   padding: 0.875rem 1rem;
-  border: 2px solid var(--white-alpha-20);
+  border: 2px solid var(--white);
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 500;
@@ -551,7 +551,7 @@
 
 :global(body.light) .onboardingModal {
   background: linear-gradient(145deg, var(--silver-light), var(--silver-dark));
-  border-color: var(--gray-200);
+  border-color: var(--gray-900);
 }
 
 :global(body.light) .stepTitle {
@@ -568,7 +568,7 @@
 
 :global(body.light) .instrumentButton {
   background: var(--gray-100);
-  border-color: var(--gray-200);
+  border-color: var(--gray-900);
 }
 
 :global(body.light) .instrumentButton:hover {
@@ -597,18 +597,19 @@
 }
 
 :global(body.light) .formGroup input {
-  background: var(--white);
-  border-color: var(--gray-200);
+  background: linear-gradient(145deg, var(--silver-light), var(--silver-dark));
+  border-color: var(--gray-900);
   color: var(--gray-900);
 }
 
 :global(body.light) .formGroup input::placeholder {
-  color: var(--gray-400);
+  color: var(--gray-900);
+  opacity: 0.6;
 }
 
 :global(body.light) .formGroup input:focus {
   border-color: var(--blue-500);
-  background: var(--white);
+  background: linear-gradient(145deg, var(--white), var(--silver-light));
 }
 
 :global(body.light) .classPreview {

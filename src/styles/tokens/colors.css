@@ -47,8 +47,8 @@
   --dark-text-primary: var(--white);
   --dark-text-secondary: var(--white);
   --dark-text-tertiary: var(--gray-200);
-  --dark-border-primary: var(--gray-600);
-  --dark-border-secondary: var(--gray-700);
+  --dark-border-primary: var(--white);
+  --dark-border-secondary: var(--white);
 
   /* ========================================
      THEME COLORS - LIGHT MODE
@@ -61,7 +61,7 @@
   --light-text-primary: var(--gray-900);
   --light-text-secondary: var(--gray-700);
   --light-text-tertiary: var(--gray-600);
-  --light-border-primary: var(--gray-200);
+  --light-border-primary: var(--gray-900);
   --light-border-secondary: var(--gray-500);
   --light-bg-gradient-1: var(--white);
   --light-bg-gradient-2: var(--gray-200);
