@@ -3,7 +3,7 @@
  * Consolidates UI interaction state like page navigation, input flashing, and settings
  */
 
-export type PageType = 'home' | 'sandbox' | 'classroom' | 'profile' | 'dashboard'
+export type PageType = 'home' | 'sandbox' | 'songs' | 'classroom' | 'profile' | 'dashboard'
 export type InputType = 'bpm' | 'beats' | 'mode'
 export type ChordMode = 'arpeggiator' | 'progression'
 
@@ -39,6 +39,7 @@ const getInitialPage = (): PageType => {
   if (typeof window === 'undefined') return 'home'
   const path = window.location.pathname
   if (path === '/sandbox' || path.startsWith('/sandbox')) return 'sandbox'
+  if (path === '/songs' || path.startsWith('/songs')) return 'songs'
   if (path === '/dashboard' || path.startsWith('/dashboard')) return 'dashboard'
   if (path === '/classroom' || path.startsWith('/classroom')) return 'classroom'
   if (path === '/profile' || path.startsWith('/profile')) return 'profile'

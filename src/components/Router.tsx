@@ -9,6 +9,7 @@ import PageLoader from './common/PageLoader'
 const Home = lazy(() => import('./pages/Home'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Sandbox = lazy(() => import('./pages/Sandbox'))
+const Songs = lazy(() => import('./pages/Songs'))
 const Classroom = lazy(() => import('./pages/Classroom'))
 const Profile = lazy(() => import('./pages/Profile'))
 const NotFound = lazy(() => import('./pages/NotFound'))
@@ -40,6 +41,9 @@ function Router() {
 
       case 'sandbox':
         return <Sandbox />
+
+      case 'songs':
+        return <Songs />
 
       case 'classroom':
         return <Classroom />

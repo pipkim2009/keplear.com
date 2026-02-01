@@ -3755,14 +3755,6 @@ function Classroom() {
             <h2 className={styles.sectionTitle}>{t('classroom.myClasses')}</h2>
             <div className={styles.sectionButtons}>
               <button
-                className={styles.joinClassButton}
-                onClick={handleOpenJoinModal}
-                aria-label={t('classroom.joinClass')}
-                title={t('classroom.joinClass')}
-              >
-                {t('classroom.join')}
-              </button>
-              <button
                 className={styles.createButton}
                 onClick={handleOpenModal}
                 aria-label={t('classroom.createClass')}
@@ -3791,16 +3783,16 @@ function Classroom() {
       <section className={styles.classesSection}>
         <div className={styles.sectionHeader}>
           <h2 className={styles.sectionTitle}>{t('classroom.availableClasses')}</h2>
-          {!user && (
-            <div className={styles.sectionButtons}>
-              <button
-                className={styles.joinClassButton}
-                onClick={handleOpenJoinModal}
-                aria-label={t('classroom.joinClass')}
-                title={t('classroom.loginToJoin')}
-              >
-                {t('classroom.join')}
-              </button>
+          <div className={styles.sectionButtons}>
+            <button
+              className={styles.joinClassButton}
+              onClick={handleOpenJoinModal}
+              aria-label={t('classroom.joinPrivateClass')}
+              title={user ? t('classroom.joinPrivateClass') : t('classroom.loginToJoin')}
+            >
+              {t('classroom.joinPrivateClass')}
+            </button>
+            {!user && (
               <button
                 className={styles.createButton}
                 onClick={handleOpenModal}
@@ -3809,8 +3801,8 @@ function Classroom() {
               >
                 {t('classroom.create')}
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <div className={styles.searchContainer}>

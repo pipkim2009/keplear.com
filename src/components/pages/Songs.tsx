@@ -1,0 +1,691 @@
+/**
+ * Songs Page - YouTube-based practice tool
+ * Paste YouTube URLs and practice with loop, speed, and A-B repeat controls
+ * Uses YouTube IFrame API for reliable playback
+ */
+
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { useTranslation } from '../../contexts/TranslationContext'
+import { PiPlay, PiPause, PiRepeat, PiSpeakerHigh, PiSpeakerLow, PiSpeakerNone, PiArrowCounterClockwise, PiX, PiLink } from 'react-icons/pi'
+import styles from '../../styles/Songs.module.css'
+
+// YouTube IFrame API types
+declare global {
+  interface Window {
+    YT: {
+      Player: new (
+        elementId: string,
+        config: {
+          height: string
+          width: string
+          videoId: string
+          playerVars?: Record<string, number | string>
+          events?: {
+            onReady?: (event: { target: YTPlayer }) => void
+            onStateChange?: (event: { data: number; target: YTPlayer }) => void
+            onError?: (event: { data: number }) => void
+          }
+        }
+      ) => YTPlayer
+      PlayerState: {
+        PLAYING: number
+        PAUSED: number
+        ENDED: number
+        BUFFERING: number
+      }
+    }
+    onYouTubeIframeAPIReady: () => void
+  }
+}
+
+interface YTPlayer {
+  playVideo: () => void
+  pauseVideo: () => void
+  seekTo: (seconds: number, allowSeekAhead?: boolean) => void
+  getCurrentTime: () => number
+  getDuration: () => number
+  setVolume: (volume: number) => void
+  getVolume: () => number
+  setPlaybackRate: (rate: number) => void
+  getPlaybackRate: () => number
+  getPlayerState: () => number
+  getVideoData: () => { title: string; author: string; video_id: string }
+  destroy: () => void
+}
+
+interface VideoInfo {
+  videoId: string
+  title: string
+}
+
+// Recent videos stored in localStorage
+const RECENT_VIDEOS_KEY = 'keplear_recent_videos'
+const MAX_RECENT_VIDEOS = 10
+
+const Songs = () => {
+  const { t } = useTranslation()
+
+  // URL input state
+  const [urlInput, setUrlInput] = useState('')
+  const [urlError, setUrlError] = useState('')
+  const [recentVideos, setRecentVideos] = useState<VideoInfo[]>([])
+
+  // Player state
+  const [currentVideo, setCurrentVideo] = useState<VideoInfo | null>(null)
+  const [videoTitle, setVideoTitle] = useState<string>('')
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [volume, setVolume] = useState(80)
+  const [isLooping, setIsLooping] = useState(false)
+  const [playbackRate, setPlaybackRate] = useState(1)
+  const [isPlayerReady, setIsPlayerReady] = useState(false)
+  const [isApiLoaded, setIsApiLoaded] = useState(false)
+
+  // A-B repeat state
+  const [markerA, setMarkerA] = useState<number | null>(null)
+  const [markerB, setMarkerB] = useState<number | null>(null)
+  const [isABLooping, setIsABLooping] = useState(false)
+
+  // Refs
+  const playerRef = useRef<YTPlayer | null>(null)
+  const playerContainerRef = useRef<HTMLDivElement>(null)
+  const timeUpdateInterval = useRef<number | null>(null)
+  const currentVideoIdRef = useRef<string | null>(null)
+
+  // Load YouTube IFrame API
+  useEffect(() => {
+    if (window.YT) {
+      setIsApiLoaded(true)
+      return
+    }
+
+    const tag = document.createElement('script')
+    tag.src = 'https://www.youtube.com/iframe_api'
+    const firstScriptTag = document.getElementsByTagName('script')[0]
+    firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag)
+
+    window.onYouTubeIframeAPIReady = () => {
+      setIsApiLoaded(true)
+    }
+
+    return () => {
+      window.onYouTubeIframeAPIReady = () => {}
+    }
+  }, [])
+
+  // Load recent videos from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(RECENT_VIDEOS_KEY)
+      if (stored) {
+        setRecentVideos(JSON.parse(stored))
+      }
+    } catch (e) {
+      console.error('Failed to load recent videos:', e)
+    }
+  }, [])
+
+  // Save video to recent list
+  const saveToRecent = useCallback((video: VideoInfo) => {
+    setRecentVideos(prev => {
+      const filtered = prev.filter(v => v.videoId !== video.videoId)
+      const updated = [video, ...filtered].slice(0, MAX_RECENT_VIDEOS)
+      try {
+        localStorage.setItem(RECENT_VIDEOS_KEY, JSON.stringify(updated))
+      } catch (e) {
+        console.error('Failed to save recent videos:', e)
+      }
+      return updated
+    })
+  }, [])
+
+  // Extract video ID from YouTube URL
+  const extractVideoId = (url: string): string | null => {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
+      /^([a-zA-Z0-9_-]{11})$/ // Direct video ID
+    ]
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern)
+      if (match) return match[1]
+    }
+    return null
+  }
+
+  // Time update loop - uses refs to avoid stale closure issues
+  const startTimeUpdate = useCallback(() => {
+    if (timeUpdateInterval.current) {
+      clearInterval(timeUpdateInterval.current)
+    }
+
+    timeUpdateInterval.current = window.setInterval(() => {
+      const player = playerRef.current
+      if (!player) return
+
+      try {
+        const current = player.getCurrentTime()
+        setCurrentTime(current)
+      } catch {
+        // Player might not be ready yet
+      }
+    }, 250)
+  }, [])
+
+  const stopTimeUpdate = useCallback(() => {
+    if (timeUpdateInterval.current) {
+      clearInterval(timeUpdateInterval.current)
+      timeUpdateInterval.current = null
+    }
+  }, [])
+
+  // Handle A-B loop and regular loop
+  useEffect(() => {
+    const player = playerRef.current
+    if (!player || !isPlayerReady) return
+
+    // Handle A-B loop
+    if (isABLooping && markerA !== null && markerB !== null) {
+      if (currentTime >= markerB) {
+        player.seekTo(markerA, true)
+      }
+    }
+  }, [currentTime, isABLooping, markerA, markerB, isPlayerReady])
+
+  // Initialize player when video is selected
+  useEffect(() => {
+    if (!isApiLoaded || !currentVideo || !playerContainerRef.current) return
+
+    // Skip if we're already playing this video (title update shouldn't recreate player)
+    if (currentVideoIdRef.current === currentVideo.videoId && playerRef.current) {
+      return
+    }
+    currentVideoIdRef.current = currentVideo.videoId
+
+    // Destroy existing player
+    if (playerRef.current) {
+      playerRef.current.destroy()
+      playerRef.current = null
+    }
+
+    setIsPlayerReady(false)
+    setCurrentTime(0)
+    setDuration(0)
+    setVideoTitle('')
+    setMarkerA(null)
+    setMarkerB(null)
+    setIsABLooping(false)
+
+    // Create player container div
+    const containerId = 'yt-player-' + Date.now()
+    const playerDiv = document.createElement('div')
+    playerDiv.id = containerId
+    playerContainerRef.current.innerHTML = ''
+    playerContainerRef.current.appendChild(playerDiv)
+
+    playerRef.current = new window.YT.Player(containerId, {
+      height: '0',
+      width: '0',
+      videoId: currentVideo.videoId,
+      playerVars: {
+        autoplay: 1,
+        controls: 0,
+        disablekb: 1,
+        fs: 0,
+        modestbranding: 1,
+        rel: 0,
+        showinfo: 0
+      },
+      events: {
+        onReady: (event) => {
+          setIsPlayerReady(true)
+          setDuration(event.target.getDuration())
+          event.target.setVolume(volume)
+          event.target.setPlaybackRate(playbackRate)
+          startTimeUpdate()
+
+          // Get video title from YouTube (with slight delay to ensure data is ready)
+          setTimeout(() => {
+            try {
+              const videoData = event.target.getVideoData()
+              if (videoData?.title) {
+                setVideoTitle(videoData.title)
+                saveToRecent({ videoId: currentVideo.videoId, title: videoData.title })
+              }
+            } catch (e) {
+              console.error('Failed to get video data:', e)
+            }
+          }, 500)
+        },
+        onStateChange: (event) => {
+          if (event.data === window.YT.PlayerState.PLAYING) {
+            setIsPlaying(true)
+            startTimeUpdate()
+          } else if (event.data === window.YT.PlayerState.PAUSED) {
+            setIsPlaying(false)
+          } else if (event.data === window.YT.PlayerState.ENDED) {
+            setIsPlaying(false)
+            if (isLooping) {
+              event.target.seekTo(0, true)
+              event.target.playVideo()
+            }
+          }
+        },
+        onError: (event) => {
+          console.error('YouTube player error:', event.data)
+          setUrlError(t('songs.playbackError'))
+        }
+      }
+    })
+
+    return () => {
+      stopTimeUpdate()
+      if (playerRef.current) {
+        playerRef.current.destroy()
+        playerRef.current = null
+      }
+    }
+  }, [isApiLoaded, currentVideo])
+
+  // Update volume
+  useEffect(() => {
+    if (playerRef.current && isPlayerReady) {
+      playerRef.current.setVolume(volume)
+    }
+  }, [volume, isPlayerReady])
+
+  // Update playback rate
+  useEffect(() => {
+    if (playerRef.current && isPlayerReady) {
+      playerRef.current.setPlaybackRate(playbackRate)
+    }
+  }, [playbackRate, isPlayerReady])
+
+  // Handle URL submission
+  const handleUrlSubmit = useCallback((e?: React.FormEvent) => {
+    e?.preventDefault()
+    setUrlError('')
+
+    const videoId = extractVideoId(urlInput.trim())
+    if (!videoId) {
+      setUrlError(t('songs.invalidUrl'))
+      return
+    }
+
+    const video: VideoInfo = {
+      videoId,
+      title: `Video ${videoId}` // Will be updated if we can get title
+    }
+
+    setCurrentVideo(video)
+    saveToRecent(video)
+    setUrlInput('')
+  }, [urlInput, t, saveToRecent])
+
+  // Load a recent video
+  const loadRecentVideo = useCallback((video: VideoInfo) => {
+    setCurrentVideo(video)
+    saveToRecent(video)
+  }, [saveToRecent])
+
+  // Player controls
+  const togglePlayPause = useCallback(() => {
+    if (!playerRef.current || !isPlayerReady) return
+
+    if (isPlaying) {
+      playerRef.current.pauseVideo()
+    } else {
+      playerRef.current.playVideo()
+    }
+  }, [isPlaying, isPlayerReady])
+
+  const handleSeek = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = parseFloat(e.target.value)
+    setCurrentTime(time)
+    if (playerRef.current && isPlayerReady) {
+      playerRef.current.seekTo(time, true)
+    }
+  }, [isPlayerReady])
+
+  const handleVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setVolume(parseInt(e.target.value))
+  }, [])
+
+  const toggleLoop = useCallback(() => {
+    setIsLooping(!isLooping)
+  }, [isLooping])
+
+  const changeSpeed = useCallback((speed: number) => {
+    setPlaybackRate(speed)
+  }, [])
+
+  // A-B repeat controls
+  const setMarkerAAtCurrent = useCallback(() => {
+    setMarkerA(currentTime)
+    if (markerB !== null && currentTime >= markerB) {
+      setMarkerB(null)
+      setIsABLooping(false)
+    }
+  }, [currentTime, markerB])
+
+  const setMarkerBAtCurrent = useCallback(() => {
+    if (markerA !== null && currentTime > markerA) {
+      setMarkerB(currentTime)
+      setIsABLooping(true)
+    }
+  }, [currentTime, markerA])
+
+  const clearABMarkers = useCallback(() => {
+    setMarkerA(null)
+    setMarkerB(null)
+    setIsABLooping(false)
+  }, [])
+
+  const toggleABLoop = useCallback(() => {
+    if (markerA !== null && markerB !== null) {
+      setIsABLooping(!isABLooping)
+    }
+  }, [markerA, markerB, isABLooping])
+
+  // Format time display
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  // Get volume icon
+  const VolumeIcon = volume === 0 ? PiSpeakerNone : volume < 50 ? PiSpeakerLow : PiSpeakerHigh
+
+  // Close player
+  const closePlayer = useCallback(() => {
+    stopTimeUpdate()
+    if (playerRef.current) {
+      playerRef.current.destroy()
+      playerRef.current = null
+    }
+    currentVideoIdRef.current = null
+    setCurrentVideo(null)
+    setVideoTitle('')
+    setIsPlaying(false)
+    setIsPlayerReady(false)
+    setCurrentTime(0)
+    setDuration(0)
+    setMarkerA(null)
+    setMarkerB(null)
+    setIsABLooping(false)
+  }, [stopTimeUpdate])
+
+  // Remove from recent
+  const removeFromRecent = useCallback((videoId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setRecentVideos(prev => {
+      const updated = prev.filter(v => v.videoId !== videoId)
+      try {
+        localStorage.setItem(RECENT_VIDEOS_KEY, JSON.stringify(updated))
+      } catch (err) {
+        console.error('Failed to save recent videos:', err)
+      }
+      return updated
+    })
+  }, [])
+
+  const speedOptions = [0.5, 0.75, 1, 1.25, 1.5, 2]
+
+  return (
+    <div className={styles.songsContainer}>
+      {/* Header */}
+      <div className={styles.headerSection}>
+        <h1 className={styles.pageTitle}>{t('songs.title')}</h1>
+        <p className={styles.pageSubtitle}>{t('songs.pasteUrl')}</p>
+      </div>
+
+      {/* URL Input Section */}
+      <form className={styles.searchSection} onSubmit={handleUrlSubmit}>
+        <div className={styles.searchInputWrapper}>
+          <PiLink className={styles.searchIcon} />
+          <input
+            type="text"
+            className={styles.searchInput}
+            placeholder={t('songs.urlPlaceholder')}
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
+          />
+          {urlInput && (
+            <button
+              type="button"
+              className={styles.clearSearchButton}
+              onClick={() => setUrlInput('')}
+              aria-label={t('common.clear')}
+            >
+              <PiX />
+            </button>
+          )}
+        </div>
+        <button type="submit" className={styles.loadButton}>
+          {t('songs.load')}
+        </button>
+      </form>
+
+      {/* URL Error */}
+      {urlError && (
+        <div className={styles.searchError}>{urlError}</div>
+      )}
+
+      {/* Recent Videos */}
+      {recentVideos.length > 0 && !currentVideo && (
+        <div className={styles.resultsSection}>
+          <div className={styles.resultsSectionHeader}>
+            <h2 className={styles.sectionTitle}>{t('songs.recentVideos')}</h2>
+          </div>
+          <div className={styles.recentList}>
+            {recentVideos.map((video) => (
+              <div
+                key={video.videoId}
+                className={styles.recentItem}
+                onClick={() => loadRecentVideo(video)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && loadRecentVideo(video)}
+              >
+                <img
+                  src={`https://i.ytimg.com/vi/${video.videoId}/mqdefault.jpg`}
+                  alt={video.title}
+                  className={styles.recentThumbnail}
+                />
+                <span className={styles.recentVideoId}>{video.title || video.videoId}</span>
+                <button
+                  className={styles.removeRecentButton}
+                  onClick={(e) => removeFromRecent(video.videoId, e)}
+                  aria-label={t('common.remove')}
+                >
+                  <PiX />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Hidden YouTube Player Container */}
+      <div ref={playerContainerRef} style={{ position: 'absolute', left: '-9999px' }} />
+
+      {/* Player Section */}
+      {currentVideo && (
+        <div className={styles.playerSection}>
+          <div className={styles.playerHeader}>
+            <div className={styles.playerTrackInfo}>
+              <img
+                src={`https://i.ytimg.com/vi/${currentVideo.videoId}/mqdefault.jpg`}
+                alt={currentVideo.title}
+                className={styles.playerArtwork}
+              />
+              <div className={styles.playerTrackDetails}>
+                <h2 className={styles.nowPlaying}>{videoTitle || currentVideo.videoId}</h2>
+                <p className={styles.playerArtist}>YouTube</p>
+              </div>
+            </div>
+            <button
+              className={styles.closePlayerButton}
+              onClick={closePlayer}
+              aria-label={t('common.close')}
+            >
+              <PiX />
+            </button>
+          </div>
+
+          {/* Loading indicator */}
+          {!isPlayerReady && (
+            <div className={styles.audioLoading}>{t('songs.loadingAudio')}</div>
+          )}
+
+          {/* Timeline with A-B markers */}
+          <div className={styles.timelineSection}>
+            <div className={styles.timelineWrapper}>
+              {/* A-B marker visualization */}
+              {markerA !== null && duration > 0 && (
+                <div
+                  className={styles.markerA}
+                  style={{ left: `${(markerA / duration) * 100}%` }}
+                  title={`A: ${formatTime(markerA)}`}
+                />
+              )}
+              {markerB !== null && duration > 0 && (
+                <div
+                  className={styles.markerB}
+                  style={{ left: `${(markerB / duration) * 100}%` }}
+                  title={`B: ${formatTime(markerB)}`}
+                />
+              )}
+              {markerA !== null && markerB !== null && duration > 0 && (
+                <div
+                  className={styles.abRange}
+                  style={{
+                    left: `${(markerA / duration) * 100}%`,
+                    width: `${((markerB - markerA) / duration) * 100}%`
+                  }}
+                />
+              )}
+              <input
+                type="range"
+                className={styles.timeline}
+                min={0}
+                max={duration || 100}
+                value={currentTime}
+                onChange={handleSeek}
+                step={0.1}
+                disabled={!isPlayerReady}
+              />
+            </div>
+            <div className={styles.timeDisplay}>
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
+          </div>
+
+          {/* Practice Controls */}
+          <div className={styles.practiceControls}>
+            {/* Play/Pause */}
+            <button
+              className={styles.controlButton}
+              onClick={togglePlayPause}
+              disabled={!isPlayerReady}
+              aria-label={isPlaying ? t('common.stop') : t('sandbox.play')}
+            >
+              {isPlaying ? <PiPause /> : <PiPlay />}
+            </button>
+
+            {/* Volume */}
+            <div className={styles.volumeControl}>
+              <VolumeIcon className={styles.volumeIcon} />
+              <input
+                type="range"
+                className={styles.volumeSlider}
+                min={0}
+                max={100}
+                step={1}
+                value={volume}
+                onChange={handleVolumeChange}
+              />
+            </div>
+
+            {/* Speed Control */}
+            <div className={styles.speedControl}>
+              <span className={styles.controlLabel}>{t('songs.speed')}</span>
+              <div className={styles.speedButtons}>
+                {speedOptions.map((speed) => (
+                  <button
+                    key={speed}
+                    className={`${styles.speedButton} ${playbackRate === speed ? styles.speedButtonActive : ''}`}
+                    onClick={() => changeSpeed(speed)}
+                  >
+                    {speed}x
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Loop Toggle */}
+            <button
+              className={`${styles.controlButton} ${isLooping ? styles.controlButtonActive : ''}`}
+              onClick={toggleLoop}
+              aria-label={t('songs.loop')}
+              title={t('songs.loop')}
+            >
+              <PiRepeat />
+            </button>
+          </div>
+
+          {/* A-B Repeat Controls */}
+          <div className={styles.abControls}>
+            <span className={styles.controlLabel}>{t('songs.abRepeat')}</span>
+            <div className={styles.abButtons}>
+              <button
+                className={`${styles.markerButton} ${markerA !== null ? styles.markerButtonSet : ''}`}
+                onClick={setMarkerAAtCurrent}
+                disabled={!isPlayerReady}
+                title={t('songs.setMarkerA')}
+              >
+                A {markerA !== null && `(${formatTime(markerA)})`}
+              </button>
+              <button
+                className={`${styles.markerButton} ${markerB !== null ? styles.markerButtonSet : ''}`}
+                onClick={setMarkerBAtCurrent}
+                disabled={markerA === null || !isPlayerReady}
+                title={t('songs.setMarkerB')}
+              >
+                B {markerB !== null && `(${formatTime(markerB)})`}
+              </button>
+              <button
+                className={`${styles.abToggleButton} ${isABLooping ? styles.abToggleButtonActive : ''}`}
+                onClick={toggleABLoop}
+                disabled={markerA === null || markerB === null}
+                title={t('songs.toggleABLoop')}
+              >
+                <PiRepeat />
+              </button>
+              <button
+                className={styles.clearMarkersButton}
+                onClick={clearABMarkers}
+                disabled={markerA === null && markerB === null}
+                title={t('songs.clearMarkers')}
+              >
+                <PiArrowCounterClockwise />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!currentVideo && recentVideos.length === 0 && (
+        <div className={styles.emptyState}>
+          <p className={styles.emptyStateText}>{t('songs.emptyStateUrl')}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default Songs

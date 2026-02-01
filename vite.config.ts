@@ -73,7 +73,7 @@ export default defineConfig(({ mode }) => ({
       'X-Frame-Options': 'SAMEORIGIN',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'Permissions-Policy': 'microphone=(self), camera=()',
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://nbrosowsky.github.io; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://*.youtube.com https://www.google.com https://*.google.com https://w.soundcloud.com https://connect.soundcloud.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://nbrosowsky.github.io https://*.soundcloud.com https://*.sndcdn.com https://*.dzcdn.net https://*.googlevideo.com https://*.youtube.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io https://api-v2.soundcloud.com https://*.soundcloud.com https://www.youtube.com https://*.youtube.com https://*.google.com; frame-src 'self' https://www.youtube.com https://*.youtube.com https://w.soundcloud.com; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
     }
   },
   // Preview server (production build preview)
@@ -84,7 +84,7 @@ export default defineConfig(({ mode }) => ({
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'Permissions-Policy': 'microphone=(self), camera=()',
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://nbrosowsky.github.io; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://*.youtube.com https://www.google.com https://*.google.com https://w.soundcloud.com https://connect.soundcloud.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://nbrosowsky.github.io https://*.soundcloud.com https://*.sndcdn.com https://*.dzcdn.net https://*.googlevideo.com https://*.youtube.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io https://api-v2.soundcloud.com https://*.soundcloud.com https://www.youtube.com https://*.youtube.com https://*.google.com; frame-src 'self' https://www.youtube.com https://*.youtube.com https://w.soundcloud.com; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
     }
   }
 }))

@@ -21,6 +21,7 @@ interface UseUIStateReturn {
   // Navigation actions
   navigateToHome: () => void
   navigateToSandbox: () => void
+  navigateToSongs: () => void
   navigateToClassroom: () => void
   navigateToProfile: (userId?: string) => void
   navigateToDashboard: () => void
@@ -62,6 +63,10 @@ export const useUIState = (): UseUIStateReturn => {
 
   const navigateToSandbox = useCallback(() => {
     dispatch({ type: 'SET_CURRENT_PAGE', payload: 'sandbox' })
+  }, [])
+
+  const navigateToSongs = useCallback(() => {
+    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'songs' })
   }, [])
 
   const navigateToClassroom = useCallback(() => {
@@ -151,6 +156,7 @@ export const useUIState = (): UseUIStateReturn => {
     // Navigation actions
     navigateToHome,
     navigateToSandbox,
+    navigateToSongs,
     navigateToClassroom,
     navigateToProfile,
     navigateToDashboard,

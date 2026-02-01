@@ -35,6 +35,7 @@ interface InstrumentContextType {
   activeInputs: { bpm: boolean; beats: boolean; mode: boolean }
   navigateToHome: () => void
   navigateToSandbox: () => void
+  navigateToSongs: () => void
   navigateToClassroom: () => void
   navigateToProfile: (userId?: string) => void
   navigateToDashboard: () => void
@@ -151,6 +152,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     activeInputs,
     navigateToHome,
     navigateToSandbox: navigateToSandboxOriginal,
+    navigateToSongs,
     navigateToClassroom,
     navigateToProfile,
     navigateToDashboard,
@@ -432,6 +434,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     activeInputs,
     navigateToHome,
     navigateToSandbox,
+    navigateToSongs,
     navigateToClassroom,
     navigateToProfile,
     navigateToDashboard,

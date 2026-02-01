@@ -3,6 +3,7 @@
     "home": "Home",
     "dashboard": "Dashboard",
     "sandbox": "Sandbox",
+    "songs": "Songs",
     "classroom": "Classroom"
   },
   "auth": {
@@ -217,6 +218,29 @@
     "detected": "Detected",
     "reset": "Reset"
   },
+  "songs": {
+    "title": "Songs",
+    "subtitle": "Search for songs and practice with playback controls",
+    "pasteUrl": "Paste a YouTube URL to practice with playback controls",
+    "urlPlaceholder": "Paste YouTube URL or video ID...",
+    "invalidUrl": "Invalid YouTube URL. Please paste a valid YouTube link.",
+    "load": "Load",
+    "recentVideos": "Recent Videos",
+    "searchPlaceholder": "Search for a song...",
+    "searchResults": "Search Results",
+    "searchError": "Search failed. Please try again.",
+    "playbackError": "Failed to load video. Please try another URL.",
+    "loadingAudio": "Loading video...",
+    "emptyState": "Search for a song to start practicing",
+    "emptyStateUrl": "Paste a YouTube URL to start practicing",
+    "speed": "Speed",
+    "loop": "Loop",
+    "abRepeat": "A-B Repeat",
+    "setMarkerA": "Set marker A at current position",
+    "setMarkerB": "Set marker B at current position",
+    "toggleABLoop": "Toggle A-B loop",
+    "clearMarkers": "Clear markers"
+  },
   "theme": {
     "switchToLight": "Switch to Light Mode",
     "switchToDark": "Switch to Dark Mode",
@@ -243,6 +267,7 @@
     "publicDescription": "Public - Anyone can see and join this class",
     "privateDescription": "Private - Only users with the class code can join",
     "join": "Join",
+    "joinPrivateClass": "Join Private Class",
     "create": "Create",
     "creating": "Creating...",
     "joining": "Joining...",
