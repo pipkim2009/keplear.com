@@ -67,6 +67,33 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false // Disable HMR overlay for better development experience
     },
+    // Proxy for Piped API (YouTube search) - verified working instances with fallback
+    proxy: {
+      '/api/piped1': {
+        target: 'https://api.piped.private.coffee', // MOST RELIABLE - 99.89% uptime
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/piped1/, ''),
+        timeout: 15000
+      },
+      '/api/piped2': {
+        target: 'https://pipedapi.kavin.rocks', // Official instance
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/piped2/, ''),
+        timeout: 15000
+      },
+      '/api/piped3': {
+        target: 'https://pipedapi.adminforge.de', // Germany
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/piped3/, ''),
+        timeout: 15000
+      },
+      '/api/piped4': {
+        target: 'https://watchapi.whatever.social', // Community
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/piped4/, ''),
+        timeout: 15000
+      }
+    },
     // Security headers for development server
     headers: {
       'X-Content-Type-Options': 'nosniff',

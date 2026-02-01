@@ -6,8 +6,33 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useTranslation } from '../../contexts/TranslationContext'
-import { PiPlay, PiPause, PiRepeat, PiSpeakerHigh, PiSpeakerLow, PiSpeakerNone, PiArrowCounterClockwise, PiX, PiLink } from 'react-icons/pi'
+import { PiPlay, PiPause, PiRepeat, PiSpeakerHigh, PiSpeakerLow, PiSpeakerNone, PiArrowCounterClockwise, PiX, PiMagnifyingGlass, PiLink } from 'react-icons/pi'
 import styles from '../../styles/Songs.module.css'
+
+// Piped API proxy endpoints
+// In development: use Vite proxy (multiple instances for fallback)
+// In production: use Vercel serverless function (handles fallback server-side)
+const IS_PRODUCTION = import.meta.env.PROD
+
+const PIPED_PROXIES = IS_PRODUCTION
+  ? ['/api/piped'] // Single serverless endpoint handles all fallback logic
+  : [
+      '/api/piped1', // api.piped.private.coffee (BEST - 99.89% uptime)
+      '/api/piped2', // pipedapi.kavin.rocks (Official)
+      '/api/piped3', // pipedapi.adminforge.de (Germany)
+      '/api/piped4'  // watchapi.whatever.social (Community)
+    ]
+
+// Session storage key for working instance
+const WORKING_INSTANCE_KEY = 'keplear_working_piped_instance'
+
+interface SearchResult {
+  videoId: string
+  title: string
+  author: string
+  lengthSeconds: number
+  viewCount: number
+}
 
 // YouTube IFrame API types
 declare global {
@@ -64,6 +89,13 @@ const MAX_RECENT_VIDEOS = 10
 
 const Songs = () => {
   const { t } = useTranslation()
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchError, setSearchError] = useState('')
+  const [showUrlInput, setShowUrlInput] = useState(false)
 
   // URL input state
   const [urlInput, setUrlInput] = useState('')
@@ -152,6 +184,131 @@ const Songs = () => {
       if (match) return match[1]
     }
     return null
+  }
+
+  // Search YouTube via Invidious API with instance fallback
+  const searchYouTube = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([])
+      return
+    }
+
+    setIsSearching(true)
+    setSearchError('')
+
+    // Get cached working proxy or start from beginning
+    const cachedProxy = sessionStorage.getItem(WORKING_INSTANCE_KEY)
+    const proxies = cachedProxy
+      ? [cachedProxy, ...PIPED_PROXIES.filter(p => p !== cachedProxy)]
+      : PIPED_PROXIES
+
+    for (const proxy of proxies) {
+      try {
+        // Piped API search endpoint
+        // Production: /api/piped?q=query (serverless function)
+        // Development: /api/pipedN/search?q=query (Vite proxy)
+        const url = IS_PRODUCTION
+          ? `${proxy}?q=${encodeURIComponent(query)}&filter=videos`
+          : `${proxy}/search?q=${encodeURIComponent(query)}&filter=videos`
+
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 15000)
+
+        const response = await fetch(url, {
+          signal: controller.signal,
+          credentials: 'omit', // Prevent auth dialogs
+          headers: {
+            'Accept': 'application/json'
+          }
+        })
+
+        clearTimeout(timeoutId)
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`)
+        }
+
+        // Verify response is JSON, not HTML login page
+        const contentType = response.headers.get('content-type')
+        if (!contentType || !contentType.includes('application/json')) {
+          throw new Error('Response is not JSON')
+        }
+
+        const data = await response.json()
+
+        // Parse Piped API results
+        // Piped returns { items: [...] } with url like "/watch?v=VIDEO_ID"
+        const items = data.items || data
+        const results: SearchResult[] = items
+          .filter((item: { type?: string; url?: string }) =>
+            item.url && item.url.includes('/watch?v=')
+          )
+          .slice(0, 20)
+          .map((item: { url: string; title: string; uploaderName: string; duration: number; views: number }) => {
+            // Extract video ID from URL like "/watch?v=dQw4w9WgXcQ"
+            const videoIdMatch = item.url.match(/[?&]v=([a-zA-Z0-9_-]{11})/)
+            return {
+              videoId: videoIdMatch ? videoIdMatch[1] : '',
+              title: item.title || 'Unknown',
+              author: item.uploaderName || 'Unknown',
+              lengthSeconds: item.duration || 0,
+              viewCount: item.views || 0
+            }
+          })
+          .filter((item: SearchResult) => item.videoId) // Filter out any without valid videoId
+
+        setSearchResults(results)
+
+        // Cache working proxy for this session
+        sessionStorage.setItem(WORKING_INSTANCE_KEY, proxy)
+
+        setIsSearching(false)
+        return
+      } catch (err) {
+        console.warn(`Piped proxy ${proxy} failed:`, err)
+        // Continue to next proxy
+      }
+    }
+
+    // All instances failed
+    setSearchError(t('songs.searchError'))
+    setIsSearching(false)
+  }, [t])
+
+  // Handle search submission
+  const handleSearch = useCallback((e?: React.FormEvent) => {
+    e?.preventDefault()
+    searchYouTube(searchQuery)
+  }, [searchQuery, searchYouTube])
+
+  // Load a search result
+  const loadSearchResult = useCallback((result: SearchResult) => {
+    const video: VideoInfo = {
+      videoId: result.videoId,
+      title: result.title
+    }
+    setCurrentVideo(video)
+    saveToRecent(video)
+    setSearchResults([])
+    setSearchQuery('')
+  }, [saveToRecent])
+
+  // Format duration from seconds
+  const formatDuration = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  // Format view count
+  const formatViews = (count: number) => {
+    if (count >= 1000000) {
+      return `${(count / 1000000).toFixed(1)}M`
+    }
+    if (count >= 1000) {
+      return `${(count / 1000).toFixed(1)}K`
+    }
+    return count.toString()
   }
 
   // Time update loop - uses refs to avoid stale closure issues
@@ -438,43 +595,124 @@ const Songs = () => {
       {/* Header */}
       <div className={styles.headerSection}>
         <h1 className={styles.pageTitle}>{t('songs.title')}</h1>
-        <p className={styles.pageSubtitle}>{t('songs.pasteUrl')}</p>
+        <p className={styles.pageSubtitle}>{t('songs.searchSubtitle')}</p>
       </div>
 
-      {/* URL Input Section */}
-      <form className={styles.searchSection} onSubmit={handleUrlSubmit}>
+      {/* Search Section */}
+      <form className={styles.searchSection} onSubmit={handleSearch}>
         <div className={styles.searchInputWrapper}>
-          <PiLink className={styles.searchIcon} />
+          <PiMagnifyingGlass className={styles.searchIcon} />
           <input
             type="text"
             className={styles.searchInput}
-            placeholder={t('songs.urlPlaceholder')}
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
+            placeholder={t('songs.searchPlaceholder')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
-          {urlInput && (
+          {searchQuery && (
             <button
               type="button"
               className={styles.clearSearchButton}
-              onClick={() => setUrlInput('')}
+              onClick={() => {
+                setSearchQuery('')
+                setSearchResults([])
+              }}
               aria-label={t('common.clear')}
             >
               <PiX />
             </button>
           )}
         </div>
-        <button type="submit" className={styles.loadButton}>
-          {t('songs.load')}
+        <button type="submit" className={styles.loadButton} disabled={isSearching}>
+          {isSearching ? t('songs.searching') : t('songs.search')}
         </button>
       </form>
+
+      {/* Search Error */}
+      {searchError && (
+        <div className={styles.searchError}>{searchError}</div>
+      )}
+
+      {/* URL Toggle */}
+      <button
+        className={styles.urlToggle}
+        onClick={() => setShowUrlInput(!showUrlInput)}
+      >
+        <PiLink /> {showUrlInput ? t('songs.hideUrl') : t('songs.pasteUrl')}
+      </button>
+
+      {/* URL Input Section (collapsible) */}
+      {showUrlInput && (
+        <form className={styles.urlSection} onSubmit={handleUrlSubmit}>
+          <div className={styles.searchInputWrapper}>
+            <PiLink className={styles.searchIcon} />
+            <input
+              type="text"
+              className={styles.searchInput}
+              placeholder={t('songs.urlPlaceholder')}
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+            />
+            {urlInput && (
+              <button
+                type="button"
+                className={styles.clearSearchButton}
+                onClick={() => setUrlInput('')}
+                aria-label={t('common.clear')}
+              >
+                <PiX />
+              </button>
+            )}
+          </div>
+          <button type="submit" className={styles.loadButton}>
+            {t('songs.load')}
+          </button>
+        </form>
+      )}
 
       {/* URL Error */}
       {urlError && (
         <div className={styles.searchError}>{urlError}</div>
       )}
 
+      {/* Search Results */}
+      {searchResults.length > 0 && !currentVideo && (
+        <div className={styles.resultsSection}>
+          <div className={styles.resultsSectionHeader}>
+            <h2 className={styles.sectionTitle}>{t('songs.searchResults')}</h2>
+            <span className={styles.resultsCount}>{searchResults.length} {t('songs.results')}</span>
+          </div>
+          <div className={styles.searchResultsList}>
+            {searchResults.map((result) => (
+              <div
+                key={result.videoId}
+                className={styles.searchResultItem}
+                onClick={() => loadSearchResult(result)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === 'Enter' && loadSearchResult(result)}
+              >
+                <img
+                  src={`https://i.ytimg.com/vi/${result.videoId}/mqdefault.jpg`}
+                  alt={result.title}
+                  className={styles.resultThumbnail}
+                />
+                <div className={styles.resultInfo}>
+                  <span className={styles.resultTitle}>{result.title}</span>
+                  <span className={styles.resultAuthor}>{result.author}</span>
+                  <div className={styles.resultMeta}>
+                    <span className={styles.resultDuration}>{formatDuration(result.lengthSeconds)}</span>
+                    <span className={styles.resultViews}>{formatViews(result.viewCount)} views</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Recent Videos */}
-      {recentVideos.length > 0 && !currentVideo && (
+      {recentVideos.length > 0 && !currentVideo && searchResults.length === 0 && (
         <div className={styles.resultsSection}>
           <div className={styles.resultsSectionHeader}>
             <h2 className={styles.sectionTitle}>{t('songs.recentVideos')}</h2>
@@ -679,9 +917,9 @@ const Songs = () => {
       )}
 
       {/* Empty State */}
-      {!currentVideo && recentVideos.length === 0 && (
+      {!currentVideo && recentVideos.length === 0 && searchResults.length === 0 && (
         <div className={styles.emptyState}>
-          <p className={styles.emptyStateText}>{t('songs.emptyStateUrl')}</p>
+          <p className={styles.emptyStateText}>{t('songs.emptyState')}</p>
         </div>
       )}
     </div>

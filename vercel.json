@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/piped",
+      "destination": "/api/piped"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
