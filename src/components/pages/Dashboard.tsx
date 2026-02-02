@@ -5,7 +5,7 @@
 
 import { useState, useEffect, useContext, useCallback } from 'react'
 import { supabase } from '../../lib/supabase'
-import AuthContext from '../../contexts/AuthContext'
+import { AuthContext } from '../../contexts/AuthContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useNavigation } from '../../hooks/useInstrumentSelectors'
 import { useInstrument } from '../../contexts/InstrumentContext'

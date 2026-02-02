@@ -16,7 +16,7 @@ export { MelodyProvider, useMelody } from './MelodyContext'
 export { InstrumentProvider, useInstrument } from './InstrumentContext'
 
 // Auth context
-export { AuthProvider } from './AuthContext'
+export { AuthContext, AuthProvider } from './AuthContext'
 export { useAuth } from '../hooks/useAuth'
 
 // Translation context

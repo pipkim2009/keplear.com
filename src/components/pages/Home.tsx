@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useContext } from 'react'
-import AuthContext from '../../contexts/AuthContext'
+import { AuthContext } from '../../contexts/AuthContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import styles from '../../styles/Home.module.css'
 import {

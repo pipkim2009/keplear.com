@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useContext, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
-import AuthContext from '../../contexts/AuthContext'
+import { AuthContext } from '../../contexts/AuthContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'

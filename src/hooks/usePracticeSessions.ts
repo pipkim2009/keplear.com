@@ -6,7 +6,7 @@
 import { useContext } from 'react'
 import { supabase } from '../lib/supabase'
 import { useSupabaseMutation } from './useSupabaseMutation'
-import AuthContext from '../contexts/AuthContext'
+import { AuthContext } from '../contexts/AuthContext'
 
 export interface PracticeSession {
   id: string

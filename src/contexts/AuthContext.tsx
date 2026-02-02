@@ -313,5 +313,4 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   )
 }
 
-export default AuthContext
-export { AuthProvider }
+export { AuthContext, AuthProvider }
