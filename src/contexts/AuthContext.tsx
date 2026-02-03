@@ -45,8 +45,9 @@ interface AuthContextType {
 
 /**
  * Authentication context - provides auth state and methods to child components
+ * Exported directly to ensure proper module initialization
  */
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 /**
  * Props for the AuthProvider component
@@ -313,4 +314,4 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   )
 }
 
-export { AuthContext, AuthProvider }
+export { AuthProvider }

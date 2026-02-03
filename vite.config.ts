@@ -30,13 +30,17 @@ export default defineConfig(({ mode }) => ({
           audio: ['tone'],
           auth: ['@supabase/supabase-js'],
           icons: ['lucide-react']
-        }
-      }
+        },
+        // Preserve export names to prevent minification issues
+        exports: 'named'
+      },
+      // Ensure module exports are preserved
+      preserveEntrySignatures: 'exports-only'
     },
     // Enable source maps for better debugging
     sourcemap: mode === 'development',
-    // Optimize bundle size
-    minify: mode === 'production' ? 'terser' : false,
+    // Use esbuild for minification (more consistent across platforms than terser)
+    minify: 'esbuild',
     // Report bundle size
     reportCompressedSize: true,
     // Set chunk size warning limit
