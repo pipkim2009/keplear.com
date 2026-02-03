@@ -1,7 +1,7 @@
 {
   "name": "keplear",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Interactive keyboard for melody generation and practice",
   "type": "module",
   "scripts": {
