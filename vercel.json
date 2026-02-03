@@ -1,6 +1,6 @@
 {
   "installCommand": "npm install --force",
-  "buildCommand": "rm -rf node_modules/.vite dist && npm run build",
+  "buildCommand": "rm -rf node_modules/.vite node_modules/.cache dist .vite && npm run build",
   "rewrites": [
     {
       "source": "/api/piped",
