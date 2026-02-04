@@ -890,12 +890,12 @@ const Songs = () => {
                 step={1}
                 value={volume}
                 onChange={handleVolumeChange}
+                style={{ '--volume-percent': `${volume}%` } as React.CSSProperties}
               />
             </div>
 
             {/* Speed Control */}
             <div className={styles.speedControl}>
-              <span className={styles.controlLabel}>{t('songs.speed')}</span>
               <div className={styles.speedButtons}>
                 {speedOptions.map((speed) => (
                   <button
@@ -922,7 +922,7 @@ const Songs = () => {
 
           {/* A-B Repeat Controls */}
           <div className={styles.abControls}>
-            <span className={styles.controlLabel}>{t('songs.abRepeat')}</span>
+            <span className={styles.controlLabel}>Looper</span>
             <div className={styles.abButtons}>
               <button
                 className={`${styles.markerButton} ${markerA !== null ? styles.markerButtonSet : ''}`}

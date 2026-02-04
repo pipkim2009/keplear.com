@@ -775,7 +775,13 @@
   height: 6px;
   appearance: none;
   -webkit-appearance: none;
-  background: var(--gray-200);
+  background: linear-gradient(
+    to right,
+    var(--primary-purple) 0%,
+    var(--primary-purple) var(--volume-percent, 80%),
+    var(--gray-500) var(--volume-percent, 80%),
+    var(--gray-500) 100%
+  );
   border-radius: 3px;
   cursor: pointer;
 }
@@ -797,6 +803,18 @@
   border-radius: 50%;
   border: none;
   cursor: pointer;
+}
+
+.volumeSlider::-moz-range-track {
+  height: 6px;
+  background: var(--gray-500);
+  border-radius: 3px;
+}
+
+.volumeSlider::-moz-range-progress {
+  height: 6px;
+  background: var(--primary-purple);
+  border-radius: 3px;
 }
 
 .controlLabel {
