@@ -2,7 +2,6 @@
  * Songs Page - YouTube-based practice tool
  * Paste YouTube URLs and practice with loop, speed, and A-B repeat controls
  * Uses YouTube IFrame API for reliable playback
- * Analyzes audio with Web Audio API for real waveform visualization
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react'
@@ -10,26 +9,20 @@ import { useTranslation } from '../../contexts/TranslationContext'
 import { PiPlay, PiPause, PiRepeat, PiSpeakerHigh, PiSpeakerLow, PiSpeakerNone, PiArrowCounterClockwise, PiX, PiMagnifyingGlass, PiLink } from 'react-icons/pi'
 import styles from '../../styles/Songs.module.css'
 
-// Piped API proxy endpoints
-// In development: use Vite proxy (multiple instances for fallback)
-// In production: use Vercel serverless function (handles fallback server-side)
+// Piped API proxy endpoints for search
 const IS_PRODUCTION = import.meta.env.PROD
 
 const PIPED_PROXIES = IS_PRODUCTION
   ? ['/api/piped'] // Single serverless endpoint handles all fallback logic
   : [
-      '/api/piped1', // api.piped.private.coffee (BEST - 99.89% uptime)
-      '/api/piped2', // pipedapi.kavin.rocks (Official)
-      '/api/piped3', // pipedapi.adminforge.de (Germany)
-      '/api/piped4'  // watchapi.whatever.social (Community)
+      '/api/piped1', // api.piped.private.coffee
+      '/api/piped2', // pipedapi.kavin.rocks
+      '/api/piped3', // pipedapi.adminforge.de
+      '/api/piped4'  // fallback
     ]
 
 // Session storage key for working instance
 const WORKING_INSTANCE_KEY = 'keplear_working_piped_instance'
-
-// Audio URL cache
-const AUDIO_URL_CACHE_KEY = 'keplear_audio_url_cache'
-const MAX_CACHED_URLS = 30
 
 interface SearchResult {
   videoId: string
@@ -92,208 +85,8 @@ interface VideoInfo {
 const RECENT_VIDEOS_KEY = 'keplear_recent_videos'
 const MAX_RECENT_VIDEOS = 10
 
-// Waveform cache in localStorage
-const WAVEFORM_CACHE_KEY = 'keplear_waveform_cache'
-const MAX_CACHED_WAVEFORMS = 50
-
-const getCachedWaveform = (videoId: string): number[] | null => {
-  try {
-    const cache = JSON.parse(localStorage.getItem(WAVEFORM_CACHE_KEY) || '{}')
-    return cache[videoId] || null
-  } catch {
-    return null
-  }
-}
-
-const cacheWaveform = (videoId: string, waveform: number[]) => {
-  try {
-    const cache = JSON.parse(localStorage.getItem(WAVEFORM_CACHE_KEY) || '{}')
-    const keys = Object.keys(cache)
-
-    // Remove oldest entries if cache is full
-    if (keys.length >= MAX_CACHED_WAVEFORMS) {
-      delete cache[keys[0]]
-    }
-
-    cache[videoId] = waveform
-    localStorage.setItem(WAVEFORM_CACHE_KEY, JSON.stringify(cache))
-  } catch {
-    // Storage full or unavailable, ignore
-  }
-}
-
-// Analyze audio buffer to generate waveform data
-const analyzeAudioBuffer = (audioBuffer: AudioBuffer, numBars: number = 150): number[] => {
-  const channelData = audioBuffer.getChannelData(0) // Get first channel
-  const samplesPerBar = Math.floor(channelData.length / numBars)
-  const waveform: number[] = []
-
-  for (let i = 0; i < numBars; i++) {
-    const start = i * samplesPerBar
-    const end = start + samplesPerBar
-
-    // Calculate RMS (root mean square) for this segment
-    let sum = 0
-    for (let j = start; j < end && j < channelData.length; j++) {
-      sum += channelData[j] * channelData[j]
-    }
-    const rms = Math.sqrt(sum / samplesPerBar)
-
-    // Normalize and boost for visibility (RMS values are typically small)
-    const normalized = Math.min(1, rms * 4)
-    waveform.push(Math.max(0.08, normalized)) // Minimum height for visibility
-  }
-
-  return waveform
-}
-
-// Try to get audio URL from Cobalt API (via serverless proxy)
-const fetchAudioUrlFromCobalt = async (videoId: string): Promise<string | null> => {
-  try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
-
-    const response = await fetch(`/api/cobalt?videoId=${videoId}`, {
-      signal: controller.signal,
-      headers: { 'Accept': 'application/json' }
-    })
-
-    clearTimeout(timeoutId)
-
-    if (!response.ok) return null
-
-    const data = await response.json()
-    return data.url || null
-  } catch (e) {
-    console.warn('Cobalt API failed:', e)
-    return null
-  }
-}
-
-// Try to get audio URL from Piped API (fallback)
-const fetchAudioUrlFromPiped = async (videoId: string): Promise<string | null> => {
-  const pipedProxies = IS_PRODUCTION
-    ? ['/api/piped-streams']
-    : ['/api/piped1', '/api/piped2', '/api/piped3', '/api/piped4']
-
-  for (const proxy of pipedProxies) {
-    try {
-      const url = IS_PRODUCTION
-        ? `${proxy}?videoId=${videoId}`
-        : `${proxy}/streams/${videoId}`
-
-      const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 10000)
-
-      const response = await fetch(url, {
-        signal: controller.signal,
-        headers: { 'Accept': 'application/json' }
-      })
-
-      clearTimeout(timeoutId)
-
-      if (!response.ok) continue
-
-      const data = await response.json()
-
-      // Find the lowest bitrate audio stream
-      const audioStreams = data.audioStreams || []
-      const sortedStreams = audioStreams
-        .filter((s: { mimeType?: string; url?: string }) => s.mimeType?.includes('audio') && s.url)
-        .sort((a: { bitrate?: number }, b: { bitrate?: number }) => (a.bitrate || 0) - (b.bitrate || 0))
-
-      if (sortedStreams[0]?.url) {
-        return sortedStreams[0].url
-      }
-    } catch (e) {
-      console.warn(`Piped proxy ${proxy} failed:`, e)
-    }
-  }
-
-  return null
-}
-
-// Fetch and analyze audio to generate real waveform data
-const fetchAndAnalyzeAudio = async (
-  videoId: string,
-  numBars: number = 150
-): Promise<{ waveform: number[]; isReal: boolean }> => {
-  // Check cache first
-  const cached = getCachedWaveform(videoId)
-  if (cached) {
-    return { waveform: cached, isReal: true }
-  }
-
-  // Try Cobalt first (more reliable via serverless), then Piped as fallback
-  let audioUrl = await fetchAudioUrlFromCobalt(videoId)
-
-  if (!audioUrl) {
-    audioUrl = await fetchAudioUrlFromPiped(videoId)
-  }
-
-  if (!audioUrl) {
-    return { waveform: generatePseudoWaveform(videoId, numBars), isReal: false }
-  }
-
-  // Fetch audio with size limit (500KB = fast download, enough for waveform)
-  const MAX_BYTES = 512 * 1024
-
-  try {
-    const audioResponse = await fetch(audioUrl)
-    if (!audioResponse.ok) {
-      return { waveform: generatePseudoWaveform(videoId, numBars), isReal: false }
-    }
-
-    // Read the stream with size limit
-    const reader = audioResponse.body?.getReader()
-    if (!reader) {
-      return { waveform: generatePseudoWaveform(videoId, numBars), isReal: false }
-    }
-
-    const chunks: Uint8Array[] = []
-    let loaded = 0
-
-    while (loaded < MAX_BYTES) {
-      const { done, value } = await reader.read()
-      if (done) break
-
-      chunks.push(value)
-      loaded += value.length
-    }
-
-    // Cancel remaining download
-    reader.cancel()
-
-    // Combine chunks
-    const audioData = new Uint8Array(loaded)
-    let offset = 0
-    for (const chunk of chunks) {
-      audioData.set(chunk, offset)
-      offset += chunk.length
-    }
-
-    // Decode and analyze audio
-    const audioContext = new AudioContext()
-    try {
-      const audioBuffer = await audioContext.decodeAudioData(audioData.buffer)
-      const waveform = analyzeAudioBuffer(audioBuffer, numBars)
-
-      // Cache for future use
-      cacheWaveform(videoId, waveform)
-
-      return { waveform, isReal: true }
-    } finally {
-      audioContext.close()
-    }
-  } catch (e) {
-    console.warn('Audio analysis failed:', e)
-    return { waveform: generatePseudoWaveform(videoId, numBars), isReal: false }
-  }
-}
-
-// Generate a deterministic waveform based on video ID (fallback)
-// Creates a unique, consistent pattern for each video
-const generatePseudoWaveform = (videoId: string, numBars: number = 150): number[] => {
+// Generate a unique waveform pattern based on video ID
+const generateWaveform = (videoId: string, numBars: number = 150): number[] => {
   // Seeded random based on video ID
   const seed = videoId.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0)
   const seededRandom = (n: number) => {
@@ -350,8 +143,6 @@ const Songs = () => {
 
   // Waveform state
   const [waveformData, setWaveformData] = useState<number[]>([])
-  const [waveformLoading, setWaveformLoading] = useState(false)
-  const [isRealWaveform, setIsRealWaveform] = useState(false)
 
   // Refs
   const playerRef = useRef<YTPlayer | null>(null)
@@ -608,26 +399,8 @@ const Songs = () => {
     setMarkerB(null)
     setIsABLooping(false)
 
-    // Reset waveform state and start loading
-    setWaveformLoading(true)
-    setIsRealWaveform(false)
-
-    // Show pseudo waveform immediately while real one loads
-    setWaveformData(generatePseudoWaveform(currentVideo.videoId, 150))
-
-    // Fetch and analyze audio in background (instant analysis at "10000x speed")
-    fetchAndAnalyzeAudio(currentVideo.videoId, 150)
-      .then(({ waveform, isReal }) => {
-        setWaveformData(waveform)
-        setIsRealWaveform(isReal)
-      })
-      .catch(() => {
-        // Keep pseudo waveform on error
-        setIsRealWaveform(false)
-      })
-      .finally(() => {
-        setWaveformLoading(false)
-      })
+    // Generate waveform based on video ID
+    setWaveformData(generateWaveform(currentVideo.videoId, 150))
 
     // Create player container div
     const containerId = 'yt-player-' + Date.now()
@@ -827,10 +600,7 @@ const Songs = () => {
     setMarkerA(null)
     setMarkerB(null)
     setIsABLooping(false)
-    // Reset waveform state
     setWaveformData([])
-    setWaveformLoading(false)
-    setIsRealWaveform(false)
   }, [stopTimeUpdate])
 
   // Remove from recent
@@ -1039,13 +809,9 @@ const Songs = () => {
 
           {/* Timeline with A-B markers */}
           <div className={styles.timelineSection}>
-            {/* Live waveform badge - only shown when using real analyzed waveform */}
-            {isRealWaveform && !waveformLoading && (
-              <div className={styles.liveWaveformBadge}>Live waveform</div>
-            )}
             <div className={styles.timelineWrapper}>
               {/* Waveform visualization */}
-              <div className={`${styles.waveformContainer} ${waveformLoading ? styles.waveformLoading : ''}`}>
+              <div className={styles.waveformContainer}>
                 {waveformData.map((height, i) => {
                   const barProgress = (i + 1) / waveformData.length
                   const currentProgress = duration > 0 ? currentTime / duration : 0
