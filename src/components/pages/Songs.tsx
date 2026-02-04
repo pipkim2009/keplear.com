@@ -2,6 +2,7 @@
  * Songs Page - YouTube-based practice tool
  * Paste YouTube URLs and practice with loop, speed, and A-B repeat controls
  * Uses YouTube IFrame API for reliable playback
+ * Analyzes audio with Web Audio API for real waveform visualization
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react'
@@ -25,6 +26,10 @@ const PIPED_PROXIES = IS_PRODUCTION
 
 // Session storage key for working instance
 const WORKING_INSTANCE_KEY = 'keplear_working_piped_instance'
+
+// Audio URL cache
+const AUDIO_URL_CACHE_KEY = 'keplear_audio_url_cache'
+const MAX_CACHED_URLS = 30
 
 interface SearchResult {
   videoId: string
@@ -87,6 +92,207 @@ interface VideoInfo {
 const RECENT_VIDEOS_KEY = 'keplear_recent_videos'
 const MAX_RECENT_VIDEOS = 10
 
+// Waveform cache in localStorage
+const WAVEFORM_CACHE_KEY = 'keplear_waveform_cache'
+const MAX_CACHED_WAVEFORMS = 50
+
+const getCachedWaveform = (videoId: string): number[] | null => {
+  try {
+    const cache = JSON.parse(localStorage.getItem(WAVEFORM_CACHE_KEY) || '{}')
+    return cache[videoId] || null
+  } catch {
+    return null
+  }
+}
+
+const cacheWaveform = (videoId: string, waveform: number[]) => {
+  try {
+    const cache = JSON.parse(localStorage.getItem(WAVEFORM_CACHE_KEY) || '{}')
+    const keys = Object.keys(cache)
+
+    // Remove oldest entries if cache is full
+    if (keys.length >= MAX_CACHED_WAVEFORMS) {
+      delete cache[keys[0]]
+    }
+
+    cache[videoId] = waveform
+    localStorage.setItem(WAVEFORM_CACHE_KEY, JSON.stringify(cache))
+  } catch {
+    // Storage full or unavailable, ignore
+  }
+}
+
+// Analyze audio buffer to generate waveform data
+const analyzeAudioBuffer = (audioBuffer: AudioBuffer, numBars: number = 150): number[] => {
+  const channelData = audioBuffer.getChannelData(0) // Get first channel
+  const samplesPerBar = Math.floor(channelData.length / numBars)
+  const waveform: number[] = []
+
+  for (let i = 0; i < numBars; i++) {
+    const start = i * samplesPerBar
+    const end = start + samplesPerBar
+
+    // Calculate RMS (root mean square) for this segment
+    let sum = 0
+    for (let j = start; j < end && j < channelData.length; j++) {
+      sum += channelData[j] * channelData[j]
+    }
+    const rms = Math.sqrt(sum / samplesPerBar)
+
+    // Normalize and boost for visibility (RMS values are typically small)
+    const normalized = Math.min(1, rms * 4)
+    waveform.push(Math.max(0.08, normalized)) // Minimum height for visibility
+  }
+
+  return waveform
+}
+
+// Fetch and analyze audio to generate real waveform data
+const fetchAndAnalyzeAudio = async (
+  videoId: string,
+  numBars: number = 150
+): Promise<{ waveform: number[]; isReal: boolean }> => {
+  // Check cache first
+  const cached = getCachedWaveform(videoId)
+  if (cached) {
+    return { waveform: cached, isReal: true }
+  }
+
+  // Use proxy endpoints to avoid CORS
+  const pipedProxies = IS_PRODUCTION
+    ? ['/api/piped-streams']
+    : ['/api/piped1', '/api/piped2', '/api/piped3', '/api/piped4']
+
+  let audioUrl: string | null = null
+
+  // Get audio stream URL from Piped
+  for (const proxy of pipedProxies) {
+    try {
+      const url = IS_PRODUCTION
+        ? `${proxy}?videoId=${videoId}`
+        : `${proxy}/streams/${videoId}`
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: { 'Accept': 'application/json' }
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) continue
+
+      const data = await response.json()
+
+      // Find the lowest bitrate audio stream (smaller = faster download)
+      const audioStreams = data.audioStreams || []
+      const sortedStreams = audioStreams
+        .filter((s: { mimeType?: string; url?: string }) => s.mimeType?.includes('audio') && s.url)
+        .sort((a: { bitrate?: number; mimeType?: string }, b: { bitrate?: number; mimeType?: string }) => {
+          // Prefer opus (usually smaller)
+          const aIsOpus = a.mimeType?.includes('opus') ? 0 : 1
+          const bIsOpus = b.mimeType?.includes('opus') ? 0 : 1
+          if (aIsOpus !== bIsOpus) return aIsOpus - bIsOpus
+          return (a.bitrate || 0) - (b.bitrate || 0)
+        })
+
+      if (sortedStreams[0]?.url) {
+        audioUrl = sortedStreams[0].url
+        break
+      }
+    } catch (e) {
+      console.warn(`Piped proxy ${proxy} failed:`, e)
+    }
+  }
+
+  if (!audioUrl) {
+    // Return pseudo waveform as fallback
+    return { waveform: generatePseudoWaveform(videoId, numBars), isReal: false }
+  }
+
+  // Fetch audio with size limit (max 2MB - enough for waveform analysis)
+  const MAX_BYTES = 2 * 1024 * 1024
+
+  try {
+    const audioResponse = await fetch(audioUrl)
+    if (!audioResponse.ok) {
+      return { waveform: generatePseudoWaveform(videoId, numBars), isReal: false }
+    }
+
+    // Read the stream with size limit
+    const reader = audioResponse.body?.getReader()
+    if (!reader) {
+      return { waveform: generatePseudoWaveform(videoId, numBars), isReal: false }
+    }
+
+    const chunks: Uint8Array[] = []
+    let loaded = 0
+
+    while (loaded < MAX_BYTES) {
+      const { done, value } = await reader.read()
+      if (done) break
+
+      chunks.push(value)
+      loaded += value.length
+    }
+
+    // Cancel remaining download
+    reader.cancel()
+
+    // Combine chunks
+    const audioData = new Uint8Array(loaded)
+    let offset = 0
+    for (const chunk of chunks) {
+      audioData.set(chunk, offset)
+      offset += chunk.length
+    }
+
+    // Decode and analyze audio
+    const audioContext = new AudioContext()
+    try {
+      const audioBuffer = await audioContext.decodeAudioData(audioData.buffer)
+      const waveform = analyzeAudioBuffer(audioBuffer, numBars)
+
+      // Cache for future use
+      cacheWaveform(videoId, waveform)
+
+      return { waveform, isReal: true }
+    } finally {
+      audioContext.close()
+    }
+  } catch (e) {
+    console.warn('Audio analysis failed:', e)
+    return { waveform: generatePseudoWaveform(videoId, numBars), isReal: false }
+  }
+}
+
+// Generate a deterministic waveform based on video ID (fallback)
+// Creates a unique, consistent pattern for each video
+const generatePseudoWaveform = (videoId: string, numBars: number = 150): number[] => {
+  // Seeded random based on video ID
+  const seed = videoId.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0)
+  const seededRandom = (n: number) => {
+    const x = Math.sin(seed + n) * 10000
+    return x - Math.floor(x)
+  }
+
+  const waveform: number[] = []
+  for (let i = 0; i < numBars; i++) {
+    // Create realistic-looking pattern with multiple frequencies
+    const base = 0.35 + seededRandom(i * 3) * 0.15
+    const low = Math.sin(i * 0.08 + seed) * 0.12
+    const mid = Math.sin(i * 0.25 + seed * 1.5) * 0.18
+    const high = seededRandom(i * 2) * 0.2
+    const spike = seededRandom(i * 7) > 0.88 ? seededRandom(i * 11) * 0.25 : 0
+
+    const value = Math.max(0.12, Math.min(1, base + low + mid + high + spike))
+    waveform.push(value)
+  }
+  return waveform
+}
+
 const Songs = () => {
   const { t } = useTranslation()
 
@@ -118,6 +324,11 @@ const Songs = () => {
   const [markerA, setMarkerA] = useState<number | null>(null)
   const [markerB, setMarkerB] = useState<number | null>(null)
   const [isABLooping, setIsABLooping] = useState(false)
+
+  // Waveform state
+  const [waveformData, setWaveformData] = useState<number[]>([])
+  const [waveformLoading, setWaveformLoading] = useState(false)
+  const [isRealWaveform, setIsRealWaveform] = useState(false)
 
   // Refs
   const playerRef = useRef<YTPlayer | null>(null)
@@ -374,6 +585,27 @@ const Songs = () => {
     setMarkerB(null)
     setIsABLooping(false)
 
+    // Reset waveform state and start loading
+    setWaveformLoading(true)
+    setIsRealWaveform(false)
+
+    // Show pseudo waveform immediately while real one loads
+    setWaveformData(generatePseudoWaveform(currentVideo.videoId, 150))
+
+    // Fetch and analyze audio in background (instant analysis at "10000x speed")
+    fetchAndAnalyzeAudio(currentVideo.videoId, 150)
+      .then(({ waveform, isReal }) => {
+        setWaveformData(waveform)
+        setIsRealWaveform(isReal)
+      })
+      .catch(() => {
+        // Keep pseudo waveform on error
+        setIsRealWaveform(false)
+      })
+      .finally(() => {
+        setWaveformLoading(false)
+      })
+
     // Create player container div
     const containerId = 'yt-player-' + Date.now()
     const playerDiv = document.createElement('div')
@@ -572,6 +804,10 @@ const Songs = () => {
     setMarkerA(null)
     setMarkerB(null)
     setIsABLooping(false)
+    // Reset waveform state
+    setWaveformData([])
+    setWaveformLoading(false)
+    setIsRealWaveform(false)
   }, [stopTimeUpdate])
 
   // Remove from recent
@@ -780,7 +1016,27 @@ const Songs = () => {
 
           {/* Timeline with A-B markers */}
           <div className={styles.timelineSection}>
+            {/* Live waveform badge - only shown when using real analyzed waveform */}
+            {isRealWaveform && !waveformLoading && (
+              <div className={styles.liveWaveformBadge}>Live waveform</div>
+            )}
             <div className={styles.timelineWrapper}>
+              {/* Waveform visualization */}
+              <div className={`${styles.waveformContainer} ${waveformLoading ? styles.waveformLoading : ''}`}>
+                {waveformData.map((height, i) => {
+                  const barProgress = (i + 1) / waveformData.length
+                  const currentProgress = duration > 0 ? currentTime / duration : 0
+                  const isPassed = barProgress <= currentProgress
+
+                  return (
+                    <div
+                      key={i}
+                      className={`${styles.waveformBar} ${isPassed ? styles.waveformBarPassed : ''}`}
+                      style={{ height: `${height * 100}%` }}
+                    />
+                  )
+                })}
+              </div>
               {/* A-B marker visualization */}
               {markerA !== null && duration > 0 && (
                 <div

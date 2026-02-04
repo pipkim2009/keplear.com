@@ -71,31 +71,43 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false // Disable HMR overlay for better development experience
     },
-    // Proxy for Piped API (YouTube search) - verified working instances with fallback
+    // Proxy for Piped API (YouTube search) - search works, streams are broken upstream
     proxy: {
       '/api/piped1': {
-        target: 'https://api.piped.private.coffee', // MOST RELIABLE - 99.89% uptime
+        target: 'https://api.piped.private.coffee', // Most reliable for search
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/piped1/, ''),
-        timeout: 15000
+        timeout: 15000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
       },
       '/api/piped2': {
         target: 'https://pipedapi.kavin.rocks', // Official instance
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/piped2/, ''),
-        timeout: 15000
+        timeout: 15000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
       },
       '/api/piped3': {
         target: 'https://pipedapi.adminforge.de', // Germany
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/piped3/, ''),
-        timeout: 15000
+        timeout: 15000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
       },
       '/api/piped4': {
-        target: 'https://watchapi.whatever.social', // Community
+        target: 'https://api.piped.private.coffee', // Fallback to most reliable
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/piped4/, ''),
-        timeout: 15000
+        timeout: 15000,
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        }
       }
     },
     // Security headers for development server
@@ -104,7 +116,7 @@ export default defineConfig(({ mode }) => ({
       'X-Frame-Options': 'SAMEORIGIN',
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'Permissions-Policy': 'microphone=(self), camera=()',
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://*.youtube.com https://www.google.com https://*.google.com https://w.soundcloud.com https://connect.soundcloud.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://nbrosowsky.github.io https://*.soundcloud.com https://*.sndcdn.com https://*.dzcdn.net https://*.googlevideo.com https://*.youtube.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io https://api-v2.soundcloud.com https://*.soundcloud.com https://www.youtube.com https://*.youtube.com https://*.google.com; frame-src 'self' https://www.youtube.com https://*.youtube.com https://w.soundcloud.com; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://*.youtube.com https://www.google.com https://*.google.com https://w.soundcloud.com https://connect.soundcloud.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://nbrosowsky.github.io https://*.soundcloud.com https://*.sndcdn.com https://*.dzcdn.net https://*.googlevideo.com https://*.youtube.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io https://api-v2.soundcloud.com https://*.soundcloud.com https://www.youtube.com https://*.youtube.com https://*.google.com https://*.googlevideo.com https://api.piped.private.coffee https://pipedapi.kavin.rocks https://pipedapi.adminforge.de https://piped-api.garudalinux.org https://pipedapi.r4fo.com https://pipedapi.darkness.services https://pipedapi.simpleprivacy.fr; frame-src 'self' https://www.youtube.com https://*.youtube.com https://w.soundcloud.com; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
     }
   },
   // Preview server (production build preview)
@@ -115,7 +127,7 @@ export default defineConfig(({ mode }) => ({
       'Referrer-Policy': 'strict-origin-when-cross-origin',
       'Permissions-Policy': 'microphone=(self), camera=()',
       'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://*.youtube.com https://www.google.com https://*.google.com https://w.soundcloud.com https://connect.soundcloud.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://nbrosowsky.github.io https://*.soundcloud.com https://*.sndcdn.com https://*.dzcdn.net https://*.googlevideo.com https://*.youtube.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io https://api-v2.soundcloud.com https://*.soundcloud.com https://www.youtube.com https://*.youtube.com https://*.google.com; frame-src 'self' https://www.youtube.com https://*.youtube.com https://w.soundcloud.com; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
+      'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://*.youtube.com https://www.google.com https://*.google.com https://w.soundcloud.com https://connect.soundcloud.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' blob: https://nbrosowsky.github.io https://*.soundcloud.com https://*.sndcdn.com https://*.dzcdn.net https://*.googlevideo.com https://*.youtube.com; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io https://api-v2.soundcloud.com https://*.soundcloud.com https://www.youtube.com https://*.youtube.com https://*.google.com https://*.googlevideo.com https://api.piped.private.coffee https://pipedapi.kavin.rocks https://pipedapi.adminforge.de https://piped-api.garudalinux.org https://pipedapi.r4fo.com https://pipedapi.darkness.services https://pipedapi.simpleprivacy.fr; frame-src 'self' https://www.youtube.com https://*.youtube.com https://w.soundcloud.com; worker-src 'self' blob:; frame-ancestors 'self'; base-uri 'self'; form-action 'self';"
     }
   }
 }))

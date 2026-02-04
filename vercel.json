@@ -7,6 +7,10 @@
       "destination": "/api/piped"
     },
     {
+      "source": "/api/piped-streams",
+      "destination": "/api/piped-streams"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
