@@ -147,25 +147,35 @@ const analyzeAudioBuffer = (audioBuffer: AudioBuffer, numBars: number = 150): nu
   return waveform
 }
 
-// Fetch and analyze audio to generate real waveform data
-const fetchAndAnalyzeAudio = async (
-  videoId: string,
-  numBars: number = 150
-): Promise<{ waveform: number[]; isReal: boolean }> => {
-  // Check cache first
-  const cached = getCachedWaveform(videoId)
-  if (cached) {
-    return { waveform: cached, isReal: true }
-  }
+// Try to get audio URL from Cobalt API (via serverless proxy)
+const fetchAudioUrlFromCobalt = async (videoId: string): Promise<string | null> => {
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 15000)
 
-  // Use proxy endpoints to avoid CORS
+    const response = await fetch(`/api/cobalt?videoId=${videoId}`, {
+      signal: controller.signal,
+      headers: { 'Accept': 'application/json' }
+    })
+
+    clearTimeout(timeoutId)
+
+    if (!response.ok) return null
+
+    const data = await response.json()
+    return data.url || null
+  } catch (e) {
+    console.warn('Cobalt API failed:', e)
+    return null
+  }
+}
+
+// Try to get audio URL from Piped API (fallback)
+const fetchAudioUrlFromPiped = async (videoId: string): Promise<string | null> => {
   const pipedProxies = IS_PRODUCTION
     ? ['/api/piped-streams']
     : ['/api/piped1', '/api/piped2', '/api/piped3', '/api/piped4']
 
-  let audioUrl: string | null = null
-
-  // Get audio stream URL from Piped
   for (const proxy of pipedProxies) {
     try {
       const url = IS_PRODUCTION
@@ -173,7 +183,7 @@ const fetchAndAnalyzeAudio = async (
         : `${proxy}/streams/${videoId}`
 
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 15000)
+      const timeoutId = setTimeout(() => controller.abort(), 10000)
 
       const response = await fetch(url, {
         signal: controller.signal,
@@ -186,34 +196,47 @@ const fetchAndAnalyzeAudio = async (
 
       const data = await response.json()
 
-      // Find the lowest bitrate audio stream (smaller = faster download)
+      // Find the lowest bitrate audio stream
       const audioStreams = data.audioStreams || []
       const sortedStreams = audioStreams
         .filter((s: { mimeType?: string; url?: string }) => s.mimeType?.includes('audio') && s.url)
-        .sort((a: { bitrate?: number; mimeType?: string }, b: { bitrate?: number; mimeType?: string }) => {
-          // Prefer opus (usually smaller)
-          const aIsOpus = a.mimeType?.includes('opus') ? 0 : 1
-          const bIsOpus = b.mimeType?.includes('opus') ? 0 : 1
-          if (aIsOpus !== bIsOpus) return aIsOpus - bIsOpus
-          return (a.bitrate || 0) - (b.bitrate || 0)
-        })
+        .sort((a: { bitrate?: number }, b: { bitrate?: number }) => (a.bitrate || 0) - (b.bitrate || 0))
 
       if (sortedStreams[0]?.url) {
-        audioUrl = sortedStreams[0].url
-        break
+        return sortedStreams[0].url
       }
     } catch (e) {
       console.warn(`Piped proxy ${proxy} failed:`, e)
     }
   }
 
+  return null
+}
+
+// Fetch and analyze audio to generate real waveform data
+const fetchAndAnalyzeAudio = async (
+  videoId: string,
+  numBars: number = 150
+): Promise<{ waveform: number[]; isReal: boolean }> => {
+  // Check cache first
+  const cached = getCachedWaveform(videoId)
+  if (cached) {
+    return { waveform: cached, isReal: true }
+  }
+
+  // Try Cobalt first (more reliable via serverless), then Piped as fallback
+  let audioUrl = await fetchAudioUrlFromCobalt(videoId)
+
   if (!audioUrl) {
-    // Return pseudo waveform as fallback
+    audioUrl = await fetchAudioUrlFromPiped(videoId)
+  }
+
+  if (!audioUrl) {
     return { waveform: generatePseudoWaveform(videoId, numBars), isReal: false }
   }
 
-  // Fetch audio with size limit (max 2MB - enough for waveform analysis)
-  const MAX_BYTES = 2 * 1024 * 1024
+  // Fetch audio with size limit (500KB = fast download, enough for waveform)
+  const MAX_BYTES = 512 * 1024
 
   try {
     const audioResponse = await fetch(audioUrl)
