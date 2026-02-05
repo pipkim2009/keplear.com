@@ -2006,21 +2006,8 @@ function Classroom() {
   const handleRemoveExercise = useCallback((indexToRemove: number) => {
     if (exercises.length <= 1) return // Keep at least one exercise
 
-    // First, save the current exercise state before removing
-    const currentData = saveCurrentToExercise()
-
-    // Build the updated exercises array synchronously so we can access the new current exercise
-    const withCurrentSaved = [...exercises]
-    if (withCurrentSaved[currentExerciseIndex]) {
-      withCurrentSaved[currentExerciseIndex] = {
-        ...withCurrentSaved[currentExerciseIndex],
-        ...currentData,
-        transcript: currentExerciseTranscript
-      }
-    }
-
     // Filter out the exercise to remove and rename
-    const updatedExercises = withCurrentSaved
+    const updatedExercises = exercises
       .filter((_, i) => i !== indexToRemove)
       .map((exercise, i) => ({
         ...exercise,
@@ -2029,28 +2016,50 @@ function Classroom() {
 
     setExercises(updatedExercises)
 
-    // Calculate new current index
-    const newLength = exercises.length - 1
-    let newCurrentIndex = currentExerciseIndex
-    if (indexToRemove <= currentExerciseIndex && currentExerciseIndex > 0) {
-      newCurrentIndex = currentExerciseIndex - 1
-    } else if (currentExerciseIndex >= newLength) {
-      newCurrentIndex = Math.max(0, newLength - 1)
-    }
+    // Calculate new current index - stay at same position or go to previous if at end
+    const newLength = updatedExercises.length
+    const newCurrentIndex = indexToRemove >= newLength ? Math.max(0, newLength - 1) : indexToRemove
     setCurrentExerciseIndex(newCurrentIndex)
 
     // Get the exercise we're switching to
     const targetExercise = updatedExercises[newCurrentIndex]
     const targetInstrument = instrument
 
-    // Clear current state and load the new current exercise's data
+    // Clear current state
     clearSelection()
     scaleChordManagement.setAppliedScalesDirectly([])
     scaleChordManagement.setAppliedChordsDirectly([])
     setExternalSelectedNoteIds([])
 
     if (targetExercise) {
-      // Apply exercise settings
+      // Handle song vs sandbox exercise
+      if (targetExercise.type === 'song' && targetExercise.songData) {
+        // Switching TO a song exercise - load song data
+        setAssignmentType('songs')
+        setSongVideoId(targetExercise.songData.videoId)
+        setSongVideoTitle(targetExercise.songData.videoTitle)
+        setSongMarkerA(targetExercise.songData.markerA ?? null)
+        setSongMarkerB(targetExercise.songData.markerB ?? null)
+        setSongPlaybackRate(targetExercise.songData.playbackRate || 1)
+        setSongWaveformData(generateWaveform(targetExercise.songData.videoId, 150))
+        setSongIsPlayerReady(false)
+        setIsSongPlaying(false)
+        setCurrentExerciseTranscript(targetExercise.transcript || '')
+        return // Exit early - song exercises don't need scale/chord/note loading
+      } else {
+        // Switching TO a sandbox exercise - clear song state
+        setSongVideoId(null)
+        setSongVideoTitle('')
+        setSongMarkerA(null)
+        setSongMarkerB(null)
+        setSongPlaybackRate(1)
+        setSongWaveformData([])
+        setSongIsPlayerReady(false)
+        setIsSongPlaying(false)
+        setAssignmentType('practice')
+      }
+
+      // Apply sandbox exercise settings
       setCurrentExerciseTranscript(targetExercise.transcript || '')
       if (targetExercise.bpm) setBpm(targetExercise.bpm)
       if (targetExercise.beats) setNumberOfBeats(targetExercise.beats)
@@ -2241,7 +2250,7 @@ function Classroom() {
         }
       }, 50)
     }
-  }, [exercises, currentExerciseIndex, saveCurrentToExercise, currentExerciseTranscript, clearSelection, scaleChordManagement, instrument, setChordMode, selectNote, handleOctaveRangeChange])
+  }, [exercises, clearSelection, scaleChordManagement, instrument, setChordMode, selectNote, handleOctaveRangeChange])
 
   // Open assignment title modal
   const handleOpenAssignModal = () => {
