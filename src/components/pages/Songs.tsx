@@ -573,11 +573,13 @@ const Songs = () => {
     }
   }, [markerA, markerB, isABLooping])
 
-  // Format time display
+  // Format time display (0.1 second precision)
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs.toString().padStart(2, '0')}`
+    const secs = seconds % 60
+    const secsWhole = Math.floor(secs)
+    const secsTenth = Math.floor((secs - secsWhole) * 10)
+    return `${mins}:${secsWhole.toString().padStart(2, '0')}.${secsTenth}`
   }
 
   // Get volume icon
@@ -810,21 +812,38 @@ const Songs = () => {
           {/* Timeline with A-B markers */}
           <div className={styles.timelineSection}>
             <div className={styles.timelineWrapper}>
-              {/* Waveform visualization */}
+              {/* Waveform visualization - 1 bar per 0.1 seconds */}
               <div className={styles.waveformContainer}>
-                {waveformData.map((height, i) => {
-                  const barProgress = (i + 1) / waveformData.length
-                  const currentProgress = duration > 0 ? currentTime / duration : 0
-                  const isPassed = barProgress <= currentProgress
+                {(() => {
+                  // Generate bars: 1 bar per 0.1 seconds, max 300 bars
+                  const numBars = Math.min(300, Math.max(1, Math.ceil(duration * 10)))
+                  const seed = currentVideo!.videoId.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0)
+                  const seededRandom = (n: number) => {
+                    const x = Math.sin(seed + n) * 10000
+                    return x - Math.floor(x)
+                  }
 
-                  return (
-                    <div
-                      key={i}
-                      className={`${styles.waveformBar} ${isPassed ? styles.waveformBarPassed : ''}`}
-                      style={{ height: `${height * 100}%` }}
-                    />
-                  )
-                })}
+                  return Array.from({ length: numBars }, (_, i) => {
+                    const base = 0.35 + seededRandom(i * 3) * 0.15
+                    const low = Math.sin(i * 0.08 + seed) * 0.12
+                    const mid = Math.sin(i * 0.25 + seed * 1.5) * 0.18
+                    const high = seededRandom(i * 2) * 0.2
+                    const spike = seededRandom(i * 7) > 0.88 ? seededRandom(i * 11) * 0.25 : 0
+                    const height = Math.max(0.12, Math.min(1, base + low + mid + high + spike))
+
+                    const barProgress = (i + 1) / numBars
+                    const currentProgress = duration > 0 ? currentTime / duration : 0
+                    const isPassed = barProgress <= currentProgress
+
+                    return (
+                      <div
+                        key={i}
+                        className={`${styles.waveformBar} ${isPassed ? styles.waveformBarPassed : ''}`}
+                        style={{ height: `${height * 100}%` }}
+                      />
+                    )
+                  })
+                })()}
               </div>
               {/* A-B marker visualization */}
               {markerA !== null && duration > 0 && (

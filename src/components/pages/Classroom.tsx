@@ -27,7 +27,7 @@ import {
   getKeyboardNoteById
 } from '../../utils/practice/practiceNotes'
 import { useRecordPracticeSession } from '../../hooks/usePracticeSessions'
-import { PiTrashFill, PiChatCircleFill, PiPencilSimpleFill, PiEyeFill, PiCheckCircleFill, PiXCircleFill, PiMusicNotesFill, PiGuitarFill, PiMagnifyingGlass, PiPlay, PiPause, PiRepeat, PiX, PiArrowCounterClockwise, PiLink, PiSpeakerHigh, PiSpeakerLow, PiSpeakerNone, PiPianoKeysFill } from 'react-icons/pi'
+import { PiTrashFill, PiChatCircleFill, PiPencilSimpleFill, PiEyeFill, PiCheckCircleFill, PiXCircleFill, PiMusicNotesFill, PiGuitarFill, PiMagnifyingGlass, PiPlay, PiPause, PiRepeat, PiX, PiArrowCounterClockwise, PiLink, PiSpeakerHigh, PiSpeakerLow, PiSpeakerNone, PiPianoKeysFill, PiCaretRight } from 'react-icons/pi'
 import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
 import { useRecordCompletion, useUserCompletions, useAssignmentCompletions } from '../../hooks/useClassrooms'
 import styles from '../../styles/Classroom.module.css'
@@ -389,6 +389,7 @@ function Classroom() {
   const [songIsABLooping, setSongIsABLooping] = useState(false)
   const [songWaveformData, setSongWaveformData] = useState<number[]>([])
   const [songIsPlayerReady, setSongIsPlayerReady] = useState(false)
+  const [ytApiLoaded, setYtApiLoaded] = useState(false)
   const songPlayerRef = useRef<any>(null)
   const songTimeUpdateRef = useRef<number | null>(null)
 
@@ -412,6 +413,7 @@ function Classroom() {
   const [showAssignmentComplete, setShowAssignmentComplete] = useState(false)
   const hasInitializedNotes = useRef(false)
   const hasAnnouncedMelody = useRef(false)
+  const hasAutoPlayedSong = useRef(false)
 
   // Assignment completion tracking
   const recordCompletion = useRecordCompletion()
@@ -1079,8 +1081,9 @@ function Classroom() {
       if (songData) {
         setSongVideoId(songData.videoId)
         setSongVideoTitle(songData.videoTitle)
-        setSongMarkerA(songData.markerA)
-        setSongMarkerB(songData.markerB)
+        // Ensure null instead of undefined for markers
+        setSongMarkerA(songData.markerA ?? null)
+        setSongMarkerB(songData.markerB ?? null)
         setSongPlaybackRate(songData.playbackRate || 1)
       }
       setViewMode('creating-assignment')
@@ -1120,7 +1123,15 @@ function Classroom() {
         higherOctaves: ex.higherOctaves ?? (octaveHigh - 5),
         selectedNoteIds: ex.selectedNoteIds || [],
         appliedScales: ex.appliedScales || [],
-        appliedChords: ex.appliedChords || []
+        appliedChords: ex.appliedChords || [],
+        // Song exercise fields - ensure markers are properly null if undefined
+        type: ex.type,
+        songData: ex.songData ? {
+          ...ex.songData,
+          markerA: ex.songData.markerA ?? null,
+          markerB: ex.songData.markerB ?? null,
+          playbackRate: ex.songData.playbackRate || 1
+        } : undefined
       }))
       setExercises(loadedExercises)
       setCurrentExerciseIndex(0)
@@ -1129,8 +1140,21 @@ function Classroom() {
         setCurrentExerciseTranscript(selectionData.exercises[0].transcript)
       }
 
-      // Apply first exercise's scales and chords after state settles
+      // Check if first exercise is a song exercise
       const firstExercise = loadedExercises[0]
+      if (firstExercise?.type === 'song' && firstExercise?.songData) {
+        setAssignmentType('songs')
+        setSongVideoId(firstExercise.songData.videoId)
+        setSongVideoTitle(firstExercise.songData.videoTitle)
+        setSongMarkerA(firstExercise.songData.markerA ?? null)
+        setSongMarkerB(firstExercise.songData.markerB ?? null)
+        setSongPlaybackRate(firstExercise.songData.playbackRate || 1)
+        setSongWaveformData(generateWaveform(firstExercise.songData.videoId, 150))
+        setViewMode('creating-assignment')
+        return
+      }
+
+      // Apply first exercise's scales and chords after state settles
       const targetInstrument = assignment.instrument as 'keyboard' | 'guitar' | 'bass'
 
       setTimeout(() => {
@@ -1581,27 +1605,56 @@ function Classroom() {
       const updated = [...prev]
       if (updated.length > 0) {
         const existingExercise = updated[currentExerciseIndex]
-        updated[currentExerciseIndex] = {
-          ...existingExercise,
-          transcript: currentExerciseTranscript,
-          bpm: currentData.bpm,
-          beats: currentData.beats,
-          chordMode: currentData.chordMode,
-          lowerOctaves: currentData.lowerOctaves,
-          higherOctaves: currentData.higherOctaves,
-          selectedNoteIds: currentData.selectedNoteIds.length > 0
-            ? currentData.selectedNoteIds
-            : existingExercise.selectedNoteIds,
-          appliedScales: currentData.appliedScales.length > 0
-            ? currentData.appliedScales
-            : existingExercise.appliedScales,
-          appliedChords: currentData.appliedChords.length > 0
-            ? currentData.appliedChords
-            : existingExercise.appliedChords
+
+        // Check if current exercise is in song mode with a video selected
+        if (assignmentType === 'songs' && songVideoId) {
+          // Save as song exercise
+          updated[currentExerciseIndex] = {
+            ...existingExercise,
+            transcript: currentExerciseTranscript,
+            bpm: currentData.bpm,
+            beats: currentData.beats,
+            chordMode: currentData.chordMode,
+            lowerOctaves: currentData.lowerOctaves,
+            higherOctaves: currentData.higherOctaves,
+            selectedNoteIds: [],
+            appliedScales: [],
+            appliedChords: [],
+            type: 'song',
+            songData: {
+              videoId: songVideoId,
+              videoTitle: songVideoTitle,
+              markerA: songMarkerA,
+              markerB: songMarkerB,
+              playbackRate: songPlaybackRate
+            }
+          }
+        } else {
+          // Save as sandbox exercise
+          updated[currentExerciseIndex] = {
+            ...existingExercise,
+            transcript: currentExerciseTranscript,
+            bpm: currentData.bpm,
+            beats: currentData.beats,
+            chordMode: currentData.chordMode,
+            lowerOctaves: currentData.lowerOctaves,
+            higherOctaves: currentData.higherOctaves,
+            selectedNoteIds: currentData.selectedNoteIds.length > 0
+              ? currentData.selectedNoteIds
+              : existingExercise.selectedNoteIds,
+            appliedScales: currentData.appliedScales.length > 0
+              ? currentData.appliedScales
+              : existingExercise.appliedScales,
+            appliedChords: currentData.appliedChords.length > 0
+              ? currentData.appliedChords
+              : existingExercise.appliedChords,
+            type: undefined,
+            songData: undefined
+          }
         }
       }
 
-      // Add new exercise
+      // Add new exercise (always starts as sandbox)
       const newExercise: ExerciseData = {
         id: `exercise-${Date.now()}`,
         name: `Exercise ${updated.length + 1}`,
@@ -1623,51 +1676,79 @@ function Classroom() {
     triggerClearChordsAndScales()
     setCurrentExerciseTranscript('')
 
-    // Clear song state if in song mode (return to base song search)
-    if (assignmentType === 'songs') {
-      setSongVideoId(null)
-      setSongVideoTitle('')
-      setSongMarkerA(null)
-      setSongMarkerB(null)
-      setSongPlaybackRate(1)
-      setSongWaveformData([])
-      setSongIsPlayerReady(false)
-      setIsSongPlaying(false)
-      setSongSearchQuery('')
-      setSongSearchResults([])
-    }
+    // Reset to sandbox mode and clear song state for new exercise
+    setAssignmentType('practice')
+    setSongVideoId(null)
+    setSongVideoTitle('')
+    setSongMarkerA(null)
+    setSongMarkerB(null)
+    setSongPlaybackRate(1)
+    setSongWaveformData([])
+    setSongIsPlayerReady(false)
+    setIsSongPlaying(false)
+    setSongSearchQuery('')
+    setSongSearchResults([])
 
     // Switch to new exercise
     setCurrentExerciseIndex(prev => exercises.length > 0 ? exercises.length : 0)
-  }, [saveCurrentToExercise, currentExerciseIndex, exercises.length, clearSelection, triggerClearChordsAndScales, bpm, numberOfBeats, chordMode, lowerOctaves, higherOctaves, currentExerciseTranscript, assignmentType])
+  }, [saveCurrentToExercise, currentExerciseIndex, exercises.length, clearSelection, triggerClearChordsAndScales, bpm, numberOfBeats, chordMode, lowerOctaves, higherOctaves, currentExerciseTranscript, assignmentType, songVideoId, songVideoTitle, songMarkerA, songMarkerB, songPlaybackRate])
 
   // Switch to a different exercise
   const handleSwitchExercise = useCallback((index: number) => {
     if (index === currentExerciseIndex || index < 0 || index >= exercises.length) return
 
-    // Save current state before switching - merge intelligently
+    // Save current state before switching - handle song vs sandbox exercises
     const currentData = saveCurrentToExercise()
 
     // Build updated exercises array synchronously so we can read target exercise from it
     const updatedExercises = [...exercises]
     const existingExercise = updatedExercises[currentExerciseIndex]
-    updatedExercises[currentExerciseIndex] = {
-      ...existingExercise,
-      transcript: currentExerciseTranscript,
-      bpm: currentData.bpm,
-      beats: currentData.beats,
-      chordMode: currentData.chordMode,
-      lowerOctaves: currentData.lowerOctaves,
-      higherOctaves: currentData.higherOctaves,
-      selectedNoteIds: currentData.selectedNoteIds.length > 0
-        ? currentData.selectedNoteIds
-        : existingExercise.selectedNoteIds,
-      appliedScales: currentData.appliedScales.length > 0
-        ? currentData.appliedScales
-        : existingExercise.appliedScales,
-      appliedChords: currentData.appliedChords.length > 0
-        ? currentData.appliedChords
-        : existingExercise.appliedChords
+
+    // Check if current exercise is in song mode with a video selected
+    if (assignmentType === 'songs' && songVideoId) {
+      // Save as song exercise
+      updatedExercises[currentExerciseIndex] = {
+        ...existingExercise,
+        transcript: currentExerciseTranscript,
+        bpm: currentData.bpm,
+        beats: currentData.beats,
+        chordMode: currentData.chordMode,
+        lowerOctaves: currentData.lowerOctaves,
+        higherOctaves: currentData.higherOctaves,
+        selectedNoteIds: [],
+        appliedScales: [],
+        appliedChords: [],
+        type: 'song',
+        songData: {
+          videoId: songVideoId,
+          videoTitle: songVideoTitle,
+          markerA: songMarkerA,
+          markerB: songMarkerB,
+          playbackRate: songPlaybackRate
+        }
+      }
+    } else {
+      // Save as sandbox exercise
+      updatedExercises[currentExerciseIndex] = {
+        ...existingExercise,
+        transcript: currentExerciseTranscript,
+        bpm: currentData.bpm,
+        beats: currentData.beats,
+        chordMode: currentData.chordMode,
+        lowerOctaves: currentData.lowerOctaves,
+        higherOctaves: currentData.higherOctaves,
+        selectedNoteIds: currentData.selectedNoteIds.length > 0
+          ? currentData.selectedNoteIds
+          : existingExercise.selectedNoteIds,
+        appliedScales: currentData.appliedScales.length > 0
+          ? currentData.appliedScales
+          : existingExercise.appliedScales,
+        appliedChords: currentData.appliedChords.length > 0
+          ? currentData.appliedChords
+          : existingExercise.appliedChords,
+        type: undefined,
+        songData: undefined
+      }
     }
 
     // Update state with the new exercises array
@@ -1688,9 +1769,10 @@ function Classroom() {
         setAssignmentType('songs')
         setSongVideoId(targetExercise.songData.videoId)
         setSongVideoTitle(targetExercise.songData.videoTitle)
-        setSongMarkerA(targetExercise.songData.markerA)
-        setSongMarkerB(targetExercise.songData.markerB)
-        setSongPlaybackRate(targetExercise.songData.playbackRate)
+        // Ensure null instead of undefined for markers
+        setSongMarkerA(targetExercise.songData.markerA ?? null)
+        setSongMarkerB(targetExercise.songData.markerB ?? null)
+        setSongPlaybackRate(targetExercise.songData.playbackRate || 1)
         setSongWaveformData(generateWaveform(targetExercise.songData.videoId))
         setSongIsPlayerReady(false)
         setIsSongPlaying(false)
@@ -1918,7 +2000,7 @@ function Classroom() {
     }
 
     setCurrentExerciseIndex(index)
-  }, [currentExerciseIndex, exercises, saveCurrentToExercise, clearSelection, scaleChordManagement, instrument, setChordMode, selectNote, handleOctaveRangeChange, currentExerciseTranscript])
+  }, [currentExerciseIndex, exercises, saveCurrentToExercise, clearSelection, scaleChordManagement, instrument, setChordMode, selectNote, handleOctaveRangeChange, currentExerciseTranscript, assignmentType, songVideoId, songVideoTitle, songMarkerA, songMarkerB, songPlaybackRate])
 
   // Remove an exercise
   const handleRemoveExercise = useCallback((indexToRemove: number) => {
@@ -2284,9 +2366,16 @@ function Classroom() {
     if (isSongPlaying) {
       songPlayerRef.current.pauseVideo()
     } else {
+      // If A-B looping is enabled and we're before marker A, seek to A first
+      if (songIsABLooping && songMarkerA !== null) {
+        const currentTime = songPlayerRef.current.getCurrentTime()
+        if (currentTime < songMarkerA) {
+          songPlayerRef.current.seekTo(songMarkerA, true)
+        }
+      }
       songPlayerRef.current.playVideo()
     }
-  }, [isSongPlaying, songIsPlayerReady])
+  }, [isSongPlaying, songIsPlayerReady, songIsABLooping, songMarkerA])
 
   const handleSongSeek = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const time = parseFloat(e.target.value)
@@ -2374,18 +2463,38 @@ function Classroom() {
   // Song player container ref
   const songPlayerContainerRef = useRef<HTMLDivElement>(null)
 
-  // Initialize YouTube player when song is selected (assignment creator)
+  // Load YouTube IFrame API
   useEffect(() => {
-    if (!songVideoId || !songPlayerContainerRef.current) return
-    // Only initialize if YouTube API is available
-    if (!window.YT) {
-      // Load YouTube API
+    if (window.YT && window.YT.Player) {
+      setYtApiLoaded(true)
+      return
+    }
+
+    // Check if script is already being loaded
+    const existingScript = document.querySelector('script[src*="youtube.com/iframe_api"]')
+    if (!existingScript) {
       const tag = document.createElement('script')
       tag.src = 'https://www.youtube.com/iframe_api'
       const firstScriptTag = document.getElementsByTagName('script')[0]
       firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag)
-      return
     }
+
+    // Set up callback for when API is ready
+    const existingCallback = window.onYouTubeIframeAPIReady
+    window.onYouTubeIframeAPIReady = () => {
+      if (existingCallback) existingCallback()
+      setYtApiLoaded(true)
+    }
+
+    return () => {
+      // Don't clear the callback as other components might need it
+    }
+  }, [])
+
+  // Initialize YouTube player when song is selected and API is loaded
+  useEffect(() => {
+    if (!songVideoId || !songPlayerContainerRef.current || !ytApiLoaded) return
+    if (!window.YT || !window.YT.Player) return
 
     // Destroy existing player
     if (songPlayerRef.current) {
@@ -2450,7 +2559,7 @@ function Classroom() {
         songTimeUpdateRef.current = null
       }
     }
-  }, [songVideoId])
+  }, [songVideoId, ytApiLoaded])
 
   // Update playback rate when changed
   useEffect(() => {
@@ -2469,11 +2578,41 @@ function Classroom() {
     }
   }, [songCurrentTime, songIsABLooping, songMarkerA, songMarkerB, songIsPlayerReady])
 
-  // Format time for display
+  // Load song data when switching to a song exercise in lesson mode
+  useEffect(() => {
+    if (viewMode !== 'taking-lesson' || !currentAssignment) return
+    if (currentAssignment.lesson_type === 'songs') return // Handled separately
+
+    const currentExercise = lessonExercises[lessonExerciseIndex]
+    if (!currentExercise) return
+
+    // Check if current exercise is a song exercise
+    if (currentExercise.type === 'song' && currentExercise.songData?.videoId) {
+      const exerciseSongData = currentExercise.songData
+      // Only update if video changed
+      if (songVideoId !== exerciseSongData.videoId) {
+        setSongVideoId(exerciseSongData.videoId)
+        setSongVideoTitle(exerciseSongData.videoTitle)
+        setSongMarkerA(exerciseSongData.markerA ?? null)
+        setSongMarkerB(exerciseSongData.markerB ?? null)
+        setSongPlaybackRate(exerciseSongData.playbackRate || 1)
+        setSongWaveformData(generateWaveform(exerciseSongData.videoId, 150))
+        setSongIsPlayerReady(false)
+        setIsSongPlaying(false)
+        const hasLoop = typeof exerciseSongData.markerA === 'number' && !isNaN(exerciseSongData.markerA) &&
+                        typeof exerciseSongData.markerB === 'number' && !isNaN(exerciseSongData.markerB)
+        setSongIsABLooping(hasLoop)
+      }
+    }
+  }, [viewMode, currentAssignment, lessonExercises, lessonExerciseIndex, songVideoId])
+
+  // Format time for display (0.1 second precision)
   const formatSongTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs.toString().padStart(2, '0')}`
+    const secs = seconds % 60
+    const secsWhole = Math.floor(secs)
+    const secsTenth = Math.floor((secs - secsWhole) * 10)
+    return `${mins}:${secsWhole.toString().padStart(2, '0')}.${secsTenth}`
   }
 
   // Save assignment
@@ -2487,126 +2626,68 @@ function Classroom() {
       return
     }
 
-    // Handle song assignment
-    if (assignmentType === 'songs') {
-      if (!songVideoId) {
-        setAssignmentError('Please select a song')
-        return
-      }
-
-      try {
-        setIsSavingAssignment(true)
-        setAssignmentError(null)
-
-        // Use override markers if provided (for "Assign Entire Track" button)
-        const finalMarkerA = overrideMarkers !== undefined ? overrideMarkers.markerA : songMarkerA
-        const finalMarkerB = overrideMarkers !== undefined ? overrideMarkers.markerB : songMarkerB
-
-        const songSelectionData: SongAssignmentData = {
-          videoId: songVideoId,
-          videoTitle: songVideoTitle,
-          markerA: finalMarkerA,
-          markerB: finalMarkerB,
-          playbackRate: songPlaybackRate
-        }
-
-        const assignmentData = {
-          classroom_id: assigningToClassroomId,
-          title: assignmentTitle.trim(),
-          lesson_type: 'songs',
-          instrument: 'keyboard', // Default, not used for songs
-          bpm: 120,
-          beats: 4,
-          chord_count: 0,
-          scales: [],
-          chords: [],
-          octave_low: 4,
-          octave_high: 5,
-          fret_low: 0,
-          fret_high: 12,
-          selection_data: songSelectionData as unknown as Record<string, unknown>
-        }
-
-        let saveError: any = null
-
-        if (editingAssignmentId) {
-          const { error } = await supabase
-            .from('assignments')
-            .update(assignmentData)
-            .eq('id', editingAssignmentId)
-          saveError = error
-        } else {
-          const { error } = await supabase
-            .from('assignments')
-            .insert({
-              ...assignmentData,
-              created_by: user.id
-            })
-          saveError = error
-        }
-
-        if (saveError) {
-          setAssignmentError(saveError.message)
-          return
-        }
-
-        // Success - go back to classroom view
-        const savedClassroomId = assigningToClassroomId
-        setAssignmentTitle('')
-        setAssigningToClassroomId(null)
-        setEditingAssignmentId(null)
-        setSongVideoId(null)
-        setSongVideoTitle('')
-        setSongMarkerA(null)
-        setSongMarkerB(null)
-        setSongPlaybackRate(1)
-        setAssignmentType('practice')
-        setViewMode('classroom')
-        await fetchClassrooms()
-        const updatedClassroom = classrooms.find(c => c.id === savedClassroomId)
-        if (updatedClassroom) {
-          setSelectedClassroom(updatedClassroom)
-        }
-      } catch (error: any) {
-        setAssignmentError(error.message || 'Failed to save assignment')
-      } finally {
-        setIsSavingAssignment(false)
-      }
-      return
-    }
-
     // Save current exercise state before saving
     // Merge intelligently - preserve original data if current state is empty
     const currentData = saveCurrentToExercise()
     const updatedExercises = [...exercises]
     if (updatedExercises.length > 0) {
       const existingExercise = updatedExercises[currentExerciseIndex]
-      updatedExercises[currentExerciseIndex] = {
-        ...existingExercise,
-        // Use current state if it has content, otherwise keep original
-        transcript: currentExerciseTranscript,
-        bpm: currentData.bpm,
-        beats: currentData.beats,
-        chordMode: currentData.chordMode,
-        lowerOctaves: currentData.lowerOctaves,
-        higherOctaves: currentData.higherOctaves,
-        selectedNoteIds: currentData.selectedNoteIds.length > 0
-          ? currentData.selectedNoteIds
-          : existingExercise.selectedNoteIds,
-        appliedScales: currentData.appliedScales.length > 0
-          ? currentData.appliedScales
-          : existingExercise.appliedScales,
-        appliedChords: currentData.appliedChords.length > 0
-          ? currentData.appliedChords
-          : existingExercise.appliedChords
+
+      // If currently in song mode with a video selected, save as song exercise
+      if (assignmentType === 'songs' && songVideoId) {
+        updatedExercises[currentExerciseIndex] = {
+          ...existingExercise,
+          transcript: currentExerciseTranscript,
+          bpm: currentData.bpm,
+          beats: currentData.beats,
+          chordMode: currentData.chordMode,
+          lowerOctaves: currentData.lowerOctaves,
+          higherOctaves: currentData.higherOctaves,
+          selectedNoteIds: [],
+          appliedScales: [],
+          appliedChords: [],
+          type: 'song',
+          songData: {
+            videoId: songVideoId,
+            videoTitle: songVideoTitle,
+            markerA: songMarkerA,
+            markerB: songMarkerB,
+            playbackRate: songPlaybackRate
+          }
+        }
+      } else {
+        // Sandbox mode - save notes/scales/chords
+        updatedExercises[currentExerciseIndex] = {
+          ...existingExercise,
+          // Use current state if it has content, otherwise keep original
+          transcript: currentExerciseTranscript,
+          bpm: currentData.bpm,
+          beats: currentData.beats,
+          chordMode: currentData.chordMode,
+          lowerOctaves: currentData.lowerOctaves,
+          higherOctaves: currentData.higherOctaves,
+          selectedNoteIds: currentData.selectedNoteIds.length > 0
+            ? currentData.selectedNoteIds
+            : existingExercise.selectedNoteIds,
+          appliedScales: currentData.appliedScales.length > 0
+            ? currentData.appliedScales
+            : existingExercise.appliedScales,
+          appliedChords: currentData.appliedChords.length > 0
+            ? currentData.appliedChords
+            : existingExercise.appliedChords,
+          // Clear song data if switching from song to sandbox
+          type: undefined,
+          songData: undefined
+        }
       }
     }
 
-    // Check if any exercise has content
+    // Check if any exercise has content (including song exercises)
     const hasAnyContent = updatedExercises.some(exercise =>
       exercise.selectedNoteIds.length > 0 ||
       exercise.appliedScales.length > 0 ||
-      exercise.appliedChords.length > 0
+      exercise.appliedChords.length > 0 ||
+      (exercise.type === 'song' && exercise.songData?.videoId)
     )
 
     const hasScales = scaleChordManagement.appliedScales.length > 0
@@ -2637,7 +2718,10 @@ function Classroom() {
         higherOctaves: exercise.higherOctaves,
         selectedNoteIds: exercise.selectedNoteIds,
         appliedScales: exercise.appliedScales,
-        appliedChords: exercise.appliedChords
+        appliedChords: exercise.appliedChords,
+        // Song exercise fields
+        type: exercise.type,
+        songData: exercise.songData
       }))
     }
 
@@ -2700,6 +2784,16 @@ function Classroom() {
       setExercises([])
       setCurrentExerciseIndex(0)
       setCurrentExerciseTranscript('')
+      // Reset song state
+      setSongVideoId(null)
+      setSongVideoTitle('')
+      setSongMarkerA(null)
+      setSongMarkerB(null)
+      setSongPlaybackRate(1)
+      setSongWaveformData([])
+      setSongSearchQuery('')
+      setSongSearchResults([])
+      setAssignmentType('practice')
 
       // Navigate to the classroom where assignment was saved
       const targetClassroom = classrooms.find(c => c.id === savedClassroomId)
@@ -2721,6 +2815,7 @@ function Classroom() {
     setCurrentAssignment(assignment)
     hasInitializedNotes.current = false
     hasAnnouncedMelody.current = false
+    hasAutoPlayedSong.current = false
     setWelcomeSpeechDone(false)
     setGenericWelcomeDone(false)
     setHasGeneratedMelody(false)
@@ -2734,8 +2829,11 @@ function Classroom() {
       if (songData) {
         setSongVideoId(songData.videoId)
         setSongVideoTitle(songData.videoTitle)
-        setSongMarkerA(songData.markerA)
-        setSongMarkerB(songData.markerB)
+        // Ensure null instead of undefined for markers (undefined !== null check would fail)
+        const markerA = songData.markerA ?? null
+        const markerB = songData.markerB ?? null
+        setSongMarkerA(markerA)
+        setSongMarkerB(markerB)
         setSongPlaybackRate(songData.playbackRate || 1)
         // Generate waveform for the player
         setSongWaveformData(generateWaveform(songData.videoId, 150))
@@ -2744,8 +2842,8 @@ function Classroom() {
         setSongCurrentTime(0)
         setSongIsPlayerReady(false)
         setIsSongPlaying(false)
-        // Enable A-B looping if teacher set markers
-        setSongIsABLooping(songData.markerA !== null && songData.markerB !== null)
+        // Enable A-B looping if teacher set markers (check both are valid numbers)
+        setSongIsABLooping(typeof markerA === 'number' && typeof markerB === 'number')
       }
       setViewMode('taking-lesson')
       return
@@ -2766,17 +2864,19 @@ function Classroom() {
     // Initialize exercises from assignment
     const selectionData = assignment.selection_data
 
+    let loadedExercises: ExerciseData[] = []
     if (selectionData?.exercises && selectionData.exercises.length > 0) {
       // Map exercises with fallback for bpm/beats, transcript
-      setLessonExercises(selectionData.exercises.map((ex: any) => ({
+      loadedExercises = selectionData.exercises.map((ex: any) => ({
         ...ex,
         transcript: ex.transcript || '',
         bpm: ex.bpm || assignment.bpm,
         beats: ex.beats || assignment.beats
-      })))
+      }))
+      setLessonExercises(loadedExercises)
     } else if (selectionData) {
       // Legacy format - single exercise from top-level fields
-      setLessonExercises([{
+      loadedExercises = [{
         id: 'legacy-exercise',
         name: 'Exercise 1',
         transcript: '',
@@ -2788,11 +2888,40 @@ function Classroom() {
         selectedNoteIds: selectionData.selectedNoteIds || [],
         appliedScales: selectionData.appliedScales || [],
         appliedChords: selectionData.appliedChords || []
-      }])
+      }]
+      setLessonExercises(loadedExercises)
     } else {
       setLessonExercises([])
     }
     setLessonExerciseIndex(0)
+
+    // If the first exercise is a song exercise, initialize song player state
+    const firstExercise = loadedExercises[0]
+    if (firstExercise?.type === 'song' && firstExercise?.songData) {
+      const songData = firstExercise.songData
+      setSongVideoId(songData.videoId)
+      setSongVideoTitle(songData.videoTitle)
+      setSongMarkerA(songData.markerA ?? null)
+      setSongMarkerB(songData.markerB ?? null)
+      setSongPlaybackRate(songData.playbackRate || 1)
+      setSongWaveformData(generateWaveform(songData.videoId, 150))
+      setSongDuration(0)
+      setSongCurrentTime(0)
+      setSongIsPlayerReady(false)
+      setIsSongPlaying(false)
+      // Enable A-B looping if markers are set
+      setSongIsABLooping(typeof songData.markerA === 'number' && typeof songData.markerB === 'number')
+    } else {
+      // Clear song state for sandbox exercises
+      setSongVideoId(null)
+      setSongVideoTitle('')
+      setSongMarkerA(null)
+      setSongMarkerB(null)
+      setSongPlaybackRate(1)
+      setSongWaveformData([])
+      setSongIsPlayerReady(false)
+      setIsSongPlaying(false)
+    }
 
     setViewMode('taking-lesson')
   }
@@ -2987,6 +3116,7 @@ function Classroom() {
     setAutoPlayAudio(false)
     setMelodySetupMessage('')
     hasAnnouncedMelody.current = false
+    hasAutoPlayedSong.current = false
 
     // Load the target exercise
     const targetExercise = lessonExercises[index]
@@ -2997,6 +3127,36 @@ function Classroom() {
     } else {
       setWelcomeSpeechDone(false)
     }
+
+    // Check if target exercise is a song exercise
+    if (targetExercise?.type === 'song' && targetExercise?.songData) {
+      // Load song data into player state
+      const songData = targetExercise.songData
+      setSongVideoId(songData.videoId)
+      setSongVideoTitle(songData.videoTitle)
+      setSongMarkerA(songData.markerA ?? null)
+      setSongMarkerB(songData.markerB ?? null)
+      setSongPlaybackRate(songData.playbackRate || 1)
+      setSongWaveformData(generateWaveform(songData.videoId, 150))
+      setSongDuration(0)
+      setSongCurrentTime(0)
+      setSongIsPlayerReady(false)
+      setIsSongPlaying(false)
+      // Enable A-B looping if markers are set
+      setSongIsABLooping(typeof songData.markerA === 'number' && typeof songData.markerB === 'number')
+      setLessonExerciseIndex(index)
+      return // Song exercises don't need scale/chord/note loading
+    }
+
+    // Clear song state when switching to sandbox exercise
+    setSongVideoId(null)
+    setSongVideoTitle('')
+    setSongMarkerA(null)
+    setSongMarkerB(null)
+    setSongPlaybackRate(1)
+    setSongWaveformData([])
+    setSongIsPlayerReady(false)
+    setIsSongPlaying(false)
 
     if (targetExercise) {
       // Apply BPM, beats, and chord mode from exercise (instrument is assignment-level)
@@ -3145,6 +3305,40 @@ function Classroom() {
       })
     }
   }, [viewMode, currentAssignment, lessonExercises, handleOctaveRangeChange, scaleChordManagement, setChordMode, selectNote])
+
+  // Auto-play song when player becomes ready and speech is done (for both legacy song assignments and song exercises)
+  // Only auto-plays once per exercise - uses ref to prevent re-triggering when user pauses
+  useEffect(() => {
+    if (viewMode !== 'taking-lesson') return
+    if (!currentAssignment) return
+    if (hasAutoPlayedSong.current) return // Already auto-played for this exercise
+
+    // Check if this is a legacy song assignment
+    const isLegacySongAssignment = currentAssignment.lesson_type === 'songs' && songVideoId
+
+    // Check if current exercise is a song exercise
+    const currentExercise = lessonExercises[lessonExerciseIndex]
+    const isSongExercise = currentExercise?.type === 'song' && currentExercise?.songData?.videoId
+
+    if (!isLegacySongAssignment && !isSongExercise) return
+
+    // Check if all speech is done
+    let speechDone = false
+    if (isLegacySongAssignment) {
+      // Legacy song assignments only have welcome message (no transcript)
+      speechDone = genericWelcomeDone
+    } else if (isSongExercise && currentExercise) {
+      // Song exercises may have transcript
+      const hasTranscript = (currentExercise.transcript || '').trim().length > 0
+      speechDone = hasTranscript ? (genericWelcomeDone && welcomeSpeechDone) : genericWelcomeDone
+    }
+
+    // Auto-play when player is ready and speech is done (only once)
+    if (songIsPlayerReady && speechDone) {
+      hasAutoPlayedSong.current = true
+      toggleSongPlayPause()
+    }
+  }, [viewMode, currentAssignment, lessonExercises, lessonExerciseIndex, songIsPlayerReady, genericWelcomeDone, welcomeSpeechDone, toggleSongPlayPause, songVideoId])
 
   // Apply pending selection data for guitar/bass
   useEffect(() => {
@@ -3541,9 +3735,23 @@ function Classroom() {
 
   // ========== RENDER: Taking Lesson Mode ==========
   if (viewMode === 'taking-lesson' && currentAssignment) {
-    // ========== SONG ASSIGNMENT VIEW ==========
+    // ========== SONG ASSIGNMENT VIEW (legacy single-song assignments) ==========
     if (currentAssignment.lesson_type === 'songs' && songVideoId) {
-      const hasLoop = songMarkerA !== null && songMarkerB !== null
+      // Check that markers are valid numbers (not null, undefined, or NaN)
+      const hasLoop = typeof songMarkerA === 'number' && !isNaN(songMarkerA) &&
+                      typeof songMarkerB === 'number' && !isNaN(songMarkerB)
+
+      // Welcome message for song assignment
+      const songAssignmentWelcome = !genericWelcomeDone ? t('sandbox.welcomeToLesson', { instrument: currentAssignment.title }) : ''
+
+      // Auto-play handler for when welcome ends
+      const handleSongAssignmentWelcomeEnd = () => {
+        setGenericWelcomeDone(true)
+        setWelcomeSpeechDone(true)
+        if (songIsPlayerReady && !isSongPlaying) {
+          toggleSongPlayPause()
+        }
+      }
 
       return (
         <>
@@ -3564,11 +3772,6 @@ function Classroom() {
           </div>
 
           <div className={songStyles.songsContainer} style={{ padding: '1rem 2rem', maxWidth: '900px', margin: '0 auto' }}>
-            {/* Assignment Title */}
-            <h2 style={{ margin: '0 0 1rem 0', color: 'var(--dark-text-primary)', textAlign: 'center' }}>
-              {currentAssignment.title}
-            </h2>
-
             {/* Hidden YouTube Player Container */}
             <div ref={songPlayerContainerRef} style={{ position: 'absolute', left: '-9999px' }} />
 
@@ -3593,54 +3796,53 @@ function Classroom() {
                 <div className={songStyles.audioLoading}>Loading audio...</div>
               )}
 
-              {/* Timeline with A-B markers */}
+              {/* Timeline - shows only A-B range when loop is set */}
               <div className={songStyles.timelineSection}>
                 <div className={songStyles.timelineWrapper}>
-                  {/* Waveform visualization */}
+                  {/* Waveform visualization - 1 bar per 0.1 seconds */}
                   <div className={songStyles.waveformContainer}>
-                    {songWaveformData.map((height, i) => {
-                      const barProgress = (i + 1) / songWaveformData.length
-                      const currentProgress = songDuration > 0 ? songCurrentTime / songDuration : 0
-                      const isPassed = barProgress <= currentProgress
+                    {(() => {
+                      const loopStart = hasLoop ? songMarkerA! : 0
+                      const loopEnd = hasLoop ? songMarkerB! : songDuration
+                      const loopDuration = loopEnd - loopStart
 
-                      return (
-                        <div
-                          key={i}
-                          className={`${songStyles.waveformBar} ${isPassed ? songStyles.waveformBarPassed : ''}`}
-                          style={{ height: `${height * 100}%` }}
-                        />
-                      )
-                    })}
+                      // Generate bars: 1 bar per 0.1 seconds, max 300 bars
+                      const numBars = Math.min(300, Math.max(1, Math.ceil(loopDuration * 10)))
+                      const seed = songVideoId.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0)
+                      const seededRandom = (n: number) => {
+                        const x = Math.sin(seed + n) * 10000
+                        return x - Math.floor(x)
+                      }
+
+                      return Array.from({ length: numBars }, (_, i) => {
+                        const base = 0.35 + seededRandom(i * 3) * 0.15
+                        const low = Math.sin(i * 0.08 + seed) * 0.12
+                        const mid = Math.sin(i * 0.25 + seed * 1.5) * 0.18
+                        const high = seededRandom(i * 2) * 0.2
+                        const spike = seededRandom(i * 7) > 0.88 ? seededRandom(i * 11) * 0.25 : 0
+                        const height = Math.max(0.12, Math.min(1, base + low + mid + high + spike))
+
+                        const barProgress = (i + 1) / numBars
+                        const currentProgress = loopDuration > 0
+                          ? Math.max(0, Math.min(1, (songCurrentTime - loopStart) / loopDuration))
+                          : 0
+                        const isPassed = barProgress <= currentProgress
+
+                        return (
+                          <div
+                            key={i}
+                            className={`${songStyles.waveformBar} ${isPassed ? songStyles.waveformBarPassed : ''}`}
+                            style={{ height: `${height * 100}%` }}
+                          />
+                        )
+                      })
+                    })()}
                   </div>
-                  {/* A-B marker visualization (read-only - shows teacher's loop) */}
-                  {songMarkerA !== null && songDuration > 0 && (
-                    <div
-                      className={songStyles.markerA}
-                      style={{ left: `${(songMarkerA / songDuration) * 100}%` }}
-                      title={`A: ${formatSongTime(songMarkerA)}`}
-                    />
-                  )}
-                  {songMarkerB !== null && songDuration > 0 && (
-                    <div
-                      className={songStyles.markerB}
-                      style={{ left: `${(songMarkerB / songDuration) * 100}%` }}
-                      title={`B: ${formatSongTime(songMarkerB)}`}
-                    />
-                  )}
-                  {songMarkerA !== null && songMarkerB !== null && songDuration > 0 && (
-                    <div
-                      className={songStyles.abRange}
-                      style={{
-                        left: `${(songMarkerA / songDuration) * 100}%`,
-                        width: `${((songMarkerB - songMarkerA) / songDuration) * 100}%`
-                      }}
-                    />
-                  )}
                   <input
                     type="range"
                     className={songStyles.timeline}
-                    min={0}
-                    max={songDuration || 100}
+                    min={hasLoop ? songMarkerA! : 0}
+                    max={hasLoop ? songMarkerB! : (songDuration || 100)}
                     value={songCurrentTime}
                     onChange={handleSongSeek}
                     step={0.1}
@@ -3648,8 +3850,8 @@ function Classroom() {
                   />
                 </div>
                 <div className={songStyles.timeDisplay}>
-                  <span>{formatSongTime(songCurrentTime)}</span>
-                  <span>{formatSongTime(songDuration)}</span>
+                  <span>{formatSongTime(hasLoop ? Math.max(0, songCurrentTime - songMarkerA!) : songCurrentTime)}</span>
+                  <span>{formatSongTime(hasLoop ? (songMarkerB! - songMarkerA!) : songDuration)}</span>
                 </div>
               </div>
 
@@ -3695,30 +3897,7 @@ function Classroom() {
                   </div>
                 </div>
 
-                {/* Loop Toggle - Student can toggle if teacher set a loop */}
-                {hasLoop && (
-                  <button
-                    className={`${songStyles.controlButton} ${songIsABLooping ? songStyles.controlButtonActive : ''}`}
-                    onClick={() => setSongIsABLooping(!songIsABLooping)}
-                    aria-label="Toggle Loop"
-                    title={`Loop ${formatSongTime(songMarkerA!)} - ${formatSongTime(songMarkerB!)}`}
-                  >
-                    <PiRepeat />
-                  </button>
-                )}
               </div>
-
-              {/* Loop Info (read-only - no edit buttons) */}
-              {hasLoop && (
-                <div className={songStyles.abControls}>
-                  <span className={songStyles.controlLabel}>Loop Section</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--dark-text-secondary)', fontSize: '0.875rem' }}>
-                    <span style={{ color: 'var(--green-500)', fontWeight: 600 }}>A: {formatSongTime(songMarkerA!)}</span>
-                    <span>→</span>
-                    <span style={{ color: 'var(--red-500)', fontWeight: 600 }}>B: {formatSongTime(songMarkerB!)}</span>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Mark as Complete button */}
@@ -3757,6 +3936,9 @@ function Classroom() {
             )}
           </div>
 
+          {/* Welcome subtitle for song assignment */}
+          {songAssignmentWelcome && <WelcomeSubtitle message={songAssignmentWelcome} onSpeechEnd={handleSongAssignmentWelcomeEnd} />}
+
           {/* Assignment Complete Animation */}
           {showAssignmentComplete && createPortal(
             <AssignmentCompleteOverlay onComplete={() => {
@@ -3790,6 +3972,281 @@ function Classroom() {
     const hasScales = currentExercise && (currentExercise.appliedScales?.length ?? 0) > 0
     const hasBothScalesAndChords = hasScales && hasChords
     const hasMultipleExercises = lessonExercises.length > 1
+
+    // Check if current exercise is a song exercise
+    const isSongExercise = currentExercise?.type === 'song' && currentExercise?.songData?.videoId
+
+    // If current exercise is a song, render song player UI
+    if (isSongExercise && currentExercise.songData) {
+      const exerciseSongData = currentExercise.songData
+      const exerciseHasLoop = typeof exerciseSongData.markerA === 'number' && !isNaN(exerciseSongData.markerA) &&
+                              typeof exerciseSongData.markerB === 'number' && !isNaN(exerciseSongData.markerB)
+
+      // Get transcript for song exercise (same pattern as sandbox)
+      const songExerciseTranscript = genericWelcomeDone ? (currentExercise.transcript || '') : ''
+      const hasTranscript = (currentExercise.transcript || '').trim().length > 0
+
+      // Auto-play song when all speech is done and player is ready
+      const handleSongAutoPlay = () => {
+        if (songIsPlayerReady && !isSongPlaying) {
+          toggleSongPlayPause()
+        }
+      }
+
+      // Handle welcome message end - if no transcript, auto-play
+      const handleWelcomeEnd = () => {
+        setGenericWelcomeDone(true)
+        if (!hasTranscript) {
+          setWelcomeSpeechDone(true)
+          handleSongAutoPlay()
+        }
+      }
+
+      // Handle transcript end - auto-play after transcript
+      const handleTranscriptEnd = () => {
+        setWelcomeSpeechDone(true)
+        handleSongAutoPlay()
+      }
+
+      return (
+        <>
+          {/* Preview Mode Banner */}
+          {isPreviewMode && (
+            <div className={practiceStyles.previewModeBanner}>
+              <PiEyeFill size={18} />
+              <span>{t('classroom.previewMode')}</span>
+            </div>
+          )}
+
+          <div className={practiceStyles.backButtonContainer}>
+            <button className={practiceStyles.backButton} onClick={handleEndLesson} aria-label="End practice session">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Timeline for multi-exercise lessons */}
+          {hasMultipleExercises && (
+            <div className={practiceStyles.exerciseTimelineBar}>
+              <span className={practiceStyles.exerciseTimelineLabel}>{t('classroom.timeline')}</span>
+              <div className={`${practiceStyles.exerciseTimeline} ${practiceStyles.exerciseTimelineLesson}`}>
+                <div className={practiceStyles.exerciseTimelineLine} />
+                <div className={practiceStyles.exerciseCircles}>
+                  {lessonExercises.map((exercise, index) => (
+                    <div
+                      key={exercise.id}
+                      className={`${practiceStyles.exerciseCircle} ${index === lessonExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${index < lessonExerciseIndex ? practiceStyles.exerciseCircleCompleted : ''}`}
+                      title={exercise.name}
+                      style={{ cursor: 'default' }}
+                    >
+                      {index + 1}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className={songStyles.songsContainer} style={{ padding: '1rem 2rem', maxWidth: '900px', margin: '0 auto' }}>
+            {/* Hidden YouTube Player Container */}
+            <div ref={songPlayerContainerRef} style={{ position: 'absolute', left: '-9999px' }} />
+
+            {/* Player Section - Same as Songs page */}
+            <div className={songStyles.playerSection}>
+              <div className={songStyles.playerHeader}>
+                <div className={songStyles.playerTrackInfo}>
+                  <img
+                    src={`https://i.ytimg.com/vi/${exerciseSongData.videoId}/mqdefault.jpg`}
+                    alt={exerciseSongData.videoTitle}
+                    className={songStyles.playerArtwork}
+                  />
+                  <div className={songStyles.playerTrackDetails}>
+                    <h2 className={songStyles.nowPlaying}>{exerciseSongData.videoTitle}</h2>
+                    <p className={songStyles.playerArtist}>YouTube</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Loading indicator */}
+              {!songIsPlayerReady && (
+                <div className={songStyles.audioLoading}>Loading audio...</div>
+              )}
+
+              {/* Timeline - shows only A-B range when loop is set */}
+              <div className={songStyles.timelineSection}>
+                <div className={songStyles.timelineWrapper}>
+                  {/* Waveform visualization - 1 bar per 0.1 seconds */}
+                  <div className={songStyles.waveformContainer}>
+                    {(() => {
+                      const loopStart = exerciseHasLoop ? exerciseSongData.markerA! : 0
+                      const loopEnd = exerciseHasLoop ? exerciseSongData.markerB! : songDuration
+                      const loopDuration = loopEnd - loopStart
+
+                      // Generate bars: 1 bar per 0.1 seconds, max 300 bars
+                      const numBars = Math.min(300, Math.max(1, Math.ceil(loopDuration * 10)))
+                      const seed = exerciseSongData.videoId.split('').reduce((acc: number, char: string, i: number) => acc + char.charCodeAt(0) * (i + 1), 0)
+                      const seededRandom = (n: number) => {
+                        const x = Math.sin(seed + n) * 10000
+                        return x - Math.floor(x)
+                      }
+
+                      return Array.from({ length: numBars }, (_, i) => {
+                        const base = 0.35 + seededRandom(i * 3) * 0.15
+                        const low = Math.sin(i * 0.08 + seed) * 0.12
+                        const mid = Math.sin(i * 0.25 + seed * 1.5) * 0.18
+                        const high = seededRandom(i * 2) * 0.2
+                        const spike = seededRandom(i * 7) > 0.88 ? seededRandom(i * 11) * 0.25 : 0
+                        const height = Math.max(0.12, Math.min(1, base + low + mid + high + spike))
+
+                        const barProgress = (i + 1) / numBars
+                        const currentProgress = loopDuration > 0
+                          ? Math.max(0, Math.min(1, (songCurrentTime - loopStart) / loopDuration))
+                          : 0
+                        const isPassed = barProgress <= currentProgress
+
+                        return (
+                          <div
+                            key={i}
+                            className={`${songStyles.waveformBar} ${isPassed ? songStyles.waveformBarPassed : ''}`}
+                            style={{ height: `${height * 100}%` }}
+                          />
+                        )
+                      })
+                    })()}
+                  </div>
+                  <input
+                    type="range"
+                    className={songStyles.timeline}
+                    min={exerciseHasLoop ? exerciseSongData.markerA! : 0}
+                    max={exerciseHasLoop ? exerciseSongData.markerB! : (songDuration || 100)}
+                    value={songCurrentTime}
+                    onChange={handleSongSeek}
+                    step={0.1}
+                    disabled={!songIsPlayerReady}
+                  />
+                </div>
+                <div className={songStyles.timeDisplay}>
+                  <span>{formatSongTime(exerciseHasLoop ? Math.max(0, songCurrentTime - exerciseSongData.markerA!) : songCurrentTime)}</span>
+                  <span>{formatSongTime(exerciseHasLoop ? (exerciseSongData.markerB! - exerciseSongData.markerA!) : songDuration)}</span>
+                </div>
+              </div>
+
+              {/* Practice Controls */}
+              <div className={songStyles.practiceControls}>
+                {/* Play/Pause */}
+                <button
+                  className={songStyles.controlButton}
+                  onClick={toggleSongPlayPause}
+                  disabled={!songIsPlayerReady}
+                  aria-label={isSongPlaying ? 'Pause' : 'Play'}
+                >
+                  {isSongPlaying ? <PiPause /> : <PiPlay />}
+                </button>
+
+                {/* Volume */}
+                <div className={songStyles.volumeControl}>
+                  <SongVolumeIcon className={songStyles.volumeIcon} />
+                  <input
+                    type="range"
+                    className={songStyles.volumeSlider}
+                    min={0}
+                    max={100}
+                    step={1}
+                    value={songVolume}
+                    onChange={handleSongVolumeChange}
+                    style={{ '--volume-percent': `${songVolume}%` } as React.CSSProperties}
+                  />
+                </div>
+
+                {/* Speed Control */}
+                <div className={songStyles.speedControl}>
+                  <div className={songStyles.speedButtons}>
+                    {[0.5, 0.75, 1, 1.25, 1.5, 2].map((speed) => (
+                      <button
+                        key={speed}
+                        className={`${songStyles.speedButton} ${songPlaybackRate === speed ? songStyles.speedButtonActive : ''}`}
+                        onClick={() => setSongPlaybackRate(speed)}
+                      >
+                        {speed}x
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Next Exercise / Complete button */}
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem', gap: '1rem' }}>
+              {lessonExerciseIndex < lessonExercises.length - 1 ? (
+                <button
+                  onClick={() => handleSwitchLessonExercise(lessonExerciseIndex + 1)}
+                  style={{
+                    padding: '1rem 2rem',
+                    borderRadius: '12px',
+                    border: 'none',
+                    background: 'var(--primary-purple)',
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '1rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  Next Exercise
+                  <PiCaretRight size={20} />
+                </button>
+              ) : !isPreviewMode && user && (
+                <button
+                  onClick={() => {
+                    recordCompletion.mutate({ assignmentId: currentAssignment.id, userId: user.id })
+                    setShowAssignmentComplete(true)
+                  }}
+                  disabled={completedAssignmentIds.has(currentAssignment.id)}
+                  style={{
+                    padding: '1rem 2rem',
+                    borderRadius: '12px',
+                    border: 'none',
+                    background: completedAssignmentIds.has(currentAssignment.id) ? 'var(--gray-600)' : 'var(--primary-purple)',
+                    color: 'white',
+                    fontWeight: 600,
+                    fontSize: '1rem',
+                    cursor: completedAssignmentIds.has(currentAssignment.id) ? 'default' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  {completedAssignmentIds.has(currentAssignment.id) ? (
+                    <>
+                      <PiCheckCircleFill size={20} />
+                      Completed
+                    </>
+                  ) : (
+                    'Mark as Complete'
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Welcome and transcript subtitles for song exercises */}
+          {genericWelcomeMessage && <WelcomeSubtitle message={genericWelcomeMessage} onSpeechEnd={handleWelcomeEnd} />}
+          {songExerciseTranscript && <WelcomeSubtitle message={songExerciseTranscript} onSpeechEnd={handleTranscriptEnd} />}
+
+          {showAssignmentComplete && createPortal(
+            <AssignmentCompleteOverlay onComplete={() => {
+              setShowAssignmentComplete(false)
+              handleEndLesson()
+            }} />,
+            document.body
+          )}
+        </>
+      )
+    }
 
     return (
       <>
@@ -4313,21 +4770,38 @@ function Classroom() {
                 {/* Timeline with A-B markers */}
                 <div className={songStyles.timelineSection}>
                   <div className={songStyles.timelineWrapper}>
-                    {/* Waveform visualization */}
+                    {/* Waveform visualization - 1 bar per 0.1 seconds */}
                     <div className={songStyles.waveformContainer}>
-                      {songWaveformData.map((height, i) => {
-                        const barProgress = (i + 1) / songWaveformData.length
-                        const currentProgress = songDuration > 0 ? songCurrentTime / songDuration : 0
-                        const isPassed = barProgress <= currentProgress
+                      {(() => {
+                        // Generate bars: 1 bar per 0.1 seconds, max 300 bars
+                        const numBars = Math.min(300, Math.max(1, Math.ceil(songDuration * 10)))
+                        const seed = songVideoId.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0)
+                        const seededRandom = (n: number) => {
+                          const x = Math.sin(seed + n) * 10000
+                          return x - Math.floor(x)
+                        }
 
-                        return (
-                          <div
-                            key={i}
-                            className={`${songStyles.waveformBar} ${isPassed ? songStyles.waveformBarPassed : ''}`}
-                            style={{ height: `${height * 100}%` }}
-                          />
-                        )
-                      })}
+                        return Array.from({ length: numBars }, (_, i) => {
+                          const base = 0.35 + seededRandom(i * 3) * 0.15
+                          const low = Math.sin(i * 0.08 + seed) * 0.12
+                          const mid = Math.sin(i * 0.25 + seed * 1.5) * 0.18
+                          const high = seededRandom(i * 2) * 0.2
+                          const spike = seededRandom(i * 7) > 0.88 ? seededRandom(i * 11) * 0.25 : 0
+                          const height = Math.max(0.12, Math.min(1, base + low + mid + high + spike))
+
+                          const barProgress = (i + 1) / numBars
+                          const currentProgress = songDuration > 0 ? songCurrentTime / songDuration : 0
+                          const isPassed = barProgress <= currentProgress
+
+                          return (
+                            <div
+                              key={i}
+                              className={`${songStyles.waveformBar} ${isPassed ? songStyles.waveformBarPassed : ''}`}
+                              style={{ height: `${height * 100}%` }}
+                            />
+                          )
+                        })
+                      })()}
                     </div>
                     {/* A-B marker visualization */}
                     {songMarkerA !== null && songDuration > 0 && (
