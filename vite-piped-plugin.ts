@@ -161,33 +161,38 @@ function isAllowedAudioUrl(urlStr: string): boolean {
 /**
  * Download audio from a URL. Uses Range header for googlevideo.com
  * (required even for un-throttled ANDROID URLs).
+ * Parses clen from URL to request the exact file size - YouTube rejects oversized ranges.
  */
 async function downloadAudio(audioUrl: string, signal: AbortSignal): Promise<Buffer> {
   const MAX_SIZE = 10 * 1024 * 1024 // 10MB safety cap
 
-  // For googlevideo.com, use Range header (YouTube requires it)
-  const isGV = new URL(audioUrl).hostname.endsWith('.googlevideo.com')
+  const parsedUrl = new URL(audioUrl)
+  const isGV = parsedUrl.hostname.endsWith('.googlevideo.com')
   const ua = isGV ? ANDROID_UA : BROWSER_UA
 
   if (isGV) {
-    // Try a single large Range request first (works with ANDROID client URLs)
+    // Parse actual file size from clen URL parameter
+    const clen = parseInt(parsedUrl.searchParams.get('clen') || '0') || 0
+    const downloadSize = clen > 0 ? Math.min(clen, MAX_SIZE) : MAX_SIZE
+
+    // Single Range request sized to actual file (YouTube rejects ranges beyond file size)
     const response = await fetch(audioUrl, {
       signal,
-      headers: { 'User-Agent': ua, Range: `bytes=0-${MAX_SIZE - 1}` },
+      headers: { 'User-Agent': ua, Range: `bytes=0-${downloadSize - 1}` },
     })
 
     if (response.status === 200 || response.status === 206) {
-      const buffer = Buffer.from(await response.arrayBuffer())
-      return buffer
+      return Buffer.from(await response.arrayBuffer())
     }
 
-    // If large range fails, fall back to chunked 256KB downloads
+    // If single request fails, fall back to chunked 256KB downloads
+    console.warn(`[audio-proxy] Single range failed (HTTP ${response.status}), trying chunks...`)
     const CHUNK_SIZE = 256 * 1024
     const chunks: Buffer[] = []
     let offset = 0
 
-    while (offset < MAX_SIZE) {
-      const end = Math.min(offset + CHUNK_SIZE - 1, MAX_SIZE - 1)
+    while (offset < downloadSize) {
+      const end = Math.min(offset + CHUNK_SIZE - 1, downloadSize - 1)
       const chunkRes = await fetch(audioUrl, {
         signal,
         headers: { 'User-Agent': ua, Range: `bytes=${offset}-${end}` },
@@ -298,12 +303,19 @@ export function pipedDevPlugin(): Plugin {
         }
 
         try {
+          const parsedAudioUrl = new URL(audioUrl)
+          const clen = parsedAudioUrl.searchParams.get('clen')
+          console.log(
+            `[audio-proxy] Downloading: host=${parsedAudioUrl.hostname} clen=${clen} itag=${parsedAudioUrl.searchParams.get('itag')}`
+          )
+
           const controller = new AbortController()
           const timeout = setTimeout(() => controller.abort(), 60000)
 
           const buffer = await downloadAudio(audioUrl, controller.signal)
           clearTimeout(timeout)
 
+          console.log(`[audio-proxy] Success: ${buffer.byteLength} bytes`)
           res.setHeader('Content-Type', 'audio/mp4')
           res.writeHead(200)
           res.end(buffer)

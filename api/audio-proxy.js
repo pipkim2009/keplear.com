@@ -59,10 +59,14 @@ async function downloadAudio(url, signal) {
   const ua = isGV ? ANDROID_UA : BROWSER_UA
 
   if (isGV) {
-    // Try single large Range request (works with ANDROID client URLs)
+    // Parse actual file size from clen URL parameter - YouTube rejects oversized ranges
+    const clen = parseInt(new URL(url).searchParams.get('clen') || '0') || 0
+    const downloadSize = clen > 0 ? Math.min(clen, MAX_SIZE) : MAX_SIZE
+
+    // Single Range request sized to actual file
     const response = await fetch(url, {
       signal,
-      headers: { 'User-Agent': ua, 'Range': `bytes=0-${MAX_SIZE - 1}` }
+      headers: { 'User-Agent': ua, 'Range': `bytes=0-${downloadSize - 1}` }
     })
 
     if (response.status === 200 || response.status === 206) {
@@ -74,8 +78,8 @@ async function downloadAudio(url, signal) {
     const chunks = []
     let offset = 0
 
-    while (offset < MAX_SIZE) {
-      const end = Math.min(offset + CHUNK_SIZE - 1, MAX_SIZE - 1)
+    while (offset < downloadSize) {
+      const end = Math.min(offset + CHUNK_SIZE - 1, downloadSize - 1)
       const chunkRes = await fetch(url, {
         signal,
         headers: { 'User-Agent': ua, 'Range': `bytes=${offset}-${end}` }

@@ -32,33 +32,38 @@ export function generateFallbackWaveform(videoId: string, numBars: number = 150)
 }
 
 /**
- * Extract amplitude peaks from a decoded AudioBuffer.
+ * Extract waveform data from a decoded AudioBuffer using RMS (root mean square).
+ * RMS measures average loudness per segment rather than peak amplitude,
+ * giving much more visual contrast between quiet and loud sections
+ * (intros, verses, choruses, bridges all look distinct).
  * Returns `numPeaks` normalized values (0.12–1.0).
  */
 export function extractPeaks(audioBuffer: AudioBuffer, numPeaks: number = 200): number[] {
   const channelData = audioBuffer.getChannelData(0)
   const samplesPerPeak = Math.floor(channelData.length / numPeaks)
-  const peaks: number[] = []
 
+  // First pass: calculate RMS per segment
   let globalMax = 0
-  // First pass: collect raw max absolute values
-  const rawPeaks: number[] = []
+  const rawRms: number[] = []
   for (let i = 0; i < numPeaks; i++) {
     const start = i * samplesPerPeak
     const end = Math.min(start + samplesPerPeak, channelData.length)
-    let max = 0
+    let sumSquares = 0
     for (let j = start; j < end; j++) {
-      const abs = Math.abs(channelData[j])
-      if (abs > max) max = abs
+      sumSquares += channelData[j] * channelData[j]
     }
-    rawPeaks.push(max)
-    if (max > globalMax) globalMax = max
+    const rms = Math.sqrt(sumSquares / (end - start))
+    rawRms.push(rms)
+    if (rms > globalMax) globalMax = rms
   }
 
-  // Second pass: normalize to 0.12–1.0
-  for (let i = 0; i < rawPeaks.length; i++) {
-    const normalized = globalMax > 0 ? rawPeaks[i] / globalMax : 0
-    peaks.push(Math.max(0.12, normalized))
+  // Second pass: normalize and apply power curve for visual spread
+  // pow(x, 0.6) expands the mid-range so quiet sections aren't crushed flat
+  const peaks: number[] = []
+  for (let i = 0; i < rawRms.length; i++) {
+    const normalized = globalMax > 0 ? rawRms[i] / globalMax : 0
+    const shaped = Math.pow(normalized, 0.6)
+    peaks.push(Math.max(0.12, shaped))
   }
 
   return peaks
