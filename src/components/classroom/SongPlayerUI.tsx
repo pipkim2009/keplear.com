@@ -5,6 +5,8 @@
  */
 
 import { PiPlay, PiPause, PiSpeakerHigh, PiSpeakerLow, PiSpeakerNone } from 'react-icons/pi'
+import { useWaveformData } from '../../hooks/useWaveformData'
+import { generateFallbackWaveform, resamplePeaks } from '../../utils/waveformUtils'
 import songStyles from '../../styles/Songs.module.css'
 
 interface SongPlayerUIProps {
@@ -45,6 +47,8 @@ export default function SongPlayerUI({
   const hasLoop =
     typeof markerA === 'number' && !isNaN(markerA) && typeof markerB === 'number' && !isNaN(markerB)
 
+  const { peaks: realPeaks } = useWaveformData(videoId)
+
   const VolumeIcon = volume === 0 ? PiSpeakerNone : volume < 50 ? PiSpeakerLow : PiSpeakerHigh
 
   const loopStart = hasLoop ? markerA! : 0
@@ -76,25 +80,22 @@ export default function SongPlayerUI({
           <div className={songStyles.waveformContainer}>
             {(() => {
               const numBars = Math.min(300, Math.max(1, Math.ceil(loopDuration * 10)))
-              const seed = videoId
-                .split('')
-                .reduce(
-                  (acc: number, char: string, i: number) => acc + char.charCodeAt(0) * (i + 1),
-                  0
-                )
-              const seededRandom = (n: number) => {
-                const x = Math.sin(seed + n) * 10000
-                return x - Math.floor(x)
+
+              let bars: number[]
+              if (realPeaks && hasLoop && duration > 0) {
+                // Slice peaks for the A-B loop section
+                const startFrac = loopStart / duration
+                const endFrac = loopEnd / duration
+                const startIdx = Math.floor(startFrac * realPeaks.length)
+                const endIdx = Math.ceil(endFrac * realPeaks.length)
+                bars = resamplePeaks(realPeaks.slice(startIdx, endIdx), numBars)
+              } else if (realPeaks) {
+                bars = resamplePeaks(realPeaks, numBars)
+              } else {
+                bars = generateFallbackWaveform(videoId, numBars)
               }
 
-              return Array.from({ length: numBars }, (_, i) => {
-                const base = 0.35 + seededRandom(i * 3) * 0.15
-                const low = Math.sin(i * 0.08 + seed) * 0.12
-                const mid = Math.sin(i * 0.25 + seed * 1.5) * 0.18
-                const high = seededRandom(i * 2) * 0.2
-                const spike = seededRandom(i * 7) > 0.88 ? seededRandom(i * 11) * 0.25 : 0
-                const height = Math.max(0.12, Math.min(1, base + low + mid + high + spike))
-
+              return bars.map((height, i) => {
                 const barProgress = (i + 1) / numBars
                 const currentProgress =
                   loopDuration > 0

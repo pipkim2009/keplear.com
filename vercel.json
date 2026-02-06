@@ -29,6 +29,10 @@
       "destination": "/api/piped-streams"
     },
     {
+      "source": "/api/audio-proxy",
+      "destination": "/api/audio-proxy"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }

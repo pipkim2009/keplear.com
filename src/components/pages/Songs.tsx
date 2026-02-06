@@ -19,6 +19,8 @@ import {
   PiLink,
 } from 'react-icons/pi'
 import SEOHead from '../common/SEOHead'
+import { useWaveformData } from '../../hooks/useWaveformData'
+import { generateFallbackWaveform, resamplePeaks } from '../../utils/waveformUtils'
 import styles from '../../styles/Songs.module.css'
 
 // Piped API proxy endpoints for search
@@ -97,30 +99,6 @@ interface VideoInfo {
 const RECENT_VIDEOS_KEY = 'keplear_recent_videos'
 const MAX_RECENT_VIDEOS = 10
 
-// Generate a unique waveform pattern based on video ID
-const generateWaveform = (videoId: string, numBars: number = 150): number[] => {
-  // Seeded random based on video ID
-  const seed = videoId.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0)
-  const seededRandom = (n: number) => {
-    const x = Math.sin(seed + n) * 10000
-    return x - Math.floor(x)
-  }
-
-  const waveform: number[] = []
-  for (let i = 0; i < numBars; i++) {
-    // Create realistic-looking pattern with multiple frequencies
-    const base = 0.35 + seededRandom(i * 3) * 0.15
-    const low = Math.sin(i * 0.08 + seed) * 0.12
-    const mid = Math.sin(i * 0.25 + seed * 1.5) * 0.18
-    const high = seededRandom(i * 2) * 0.2
-    const spike = seededRandom(i * 7) > 0.88 ? seededRandom(i * 11) * 0.25 : 0
-
-    const value = Math.max(0.12, Math.min(1, base + low + mid + high + spike))
-    waveform.push(value)
-  }
-  return waveform
-}
-
 const Songs = () => {
   const { t } = useTranslation()
 
@@ -153,9 +131,8 @@ const Songs = () => {
   const [markerB, setMarkerB] = useState<number | null>(null)
   const [isABLooping, setIsABLooping] = useState(false)
 
-  // Waveform state
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [waveformData, setWaveformData] = useState<number[]>([])
+  // Real waveform data hook
+  const { peaks: realPeaks } = useWaveformData(currentVideo?.videoId ?? null)
 
   // Refs
   const playerRef = useRef<YTPlayer | null>(null)
@@ -429,9 +406,6 @@ const Songs = () => {
     setMarkerB(null)
     setIsABLooping(false)
 
-    // Generate waveform based on video ID
-    setWaveformData(generateWaveform(currentVideo.videoId, 150))
-
     // Create player container div
     const containerId = 'yt-player-' + Date.now()
     const playerDiv = document.createElement('div')
@@ -641,7 +615,6 @@ const Songs = () => {
     setMarkerA(null)
     setMarkerB(null)
     setIsABLooping(false)
-    setWaveformData([])
   }, [stopTimeUpdate])
 
   // Remove from recent
@@ -856,24 +829,13 @@ const Songs = () => {
               {/* Waveform visualization - 1 bar per 0.1 seconds */}
               <div className={styles.waveformContainer}>
                 {(() => {
-                  // Generate bars: 1 bar per 0.1 seconds, max 300 bars
                   const numBars = Math.min(300, Math.max(1, Math.ceil(duration * 10)))
-                  const seed = currentVideo!.videoId
-                    .split('')
-                    .reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0)
-                  const seededRandom = (n: number) => {
-                    const x = Math.sin(seed + n) * 10000
-                    return x - Math.floor(x)
-                  }
+                  const videoId = currentVideo!.videoId
+                  const bars = realPeaks
+                    ? resamplePeaks(realPeaks, numBars)
+                    : generateFallbackWaveform(videoId, numBars)
 
-                  return Array.from({ length: numBars }, (_, i) => {
-                    const base = 0.35 + seededRandom(i * 3) * 0.15
-                    const low = Math.sin(i * 0.08 + seed) * 0.12
-                    const mid = Math.sin(i * 0.25 + seed * 1.5) * 0.18
-                    const high = seededRandom(i * 2) * 0.2
-                    const spike = seededRandom(i * 7) > 0.88 ? seededRandom(i * 11) * 0.25 : 0
-                    const height = Math.max(0.12, Math.min(1, base + low + mid + high + spike))
-
+                  return bars.map((height, i) => {
                     const barProgress = (i + 1) / numBars
                     const currentProgress = duration > 0 ? currentTime / duration : 0
                     const isPassed = barProgress <= currentProgress

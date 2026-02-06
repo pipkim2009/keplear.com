@@ -89,6 +89,8 @@ import {
   AssignmentTitleModal,
 } from '../classroom/ClassroomModals'
 import SongPlayerUI from '../classroom/SongPlayerUI'
+import { useWaveformData } from '../../hooks/useWaveformData'
+import { generateFallbackWaveform, resamplePeaks } from '../../utils/waveformUtils'
 
 // Type for serialized scale data from JSON
 interface SerializedScaleData {
@@ -195,28 +197,6 @@ interface SongAssignmentData {
   markerA: number | null // Start time in seconds
   markerB: number | null // End time in seconds
   playbackRate: number // Default playback speed
-}
-
-// Generate a unique waveform pattern based on video ID (same as Songs page)
-const generateWaveform = (videoId: string, numBars: number = 150): number[] => {
-  const seed = videoId.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0)
-  const seededRandom = (n: number) => {
-    const x = Math.sin(seed + n) * 10000
-    return x - Math.floor(x)
-  }
-
-  const waveform: number[] = []
-  for (let i = 0; i < numBars; i++) {
-    const base = 0.35 + seededRandom(i * 3) * 0.15
-    const low = Math.sin(i * 0.08 + seed) * 0.12
-    const mid = Math.sin(i * 0.25 + seed * 1.5) * 0.18
-    const high = seededRandom(i * 2) * 0.2
-    const spike = seededRandom(i * 7) > 0.88 ? seededRandom(i * 11) * 0.25 : 0
-
-    const value = Math.max(0.12, Math.min(1, base + low + mid + high + spike))
-    waveform.push(value)
-  }
-  return waveform
 }
 
 interface ExerciseData {
@@ -410,12 +390,13 @@ function Classroom() {
   const [songVolume, setSongVolume] = useState(80)
   const [songIsLooping, setSongIsLooping] = useState(false)
   const [songIsABLooping, setSongIsABLooping] = useState(false)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [songWaveformData, setSongWaveformData] = useState<number[]>([])
   const [songIsPlayerReady, setSongIsPlayerReady] = useState(false)
   const [ytApiLoaded, setYtApiLoaded] = useState(false)
   const songPlayerRef = useRef<unknown>(null)
   const songTimeUpdateRef = useRef<number | null>(null)
+
+  // Real waveform data hook
+  const { peaks: songRealPeaks } = useWaveformData(songVideoId)
 
   // Multi-exercise state for assignment editor
   const [exercises, setExercises] = useState<ExerciseData[]>([])
@@ -1128,7 +1109,6 @@ function Classroom() {
         setSongMarkerA(firstExercise.songData.markerA ?? null)
         setSongMarkerB(firstExercise.songData.markerB ?? null)
         setSongPlaybackRate(firstExercise.songData.playbackRate || 1)
-        setSongWaveformData(generateWaveform(firstExercise.songData.videoId, 150))
         setViewMode('creating-assignment')
         return
       }
@@ -1722,7 +1702,6 @@ function Classroom() {
     setSongMarkerA(null)
     setSongMarkerB(null)
     setSongPlaybackRate(1)
-    setSongWaveformData([])
     setSongIsPlayerReady(false)
     setIsSongPlaying(false)
     setSongSearchQuery('')
@@ -1835,7 +1814,6 @@ function Classroom() {
           setSongMarkerA(targetExercise.songData.markerA ?? null)
           setSongMarkerB(targetExercise.songData.markerB ?? null)
           setSongPlaybackRate(targetExercise.songData.playbackRate || 1)
-          setSongWaveformData(generateWaveform(targetExercise.songData.videoId))
           setSongIsPlayerReady(false)
           setIsSongPlaying(false)
           // Clear sandbox state since we're on a song exercise
@@ -1853,7 +1831,6 @@ function Classroom() {
           setSongMarkerA(null)
           setSongMarkerB(null)
           setSongPlaybackRate(1)
-          setSongWaveformData([])
           setSongIsPlayerReady(false)
           setIsSongPlaying(false)
           setSongSearchQuery('')
@@ -2156,7 +2133,6 @@ function Classroom() {
           setSongMarkerA(targetExercise.songData.markerA ?? null)
           setSongMarkerB(targetExercise.songData.markerB ?? null)
           setSongPlaybackRate(targetExercise.songData.playbackRate || 1)
-          setSongWaveformData(generateWaveform(targetExercise.songData.videoId, 150))
           setSongIsPlayerReady(false)
           setIsSongPlaying(false)
           setCurrentExerciseTranscript(targetExercise.transcript || '')
@@ -2168,7 +2144,6 @@ function Classroom() {
           setSongMarkerA(null)
           setSongMarkerB(null)
           setSongPlaybackRate(1)
-          setSongWaveformData([])
           setSongIsPlayerReady(false)
           setIsSongPlaying(false)
           setAssignmentType('practice')
@@ -2497,7 +2472,6 @@ function Classroom() {
       setSongIsPlayerReady(false)
       setSongIsABLooping(false)
       // Generate waveform based on video ID
-      setSongWaveformData(generateWaveform(result.videoId, 150))
     },
     []
   )
@@ -2523,7 +2497,6 @@ function Classroom() {
     setSongIsPlayerReady(false)
     setIsSongPlaying(false)
     setSongIsABLooping(false)
-    setSongWaveformData([])
   }, [])
 
   // Song player controls
@@ -2794,7 +2767,6 @@ function Classroom() {
         setSongMarkerA(exerciseSongData.markerA ?? null)
         setSongMarkerB(exerciseSongData.markerB ?? null)
         setSongPlaybackRate(exerciseSongData.playbackRate || 1)
-        setSongWaveformData(generateWaveform(exerciseSongData.videoId, 150))
         setSongIsPlayerReady(false)
         setIsSongPlaying(false)
         const hasLoop =
@@ -2985,7 +2957,6 @@ function Classroom() {
       setSongMarkerA(null)
       setSongMarkerB(null)
       setSongPlaybackRate(1)
-      setSongWaveformData([])
       setSongSearchQuery('')
       setSongSearchResults([])
       setAssignmentType('practice')
@@ -3031,7 +3002,6 @@ function Classroom() {
         setSongMarkerB(markerB)
         setSongPlaybackRate(songData.playbackRate || 1)
         // Generate waveform for the player
-        setSongWaveformData(generateWaveform(songData.videoId, 150))
         // Initialize player state
         setSongDuration(0)
         setSongCurrentTime(0)
@@ -3101,7 +3071,6 @@ function Classroom() {
       setSongMarkerA(songData.markerA ?? null)
       setSongMarkerB(songData.markerB ?? null)
       setSongPlaybackRate(songData.playbackRate || 1)
-      setSongWaveformData(generateWaveform(songData.videoId, 150))
       setSongDuration(0)
       setSongCurrentTime(0)
       setSongIsPlayerReady(false)
@@ -3117,7 +3086,6 @@ function Classroom() {
       setSongMarkerA(null)
       setSongMarkerB(null)
       setSongPlaybackRate(1)
-      setSongWaveformData([])
       setSongIsPlayerReady(false)
       setIsSongPlaying(false)
     }
@@ -3352,7 +3320,6 @@ function Classroom() {
         setSongMarkerA(songData.markerA ?? null)
         setSongMarkerB(songData.markerB ?? null)
         setSongPlaybackRate(songData.playbackRate || 1)
-        setSongWaveformData(generateWaveform(songData.videoId, 150))
         setSongDuration(0)
         setSongCurrentTime(0)
         setSongIsPlayerReady(false)
@@ -3371,7 +3338,6 @@ function Classroom() {
       setSongMarkerA(null)
       setSongMarkerB(null)
       setSongPlaybackRate(1)
-      setSongWaveformData([])
       setSongIsPlayerReady(false)
       setIsSongPlaying(false)
 
@@ -4921,27 +4887,12 @@ function Classroom() {
                     {/* Waveform visualization - 1 bar per 0.1 seconds */}
                     <div className={songStyles.waveformContainer}>
                       {(() => {
-                        // Generate bars: 1 bar per 0.1 seconds, max 300 bars
                         const numBars = Math.min(300, Math.max(1, Math.ceil(songDuration * 10)))
-                        const seed = songVideoId
-                          .split('')
-                          .reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0)
-                        const seededRandom = (n: number) => {
-                          const x = Math.sin(seed + n) * 10000
-                          return x - Math.floor(x)
-                        }
+                        const bars = songRealPeaks
+                          ? resamplePeaks(songRealPeaks, numBars)
+                          : generateFallbackWaveform(songVideoId, numBars)
 
-                        return Array.from({ length: numBars }, (_, i) => {
-                          const base = 0.35 + seededRandom(i * 3) * 0.15
-                          const low = Math.sin(i * 0.08 + seed) * 0.12
-                          const mid = Math.sin(i * 0.25 + seed * 1.5) * 0.18
-                          const high = seededRandom(i * 2) * 0.2
-                          const spike = seededRandom(i * 7) > 0.88 ? seededRandom(i * 11) * 0.25 : 0
-                          const height = Math.max(
-                            0.12,
-                            Math.min(1, base + low + mid + high + spike)
-                          )
-
+                        return bars.map((height, i) => {
                           const barProgress = (i + 1) / numBars
                           const currentProgress =
                             songDuration > 0 ? songCurrentTime / songDuration : 0

@@ -21,14 +21,34 @@ export type { AudioInputConfig, AudioInputState, UseAudioInputReturn } from './u
 
 // Melody feedback system (rhythm-ignored, polyphonic transcription)
 export { useMelodyFeedback } from './useMelodyFeedback'
-export type { MelodyFeedbackConfig, FeedbackNote, MelodyFeedbackState, UseMelodyFeedbackReturn } from './useMelodyFeedback'
+export type {
+  MelodyFeedbackConfig,
+  FeedbackNote,
+  MelodyFeedbackState,
+  UseMelodyFeedbackReturn,
+} from './useMelodyFeedback'
 
 // Database hooks
 export { useQueryCache, invalidateCache, clearCache, setCache } from './useQueryCache'
 export type { CacheEntry, CacheOptions } from './useQueryCache'
-export { useSupabaseQuery, usePaginatedQuery, invalidateQueries, prefetchQuery } from './useSupabaseQuery'
-export type { QueryOptions, PaginatedResult, UseSupabaseQueryResult, UsePaginatedQueryResult } from './useSupabaseQuery'
-export { useSupabaseMutation, useInsertMutation, useUpdateMutation, useDeleteMutation } from './useSupabaseMutation'
+export {
+  useSupabaseQuery,
+  usePaginatedQuery,
+  invalidateQueries,
+  prefetchQuery,
+} from './useSupabaseQuery'
+export type {
+  QueryOptions,
+  PaginatedResult,
+  UseSupabaseQueryResult,
+  UsePaginatedQueryResult,
+} from './useSupabaseQuery'
+export {
+  useSupabaseMutation,
+  useInsertMutation,
+  useUpdateMutation,
+  useDeleteMutation,
+} from './useSupabaseMutation'
 export type { MutationOptions, MutationResult } from './useSupabaseMutation'
 export { useRealtimeSubscription, useClassroomRealtime } from './useRealtimeSubscription'
 export type { RealtimeEvent, RealtimeOptions, UseRealtimeResult } from './useRealtimeSubscription'
@@ -43,9 +63,15 @@ export {
   useDeleteAssignment,
   useUpdateAssignment,
   useClassroomsWithRealtime,
-  prefetchClassroom
+  prefetchClassroom,
 } from './useClassrooms'
-export type { Classroom, Assignment, ClassroomStudent, CreateClassroomData, CreateAssignmentData } from './useClassrooms'
+export type {
+  Classroom,
+  Assignment,
+  ClassroomStudent,
+  CreateClassroomData,
+  CreateAssignmentData,
+} from './useClassrooms'
 
 // Accessibility hooks
 export { useFocusTrap, useBodyScrollLock } from './useFocusTrap'
@@ -61,7 +87,7 @@ export {
   useRenderCount,
   usePerformanceMeasure,
   useLazyRef,
-  useUpdateEffect
+  useUpdateEffect,
 } from './usePerformance'
 
 // Context selector hooks (focused state slices for better performance)
@@ -73,5 +99,8 @@ export {
   useNoteSelection,
   useAudioPlayback,
   useScaleChordState,
-  useOctaveRange
+  useOctaveRange,
 } from './useInstrumentSelectors'
+
+// Waveform hooks
+export { useWaveformData } from './useWaveformData'

@@ -34,7 +34,7 @@ export {
   RateLimiter,
   authRateLimiter,
   apiRateLimiter,
-  SECURITY_CONFIG
+  SECURITY_CONFIG,
 } from './security'
 export type { PasswordRequirements, PasswordValidationResult } from './security'
 
@@ -47,5 +47,14 @@ export {
   shallowEqual,
   deepEqual,
   batchUpdates,
-  RenderMonitor
+  RenderMonitor,
 } from './performance'
+
+// Waveform utilities
+export {
+  generateFallbackWaveform,
+  extractPeaks,
+  resamplePeaks,
+  getCachedPeaks,
+  setCachedPeaks,
+} from './waveformUtils'
