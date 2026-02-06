@@ -3,10 +3,10 @@
  * Interactive spotlight overlay that guides users through the Sandbox UI
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { PiSparkle, PiPlayFill } from 'react-icons/pi'
-import { TUTORIAL_STEPS, type TutorialStep } from '../../hooks/useTutorial'
+import { TUTORIAL_STEPS } from '../../hooks/useTutorial'
 import styles from './TutorialOverlay.module.css'
 
 interface TutorialOverlayProps {
@@ -42,16 +42,10 @@ function getSpotlightPosition(target: string): SpotlightPosition | null {
       // Dashboard fallbacks
       '[class*="mainContent"]': [
         '[class*="dashboardContainer"] > [class*="mainContent"]',
-        '[class*="dashboard"]'
+        '[class*="dashboard"]',
       ],
-      '[class*="statsSection"]': [
-        '[class*="stats"]',
-        '[class*="activity"]'
-      ],
-      '[class*="classesSection"]': [
-        '[class*="classes"]',
-        '[class*="classrooms"]'
-      ],
+      '[class*="statsSection"]': ['[class*="stats"]', '[class*="activity"]'],
+      '[class*="classesSection"]': ['[class*="classes"]', '[class*="classrooms"]'],
       // Sandbox fallbacks
       '.keyboard-container, .guitar-container, .bass-container': [
         '.keyboard-container',
@@ -59,34 +53,21 @@ function getSpotlightPosition(target: string): SpotlightPosition | null {
         '.bass-container',
         '.keyboard',
         '.guitar-fretboard',
-        '.bass-fretboard'
+        '.bass-fretboard',
       ],
-      '.controls-container': [
-        '.modern-controls-row',
-        '.bpm-input',
-        '[class*="controls"]'
-      ],
-      '.modern-generate-button': [
-        '[class*="generate"]',
-        'button[class*="Generate"]'
-      ],
-      '.custom-audio-player': [
-        '[class*="audio-player"]',
-        '[class*="audioPlayer"]'
-      ],
+      '.controls-container': ['.modern-controls-row', '.bpm-input', '[class*="controls"]'],
+      '.modern-generate-button': ['[class*="generate"]', 'button[class*="Generate"]'],
+      '.custom-audio-player': ['[class*="audio-player"]', '[class*="audioPlayer"]'],
       // Classroom fallbacks
       '[class*="classesSection"]:first-of-type': [
         '[class*="classesSection"]',
-        '[class*="myClasses"]'
+        '[class*="myClasses"]',
       ],
-      '[class*="sectionButtons"]': [
-        '[class*="joinClass"]',
-        '[class*="createButton"]'
-      ],
+      '[class*="sectionButtons"]': ['[class*="joinClass"]', '[class*="createButton"]'],
       '[class*="classesSection"]:last-of-type': [
         '[class*="availableClasses"]',
-        '[class*="classesGrid"]'
-      ]
+        '[class*="classesGrid"]',
+      ],
     }
 
     const fallbacks = fallbackSelectors[target] || []
@@ -106,20 +87,14 @@ function getSpotlightPosition(target: string): SpotlightPosition | null {
     top: rect.top - padding,
     left: rect.left - padding,
     width: rect.width + padding * 2,
-    height: rect.height + padding * 2
+    height: rect.height + padding * 2,
   }
 }
 
 /**
  * Welcome modal shown before starting the tutorial
  */
-function WelcomeModal({
-  onStart,
-  onSkip
-}: {
-  onStart: () => void
-  onSkip: () => void
-}) {
+function WelcomeModal({ onStart, onSkip }: { onStart: () => void; onSkip: () => void }) {
   return (
     <div className={styles.welcomeModal}>
       <div className={styles.welcomeCard}>
@@ -128,20 +103,15 @@ function WelcomeModal({
         </div>
         <h2 className={styles.welcomeTitle}>Quick Tour</h2>
         <p className={styles.welcomeDescription}>
-          Let us show you around! We'll walk you through creating your first melody in just a few steps.
+          Let us show you around! We'll walk you through creating your first melody in just a few
+          steps.
         </p>
         <div className={styles.welcomeActions}>
-          <button
-            className={styles.startButton}
-            onClick={onStart}
-          >
+          <button className={styles.startButton} onClick={onStart}>
             <PiPlayFill style={{ marginRight: 8, verticalAlign: 'middle' }} />
             Start Tour
           </button>
-          <button
-            className={styles.skipWelcomeButton}
-            onClick={onSkip}
-          >
+          <button className={styles.skipWelcomeButton} onClick={onSkip}>
             Skip - I'll explore on my own
           </button>
         </div>
@@ -162,7 +132,7 @@ const TutorialOverlay = ({
   onComplete,
   shouldShowWelcome,
   onStartTutorial,
-  interactionComplete = false
+  interactionComplete = false,
 }: TutorialOverlayProps) => {
   const [spotlight, setSpotlight] = useState<SpotlightPosition | null>(null)
   const currentStepData = isActive ? TUTORIAL_STEPS[currentStep] : null
@@ -272,23 +242,21 @@ const TutorialOverlay = ({
       const y = e.clientY
 
       // Check if click is inside spotlight area
-      const inSpotlight = (
+      const inSpotlight =
         x >= spotlight.left &&
         x <= spotlight.left + spotlight.width &&
         y >= spotlight.top &&
         y <= spotlight.top + spotlight.height
-      )
 
       // Check if click is inside subtitle container (allow button clicks)
       const subtitleEl = document.querySelector('[class*="subtitleContainer"]')
       if (subtitleEl) {
         const subtitleRect = subtitleEl.getBoundingClientRect()
-        const inSubtitle = (
+        const inSubtitle =
           x >= subtitleRect.left &&
           x <= subtitleRect.right &&
           y >= subtitleRect.top &&
           y <= subtitleRect.bottom
-        )
         if (inSubtitle) return // Allow subtitle/button clicks
       }
 
@@ -318,11 +286,7 @@ const TutorialOverlay = ({
 
   // Show welcome modal if shouldShowWelcome
   if (shouldShowWelcome && !isActive) {
-    console.log('[TutorialOverlay] Showing welcome modal')
-    return createPortal(
-      <WelcomeModal onStart={onStartTutorial} onSkip={onSkip} />,
-      document.body
-    )
+    return createPortal(<WelcomeModal onStart={onStartTutorial} onSkip={onSkip} />, document.body)
   }
 
   // Don't render if not active
@@ -342,7 +306,7 @@ const TutorialOverlay = ({
               top: 0,
               left: 0,
               right: 0,
-              height: spotlight.top
+              height: spotlight.top,
             }}
           />
           {/* Bottom overlay */}
@@ -352,7 +316,7 @@ const TutorialOverlay = ({
               top: spotlight.top + spotlight.height,
               left: 0,
               right: 0,
-              bottom: 0
+              bottom: 0,
             }}
           />
           {/* Left overlay */}
@@ -362,7 +326,7 @@ const TutorialOverlay = ({
               top: spotlight.top,
               left: 0,
               width: spotlight.left,
-              height: spotlight.height
+              height: spotlight.height,
             }}
           />
           {/* Right overlay */}
@@ -372,7 +336,7 @@ const TutorialOverlay = ({
               top: spotlight.top,
               left: spotlight.left + spotlight.width,
               right: 0,
-              height: spotlight.height
+              height: spotlight.height,
             }}
           />
           {/* Spotlight border ring */}
@@ -382,7 +346,7 @@ const TutorialOverlay = ({
               top: spotlight.top - 4,
               left: spotlight.left - 4,
               width: spotlight.width + 8,
-              height: spotlight.height + 8
+              height: spotlight.height + 8,
             }}
           />
         </>
@@ -391,33 +355,22 @@ const TutorialOverlay = ({
       {/* Tutorial Subtitle Bar */}
       <div className={styles.subtitleContainer}>
         <div className={styles.subtitleButtons}>
-          <button
-            className={styles.skipButton}
-            onClick={onSkip}
-          >
+          <button className={styles.skipButton} onClick={onSkip}>
             Skip
           </button>
           {currentStep > 0 && (
-            <button
-              className={styles.backButton}
-              onClick={onPrev}
-            >
+            <button className={styles.backButton} onClick={onPrev}>
               Back
             </button>
           )}
           {/* Show Next only if step doesn't require interaction OR interaction is complete */}
           {(!currentStepData?.requiresInteraction || interactionComplete) && (
-            <button
-              className={styles.nextButton}
-              onClick={isLastStep ? onComplete : onNext}
-            >
+            <button className={styles.nextButton} onClick={isLastStep ? onComplete : onNext}>
               {isLastStep ? 'Finish' : 'Next'}
             </button>
           )}
         </div>
-        <div className={styles.subtitle}>
-          {currentStepData.description}
-        </div>
+        <div className={styles.subtitle}>{currentStepData.description}</div>
       </div>
     </div>
   )

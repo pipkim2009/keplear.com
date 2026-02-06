@@ -5,6 +5,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { getTranslation } from '../contexts/TranslationContext'
 
 export type MicrophonePermission = 'prompt' | 'granted' | 'denied' | 'error'
 
@@ -33,7 +34,7 @@ export interface UseAudioInputReturn extends AudioInputState {
 const DEFAULT_CONFIG: Required<AudioInputConfig> = {
   sampleRate: 44100,
   fftSize: 4096,
-  smoothingTimeConstant: 0
+  smoothingTimeConstant: 0,
 }
 
 /**
@@ -73,7 +74,10 @@ export const useAudioInput = (config: AudioInputConfig = {}): UseAudioInputRetur
   const getTimeDomainData = useCallback((): Float32Array | null => {
     if (!analyserRef.current) return null
 
-    if (!timeDomainBufferRef.current || timeDomainBufferRef.current.length !== analyserRef.current.fftSize) {
+    if (
+      !timeDomainBufferRef.current ||
+      timeDomainBufferRef.current.length !== analyserRef.current.fftSize
+    ) {
       timeDomainBufferRef.current = new Float32Array(analyserRef.current.fftSize)
     }
 
@@ -92,7 +96,10 @@ export const useAudioInput = (config: AudioInputConfig = {}): UseAudioInputRetur
   const getFrequencyData = useCallback((): Uint8Array | null => {
     if (!analyserRef.current) return null
 
-    if (!frequencyBufferRef.current || frequencyBufferRef.current.length !== analyserRef.current.frequencyBinCount) {
+    if (
+      !frequencyBufferRef.current ||
+      frequencyBufferRef.current.length !== analyserRef.current.frequencyBinCount
+    ) {
       frequencyBufferRef.current = new Uint8Array(analyserRef.current.frequencyBinCount)
     }
 
@@ -135,8 +142,8 @@ export const useAudioInput = (config: AudioInputConfig = {}): UseAudioInputRetur
           echoCancellation: false,
           noiseSuppression: false,
           autoGainControl: false,
-          sampleRate: mergedConfig.sampleRate
-        }
+          sampleRate: mergedConfig.sampleRate,
+        },
       })
 
       setPermission('granted')
@@ -167,19 +174,25 @@ export const useAudioInput = (config: AudioInputConfig = {}): UseAudioInputRetur
 
       if (errorMessage.includes('Permission denied') || errorMessage.includes('NotAllowedError')) {
         setPermission('denied')
-        setError('Microphone access denied. Please allow microphone access.')
+        setError(getTranslation('errors.micDenied'))
       } else if (errorMessage.includes('NotFoundError')) {
-        setError('No microphone found.')
+        setError(getTranslation('errors.micNotFound'))
         setPermission('error')
       } else {
-        setError(`Microphone error: ${errorMessage}`)
+        setError(getTranslation('errors.micError'))
         setPermission('error')
       }
 
       cleanup()
       return false
     }
-  }, [isListening, mergedConfig.sampleRate, mergedConfig.fftSize, mergedConfig.smoothingTimeConstant, cleanup])
+  }, [
+    isListening,
+    mergedConfig.sampleRate,
+    mergedConfig.fftSize,
+    mergedConfig.smoothingTimeConstant,
+    cleanup,
+  ])
 
   /**
    * Stop listening
@@ -213,7 +226,7 @@ export const useAudioInput = (config: AudioInputConfig = {}): UseAudioInputRetur
 
     // Data getters
     getTimeDomainData,
-    getFrequencyData
+    getFrequencyData,
   }
 }
 

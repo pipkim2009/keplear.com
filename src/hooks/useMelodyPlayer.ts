@@ -1,10 +1,5 @@
 import { useReducer, useCallback, useEffect, useRef } from 'react'
-import {
-  melodyReducer,
-  initialMelodyState,
-  type MelodyState,
-  type MelodyAction
-} from '../reducers/melodyReducer'
+import { melodyReducer, initialMelodyState } from '../reducers/melodyReducer'
 import type { Note } from '../utils/notes'
 import type { InstrumentType } from '../reducers/instrumentReducer'
 
@@ -13,7 +8,12 @@ interface UseMelodyPlayerProps {
   bpm: number
   isPlaying: boolean
   isRecording: boolean
-  recordMelody: (notes: readonly Note[], bpm: number, instrument: InstrumentType, chordMode?: 'arpeggiator' | 'progression') => Promise<Blob | null>
+  recordMelody: (
+    notes: readonly Note[],
+    bpm: number,
+    instrument: InstrumentType,
+    chordMode?: 'arpeggiator' | 'progression'
+  ) => Promise<Blob | null>
   stopMelody: () => void
   instrument: InstrumentType
   chordMode?: 'arpeggiator' | 'progression'
@@ -57,7 +57,7 @@ export const useMelodyPlayer = ({
   recordMelody,
   stopMelody,
   instrument,
-  chordMode = 'arpeggiator'
+  chordMode = 'arpeggiator',
 }: UseMelodyPlayerProps): UseMelodyPlayerReturn => {
   const [state, dispatch] = useReducer(melodyReducer, initialMelodyState)
 
@@ -65,20 +65,23 @@ export const useMelodyPlayer = ({
   const abortRecordingRef = useRef(false)
 
   // Calculate melody duration in milliseconds
-  const calculateMelodyDuration = useCallback((melodyLength: number, bpm: number, instrument: InstrumentType) => {
-    if (melodyLength === 0) return 0
-    // Match the exact timing from useAudio.ts:
-    // - Each note has a delay of (60 / bpm) * 1000 milliseconds between notes
-    // - Final delay: instrument-specific release time
-    const noteDuration = (60 / bpm) * 1000
-    const instrumentDelays = {
-      keyboard: 1500, // 1.5 seconds
-      guitar: 1000,   // 1.0 seconds
-      bass: 1500      // 1.5 seconds
-    }
-    const finalDelay = instrumentDelays[instrument]
-    return (melodyLength - 1) * noteDuration + finalDelay
-  }, [])
+  const calculateMelodyDuration = useCallback(
+    (melodyLength: number, bpm: number, instrument: InstrumentType) => {
+      if (melodyLength === 0) return 0
+      // Match the exact timing from useAudio.ts:
+      // - Each note has a delay of (60 / bpm) * 1000 milliseconds between notes
+      // - Final delay: instrument-specific release time
+      const noteDuration = (60 / bpm) * 1000
+      const instrumentDelays = {
+        keyboard: 1500, // 1.5 seconds
+        guitar: 1000, // 1.0 seconds
+        bass: 1500, // 1.5 seconds
+      }
+      const finalDelay = instrumentDelays[instrument]
+      return (melodyLength - 1) * noteDuration + finalDelay
+    },
+    []
+  )
 
   // Action creators
   const setPlaybackProgress = useCallback((progress: number) => {
@@ -174,7 +177,13 @@ export const useMelodyPlayer = ({
 
   // Auto-record melody when it changes
   useEffect(() => {
-    if (generatedMelody.length > 0 && !isPlaying && !isRecording && !state.isAutoRecording && !state.hasRecordedAudio) {
+    if (
+      generatedMelody.length > 0 &&
+      !isPlaying &&
+      !isRecording &&
+      !state.isAutoRecording &&
+      !state.hasRecordedAudio
+    ) {
       // Reset abort flag for new recording
       abortRecordingRef.current = false
 
@@ -208,7 +217,15 @@ export const useMelodyPlayer = ({
 
       autoRecord()
     }
-  }, [generatedMelody.length, isPlaying, isRecording, state.isAutoRecording, state.hasRecordedAudio, stopMelody, handleRecordMelody])
+  }, [
+    generatedMelody.length,
+    isPlaying,
+    isRecording,
+    state.isAutoRecording,
+    state.hasRecordedAudio,
+    stopMelody,
+    handleRecordMelody,
+  ])
 
   return {
     // State
@@ -233,6 +250,6 @@ export const useMelodyPlayer = ({
     setCurrentlyPlayingNoteIndex,
 
     // Computed values
-    calculateMelodyDuration
+    calculateMelodyDuration,
   }
 }

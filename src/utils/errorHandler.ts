@@ -3,6 +3,8 @@
  * Provides robust error handling patterns for audio, network, and user operations
  */
 
+import * as Sentry from '@sentry/react'
+
 export interface RetryOptions {
   /** Maximum number of retry attempts */
   maxRetries: number
@@ -31,27 +33,27 @@ export const DEFAULT_RETRY_OPTIONS: Record<string, RetryOptions> = {
     baseDelay: 500,
     maxDelay: 5000,
     backoffFactor: 2,
-    shouldRetry: (error) => error.message.includes('AudioContext') || error.message.includes('suspended')
+    shouldRetry: error =>
+      error.message.includes('AudioContext') || error.message.includes('suspended'),
   },
   network: {
     maxRetries: 5,
     baseDelay: 1000,
     maxDelay: 10000,
     backoffFactor: 1.5,
-    shouldRetry: (error) =>
+    shouldRetry: error =>
       error.message.includes('fetch') ||
       error.message.includes('network') ||
-      error.message.includes('timeout')
+      error.message.includes('timeout'),
   },
   auth: {
     maxRetries: 2,
     baseDelay: 2000,
     maxDelay: 8000,
     backoffFactor: 2,
-    shouldRetry: (error) =>
-      !error.message.includes('Invalid credentials') &&
-      !error.message.includes('User not found')
-  }
+    shouldRetry: error =>
+      !error.message.includes('Invalid credentials') && !error.message.includes('User not found'),
+  },
 }
 
 /**
@@ -106,7 +108,10 @@ export async function withRetry<T>(
       // Add jitter to prevent thundering herd
       const jitteredDelay = delay + Math.random() * 1000
 
-      console.warn(`Operation failed (attempt ${attempt + 1}/${config.maxRetries + 1}), retrying in ${Math.round(jitteredDelay)}ms:`, lastError.message)
+      console.warn(
+        `Operation failed (attempt ${attempt + 1}/${config.maxRetries + 1}), retrying in ${Math.round(jitteredDelay)}ms:`,
+        lastError.message
+      )
 
       await sleep(jitteredDelay)
     }
@@ -169,7 +174,7 @@ export class CircuitBreaker {
     return {
       state: this.state,
       failures: this.failures,
-      threshold: this.threshold
+      threshold: this.threshold,
     }
   }
 }
@@ -184,18 +189,27 @@ export interface ErrorInfo {
 }
 
 export function logErrorToService(error: Error, errorInfo?: ErrorInfo) {
-  // In production, this would send errors to a logging service
-  console.error('Error caught by boundary:', {
-    error: {
-      name: error.name,
-      message: error.message,
-      stack: error.stack
+  // Send to Sentry if initialized
+  Sentry.captureException(error, {
+    contexts: {
+      errorBoundary: {
+        componentStack: errorInfo?.componentStack,
+        errorBoundary: errorInfo?.errorBoundary,
+      },
+      app: {
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+      },
     },
-    errorInfo,
-    timestamp: new Date().toISOString(),
-    userAgent: navigator.userAgent,
-    url: window.location.href
   })
+
+  // Also log to console in development
+  if (import.meta.env.DEV) {
+    console.error('Error caught by boundary:', {
+      error: { name: error.name, message: error.message, stack: error.stack },
+      errorInfo,
+    })
+  }
 }
 
 /**
@@ -245,21 +259,31 @@ function sleep(ms: number): Promise<void> {
  * Enhanced error types for better error handling
  */
 export class AudioError extends Error {
-  constructor(message: string, public readonly audioContext?: AudioContext) {
+  constructor(
+    message: string,
+    public readonly audioContext?: AudioContext
+  ) {
     super(message)
     this.name = 'AudioError'
   }
 }
 
 export class NetworkError extends Error {
-  constructor(message: string, public readonly status?: number, public readonly url?: string) {
+  constructor(
+    message: string,
+    public readonly status?: number,
+    public readonly url?: string
+  ) {
     super(message)
     this.name = 'NetworkError'
   }
 }
 
 export class AuthenticationError extends Error {
-  constructor(message: string, public readonly code?: string) {
+  constructor(
+    message: string,
+    public readonly code?: string
+  ) {
     super(message)
     this.name = 'AuthenticationError'
   }
@@ -285,7 +309,7 @@ export const errorRecoveryStrategies = {
       operation(),
       new Promise((_, reject) =>
         setTimeout(() => reject(new NetworkError('Operation timed out')), timeoutMs)
-      )
+      ),
     ])
   },
 
@@ -296,5 +320,5 @@ export const errorRecoveryStrategies = {
     }
     // Clear any cached audio buffers or large objects
     console.warn('Memory pressure detected - cleared caches')
-  }
+  },
 }

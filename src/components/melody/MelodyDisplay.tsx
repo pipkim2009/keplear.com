@@ -10,6 +10,7 @@ interface MelodyDisplayProps {
 }
 
 // Function to detect chord name from a set of notes
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const detectChordName = (notes: string[]): string => {
   // Remove octave numbers and get unique note names
   const uniqueNotes = [...new Set(notes.map(n => n.replace(/\d+$/, '')))].sort()
@@ -21,7 +22,8 @@ const detectChordName = (notes: string[]): string => {
   const possibleRoots = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
   // Find best matching chord - prioritize exact matches, then by number of matching notes
-  let bestMatch: { root: string; chordType: typeof GUITAR_CHORDS[0]; matchScore: number } | null = null
+  let bestMatch: { root: string; chordType: (typeof GUITAR_CHORDS)[0]; matchScore: number } | null =
+    null
 
   for (const root of possibleRoots) {
     for (const chordType of GUITAR_CHORDS) {
@@ -44,8 +46,8 @@ const detectChordName = (notes: string[]): string => {
         const hasRoot = uniqueNotes.includes(root)
         const matchedNotes = uniqueNotes.length
         const totalChordNotes = chordNotes.length
-        const isExactMatch = matchedNotes === totalChordNotes &&
-                            chordNotes.every(note => uniqueNotes.includes(note))
+        const isExactMatch =
+          matchedNotes === totalChordNotes && chordNotes.every(note => uniqueNotes.includes(note))
 
         let matchScore = 0
 
@@ -88,7 +90,7 @@ const MelodyDisplay: React.FC<MelodyDisplayProps> = ({
   generatedMelody,
   showNotes,
   chordMode = 'arpeggiator',
-  currentlyPlayingNoteIndex
+  currentlyPlayingNoteIndex,
 }) => {
   if (generatedMelody.length === 0 || !showNotes) {
     return null

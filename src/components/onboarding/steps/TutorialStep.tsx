@@ -14,11 +14,12 @@ interface TutorialStepProps {
  * User can start the interactive tutorial or skip to sandbox
  */
 const TutorialStep = ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onComplete,
   onSkip,
   onBack,
   onStartTutorial,
-  isLoading = false
+  isLoading = false,
 }: TutorialStepProps) => {
   return (
     <div className={styles.stepContent}>
@@ -27,9 +28,7 @@ const TutorialStep = ({
           <PiSparkle />
         </span>
         <h2 className={styles.stepTitle}>You're All Set!</h2>
-        <p className={styles.stepDescription}>
-          Would you like a quick tour of the sandbox?
-        </p>
+        <p className={styles.stepDescription}>Would you like a quick tour of the sandbox?</p>
       </div>
 
       <div className={styles.tutorialContent}>
@@ -54,12 +53,7 @@ const TutorialStep = ({
           </button>
         </div>
 
-        <button
-          className={styles.skipButton}
-          onClick={onSkip}
-          type="button"
-          disabled={isLoading}
-        >
+        <button className={styles.skipButton} onClick={onSkip} type="button" disabled={isLoading}>
           <PiRocketLaunch style={{ verticalAlign: 'middle', marginRight: 4 }} />
           Skip - I'll explore on my own
         </button>

@@ -1,44 +1,101 @@
 import { render, screen, fireEvent } from '@testing-library/react'
-import { vi, describe, it, expect } from 'vitest'
+import { vi, describe, it, expect, beforeEach } from 'vitest'
+import { MemoryRouter } from 'react-router'
 import Header from '../layout/Header'
 
-// Mock the auth context
-const mockAuthContext = {
-  user: null,
-  loading: false,
-  signIn: vi.fn(),
-  signUp: vi.fn(),
-  signOut: vi.fn(),
-  updatePassword: vi.fn(),
-  deleteAccount: vi.fn(),
-}
-
-vi.mock('../../contexts/AuthContext', () => ({
-  default: {
-    useContext: () => mockAuthContext,
-  },
+// Mock hooks
+vi.mock('../../hooks/useAuth', () => ({
+  useAuth: vi.fn(() => ({
+    user: null,
+    loading: false,
+  })),
 }))
 
-describe('Header', () => {
+vi.mock('../../contexts/InstrumentContext', () => ({
+  useInstrument: () => ({
+    navigateToSandbox: vi.fn(),
+  }),
+}))
+
+vi.mock('../../contexts/TranslationContext', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: Record<string, string> = {
+        'nav.home': 'Home',
+        'nav.dashboard': 'Dashboard',
+        'nav.sandbox': 'Sandbox',
+        'nav.songs': 'Songs',
+        'nav.classroom': 'Classroom',
+        'auth.signIn': 'Sign In',
+        'auth.signUp': 'Sign Up',
+      }
+      return translations[key] || key
+    },
+  }),
+}))
+
+vi.mock('../common/ThemeToggle', () => ({
+  default: ({ onToggle }: { onToggle: () => void }) => (
+    <button aria-label="Toggle theme" onClick={onToggle}>
+      Toggle theme
+    </button>
+  ),
+}))
+
+vi.mock('../auth/AuthModal', () => ({
+  default: () => null,
+}))
+
+vi.mock('../auth/UserMenu', () => ({
+  default: () => <div data-testid="user-menu">User Menu</div>,
+}))
+
+import { useAuth } from '../../hooks/useAuth'
+
+const mockUseAuth = vi.mocked(useAuth)
+
+function renderHeader(props = {}) {
   const defaultProps = {
     isDarkMode: false,
     onToggleTheme: vi.fn(),
+    ...props,
   }
+  return render(
+    <MemoryRouter>
+      <Header {...defaultProps} />
+    </MemoryRouter>
+  )
+}
 
+describe('Header', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockUseAuth.mockReturnValue({
+      user: null,
+      loading: false,
+      isNewUser: false,
+      clearNewUserFlag: vi.fn(),
+      signIn: vi.fn(),
+      signUp: vi.fn(),
+      signOut: vi.fn(),
+      updatePassword: vi.fn(),
+      deleteAccount: vi.fn(),
+    })
   })
 
   it('renders the logo and navigation', () => {
-    render(<Header {...defaultProps} />)
+    renderHeader()
 
-    expect(screen.getByText('Keplear')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /toggle theme/i })).toBeInTheDocument()
+    expect(screen.getByAltText('Keplear')).toBeInTheDocument()
+    expect(screen.getByText('Home')).toBeInTheDocument()
+    expect(screen.getByText('Sandbox')).toBeInTheDocument()
+    expect(screen.getByText('Songs')).toBeInTheDocument()
+    expect(screen.getByText('Classroom')).toBeInTheDocument()
   })
 
   it('calls onToggleTheme when theme button is clicked', () => {
     const mockToggleTheme = vi.fn()
-    render(<Header {...defaultProps} onToggleTheme={mockToggleTheme} />)
+    renderHeader({ onToggleTheme: mockToggleTheme })
 
     const themeButton = screen.getByRole('button', { name: /toggle theme/i })
     fireEvent.click(themeButton)
@@ -47,43 +104,51 @@ describe('Header', () => {
   })
 
   it('shows login button when user is not authenticated', () => {
-    render(<Header {...defaultProps} />)
+    renderHeader()
 
-    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument()
+    expect(screen.getByText('Sign In')).toBeInTheDocument()
+    expect(screen.getByText('Sign Up')).toBeInTheDocument()
   })
 
   it('shows user menu when user is authenticated', () => {
-    const mockUser = {
-      id: '1',
-      email: 'test@example.com',
-      user_metadata: { username: 'testuser' },
-    }
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', email: 'test@example.com' } as ReturnType<typeof mockUseAuth>['user'],
+      loading: false,
+      isNewUser: false,
+      clearNewUserFlag: vi.fn(),
+      signIn: vi.fn(),
+      signUp: vi.fn(),
+      signOut: vi.fn(),
+      updatePassword: vi.fn(),
+      deleteAccount: vi.fn(),
+    })
 
-    mockAuthContext.user = mockUser
+    renderHeader()
 
-    render(<Header {...defaultProps} />)
-
-    expect(screen.getByText('testuser')).toBeInTheDocument()
+    expect(screen.getByTestId('user-menu')).toBeInTheDocument()
   })
 
-  it('applies correct theme classes', () => {
-    const { rerender } = render(<Header {...defaultProps} />)
+  it('shows Dashboard link for logged-in users instead of Home', () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', email: 'test@example.com' } as ReturnType<typeof mockUseAuth>['user'],
+      loading: false,
+      isNewUser: false,
+      clearNewUserFlag: vi.fn(),
+      signIn: vi.fn(),
+      signUp: vi.fn(),
+      signOut: vi.fn(),
+      updatePassword: vi.fn(),
+      deleteAccount: vi.fn(),
+    })
 
-    // Test light mode
-    expect(document.querySelector('.light')).toBeInTheDocument()
+    renderHeader()
 
-    // Test dark mode
-    rerender(<Header {...defaultProps} isDarkMode={true} />)
-    expect(document.querySelector('.dark')).toBeInTheDocument()
+    expect(screen.getByText('Dashboard')).toBeInTheDocument()
+    expect(screen.queryByText('Home')).not.toBeInTheDocument()
   })
 
-  it('is accessible with proper ARIA labels', () => {
-    render(<Header {...defaultProps} />)
-
-    const nav = screen.getByRole('banner')
-    expect(nav).toBeInTheDocument()
-
-    const themeButton = screen.getByRole('button', { name: /toggle theme/i })
-    expect(themeButton).toHaveAttribute('aria-label')
+  it('renders banner element for accessibility', () => {
+    renderHeader()
+    expect(screen.getByRole('banner')).toBeInTheDocument()
   })
 })

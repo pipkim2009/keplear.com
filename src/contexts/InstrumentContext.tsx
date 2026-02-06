@@ -22,7 +22,11 @@ interface InstrumentContextType {
   playGuitarMelody: (melody: readonly Note[], bpm: number) => Promise<void>
   playBassMelody: (melody: readonly Note[], bpm: number) => Promise<void>
   stopMelody: () => void
-  recordMelody: (notes: readonly Note[], bpm: number, instrument: InstrumentType) => Promise<Blob | null>
+  recordMelody: (
+    notes: readonly Note[],
+    bpm: number,
+    instrument: InstrumentType
+  ) => Promise<Blob | null>
   isPlaying: boolean
   isRecording: boolean
 
@@ -58,7 +62,17 @@ interface InstrumentContextType {
   selectedNotes: Note[]
   generatedMelody: Note[]
   selectNote: (note: Note, mode?: 'range' | 'multi') => void
-  generateMelody: (notes: Note[], count: number, instrument: InstrumentType, mode: 'range' | 'multi', notesToUse?: readonly Note[], chordMode?: 'arpeggiator' | 'progression', appliedChords?: any[], appliedScales?: any[], inclusiveMode?: boolean) => void
+  generateMelody: (
+    notes: Note[],
+    count: number,
+    instrument: InstrumentType,
+    mode: 'range' | 'multi',
+    notesToUse?: readonly Note[],
+    chordMode?: 'arpeggiator' | 'progression',
+    appliedChords?: AppliedChord[],
+    appliedScales?: AppliedScale[],
+    inclusiveMode?: boolean
+  ) => void
   setGuitarNotes: (notes: Note[]) => void
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
@@ -108,6 +122,7 @@ interface InstrumentContextType {
 
 const InstrumentContext = createContext<InstrumentContextType | undefined>(undefined)
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useInstrument = () => {
   const context = useContext(InstrumentContext)
   if (context === undefined) {
@@ -137,11 +152,22 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
   }>({
     noteCount: 0,
     chordCount: 0,
-    scaleCount: 0
+    scaleCount: 0,
   })
 
   // All the existing hooks from App.tsx
-  const { playNote, playGuitarNote, playBassNote, playMelody, playGuitarMelody, playBassMelody, stopMelody, recordMelody, isPlaying, isRecording } = useAudio()
+  const {
+    playNote,
+    playGuitarNote,
+    playBassNote,
+    playMelody,
+    playGuitarMelody,
+    playBassMelody,
+    stopMelody,
+    recordMelody,
+    isPlaying,
+    isRecording,
+  } = useAudio()
 
   const {
     currentPage,
@@ -163,7 +189,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     triggerInputFlash,
     setInputActive,
     setCurrentPage,
-    resetSettings
+    resetSettings,
   } = useUIState()
 
   const {
@@ -171,7 +197,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     keyboardOctaves,
     clearChordsAndScalesTrigger,
     setInstrument,
-    triggerClearChordsAndScales
+    triggerClearChordsAndScales,
   } = useInstrumentConfig()
 
   const {
@@ -184,7 +210,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     isInMelody,
     clearSelection,
     clearMelody,
-    clearTrigger
+    clearTrigger,
   } = useMelodyGenerator()
 
   const {
@@ -201,7 +227,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     handleRecordMelody,
     handleClearRecordedAudio,
     calculateMelodyDuration,
-    setCurrentlyPlayingNoteIndex
+    setCurrentlyPlayingNoteIndex,
   } = useMelodyPlayer({
     generatedMelody,
     bpm,
@@ -210,7 +236,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     recordMelody,
     stopMelody,
     instrument,
-    chordMode
+    chordMode,
   })
 
   // Scale and chord management (must come before useMelodyChanges)
@@ -222,7 +248,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     clearSelection,
     clearChordsAndScales: clearChordsAndScalesTrigger,
     lowerOctaves,
-    higherOctaves
+    higherOctaves,
   })
 
   const { appliedChords, appliedScales } = scaleChordManagement
@@ -233,7 +259,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     numberOfBeats,
     generatedMelody,
     instrument,
-    appliedChords
+    appliedChords,
   })
 
   // Turn off generating indicator only when we have recorded audio ready
@@ -266,56 +292,104 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     prevSelectionRef.current = {
       noteCount: currentNoteCount,
       chordCount: currentChordCount,
-      scaleCount: currentScaleCount
+      scaleCount: currentScaleCount,
     }
-  }, [selectedNotes.length, appliedChords.length, appliedScales.length, showNotes, generatedMelody.length, setShowNotes])
+  }, [
+    selectedNotes.length,
+    appliedChords.length,
+    appliedScales.length,
+    showNotes,
+    generatedMelody.length,
+    setShowNotes,
+  ])
 
   // Handlers from App.tsx
-  const handleNoteClick = useCallback(async (note: Note): Promise<void> => {
-    try {
-      // Don't play sounds during melody generation to prevent interference with recording
-      if (!isGeneratingMelody && !isAutoRecording) {
-        if (instrument === 'guitar') {
-          await playGuitarNote(note.name)
-        } else if (instrument === 'bass') {
-          await playBassNote(note.name)
-        } else {
-          await playNote(note.name)
+  const handleNoteClick = useCallback(
+    async (note: Note): Promise<void> => {
+      try {
+        // Don't play sounds during melody generation to prevent interference with recording
+        if (!isGeneratingMelody && !isAutoRecording) {
+          if (instrument === 'guitar') {
+            await playGuitarNote(note.name)
+          } else if (instrument === 'bass') {
+            await playBassNote(note.name)
+          } else {
+            await playNote(note.name)
+          }
         }
+        // Always use multi-select mode
+        selectNote(note, 'multi')
+      } catch (error) {
+        console.error('handleNoteClick error:', error)
       }
-      // Always use multi-select mode
-      selectNote(note, 'multi')
-    } catch (error) {
-      console.error('handleNoteClick error:', error)
-    }
-  }, [instrument, playGuitarNote, playBassNote, playNote, selectNote, isGeneratingMelody, isAutoRecording])
+    },
+    [
+      instrument,
+      playGuitarNote,
+      playBassNote,
+      playNote,
+      selectNote,
+      isGeneratingMelody,
+      isAutoRecording,
+    ]
+  )
 
-  const handleGenerateMelody = useCallback((inclusiveMode?: boolean): void => {
-    setIsGeneratingMelody(true)
+  const handleGenerateMelody = useCallback(
+    (inclusiveMode?: boolean): void => {
+      setIsGeneratingMelody(true)
 
-    // Store the BPM used for this melody
-    setMelodyBpm(bpm)
+      // Store the BPM used for this melody
+      setMelodyBpm(bpm)
 
-    // Generate melody immediately with current values
-    // Use local lowerOctaves/higherOctaves state which is updated by the octave buttons
-    const melodyNotes = instrument === 'keyboard' && (lowerOctaves !== 0 || higherOctaves !== 0)
-      ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
-      : notes
+      // Generate melody immediately with current values
+      // Use local lowerOctaves/higherOctaves state which is updated by the octave buttons
+      const melodyNotes =
+        instrument === 'keyboard' && (lowerOctaves !== 0 || higherOctaves !== 0)
+          ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+          : notes
 
-    // Take a snapshot of currently selected notes to prevent interference from note clicks during generation
-    const selectedNotesSnapshot = [...selectedNotes]
+      // Take a snapshot of currently selected notes to prevent interference from note clicks during generation
+      const selectedNotesSnapshot = [...selectedNotes]
 
-    // Pass chordMode, appliedChords, appliedScales, and inclusiveMode to generateMelody (always use 'multi' mode)
-    generateMelody(melodyNotes, numberOfBeats, instrument, 'multi', selectedNotesSnapshot, chordMode, appliedChords, appliedScales, inclusiveMode)
+      // Pass chordMode, appliedChords, appliedScales, and inclusiveMode to generateMelody (always use 'multi' mode)
+      generateMelody(
+        melodyNotes,
+        numberOfBeats,
+        instrument,
+        'multi',
+        selectedNotesSnapshot,
+        chordMode,
+        appliedChords,
+        appliedScales,
+        inclusiveMode
+      )
 
-    const duration = calculateMelodyDuration(numberOfBeats, bpm, instrument)
-    setMelodyDuration(duration)
-    setPlaybackProgress(0)
-    handleClearRecordedAudio()
-    clearChanges()
+      const duration = calculateMelodyDuration(numberOfBeats, bpm, instrument)
+      setMelodyDuration(duration)
+      setPlaybackProgress(0)
+      handleClearRecordedAudio()
+      clearChanges()
 
-    // isGeneratingMelody will stay true until recorded audio is ready
-  }, [generateMelody, numberOfBeats, instrument, lowerOctaves, higherOctaves, selectedNotes, calculateMelodyDuration, bpm, setMelodyDuration, setPlaybackProgress, handleClearRecordedAudio, clearChanges, chordMode, appliedChords, appliedScales])
+      // isGeneratingMelody will stay true until recorded audio is ready
+    },
+    [
+      generateMelody,
+      numberOfBeats,
+      instrument,
+      lowerOctaves,
+      higherOctaves,
+      selectedNotes,
+      calculateMelodyDuration,
+      bpm,
+      setMelodyDuration,
+      setPlaybackProgress,
+      handleClearRecordedAudio,
+      clearChanges,
+      chordMode,
+      appliedChords,
+      appliedScales,
+    ]
+  )
 
   const handlePlayMelody = useCallback((): void => {
     if (isPlaying) {
@@ -337,35 +411,64 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
         playMelody([...generatedMelody], bpm, chordMode)
       }
     }
-  }, [isPlaying, stopMelody, generatedMelody, instrument, playGuitarMelody, playBassMelody, playMelody, bpm, chordMode, setPlaybackProgress])
+  }, [
+    isPlaying,
+    stopMelody,
+    generatedMelody,
+    instrument,
+    playGuitarMelody,
+    playBassMelody,
+    playMelody,
+    bpm,
+    chordMode,
+    setPlaybackProgress,
+  ])
 
-  const handleInstrumentChange = useCallback((newInstrument: InstrumentType): void => {
-    // FIRST: Abort any ongoing recording before anything else
-    handleClearRecordedAudio()
+  const handleInstrumentChange = useCallback(
+    (newInstrument: InstrumentType): void => {
+      // FIRST: Abort any ongoing recording before anything else
+      handleClearRecordedAudio()
 
-    // Stop any ongoing melody playback or recording
-    if (isPlaying || isRecording) {
-      stopMelody()
-    }
+      // Stop any ongoing melody playback or recording
+      if (isPlaying || isRecording) {
+        stopMelody()
+      }
 
-    // Cancel melody generation if in progress
-    setIsGeneratingMelody(false)
+      // Cancel melody generation if in progress
+      setIsGeneratingMelody(false)
 
-    // Clear all melody-related state
-    setInstrument(newInstrument)
-    clearSelection()
-    clearMelody()
-    triggerClearChordsAndScales()
-  }, [setInstrument, clearSelection, clearMelody, handleClearRecordedAudio, triggerClearChordsAndScales, isPlaying, isRecording, stopMelody])
+      // Clear all melody-related state
+      setInstrument(newInstrument)
+      clearSelection()
+      clearMelody()
+      triggerClearChordsAndScales()
+    },
+    [
+      setInstrument,
+      clearSelection,
+      clearMelody,
+      handleClearRecordedAudio,
+      triggerClearChordsAndScales,
+      isPlaying,
+      isRecording,
+      stopMelody,
+    ]
+  )
 
-  const handleOctaveRangeChange = useCallback((newLowerOctaves: number, newHigherOctaves: number): void => {
-    setLowerOctaves(newLowerOctaves)
-    setHigherOctaves(newHigherOctaves)
-  }, [])
+  const handleOctaveRangeChange = useCallback(
+    (newLowerOctaves: number, newHigherOctaves: number): void => {
+      setLowerOctaves(newLowerOctaves)
+      setHigherOctaves(newHigherOctaves)
+    },
+    []
+  )
 
-  const handleCurrentlyPlayingNoteChange = useCallback((index: number | null): void => {
-    setCurrentlyPlayingNoteIndex(index)
-  }, [setCurrentlyPlayingNoteIndex])
+  const handleCurrentlyPlayingNoteChange = useCallback(
+    (index: number | null): void => {
+      setCurrentlyPlayingNoteIndex(index)
+    },
+    [setCurrentlyPlayingNoteIndex]
+  )
 
   // Custom navigateToSandbox that resets all state for a fresh sandbox environment
   const navigateToSandbox = useCallback((): void => {
@@ -409,7 +512,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     setMelodyDuration,
     resetSettings,
     setInstrument,
-    navigateToSandboxOriginal
+    navigateToSandboxOriginal,
   ])
 
   const value: InstrumentContextType = {
@@ -501,12 +604,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
 
     // Octave Range
     lowerOctaves,
-    higherOctaves
+    higherOctaves,
   }
 
-  return (
-    <InstrumentContext.Provider value={value}>
-      {children}
-    </InstrumentContext.Provider>
-  )
+  return <InstrumentContext.Provider value={value}>{children}</InstrumentContext.Provider>
 }

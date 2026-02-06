@@ -99,7 +99,26 @@ async function tryInvidiousInstance(instance, videoId, controller) {
   }
 }
 
+const ALLOWED_ORIGINS = [
+  'https://keplear.com',
+  'https://www.keplear.com',
+  'http://localhost:5173'
+]
+
+function getCorsOrigin(req) {
+  const origin = req.headers.origin || req.headers.referer || ''
+  return ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
+}
+
 export default async function handler(req, res) {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', getCorsOrigin(req))
+    res.setHeader('Access-Control-Allow-Methods', 'GET')
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+    return res.status(204).end()
+  }
+
   // Only allow GET requests
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
@@ -112,7 +131,7 @@ export default async function handler(req, res) {
   }
 
   // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Origin', getCorsOrigin(req))
   res.setHeader('Access-Control-Allow-Methods', 'GET')
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=7200')
 

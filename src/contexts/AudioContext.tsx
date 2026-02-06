@@ -12,13 +12,18 @@ interface AudioContextType {
   playGuitarMelody: (melody: readonly Note[], bpm: number) => Promise<void>
   playBassMelody: (melody: readonly Note[], bpm: number) => Promise<void>
   stopMelody: () => void
-  recordMelody: (notes: readonly Note[], bpm: number, instrument: InstrumentType) => Promise<Blob | null>
+  recordMelody: (
+    notes: readonly Note[],
+    bpm: number,
+    instrument: InstrumentType
+  ) => Promise<Blob | null>
   isPlaying: boolean
   isRecording: boolean
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined)
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAudioContext = () => {
   const context = useContext(AudioContext)
   if (context === undefined) {
@@ -44,7 +49,7 @@ export const AudioProvider: React.FC<AudioProviderProps> = ({ children }) => {
     stopMelody: audioHook.stopMelody,
     recordMelody: audioHook.recordMelody,
     isPlaying: audioHook.isPlaying,
-    isRecording: audioHook.isRecording
+    isRecording: audioHook.isRecording,
   }
 
   return <AudioContext.Provider value={value}>{children}</AudioContext.Provider>

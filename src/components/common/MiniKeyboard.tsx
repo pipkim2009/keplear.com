@@ -8,17 +8,26 @@ interface MiniKeyboardProps {
   notes: { name: string }[]
   root: string
   mode?: 'scale' | 'chord'
-  playingNotes?: string[]  // Note names that are currently playing
+  playingNotes?: string[] // Note names that are currently playing
 }
 
 // Standard piano key pattern for one octave
 const WHITE_KEYS = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
 const BLACK_KEYS = ['C#', 'D#', 'F#', 'G#', 'A#']
 const BLACK_KEY_POSITIONS: Record<string, number> = {
-  'C#': 0, 'D#': 1, 'F#': 3, 'G#': 4, 'A#': 5
+  'C#': 0,
+  'D#': 1,
+  'F#': 3,
+  'G#': 4,
+  'A#': 5,
 }
 
-const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale', playingNotes = [] }) => {
+const MiniKeyboard: React.FC<MiniKeyboardProps> = ({
+  notes,
+  root,
+  mode = 'scale',
+  playingNotes = [],
+}) => {
   const { t } = useTranslation()
 
   // Determine available octaves from notes
@@ -108,15 +117,18 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
           <div className="octave-visual">
             <div className="keyboard-range-container">
               <img
-                src="/Keyboard.png"
+                src="/Keyboard.webp"
                 alt="Keyboard octave range"
                 className="keyboard-range-image"
-                onClick={(e) => {
+                onClick={e => {
                   const rect = e.currentTarget.getBoundingClientRect()
                   const clickX = e.clientX - rect.left
                   const clickPercent = clickX / rect.width
                   const clickedOctave = Math.round(clickPercent * 8) + 1
-                  const clampedOctave = Math.max(minAvailableOctave, Math.min(maxAvailableOctave, clickedOctave))
+                  const clampedOctave = Math.max(
+                    minAvailableOctave,
+                    Math.min(maxAvailableOctave, clickedOctave)
+                  )
                   setSelectedOctave(clampedOctave)
                 }}
                 style={{ cursor: 'pointer' }}
@@ -147,7 +159,7 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
               style={{
                 left: `${keyIdx * whiteKeyWidth}px`,
                 width: `${whiteKeyWidth}px`,
-                height: `${whiteKeyHeight}px`
+                height: `${whiteKeyHeight}px`,
               }}
             >
               <span className="mini-kb-note-label">{displayName}</span>
@@ -156,7 +168,7 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
         })}
 
         {/* Black keys */}
-        {BLACK_KEYS.map((note) => {
+        {BLACK_KEYS.map(note => {
           const noteName = note
           const fullNoteName = `${note}${selectedOctave}`
           const displayName = fullNoteName
@@ -170,7 +182,7 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({ notes, root, mode = 'scale'
               style={{
                 left: `${leftOffset}px`,
                 width: `${blackKeyWidth}px`,
-                height: `${blackKeyHeight}px`
+                height: `${blackKeyHeight}px`,
               }}
             >
               <span className="mini-kb-note-label">{displayName}</span>

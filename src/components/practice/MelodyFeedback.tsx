@@ -49,8 +49,10 @@ function NoteChip({ note, showAnimation = false }: NoteChipProps) {
   const classes = [
     styles.noteChip,
     note.isPlayed && styles.played,
-    note.isCurrent && !note.isPlayed && styles.current
-  ].filter(Boolean).join(' ')
+    note.isCurrent && !note.isPlayed && styles.current,
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
     <div className={classes}>
@@ -108,10 +110,7 @@ function ProgressDisplay({ playedCount, totalNotes, progress }: ProgressDisplayP
         <span className={styles.progressLabel}>notes</span>
       </div>
       <div className={styles.progressBar}>
-        <div
-          className={styles.progressFill}
-          style={{ width: `${progress}%` }}
-        />
+        <div className={styles.progressFill} style={{ width: `${progress}%` }} />
       </div>
     </div>
   )
@@ -125,22 +124,13 @@ export function MelodyFeedback({
   melody,
   instrument = 'keyboard',
   strictOctave = false,
-  onComplete
+  onComplete,
 }: MelodyFeedbackProps) {
-  const {
-    start,
-    stop,
-    reset,
-    setMelody,
-    state,
-    modelStatus,
-    permission,
-    error,
-    updateConfig
-  } = useMelodyFeedback({
-    instrument,
-    strictOctave
-  })
+  const { start, stop, reset, setMelody, state, modelStatus, permission, error, updateConfig } =
+    useMelodyFeedback({
+      instrument,
+      strictOctave,
+    })
 
   // Update melody when it changes
   useEffect(() => {
@@ -185,6 +175,7 @@ export function MelodyFeedback({
   }, [reset])
 
   // Get display notes (current + upcoming)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const displayNotes = useMemo(() => {
     return state.notes
   }, [state.notes])
@@ -206,8 +197,8 @@ export function MelodyFeedback({
         <div className={styles.permissionDenied}>
           <MicOff size={48} className={styles.permissionIcon} />
           <p className={styles.permissionText}>
-            Microphone access is required for live feedback.
-            Please allow microphone access in your browser settings.
+            Microphone access is required for live feedback. Please allow microphone access in your
+            browser settings.
           </p>
         </div>
       </div>
@@ -217,11 +208,7 @@ export function MelodyFeedback({
   return (
     <div className={styles.container}>
       {/* Error Display */}
-      {error && (
-        <div className={styles.error}>
-          {error}
-        </div>
-      )}
+      {error && <div className={styles.error}>{error}</div>}
 
       {/* Controls */}
       <div className={styles.controls}>
@@ -312,11 +299,7 @@ export function MelodyFeedback({
               </div>
               <div className={styles.noteGrid}>
                 {remainingNotes.map(note => (
-                  <NoteChip
-                    key={note.index}
-                    note={note}
-                    showAnimation={state.isActive}
-                  />
+                  <NoteChip key={note.index} note={note} showAnimation={state.isActive} />
                 ))}
               </div>
             </div>
@@ -327,8 +310,12 @@ export function MelodyFeedback({
       {/* Instructions */}
       {!state.isActive && state.playedCount === 0 && state.totalNotes > 0 && (
         <div className={styles.instructions}>
-          <p>Press <strong>Start Practice</strong> and play the notes above on your instrument.</p>
-          <p className={styles.instructionNote}>Play at your own pace - timing doesn&apos;t matter!</p>
+          <p>
+            Press <strong>Start Practice</strong> and play the notes above on your instrument.
+          </p>
+          <p className={styles.instructionNote}>
+            Play at your own pace - timing doesn&apos;t matter!
+          </p>
         </div>
       )}
     </div>

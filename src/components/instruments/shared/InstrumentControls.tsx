@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback, memo, useMemo } from 'react'
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react'
 import '../../../styles/Controls.css'
 import '../../../styles/MelodyControls.css'
-import { GUITAR_SCALES, ROOT_NOTES, getScaleBoxes, type GuitarScale, type ScaleBox } from '../../../utils/instruments/guitar/guitarScales'
-import { guitarNotes } from '../../../utils/instruments/guitar/guitarNotes'
-import { KEYBOARD_SCALES, type KeyboardScale } from '../../../utils/instruments/keyboard/keyboardScales'
+import { type GuitarScale, type ScaleBox } from '../../../utils/instruments/guitar/guitarScales'
+import { type KeyboardScale } from '../../../utils/instruments/keyboard/keyboardScales'
 import Tooltip from '../../common/Tooltip'
 import { useTranslation } from '../../../contexts/TranslationContext'
 import type { Note } from '../../../utils/notes'
@@ -14,7 +13,6 @@ import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import { IoMdArrowDropdown } from 'react-icons/io'
 import { IoWarning } from 'react-icons/io5'
-import { useIncrementDecrement } from '../../../hooks/useHoldButton'
 import { sanitizeNumericInput } from '../../../utils/inputValidation'
 
 interface InstrumentControlsProps {
@@ -93,19 +91,12 @@ const InstrumentControls = memo(function InstrumentControls({
   setChordMode,
   instrument,
   setInstrument,
-  clearSelection,
-  hasSelectedNotes,
-  onScaleSelect,
-  onScaleBoxSelect,
-  onClearScale,
   lowerOctaves = 0,
   higherOctaves = 0,
   onAddLowerOctave,
   onRemoveLowerOctave,
   onAddHigherOctave,
   onRemoveHigherOctave,
-  onKeyboardScaleApply,
-  onKeyboardScaleClear,
   flashingInputs,
   triggerInputFlash,
   setInputActive,
@@ -113,14 +104,8 @@ const InstrumentControls = memo(function InstrumentControls({
   appliedChordsCount = 0,
   appliedScalesCount = 0,
   onGenerateMelody,
-  onPlayMelody,
-  onRecordMelody,
-  isPlaying = false,
-  isRecording = false,
-  hasGeneratedMelody = false,
   showNotes = false,
   onToggleNotes,
-  playbackProgress = 0,
   melodyDuration = 0,
   onProgressChange,
   onClearRecordedAudio,
@@ -144,23 +129,11 @@ const InstrumentControls = memo(function InstrumentControls({
   autoPlayAudio = false,
   onMelodyComplete,
   autoStartFeedback = false,
-  onExportToClassroom,
-  canExportToClassroom = false,
-  hasExportableContent = false
 }: InstrumentControlsProps) {
   const { t } = useTranslation()
 
   const [bpmDisplay, setBpmDisplay] = useState(bpm.toString())
   const [beatsDisplay, setBeatsDisplay] = useState(numberOfBeats.toString())
-  const [selectedRoot, setSelectedRoot] = useState<string>('C')
-  const [selectedScale, setSelectedScale] = useState<GuitarScale>(GUITAR_SCALES[0])
-  const [hasActiveScale, setHasActiveScale] = useState<boolean>(false)
-  const [keyboardSelectedRoot, setKeyboardSelectedRoot] = useState<string>('C')
-  const [keyboardSelectedScale, setKeyboardSelectedScale] = useState<KeyboardScale>(KEYBOARD_SCALES[0])
-  const [hasActiveKeyboardScale, setHasActiveKeyboardScale] = useState<boolean>(false)
-  const [showPositions, setShowPositions] = useState<boolean>(true)
-  const [availableBoxes, setAvailableBoxes] = useState<ScaleBox[]>([])
-  const [selectedBoxIndex, setSelectedBoxIndex] = useState<number>(0)
   const [isDragging, setIsDragging] = useState<boolean>(false)
   const [audioFileBlob, setAudioFileBlob] = useState<Blob | null>(null)
   const [audioFileUrl, setAudioFileUrl] = useState<string | null>(null)
@@ -176,7 +149,7 @@ const InstrumentControls = memo(function InstrumentControls({
   // Original default values
   const DEFAULT_BPM = 120
   const DEFAULT_NOTES = 5
-  
+
   // Refs for hold-down functionality
   const bpmIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const notesIntervalRef = useRef<NodeJS.Timeout | null>(null)
@@ -184,7 +157,7 @@ const InstrumentControls = memo(function InstrumentControls({
   const isHoldingNotes = useRef<boolean>(false)
   const currentBpmRef = useRef<number>(bpm)
   const currentNotesRef = useRef<number>(numberOfBeats)
-  
+
   // Update display values when props change
   useEffect(() => {
     setBpmDisplay(bpm.toString())
@@ -195,7 +168,7 @@ const InstrumentControls = memo(function InstrumentControls({
     setBeatsDisplay(numberOfBeats.toString())
     currentNotesRef.current = numberOfBeats
   }, [numberOfBeats])
-  
+
   // Use centralized input validation
   const handleBpmChange = useCallback((value: string) => {
     setBpmDisplay(sanitizeNumericInput(value, { max: 999 }))
@@ -204,7 +177,7 @@ const InstrumentControls = memo(function InstrumentControls({
   const handleNotesChange = useCallback((value: string) => {
     setBeatsDisplay(sanitizeNumericInput(value, { max: 999 }))
   }, [])
-  
+
   const handleBpmKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       if (bpmDisplay === '') {
@@ -217,7 +190,7 @@ const InstrumentControls = memo(function InstrumentControls({
       e.currentTarget.blur()
     }
   }
-  
+
   const handleNotesKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       if (beatsDisplay === '') {
@@ -230,7 +203,7 @@ const InstrumentControls = memo(function InstrumentControls({
       e.currentTarget.blur()
     }
   }
-  
+
   const handleBpmBlur = () => {
     if (bpmDisplay !== '' && !isNaN(Number(bpmDisplay))) {
       setBpm(Number(bpmDisplay))
@@ -238,7 +211,7 @@ const InstrumentControls = memo(function InstrumentControls({
       setBpmDisplay(bpm.toString())
     }
   }
-  
+
   const handleNotesBlur = () => {
     if (beatsDisplay !== '' && !isNaN(Number(beatsDisplay))) {
       setNumberOfBeats(Number(beatsDisplay))
@@ -246,7 +219,6 @@ const InstrumentControls = memo(function InstrumentControls({
       setBeatsDisplay(numberOfBeats.toString())
     }
   }
-
 
   // Hold-down functionality
   const startBpmIncrement = () => {
@@ -349,95 +321,6 @@ const InstrumentControls = memo(function InstrumentControls({
     setInputActive('beats', false)
   }
 
-
-  // Update available boxes when root or scale changes
-  useEffect(() => {
-    const boxes = getScaleBoxes(selectedRoot, selectedScale, guitarNotes)
-    setAvailableBoxes(boxes)
-    setSelectedBoxIndex(0)
-  }, [selectedRoot, selectedScale])
-
-  // Scale control handlers
-  const handleRootChange = (rootNote: string) => {
-    setSelectedRoot(rootNote)
-  }
-
-  const handleScaleChange = (scale: GuitarScale) => {
-    setSelectedScale(scale)
-  }
-
-  const handleBoxChange = (boxIndex: number) => {
-    setSelectedBoxIndex(boxIndex)
-    // If "Entire Fretboard" is selected (index equals availableBoxes.length), use full scale
-    if (boxIndex >= availableBoxes.length) {
-      setShowPositions(false)
-    } else {
-      setShowPositions(true)
-    }
-  }
-
-
-  const handleApplyScale = () => {
-    if (showPositions && availableBoxes.length > 0 && onScaleBoxSelect) {
-      onScaleBoxSelect(availableBoxes[selectedBoxIndex])
-      setHasActiveScale(true)
-    } else if (onScaleSelect) {
-      onScaleSelect(selectedRoot, selectedScale)
-      setHasActiveScale(true)
-    }
-  }
-
-  const handleClearScale = () => {
-    if (onClearScale) {
-      onClearScale()
-      setHasActiveScale(false)
-    }
-  }
-
-  // Keyboard scale handlers
-  const handleKeyboardRootChange = (rootNote: string) => {
-    setKeyboardSelectedRoot(rootNote)
-  }
-
-  const handleKeyboardScaleChange = (scale: KeyboardScale) => {
-    setKeyboardSelectedScale(scale)
-  }
-
-  const handleApplyKeyboardScale = () => {
-    if (onKeyboardScaleApply) {
-      onKeyboardScaleApply(keyboardSelectedRoot, keyboardSelectedScale)
-      setHasActiveKeyboardScale(true)
-    }
-  }
-
-  const handleClearKeyboardScale = () => {
-    if (onKeyboardScaleClear) {
-      onKeyboardScaleClear()
-      setHasActiveKeyboardScale(false)
-    }
-  }
-
-  // Remove auto-reapplication - user must click Apply button
-
-  // Progress bar drag handling
-  const handleProgressBarClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!onProgressChange || melodyDuration === 0) return
-
-    const rect = e.currentTarget.getBoundingClientRect()
-    const clickX = e.clientX - rect.left
-    const percentage = Math.max(0, Math.min(1, clickX / rect.width))
-    const newProgress = percentage * melodyDuration
-
-    onProgressChange(newProgress)
-  }, [onProgressChange, melodyDuration])
-
-  const handleProgressBarMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!onProgressChange || melodyDuration === 0) return
-
-    setIsDragging(true)
-    handleProgressBarClick(e)
-  }, [onProgressChange, melodyDuration, handleProgressBarClick])
-
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging) return
@@ -478,24 +361,6 @@ const InstrumentControls = memo(function InstrumentControls({
     }
   }, [])
 
-  // Recording handlers
-  const handleRecordForPlayback = async () => {
-    if (!onRecordMelody) return
-
-    try {
-      const audioBlob = await onRecordMelody()
-      if (audioBlob) {
-        // Create URL for HTML audio element (no download)
-        const url = URL.createObjectURL(audioBlob)
-        setAudioFileBlob(audioBlob)
-        setAudioFileUrl(url)
-      }
-    } catch (error) {
-      console.error('Failed to record melody:', error)
-    }
-  }
-
-
   // Handle auto-recorded audio from parent
   React.useEffect(() => {
     if (recordedAudioBlob) {
@@ -525,163 +390,179 @@ const InstrumentControls = memo(function InstrumentControls({
   const hasContent = appliedChordsCount > 0 || appliedScalesCount > 0 || selectedNotesCount > 0
   const canGenerateMelody = hasContent && hasEnoughBeats
   return (
-    <div className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}>
+    <div
+      className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}
+    >
       {/* Top row: Instrument selector */}
       {!hideInstrumentSelector && (
-      <div className="control-group instrument-selector-group">
-        {/* Desktop/Tablet view - Cards */}
-        <div className="instrument-selector desktop-selector">
-          <div
-            className={`instrument-card ${instrument === 'keyboard' ? 'active' : ''}`}
-            onClick={() => {
-              // Clear recorded audio when switching instruments
-              if (audioFileUrl) {
-                URL.revokeObjectURL(audioFileUrl)
-                setAudioFileUrl(null)
-              }
-              setAudioFileBlob(null)
-              if (onClearRecordedAudio) {
-                onClearRecordedAudio()
-              }
-              setInstrument('keyboard')
-            }}
-          >
-            <div className="instrument-icon"><PiPianoKeysFill /></div>
-            <div className="instrument-name">{t('sandbox.keyboard')}</div>
-            <div className="instrument-glow"></div>
-          </div>
-          <div
-            className={`instrument-card ${instrument === 'guitar' ? 'active' : ''}`}
-            onClick={() => {
-              // Clear recorded audio when switching instruments
-              if (audioFileUrl) {
-                URL.revokeObjectURL(audioFileUrl)
-                setAudioFileUrl(null)
-              }
-              setAudioFileBlob(null)
-              if (onClearRecordedAudio) {
-                onClearRecordedAudio()
-              }
-              setInstrument('guitar')
-            }}
-          >
-            <div className="instrument-icon"><GiGuitarHead /></div>
-            <div className="instrument-name">{t('sandbox.guitar')}</div>
-            <div className="instrument-glow"></div>
-          </div>
-          <div
-            className={`instrument-card ${instrument === 'bass' ? 'active' : ''}`}
-            onClick={() => {
-              // Clear recorded audio when switching instruments
-              if (audioFileUrl) {
-                URL.revokeObjectURL(audioFileUrl)
-                setAudioFileUrl(null)
-              }
-              setAudioFileBlob(null)
-              if (onClearRecordedAudio) {
-                onClearRecordedAudio()
-              }
-              setInstrument('bass')
-            }}
-          >
-            <div className="instrument-icon"><GiGuitarBassHead /></div>
-            <div className="instrument-name">{t('sandbox.bass')}</div>
-            <div className="instrument-glow"></div>
-          </div>
-        </div>
-
-        {/* Mobile view - Dropdown */}
-        <div className="instrument-selector mobile-selector">
-          <div
-            className={`instrument-dropdown ${isInstrumentDropdownOpen ? 'open' : ''} ${instrument}-active`}
-            onClick={() => setIsInstrumentDropdownOpen(!isInstrumentDropdownOpen)}
-          >
-            <div className="current-instrument">
+        <div className="control-group instrument-selector-group">
+          {/* Desktop/Tablet view - Cards */}
+          <div className="instrument-selector desktop-selector">
+            <div
+              className={`instrument-card ${instrument === 'keyboard' ? 'active' : ''}`}
+              onClick={() => {
+                // Clear recorded audio when switching instruments
+                if (audioFileUrl) {
+                  URL.revokeObjectURL(audioFileUrl)
+                  setAudioFileUrl(null)
+                }
+                setAudioFileBlob(null)
+                if (onClearRecordedAudio) {
+                  onClearRecordedAudio()
+                }
+                setInstrument('keyboard')
+              }}
+            >
               <div className="instrument-icon">
-                {instrument === 'keyboard' && <PiPianoKeysFill />}
-                {instrument === 'guitar' && <GiGuitarHead />}
-                {instrument === 'bass' && <GiGuitarBassHead />}
+                <PiPianoKeysFill />
               </div>
-              <div className="instrument-name">
-                {instrument === 'keyboard' && t('sandbox.keyboard')}
-                {instrument === 'guitar' && t('sandbox.guitar')}
-                {instrument === 'bass' && t('sandbox.bass')}
-              </div>
-              <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}><IoMdArrowDropdown /></div>
+              <div className="instrument-name">{t('sandbox.keyboard')}</div>
+              <div className="instrument-glow"></div>
             </div>
-            {isInstrumentDropdownOpen && (
-              <div className="dropdown-options">
-                {instrument !== 'keyboard' && (
-                  <div
-                    className="dropdown-option keyboard-option"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Clear recorded audio when switching instruments
-                      if (audioFileUrl) {
-                        URL.revokeObjectURL(audioFileUrl)
-                        setAudioFileUrl(null)
-                      }
-                      setAudioFileBlob(null)
-                      if (onClearRecordedAudio) {
-                        onClearRecordedAudio()
-                      }
-                      setInstrument('keyboard');
-                      setIsInstrumentDropdownOpen(false);
-                    }}
-                  >
-                    <div className="instrument-icon"><PiPianoKeysFill /></div>
-                    <div className="instrument-name">{t('sandbox.keyboard')}</div>
-                  </div>
-                )}
-                {instrument !== 'guitar' && (
-                  <div
-                    className="dropdown-option guitar-option"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Clear recorded audio when switching instruments
-                      if (audioFileUrl) {
-                        URL.revokeObjectURL(audioFileUrl)
-                        setAudioFileUrl(null)
-                      }
-                      setAudioFileBlob(null)
-                      if (onClearRecordedAudio) {
-                        onClearRecordedAudio()
-                      }
-                      setInstrument('guitar');
-                      setIsInstrumentDropdownOpen(false);
-                    }}
-                  >
-                    <div className="instrument-icon"><GiGuitarHead /></div>
-                    <div className="instrument-name">{t('sandbox.guitar')}</div>
-                  </div>
-                )}
-                {instrument !== 'bass' && (
-                  <div
-                    className="dropdown-option bass-option"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Clear recorded audio when switching instruments
-                      if (audioFileUrl) {
-                        URL.revokeObjectURL(audioFileUrl)
-                        setAudioFileUrl(null)
-                      }
-                      setAudioFileBlob(null)
-                      if (onClearRecordedAudio) {
-                        onClearRecordedAudio()
-                      }
-                      setInstrument('bass');
-                      setIsInstrumentDropdownOpen(false);
-                    }}
-                  >
-                    <div className="instrument-icon"><GiGuitarBassHead /></div>
-                    <div className="instrument-name">{t('sandbox.bass')}</div>
-                  </div>
-                )}
+            <div
+              className={`instrument-card ${instrument === 'guitar' ? 'active' : ''}`}
+              onClick={() => {
+                // Clear recorded audio when switching instruments
+                if (audioFileUrl) {
+                  URL.revokeObjectURL(audioFileUrl)
+                  setAudioFileUrl(null)
+                }
+                setAudioFileBlob(null)
+                if (onClearRecordedAudio) {
+                  onClearRecordedAudio()
+                }
+                setInstrument('guitar')
+              }}
+            >
+              <div className="instrument-icon">
+                <GiGuitarHead />
               </div>
-            )}
+              <div className="instrument-name">{t('sandbox.guitar')}</div>
+              <div className="instrument-glow"></div>
+            </div>
+            <div
+              className={`instrument-card ${instrument === 'bass' ? 'active' : ''}`}
+              onClick={() => {
+                // Clear recorded audio when switching instruments
+                if (audioFileUrl) {
+                  URL.revokeObjectURL(audioFileUrl)
+                  setAudioFileUrl(null)
+                }
+                setAudioFileBlob(null)
+                if (onClearRecordedAudio) {
+                  onClearRecordedAudio()
+                }
+                setInstrument('bass')
+              }}
+            >
+              <div className="instrument-icon">
+                <GiGuitarBassHead />
+              </div>
+              <div className="instrument-name">{t('sandbox.bass')}</div>
+              <div className="instrument-glow"></div>
+            </div>
+          </div>
+
+          {/* Mobile view - Dropdown */}
+          <div className="instrument-selector mobile-selector">
+            <div
+              className={`instrument-dropdown ${isInstrumentDropdownOpen ? 'open' : ''} ${instrument}-active`}
+              onClick={() => setIsInstrumentDropdownOpen(!isInstrumentDropdownOpen)}
+            >
+              <div className="current-instrument">
+                <div className="instrument-icon">
+                  {instrument === 'keyboard' && <PiPianoKeysFill />}
+                  {instrument === 'guitar' && <GiGuitarHead />}
+                  {instrument === 'bass' && <GiGuitarBassHead />}
+                </div>
+                <div className="instrument-name">
+                  {instrument === 'keyboard' && t('sandbox.keyboard')}
+                  {instrument === 'guitar' && t('sandbox.guitar')}
+                  {instrument === 'bass' && t('sandbox.bass')}
+                </div>
+                <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}>
+                  <IoMdArrowDropdown />
+                </div>
+              </div>
+              {isInstrumentDropdownOpen && (
+                <div className="dropdown-options">
+                  {instrument !== 'keyboard' && (
+                    <div
+                      className="dropdown-option keyboard-option"
+                      onClick={e => {
+                        e.stopPropagation()
+                        // Clear recorded audio when switching instruments
+                        if (audioFileUrl) {
+                          URL.revokeObjectURL(audioFileUrl)
+                          setAudioFileUrl(null)
+                        }
+                        setAudioFileBlob(null)
+                        if (onClearRecordedAudio) {
+                          onClearRecordedAudio()
+                        }
+                        setInstrument('keyboard')
+                        setIsInstrumentDropdownOpen(false)
+                      }}
+                    >
+                      <div className="instrument-icon">
+                        <PiPianoKeysFill />
+                      </div>
+                      <div className="instrument-name">{t('sandbox.keyboard')}</div>
+                    </div>
+                  )}
+                  {instrument !== 'guitar' && (
+                    <div
+                      className="dropdown-option guitar-option"
+                      onClick={e => {
+                        e.stopPropagation()
+                        // Clear recorded audio when switching instruments
+                        if (audioFileUrl) {
+                          URL.revokeObjectURL(audioFileUrl)
+                          setAudioFileUrl(null)
+                        }
+                        setAudioFileBlob(null)
+                        if (onClearRecordedAudio) {
+                          onClearRecordedAudio()
+                        }
+                        setInstrument('guitar')
+                        setIsInstrumentDropdownOpen(false)
+                      }}
+                    >
+                      <div className="instrument-icon">
+                        <GiGuitarHead />
+                      </div>
+                      <div className="instrument-name">{t('sandbox.guitar')}</div>
+                    </div>
+                  )}
+                  {instrument !== 'bass' && (
+                    <div
+                      className="dropdown-option bass-option"
+                      onClick={e => {
+                        e.stopPropagation()
+                        // Clear recorded audio when switching instruments
+                        if (audioFileUrl) {
+                          URL.revokeObjectURL(audioFileUrl)
+                          setAudioFileUrl(null)
+                        }
+                        setAudioFileBlob(null)
+                        if (onClearRecordedAudio) {
+                          onClearRecordedAudio()
+                        }
+                        setInstrument('bass')
+                        setIsInstrumentDropdownOpen(false)
+                      }}
+                    >
+                      <div className="instrument-icon">
+                        <GiGuitarBassHead />
+                      </div>
+                      <div className="instrument-name">{t('sandbox.bass')}</div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
       )}
 
       {/* Second row: Octave range (keyboard only) */}
@@ -700,73 +581,72 @@ const InstrumentControls = memo(function InstrumentControls({
               </span>
             </div>
             {!disableOctaveRange && (
-            <div className="dual-range-container">
-              <div
-                className="range-fill"
-                style={{
-                  left: `${((Math.max(1, 4 - lowerOctaves) - 1) / 8) * 100}%`,
-                  right: `${((8 - Math.min(8, 5 + higherOctaves)) / 8) * 100}%`
-                }}
-              />
-              <input
-                type="range"
-                min="1"
-                max="8"
-                value={Math.max(1, 4 - lowerOctaves)}
-                onChange={(e) => {
-                  const newLowOctave = parseInt(e.target.value)
-                  const currentHighOctave = Math.min(8, 5 + higherOctaves)
+              <div className="dual-range-container">
+                <div
+                  className="range-fill"
+                  style={{
+                    left: `${((Math.max(1, 4 - lowerOctaves) - 1) / 8) * 100}%`,
+                    right: `${((8 - Math.min(8, 5 + higherOctaves)) / 8) * 100}%`,
+                  }}
+                />
+                <input
+                  type="range"
+                  min="1"
+                  max="8"
+                  value={Math.max(1, 4 - lowerOctaves)}
+                  onChange={e => {
+                    const newLowOctave = parseInt(e.target.value)
+                    const currentHighOctave = Math.min(8, 5 + higherOctaves)
 
-                  // Prevent low octave from going higher than high octave
-                  if (newLowOctave > currentHighOctave) return
+                    // Prevent low octave from going higher than high octave
+                    if (newLowOctave > currentHighOctave) return
 
-                  const currentLowOctave = Math.max(1, 4 - lowerOctaves)
-                  const targetLowerOctaves = 4 - newLowOctave
+                    const targetLowerOctaves = 4 - newLowOctave
 
-                  if (targetLowerOctaves !== lowerOctaves) {
-                    if (targetLowerOctaves > lowerOctaves) {
-                      for (let i = 0; i < targetLowerOctaves - lowerOctaves; i++) {
-                        onAddLowerOctave && onAddLowerOctave()
-                      }
-                    } else if (targetLowerOctaves < lowerOctaves) {
-                      for (let i = 0; i < lowerOctaves - targetLowerOctaves; i++) {
-                        onRemoveLowerOctave && onRemoveLowerOctave()
-                      }
-                    }
-                  }
-                }}
-                className="range-slider range-low"
-                title={t('sandbox.setLowestOctave')}
-              />
-              <input
-                type="range"
-                min="1"
-                max="8"
-                value={Math.min(8, 5 + higherOctaves)}
-                onChange={(e) => {
-                  const newHighOctave = parseInt(e.target.value)
-                  const currentLowOctave = Math.max(1, 4 - lowerOctaves)
-
-                  // Prevent high octave from going lower than low octave
-                  if (newHighOctave < currentLowOctave) return
-
-                  const targetHigherOctaves = newHighOctave - 5
-                  if (onAddHigherOctave && onRemoveHigherOctave) {
-                    if (targetHigherOctaves > higherOctaves) {
-                      for (let i = 0; i < targetHigherOctaves - higherOctaves; i++) {
-                        onAddHigherOctave()
-                      }
-                    } else if (targetHigherOctaves < higherOctaves) {
-                      for (let i = 0; i < higherOctaves - targetHigherOctaves; i++) {
-                        onRemoveHigherOctave()
+                    if (targetLowerOctaves !== lowerOctaves) {
+                      if (targetLowerOctaves > lowerOctaves) {
+                        for (let i = 0; i < targetLowerOctaves - lowerOctaves; i++) {
+                          if (onAddLowerOctave) onAddLowerOctave()
+                        }
+                      } else if (targetLowerOctaves < lowerOctaves) {
+                        for (let i = 0; i < lowerOctaves - targetLowerOctaves; i++) {
+                          if (onRemoveLowerOctave) onRemoveLowerOctave()
+                        }
                       }
                     }
-                  }
-                }}
-                className="range-slider range-high"
-                title={t('sandbox.setHighestOctave')}
-              />
-            </div>
+                  }}
+                  className="range-slider range-low"
+                  title={t('sandbox.setLowestOctave')}
+                />
+                <input
+                  type="range"
+                  min="1"
+                  max="8"
+                  value={Math.min(8, 5 + higherOctaves)}
+                  onChange={e => {
+                    const newHighOctave = parseInt(e.target.value)
+                    const currentLowOctave = Math.max(1, 4 - lowerOctaves)
+
+                    // Prevent high octave from going lower than low octave
+                    if (newHighOctave < currentLowOctave) return
+
+                    const targetHigherOctaves = newHighOctave - 5
+                    if (onAddHigherOctave && onRemoveHigherOctave) {
+                      if (targetHigherOctaves > higherOctaves) {
+                        for (let i = 0; i < targetHigherOctaves - higherOctaves; i++) {
+                          onAddHigherOctave()
+                        }
+                      } else if (targetHigherOctaves < higherOctaves) {
+                        for (let i = 0; i < higherOctaves - targetHigherOctaves; i++) {
+                          onRemoveHigherOctave()
+                        }
+                      }
+                    }
+                  }}
+                  className="range-slider range-high"
+                  title={t('sandbox.setHighestOctave')}
+                />
+              </div>
             )}
             <div className="octave-visual">
               {(() => {
@@ -778,7 +658,7 @@ const InstrumentControls = memo(function InstrumentControls({
                 return (
                   <div className="keyboard-range-container">
                     <img
-                      src="/Keyboard.png"
+                      src="/Keyboard.webp"
                       alt="Keyboard octave range"
                       className="keyboard-range-image"
                     />
@@ -798,8 +678,6 @@ const InstrumentControls = memo(function InstrumentControls({
         </div>
       )}
 
-
-
       {/* Generate Melody, BPM, Notes - Modern styled row */}
       <div className="control-group modern-controls-row">
         <div className="controls-container">
@@ -814,9 +692,9 @@ const InstrumentControls = memo(function InstrumentControls({
               <input
                 type="text"
                 value={bpmDisplay}
-                onChange={(e) => !disableBpmInput && handleBpmChange(e.target.value)}
-                onKeyPress={(e) => !disableBpmInput && handleBpmKeyPress(e)}
-                onBlur={(e) => !disableBpmInput && handleBpmBlur(e)}
+                onChange={e => !disableBpmInput && handleBpmChange(e.target.value)}
+                onKeyPress={e => !disableBpmInput && handleBpmKeyPress(e)}
+                onBlur={() => !disableBpmInput && handleBpmBlur()}
                 className={`control-input bpm-input ${hideBpmButtons ? '' : 'with-internal-buttons'} ${flashingInputs.bpm ? 'flashing' : ''}`}
                 disabled={disableBpmInput}
                 readOnly={disableBpmInput}
@@ -825,10 +703,10 @@ const InstrumentControls = memo(function InstrumentControls({
                 <>
                   <button
                     className="control-button-internal minus"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      startBpmDecrement();
+                    onMouseDown={e => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      startBpmDecrement()
                     }}
                     onMouseUp={stopBpmInterval}
                     onMouseLeave={stopBpmInterval}
@@ -838,10 +716,10 @@ const InstrumentControls = memo(function InstrumentControls({
                   </button>
                   <button
                     className="control-button-internal plus"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      startBpmIncrement();
+                    onMouseDown={e => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      startBpmIncrement()
                     }}
                     onMouseUp={stopBpmInterval}
                     onMouseLeave={stopBpmInterval}
@@ -861,7 +739,10 @@ const InstrumentControls = memo(function InstrumentControls({
                 <div className="tooltip-icon">?</div>
               </Tooltip>
               {!hasEnoughBeats && hasContent && (
-                <Tooltip title={t('sandbox.warning')} text={t('sandbox.notEnoughBeats', { count: totalNotesCount })}>
+                <Tooltip
+                  title={t('sandbox.warning')}
+                  text={t('sandbox.notEnoughBeats', { count: totalNotesCount })}
+                >
                   <div className="beats-warning">
                     <IoWarning />
                   </div>
@@ -872,9 +753,9 @@ const InstrumentControls = memo(function InstrumentControls({
               <input
                 type="text"
                 value={beatsDisplay}
-                onChange={(e) => !disableBeatsInput && handleNotesChange(e.target.value)}
-                onKeyPress={(e) => !disableBeatsInput && handleNotesKeyPress(e)}
-                onBlur={(e) => !disableBeatsInput && handleNotesBlur(e)}
+                onChange={e => !disableBeatsInput && handleNotesChange(e.target.value)}
+                onKeyPress={e => !disableBeatsInput && handleNotesKeyPress(e)}
+                onBlur={() => !disableBeatsInput && handleNotesBlur()}
                 className={`control-input beats-input ${hideBeatsButtons ? '' : 'with-internal-buttons'} ${flashingInputs.beats ? 'flashing' : ''} ${!hasEnoughBeats && hasContent ? 'warning' : ''}`}
                 disabled={disableBeatsInput}
                 readOnly={disableBeatsInput}
@@ -883,10 +764,10 @@ const InstrumentControls = memo(function InstrumentControls({
                 <>
                   <button
                     className="control-button-internal minus"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      startNotesDecrement();
+                    onMouseDown={e => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      startNotesDecrement()
                     }}
                     onMouseUp={stopNotesInterval}
                     onMouseLeave={stopNotesInterval}
@@ -896,10 +777,10 @@ const InstrumentControls = memo(function InstrumentControls({
                   </button>
                   <button
                     className="control-button-internal plus"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      startNotesIncrement();
+                    onMouseDown={e => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      startNotesIncrement()
                     }}
                     onMouseUp={stopNotesInterval}
                     onMouseLeave={stopNotesInterval}
@@ -917,10 +798,7 @@ const InstrumentControls = memo(function InstrumentControls({
             <div className="modern-control-item">
               <div className="label-with-tooltip">
                 <label className="control-label">{t('sandbox.chordMode')}</label>
-                <Tooltip
-                  title={t('sandbox.chordMode')}
-                  text={t('sandbox.chordModeTooltip')}
-                >
+                <Tooltip title={t('sandbox.chordMode')} text={t('sandbox.chordModeTooltip')}>
                   <div className="tooltip-icon">?</div>
                 </Tooltip>
               </div>
@@ -928,11 +806,15 @@ const InstrumentControls = memo(function InstrumentControls({
                 {disableChordMode ? (
                   <div className="chord-mode-switch single-option">
                     <span className="switch-option active">
-                      {chordMode === 'arpeggiator' ? t('sandbox.arpeggiator') : t('sandbox.progression')}
+                      {chordMode === 'arpeggiator'
+                        ? t('sandbox.arpeggiator')
+                        : t('sandbox.progression')}
                     </span>
                   </div>
                 ) : (
-                  <div className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''} ${appliedChordsCount === 0 ? 'disabled' : ''}`}>
+                  <div
+                    className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''} ${appliedChordsCount === 0 ? 'disabled' : ''}`}
+                  >
                     <button
                       className={`switch-option ${chordMode === 'progression' ? 'active' : ''}`}
                       onClick={() => {
@@ -942,7 +824,11 @@ const InstrumentControls = memo(function InstrumentControls({
                           setTimeout(() => setIsChordModeFlashing(false), 500)
                         }
                       }}
-                      title={appliedChordsCount === 0 ? t('sandbox.applyChord') : t('sandbox.progression')}
+                      title={
+                        appliedChordsCount === 0
+                          ? t('sandbox.applyChord')
+                          : t('sandbox.progression')
+                      }
                       disabled={appliedChordsCount === 0}
                     >
                       {t('sandbox.progression')}
@@ -956,7 +842,11 @@ const InstrumentControls = memo(function InstrumentControls({
                           setTimeout(() => setIsChordModeFlashing(false), 500)
                         }
                       }}
-                      title={appliedChordsCount === 0 ? t('sandbox.applyChord') : t('sandbox.arpeggiator')}
+                      title={
+                        appliedChordsCount === 0
+                          ? t('sandbox.applyChord')
+                          : t('sandbox.arpeggiator')
+                      }
                       disabled={appliedChordsCount === 0}
                     >
                       {t('sandbox.arpeggiator')}
@@ -992,14 +882,13 @@ const InstrumentControls = memo(function InstrumentControls({
               {hasChanges && canGenerateMelody && <span className="change-badge">●</span>}
             </button>
           )}
-
         </div>
 
         {/* Second row - Auto-recorded audio player or generating indicator */}
         {(audioFileBlob || isGeneratingMelody || isAutoRecording) && (
           <div className="controls-container second-row">
             <div className="modern-control-item audio-player-section centered">
-              {(isGeneratingMelody || isAutoRecording) ? (
+              {isGeneratingMelody || isAutoRecording ? (
                 <div className="generating-indicator">
                   <div className="generating-spinner"></div>
                   <span className="generating-text">{t('sandbox.generatingMelody')}</span>
@@ -1027,9 +916,7 @@ const InstrumentControls = memo(function InstrumentControls({
             </div>
           </div>
         )}
-
       </div>
-
     </div>
   )
 })

@@ -1,20 +1,27 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { screen, fireEvent } from '@testing-library/react'
 import { vi } from 'vitest'
+import { render } from '../../../test/test-utils'
 import InstrumentSelector from './InstrumentSelector'
 
-// Mock the InstrumentContext
+// Mock the useInstrumentType hook (used by the component via ../../../hooks)
 const mockInstrumentContext = {
-  instrument: 'keyboard',
+  instrument: 'keyboard' as string,
   handleInstrumentChange: vi.fn(),
+  setInstrument: vi.fn(),
 }
 
-vi.mock('../../contexts/InstrumentContext', () => ({
-  useInstrument: () => mockInstrumentContext
-}))
+vi.mock('../../../hooks', async importOriginal => {
+  const actual = await importOriginal<Record<string, unknown>>()
+  return {
+    ...actual,
+    useInstrumentType: () => mockInstrumentContext,
+  }
+})
 
 describe('InstrumentSelector', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    mockInstrumentContext.instrument = 'keyboard'
   })
 
   it('renders all instrument options', () => {

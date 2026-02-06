@@ -18,15 +18,11 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import {
   MagentaTranscriber,
   MelodyMatcher,
-  midiToNoteName,
-  type TranscriberConfig,
   type TranscriberStatus,
   type TranscribedNote,
-  type MelodyNote,
-  type MelodyMatchState,
-  type MelodyMatcherConfig
 } from '../services/transcription'
 import type { Note } from '../utils/notes'
+import { getTranslation } from '../contexts/TranslationContext'
 
 // ============================================================================
 // TYPES
@@ -115,7 +111,7 @@ const DEFAULT_CONFIG: MelodyFeedbackConfig = {
   onsetThreshold: 0.5,
   strictOctave: false,
   pitchTolerance: 0,
-  instrument: 'keyboard'
+  instrument: 'keyboard',
 }
 
 // ============================================================================
@@ -128,7 +124,7 @@ export function useMelodyFeedback(
   // Configuration
   const [config, setConfig] = useState<MelodyFeedbackConfig>({
     ...DEFAULT_CONFIG,
-    ...initialConfig
+    ...initialConfig,
   })
 
   // State
@@ -142,7 +138,7 @@ export function useMelodyFeedback(
     isComplete: false,
     detectedNotes: [],
     lastDetectedNote: null,
-    volumeLevel: 0
+    volumeLevel: 0,
   })
 
   const [modelStatus, setModelStatus] = useState<TranscriberStatus>('unloaded')
@@ -170,16 +166,16 @@ export function useMelodyFeedback(
         windowSizeMs: config.windowSizeMs,
         hopSizeMs: config.hopSizeMs,
         onsetThreshold: config.onsetThreshold,
-        instrument: config.instrument
+        instrument: config.instrument,
       })
 
       transcriberRef.current.setOnStatusChange(setModelStatus)
 
-      transcriberRef.current.setOnTranscription((result) => {
+      transcriberRef.current.setOnTranscription(result => {
         if (!isActiveRef.current || !matcherRef.current) return
 
         // Process detected notes through melody matcher
-        const matches = matcherRef.current.processDetectedNotes(result.newOnsets)
+        matcherRef.current.processDetectedNotes(result.newOnsets)
         const matchState = matcherRef.current.getState()
 
         // Update state with new detections
@@ -187,7 +183,7 @@ export function useMelodyFeedback(
           const notes = prev.notes.map((note, idx) => ({
             ...note,
             isPlayed: matchState.notes[idx]?.isPlayed ?? false,
-            isCurrent: idx === matchState.currentIndex
+            isCurrent: idx === matchState.currentIndex,
           }))
 
           return {
@@ -198,9 +194,8 @@ export function useMelodyFeedback(
             progress: matchState.progress,
             isComplete: matchState.isComplete,
             detectedNotes: result.newOnsets,
-            lastDetectedNote: result.newOnsets.length > 0
-              ? result.newOnsets[0].noteName
-              : prev.lastDetectedNote
+            lastDetectedNote:
+              result.newOnsets.length > 0 ? result.newOnsets[0].noteName : prev.lastDetectedNote,
           }
         })
       })
@@ -217,7 +212,7 @@ export function useMelodyFeedback(
       matcherRef.current = new MelodyMatcher({
         strictOctave: config.strictOctave,
         pitchToleranceSemitones: config.pitchTolerance,
-        lookAhead: 2
+        lookAhead: 2,
       })
     }
 
@@ -238,20 +233,21 @@ export function useMelodyFeedback(
         audio: {
           echoCancellation: false,
           noiseSuppression: false,
-          autoGainControl: false
-        }
+          autoGainControl: false,
+        },
       })
 
       setPermission('granted')
       mediaStreamRef.current = stream
 
       // Create audio context - use browser's default sample rate
-      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
       audioContextRef.current = new AudioContextClass()
 
       // Tell transcriber the actual sample rate
       const actualSampleRate = audioContextRef.current.sampleRate
-      console.log(`[useMelodyFeedback] AudioContext sample rate: ${actualSampleRate}Hz`)
 
       if (transcriberRef.current) {
         transcriberRef.current.setActualSampleRate(actualSampleRate)
@@ -271,10 +267,10 @@ export function useMelodyFeedback(
       scriptProcessorRef.current = audioContextRef.current.createScriptProcessor(
         bufferSize,
         1, // mono input
-        1  // mono output
+        1 // mono output
       )
 
-      scriptProcessorRef.current.onaudioprocess = (event) => {
+      scriptProcessorRef.current.onaudioprocess = event => {
         if (!isActiveRef.current || !transcriberRef.current) return
 
         const inputData = event.inputBuffer.getChannelData(0)
@@ -304,15 +300,14 @@ export function useMelodyFeedback(
 
         setState(prev => ({ ...prev, volumeLevel }))
       }, 50)
-
     } catch (err) {
       console.error('[useMelodyFeedback] Microphone error:', err)
       if ((err as DOMException).name === 'NotAllowedError') {
         setPermission('denied')
-        setError('Microphone access denied. Please allow microphone access.')
+        setError(getTranslation('errors.micDenied'))
       } else {
         setPermission('error')
-        setError('Failed to access microphone.')
+        setError(getTranslation('errors.micError'))
       }
       throw err
     }
@@ -365,7 +360,7 @@ export function useMelodyFeedback(
       pitch: Math.round(note.frequency ? 12 * Math.log2(note.frequency / 440) + 69 : 60),
       isPlayed: false,
       isCurrent: index === 0,
-      index
+      index,
     }))
 
     setState(prev => ({
@@ -377,7 +372,7 @@ export function useMelodyFeedback(
       progress: 0,
       isComplete: false,
       detectedNotes: [],
-      lastDetectedNote: null
+      lastDetectedNote: null,
     }))
   }, [])
 
@@ -402,7 +397,6 @@ export function useMelodyFeedback(
       // Set active
       isActiveRef.current = true
       setState(prev => ({ ...prev, isActive: true }))
-
     } catch (err) {
       console.error('[useMelodyFeedback] Failed to start:', err)
       isActiveRef.current = false
@@ -427,7 +421,7 @@ export function useMelodyFeedback(
     setState(prev => ({
       ...prev,
       isActive: false,
-      volumeLevel: 0
+      volumeLevel: 0,
     }))
   }, [stopAudioCapture])
 
@@ -451,14 +445,14 @@ export function useMelodyFeedback(
       notes: prev.notes.map((note, idx) => ({
         ...note,
         isPlayed: false,
-        isCurrent: idx === 0
+        isCurrent: idx === 0,
       })),
       currentIndex: 0,
       playedCount: 0,
       progress: 0,
       isComplete: false,
       detectedNotes: [],
-      lastDetectedNote: null
+      lastDetectedNote: null,
     }))
   }, [])
 
@@ -476,7 +470,7 @@ export function useMelodyFeedback(
           windowSizeMs: updated.windowSizeMs,
           hopSizeMs: updated.hopSizeMs,
           onsetThreshold: updated.onsetThreshold,
-          instrument: updated.instrument
+          instrument: updated.instrument,
         })
       }
 
@@ -484,7 +478,7 @@ export function useMelodyFeedback(
       if (matcherRef.current) {
         matcherRef.current.updateConfig({
           strictOctave: updated.strictOctave,
-          pitchToleranceSemitones: updated.pitchTolerance
+          pitchToleranceSemitones: updated.pitchTolerance,
         })
       }
 
@@ -512,6 +506,6 @@ export function useMelodyFeedback(
     modelStatus,
     permission,
     error,
-    updateConfig
+    updateConfig,
   }
 }

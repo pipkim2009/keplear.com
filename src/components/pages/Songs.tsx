@@ -6,7 +6,19 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 import { useTranslation } from '../../contexts/TranslationContext'
-import { PiPlay, PiPause, PiRepeat, PiSpeakerHigh, PiSpeakerLow, PiSpeakerNone, PiArrowCounterClockwise, PiX, PiMagnifyingGlass, PiLink } from 'react-icons/pi'
+import {
+  PiPlay,
+  PiPause,
+  PiRepeat,
+  PiSpeakerHigh,
+  PiSpeakerLow,
+  PiSpeakerNone,
+  PiArrowCounterClockwise,
+  PiX,
+  PiMagnifyingGlass,
+  PiLink,
+} from 'react-icons/pi'
+import SEOHead from '../common/SEOHead'
 import styles from '../../styles/Songs.module.css'
 
 // Piped API proxy endpoints for search
@@ -18,7 +30,7 @@ const PIPED_PROXIES = IS_PRODUCTION
       '/api/piped1', // api.piped.private.coffee
       '/api/piped2', // pipedapi.kavin.rocks
       '/api/piped3', // pipedapi.adminforge.de
-      '/api/piped4'  // fallback
+      '/api/piped4', // fallback
     ]
 
 // Session storage key for working instance
@@ -142,6 +154,7 @@ const Songs = () => {
   const [isABLooping, setIsABLooping] = useState(false)
 
   // Waveform state
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [waveformData, setWaveformData] = useState<number[]>([])
 
   // Refs
@@ -201,7 +214,7 @@ const Songs = () => {
   const extractVideoId = (url: string): string | null => {
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
-      /^([a-zA-Z0-9_-]{11})$/ // Direct video ID
+      /^([a-zA-Z0-9_-]{11})$/, // Direct video ID
     ]
 
     for (const pattern of patterns) {
@@ -212,111 +225,128 @@ const Songs = () => {
   }
 
   // Search YouTube via Invidious API with instance fallback
-  const searchYouTube = useCallback(async (query: string) => {
-    if (!query.trim()) {
-      setSearchResults([])
-      return
-    }
-
-    setIsSearching(true)
-    setSearchError('')
-
-    // Get cached working proxy or start from beginning
-    const cachedProxy = sessionStorage.getItem(WORKING_INSTANCE_KEY)
-    const proxies = cachedProxy
-      ? [cachedProxy, ...PIPED_PROXIES.filter(p => p !== cachedProxy)]
-      : PIPED_PROXIES
-
-    for (const proxy of proxies) {
-      try {
-        // Piped API search endpoint
-        // Production: /api/piped?q=query (serverless function)
-        // Development: /api/pipedN/search?q=query (Vite proxy)
-        const url = IS_PRODUCTION
-          ? `${proxy}?q=${encodeURIComponent(query)}&filter=videos`
-          : `${proxy}/search?q=${encodeURIComponent(query)}&filter=videos`
-
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 15000)
-
-        const response = await fetch(url, {
-          signal: controller.signal,
-          credentials: 'omit', // Prevent auth dialogs
-          headers: {
-            'Accept': 'application/json'
-          }
-        })
-
-        clearTimeout(timeoutId)
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`)
-        }
-
-        // Verify response is JSON, not HTML login page
-        const contentType = response.headers.get('content-type')
-        if (!contentType || !contentType.includes('application/json')) {
-          throw new Error('Response is not JSON')
-        }
-
-        const data = await response.json()
-
-        // Parse Piped API results
-        // Piped returns { items: [...] } with url like "/watch?v=VIDEO_ID"
-        const items = data.items || data
-        const results: SearchResult[] = items
-          .filter((item: { type?: string; url?: string }) =>
-            item.url && item.url.includes('/watch?v=')
-          )
-          .slice(0, 20)
-          .map((item: { url: string; title: string; uploaderName: string; duration: number; views: number }) => {
-            // Extract video ID from URL like "/watch?v=dQw4w9WgXcQ"
-            const videoIdMatch = item.url.match(/[?&]v=([a-zA-Z0-9_-]{11})/)
-            return {
-              videoId: videoIdMatch ? videoIdMatch[1] : '',
-              title: item.title || 'Unknown',
-              author: item.uploaderName || 'Unknown',
-              lengthSeconds: item.duration || 0,
-              viewCount: item.views || 0
-            }
-          })
-          .filter((item: SearchResult) => item.videoId) // Filter out any without valid videoId
-
-        setSearchResults(results)
-
-        // Cache working proxy for this session
-        sessionStorage.setItem(WORKING_INSTANCE_KEY, proxy)
-
-        setIsSearching(false)
+  const searchYouTube = useCallback(
+    async (query: string) => {
+      if (!query.trim()) {
+        setSearchResults([])
         return
-      } catch (err) {
-        console.warn(`Piped proxy ${proxy} failed:`, err)
-        // Continue to next proxy
       }
-    }
 
-    // All instances failed
-    setSearchError(t('songs.searchError'))
-    setIsSearching(false)
-  }, [t])
+      setIsSearching(true)
+      setSearchError('')
+
+      // Get cached working proxy or start from beginning
+      const cachedProxy = sessionStorage.getItem(WORKING_INSTANCE_KEY)
+      const proxies = cachedProxy
+        ? [cachedProxy, ...PIPED_PROXIES.filter(p => p !== cachedProxy)]
+        : PIPED_PROXIES
+
+      for (const proxy of proxies) {
+        try {
+          // Piped API search endpoint
+          // Production: /api/piped?q=query (serverless function)
+          // Development: /api/pipedN/search?q=query (Vite proxy)
+          const url = IS_PRODUCTION
+            ? `${proxy}?q=${encodeURIComponent(query)}&filter=videos`
+            : `${proxy}/search?q=${encodeURIComponent(query)}&filter=videos`
+
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 15000)
+
+          const response = await fetch(url, {
+            signal: controller.signal,
+            credentials: 'omit', // Prevent auth dialogs
+            headers: {
+              Accept: 'application/json',
+            },
+          })
+
+          clearTimeout(timeoutId)
+
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`)
+          }
+
+          // Verify response is JSON, not HTML login page
+          const contentType = response.headers.get('content-type')
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Response is not JSON')
+          }
+
+          const data = await response.json()
+
+          // Parse Piped API results
+          // Piped returns { items: [...] } with url like "/watch?v=VIDEO_ID"
+          const items = data.items || data
+          const results: SearchResult[] = items
+            .filter(
+              (item: { type?: string; url?: string }) => item.url && item.url.includes('/watch?v=')
+            )
+            .slice(0, 20)
+            .map(
+              (item: {
+                url: string
+                title: string
+                uploaderName: string
+                duration: number
+                views: number
+              }) => {
+                // Extract video ID from URL like "/watch?v=dQw4w9WgXcQ"
+                const videoIdMatch = item.url.match(/[?&]v=([a-zA-Z0-9_-]{11})/)
+                return {
+                  videoId: videoIdMatch ? videoIdMatch[1] : '',
+                  title: item.title || 'Unknown',
+                  author: item.uploaderName || 'Unknown',
+                  lengthSeconds: item.duration || 0,
+                  viewCount: item.views || 0,
+                }
+              }
+            )
+            .filter((item: SearchResult) => item.videoId) // Filter out any without valid videoId
+
+          setSearchResults(results)
+
+          // Cache working proxy for this session
+          sessionStorage.setItem(WORKING_INSTANCE_KEY, proxy)
+
+          setIsSearching(false)
+          return
+        } catch (err) {
+          console.warn(`Piped proxy ${proxy} failed:`, err)
+          // Continue to next proxy
+        }
+      }
+
+      // All instances failed
+      setSearchError(t('songs.searchError'))
+      setIsSearching(false)
+    },
+    [t]
+  )
 
   // Handle search submission
-  const handleSearch = useCallback((e?: React.FormEvent) => {
-    e?.preventDefault()
-    searchYouTube(searchQuery)
-  }, [searchQuery, searchYouTube])
+  const handleSearch = useCallback(
+    (e?: React.FormEvent) => {
+      e?.preventDefault()
+      searchYouTube(searchQuery)
+    },
+    [searchQuery, searchYouTube]
+  )
 
   // Load a search result
-  const loadSearchResult = useCallback((result: SearchResult) => {
-    const video: VideoInfo = {
-      videoId: result.videoId,
-      title: result.title
-    }
-    setCurrentVideo(video)
-    saveToRecent(video)
-    setSearchResults([])
-    setSearchQuery('')
-  }, [saveToRecent])
+  const loadSearchResult = useCallback(
+    (result: SearchResult) => {
+      const video: VideoInfo = {
+        videoId: result.videoId,
+        title: result.title,
+      }
+      setCurrentVideo(video)
+      saveToRecent(video)
+      setSearchResults([])
+      setSearchQuery('')
+    },
+    [saveToRecent]
+  )
 
   // Format duration from seconds
   const formatDuration = (seconds: number) => {
@@ -420,10 +450,10 @@ const Songs = () => {
         fs: 0,
         modestbranding: 1,
         rel: 0,
-        showinfo: 0
+        showinfo: 0,
       },
       events: {
-        onReady: (event) => {
+        onReady: event => {
           setIsPlayerReady(true)
           setDuration(event.target.getDuration())
           event.target.setVolume(volume)
@@ -443,7 +473,7 @@ const Songs = () => {
             }
           }, 500)
         },
-        onStateChange: (event) => {
+        onStateChange: event => {
           if (event.data === window.YT.PlayerState.PLAYING) {
             setIsPlaying(true)
             startTimeUpdate()
@@ -457,11 +487,11 @@ const Songs = () => {
             }
           }
         },
-        onError: (event) => {
+        onError: event => {
           console.error('YouTube player error:', event.data)
           setUrlError(t('songs.playbackError'))
-        }
-      }
+        },
+      },
     })
 
     return () => {
@@ -488,31 +518,37 @@ const Songs = () => {
   }, [playbackRate, isPlayerReady])
 
   // Handle URL submission
-  const handleUrlSubmit = useCallback((e?: React.FormEvent) => {
-    e?.preventDefault()
-    setUrlError('')
+  const handleUrlSubmit = useCallback(
+    (e?: React.FormEvent) => {
+      e?.preventDefault()
+      setUrlError('')
 
-    const videoId = extractVideoId(urlInput.trim())
-    if (!videoId) {
-      setUrlError(t('songs.invalidUrl'))
-      return
-    }
+      const videoId = extractVideoId(urlInput.trim())
+      if (!videoId) {
+        setUrlError(t('songs.invalidUrl'))
+        return
+      }
 
-    const video: VideoInfo = {
-      videoId,
-      title: `Video ${videoId}` // Will be updated if we can get title
-    }
+      const video: VideoInfo = {
+        videoId,
+        title: `Video ${videoId}`, // Will be updated if we can get title
+      }
 
-    setCurrentVideo(video)
-    saveToRecent(video)
-    setUrlInput('')
-  }, [urlInput, t, saveToRecent])
+      setCurrentVideo(video)
+      saveToRecent(video)
+      setUrlInput('')
+    },
+    [urlInput, t, saveToRecent]
+  )
 
   // Load a recent video
-  const loadRecentVideo = useCallback((video: VideoInfo) => {
-    setCurrentVideo(video)
-    saveToRecent(video)
-  }, [saveToRecent])
+  const loadRecentVideo = useCallback(
+    (video: VideoInfo) => {
+      setCurrentVideo(video)
+      saveToRecent(video)
+    },
+    [saveToRecent]
+  )
 
   // Player controls
   const togglePlayPause = useCallback(() => {
@@ -525,13 +561,16 @@ const Songs = () => {
     }
   }, [isPlaying, isPlayerReady])
 
-  const handleSeek = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const time = parseFloat(e.target.value)
-    setCurrentTime(time)
-    if (playerRef.current && isPlayerReady) {
-      playerRef.current.seekTo(time, true)
-    }
-  }, [isPlayerReady])
+  const handleSeek = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const time = parseFloat(e.target.value)
+      setCurrentTime(time)
+      if (playerRef.current && isPlayerReady) {
+        playerRef.current.seekTo(time, true)
+      }
+    },
+    [isPlayerReady]
+  )
 
   const handleVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setVolume(parseInt(e.target.value))
@@ -623,6 +662,11 @@ const Songs = () => {
 
   return (
     <div className={styles.songsContainer}>
+      <SEOHead
+        title="Songs"
+        description="Practice along with your favorite songs. Loop sections, adjust speed, and train your ear with real music."
+        path="/songs"
+      />
       {/* Header */}
       <div className={styles.headerSection}>
         <h1 className={styles.pageTitle}>{t('songs.title')}</h1>
@@ -638,7 +682,7 @@ const Songs = () => {
             className={styles.searchInput}
             placeholder={t('songs.searchPlaceholder')}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
           />
           {searchQuery && (
             <button
@@ -660,15 +704,10 @@ const Songs = () => {
       </form>
 
       {/* Search Error */}
-      {searchError && (
-        <div className={styles.searchError}>{searchError}</div>
-      )}
+      {searchError && <div className={styles.searchError}>{searchError}</div>}
 
       {/* URL Toggle */}
-      <button
-        className={styles.urlToggle}
-        onClick={() => setShowUrlInput(!showUrlInput)}
-      >
+      <button className={styles.urlToggle} onClick={() => setShowUrlInput(!showUrlInput)}>
         <PiLink /> {showUrlInput ? t('songs.hideUrl') : t('songs.pasteUrl')}
       </button>
 
@@ -682,7 +721,7 @@ const Songs = () => {
               className={styles.searchInput}
               placeholder={t('songs.urlPlaceholder')}
               value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
+              onChange={e => setUrlInput(e.target.value)}
             />
             {urlInput && (
               <button
@@ -702,26 +741,26 @@ const Songs = () => {
       )}
 
       {/* URL Error */}
-      {urlError && (
-        <div className={styles.searchError}>{urlError}</div>
-      )}
+      {urlError && <div className={styles.searchError}>{urlError}</div>}
 
       {/* Search Results */}
       {searchResults.length > 0 && !currentVideo && (
         <div className={styles.resultsSection}>
           <div className={styles.resultsSectionHeader}>
             <h2 className={styles.sectionTitle}>{t('songs.searchResults')}</h2>
-            <span className={styles.resultsCount}>{searchResults.length} {t('songs.results')}</span>
+            <span className={styles.resultsCount}>
+              {searchResults.length} {t('songs.results')}
+            </span>
           </div>
           <div className={styles.searchResultsList}>
-            {searchResults.map((result) => (
+            {searchResults.map(result => (
               <div
                 key={result.videoId}
                 className={styles.searchResultItem}
                 onClick={() => loadSearchResult(result)}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && loadSearchResult(result)}
+                onKeyDown={e => e.key === 'Enter' && loadSearchResult(result)}
               >
                 <img
                   src={`https://i.ytimg.com/vi/${result.videoId}/mqdefault.jpg`}
@@ -732,8 +771,12 @@ const Songs = () => {
                   <span className={styles.resultTitle}>{result.title}</span>
                   <span className={styles.resultAuthor}>{result.author}</span>
                   <div className={styles.resultMeta}>
-                    <span className={styles.resultDuration}>{formatDuration(result.lengthSeconds)}</span>
-                    <span className={styles.resultViews}>{formatViews(result.viewCount)} views</span>
+                    <span className={styles.resultDuration}>
+                      {formatDuration(result.lengthSeconds)}
+                    </span>
+                    <span className={styles.resultViews}>
+                      {formatViews(result.viewCount)} views
+                    </span>
                   </div>
                 </div>
               </div>
@@ -749,14 +792,14 @@ const Songs = () => {
             <h2 className={styles.sectionTitle}>{t('songs.recentVideos')}</h2>
           </div>
           <div className={styles.recentList}>
-            {recentVideos.map((video) => (
+            {recentVideos.map(video => (
               <div
                 key={video.videoId}
                 className={styles.recentItem}
                 onClick={() => loadRecentVideo(video)}
                 role="button"
                 tabIndex={0}
-                onKeyDown={(e) => e.key === 'Enter' && loadRecentVideo(video)}
+                onKeyDown={e => e.key === 'Enter' && loadRecentVideo(video)}
               >
                 <img
                   src={`https://i.ytimg.com/vi/${video.videoId}/mqdefault.jpg`}
@@ -766,7 +809,7 @@ const Songs = () => {
                 <span className={styles.recentVideoId}>{video.title || video.videoId}</span>
                 <button
                   className={styles.removeRecentButton}
-                  onClick={(e) => removeFromRecent(video.videoId, e)}
+                  onClick={e => removeFromRecent(video.videoId, e)}
                   aria-label={t('common.remove')}
                 >
                   <PiX />
@@ -805,9 +848,7 @@ const Songs = () => {
           </div>
 
           {/* Loading indicator */}
-          {!isPlayerReady && (
-            <div className={styles.audioLoading}>{t('songs.loadingAudio')}</div>
-          )}
+          {!isPlayerReady && <div className={styles.audioLoading}>{t('songs.loadingAudio')}</div>}
 
           {/* Timeline with A-B markers */}
           <div className={styles.timelineSection}>
@@ -817,7 +858,9 @@ const Songs = () => {
                 {(() => {
                   // Generate bars: 1 bar per 0.1 seconds, max 300 bars
                   const numBars = Math.min(300, Math.max(1, Math.ceil(duration * 10)))
-                  const seed = currentVideo!.videoId.split('').reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0)
+                  const seed = currentVideo!.videoId
+                    .split('')
+                    .reduce((acc, char, i) => acc + char.charCodeAt(0) * (i + 1), 0)
                   const seededRandom = (n: number) => {
                     const x = Math.sin(seed + n) * 10000
                     return x - Math.floor(x)
@@ -865,7 +908,7 @@ const Songs = () => {
                   className={styles.abRange}
                   style={{
                     left: `${(markerA / duration) * 100}%`,
-                    width: `${((markerB - markerA) / duration) * 100}%`
+                    width: `${((markerB - markerA) / duration) * 100}%`,
                   }}
                 />
               )}
@@ -916,7 +959,7 @@ const Songs = () => {
             {/* Speed Control */}
             <div className={styles.speedControl}>
               <div className={styles.speedButtons}>
-                {speedOptions.map((speed) => (
+                {speedOptions.map(speed => (
                   <button
                     key={speed}
                     className={`${styles.speedButton} ${playbackRate === speed ? styles.speedButtonActive : ''}`}

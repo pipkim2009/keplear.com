@@ -27,6 +27,7 @@ interface UIContextType {
 
 const UIContext = createContext<UIContextType | undefined>(undefined)
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useUI = () => {
   const context = useContext(UIContext)
   if (context === undefined) {
@@ -57,7 +58,7 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
     flashingInputs: uiState.flashingInputs,
     activeInputs: uiState.activeInputs,
     triggerInputFlash: uiState.triggerInputFlash,
-    setInputActive: uiState.setInputActive
+    setInputActive: uiState.setInputActive,
   }
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>

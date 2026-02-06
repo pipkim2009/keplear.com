@@ -21,6 +21,7 @@ interface InstrumentConfigContextType {
 
 const InstrumentConfigContext = createContext<InstrumentConfigContextType | undefined>(undefined)
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useInstrumentConfigContext = () => {
   const context = useContext(InstrumentConfigContext)
   if (context === undefined) {
@@ -43,8 +44,10 @@ export const InstrumentConfigProvider: React.FC<InstrumentConfigProviderProps> =
     keyboardSelectionMode: config.keyboardSelectionMode,
     setKeyboardSelectionMode: config.setKeyboardSelectionMode,
     clearChordsAndScalesTrigger: config.clearChordsAndScalesTrigger,
-    triggerClearChordsAndScales: config.triggerClearChordsAndScales
+    triggerClearChordsAndScales: config.triggerClearChordsAndScales,
   }
 
-  return <InstrumentConfigContext.Provider value={value}>{children}</InstrumentConfigContext.Provider>
+  return (
+    <InstrumentConfigContext.Provider value={value}>{children}</InstrumentConfigContext.Provider>
+  )
 }

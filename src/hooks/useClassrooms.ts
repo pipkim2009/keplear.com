@@ -4,7 +4,6 @@
  * pagination, real-time updates, and optimistic mutations
  */
 
-import { useCallback, useMemo } from 'react'
 import { supabase } from '../lib/supabase'
 import { usePaginatedQuery, useSupabaseQuery, invalidateQueries } from './useSupabaseQuery'
 import { useSupabaseMutation, useInsertMutation, useDeleteMutation } from './useSupabaseMutation'
@@ -88,22 +87,27 @@ export interface AssignmentCompletion {
 /**
  * Hook to fetch paginated list of classrooms
  */
-export function useClassroomsList(options: {
-  pageSize?: number
-  enabled?: boolean
-} = {}) {
+export function useClassroomsList(
+  options: {
+    pageSize?: number
+    enabled?: boolean
+  } = {}
+) {
   const { pageSize = 10, enabled = true } = options
 
   return usePaginatedQuery<Classroom>(
     'classrooms',
-    (query) => query
-      .select('*, profiles(username), classroom_students(user_id, profiles(username)), assignments(*)')
-      .order('created_at', { ascending: false }),
+    query =>
+      query
+        .select(
+          '*, profiles(username), classroom_students(user_id, profiles(username)), assignments(*)'
+        )
+        .order('created_at', { ascending: false }),
     {
       pagination: { pageSize },
       enabled,
       staleTime: 30000, // 30 seconds
-      retry: { maxRetries: 3, baseDelay: 1000, maxDelay: 5000, backoffFactor: 2 }
+      retry: { maxRetries: 3, baseDelay: 1000, maxDelay: 5000, backoffFactor: 2 },
     }
   )
 }
@@ -111,23 +115,29 @@ export function useClassroomsList(options: {
 /**
  * Hook to fetch a single classroom by ID
  */
-export function useClassroom(classroomId: string | null, options: {
-  enabled?: boolean
-  enableRealtime?: boolean
-} = {}) {
+export function useClassroom(
+  classroomId: string | null,
+  options: {
+    enabled?: boolean
+    enableRealtime?: boolean
+  } = {}
+) {
   const { enabled = true, enableRealtime = true } = options
 
   const query = useSupabaseQuery<Classroom>(
     'classrooms',
-    (q) => q
-      .select('*, profiles(username), classroom_students(user_id, profiles(username)), assignments(*)')
-      .eq('id', classroomId!)
-      .single(),
+    q =>
+      q
+        .select(
+          '*, profiles(username), classroom_students(user_id, profiles(username)), assignments(*)'
+        )
+        .eq('id', classroomId!)
+        .single(),
     {
       enabled: enabled && !!classroomId,
       staleTime: 30000,
       dependencies: [classroomId],
-      retry: { maxRetries: 3, baseDelay: 1000, maxDelay: 5000, backoffFactor: 2 }
+      retry: { maxRetries: 3, baseDelay: 1000, maxDelay: 5000, backoffFactor: 2 },
     }
   )
 
@@ -139,7 +149,7 @@ export function useClassroom(classroomId: string | null, options: {
       onAssignmentUpdated: () => query.refetch(),
       onAssignmentDeleted: () => query.refetch(),
       onStudentJoined: () => query.refetch(),
-      onStudentLeft: () => query.refetch()
+      onStudentLeft: () => query.refetch(),
     }
   )
 
@@ -147,8 +157,8 @@ export function useClassroom(classroomId: string | null, options: {
     ...query,
     realtimeStatus: {
       assignments: assignmentsStatus.status,
-      students: studentsStatus.status
-    }
+      students: studentsStatus.status,
+    },
   }
 }
 
@@ -160,7 +170,7 @@ export function useCreateClassroom() {
     onSuccess: () => {
       // Invalidate the classrooms list
       invalidateQueries('classrooms')
-    }
+    },
   })
 }
 
@@ -169,7 +179,7 @@ export function useCreateClassroom() {
  */
 export function useDeleteClassroom() {
   return useDeleteMutation('classrooms', {
-    invalidateTables: ['classrooms', 'assignments', 'classroom_students']
+    invalidateTables: ['classrooms', 'assignments', 'classroom_students'],
   })
 }
 
@@ -177,7 +187,10 @@ export function useDeleteClassroom() {
  * Hook to join a classroom
  */
 export function useJoinClassroom() {
-  return useSupabaseMutation<{ user_id: string; classroom_id: string }, { userId: string; classroomId: string }>(
+  return useSupabaseMutation<
+    { user_id: string; classroom_id: string },
+    { userId: string; classroomId: string }
+  >(
     async ({ userId, classroomId }) => {
       const { data, error } = await supabase
         .from('classroom_students')
@@ -193,7 +206,7 @@ export function useJoinClassroom() {
       onSuccess: (_, { classroomId }) => {
         // Also invalidate the specific classroom
         invalidateQueries(`classrooms:${classroomId}`)
-      }
+      },
     }
   )
 }
@@ -213,7 +226,7 @@ export function useLeaveClassroom() {
       if (error) throw error
     },
     {
-      invalidateTables: ['classrooms', 'classroom_students']
+      invalidateTables: ['classrooms', 'classroom_students'],
     }
   )
 }
@@ -223,7 +236,7 @@ export function useLeaveClassroom() {
  */
 export function useCreateAssignment() {
   return useSupabaseMutation<Assignment, CreateAssignmentData>(
-    async (data) => {
+    async data => {
       const { data: result, error } = await supabase
         .from('assignments')
         .insert(data)
@@ -235,7 +248,7 @@ export function useCreateAssignment() {
     },
     {
       invalidateTables: ['classrooms', 'assignments'],
-      retry: { maxRetries: 2, baseDelay: 1000, maxDelay: 3000, backoffFactor: 2 }
+      retry: { maxRetries: 2, baseDelay: 1000, maxDelay: 3000, backoffFactor: 2 },
     }
   )
 }
@@ -245,7 +258,7 @@ export function useCreateAssignment() {
  */
 export function useDeleteAssignment() {
   return useDeleteMutation('assignments', {
-    invalidateTables: ['classrooms', 'assignments']
+    invalidateTables: ['classrooms', 'assignments'],
   })
 }
 
@@ -266,7 +279,7 @@ export function useUpdateAssignment() {
       return result as Assignment
     },
     {
-      invalidateTables: ['classrooms', 'assignments']
+      invalidateTables: ['classrooms', 'assignments'],
     }
   )
 }
@@ -283,12 +296,12 @@ export function useClassroomsWithRealtime(userId: string | null) {
     onChange: () => {
       // Refetch when any classroom changes
       classroomsList.refetch()
-    }
+    },
   })
 
   return {
     ...classroomsList,
-    realtimeStatus: realtimeStatus.status
+    realtimeStatus: realtimeStatus.status,
   }
 }
 
@@ -299,7 +312,9 @@ export async function prefetchClassroom(classroomId: string): Promise<void> {
   try {
     const { data, error } = await supabase
       .from('classrooms')
-      .select('*, profiles(username), classroom_students(user_id, profiles(username)), assignments(*)')
+      .select(
+        '*, profiles(username), classroom_students(user_id, profiles(username)), assignments(*)'
+      )
       .eq('id', classroomId)
       .single()
 
@@ -331,7 +346,7 @@ export function useRecordCompletion() {
       return data as AssignmentCompletion
     },
     {
-      invalidateTables: ['assignment_completions']
+      invalidateTables: ['assignment_completions'],
     }
   )
 }
@@ -339,20 +354,21 @@ export function useRecordCompletion() {
 /**
  * Hook to fetch all completed assignment IDs for a user
  */
-export function useUserCompletions(userId: string | null, options: {
-  enabled?: boolean
-} = {}) {
+export function useUserCompletions(
+  userId: string | null,
+  options: {
+    enabled?: boolean
+  } = {}
+) {
   const { enabled = true } = options
 
   return useSupabaseQuery<AssignmentCompletion[]>(
     'assignment_completions',
-    (q) => q
-      .select('*')
-      .eq('user_id', userId!),
+    q => q.select('*').eq('user_id', userId!),
     {
       enabled: enabled && !!userId,
       staleTime: 30000,
-      dependencies: [userId]
+      dependencies: [userId],
     }
   )
 }
@@ -360,20 +376,21 @@ export function useUserCompletions(userId: string | null, options: {
 /**
  * Hook to fetch all completions for a specific assignment (for classroom owners)
  */
-export function useAssignmentCompletions(assignmentId: string | null, options: {
-  enabled?: boolean
-} = {}) {
+export function useAssignmentCompletions(
+  assignmentId: string | null,
+  options: {
+    enabled?: boolean
+  } = {}
+) {
   const { enabled = true } = options
 
   return useSupabaseQuery<AssignmentCompletion[]>(
     'assignment_completions',
-    (q) => q
-      .select('*, profiles(username, avatar_url)')
-      .eq('assignment_id', assignmentId!),
+    q => q.select('*, profiles(username, avatar_url)').eq('assignment_id', assignmentId!),
     {
       enabled: enabled && !!assignmentId,
       staleTime: 30000,
-      dependencies: [assignmentId]
+      dependencies: [assignmentId],
     }
   )
 }
@@ -382,22 +399,28 @@ export function useAssignmentCompletions(assignmentId: string | null, options: {
  * Hook to find a classroom by its join code (ID)
  * Used during onboarding to preview a classroom before joining
  */
-export function useFindClassroomByCode(code: string | null, options: {
-  enabled?: boolean
-} = {}) {
+export function useFindClassroomByCode(
+  code: string | null,
+  options: {
+    enabled?: boolean
+  } = {}
+) {
   const { enabled = true } = options
 
   return useSupabaseQuery<Classroom>(
     'classrooms',
-    (q) => q
-      .select('*, profiles(username), classroom_students(user_id, profiles(username)), assignments(*)')
-      .eq('id', code!)
-      .single(),
+    q =>
+      q
+        .select(
+          '*, profiles(username), classroom_students(user_id, profiles(username)), assignments(*)'
+        )
+        .eq('id', code!)
+        .single(),
     {
       enabled: enabled && !!code && code.length > 0,
       staleTime: 30000,
       dependencies: [code],
-      retry: { maxRetries: 2, baseDelay: 500, maxDelay: 2000, backoffFactor: 2 }
+      retry: { maxRetries: 2, baseDelay: 500, maxDelay: 2000, backoffFactor: 2 },
     }
   )
 }
@@ -417,5 +440,5 @@ export default {
   useRecordCompletion,
   useUserCompletions,
   useAssignmentCompletions,
-  useFindClassroomByCode
+  useFindClassroomByCode,
 }

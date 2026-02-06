@@ -29,3 +29,6 @@ dist-ssr
 
 # Claude Code settings (personal AI assistant config)
 .claude/
+
+# Windows reserved device names
+nul

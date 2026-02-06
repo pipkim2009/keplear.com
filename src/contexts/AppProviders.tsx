@@ -29,7 +29,7 @@ interface AppProvidersProps {
 
 export const AppProviders: React.FC<AppProvidersProps> = ({
   children,
-  useLegacyContext = false
+  useLegacyContext = false,
 }) => {
   if (useLegacyContext) {
     // Legacy single context (for gradual migration)
@@ -42,9 +42,7 @@ export const AppProviders: React.FC<AppProvidersProps> = ({
       <AudioProvider>
         <UIProvider>
           <InstrumentConfigProvider>
-            <MelodyProvider>
-              {children}
-            </MelodyProvider>
+            <MelodyProvider>{children}</MelodyProvider>
           </InstrumentConfigProvider>
         </UIProvider>
       </AudioProvider>
@@ -59,10 +57,15 @@ export const AppProviders: React.FC<AppProvidersProps> = ({
  * @deprecated Use specific context hooks instead (useAudioContext, useUI, etc.)
  * This is provided for backward compatibility only
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export { useInstrument } from './InstrumentContext'
 
 // Export new context hooks
+// eslint-disable-next-line react-refresh/only-export-components
 export { useAudioContext } from './AudioContext'
+// eslint-disable-next-line react-refresh/only-export-components
 export { useUI } from './UIContext'
+// eslint-disable-next-line react-refresh/only-export-components
 export { useInstrumentConfigContext } from './InstrumentConfigContext'
+// eslint-disable-next-line react-refresh/only-export-components
 export { useMelody } from './MelodyContext'

@@ -58,6 +58,26 @@
   gap: 1rem;
 }
 
+.footer-legal {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: flex-end;
+}
+
+.footer-legal-link {
+  color: var(--text-primary);
+  opacity: 0.6;
+  font-size: 0.8rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.footer-legal-link:hover {
+  opacity: 1;
+  color: var(--primary-purple-light);
+  text-decoration: underline;
+}
+
 .footer-contact {
   display: flex;
   align-items: center;

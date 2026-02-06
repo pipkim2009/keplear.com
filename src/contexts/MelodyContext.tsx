@@ -1,4 +1,12 @@
-import { createContext, useContext, ReactNode, useCallback, useState, useEffect, useRef } from 'react'
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useCallback,
+  useState,
+  useEffect,
+  useRef,
+} from 'react'
 import { useMelodyGenerator } from '../hooks/useMelodyGenerator'
 import { useMelodyPlayer } from '../hooks/useMelodyPlayer'
 import { useMelodyChanges } from '../hooks/useMelodyChanges'
@@ -20,7 +28,13 @@ interface MelodyContextType {
 
   // Melody Generation
   generatedMelody: Note[]
-  generateMelody: (notes: Note[], count: number, instrument: InstrumentType, mode: 'range' | 'multi', notesToUse?: readonly Note[]) => void
+  generateMelody: (
+    notes: Note[],
+    count: number,
+    instrument: InstrumentType,
+    mode: 'range' | 'multi',
+    notesToUse?: readonly Note[]
+  ) => void
   isInMelody: (note: Note, showNotes: boolean) => boolean
   isGeneratingMelody: boolean
   /** BPM that was used when generating the current melody */
@@ -54,6 +68,7 @@ interface MelodyContextType {
 
 const MelodyContext = createContext<MelodyContextType | undefined>(undefined)
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useMelody = () => {
   const context = useContext(MelodyContext)
   if (context === undefined) {
@@ -84,7 +99,7 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
   }>({
     noteCount: 0,
     chordCount: 0,
-    scaleCount: 0
+    scaleCount: 0,
   })
 
   // Melody generation and selection
@@ -98,7 +113,7 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
     isRecording: audio.isRecording,
     recordMelody: audio.recordMelody,
     stopMelody: audio.stopMelody,
-    instrument: config.instrument
+    instrument: config.instrument,
   })
 
   // Changes tracking
@@ -109,7 +124,7 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
     generatedMelody: melodyGen.generatedMelody,
     instrument: config.instrument,
     appliedChords,
-    appliedScales
+    appliedScales,
   })
 
   // Turn off generating indicator when recorded audio is ready
@@ -142,53 +157,86 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
     prevSelectionRef.current = {
       noteCount: currentNoteCount,
       chordCount: currentChordCount,
-      scaleCount: currentScaleCount
+      scaleCount: currentScaleCount,
     }
-  }, [melodyGen.selectedNotes.length, appliedChords.length, appliedScales.length, melodyPlayer.showNotes, melodyPlayer.setShowNotes, melodyGen.generatedMelody.length])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    melodyGen.selectedNotes.length,
+    appliedChords.length,
+    appliedScales.length,
+    melodyPlayer.showNotes,
+    melodyPlayer.setShowNotes,
+    melodyGen.generatedMelody.length,
+  ])
 
   // Handle note click
-  const handleNoteClick = useCallback(async (note: Note): Promise<void> => {
-    try {
-      // Don't play sounds during melody generation
-      if (!isGeneratingMelody && !melodyPlayer.isAutoRecording) {
-        if (config.instrument === 'guitar') {
-          await audio.playGuitarNote(note.name)
-        } else if (config.instrument === 'bass') {
-          await audio.playBassNote(note.name)
-        } else {
-          await audio.playNote(note.name)
+  const handleNoteClick = useCallback(
+    async (note: Note): Promise<void> => {
+      try {
+        // Don't play sounds during melody generation
+        if (!isGeneratingMelody && !melodyPlayer.isAutoRecording) {
+          if (config.instrument === 'guitar') {
+            await audio.playGuitarNote(note.name)
+          } else if (config.instrument === 'bass') {
+            await audio.playBassNote(note.name)
+          } else {
+            await audio.playNote(note.name)
+          }
         }
+        melodyGen.selectNote(note, 'multi')
+      } catch {
+        // Error handling done in audio layer
       }
-      melodyGen.selectNote(note, 'multi')
-    } catch (error) {
-      // Error handling done in audio layer
-    }
-  }, [config.instrument, audio, melodyGen, isGeneratingMelody, melodyPlayer.isAutoRecording])
+    },
+    [config.instrument, audio, melodyGen, isGeneratingMelody, melodyPlayer.isAutoRecording]
+  )
 
   // Handle melody generation
-  const handleGenerateMelody = useCallback((inclusiveMode?: boolean): void => {
-    setIsGeneratingMelody(true)
+  const handleGenerateMelody = useCallback(
+    (inclusiveMode?: boolean): void => {
+      setIsGeneratingMelody(true)
 
-    // Store the BPM used for this melody
-    setMelodyBpm(ui.bpm)
+      // Store the BPM used for this melody
+      setMelodyBpm(ui.bpm)
 
-    // Hide notes before generating new melody
-    melodyPlayer.setShowNotes(false)
+      // Hide notes before generating new melody
+      melodyPlayer.setShowNotes(false)
 
-    const melodyNotes = config.instrument === 'keyboard' && (config.keyboardOctaves.lower !== 0 || config.keyboardOctaves.higher !== 0)
-      ? generateNotesWithSeparateOctaves(config.keyboardOctaves.lower, config.keyboardOctaves.higher)
-      : notes
+      const melodyNotes =
+        config.instrument === 'keyboard' &&
+        (config.keyboardOctaves.lower !== 0 || config.keyboardOctaves.higher !== 0)
+          ? generateNotesWithSeparateOctaves(
+              config.keyboardOctaves.lower,
+              config.keyboardOctaves.higher
+            )
+          : notes
 
-    const selectedNotesSnapshot = [...melodyGen.selectedNotes]
+      const selectedNotesSnapshot = [...melodyGen.selectedNotes]
 
-    melodyGen.generateMelody(melodyNotes, ui.numberOfBeats, config.instrument, 'multi', selectedNotesSnapshot, ui.chordMode, appliedChords, appliedScales, inclusiveMode)
+      melodyGen.generateMelody(
+        melodyNotes,
+        ui.numberOfBeats,
+        config.instrument,
+        'multi',
+        selectedNotesSnapshot,
+        ui.chordMode,
+        appliedChords,
+        appliedScales,
+        inclusiveMode
+      )
 
-    const duration = melodyPlayer.calculateMelodyDuration(ui.numberOfBeats, ui.bpm, config.instrument)
-    melodyPlayer.setMelodyDuration(duration)
-    melodyPlayer.setPlaybackProgress(0)
-    melodyPlayer.handleClearRecordedAudio()
-    changes.clearChanges()
-  }, [melodyGen, ui, config, melodyPlayer, changes, appliedChords, appliedScales])
+      const duration = melodyPlayer.calculateMelodyDuration(
+        ui.numberOfBeats,
+        ui.bpm,
+        config.instrument
+      )
+      melodyPlayer.setMelodyDuration(duration)
+      melodyPlayer.setPlaybackProgress(0)
+      melodyPlayer.handleClearRecordedAudio()
+      changes.clearChanges()
+    },
+    [melodyGen, ui, config, melodyPlayer, changes, appliedChords, appliedScales]
+  )
 
   // Handle melody playback
   const handlePlayMelody = useCallback((): void => {
@@ -252,7 +300,7 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
     // High-level Actions
     handleNoteClick,
     handleGenerateMelody,
-    handlePlayMelody
+    handlePlayMelody,
   }
 
   return <MelodyContext.Provider value={value}>{children}</MelodyContext.Provider>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import type { Note } from '../utils/notes'
 import type { AppliedChord, AppliedScale } from '../components/common/ScaleChordOptions'
 
@@ -28,13 +28,13 @@ export const useMelodyChanges = ({
   generatedMelody,
   instrument,
   appliedChords = [],
-  appliedScales = []
+  appliedScales = [],
 }: UseMelodyChangesProps): UseMelodyChangesReturn => {
   const [hasChanges, setHasChanges] = useState(false)
   const [lastMelodyLength, setLastMelodyLength] = useState(0)
 
   // Check if user has enough notes selected to generate a melody
-  const canGenerateMelody = () => {
+  const canGenerateMelody = useCallback(() => {
     // If there are applied chords or scales, we can always generate a melody
     if (appliedChords.length > 0 || appliedScales.length > 0) {
       return true
@@ -42,7 +42,7 @@ export const useMelodyChanges = ({
 
     // Need at least 1 note selected
     return selectedNotes.length > 0
-  }
+  }, [appliedChords.length, appliedScales.length, selectedNotes.length])
 
   // Track the last values when melody was generated
   const lastValuesRef = useRef<{
@@ -58,7 +58,7 @@ export const useMelodyChanges = ({
     appliedScaleIds: [],
     bpm: 120,
     numberOfBeats: 8,
-    melodyGenerated: false
+    melodyGenerated: false,
   })
 
   // Update tracking when melody is generated
@@ -73,12 +73,20 @@ export const useMelodyChanges = ({
         appliedScaleIds: [...scaleIds],
         bpm,
         numberOfBeats,
-        melodyGenerated: true
+        melodyGenerated: true,
       }
       setHasChanges(false)
       setLastMelodyLength(generatedMelody.length)
     }
-  }, [generatedMelody.length, selectedNotes, appliedChords, appliedScales, bpm, numberOfBeats, lastMelodyLength])
+  }, [
+    generatedMelody.length,
+    selectedNotes,
+    appliedChords,
+    appliedScales,
+    bpm,
+    numberOfBeats,
+    lastMelodyLength,
+  ])
 
   // Track changes in parameters
   useEffect(() => {
@@ -94,26 +102,38 @@ export const useMelodyChanges = ({
     }
 
     // Check if selected notes changed
-    const notesChanged = currentNoteNames.length !== last.selectedNotes.length ||
+    const notesChanged =
+      currentNoteNames.length !== last.selectedNotes.length ||
       currentNoteNames.some((name, index) => name !== last.selectedNotes[index])
 
     // Check if applied chords changed
-    const chordsChanged = currentChordIds.length !== last.appliedChordIds.length ||
+    const chordsChanged =
+      currentChordIds.length !== last.appliedChordIds.length ||
       currentChordIds.some((id, index) => id !== last.appliedChordIds[index])
 
     // Check if applied scales changed
-    const scalesChanged = currentScaleIds.length !== last.appliedScaleIds.length ||
+    const scalesChanged =
+      currentScaleIds.length !== last.appliedScaleIds.length ||
       currentScaleIds.some((id, index) => id !== last.appliedScaleIds[index])
 
     // Check if BPM or number of beats changed
     const bpmChanged = bpm !== last.bpm
     const numberOfBeatsChanged = numberOfBeats !== last.numberOfBeats
 
-    const hasAnyChanges = notesChanged || chordsChanged || scalesChanged || bpmChanged || numberOfBeatsChanged
+    const hasAnyChanges =
+      notesChanged || chordsChanged || scalesChanged || bpmChanged || numberOfBeatsChanged
 
     // Only show badge if there are changes AND user can generate a melody
     setHasChanges(hasAnyChanges && canGenerateMelody())
-  }, [selectedNotes, appliedChords, appliedScales, bpm, numberOfBeats, instrument])
+  }, [
+    selectedNotes,
+    appliedChords,
+    appliedScales,
+    bpm,
+    numberOfBeats,
+    instrument,
+    canGenerateMelody,
+  ])
 
   const clearChanges = () => {
     const noteNames = selectedNotes.map(note => note.name)
@@ -126,12 +146,12 @@ export const useMelodyChanges = ({
       appliedScaleIds: [...scaleIds],
       bpm,
       numberOfBeats,
-      melodyGenerated: true
+      melodyGenerated: true,
     }
   }
 
   return {
     hasChanges,
-    clearChanges
+    clearChanges,
   }
 }

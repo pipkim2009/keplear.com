@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState, useRef, useEffect } from 'react'
 
 interface DropdownOption {
@@ -22,7 +23,7 @@ export const useCustomDropdown = ({
   defaultValue = '',
   onChange,
   placeholder = 'Select...',
-  className = ''
+  className = '',
 }: UseCustomDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedValue, setSelectedValue] = useState(defaultValue)
@@ -77,10 +78,7 @@ export const useCustomDropdown = ({
   }
 
   const DropdownComponent = (
-    <div
-      ref={dropdownRef}
-      className={`custom-dropdown ${isOpen ? 'open' : ''} ${className}`}
-    >
+    <div ref={dropdownRef} className={`custom-dropdown ${isOpen ? 'open' : ''} ${className}`}>
       <button
         type="button"
         className="custom-dropbtn"
@@ -91,7 +89,7 @@ export const useCustomDropdown = ({
         <span className="button-text">{getSelectedLabel()}</span>
       </button>
       <div className={`custom-dropdown-content ${isOpen ? 'show' : ''}`} role="listbox">
-        {options.map((option) => (
+        {options.map(option => (
           <div
             key={option.value}
             className={`custom-dropdown-item ${selectedValue === option.value ? 'selected' : ''}`}
@@ -112,7 +110,7 @@ export const useCustomDropdown = ({
     selectedValue,
     setSelectedValue,
     isOpen,
-    setIsOpen
+    setIsOpen,
   }
 }
 
@@ -126,30 +124,30 @@ interface CustomDropdownWrapperProps {
 
 export const CustomDropdownWrapper: React.FC<CustomDropdownWrapperProps> = ({
   children,
-  className = ''
+  className = '',
 }) => {
   const selectElement = React.Children.only(children)
   const options = React.Children.toArray(selectElement.props.children)
     .filter((child): child is React.ReactElement => React.isValidElement(child))
-    .map((option) => ({
+    .map(option => ({
       value: option.props.value,
-      label: option.props.children
+      label: option.props.children,
     }))
 
   const { DropdownComponent } = useCustomDropdown({
     options,
     defaultValue: selectElement.props.value,
     onChange: selectElement.props.onChange
-      ? (value) => {
+      ? value => {
           // Create a synthetic event to match the original select onChange
           const syntheticEvent = {
             target: { value },
-            currentTarget: { value }
+            currentTarget: { value },
           } as React.ChangeEvent<HTMLSelectElement>
           selectElement.props.onChange(syntheticEvent)
         }
       : undefined,
-    className: className || selectElement.props.className
+    className: className || selectElement.props.className,
   })
 
   return DropdownComponent
@@ -173,19 +171,15 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   options,
   className = '',
   placeholder = 'Select...',
-  'aria-label': ariaLabel
+  'aria-label': ariaLabel,
 }) => {
   const { DropdownComponent } = useCustomDropdown({
     options,
     defaultValue: value,
     onChange,
     placeholder,
-    className
+    className,
   })
 
-  return (
-    <div aria-label={ariaLabel}>
-      {DropdownComponent}
-    </div>
-  )
+  return <div aria-label={ariaLabel}>{DropdownComponent}</div>
 }

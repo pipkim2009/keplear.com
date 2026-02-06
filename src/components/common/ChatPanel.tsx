@@ -20,8 +20,8 @@ const ChatPanel = memo(function ChatPanel() {
       id: '1',
       text: getWelcomeMessage(),
       sender: 'assistant',
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    },
   ])
   const [inputValue, setInputValue] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -93,7 +93,7 @@ const ChatPanel = memo(function ChatPanel() {
       id: Date.now().toString(),
       text: messageText,
       sender: 'user',
-      timestamp: new Date()
+      timestamp: new Date(),
     }
 
     setMessages(prev => [...prev, newMessage])
@@ -109,7 +109,7 @@ const ChatPanel = memo(function ChatPanel() {
         id: (Date.now() + 1).toString(),
         text: response,
         sender: 'assistant',
-        timestamp: new Date()
+        timestamp: new Date(),
       }
       setMessages(prev => [...prev, assistantMessage])
       setIsTyping(false)
@@ -127,19 +127,30 @@ const ChatPanel = memo(function ChatPanel() {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
   }
 
-  // Simple markdown-like formatting
+  // Simple markdown-like formatting using pure React elements (no dangerouslySetInnerHTML)
   const formatMessage = (text: string) => {
-    return text
-      .split('\n')
-      .map((line, i) => {
-        // Bold text
-        let formatted = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        // Bullet points
-        if (formatted.startsWith('• ')) {
-          formatted = `<span class="${styles.bullet}">•</span> ${formatted.slice(2)}`
+    return text.split('\n').map((line, i) => {
+      // Bullet points
+      const isBullet = line.startsWith('• ')
+      const content = isBullet ? line.slice(2) : line
+
+      // Split on **bold** markers and create React elements
+      const parts = content.split(/(\*\*.+?\*\*)/g)
+      const elements = parts.map((part, j) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={j}>{part.slice(2, -2)}</strong>
         }
-        return <p key={i} dangerouslySetInnerHTML={{ __html: formatted }} />
+        return part
       })
+
+      return (
+        <p key={i}>
+          {isBullet && <span className={styles.bullet}>{'•'}</span>}
+          {isBullet && ' '}
+          {elements}
+        </p>
+      )
+    })
   }
 
   return createPortal(
@@ -161,17 +172,18 @@ const ChatPanel = memo(function ChatPanel() {
         </div>
 
         <div className={styles.messagesContainer}>
-          {messages.map((message) => (
+          {messages.map(message => (
             <div
               key={message.id}
               className={`${styles.message} ${message.sender === 'user' ? styles.userMessage : styles.assistantMessage}`}
             >
               <div className={styles.messageContent}>
                 <div className={styles.messageText}>
-                  {message.sender === 'assistant'
-                    ? formatMessage(message.text)
-                    : <p>{message.text}</p>
-                  }
+                  {message.sender === 'assistant' ? (
+                    formatMessage(message.text)
+                  ) : (
+                    <p>{message.text}</p>
+                  )}
                 </div>
                 <span className={styles.messageTime}>{formatTime(message.timestamp)}</span>
               </div>
@@ -193,15 +205,15 @@ const ChatPanel = memo(function ChatPanel() {
           <div ref={messagesEndRef} />
         </div>
 
-
         <div className={styles.inputContainer}>
           <input
             ref={inputRef}
             type="text"
             className={styles.chatInput}
             placeholder={t('chat.askMeAnything')}
+            aria-label={t('chat.askMeAnything')}
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={e => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={isTyping}
           />

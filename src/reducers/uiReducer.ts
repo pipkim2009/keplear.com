@@ -31,11 +31,11 @@ export type UIAction =
 export const DEFAULT_SETTINGS = {
   bpm: 120,
   numberOfBeats: 5,
-  chordMode: 'progression' as ChordMode
+  chordMode: 'progression' as ChordMode,
 } as const
 
 // Determine initial page from URL
-const getInitialPage = (): PageType => {
+export const getInitialPage = (): PageType => {
   if (typeof window === 'undefined') return 'home'
   const path = window.location.pathname
   if (path === '/sandbox' || path.startsWith('/sandbox')) return 'sandbox'
@@ -43,6 +43,8 @@ const getInitialPage = (): PageType => {
   if (path === '/dashboard' || path.startsWith('/dashboard')) return 'dashboard'
   if (path === '/classroom' || path.startsWith('/classroom')) return 'classroom'
   if (path === '/profile' || path.startsWith('/profile')) return 'profile'
+  if (path === '/privacy' || path === '/terms' || path === '/cookies') return 'home'
+  if (path === '/') return 'home'
   return 'home'
 }
 
@@ -54,13 +56,13 @@ export const initialUIState: UIState = {
   flashingInputs: {
     bpm: false,
     beats: false,
-    mode: false
+    mode: false,
   },
   activeInputs: {
     bpm: false,
     beats: false,
-    mode: false
-  }
+    mode: false,
+  },
 }
 
 export function uiReducer(state: UIState, action: UIAction): UIState {
@@ -68,29 +70,31 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
     case 'SET_CURRENT_PAGE':
       return {
         ...state,
-        currentPage: action.payload
+        currentPage: action.payload,
       }
 
-    case 'SET_BPM':
+    case 'SET_BPM': {
       // Ensure we never store NaN values
       const bpmValue = isNaN(action.payload) ? state.bpm : action.payload
       return {
         ...state,
-        bpm: Math.max(1, Math.min(999, bpmValue))
+        bpm: Math.max(1, Math.min(999, bpmValue)),
       }
+    }
 
-    case 'SET_NUMBER_OF_BEATS':
+    case 'SET_NUMBER_OF_BEATS': {
       // Ensure we never store NaN values
       const beatsValue = isNaN(action.payload) ? state.numberOfBeats : action.payload
       return {
         ...state,
-        numberOfBeats: Math.max(1, Math.min(100, beatsValue))
+        numberOfBeats: Math.max(1, Math.min(100, beatsValue)),
       }
+    }
 
     case 'SET_CHORD_MODE':
       return {
         ...state,
-        chordMode: action.payload
+        chordMode: action.payload,
       }
 
     case 'TRIGGER_INPUT_FLASH':
@@ -98,8 +102,8 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
         ...state,
         flashingInputs: {
           ...state.flashingInputs,
-          [action.payload]: true
-        }
+          [action.payload]: true,
+        },
       }
 
     case 'CLEAR_INPUT_FLASH':
@@ -107,8 +111,8 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
         ...state,
         flashingInputs: {
           ...state.flashingInputs,
-          [action.payload]: false
-        }
+          [action.payload]: false,
+        },
       }
 
     case 'SET_INPUT_ACTIVE':
@@ -116,8 +120,8 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
         ...state,
         activeInputs: {
           ...state.activeInputs,
-          [action.payload.inputType]: action.payload.active
-        }
+          [action.payload.inputType]: action.payload.active,
+        },
       }
 
     case 'CLEAR_ALL_FLASHING':
@@ -126,8 +130,8 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
         flashingInputs: {
           bpm: false,
           beats: false,
-          mode: false
-        }
+          mode: false,
+        },
       }
 
     case 'CLEAR_ALL_ACTIVE':
@@ -136,8 +140,8 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
         activeInputs: {
           bpm: false,
           beats: false,
-          mode: false
-        }
+          mode: false,
+        },
       }
 
     case 'RESET_SETTINGS':
@@ -149,13 +153,13 @@ export function uiReducer(state: UIState, action: UIAction): UIState {
         flashingInputs: {
           bpm: false,
           beats: false,
-          mode: false
+          mode: false,
         },
         activeInputs: {
           bpm: false,
           beats: false,
-          mode: false
-        }
+          mode: false,
+        },
       }
 
     default:

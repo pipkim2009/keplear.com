@@ -1,13 +1,17 @@
 import { memo, useMemo } from 'react'
 import { useTranslation } from '../../../contexts/TranslationContext'
-import ScaleChordOptions, { type AppliedChord, type AppliedScale, type FretboardPreview, type KeyboardPreview } from '../../common/ScaleChordOptions'
+import ScaleChordOptions, {
+  type AppliedChord,
+  type AppliedScale,
+  type FretboardPreview,
+  type KeyboardPreview,
+} from '../../common/ScaleChordOptions'
 import { PiTrashFill, PiExportFill } from 'react-icons/pi'
 import type { Note } from '../../../utils/notes'
 import type { KeyboardScale } from '../../../utils/instruments/keyboard/keyboardScales'
 import type { KeyboardChord } from '../../../utils/instruments/keyboard/keyboardChords'
 import type { GuitarChord, ChordShape } from '../../../utils/instruments/guitar/guitarChords'
 import type { GuitarScale, ScaleBox } from '../../../utils/instruments/guitar/guitarScales'
-import type { BassChord, BassChordShape } from '../../../utils/instruments/bass/bassChords'
 
 interface InstrumentHeaderProps {
   instrument: string
@@ -82,13 +86,16 @@ const InstrumentHeader = memo(function InstrumentHeader({
   lessonType,
   onExportToClassroom,
   canExportToClassroom = false,
-  hasExportableContent = false
+  hasExportableContent = false,
 }: InstrumentHeaderProps) {
   const { t } = useTranslation()
 
   // Memoize computed values
   const showDeselectButton = useMemo(() => {
-    return !hideDeselectAll && (selectedNotes.length > 0 || appliedChords.length > 0 || appliedScales.length > 0)
+    return (
+      !hideDeselectAll &&
+      (selectedNotes.length > 0 || appliedChords.length > 0 || appliedScales.length > 0)
+    )
   }, [hideDeselectAll, selectedNotes.length, appliedChords.length, appliedScales.length])
 
   return (
@@ -109,37 +116,37 @@ const InstrumentHeader = memo(function InstrumentHeader({
 
         {/* Scale/Chord Options */}
         {!hideScalesChords && (
-        <div className="control-group scale-chord-options">
-          <ScaleChordOptions
-            instrument={instrument}
-            onScaleSelect={onScaleSelect}
-            onScaleBoxSelect={onScaleBoxSelect}
-            onClearScale={onClearScale}
-            onChordSelect={onChordSelect}
-            onChordShapeSelect={onChordShapeSelect}
-            onClearChord={onClearChord}
-            onRootChange={onRootChange}
-            onChordRootChange={onChordRootChange}
-            selectedRoot={selectedRoot}
-            selectedChordRoot={selectedChordRoot}
-            onKeyboardScaleApply={onKeyboardScaleApply}
-            onKeyboardScaleClear={onKeyboardScaleClear}
-            onKeyboardChordApply={onKeyboardChordApply}
-            onKeyboardChordClear={onKeyboardChordClear}
-            appliedChords={appliedChords}
-            onChordDelete={onChordDelete}
-            appliedScales={appliedScales}
-            onScaleDelete={onScaleDelete}
-            lowerOctaves={lowerOctaves}
-            higherOctaves={higherOctaves}
-            showOnlyAppliedList={showOnlyAppliedList}
-            disableDelete={disableDelete}
-            onFretboardPreviewChange={onFretboardPreviewChange}
-            onKeyboardPreviewChange={onKeyboardPreviewChange}
-            availableKeyboardNotes={availableKeyboardNotes}
-            lessonType={lessonType}
-          />
-        </div>
+          <div className="control-group scale-chord-options">
+            <ScaleChordOptions
+              instrument={instrument}
+              onScaleSelect={onScaleSelect}
+              onScaleBoxSelect={onScaleBoxSelect}
+              onClearScale={onClearScale}
+              onChordSelect={onChordSelect}
+              onChordShapeSelect={onChordShapeSelect}
+              onClearChord={onClearChord}
+              onRootChange={onRootChange}
+              onChordRootChange={onChordRootChange}
+              selectedRoot={selectedRoot}
+              selectedChordRoot={selectedChordRoot}
+              onKeyboardScaleApply={onKeyboardScaleApply}
+              onKeyboardScaleClear={onKeyboardScaleClear}
+              onKeyboardChordApply={onKeyboardChordApply}
+              onKeyboardChordClear={onKeyboardChordClear}
+              appliedChords={appliedChords}
+              onChordDelete={onChordDelete}
+              appliedScales={appliedScales}
+              onScaleDelete={onScaleDelete}
+              lowerOctaves={lowerOctaves}
+              higherOctaves={higherOctaves}
+              showOnlyAppliedList={showOnlyAppliedList}
+              disableDelete={disableDelete}
+              onFretboardPreviewChange={onFretboardPreviewChange}
+              onKeyboardPreviewChange={onKeyboardPreviewChange}
+              availableKeyboardNotes={availableKeyboardNotes}
+              lessonType={lessonType}
+            />
+          </div>
         )}
 
         {/* Deselect All button */}

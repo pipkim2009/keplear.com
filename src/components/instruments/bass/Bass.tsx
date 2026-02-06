@@ -1,11 +1,21 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import '../../../styles/Bass.css'
 import { bassNotes } from '../../../utils/instruments/bass/bassNotes'
-import { applyScaleToBass, applyScaleBoxToBass, BASS_SCALES, type BassScale, type BassScaleBox } from '../../../utils/instruments/bass/bassScales'
-import { applyChordToBass, applyBassChordShapeToBass, type BassChord, type BassChordShape } from '../../../utils/instruments/bass/bassChords'
+import {
+  applyScaleToBass,
+  applyScaleBoxToBass,
+  BASS_SCALES,
+  type BassScale,
+  type BassScaleBox,
+} from '../../../utils/instruments/bass/bassScales'
+import {
+  applyChordToBass,
+  applyBassChordShapeToBass,
+  type BassChord,
+  type BassChordShape,
+} from '../../../utils/instruments/bass/bassChords'
 import type { Note } from '../../../utils/notes'
 import type { AppliedChord, AppliedScale, FretboardPreview } from '../../common/ScaleChordOptions'
-import { useTranslation } from '../../../contexts/TranslationContext'
 
 interface BassProps {
   setBassNotes: (notes: Note[]) => void
@@ -14,20 +24,18 @@ interface BassProps {
   onNoteClick?: (note: Note) => void
   clearTrigger?: number
   onScaleHandlersReady?: (handlers: {
-    handleScaleSelect: (rootNote: string, scale: BassScale) => void;
-    handleScaleBoxSelect: (scaleBox: BassScaleBox) => void;
-    handleClearScale: () => void;
-    handleScaleDelete: (rootNote: string, scale: BassScale) => void;
+    handleScaleSelect: (rootNote: string, scale: BassScale) => void
+    handleScaleBoxSelect: (scaleBox: BassScaleBox) => void
+    handleClearScale: () => void
+    handleScaleDelete: (rootNote: string, scale: BassScale) => void
   }) => void
   onChordHandlersReady?: (handlers: {
-    handleChordSelect: (rootNote: string, chord: BassChord) => void;
-    handleChordShapeSelect: (chordShape: BassChordShape & { root?: string }) => void;
-    handleClearChord: () => void;
-    handleRemoveChordNotes: (noteKeys: string[]) => void;
+    handleChordSelect: (rootNote: string, chord: BassChord) => void
+    handleChordShapeSelect: (chordShape: BassChordShape & { root?: string }) => void
+    handleClearChord: () => void
+    handleRemoveChordNotes: (noteKeys: string[]) => void
   }) => void
-  onNoteHandlersReady?: (handlers: {
-    handleSetManualNotes: (noteIds: string[]) => void;
-  }) => void
+  onNoteHandlersReady?: (handlers: { handleSetManualNotes: (noteIds: string[]) => void }) => void
   appliedScales?: AppliedScale[]
   appliedChords?: AppliedChord[]
   externalSelectedNoteIds?: string[]
@@ -41,16 +49,35 @@ interface BassProps {
   fretRangeHigh?: number
 }
 
-const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNoteClick, clearTrigger, onScaleHandlersReady, onChordHandlersReady, onNoteHandlersReady, appliedScales, appliedChords, externalSelectedNoteIds, currentlyPlayingNote, currentlyPlayingNoteNames = [], currentlyPlayingNoteIds = [], currentlyPlayingChordId = null, previewPositions = null, disableNoteSelection = false, fretRangeLow, fretRangeHigh }) => {
-  const { t } = useTranslation()
-
+const Bass: React.FC<BassProps> = ({
+  setBassNotes,
+  isInMelody,
+  showNotes,
+  onNoteClick,
+  clearTrigger,
+  onScaleHandlersReady,
+  onChordHandlersReady,
+  onNoteHandlersReady,
+  appliedScales,
+  appliedChords,
+  externalSelectedNoteIds,
+  currentlyPlayingNoteNames = [],
+  currentlyPlayingNoteIds = [],
+  currentlyPlayingChordId = null,
+  previewPositions = null,
+  disableNoteSelection = false,
+  fretRangeLow,
+  fretRangeHigh,
+}) => {
   // Helper to get note display name (with octave number)
   const getNoteName = useCallback((noteName: string | null): string => {
     if (!noteName) return ''
     return noteName
   }, [])
 
-  const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() => new Array(4).fill(false))
+  const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() =>
+    new Array(4).fill(false)
+  )
   const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() => new Array(25).fill(false))
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
   const [manualSelectedNotes, setManualSelectedNotes] = useState<Set<string>>(() => new Set())
@@ -65,8 +92,6 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   const [hoveredFret, setHoveredFret] = useState<number | null>(null)
   const [hoveredNote, setHoveredNote] = useState<{ string: number; fret: number } | null>(null)
 
-  const STRING_COUNT = 4
-  const FRET_COUNT = 24
   const STRING_MAPPING = useMemo(() => [4, 3, 2, 1], []) // Top visual string = highest pitch (G), bottom = lowest (E)
 
   const handleStringCheckboxChange = useCallback((index: number) => {
@@ -89,19 +114,21 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     // Checkbox selections are tracked separately via stringCheckboxes/fretCheckboxes
   }, [])
 
-  const getNoteForStringAndFret = useCallback((stringIndex: number, fretIndex: number): string => {
-    const bassString = STRING_MAPPING[stringIndex]
-    const fret = fretIndex + 1
-    const note = bassNotes.find(n => n.string === bassString && n.fret === fret)
-    return note?.name ?? ''
-  }, [STRING_MAPPING])
+  const getNoteForStringAndFret = useCallback(
+    (stringIndex: number, fretIndex: number): string => {
+      const bassString = STRING_MAPPING[stringIndex]
+      const fret = fretIndex + 1
+      const note = bassNotes.find(n => n.string === bassString && n.fret === fret)
+      return note?.name ?? ''
+    },
+    [STRING_MAPPING]
+  )
 
   const handleOpenStringClick = async (stringIndex: number) => {
     // Don't allow selection changes in practice mode
     if (disableNoteSelection) return
 
     const noteKey = `${stringIndex}-open`
-    const newSelectedNotes = new Set(selectedNotes)
 
     if (onNoteClick) {
       const bassString = STRING_MAPPING[stringIndex]
@@ -113,7 +140,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
           name: openNote.name,
           frequency: openNote.frequency,
           isBlack: openNote.name.includes('#'),
-          position: stringIndex * 100 - 1
+          position: stringIndex * 100 - 1,
         }
         await onNoteClick(noteObj)
       }
@@ -193,14 +220,13 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     if (disableNoteSelection) return
 
     const noteKey = `${stringIndex}-${fretIndex}`
-    const newSelectedNotes = new Set(selectedNotes)
 
     if (onNoteClick) {
       const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
       if (noteName) {
         const bassString = STRING_MAPPING[stringIndex]
-        const bassNote = bassNotes.find(note =>
-          note.string === bassString && note.fret === fretIndex + 1
+        const bassNote = bassNotes.find(
+          note => note.string === bassString && note.fret === fretIndex + 1
         )
 
         if (bassNote) {
@@ -209,7 +235,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             name: noteName,
             frequency: bassNote.frequency,
             isBlack: noteName.includes('#'),
-            position: stringIndex * 100 + fretIndex
+            position: stringIndex * 100 + fretIndex,
           }
           await onNoteClick(noteObj)
         }
@@ -279,43 +305,65 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     }
   }
 
-  const isNoteSelected = useCallback((stringIndex: number, fretIndex: number): boolean => {
-    const noteKey = `${stringIndex}-${fretIndex}`
-    // Also check refs as fallback for practice mode state sync issues
-    const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey) ||
-                                 scaleSelectedNotesRef.current.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)
-    const isInManualLayer = manualSelectedNotes.has(noteKey) || stringCheckboxes[stringIndex] || fretCheckboxes[fretIndex + 1]
-    return isInScaleChordLayer || isInManualLayer
-  }, [scaleSelectedNotes, chordSelectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+  const isNoteSelected = useCallback(
+    (stringIndex: number, fretIndex: number): boolean => {
+      const noteKey = `${stringIndex}-${fretIndex}`
+      // Also check refs as fallback for practice mode state sync issues
+      const isInScaleChordLayer =
+        scaleSelectedNotes.has(noteKey) ||
+        chordSelectedNotes.has(noteKey) ||
+        scaleSelectedNotesRef.current.has(noteKey) ||
+        chordSelectedNotesRef.current.has(noteKey)
+      const isInManualLayer =
+        manualSelectedNotes.has(noteKey) ||
+        stringCheckboxes[stringIndex] ||
+        fretCheckboxes[fretIndex + 1]
+      return isInScaleChordLayer || isInManualLayer
+    },
+    [scaleSelectedNotes, chordSelectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes]
+  )
 
-  const isOpenStringSelected = useCallback((stringIndex: number): boolean => {
-    const openKey = `${stringIndex}-open`
-    // Also check refs as fallback for practice mode state sync issues
-    const isInScaleChordLayer = scaleSelectedNotes.has(openKey) || chordSelectedNotes.has(openKey) ||
-                                 scaleSelectedNotesRef.current.has(openKey) || chordSelectedNotesRef.current.has(openKey)
-    const isInManualLayer = manualSelectedNotes.has(openKey) || stringCheckboxes[stringIndex] || fretCheckboxes[0]
-    return isInScaleChordLayer || isInManualLayer
-  }, [scaleSelectedNotes, chordSelectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+  const isOpenStringSelected = useCallback(
+    (stringIndex: number): boolean => {
+      const openKey = `${stringIndex}-open`
+      // Also check refs as fallback for practice mode state sync issues
+      const isInScaleChordLayer =
+        scaleSelectedNotes.has(openKey) ||
+        chordSelectedNotes.has(openKey) ||
+        scaleSelectedNotesRef.current.has(openKey) ||
+        chordSelectedNotesRef.current.has(openKey)
+      const isInManualLayer =
+        manualSelectedNotes.has(openKey) || stringCheckboxes[stringIndex] || fretCheckboxes[0]
+      return isInScaleChordLayer || isInManualLayer
+    },
+    [scaleSelectedNotes, chordSelectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes]
+  )
 
   // Check if a note is in the manual layer (manually selected)
-  const isNoteInManualLayer = useCallback((stringIndex: number, fretIndex: number): boolean => {
-    const noteKey = `${stringIndex}-${fretIndex}`
-    const isManuallySelected = manualSelectedNotes.has(noteKey)
-    const isStringSelected = stringCheckboxes[stringIndex]
-    const isFretSelected = fretCheckboxes[fretIndex + 1]
-    const isCheckboxSelected = isStringSelected || isFretSelected
-    return isManuallySelected || isCheckboxSelected
-  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+  const isNoteInManualLayer = useCallback(
+    (stringIndex: number, fretIndex: number): boolean => {
+      const noteKey = `${stringIndex}-${fretIndex}`
+      const isManuallySelected = manualSelectedNotes.has(noteKey)
+      const isStringSelected = stringCheckboxes[stringIndex]
+      const isFretSelected = fretCheckboxes[fretIndex + 1]
+      const isCheckboxSelected = isStringSelected || isFretSelected
+      return isManuallySelected || isCheckboxSelected
+    },
+    [manualSelectedNotes, stringCheckboxes, fretCheckboxes]
+  )
 
   // Check if an open string is in the manual layer (manually selected)
-  const isOpenStringInManualLayer = useCallback((stringIndex: number): boolean => {
-    const openKey = `${stringIndex}-open`
-    const isManuallySelected = manualSelectedNotes.has(openKey)
-    const isStringSelected = stringCheckboxes[stringIndex]
-    const isOpenFretSelected = fretCheckboxes[0]
-    const isCheckboxSelected = isStringSelected || isOpenFretSelected
-    return isManuallySelected || isCheckboxSelected
-  }, [manualSelectedNotes, stringCheckboxes, fretCheckboxes])
+  const isOpenStringInManualLayer = useCallback(
+    (stringIndex: number): boolean => {
+      const openKey = `${stringIndex}-open`
+      const isManuallySelected = manualSelectedNotes.has(openKey)
+      const isStringSelected = stringCheckboxes[stringIndex]
+      const isOpenFretSelected = fretCheckboxes[0]
+      const isCheckboxSelected = isStringSelected || isOpenFretSelected
+      return isManuallySelected || isCheckboxSelected
+    },
+    [manualSelectedNotes, stringCheckboxes, fretCheckboxes]
+  )
 
   const convertToMelodyNotes = useCallback((): Note[] => {
     const melodyNotes: Note[] = []
@@ -336,7 +384,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             frequency: openNote.frequency,
             isBlack: openNote.name.includes('#'),
             position: stringIndex * 100 - 1,
-            isManualSelection: isManual // Tag whether this is a manual selection
+            isManualSelection: isManual, // Tag whether this is a manual selection
           })
         }
       }
@@ -349,8 +397,8 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
           const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
           if (noteName) {
             const bassString = STRING_MAPPING[stringIndex]
-            const bassNote = bassNotes.find(note =>
-              note.string === bassString && note.fret === fretIndex + 1
+            const bassNote = bassNotes.find(
+              note => note.string === bassString && note.fret === fretIndex + 1
             )
 
             // Check if this note is in the manual layer
@@ -362,7 +410,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               frequency: bassNote ? bassNote.frequency : 0,
               isBlack: noteName.includes('#'),
               position: stringIndex * 100 + fretIndex,
-              isManualSelection: isManual // Tag whether this is a manual selection
+              isManualSelection: isManual, // Tag whether this is a manual selection
             })
           }
         }
@@ -370,7 +418,14 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     }
 
     return melodyNotes
-  }, [isOpenStringSelected, isNoteSelected, getNoteForStringAndFret, bassNotes, isOpenStringInManualLayer, isNoteInManualLayer])
+  }, [
+    isOpenStringSelected,
+    isNoteSelected,
+    getNoteForStringAndFret,
+    bassNotes,
+    isOpenStringInManualLayer,
+    isNoteInManualLayer,
+  ])
 
   const lastSyncedState = useRef<string>('')
 
@@ -381,154 +436,176 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       selectedNotes: Array.from(selectedNotes).sort(),
       manualSelectedNotes: Array.from(manualSelectedNotes).sort(),
       stringCheckboxes,
-      fretCheckboxes
+      fretCheckboxes,
     })
 
     if (currentStateSignature !== lastSyncedState.current) {
       lastSyncedState.current = currentStateSignature
       setBassNotes(melodyNotes)
     }
-  }, [selectedNotes, manualSelectedNotes, stringCheckboxes, fretCheckboxes, convertToMelodyNotes, setBassNotes])
+  }, [
+    selectedNotes,
+    manualSelectedNotes,
+    stringCheckboxes,
+    fretCheckboxes,
+    convertToMelodyNotes,
+    setBassNotes,
+  ])
 
-  const handleScaleSelect = useCallback((rootNote: string, scale: BassScale) => {
-    const scaleSelections = applyScaleToBass(rootNote, scale, bassNotes)
+  const handleScaleSelect = useCallback(
+    (rootNote: string, scale: BassScale) => {
+      const scaleSelections = applyScaleToBass(rootNote, scale, bassNotes)
 
-    // Update refs for practice mode (state updates don't work reliably)
-    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      scaleSelectedNotesRef.current.add(noteKey)
-    })
-
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
+      // Update refs for practice mode (state updates don't work reliably)
       scaleSelections.forEach(({ stringIndex, fretIndex }) => {
         const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.add(noteKey)
+        scaleSelectedNotesRef.current.add(noteKey)
       })
-      return newSelectedNotes
-    })
 
-    setScaleSelectedNotes(prev => {
-      const newScaleSelectedNotes = new Set(prev)
-      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newScaleSelectedNotes.add(noteKey)
-      })
-      return newScaleSelectedNotes
-    })
-
-    setCurrentScale({ root: rootNote, scale })
-  }, [bassNotes])
-
-  const handleScaleDelete = useCallback((rootNote: string, scale: BassScale) => {
-    let scaleSelections: any[] = []
-
-    if (scale.intervals && scale.intervals.length > 0) {
-      scaleSelections = applyScaleToBass(rootNote, scale, bassNotes)
-    } else {
-      const scaleName = scale.name
-      const fretRangeMatch = scaleName.match(/Frets (\d+)-(\d+)/)
-
-      if (fretRangeMatch) {
-        const minFret = parseInt(fretRangeMatch[1])
-        const maxFret = parseInt(fretRangeMatch[2])
-
-        const fakeScaleBox = {
-          name: scaleName,
-          minFret: minFret,
-          maxFret: maxFret,
-          positions: [] as any[]
-        }
-
-        const originalScaleSelections = applyScaleBoxToBass(fakeScaleBox)
-        scaleSelections = originalScaleSelections
-      } else {
-        scaleSelections = Array.from(scaleSelectedNotes).map(noteKey => {
-          const [stringIndex, fretInfo] = noteKey.split('-')
-          const fretIndex = fretInfo === 'open' ? 0 : parseInt(fretInfo) + 1
-          return { stringIndex: parseInt(stringIndex), fretIndex }
+      setSelectedNotes(prev => {
+        const newSelectedNotes = new Set(prev)
+        scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+          const noteKey =
+            fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+          newSelectedNotes.add(noteKey)
         })
-      }
-
-      setScaleSelectedNotes(new Set())
-    }
-
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
-      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.delete(noteKey)
+        return newSelectedNotes
       })
-      return newSelectedNotes
-    })
 
-    setScaleSelectedNotes(prev => {
-      const newScaleSelectedNotes = new Set(prev)
-      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newScaleSelectedNotes.delete(noteKey)
+      setScaleSelectedNotes(prev => {
+        const newScaleSelectedNotes = new Set(prev)
+        scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+          const noteKey =
+            fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+          newScaleSelectedNotes.add(noteKey)
+        })
+        return newScaleSelectedNotes
       })
-      return newScaleSelectedNotes
-    })
-  }, [bassNotes])
 
-  const handleScaleBoxSelect = useCallback((scaleBox: BassScaleBox) => {
-    const scaleSelections = applyScaleBoxToBass(scaleBox)
+      setCurrentScale({ root: rootNote, scale })
+    },
+    [bassNotes]
+  )
 
-    // Update refs for practice mode (state updates don't work reliably)
-    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      scaleSelectedNotesRef.current.add(noteKey)
-    })
+  const handleScaleDelete = useCallback(
+    (rootNote: string, scale: BassScale) => {
+      let scaleSelections: { stringIndex: number; fretIndex: number }[] = []
 
-    setSelectedNotes(prev => {
-      const newSelectedNotes = new Set(prev)
-      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newSelectedNotes.add(noteKey)
-      })
-      return newSelectedNotes
-    })
+      if (scale.intervals && scale.intervals.length > 0) {
+        scaleSelections = applyScaleToBass(rootNote, scale, bassNotes)
+      } else {
+        const scaleName = scale.name
+        const fretRangeMatch = scaleName.match(/Frets (\d+)-(\d+)/)
 
-    setScaleSelectedNotes(prev => {
-      const newScaleSelectedNotes = new Set(prev)
-      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-        newScaleSelectedNotes.add(noteKey)
-      })
-      return newScaleSelectedNotes
-    })
+        if (fretRangeMatch) {
+          const minFret = parseInt(fretRangeMatch[1])
+          const maxFret = parseInt(fretRangeMatch[2])
 
-    const rootPosition = scaleBox.positions.find(pos => pos.isRoot)
-    if (rootPosition) {
-      const rootNote = rootPosition.note.replace(/\d+$/, '')
-      setCurrentScale({ root: rootNote, scale: BASS_SCALES[0] })
-    }
+          const fakeScaleBox: BassScaleBox = {
+            name: scaleName,
+            minFret: minFret,
+            maxFret: maxFret,
+            positions: [],
+          }
 
-    setStringCheckboxes(new Array(4).fill(false))
-    setFretCheckboxes(new Array(25).fill(false))
-
-    const melodyNotes: Note[] = []
-    scaleSelections.forEach(({ stringIndex, fretIndex }) => {
-      const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
-      if (noteName) {
-        const bassString = STRING_MAPPING[stringIndex]
-        const bassNote = bassNotes.find(note =>
-          note.string === bassString && note.fret === fretIndex + 1
-        )
-
-        if (bassNote) {
-          melodyNotes.push({
-            name: noteName,
-            frequency: bassNote.frequency,
-            isBlack: noteName.includes('#'),
-            position: stringIndex * 100 + fretIndex
+          const originalScaleSelections = applyScaleBoxToBass(fakeScaleBox)
+          scaleSelections = originalScaleSelections
+        } else {
+          scaleSelections = Array.from(scaleSelectedNotes).map(noteKey => {
+            const [stringIndex, fretInfo] = noteKey.split('-')
+            const fretIndex = fretInfo === 'open' ? 0 : parseInt(fretInfo) + 1
+            return { stringIndex: parseInt(stringIndex), fretIndex }
           })
         }
+
+        setScaleSelectedNotes(new Set())
       }
-    })
-    setBassNotes(melodyNotes)
-  }, [bassNotes])
+
+      setSelectedNotes(prev => {
+        const newSelectedNotes = new Set(prev)
+        scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+          const noteKey =
+            fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+          newSelectedNotes.delete(noteKey)
+        })
+        return newSelectedNotes
+      })
+
+      setScaleSelectedNotes(prev => {
+        const newScaleSelectedNotes = new Set(prev)
+        scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+          const noteKey =
+            fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+          newScaleSelectedNotes.delete(noteKey)
+        })
+        return newScaleSelectedNotes
+      })
+    },
+    [bassNotes]
+  )
+
+  const handleScaleBoxSelect = useCallback(
+    (scaleBox: BassScaleBox) => {
+      const scaleSelections = applyScaleBoxToBass(scaleBox)
+
+      // Update refs for practice mode (state updates don't work reliably)
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        scaleSelectedNotesRef.current.add(noteKey)
+      })
+
+      setSelectedNotes(prev => {
+        const newSelectedNotes = new Set(prev)
+        scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+          const noteKey =
+            fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+          newSelectedNotes.add(noteKey)
+        })
+        return newSelectedNotes
+      })
+
+      setScaleSelectedNotes(prev => {
+        const newScaleSelectedNotes = new Set(prev)
+        scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+          const noteKey =
+            fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+          newScaleSelectedNotes.add(noteKey)
+        })
+        return newScaleSelectedNotes
+      })
+
+      const rootPosition = scaleBox.positions.find(pos => pos.isRoot)
+      if (rootPosition) {
+        const rootNote = rootPosition.note.replace(/\d+$/, '')
+        setCurrentScale({ root: rootNote, scale: BASS_SCALES[0] })
+      }
+
+      setStringCheckboxes(new Array(4).fill(false))
+      setFretCheckboxes(new Array(25).fill(false))
+
+      const melodyNotes: Note[] = []
+      scaleSelections.forEach(({ stringIndex, fretIndex }) => {
+        const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
+        if (noteName) {
+          const bassString = STRING_MAPPING[stringIndex]
+          const bassNote = bassNotes.find(
+            note => note.string === bassString && note.fret === fretIndex + 1
+          )
+
+          if (bassNote) {
+            melodyNotes.push({
+              name: noteName,
+              frequency: bassNote.frequency,
+              isBlack: noteName.includes('#'),
+              position: stringIndex * 100 + fretIndex,
+            })
+          }
+        }
+      })
+      setBassNotes(melodyNotes)
+    },
+    [bassNotes]
+  )
 
   const handleClearScale = useCallback(() => {
     setCurrentScale(null)
@@ -679,15 +756,21 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     setSelectedNotes(new Set(noteKeys))
   }, [])
 
-  const isNoteInCurrentScale = useCallback((stringIndex: number, fretIndex: number): boolean => {
-    const noteKey = `${stringIndex}-${fretIndex}`
-    return scaleSelectedNotes.has(noteKey) || scaleSelectedNotesRef.current.has(noteKey)
-  }, [scaleSelectedNotes])
+  const isNoteInCurrentScale = useCallback(
+    (stringIndex: number, fretIndex: number): boolean => {
+      const noteKey = `${stringIndex}-${fretIndex}`
+      return scaleSelectedNotes.has(noteKey) || scaleSelectedNotesRef.current.has(noteKey)
+    },
+    [scaleSelectedNotes]
+  )
 
-  const isOpenStringInCurrentScale = useCallback((stringIndex: number): boolean => {
-    const noteKey = `${stringIndex}-open`
-    return scaleSelectedNotes.has(noteKey) || scaleSelectedNotesRef.current.has(noteKey)
-  }, [scaleSelectedNotes])
+  const isOpenStringInCurrentScale = useCallback(
+    (stringIndex: number): boolean => {
+      const noteKey = `${stringIndex}-open`
+      return scaleSelectedNotes.has(noteKey) || scaleSelectedNotesRef.current.has(noteKey)
+    },
+    [scaleSelectedNotes]
+  )
 
   const isScaleRootNote = (noteName: string, stringIndex?: number, fretIndex?: number): boolean => {
     const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
@@ -698,16 +781,22 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       if (scaleSelectedNotes.has(noteKey) || scaleSelectedNotesRef.current.has(noteKey)) {
         if (appliedScales && appliedScales.length > 0) {
           return appliedScales.some(appliedScale => {
-            return noteNameWithoutOctave === appliedScale.root &&
-                   appliedScale.notes &&
-                   appliedScale.notes.some((note) => {
-                     if (note.__bassCoord) {
-                       const { stringIndex: noteStringIndex, fretIndex: noteFretIndex } = note.__bassCoord
-                       const appliedNoteKey = noteFretIndex === 0 ? `${noteStringIndex}-open` : `${noteStringIndex}-${noteFretIndex - 1}`
-                       return appliedNoteKey === noteKey
-                     }
-                     return false
-                   })
+            return (
+              noteNameWithoutOctave === appliedScale.root &&
+              appliedScale.notes &&
+              appliedScale.notes.some(note => {
+                if (note.__bassCoord) {
+                  const { stringIndex: noteStringIndex, fretIndex: noteFretIndex } =
+                    note.__bassCoord
+                  const appliedNoteKey =
+                    noteFretIndex === 0
+                      ? `${noteStringIndex}-open`
+                      : `${noteStringIndex}-${noteFretIndex - 1}`
+                  return appliedNoteKey === noteKey
+                }
+                return false
+              })
+            )
           })
         }
 
@@ -732,16 +821,22 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       if (chordSelectedNotes.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)) {
         if (appliedChords && appliedChords.length > 0) {
           return appliedChords.some(appliedChord => {
-            return noteNameWithoutOctave === appliedChord.root &&
-                   appliedChord.notes &&
-                   appliedChord.notes.some((note) => {
-                     if (note.__bassCoord) {
-                       const { stringIndex: noteStringIndex, fretIndex: noteFretIndex } = note.__bassCoord
-                       const appliedNoteKey = noteFretIndex === 0 ? `${noteStringIndex}-open` : `${noteStringIndex}-${noteFretIndex - 1}`
-                       return appliedNoteKey === noteKey
-                     }
-                     return false
-                   })
+            return (
+              noteNameWithoutOctave === appliedChord.root &&
+              appliedChord.notes &&
+              appliedChord.notes.some(note => {
+                if (note.__bassCoord) {
+                  const { stringIndex: noteStringIndex, fretIndex: noteFretIndex } =
+                    note.__bassCoord
+                  const appliedNoteKey =
+                    noteFretIndex === 0
+                      ? `${noteStringIndex}-open`
+                      : `${noteStringIndex}-${noteFretIndex - 1}`
+                  return appliedNoteKey === noteKey
+                }
+                return false
+              })
+            )
           })
         }
 
@@ -757,27 +852,42 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
     return false
   }
 
-  const isNoteInCurrentChord = useCallback((stringIndex: number, fretIndex: number): boolean => {
-    const noteKey = `${stringIndex}-${fretIndex}`
-    return chordSelectedNotes.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)
-  }, [chordSelectedNotes])
+  const isNoteInCurrentChord = useCallback(
+    (stringIndex: number, fretIndex: number): boolean => {
+      const noteKey = `${stringIndex}-${fretIndex}`
+      return chordSelectedNotes.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)
+    },
+    [chordSelectedNotes]
+  )
 
-  const isOpenStringInCurrentChord = useCallback((stringIndex: number): boolean => {
-    const noteKey = `${stringIndex}-open`
-    return chordSelectedNotes.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)
-  }, [chordSelectedNotes])
+  const isOpenStringInCurrentChord = useCallback(
+    (stringIndex: number): boolean => {
+      const noteKey = `${stringIndex}-open`
+      return chordSelectedNotes.has(noteKey) || chordSelectedNotesRef.current.has(noteKey)
+    },
+    [chordSelectedNotes]
+  )
 
-  const shouldShowStringPreview = useCallback((stringIndex: number): boolean => {
-    return hoveredString === stringIndex && !stringCheckboxes[stringIndex]
-  }, [hoveredString, stringCheckboxes])
+  const shouldShowStringPreview = useCallback(
+    (stringIndex: number): boolean => {
+      return hoveredString === stringIndex && !stringCheckboxes[stringIndex]
+    },
+    [hoveredString, stringCheckboxes]
+  )
 
-  const shouldShowFretPreview = useCallback((fretIndex: number): boolean => {
-    return hoveredFret === fretIndex && !fretCheckboxes[fretIndex]
-  }, [hoveredFret, fretCheckboxes])
+  const shouldShowFretPreview = useCallback(
+    (fretIndex: number): boolean => {
+      return hoveredFret === fretIndex && !fretCheckboxes[fretIndex]
+    },
+    [hoveredFret, fretCheckboxes]
+  )
 
-  const shouldShowNotePreview = useCallback((stringIndex: number, fretIndex: number): boolean => {
-    return hoveredNote?.string === stringIndex && hoveredNote?.fret === fretIndex
-  }, [hoveredNote])
+  const shouldShowNotePreview = useCallback(
+    (stringIndex: number, fretIndex: number): boolean => {
+      return hoveredNote?.string === stringIndex && hoveredNote?.fret === fretIndex
+    },
+    [hoveredNote]
+  )
 
   useEffect(() => {
     if (onScaleHandlersReady) {
@@ -785,10 +895,16 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         handleScaleSelect,
         handleScaleBoxSelect,
         handleClearScale,
-        handleScaleDelete
+        handleScaleDelete,
       })
     }
-  }, [onScaleHandlersReady, handleScaleSelect, handleScaleBoxSelect, handleClearScale, handleScaleDelete])
+  }, [
+    onScaleHandlersReady,
+    handleScaleSelect,
+    handleScaleBoxSelect,
+    handleClearScale,
+    handleScaleDelete,
+  ])
 
   useEffect(() => {
     if (onChordHandlersReady) {
@@ -797,16 +913,23 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         handleChordShapeSelect,
         handleClearChord,
         handleRemoveChordNotes,
-        handleRemoveChordNotesOnly
+        handleRemoveChordNotesOnly,
       })
     }
-  }, [onChordHandlersReady, handleChordSelect, handleChordShapeSelect, handleClearChord, handleRemoveChordNotes, handleRemoveChordNotesOnly])
+  }, [
+    onChordHandlersReady,
+    handleChordSelect,
+    handleChordShapeSelect,
+    handleClearChord,
+    handleRemoveChordNotes,
+    handleRemoveChordNotesOnly,
+  ])
 
   // Provide note handlers to parent component
   useEffect(() => {
     if (onNoteHandlersReady) {
       onNoteHandlersReady({
-        handleSetManualNotes
+        handleSetManualNotes,
       })
     }
   }, [onNoteHandlersReady, handleSetManualNotes])
@@ -820,7 +943,11 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   // IMPORTANT: This effect must run FIRST, before appliedScales/appliedChords/externalSelectedNoteIds effects
   // so that notes can be properly re-applied after clearing
   useEffect(() => {
-    if (clearTrigger !== undefined && clearTrigger > 0 && clearTrigger !== prevClearTrigger.current) {
+    if (
+      clearTrigger !== undefined &&
+      clearTrigger > 0 &&
+      clearTrigger !== prevClearTrigger.current
+    ) {
       setStringCheckboxes(new Array(4).fill(false))
       setFretCheckboxes(new Array(25).fill(false))
       setSelectedNotes(new Set())
@@ -843,15 +970,20 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   // This effect runs AFTER clearTrigger effect
   useEffect(() => {
     // Only sync when scales are added (not when cleared)
-    if (appliedScales && appliedScales.length > 0 && appliedScales.length !== prevAppliedScalesLength.current) {
+    if (
+      appliedScales &&
+      appliedScales.length > 0 &&
+      appliedScales.length !== prevAppliedScalesLength.current
+    ) {
       // Build note keys from all applied scales
       const newScaleNotes = new Set<string>()
       appliedScales.forEach(appliedScale => {
         if (appliedScale.notes) {
-          appliedScale.notes.forEach((note) => {
+          appliedScale.notes.forEach(note => {
             if (note.__bassCoord) {
               const { stringIndex, fretIndex } = note.__bassCoord
-              const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+              const noteKey =
+                fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
               newScaleNotes.add(noteKey)
             }
           })
@@ -870,7 +1002,11 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
   // This effect runs AFTER clearTrigger effect
   useEffect(() => {
     // Only sync when chords are added (not when cleared)
-    if (appliedChords && appliedChords.length > 0 && appliedChords.length !== prevAppliedChordsLength.current) {
+    if (
+      appliedChords &&
+      appliedChords.length > 0 &&
+      appliedChords.length !== prevAppliedChordsLength.current
+    ) {
       // Build note keys from all applied chords
       const newChordNotes = new Set<string>()
       appliedChords.forEach(appliedChord => {
@@ -879,10 +1015,11 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             newChordNotes.add(noteKey)
           })
         } else if (appliedChord.notes) {
-          appliedChord.notes.forEach((note) => {
+          appliedChord.notes.forEach(note => {
             if (note.__bassCoord) {
               const { stringIndex, fretIndex } = note.__bassCoord
-              const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+              const noteKey =
+                fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
               newChordNotes.add(noteKey)
             }
           })
@@ -907,8 +1044,8 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
       const prevIds = prevExternalNoteIds.current
       const currentIds = externalSelectedNoteIds
       // Check if arrays are different (different length or different content)
-      const isDifferent = prevIds.length !== currentIds.length ||
-        currentIds.some((id, idx) => prevIds[idx] !== id)
+      const isDifferent =
+        prevIds.length !== currentIds.length || currentIds.some((id, idx) => prevIds[idx] !== id)
 
       // Also apply if internal state is empty but we have external notes
       // This handles the case where component remounts after instrument change
@@ -951,13 +1088,19 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               onMouseEnter={() => setHoveredFret(0)}
               onMouseLeave={() => setHoveredFret(null)}
             />
-            <label htmlFor="bass-fret-open" className="bass-fret-checkbox-label">0</label>
+            <label htmlFor="bass-fret-open" className="bass-fret-checkbox-label">
+              0
+            </label>
           </div>
         )}
 
         {/* Frets */}
         {[...Array(24)].map((_, index) => (
-          <div key={index} className="bass-fret" style={{ left: `${(index + 1) * 54 + (index === 23 ? 3 : 0)}px` }}>
+          <div
+            key={index}
+            className="bass-fret"
+            style={{ left: `${(index + 1) * 54 + (index === 23 ? 3 : 0)}px` }}
+          >
             <div className="bass-fret-wire"></div>
             {[3, 5, 7, 9, 15, 17, 19, 21].includes(index + 1) && (
               <div className="bass-fret-marker"></div>
@@ -979,7 +1122,9 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                   onMouseEnter={() => setHoveredFret(index + 1)}
                   onMouseLeave={() => setHoveredFret(null)}
                 />
-                <label htmlFor={`bass-fret-${index + 1}`} className="bass-fret-checkbox-label">{index + 1}</label>
+                <label htmlFor={`bass-fret-${index + 1}`} className="bass-fret-checkbox-label">
+                  {index + 1}
+                </label>
               </div>
             )}
           </div>
@@ -989,14 +1134,14 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         {[...Array(4)].map((_, index) => {
           const stringHeights = [3.5, 4.5, 5.5, 6.5]
           const openMarkerCenter = 22 + index * 30
-          const stringTop = openMarkerCenter - (stringHeights[index] / 2)
+          const stringTop = openMarkerCenter - stringHeights[index] / 2
           return (
             <div
               key={index}
               className="bass-string"
               style={{
                 top: `${stringTop}px`,
-                height: `${stringHeights[index]}px`
+                height: `${stringHeights[index]}px`,
               }}
             ></div>
           )
@@ -1021,7 +1166,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         ))}
 
         {/* Clickable fret positions */}
-        {[...Array(4)].map((_, stringIndex) => (
+        {[...Array(4)].map((_, stringIndex) =>
           [...Array(24)].map((_, fretIndex) => (
             <div
               key={`bass-fret-position-${stringIndex}-${fretIndex}`}
@@ -1037,27 +1182,30 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               onMouseLeave={() => setHoveredNote(null)}
             />
           ))
-        ))}
+        )}
 
         {/* String checkboxes */}
-        {!disableNoteSelection && [...Array(4)].map((_, index) => (
-          <div
-            key={`bass-string-checkbox-${index}`}
-            className="bass-string-checkbox-container"
-            style={{ top: `${22 + index * 30}px` }}
-          >
-            <input
-              type="checkbox"
-              id={`bass-string-${index}`}
-              className="bass-string-checkbox"
-              checked={stringCheckboxes[index] || false}
-              onChange={() => handleStringCheckboxChange(index)}
-              onMouseEnter={() => setHoveredString(index)}
-              onMouseLeave={() => setHoveredString(null)}
-            />
-            <label htmlFor={`bass-string-${index}`} className="bass-string-checkbox-label">{4 - index}</label>
-          </div>
-        ))}
+        {!disableNoteSelection &&
+          [...Array(4)].map((_, index) => (
+            <div
+              key={`bass-string-checkbox-${index}`}
+              className="bass-string-checkbox-container"
+              style={{ top: `${22 + index * 30}px` }}
+            >
+              <input
+                type="checkbox"
+                id={`bass-string-${index}`}
+                className="bass-string-checkbox"
+                checked={stringCheckboxes[index] || false}
+                onChange={() => handleStringCheckboxChange(index)}
+                onMouseEnter={() => setHoveredString(index)}
+                onMouseLeave={() => setHoveredString(null)}
+              />
+              <label htmlFor={`bass-string-${index}`} className="bass-string-checkbox-label">
+                {4 - index}
+              </label>
+            </div>
+          ))}
 
         {/* Open string note visualization circles */}
         {[...Array(4)].map((_, stringIndex) => {
@@ -1072,7 +1220,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
             name: openNote.name,
             frequency: openNote.frequency,
             isBlack: openNote.name.includes('#'),
-            position: stringIndex * 100 - 1
+            position: stringIndex * 100 - 1,
           }
 
           const isInGeneratedMelody = isInMelody(noteObj, showNotes)
@@ -1171,9 +1319,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                 top: `${22 + stringIndex * 30 - 11}px`,
               }}
             >
-              <span className="bass-note-name">
-                {openNote.name}
-              </span>
+              <span className="bass-note-name">{openNote.name}</span>
             </div>
           )
         })}
@@ -1188,7 +1334,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
               name: noteName,
               frequency: 0,
               isBlack: noteName.includes('#'),
-              position: stringIndex * 100 + fretIndex
+              position: stringIndex * 100 + fretIndex,
             }
 
             const isInGeneratedMelody = isInMelody(noteObj, showNotes)
@@ -1287,9 +1433,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                   top: `${22 + stringIndex * 30 - 11}px`,
                 }}
               >
-                <span className="bass-note-name">
-                  {getNoteName(noteName)}
-                </span>
+                <span className="bass-note-name">{getNoteName(noteName)}</span>
               </div>
             )
           })
@@ -1299,37 +1443,38 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         {[...Array(4)].map((_, stringIndex) =>
           [...Array(25)].map((_, fretIndex) => {
             const adjustedFretIndex = fretIndex === 0 ? 0 : fretIndex - 1
-            const isCurrentNoteSelected = fretIndex === 0
-              ? isOpenStringSelected(stringIndex)
-              : isNoteSelected(stringIndex, adjustedFretIndex)
-            const shouldShowPreview = (
-              shouldShowStringPreview(stringIndex) ||
-              shouldShowFretPreview(fretIndex) ||
-              shouldShowNotePreview(stringIndex, fretIndex)
-            ) && !isCurrentNoteSelected
+            const isCurrentNoteSelected =
+              fretIndex === 0
+                ? isOpenStringSelected(stringIndex)
+                : isNoteSelected(stringIndex, adjustedFretIndex)
+            const shouldShowPreview =
+              (shouldShowStringPreview(stringIndex) ||
+                shouldShowFretPreview(fretIndex) ||
+                shouldShowNotePreview(stringIndex, fretIndex)) &&
+              !isCurrentNoteSelected
 
             if (!shouldShowPreview) return null
 
-            const noteName = fretIndex === 0
-              ? getNoteForStringAndFret(stringIndex, -1)
-              : getNoteForStringAndFret(stringIndex, fretIndex - 1)
+            const noteName =
+              fretIndex === 0
+                ? getNoteForStringAndFret(stringIndex, -1)
+                : getNoteForStringAndFret(stringIndex, fretIndex - 1)
 
             return (
               <div
                 key={`bass-preview-note-${stringIndex}-${fretIndex}`}
                 className="bass-note-circle preview"
                 style={{
-                  left: fretIndex === 0
-                    ? `-2.5px`
-                    : fretIndex === 1
-                    ? `${fretIndex * 54 - 35 + 9}px`
-                    : `${fretIndex * 54 - 35}px`,
+                  left:
+                    fretIndex === 0
+                      ? `-2.5px`
+                      : fretIndex === 1
+                        ? `${fretIndex * 54 - 35 + 9}px`
+                        : `${fretIndex * 54 - 35}px`,
                   top: `${22 + stringIndex * 30 - 11}px`,
                 }}
               >
-                <span className="bass-note-name">
-                  {getNoteName(noteName)}
-                </span>
+                <span className="bass-note-name">{getNoteName(noteName)}</span>
               </div>
             )
           })
@@ -1339,29 +1484,38 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
         {previewPositions?.positions?.map((pos, idx) => {
           // Check if this position is already selected (don't show preview for already selected notes)
           // Note: Applied scales/chords use fretIndex-1 for storage, so we must match that format
-          const noteKey = pos.fretIndex === 0 ? `${pos.stringIndex}-open` : `${pos.stringIndex}-${pos.fretIndex - 1}`
-          const isAlreadySelected = selectedNotes.has(noteKey) || scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
+          const noteKey =
+            pos.fretIndex === 0
+              ? `${pos.stringIndex}-open`
+              : `${pos.stringIndex}-${pos.fretIndex - 1}`
+          const isAlreadySelected =
+            selectedNotes.has(noteKey) ||
+            scaleSelectedNotes.has(noteKey) ||
+            chordSelectedNotes.has(noteKey)
           if (isAlreadySelected) return null
 
           // Determine preview type class
-          const isRoot = previewPositions.rootPositions?.some(
-            rp => rp.stringIndex === pos.stringIndex && rp.fretIndex === pos.fretIndex
-          ) ?? false
+          const isRoot =
+            previewPositions.rootPositions?.some(
+              rp => rp.stringIndex === pos.stringIndex && rp.fretIndex === pos.fretIndex
+            ) ?? false
           const previewClass = previewPositions.isChord
-            ? (isRoot ? 'chord-root-note' : 'chord-note')
-            : (isRoot ? 'scale-root-note' : 'scale-note')
+            ? isRoot
+              ? 'chord-root-note'
+              : 'chord-note'
+            : isRoot
+              ? 'scale-root-note'
+              : 'scale-note'
 
-          const noteName = pos.fretIndex === 0
-            ? getNoteForStringAndFret(pos.stringIndex, -1)
-            : getNoteForStringAndFret(pos.stringIndex, pos.fretIndex - 1)
+          const noteName =
+            pos.fretIndex === 0
+              ? getNoteForStringAndFret(pos.stringIndex, -1)
+              : getNoteForStringAndFret(pos.stringIndex, pos.fretIndex - 1)
 
           // Calculate position - fretIndex from preview is the actual fret (0 = open, 1-24 = frets)
           // Open string: -3px, Fret 1: 27px, Frets 2+: fret * 54 - 35
-          const leftPosition = pos.fretIndex === 0
-            ? -3
-            : pos.fretIndex === 1
-            ? 27
-            : pos.fretIndex * 54 - 35
+          const leftPosition =
+            pos.fretIndex === 0 ? -3 : pos.fretIndex === 1 ? 27 : pos.fretIndex * 54 - 35
 
           return (
             <div
@@ -1372,9 +1526,7 @@ const Bass: React.FC<BassProps> = ({ setBassNotes, isInMelody, showNotes, onNote
                 top: `${22 + pos.stringIndex * 30 - 11}px`,
               }}
             >
-              <span className="bass-note-name">
-                {getNoteName(noteName)}
-              </span>
+              <span className="bass-note-name">{getNoteName(noteName)}</span>
             </div>
           )
         })}

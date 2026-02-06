@@ -23,11 +23,42 @@ export interface CacheOptions {
 
 const DEFAULT_STALE_TIME = 30 * 1000 // 30 seconds
 const DEFAULT_CACHE_TIME = 5 * 60 * 1000 // 5 minutes
+const MAX_CACHE_SIZE = 100
 
 // Global cache store
 const cache = new Map<string, CacheEntry<unknown>>()
 const subscribers = new Map<string, Set<() => void>>()
 const pendingRequests = new Map<string, Promise<unknown>>()
+
+/**
+ * Evict oldest entries when cache exceeds MAX_CACHE_SIZE.
+ * Also removes expired entries (older than DEFAULT_CACHE_TIME).
+ */
+function garbageCollect(): void {
+  const now = Date.now()
+
+  // Remove expired entries first
+  const expired: string[] = []
+  cache.forEach((entry, key) => {
+    if (now - entry.timestamp > DEFAULT_CACHE_TIME) {
+      expired.push(key)
+    }
+  })
+  expired.forEach(key => {
+    cache.delete(key)
+    // Don't notify — expired entries shouldn't trigger re-renders
+  })
+
+  // If still over limit, evict oldest entries (LRU)
+  if (cache.size > MAX_CACHE_SIZE) {
+    const entries = Array.from(cache.entries()).sort((a, b) => a[1].timestamp - b[1].timestamp)
+
+    const toEvict = entries.slice(0, cache.size - MAX_CACHE_SIZE)
+    toEvict.forEach(([key]) => {
+      cache.delete(key)
+    })
+  }
+}
 
 /**
  * Notify all subscribers of a cache key that data has changed
@@ -74,9 +105,10 @@ export function setCache<T>(key: string, data: T, error?: Error): void {
     data,
     timestamp: Date.now(),
     error,
-    isValidating: false
+    isValidating: false,
   })
   notifySubscribers(key)
+  garbageCollect()
 }
 
 /**
@@ -146,22 +178,16 @@ export function useQueryCache<T>(
   mutate: (data?: T | ((current: T | undefined) => T)) => void
   refetch: () => Promise<T | undefined>
 } {
-  const {
-    staleTime = DEFAULT_STALE_TIME,
-    dedupe = true
-  } = options
+  const { staleTime = DEFAULT_STALE_TIME, dedupe = true } = options
 
   const fetcherRef = useRef(fetcher)
   fetcherRef.current = fetcher
 
   // Subscribe to cache changes
   const entry = useSyncExternalStore(
-    useCallback(
-      (callback) => key ? subscribe(key, callback) : () => {},
-      [key]
-    ),
-    useCallback(() => key ? getSnapshot<T>(key) : undefined, [key]),
-    useCallback(() => key ? getSnapshot<T>(key) : undefined, [key])
+    useCallback(callback => (key ? subscribe(key, callback) : () => {}), [key]),
+    useCallback(() => (key ? getSnapshot<T>(key) : undefined), [key]),
+    useCallback(() => (key ? getSnapshot<T>(key) : undefined), [key])
   )
 
   // Fetch data with deduplication
@@ -187,7 +213,7 @@ export function useQueryCache<T>(
           data: currentEntry?.data,
           timestamp: Date.now(),
           error,
-          isValidating: false
+          isValidating: false,
         })
         notifySubscribers(key)
         throw error
@@ -215,20 +241,22 @@ export function useQueryCache<T>(
   }
 
   // Mutate function for optimistic updates
-  const mutate = useCallback((data?: T | ((current: T | undefined) => T)) => {
-    if (!key) return
+  const mutate = useCallback(
+    (data?: T | ((current: T | undefined) => T)) => {
+      if (!key) return
 
-    if (data === undefined) {
-      // Revalidate
-      fetchData().catch(() => {})
-    } else {
-      // Optimistic update
-      const newData = typeof data === 'function'
-        ? (data as (current: T | undefined) => T)(entry?.data)
-        : data
-      setCache(key, newData)
-    }
-  }, [key, entry?.data, fetchData])
+      if (data === undefined) {
+        // Revalidate
+        fetchData().catch(() => {})
+      } else {
+        // Optimistic update
+        const newData =
+          typeof data === 'function' ? (data as (current: T | undefined) => T)(entry?.data) : data
+        setCache(key, newData)
+      }
+    },
+    [key, entry?.data, fetchData]
+  )
 
   return {
     data: entry?.data,
@@ -236,7 +264,7 @@ export function useQueryCache<T>(
     isLoading: !entry && !!key,
     isValidating: entry?.isValidating ?? false,
     mutate,
-    refetch: fetchData
+    refetch: fetchData,
   }
 }
 

@@ -12,43 +12,58 @@ import { applyChordToKeyboard } from '../utils/instruments/keyboard/keyboardChor
 import { generateNotesWithSeparateOctaves } from '../utils/notes'
 import { applyScaleToGuitar, applyScaleBoxToGuitar } from '../utils/instruments/guitar/guitarScales'
 import { applyScaleToBass, applyScaleBoxToBass } from '../utils/instruments/bass/bassScales'
-import { applyChordToGuitar, applyChordShapeToGuitar, getChordBoxes } from '../utils/instruments/guitar/guitarChords'
-import { applyChordToBass, applyBassChordShapeToBass, getBassChordBoxes } from '../utils/instruments/bass/bassChords'
+import {
+  applyChordToGuitar,
+  applyChordShapeToGuitar,
+  getChordBoxes,
+} from '../utils/instruments/guitar/guitarChords'
+import {
+  applyChordToBass,
+  applyBassChordShapeToBass,
+  getBassChordBoxes,
+} from '../utils/instruments/bass/bassChords'
 import { guitarNotes } from '../utils/instruments/guitar/guitarNotes'
 import { bassNotes } from '../utils/instruments/bass/bassNotes'
 
 interface ScaleChordHandlers {
   // Guitar/Bass scale handlers
   scaleHandlers: {
-    handleScaleSelect: (rootNote: string, scale: GuitarScale) => void;
-    handleScaleBoxSelect: (scaleBox: ScaleBox) => void;
-    handleClearScale: () => void;
-    handleScaleDelete: (rootNote: string, scale: GuitarScale) => void;
-  } | null;
+    handleScaleSelect: (rootNote: string, scale: GuitarScale) => void
+    handleScaleBoxSelect: (scaleBox: ScaleBox) => void
+    handleClearScale: () => void
+    handleScaleDelete: (rootNote: string, scale: GuitarScale) => void
+  } | null
 
   bassScaleHandlers: {
-    handleScaleSelect: (rootNote: string, scale: BassScale) => void;
-    handleScaleBoxSelect: (scaleBox: BassScaleBox) => void;
-    handleClearScale: () => void;
-    handleScaleDelete: (rootNote: string, scale: BassScale) => void;
-  } | null;
+    handleScaleSelect: (rootNote: string, scale: BassScale) => void
+    handleScaleBoxSelect: (scaleBox: BassScaleBox) => void
+    handleClearScale: () => void
+    handleScaleDelete: (rootNote: string, scale: BassScale) => void
+  } | null
 
   // Guitar/Bass chord handlers
   chordHandlers: {
-    handleChordSelect: (rootNote: string, chord: GuitarChord) => void;
-    handleChordShapeSelect: (chordShape: ChordShape) => void;
-    handleClearChord: () => void;
-    handleRemoveChordNotes: (noteKeys: string[]) => void;
-    handleRemoveChordNotesOnly?: (noteKeys: string[]) => void;
-  } | null;
+    handleChordSelect: (rootNote: string, chord: GuitarChord) => void
+    handleChordShapeSelect: (chordShape: ChordShape) => void
+    handleClearChord: () => void
+    handleRemoveChordNotes: (noteKeys: string[]) => void
+    handleRemoveChordNotesOnly?: (noteKeys: string[]) => void
+  } | null
 
   bassChordHandlers: {
-    handleChordSelect: (rootNote: string, chord: BassChord) => void;
-    handleChordShapeSelect: (chordShape: BassChordShape) => void;
-    handleClearChord: () => void;
-    handleRemoveChordNotes: (noteKeys: string[]) => void;
-    handleRemoveChordNotesOnly?: (noteKeys: string[]) => void;
-  } | null;
+    handleChordSelect: (rootNote: string, chord: BassChord) => void
+    handleChordShapeSelect: (chordShape: BassChordShape) => void
+    handleClearChord: () => void
+    handleRemoveChordNotes: (noteKeys: string[]) => void
+    handleRemoveChordNotesOnly?: (noteKeys: string[]) => void
+  } | null
+}
+
+/**
+ * Extended Note type with optional bass coordinate for fretboard tracking
+ */
+interface NoteWithCoords extends Note {
+  __bassCoord?: { stringIndex: number; fretIndex: number }
 }
 
 interface UseScaleChordManagementProps {
@@ -64,13 +79,10 @@ interface UseScaleChordManagementProps {
 
 export const useScaleChordManagement = ({
   instrument,
-  selectedNotes,
-  setGuitarNotes,
-  selectNote,
   clearSelection,
   clearChordsAndScales,
   lowerOctaves,
-  higherOctaves
+  higherOctaves,
 }: UseScaleChordManagementProps) => {
   // State for applied scales and chords
   const [appliedChords, setAppliedChords] = useState<AppliedChord[]>([])
@@ -79,16 +91,28 @@ export const useScaleChordManagement = ({
   const [selectedChordRoot, setSelectedChordRoot] = useState<string>('C')
 
   // State for keyboard-specific scale/chord tracking
-  const [currentKeyboardScale, setCurrentKeyboardScale] = useState<{ root: string; scale: KeyboardScale } | null>(null)
-  const [currentKeyboardChord, setCurrentKeyboardChord] = useState<{ root: string; chord: KeyboardChord } | null>(null)
+  const [currentKeyboardScale, setCurrentKeyboardScale] = useState<{
+    root: string
+    scale: KeyboardScale
+  } | null>(null)
+  const [currentKeyboardChord, setCurrentKeyboardChord] = useState<{
+    root: string
+    chord: KeyboardChord
+  } | null>(null)
 
   // State for instrument handlers
   const [scaleHandlers, setScaleHandlers] = useState<ScaleChordHandlers['scaleHandlers']>(null)
-  const [bassScaleHandlers, setBassScaleHandlers] = useState<ScaleChordHandlers['bassScaleHandlers']>(null)
+  const [bassScaleHandlers, setBassScaleHandlers] =
+    useState<ScaleChordHandlers['bassScaleHandlers']>(null)
   const [chordHandlers, setChordHandlers] = useState<ScaleChordHandlers['chordHandlers']>(null)
-  const [bassChordHandlers, setBassChordHandlers] = useState<ScaleChordHandlers['bassChordHandlers']>(null)
-  const [noteHandlers, setNoteHandlers] = useState<{ handleSetManualNotes: (noteIds: string[]) => void } | null>(null)
-  const [bassNoteHandlers, setBassNoteHandlers] = useState<{ handleSetManualNotes: (noteIds: string[]) => void } | null>(null)
+  const [bassChordHandlers, setBassChordHandlers] =
+    useState<ScaleChordHandlers['bassChordHandlers']>(null)
+  const [noteHandlers, setNoteHandlers] = useState<{
+    handleSetManualNotes: (noteIds: string[]) => void
+  } | null>(null)
+  const [bassNoteHandlers, setBassNoteHandlers] = useState<{
+    handleSetManualNotes: (noteIds: string[]) => void
+  } | null>(null)
 
   // Clear all chords and scales when instrument changes
   useEffect(() => {
@@ -129,9 +153,10 @@ export const useScaleChordManagement = ({
     if (instrument !== 'keyboard') return
 
     // Generate notes for the new octave range
-    const currentNotes = (lowerOctaves !== 0 || higherOctaves !== 0)
-      ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
-      : generateNotesWithSeparateOctaves(0, 0)
+    const currentNotes =
+      lowerOctaves !== 0 || higherOctaves !== 0
+        ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+        : generateNotesWithSeparateOctaves(0, 0)
 
     // Update all applied scales with new octave range using callback form
     setAppliedScales(prevScales => {
@@ -139,7 +164,11 @@ export const useScaleChordManagement = ({
 
       return prevScales.map(appliedScale => {
         // Regenerate notes for this scale with the new octave range
-        let scaleNotes = applyScaleToKeyboard(appliedScale.root, appliedScale.scale as KeyboardScale, currentNotes)
+        let scaleNotes = applyScaleToKeyboard(
+          appliedScale.root,
+          appliedScale.scale as KeyboardScale,
+          currentNotes
+        )
 
         // If this scale was applied to a specific octave, filter to only that octave
         if (appliedScale.octave !== undefined) {
@@ -151,7 +180,7 @@ export const useScaleChordManagement = ({
 
         return {
           ...appliedScale,
-          notes: scaleNotes
+          notes: scaleNotes,
         }
       })
     })
@@ -163,7 +192,11 @@ export const useScaleChordManagement = ({
       return prevChords.map(appliedChord => {
         // Only update keyboard chords (they have 'keyboard' in their ID)
         if (appliedChord.id.startsWith('keyboard')) {
-          let chordNotes = applyChordToKeyboard(appliedChord.root, appliedChord.chord as KeyboardChord, currentNotes)
+          let chordNotes = applyChordToKeyboard(
+            appliedChord.root,
+            appliedChord.chord as KeyboardChord,
+            currentNotes
+          )
 
           // If this chord was applied to a specific octave, filter to only that octave
           if (appliedChord.octave !== undefined) {
@@ -175,7 +208,7 @@ export const useScaleChordManagement = ({
 
           return {
             ...appliedChord,
-            notes: chordNotes
+            notes: chordNotes,
           }
         }
         return appliedChord
@@ -184,285 +217,310 @@ export const useScaleChordManagement = ({
   }, [instrument, lowerOctaves, higherOctaves])
 
   // Helper function to check if a chord already exists
-  const isChordAlreadyApplied = useCallback((root: string, chordName: string): boolean => {
-    return appliedChords.some(appliedChord =>
-      appliedChord.root === root && appliedChord.chord.name === chordName
-    )
-  }, [appliedChords])
+  const isChordAlreadyApplied = useCallback(
+    (root: string, chordName: string): boolean => {
+      return appliedChords.some(
+        appliedChord => appliedChord.root === root && appliedChord.chord.name === chordName
+      )
+    },
+    [appliedChords]
+  )
 
   // Scale selection handlers
   // Helper function to convert guitar/bass scale/chord selections to Note objects
-  const convertSelectionsToNotes = useCallback((selections: { stringIndex: number, fretIndex: number }[], instrument: string): Note[] => {
-    const notes: Note[] = []
+  const convertSelectionsToNotes = useCallback(
+    (selections: { stringIndex: number; fretIndex: number }[], instrumentType: string): Note[] => {
+      const notes: Note[] = []
 
-    if (instrument === 'guitar') {
-      selections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      if (instrumentType === 'guitar') {
+        selections.forEach(({ stringIndex, fretIndex }) => {
+          const noteKey =
+            fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
 
-        // Find the actual guitar note to get the real note name and frequency
-        const guitarString = 6 - stringIndex // Convert visual string index to guitar string number (1-6)
-        const actualGuitarNote = guitarNotes.find(gn => gn.string === guitarString && gn.fret === fretIndex)
+          // Find the actual guitar note to get the real note name and frequency
+          const guitarString = 6 - stringIndex // Convert visual string index to guitar string number (1-6)
+          const actualGuitarNote = guitarNotes.find(
+            gn => gn.string === guitarString && gn.fret === fretIndex
+          )
 
-        notes.push({
-          name: actualGuitarNote?.name || noteKey, // Use actual note name (e.g., "C4") or fallback to noteKey
-          frequency: actualGuitarNote?.frequency || 0,
-          isBlack: actualGuitarNote?.name.includes('#') || false,
-          position: stringIndex * 100 + fretIndex, // Unique position
-          __guitarCoord: { stringIndex, fretIndex } // Store the original coordinate for removal
-        } as any)
-      })
-    } else if (instrument === 'bass') {
-      selections.forEach(({ stringIndex, fretIndex }) => {
-        const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+          notes.push({
+            name: actualGuitarNote?.name || noteKey, // Use actual note name (e.g., "C4") or fallback to noteKey
+            frequency: actualGuitarNote?.frequency || 0,
+            isBlack: actualGuitarNote?.name.includes('#') || false,
+            position: stringIndex * 100 + fretIndex, // Unique position
+            __guitarCoord: { stringIndex, fretIndex }, // Store the original coordinate for removal
+          } as Note)
+        })
+      } else if (instrumentType === 'bass') {
+        selections.forEach(({ stringIndex, fretIndex }) => {
+          const noteKey =
+            fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
 
-        // Find the actual bass note to get the real note name and frequency
-        const bassString = 4 - stringIndex // Convert visual string index to bass string number (1-4)
-        const actualBassNote = bassNotes.find(bn => bn.string === bassString && bn.fret === fretIndex)
+          // Find the actual bass note to get the real note name and frequency
+          const bassString = 4 - stringIndex // Convert visual string index to bass string number (1-4)
+          const actualBassNote = bassNotes.find(
+            bn => bn.string === bassString && bn.fret === fretIndex
+          )
 
-        notes.push({
-          name: actualBassNote?.name || noteKey, // Use actual note name (e.g., "E2") or fallback to noteKey
-          frequency: actualBassNote?.frequency || 0,
-          isBlack: actualBassNote?.name.includes('#') || false,
-          position: stringIndex * 100 + fretIndex, // Unique position
-          __bassCoord: { stringIndex, fretIndex } // Store the original coordinate for removal
-        } as any)
-      })
-    }
+          notes.push({
+            name: actualBassNote?.name || noteKey, // Use actual note name (e.g., "E2") or fallback to noteKey
+            frequency: actualBassNote?.frequency || 0,
+            isBlack: actualBassNote?.name.includes('#') || false,
+            position: stringIndex * 100 + fretIndex, // Unique position
+            __bassCoord: { stringIndex, fretIndex }, // Store the original coordinate for removal
+          } as NoteWithCoords as Note)
+        })
+      }
 
-    return notes
-  }, [])
+      return notes
+    },
+    []
+  )
 
   // Helper function to find notes that can be safely removed (not used by other scales/chords)
-  const getNotesToRemove = useCallback((itemToDelete: AppliedScale | AppliedChord, itemType: 'scale' | 'chord'): string[] => {
-    if (!itemToDelete.notes) return []
+  const getNotesToRemove = useCallback(
+    (itemToDelete: AppliedScale | AppliedChord): string[] => {
+      if (!itemToDelete.notes) return []
 
-    // Get all noteKeys from the item being deleted
-    const itemNoteKeys = itemToDelete.notes.map((note: any) => {
-      if (note.__guitarCoord) {
-        const { stringIndex, fretIndex } = note.__guitarCoord
-        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      } else if (note.__bassCoord) {
-        const { stringIndex, fretIndex } = note.__bassCoord
-        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+      // Helper to extract noteKey from a note with possible coordinate data
+      const getNoteKey = (note: Note): string => {
+        const noteWithCoords = note as NoteWithCoords
+        if (note.__guitarCoord) {
+          const { stringIndex, fretIndex } = note.__guitarCoord
+          return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        } else if (noteWithCoords.__bassCoord) {
+          const { stringIndex, fretIndex } = noteWithCoords.__bassCoord
+          return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        }
+        return note.name // fallback
       }
-      return note.name // fallback
-    }).filter(Boolean)
 
-    // Get all noteKeys from other active scales and chords
-    const otherActiveNoteKeys = new Set<string>()
+      // Get all noteKeys from the item being deleted
+      const itemNoteKeys = itemToDelete.notes.map(getNoteKey).filter(Boolean)
 
-    // Check other scales (excluding the one being deleted)
-    appliedScales.forEach(scale => {
-      if (scale.id !== itemToDelete.id && scale.notes) {
-        scale.notes.forEach((note: any) => {
+      // Get all noteKeys from other active scales and chords
+      const otherActiveNoteKeys = new Set<string>()
+
+      // Helper to add note keys from an array of notes
+      const addNoteKeys = (notes: Note[]) => {
+        notes.forEach(note => {
+          const noteWithCoords = note as NoteWithCoords
           if (note.__guitarCoord) {
             const { stringIndex, fretIndex } = note.__guitarCoord
-            const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+            const noteKey =
+              fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
             otherActiveNoteKeys.add(noteKey)
-          } else if (note.__bassCoord) {
-            const { stringIndex, fretIndex } = note.__bassCoord
-            const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+          } else if (noteWithCoords.__bassCoord) {
+            const { stringIndex, fretIndex } = noteWithCoords.__bassCoord
+            const noteKey =
+              fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
             otherActiveNoteKeys.add(noteKey)
           } else if (note.name) {
             otherActiveNoteKeys.add(note.name)
           }
         })
       }
-    })
 
-    // Check other chords (excluding the one being deleted if it's a chord)
-    appliedChords.forEach(chord => {
-      if (chord.id !== itemToDelete.id && chord.notes) {
-        chord.notes.forEach((note: any) => {
-          if (note.__guitarCoord) {
-            const { stringIndex, fretIndex } = note.__guitarCoord
-            const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-            otherActiveNoteKeys.add(noteKey)
-          } else if (note.__bassCoord) {
-            const { stringIndex, fretIndex } = note.__bassCoord
-            const noteKey = fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-            otherActiveNoteKeys.add(noteKey)
-          } else if (note.name) {
-            otherActiveNoteKeys.add(note.name)
-          }
+      // Check other scales (excluding the one being deleted)
+      appliedScales.forEach(scale => {
+        if (scale.id !== itemToDelete.id && scale.notes) {
+          addNoteKeys(scale.notes)
+        }
+      })
+
+      // Check other chords (excluding the one being deleted if it's a chord)
+      appliedChords.forEach(chord => {
+        if (chord.id !== itemToDelete.id && chord.notes) {
+          addNoteKeys(chord.notes)
+        }
+      })
+
+      // Only remove notes that are NOT used by other active scales/chords
+      const notesToRemove = itemNoteKeys.filter(noteKey => !otherActiveNoteKeys.has(noteKey))
+
+      return notesToRemove
+    },
+    [appliedScales, appliedChords]
+  )
+
+  const handleScaleSelect = useCallback(
+    (rootNote: string, scale: GuitarScale) => {
+      // Check if this exact scale is already applied
+      const isScaleAlreadyApplied = appliedScales.some(
+        appliedScale => appliedScale.root === rootNote && appliedScale.scale.name === scale.name
+      )
+
+      if (isScaleAlreadyApplied) {
+        return // Don't add duplicate scales
+      }
+
+      if (instrument === 'guitar' && scaleHandlers) {
+        // Get the scale selections first to store as notes
+        const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes)
+
+        // Apply to guitar component
+        scaleHandlers.handleScaleSelect(rootNote, scale)
+
+        // Convert selections to Note objects for storage
+        const scaleNotes = convertSelectionsToNotes(scaleSelections, 'guitar')
+
+        // Convert selections to noteKeys for MiniFretboard
+        const noteKeys = scaleSelections.map(sel =>
+          sel.fretIndex === 0
+            ? `${sel.stringIndex}-open`
+            : `${sel.stringIndex}-${sel.fretIndex - 1}`
+        )
+
+        // Add to applied scales list with actual notes
+        const newAppliedScale: AppliedScale = {
+          id: `guitar-${rootNote}-${scale.name}-${Date.now()}`,
+          root: rootNote,
+          scale: scale,
+          displayName: `${rootNote} ${scale.name}`,
+          notes: scaleNotes, // Store the actual notes for removal
+          noteKeys: noteKeys, // Store noteKeys for MiniFretboard
+        }
+        setAppliedScales(prev => {
+          const newList = [...prev, newAppliedScale]
+          return newList
+        })
+      } else if (instrument === 'bass' && bassScaleHandlers) {
+        // Get the scale selections first to store as notes
+        const scaleSelections = applyScaleToBass(rootNote, scale as BassScale, bassNotes)
+
+        // Apply to bass component
+        bassScaleHandlers.handleScaleSelect(rootNote, scale as BassScale)
+
+        // Convert selections to Note objects for storage
+        const scaleNotes = convertSelectionsToNotes(scaleSelections, 'bass')
+
+        // Convert selections to noteKeys for MiniFretboard
+        const noteKeys = scaleSelections.map(sel =>
+          sel.fretIndex === 0
+            ? `${sel.stringIndex}-open`
+            : `${sel.stringIndex}-${sel.fretIndex - 1}`
+        )
+
+        // Add to applied scales list with actual notes
+        const newAppliedScale: AppliedScale = {
+          id: `bass-${rootNote}-${scale.name}-${Date.now()}`,
+          root: rootNote,
+          scale: scale,
+          displayName: `${rootNote} ${scale.name}`,
+          notes: scaleNotes, // Store the actual notes for removal
+          noteKeys: noteKeys, // Store noteKeys for MiniFretboard
+        }
+        setAppliedScales(prev => {
+          const newList = [...prev, newAppliedScale]
+          return newList
+        })
+      } else {
+        console.warn('No handlers or wrong condition:', {
+          instrument,
+          hasScaleHandlers: !!scaleHandlers,
+          hasBassScaleHandlers: !!bassScaleHandlers,
         })
       }
-    })
+    },
+    [instrument, scaleHandlers, bassScaleHandlers, appliedScales, convertSelectionsToNotes]
+  )
 
-    // Only remove notes that are NOT used by other active scales/chords
-    const notesToRemove = itemNoteKeys.filter(noteKey => !otherActiveNoteKeys.has(noteKey))
+  const handleScaleBoxSelect = useCallback(
+    (scaleBox: ScaleBox) => {
+      if (instrument === 'guitar' && scaleHandlers) {
+        // Get the scale box selections first to store as notes
+        const scaleSelections = applyScaleBoxToGuitar(scaleBox)
 
-    return notesToRemove
-  }, [appliedScales, appliedChords])
+        // Apply to guitar component
+        scaleHandlers.handleScaleBoxSelect(scaleBox)
 
-  const handleScaleSelect = useCallback((rootNote: string, scale: GuitarScale) => {
-    // Check if this exact scale is already applied
-    const isScaleAlreadyApplied = appliedScales.some(appliedScale =>
-      appliedScale.root === rootNote && appliedScale.scale.name === scale.name
-    )
+        // Convert selections to Note objects for storage
+        const scaleNotes = convertSelectionsToNotes(scaleSelections, 'guitar')
 
-    if (isScaleAlreadyApplied) {
-      return // Don't add duplicate scales
-    }
-
-    if (instrument === 'guitar' && scaleHandlers) {
-      // Get the scale selections first to store as notes
-      const scaleSelections = applyScaleToGuitar(rootNote, scale, guitarNotes)
-
-      // Apply to guitar component
-      scaleHandlers.handleScaleSelect(rootNote, scale)
-
-      // Convert selections to Note objects for storage
-      const scaleNotes = convertSelectionsToNotes(scaleSelections, 'guitar')
-
-      // Convert selections to noteKeys for MiniFretboard
-      const noteKeys = scaleSelections.map(sel =>
-        sel.fretIndex === 0 ? `${sel.stringIndex}-open` : `${sel.stringIndex}-${sel.fretIndex - 1}`
-      )
-
-      // Add to applied scales list with actual notes
-      const newAppliedScale: AppliedScale = {
-        id: `guitar-${rootNote}-${scale.name}-${Date.now()}`,
-        root: rootNote,
-        scale: scale,
-        displayName: `${rootNote} ${scale.name}`,
-        notes: scaleNotes, // Store the actual notes for removal
-        noteKeys: noteKeys // Store noteKeys for MiniFretboard
-      }
-      setAppliedScales(prev => {
-        const newList = [...prev, newAppliedScale]
-        return newList
-      })
-    } else if (instrument === 'bass' && bassScaleHandlers) {
-      // Get the scale selections first to store as notes
-      const scaleSelections = applyScaleToBass(rootNote, scale as any, bassNotes)
-
-      // Apply to bass component
-      bassScaleHandlers.handleScaleSelect(rootNote, scale as any)
-
-      // Convert selections to Note objects for storage
-      const scaleNotes = convertSelectionsToNotes(scaleSelections, 'bass')
-
-      // Convert selections to noteKeys for MiniFretboard
-      const noteKeys = scaleSelections.map(sel =>
-        sel.fretIndex === 0 ? `${sel.stringIndex}-open` : `${sel.stringIndex}-${sel.fretIndex - 1}`
-      )
-
-      // Add to applied scales list with actual notes
-      const newAppliedScale: AppliedScale = {
-        id: `bass-${rootNote}-${scale.name}-${Date.now()}`,
-        root: rootNote,
-        scale: scale,
-        displayName: `${rootNote} ${scale.name}`,
-        notes: scaleNotes, // Store the actual notes for removal
-        noteKeys: noteKeys // Store noteKeys for MiniFretboard
-      }
-      setAppliedScales(prev => {
-        const newList = [...prev, newAppliedScale]
-        return newList
-      })
-    } else {
-      console.warn('No handlers or wrong condition:', {
-        instrument,
-        hasScaleHandlers: !!scaleHandlers,
-        hasBassScaleHandlers: !!bassScaleHandlers
-      })
-    }
-  }, [instrument, scaleHandlers, bassScaleHandlers, appliedScales, convertSelectionsToNotes])
-
-  const handleScaleBoxSelect = useCallback((scaleBox: ScaleBox) => {
-    if (instrument === 'guitar' && scaleHandlers) {
-      // Get the scale box selections first to store as notes
-      const scaleSelections = applyScaleBoxToGuitar(scaleBox)
-
-      // Apply to guitar component
-      scaleHandlers.handleScaleBoxSelect(scaleBox)
-
-      // Convert selections to Note objects for storage
-      const scaleNotes = convertSelectionsToNotes(scaleSelections, 'guitar')
-
-      // Convert selections to noteKeys for MiniFretboard
-      const noteKeys = scaleSelections.map(sel =>
-        sel.fretIndex === 0 ? `${sel.stringIndex}-open` : `${sel.stringIndex}-${sel.fretIndex - 1}`
-      )
-
-      // Get root note - prefer isRoot position, fallback to first position
-      const rootPosition = scaleBox.positions.find(pos => pos.isRoot) || scaleBox.positions[0]
-      if (rootPosition) {
-        const rootNote = rootPosition.note.replace(/\d+$/, '') // Remove octave
-        // Create a scale object from the box info - use scaleBox.name which includes scale type
-        const scaleFromBox = {
-          name: scaleBox.name || `Frets ${scaleBox.minFret}-${scaleBox.maxFret}`,
-          intervals: [], // Box selections don't need intervals
-          modes: [],
-          description: 'Scale box selection'
-        }
-
-        const newAppliedScale: AppliedScale = {
-          id: `${scaleFromBox.name}-${Date.now()}`,
-          root: rootNote,
-          scale: scaleFromBox,
-          displayName: `${rootNote} ${scaleFromBox.name}`,
-          notes: scaleNotes, // Store the actual notes for removal
-          noteKeys: noteKeys // Store noteKeys for MiniFretboard
-        }
-
-        // Check for duplicates by scale name (fret range makes each unique)
-        const isDuplicate = appliedScales.some(scale =>
-          scale.scale.name === scaleFromBox.name
+        // Convert selections to noteKeys for MiniFretboard
+        const noteKeys = scaleSelections.map(sel =>
+          sel.fretIndex === 0
+            ? `${sel.stringIndex}-open`
+            : `${sel.stringIndex}-${sel.fretIndex - 1}`
         )
 
-        if (!isDuplicate) {
-          setAppliedScales(prev => [...prev, newAppliedScale])
+        // Get root note - prefer isRoot position, fallback to first position
+        const rootPosition = scaleBox.positions.find(pos => pos.isRoot) || scaleBox.positions[0]
+        if (rootPosition) {
+          const rootNote = rootPosition.note.replace(/\d+$/, '') // Remove octave
+          // Create a scale object from the box info - use scaleBox.name which includes scale type
+          const scaleFromBox = {
+            name: scaleBox.name || `Frets ${scaleBox.minFret}-${scaleBox.maxFret}`,
+            intervals: [], // Box selections don't need intervals
+            modes: [],
+            description: 'Scale box selection',
+          }
+
+          const newAppliedScale: AppliedScale = {
+            id: `${scaleFromBox.name}-${Date.now()}`,
+            root: rootNote,
+            scale: scaleFromBox,
+            displayName: `${rootNote} ${scaleFromBox.name}`,
+            notes: scaleNotes, // Store the actual notes for removal
+            noteKeys: noteKeys, // Store noteKeys for MiniFretboard
+          }
+
+          // Check for duplicates by scale name (fret range makes each unique)
+          const isDuplicate = appliedScales.some(scale => scale.scale.name === scaleFromBox.name)
+
+          if (!isDuplicate) {
+            setAppliedScales(prev => [...prev, newAppliedScale])
+          }
         }
-      }
-    } else if (instrument === 'bass' && bassScaleHandlers) {
-      // Get the scale box selections first to store as notes
-      const scaleSelections = applyScaleBoxToBass(scaleBox as any)
+      } else if (instrument === 'bass' && bassScaleHandlers) {
+        // Get the scale box selections first to store as notes
+        const scaleSelections = applyScaleBoxToBass(scaleBox as BassScaleBox)
 
-      // Apply to bass component
-      bassScaleHandlers.handleScaleBoxSelect(scaleBox as any)
+        // Apply to bass component
+        bassScaleHandlers.handleScaleBoxSelect(scaleBox as BassScaleBox)
 
-      // Convert selections to Note objects for storage
-      const scaleNotes = convertSelectionsToNotes(scaleSelections, 'bass')
+        // Convert selections to Note objects for storage
+        const scaleNotes = convertSelectionsToNotes(scaleSelections, 'bass')
 
-      // Convert selections to noteKeys for MiniFretboard
-      const noteKeys = scaleSelections.map(sel =>
-        sel.fretIndex === 0 ? `${sel.stringIndex}-open` : `${sel.stringIndex}-${sel.fretIndex - 1}`
-      )
-
-      // Get root note - prefer isRoot position, fallback to first position
-      const rootPosition = scaleBox.positions.find(pos => pos.isRoot) || scaleBox.positions[0]
-      if (rootPosition) {
-        const rootNote = rootPosition.note.replace(/\d+$/, '') // Remove octave
-        // Create a scale object from the box info - use scaleBox.name which includes scale type
-        const scaleFromBox = {
-          name: scaleBox.name || `Frets ${scaleBox.minFret}-${scaleBox.maxFret}`,
-          intervals: [], // Box selections don't need intervals
-          modes: [],
-          description: 'Scale box selection'
-        }
-
-        const newAppliedScale: AppliedScale = {
-          id: `${scaleFromBox.name}-${Date.now()}`,
-          root: rootNote,
-          scale: scaleFromBox,
-          displayName: `${rootNote} ${scaleFromBox.name}`,
-          notes: scaleNotes, // Store the actual notes for removal
-          noteKeys: noteKeys // Store noteKeys for MiniFretboard
-        }
-
-        // Check for duplicates by scale name (fret range makes each unique)
-        const isDuplicate = appliedScales.some(scale =>
-          scale.scale.name === scaleFromBox.name
+        // Convert selections to noteKeys for MiniFretboard
+        const noteKeys = scaleSelections.map(sel =>
+          sel.fretIndex === 0
+            ? `${sel.stringIndex}-open`
+            : `${sel.stringIndex}-${sel.fretIndex - 1}`
         )
 
-        if (!isDuplicate) {
-          setAppliedScales(prev => [...prev, newAppliedScale])
+        // Get root note - prefer isRoot position, fallback to first position
+        const rootPosition = scaleBox.positions.find(pos => pos.isRoot) || scaleBox.positions[0]
+        if (rootPosition) {
+          const rootNote = rootPosition.note.replace(/\d+$/, '') // Remove octave
+          // Create a scale object from the box info - use scaleBox.name which includes scale type
+          const scaleFromBox = {
+            name: scaleBox.name || `Frets ${scaleBox.minFret}-${scaleBox.maxFret}`,
+            intervals: [], // Box selections don't need intervals
+            modes: [],
+            description: 'Scale box selection',
+          }
+
+          const newAppliedScale: AppliedScale = {
+            id: `${scaleFromBox.name}-${Date.now()}`,
+            root: rootNote,
+            scale: scaleFromBox,
+            displayName: `${rootNote} ${scaleFromBox.name}`,
+            notes: scaleNotes, // Store the actual notes for removal
+            noteKeys: noteKeys, // Store noteKeys for MiniFretboard
+          }
+
+          // Check for duplicates by scale name (fret range makes each unique)
+          const isDuplicate = appliedScales.some(scale => scale.scale.name === scaleFromBox.name)
+
+          if (!isDuplicate) {
+            setAppliedScales(prev => [...prev, newAppliedScale])
+          }
         }
       }
-    }
-  }, [instrument, scaleHandlers, bassScaleHandlers, appliedScales, convertSelectionsToNotes])
+    },
+    [instrument, scaleHandlers, bassScaleHandlers, appliedScales, convertSelectionsToNotes]
+  )
 
   const handleClearScale = useCallback(() => {
     if (instrument === 'guitar' && scaleHandlers) {
@@ -475,129 +533,135 @@ export const useScaleChordManagement = ({
   }, [instrument, scaleHandlers, bassScaleHandlers])
 
   // Chord selection handlers
-  const handleChordSelect = useCallback((rootNote: string, chord: GuitarChord) => {
-    // Check if this chord is already applied
-    if (isChordAlreadyApplied(rootNote, chord.name)) {
-      return
-    }
-
-    if (instrument === 'guitar' && chordHandlers) {
-      // Get the chord selections first to store as notes
-      const chordSelections = applyChordToGuitar(rootNote, chord, guitarNotes)
-
-      // Apply to guitar component
-      chordHandlers.handleChordSelect(rootNote, chord)
-
-      // Convert selections to Note objects for storage
-      const chordNotes = convertSelectionsToNotes(chordSelections, 'guitar')
-
-      // Convert selections to noteKeys (position strings like "0-open", "1-3")
-      const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
-        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      })
-
-      // Track the chord with actual notes
-      const chordId = `${instrument}-${rootNote}-${chord.name}-${Date.now()}`
-      const newAppliedChord: AppliedChord = {
-        id: chordId,
-        root: rootNote,
-        chord: chord,
-        displayName: `${rootNote}${chord.name}`,
-        notes: chordNotes, // Store the actual notes for removal
-        noteKeys: noteKeys // Store the fretboard positions for shape-specific highlighting
+  const handleChordSelect = useCallback(
+    (rootNote: string, chord: GuitarChord) => {
+      // Check if this chord is already applied
+      if (isChordAlreadyApplied(rootNote, chord.name)) {
+        return
       }
-      setAppliedChords(prev => [...prev, newAppliedChord])
-    } else if (instrument === 'bass' && bassChordHandlers) {
-      // Get the chord selections first to store as notes
-      const chordSelections = applyChordToBass(rootNote, chord as any, bassNotes)
 
-      // Apply to bass component
-      bassChordHandlers.handleChordSelect(rootNote, chord as any)
+      if (instrument === 'guitar' && chordHandlers) {
+        // Get the chord selections first to store as notes
+        const chordSelections = applyChordToGuitar(rootNote, chord, guitarNotes)
 
-      // Convert selections to Note objects for storage
-      const chordNotes = convertSelectionsToNotes(chordSelections, 'bass')
+        // Apply to guitar component
+        chordHandlers.handleChordSelect(rootNote, chord)
 
-      // Convert selections to noteKeys (position strings like "0-open", "1-3")
-      const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
-        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      })
+        // Convert selections to Note objects for storage
+        const chordNotes = convertSelectionsToNotes(chordSelections, 'guitar')
 
-      // Track the chord with actual notes
-      const chordId = `${instrument}-${rootNote}-${chord.name}-${Date.now()}`
-      const newAppliedChord: AppliedChord = {
-        id: chordId,
-        root: rootNote,
-        chord: chord,
-        displayName: `${rootNote}${chord.name}`,
-        notes: chordNotes, // Store the actual notes for removal
-        noteKeys: noteKeys // Store the fretboard positions for shape-specific highlighting
+        // Convert selections to noteKeys (position strings like "0-open", "1-3")
+        const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
+          return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        })
+
+        // Track the chord with actual notes
+        const chordId = `${instrument}-${rootNote}-${chord.name}-${Date.now()}`
+        const newAppliedChord: AppliedChord = {
+          id: chordId,
+          root: rootNote,
+          chord: chord,
+          displayName: `${rootNote}${chord.name}`,
+          notes: chordNotes, // Store the actual notes for removal
+          noteKeys: noteKeys, // Store the fretboard positions for shape-specific highlighting
+        }
+        setAppliedChords(prev => [...prev, newAppliedChord])
+      } else if (instrument === 'bass' && bassChordHandlers) {
+        // Get the chord selections first to store as notes
+        const chordSelections = applyChordToBass(rootNote, chord as BassChord, bassNotes)
+
+        // Apply to bass component
+        bassChordHandlers.handleChordSelect(rootNote, chord as BassChord)
+
+        // Convert selections to Note objects for storage
+        const chordNotes = convertSelectionsToNotes(chordSelections, 'bass')
+
+        // Convert selections to noteKeys (position strings like "0-open", "1-3")
+        const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
+          return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        })
+
+        // Track the chord with actual notes
+        const chordId = `${instrument}-${rootNote}-${chord.name}-${Date.now()}`
+        const newAppliedChord: AppliedChord = {
+          id: chordId,
+          root: rootNote,
+          chord: chord,
+          displayName: `${rootNote}${chord.name}`,
+          notes: chordNotes, // Store the actual notes for removal
+          noteKeys: noteKeys, // Store the fretboard positions for shape-specific highlighting
+        }
+        setAppliedChords(prev => [...prev, newAppliedChord])
       }
-      setAppliedChords(prev => [...prev, newAppliedChord])
-    }
-  }, [instrument, chordHandlers, bassChordHandlers, isChordAlreadyApplied, convertSelectionsToNotes])
+    },
+    [instrument, chordHandlers, bassChordHandlers, isChordAlreadyApplied, convertSelectionsToNotes]
+  )
 
-  const handleChordShapeSelect = useCallback((chordShape: ChordShape & { root?: string; fretZone?: number }) => {
-    // Check if this chord shape is already applied (simplified check)
-    if (appliedChords.some(chord => chord.displayName === chordShape.name)) {
-      return
-    }
-
-    if (instrument === 'guitar' && chordHandlers) {
-      // Get the chord shape selections first to store as notes
-      const chordSelections = applyChordShapeToGuitar(chordShape)
-
-      // Apply to guitar component
-      chordHandlers.handleChordShapeSelect(chordShape)
-
-      // Convert selections to Note objects for storage
-      const chordNotes = convertSelectionsToNotes(chordSelections, 'guitar')
-
-      // Convert selections to noteKeys (position strings like "0-open", "1-3")
-      const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
-        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      })
-
-      // Track the chord shape with actual notes
-      const chordId = `${instrument}-shape-${chordShape.name}-${Date.now()}`
-      const newAppliedChord: AppliedChord = {
-        id: chordId,
-        root: chordShape.root || 'Unknown', // Use provided root or fallback
-        chord: { name: chordShape.name, intervals: [] } as any, // Simplified for shapes
-        displayName: chordShape.name,
-        notes: chordNotes, // Store the actual notes for removal
-        noteKeys: noteKeys, // Store the fretboard positions for shape-specific highlighting
-        fretZone: chordShape.fretZone // Store the fret zone for export
+  const handleChordShapeSelect = useCallback(
+    (chordShape: ChordShape & { root?: string; fretZone?: number }) => {
+      // Check if this chord shape is already applied (simplified check)
+      if (appliedChords.some(chord => chord.displayName === chordShape.name)) {
+        return
       }
-      setAppliedChords(prev => [...prev, newAppliedChord])
-    } else if (instrument === 'bass' && bassChordHandlers) {
-      // Get the chord shape selections first to store as notes
-      const chordSelections = applyBassChordShapeToBass(chordShape as any)
 
-      // Apply to bass component
-      bassChordHandlers.handleChordShapeSelect(chordShape as any)
+      if (instrument === 'guitar' && chordHandlers) {
+        // Get the chord shape selections first to store as notes
+        const chordSelections = applyChordShapeToGuitar(chordShape)
 
-      // Convert selections to Note objects for storage
-      const chordNotes = convertSelectionsToNotes(chordSelections, 'bass')
+        // Apply to guitar component
+        chordHandlers.handleChordShapeSelect(chordShape)
 
-      // Convert selections to noteKeys (position strings like "0-open", "1-3")
-      const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
-        return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-      })
+        // Convert selections to Note objects for storage
+        const chordNotes = convertSelectionsToNotes(chordSelections, 'guitar')
 
-      // Track the chord shape with actual notes
-      const chordId = `${instrument}-shape-${chordShape.name}-${Date.now()}`
-      const newAppliedChord: AppliedChord = {
-        id: chordId,
-        root: chordShape.root || 'Unknown', // Use provided root or fallback
-        chord: { name: chordShape.name, intervals: [] } as any, // Simplified for shapes
-        displayName: chordShape.name,
-        notes: chordNotes, // Store the actual notes for removal
-        noteKeys: noteKeys, // Store the fretboard positions for shape-specific highlighting
-        fretZone: chordShape.fretZone // Store the fret zone for export
+        // Convert selections to noteKeys (position strings like "0-open", "1-3")
+        const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
+          return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        })
+
+        // Track the chord shape with actual notes
+        const chordId = `${instrument}-shape-${chordShape.name}-${Date.now()}`
+        const newAppliedChord: AppliedChord = {
+          id: chordId,
+          root: chordShape.root || 'Unknown', // Use provided root or fallback
+          chord: { name: chordShape.name, intervals: [], description: '' } as GuitarChord, // Simplified for shapes
+          displayName: chordShape.name,
+          notes: chordNotes, // Store the actual notes for removal
+          noteKeys: noteKeys, // Store the fretboard positions for shape-specific highlighting
+          fretZone: chordShape.fretZone, // Store the fret zone for export
+        }
+        setAppliedChords(prev => [...prev, newAppliedChord])
+      } else if (instrument === 'bass' && bassChordHandlers) {
+        // Get the chord shape selections first to store as notes
+        const chordSelections = applyBassChordShapeToBass(chordShape as BassChordShape)
+
+        // Apply to bass component
+        bassChordHandlers.handleChordShapeSelect(chordShape as BassChordShape)
+
+        // Convert selections to Note objects for storage
+        const chordNotes = convertSelectionsToNotes(chordSelections, 'bass')
+
+        // Convert selections to noteKeys (position strings like "0-open", "1-3")
+        const noteKeys = chordSelections.map(({ stringIndex, fretIndex }) => {
+          return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+        })
+
+        // Track the chord shape with actual notes
+        const chordId = `${instrument}-shape-${chordShape.name}-${Date.now()}`
+        const newAppliedChord: AppliedChord = {
+          id: chordId,
+          root: chordShape.root || 'Unknown', // Use provided root or fallback
+          chord: { name: chordShape.name, intervals: [], description: '' } as BassChord, // Simplified for shapes
+          displayName: chordShape.name,
+          notes: chordNotes, // Store the actual notes for removal
+          noteKeys: noteKeys, // Store the fretboard positions for shape-specific highlighting
+          fretZone: chordShape.fretZone, // Store the fret zone for export
+        }
+        setAppliedChords(prev => [...prev, newAppliedChord])
       }
-      setAppliedChords(prev => [...prev, newAppliedChord])
-    }
-  }, [instrument, chordHandlers, bassChordHandlers, appliedChords, convertSelectionsToNotes])
+    },
+    [instrument, chordHandlers, bassChordHandlers, appliedChords, convertSelectionsToNotes]
+  )
 
   const handleClearChord = useCallback(() => {
     if (instrument === 'guitar' && chordHandlers) {
@@ -610,112 +674,125 @@ export const useScaleChordManagement = ({
   }, [instrument, chordHandlers, bassChordHandlers])
 
   // Guitar chord apply handler - uses the same chord box system as sandbox mode
-  const handleGuitarChordApply = useCallback((rootNote: string, chord: GuitarChord, boxIndex: number = 0) => {
-    // Get chord boxes (same as sandbox mode)
-    const chordBoxes = getChordBoxes(rootNote, chord, guitarNotes)
+  const handleGuitarChordApply = useCallback(
+    (rootNote: string, chord: GuitarChord, boxIndex: number = 0) => {
+      // Get chord boxes (same as sandbox mode)
+      const chordBoxes = getChordBoxes(rootNote, chord, guitarNotes)
 
-    if (chordBoxes.length === 0) {
-      return
-    }
+      if (chordBoxes.length === 0) {
+        return
+      }
 
-    // Use specified box index or default to first
-    const actualBoxIndex = Math.min(boxIndex, chordBoxes.length - 1)
-    const chordBox = chordBoxes[actualBoxIndex]
+      // Use specified box index or default to first
+      const actualBoxIndex = Math.min(boxIndex, chordBoxes.length - 1)
+      const chordBox = chordBoxes[actualBoxIndex]
 
-    // Create chord shape from box - exactly like sandbox mode does
-    const chordShapeFromBox = {
-      name: `${rootNote} ${chord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
-      minFret: chordBox.minFret,
-      maxFret: chordBox.maxFret,
-      positions: chordBox.positions,
-      difficulty: 'Medium' as const,
-      root: rootNote,
-      fretZone: actualBoxIndex // Store the fret zone for export
-    }
+      // Create chord shape from box - exactly like sandbox mode does
+      const chordShapeFromBox = {
+        name: `${rootNote} ${chord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
+        minFret: chordBox.minFret,
+        maxFret: chordBox.maxFret,
+        positions: chordBox.positions,
+        difficulty: 'Medium' as const,
+        root: rootNote,
+        fretZone: actualBoxIndex, // Store the fret zone for export
+      }
 
-    // Use handleChordShapeSelect - same as sandbox mode
-    handleChordShapeSelect(chordShapeFromBox as any)
-  }, [handleChordShapeSelect])
+      // Use handleChordShapeSelect - same as sandbox mode
+      handleChordShapeSelect(chordShapeFromBox as ChordShape & { root?: string; fretZone?: number })
+    },
+    [handleChordShapeSelect]
+  )
 
   // Bass chord apply handler - uses the same chord box system as sandbox mode
-  const handleBassChordApply = useCallback((rootNote: string, chord: BassChord, boxIndex: number = 0) => {
-    // Get chord boxes (same as sandbox mode)
-    const chordBoxes = getBassChordBoxes(rootNote, chord, bassNotes)
+  const handleBassChordApply = useCallback(
+    (rootNote: string, chord: BassChord, boxIndex: number = 0) => {
+      // Get chord boxes (same as sandbox mode)
+      const chordBoxes = getBassChordBoxes(rootNote, chord, bassNotes)
 
-    if (chordBoxes.length === 0) {
-      return
-    }
+      if (chordBoxes.length === 0) {
+        return
+      }
 
-    // Use specified box index or default to first
-    const actualBoxIndex = Math.min(boxIndex, chordBoxes.length - 1)
-    const chordBox = chordBoxes[actualBoxIndex]
+      // Use specified box index or default to first
+      const actualBoxIndex = Math.min(boxIndex, chordBoxes.length - 1)
+      const chordBox = chordBoxes[actualBoxIndex]
 
-    // Create chord shape from box - exactly like sandbox mode does
-    const bassChordShapeFromBox = {
-      name: `${rootNote} ${chord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
-      minFret: chordBox.minFret,
-      maxFret: chordBox.maxFret,
-      positions: chordBox.positions,
-      difficulty: 'Medium' as const,
-      root: rootNote,
-      fretZone: actualBoxIndex // Store the fret zone for export
-    }
+      // Create chord shape from box - exactly like sandbox mode does
+      const bassChordShapeFromBox = {
+        name: `${rootNote} ${chord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
+        minFret: chordBox.minFret,
+        maxFret: chordBox.maxFret,
+        positions: chordBox.positions,
+        difficulty: 'Medium' as const,
+        root: rootNote,
+        fretZone: actualBoxIndex, // Store the fret zone for export
+      }
 
-    // Use handleChordShapeSelect - same as sandbox mode
-    handleChordShapeSelect(bassChordShapeFromBox as any)
-  }, [handleChordShapeSelect])
+      // Use handleChordShapeSelect - same as sandbox mode
+      handleChordShapeSelect(
+        bassChordShapeFromBox as unknown as ChordShape & { root?: string; fretZone?: number }
+      )
+    },
+    [handleChordShapeSelect]
+  )
 
   // Keyboard scale handlers
-  const handleKeyboardScaleApply = useCallback((rootNote: string, scale: KeyboardScale, octave?: number) => {
-    // Check if this exact scale with this octave is already applied
-    const displayName = octave !== undefined
-      ? `${rootNote} ${scale.name} (Octave ${octave})`
-      : `${rootNote} ${scale.name}`
-    const isScaleAlreadyApplied = appliedScales.some(appliedScale =>
-      appliedScale.displayName === displayName
-    )
+  const handleKeyboardScaleApply = useCallback(
+    (rootNote: string, scale: KeyboardScale, octave?: number) => {
+      // Check if this exact scale with this octave is already applied
+      const displayName =
+        octave !== undefined
+          ? `${rootNote} ${scale.name} (Octave ${octave})`
+          : `${rootNote} ${scale.name}`
+      const isScaleAlreadyApplied = appliedScales.some(
+        appliedScale => appliedScale.displayName === displayName
+      )
 
-    if (isScaleAlreadyApplied) {
-      return // Don't add duplicate scales
-    }
+      if (isScaleAlreadyApplied) {
+        return // Don't add duplicate scales
+      }
 
-    // Generate keyboard notes - use full range if specific octave is requested
-    // This ensures notes are found even if octave range state hasn't updated yet
-    const currentNotes = octave !== undefined
-      ? generateNotesWithSeparateOctaves(3, 3) // Full range (octaves 1-8) when filtering by octave
-      : (lowerOctaves !== 0 || higherOctaves !== 0)
-        ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
-        : generateNotesWithSeparateOctaves(0, 0) // Default range
+      // Generate keyboard notes - use full range if specific octave is requested
+      // This ensures notes are found even if octave range state hasn't updated yet
+      const currentNotes =
+        octave !== undefined
+          ? generateNotesWithSeparateOctaves(3, 3) // Full range (octaves 1-8) when filtering by octave
+          : lowerOctaves !== 0 || higherOctaves !== 0
+            ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+            : generateNotesWithSeparateOctaves(0, 0) // Default range
 
-    // Apply scale to get scale notes
-    let scaleNotes = applyScaleToKeyboard(rootNote, scale, currentNotes)
+      // Apply scale to get scale notes
+      let scaleNotes = applyScaleToKeyboard(rootNote, scale, currentNotes)
 
-    // If octave is specified, filter to only that octave
-    if (octave !== undefined) {
-      scaleNotes = scaleNotes.filter(note => {
-        const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
-        return noteOctave === octave
-      })
-    }
+      // If octave is specified, filter to only that octave
+      if (octave !== undefined) {
+        scaleNotes = scaleNotes.filter(note => {
+          const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
+          return noteOctave === octave
+        })
+      }
 
-    // DON'T add scale notes to selectedNotes - they should only be in appliedScales
-    // This allows clicking them to add a "manual" layer for gradient colors
+      // DON'T add scale notes to selectedNotes - they should only be in appliedScales
+      // This allows clicking them to add a "manual" layer for gradient colors
 
-    // Add scale to applied scales list
-    const newAppliedScale: AppliedScale = {
-      id: `${rootNote}-${scale.name}-${octave !== undefined ? octave : 'all'}-${Date.now()}`,
-      root: rootNote,
-      scale: scale,
-      displayName: displayName,
-      notes: scaleNotes,
-      octave: octave // Store the octave for regeneration
-    }
+      // Add scale to applied scales list
+      const newAppliedScale: AppliedScale = {
+        id: `${rootNote}-${scale.name}-${octave !== undefined ? octave : 'all'}-${Date.now()}`,
+        root: rootNote,
+        scale: scale,
+        displayName: displayName,
+        notes: scaleNotes,
+        octave: octave, // Store the octave for regeneration
+      }
 
-    setAppliedScales(prev => [...prev, newAppliedScale])
+      setAppliedScales(prev => [...prev, newAppliedScale])
 
-    // Store current scale info for visual highlighting
-    setCurrentKeyboardScale({ root: rootNote, scale })
-  }, [appliedScales, lowerOctaves, higherOctaves, selectNote, selectedNotes])
+      // Store current scale info for visual highlighting
+      setCurrentKeyboardScale({ root: rootNote, scale })
+    },
+    [appliedScales, lowerOctaves, higherOctaves]
+  )
 
   const handleKeyboardScaleClear = useCallback(() => {
     // Clear all selected notes
@@ -726,96 +803,114 @@ export const useScaleChordManagement = ({
     setAppliedScales([])
   }, [clearSelection])
 
-  const handleScaleDelete = useCallback((scaleId: string) => {
-    // Find the scale to delete by ID
-    const scaleToDelete = appliedScales.find(scale => scale.id === scaleId)
-    if (!scaleToDelete) {
-      return
-    }
-
-    if (instrument === 'guitar' && scaleHandlers) {
-      // For guitar, use overlap-aware removal
-      const noteKeysToRemove = getNotesToRemove(scaleToDelete, 'scale')
-
-      if (noteKeysToRemove.length > 0 && chordHandlers?.handleRemoveChordNotes) {
-        chordHandlers.handleRemoveChordNotes(noteKeysToRemove)
-      } else if (noteKeysToRemove.length === 0) {
-      } else {
-        // Fallback: call the specific scale delete function
-        scaleHandlers.handleScaleDelete(scaleToDelete.root, scaleToDelete.scale as any)
+  const handleScaleDelete = useCallback(
+    (scaleId: string) => {
+      // Find the scale to delete by ID
+      const scaleToDelete = appliedScales.find(scale => scale.id === scaleId)
+      if (!scaleToDelete) {
+        return
       }
-    } else if (instrument === 'bass' && bassScaleHandlers) {
-      // For bass, use overlap-aware removal
-      const noteKeysToRemove = getNotesToRemove(scaleToDelete, 'scale')
 
-      if (noteKeysToRemove.length > 0 && bassChordHandlers?.handleRemoveChordNotes) {
-        bassChordHandlers.handleRemoveChordNotes(noteKeysToRemove)
-      } else {
-        // Fallback: call the specific scale delete function
-        bassScaleHandlers.handleScaleDelete(scaleToDelete.root, scaleToDelete.scale as any)
-      }
-    } else if (instrument === 'keyboard') {
-      // For keyboard, we need to remove only the specific scale notes
-      if (scaleToDelete.notes) {
-        // For keyboard, we'd need a removeNote function, but this is complex to implement
-        // For now, just clear all selections (same as before)
-        clearSelection()
-        setCurrentKeyboardScale(null)
-      }
-    }
+      if (instrument === 'guitar' && scaleHandlers) {
+        // For guitar, use overlap-aware removal
+        const noteKeysToRemove = getNotesToRemove(scaleToDelete)
 
-    // Remove from applied scales list
-    setAppliedScales(prev => prev.filter(scale => scale.id !== scaleId))
-  }, [instrument, scaleHandlers, bassScaleHandlers, chordHandlers, bassChordHandlers, clearSelection, appliedScales])
+        if (noteKeysToRemove.length > 0 && chordHandlers?.handleRemoveChordNotes) {
+          chordHandlers.handleRemoveChordNotes(noteKeysToRemove)
+        } else if (noteKeysToRemove.length === 0) {
+          // No notes to remove - all notes are shared with other scales/chords
+        } else {
+          // Fallback: call the specific scale delete function
+          scaleHandlers.handleScaleDelete(scaleToDelete.root, scaleToDelete.scale as GuitarScale)
+        }
+      } else if (instrument === 'bass' && bassScaleHandlers) {
+        // For bass, use overlap-aware removal
+        const noteKeysToRemove = getNotesToRemove(scaleToDelete)
+
+        if (noteKeysToRemove.length > 0 && bassChordHandlers?.handleRemoveChordNotes) {
+          bassChordHandlers.handleRemoveChordNotes(noteKeysToRemove)
+        } else {
+          // Fallback: call the specific scale delete function
+          bassScaleHandlers.handleScaleDelete(scaleToDelete.root, scaleToDelete.scale as BassScale)
+        }
+      } else if (instrument === 'keyboard') {
+        // For keyboard, we need to remove only the specific scale notes
+        if (scaleToDelete.notes) {
+          // For keyboard, we'd need a removeNote function, but this is complex to implement
+          // For now, just clear all selections (same as before)
+          clearSelection()
+          setCurrentKeyboardScale(null)
+        }
+      }
+
+      // Remove from applied scales list
+      setAppliedScales(prev => prev.filter(scale => scale.id !== scaleId))
+    },
+    [
+      instrument,
+      scaleHandlers,
+      bassScaleHandlers,
+      chordHandlers,
+      bassChordHandlers,
+      clearSelection,
+      appliedScales,
+      getNotesToRemove,
+    ]
+  )
 
   // Keyboard chord handlers
-  const handleKeyboardChordApply = useCallback((rootNote: string, chord: KeyboardChord, octave?: number) => {
-    // Check if this chord with this octave is already applied
-    const displayName = octave !== undefined
-      ? `${rootNote} ${chord.name} (Octave ${octave})`
-      : `${rootNote} ${chord.name}`
-    const isAlreadyApplied = appliedChords.some(appliedChord =>
-      appliedChord.displayName === displayName
-    )
+  const handleKeyboardChordApply = useCallback(
+    (rootNote: string, chord: KeyboardChord, octave?: number) => {
+      // Check if this chord with this octave is already applied
+      const displayName =
+        octave !== undefined
+          ? `${rootNote} ${chord.name} (Octave ${octave})`
+          : `${rootNote} ${chord.name}`
+      const isAlreadyApplied = appliedChords.some(
+        appliedChord => appliedChord.displayName === displayName
+      )
 
-    if (isAlreadyApplied) {
-      return
-    }
+      if (isAlreadyApplied) {
+        return
+      }
 
-    // Generate keyboard notes - use full range if specific octave is requested
-    // This ensures notes are found even if octave range state hasn't updated yet
-    const currentNotes = octave !== undefined
-      ? generateNotesWithSeparateOctaves(3, 3) // Full range (octaves 1-8) when filtering by octave
-      : (lowerOctaves !== 0 || higherOctaves !== 0)
-        ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
-        : generateNotesWithSeparateOctaves(0, 0) // Default range
+      // Generate keyboard notes - use full range if specific octave is requested
+      // This ensures notes are found even if octave range state hasn't updated yet
+      const currentNotes =
+        octave !== undefined
+          ? generateNotesWithSeparateOctaves(3, 3) // Full range (octaves 1-8) when filtering by octave
+          : lowerOctaves !== 0 || higherOctaves !== 0
+            ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+            : generateNotesWithSeparateOctaves(0, 0) // Default range
 
-    // Apply chord to get chord notes
-    let chordNotes = applyChordToKeyboard(rootNote, chord, currentNotes)
+      // Apply chord to get chord notes
+      let chordNotes = applyChordToKeyboard(rootNote, chord, currentNotes)
 
-    // If octave is specified, filter to only that octave
-    if (octave !== undefined) {
-      chordNotes = chordNotes.filter(note => {
-        const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
-        return noteOctave === octave
-      })
-    }
+      // If octave is specified, filter to only that octave
+      if (octave !== undefined) {
+        chordNotes = chordNotes.filter(note => {
+          const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
+          return noteOctave === octave
+        })
+      }
 
-    // DON'T add chord notes to selectedNotes - they should only be in appliedChords
-    // This allows clicking them to add a "manual" layer for gradient colors
+      // DON'T add chord notes to selectedNotes - they should only be in appliedChords
+      // This allows clicking them to add a "manual" layer for gradient colors
 
-    // Add keyboard chord to applied chords list with the actual notes
-    const chordId = `keyboard-${rootNote}-${chord.name}-${octave !== undefined ? octave : 'all'}-${Date.now()}`
-    const newAppliedChord: AppliedChord = {
-      id: chordId,
-      root: rootNote,
-      chord: chord,
-      displayName: displayName,
-      notes: chordNotes,
-      octave: octave // Store the octave for regeneration
-    }
-    setAppliedChords(prev => [...prev, newAppliedChord])
-  }, [isChordAlreadyApplied, appliedChords, lowerOctaves, higherOctaves, selectNote, selectedNotes])
+      // Add keyboard chord to applied chords list with the actual notes
+      const chordId = `keyboard-${rootNote}-${chord.name}-${octave !== undefined ? octave : 'all'}-${Date.now()}`
+      const newAppliedChord: AppliedChord = {
+        id: chordId,
+        root: rootNote,
+        chord: chord,
+        displayName: displayName,
+        notes: chordNotes,
+        octave: octave, // Store the octave for regeneration
+      }
+      setAppliedChords(prev => [...prev, newAppliedChord])
+    },
+    [appliedChords, lowerOctaves, higherOctaves]
+  )
 
   const handleKeyboardChordClear = useCallback(() => {
     // Clear all selected notes
@@ -827,49 +922,53 @@ export const useScaleChordManagement = ({
   }, [clearSelection])
 
   // Handle deleting individual chords
-  const handleChordDelete = useCallback((chordId: string) => {
-    // Find the chord to delete by ID
-    const chordToDelete = appliedChords.find(chord => chord.id === chordId)
-    if (!chordToDelete) {
-      return
-    }
-
-    if (instrument === 'guitar' && chordHandlers) {
-      // For guitar, use overlap-aware removal
-      const noteKeysToRemove = getNotesToRemove(chordToDelete, 'chord')
-
-      if (noteKeysToRemove.length > 0) {
-        // Use the chord-only removal handler to preserve scale highlighting
-        if (chordHandlers?.handleRemoveChordNotesOnly) {
-          chordHandlers.handleRemoveChordNotesOnly(noteKeysToRemove)
-        } else if (chordHandlers?.handleRemoveChordNotes) {
-          // Fallback to regular removal if chord-only function not available
-          chordHandlers.handleRemoveChordNotes(noteKeysToRemove)
-        }
-      } else {
+  const handleChordDelete = useCallback(
+    (chordId: string) => {
+      // Find the chord to delete by ID
+      const chordToDelete = appliedChords.find(chord => chord.id === chordId)
+      if (!chordToDelete) {
+        return
       }
-    } else if (instrument === 'bass' && bassChordHandlers) {
-      // For bass, use overlap-aware removal
-      const noteKeysToRemove = getNotesToRemove(chordToDelete, 'chord')
 
-      if (noteKeysToRemove.length > 0) {
-        // Use the chord-only removal handler to preserve scale highlighting
-        if (bassChordHandlers?.handleRemoveChordNotesOnly) {
-          bassChordHandlers.handleRemoveChordNotesOnly(noteKeysToRemove)
-        } else if (bassChordHandlers?.handleRemoveChordNotes) {
-          // Fallback to regular removal if chord-only function not available
-          bassChordHandlers.handleRemoveChordNotes(noteKeysToRemove)
+      if (instrument === 'guitar' && chordHandlers) {
+        // For guitar, use overlap-aware removal
+        const noteKeysToRemove = getNotesToRemove(chordToDelete)
+
+        if (noteKeysToRemove.length > 0) {
+          // Use the chord-only removal handler to preserve scale highlighting
+          if (chordHandlers?.handleRemoveChordNotesOnly) {
+            chordHandlers.handleRemoveChordNotesOnly(noteKeysToRemove)
+          } else if (chordHandlers?.handleRemoveChordNotes) {
+            // Fallback to regular removal if chord-only function not available
+            chordHandlers.handleRemoveChordNotes(noteKeysToRemove)
+          }
+        } else {
+          // No notes to remove - all notes are shared with other scales/chords
         }
-      }
-    } else if (instrument === 'keyboard') {
-      // For keyboard, clear all selected notes (same as before)
-      clearSelection()
-      setCurrentKeyboardChord(null)
-    }
+      } else if (instrument === 'bass' && bassChordHandlers) {
+        // For bass, use overlap-aware removal
+        const noteKeysToRemove = getNotesToRemove(chordToDelete)
 
-    // Remove from applied chords list
-    setAppliedChords(prev => prev.filter(chord => chord.id !== chordId))
-  }, [instrument, chordHandlers, bassChordHandlers, clearSelection, appliedChords])
+        if (noteKeysToRemove.length > 0) {
+          // Use the chord-only removal handler to preserve scale highlighting
+          if (bassChordHandlers?.handleRemoveChordNotesOnly) {
+            bassChordHandlers.handleRemoveChordNotesOnly(noteKeysToRemove)
+          } else if (bassChordHandlers?.handleRemoveChordNotes) {
+            // Fallback to regular removal if chord-only function not available
+            bassChordHandlers.handleRemoveChordNotes(noteKeysToRemove)
+          }
+        }
+      } else if (instrument === 'keyboard') {
+        // For keyboard, clear all selected notes (same as before)
+        clearSelection()
+        setCurrentKeyboardChord(null)
+      }
+
+      // Remove from applied chords list
+      setAppliedChords(prev => prev.filter(chord => chord.id !== chordId))
+    },
+    [instrument, chordHandlers, bassChordHandlers, clearSelection, appliedChords, getNotesToRemove]
+  )
 
   const handleRootChange = useCallback((rootNote: string) => {
     setSelectedRoot(rootNote)
@@ -936,6 +1035,6 @@ export const useScaleChordManagement = ({
     handleChordRootChange,
 
     // Utility functions
-    isChordAlreadyApplied
+    isChordAlreadyApplied,
   }
 }

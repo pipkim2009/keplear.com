@@ -8,51 +8,74 @@ import { useScaleChordState } from '../../../hooks'
 import { useKeyboardHighlighting } from '../../../hooks/useKeyboardHighlighting'
 import type { FretboardPreview, KeyboardPreview } from '../../common/ScaleChordOptions'
 
-interface InstrumentDisplayProps {
+/** Core note selection and interaction */
+export interface NoteInteractionProps {
   onNoteClick: (note: Note) => void
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
+  selectedNotes: Note[]
+  selectNote?: (note: Note, selectionMode?: 'range' | 'multi') => void
+  clearSelection: () => void
+  clearTrigger: number
   showNotes: boolean
-  bpm: number
-  setBpm: (bpm: number) => void
-  numberOfBeats: number
-  setNumberOfBeats: (count: number) => void
-  chordMode?: ChordMode
-  setChordMode?: (mode: ChordMode) => void
+}
+
+/** Instrument type and configuration */
+export interface InstrumentConfigProps {
   instrument: string
   setInstrument: (instrument: string) => void
   setGuitarNotes: (notes: Note[]) => void
   setBassNotes?: (notes: Note[]) => void
-  clearSelection: () => void
-  clearTrigger: number
-  selectedNotes: Note[]
-  selectNote?: (note: Note, selectionMode?: 'range' | 'multi') => void
+  chordMode?: ChordMode
+  setChordMode?: (mode: ChordMode) => void
+  clearChordsAndScales?: number
+}
+
+/** Tempo, beats, and input flash state */
+export interface TempoControlProps {
+  bpm: number
+  setBpm: (bpm: number) => void
+  numberOfBeats: number
+  setNumberOfBeats: (count: number) => void
+  flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
+  triggerInputFlash: (inputType: 'bpm' | 'beats' | 'mode') => void
+  setInputActive: (inputType: 'bpm' | 'beats' | 'mode', active: boolean) => void
+}
+
+/** Octave range and fret range */
+export interface RangeProps {
   onOctaveRangeChange?: (lowerOctaves: number, higherOctaves: number) => void
   initialLowerOctaves?: number
   initialHigherOctaves?: number
   disableOctaveCleanup?: boolean
-  flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
-  triggerInputFlash: (inputType: 'bpm' | 'beats' | 'mode') => void
-  setInputActive: (inputType: 'bpm' | 'beats' | 'mode', active: boolean) => void
-  clearChordsAndScales?: number
+  fretRangeLow?: number
+  fretRangeHigh?: number
+}
+
+/** Melody generation, playback, and recording */
+export interface PlaybackProps {
   onGenerateMelody?: () => void
   onPlayMelody?: () => void
   onRecordMelody?: () => Promise<Blob | null>
   isPlaying?: boolean
   isRecording?: boolean
   hasGeneratedMelody?: boolean
-  onToggleNotes?: () => void
+  generatedMelody?: Note[]
   playbackProgress?: number
   melodyDuration?: number
   onProgressChange?: (progress: number) => void
   onClearRecordedAudio?: () => void
   recordedAudioBlob?: Blob | null
-  generatedMelody?: Note[]
   hasChanges?: boolean
   isGeneratingMelody?: boolean
   isAutoRecording?: boolean
   currentlyPlayingNoteIndex?: number | null
   onCurrentlyPlayingNoteChange?: (index: number | null) => void
+  onToggleNotes?: () => void
+}
+
+/** UI visibility and disable toggles */
+export interface VisibilityProps {
   hideInstrumentSelector?: boolean
   hideOctaveRange?: boolean
   disableOctaveRange?: boolean
@@ -62,24 +85,39 @@ interface InstrumentDisplayProps {
   hideDeselectAll?: boolean
   showOnlyAppliedList?: boolean
   hideChordMode?: boolean
+  hideScalesChords?: boolean
   disableBpmInput?: boolean
   disableBeatsInput?: boolean
   disableChordMode?: boolean
+}
+
+/** Practice and lesson mode */
+export interface PracticeModeProps {
   practiceMode?: boolean
   onLessonComplete?: () => void
   autoPlayAudio?: boolean
   autoStartFeedback?: boolean
-  fretRangeLow?: number
-  fretRangeHigh?: number
   lessonType?: 'melodies' | 'chords'
   externalSelectedNoteIds?: string[]
-  hideScalesChords?: boolean
-  // Feedback now handled internally by CustomAudioPlayer
-  // Export to Classroom props
+}
+
+/** Classroom export */
+export interface ExportProps {
   onExportToClassroom?: () => void
   canExportToClassroom?: boolean
   hasExportableContent?: boolean
 }
+
+/** Combined InstrumentDisplay props */
+interface InstrumentDisplayProps
+  extends NoteInteractionProps,
+    InstrumentConfigProps,
+    TempoControlProps,
+    RangeProps,
+    PlaybackProps,
+    VisibilityProps,
+    PracticeModeProps,
+    ExportProps {}
 
 const InstrumentDisplay = memo(function InstrumentDisplay({
   onNoteClick,
@@ -107,7 +145,6 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   flashingInputs,
   triggerInputFlash,
   setInputActive,
-  clearChordsAndScales,
   onGenerateMelody,
   onPlayMelody,
   onRecordMelody,
@@ -149,7 +186,7 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
   hideScalesChords = false,
   onExportToClassroom,
   canExportToClassroom = false,
-  hasExportableContent = false
+  hasExportableContent = false,
 }: InstrumentDisplayProps) {
   const [lowerOctaves, setLowerOctaves] = useState<number>(initialLowerOctaves)
   const [higherOctaves, setHigherOctaves] = useState<number>(initialHigherOctaves)
@@ -175,7 +212,11 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
 
   // Memoize the currently playing note(s) calculation
   const currentlyPlayingNoteNames = useMemo<string[]>(() => {
-    if (currentlyPlayingNoteIndex === null || currentlyPlayingNoteIndex === undefined || !generatedMelody) {
+    if (
+      currentlyPlayingNoteIndex === null ||
+      currentlyPlayingNoteIndex === undefined ||
+      !generatedMelody
+    ) {
       return []
     }
 
@@ -195,7 +236,11 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
 
   // Memoize the currently playing note IDs for position-accurate highlighting (guitar/bass)
   const currentlyPlayingNoteIds = useMemo<string[]>(() => {
-    if (currentlyPlayingNoteIndex === null || currentlyPlayingNoteIndex === undefined || !generatedMelody) {
+    if (
+      currentlyPlayingNoteIndex === null ||
+      currentlyPlayingNoteIndex === undefined ||
+      !generatedMelody
+    ) {
       return []
     }
 
@@ -215,7 +260,11 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
 
   // Memoize chord ID calculation for guitar/bass
   const currentlyPlayingChordId = useMemo<string | null>(() => {
-    if (currentlyPlayingNoteIndex === null || currentlyPlayingNoteIndex === undefined || !generatedMelody) {
+    if (
+      currentlyPlayingNoteIndex === null ||
+      currentlyPlayingNoteIndex === undefined ||
+      !generatedMelody
+    ) {
       return null
     }
 
@@ -225,7 +274,11 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
 
   // Memoize the single note for backward compatibility
   const currentlyPlayingNote = useMemo(() => {
-    if (currentlyPlayingNoteIndex === null || currentlyPlayingNoteIndex === undefined || !generatedMelody) {
+    if (
+      currentlyPlayingNoteIndex === null ||
+      currentlyPlayingNoteIndex === undefined ||
+      !generatedMelody
+    ) {
       return null
     }
     return generatedMelody[currentlyPlayingNoteIndex] ?? null
@@ -257,7 +310,7 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
     handleKeyboardChordClear,
     handleChordDelete,
     handleRootChange,
-    handleChordRootChange
+    handleChordRootChange,
   } = scaleChordManagement
 
   // Use the keyboard highlighting hook
@@ -265,14 +318,14 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
     isNoteInKeyboardScale,
     isNoteInKeyboardChord,
     isNoteKeyboardRoot,
-    isNoteKeyboardChordRoot
+    isNoteKeyboardChordRoot,
   } = useKeyboardHighlighting({
     instrument,
     appliedScales,
     appliedChords,
     currentKeyboardScale,
     lowerOctaves,
-    higherOctaves
+    higherOctaves,
   })
 
   // Memoize clear all selections handler
@@ -284,7 +337,14 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
     }
     handleClearChord()
     handleClearScale()
-  }, [clearSelection, instrument, handleKeyboardChordClear, handleKeyboardScaleClear, handleClearChord, handleClearScale])
+  }, [
+    clearSelection,
+    instrument,
+    handleKeyboardChordClear,
+    handleKeyboardScaleClear,
+    handleClearChord,
+    handleClearScale,
+  ])
 
   // Memoize octave change handlers
   const handleAddLowerOctave = useCallback(() => {
@@ -358,11 +418,24 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
     scalesToRemove.forEach(scale => {
       handleScaleDelete(scale.id)
     })
-  }, [lowerOctaves, higherOctaves, instrument, selectedNotes, appliedChords, appliedScales, selectNote, handleChordDelete, handleScaleDelete])
+  }, [
+    lowerOctaves,
+    higherOctaves,
+    instrument,
+    selectedNotes,
+    appliedChords,
+    appliedScales,
+    selectNote,
+    handleChordDelete,
+    handleScaleDelete,
+  ])
 
   return (
     <>
-      <div className={`instrument-controls-container ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`} data-instrument={instrument}>
+      <div
+        className={`instrument-controls-container ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}
+        data-instrument={instrument}
+      >
         <InstrumentControls
           bpm={bpm}
           setBpm={setBpm}

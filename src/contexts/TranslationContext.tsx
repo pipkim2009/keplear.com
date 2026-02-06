@@ -46,12 +46,11 @@ export const TranslationProvider: React.FC<TranslationProviderProps> = ({ childr
   }, [])
 
   return (
-    <TranslationContext.Provider value={{ language, t }}>
-      {children}
-    </TranslationContext.Provider>
+    <TranslationContext.Provider value={{ language, t }}>{children}</TranslationContext.Provider>
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useTranslation = (): TranslationContextType => {
   const context = useContext(TranslationContext)
   if (!context) {
@@ -61,6 +60,7 @@ export const useTranslation = (): TranslationContextType => {
 }
 
 // Helper function for class components
+// eslint-disable-next-line react-refresh/only-export-components
 export const getTranslation = (key: string, params?: Record<string, string | number>): string => {
   const keys = key.split('.')
   let value: unknown = en

@@ -37,8 +37,10 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     )
 
-    expect(screen.getByText('🚨 Something went wrong')).toBeInTheDocument()
-    expect(screen.getByText('We\'re sorry, but something unexpected happened.')).toBeInTheDocument()
+    expect(screen.getByText('Oops! Something went wrong')).toBeInTheDocument()
+    expect(
+      screen.getByText("We're sorry, but something unexpected happened while making music.")
+    ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /reload page/i })).toBeInTheDocument()
   })
 
@@ -52,7 +54,7 @@ describe('ErrorBoundary', () => {
     )
 
     expect(screen.getByText('Custom error message')).toBeInTheDocument()
-    expect(screen.queryByText('🚨 Something went wrong')).not.toBeInTheDocument()
+    expect(screen.queryByText('Oops! Something went wrong')).not.toBeInTheDocument()
   })
 
   it('shows error details when expanded', () => {

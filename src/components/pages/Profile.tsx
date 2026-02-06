@@ -9,7 +9,15 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import { useTranslation } from '../../contexts/TranslationContext'
-import { PiPencilSimpleFill, PiCheckCircleFill, PiUsersFill, PiCaretLeftBold, PiWarningCircleFill } from 'react-icons/pi'
+import { containsScriptInjection, sanitizeUsername } from '../../utils/security'
+import SEOHead from '../common/SEOHead'
+import {
+  PiPencilSimpleFill,
+  PiCheckCircleFill,
+  PiUsersFill,
+  PiCaretLeftBold,
+  PiWarningCircleFill,
+} from 'react-icons/pi'
 import styles from '../../styles/Profile.module.css'
 
 interface ProfileData {
@@ -22,11 +30,31 @@ interface ProfileData {
 }
 
 const PROFILE_COLORS = [
-  { id: 'purple', label: 'Purple', gradient: 'linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%)' },
-  { id: 'blue', label: 'Blue', gradient: 'linear-gradient(135deg, var(--blue-500) 0%, var(--blue-700) 100%)' },
-  { id: 'green', label: 'Green', gradient: 'linear-gradient(135deg, var(--green-500) 0%, var(--green-700) 100%)' },
-  { id: 'red', label: 'Red', gradient: 'linear-gradient(135deg, var(--red-500) 0%, var(--red-700) 100%)' },
-  { id: 'orange', label: 'Orange', gradient: 'linear-gradient(135deg, var(--orange-500) 0%, var(--orange-700) 100%)' },
+  {
+    id: 'purple',
+    label: 'Purple',
+    gradient: 'linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%)',
+  },
+  {
+    id: 'blue',
+    label: 'Blue',
+    gradient: 'linear-gradient(135deg, var(--blue-500) 0%, var(--blue-700) 100%)',
+  },
+  {
+    id: 'green',
+    label: 'Green',
+    gradient: 'linear-gradient(135deg, var(--green-500) 0%, var(--green-700) 100%)',
+  },
+  {
+    id: 'red',
+    label: 'Red',
+    gradient: 'linear-gradient(135deg, var(--red-500) 0%, var(--red-700) 100%)',
+  },
+  {
+    id: 'orange',
+    label: 'Orange',
+    gradient: 'linear-gradient(135deg, var(--orange-500) 0%, var(--orange-700) 100%)',
+  },
 ]
 
 interface ActivityItem {
@@ -94,7 +122,7 @@ const Profile = () => {
             full_name: user.user_metadata?.display_name || user.user_metadata?.full_name || null,
             avatar_url: user.user_metadata?.avatar_url || null,
             profile_color: null,
-            created_at: user.created_at
+            created_at: user.created_at,
           })
         } else {
           setProfile(null)
@@ -144,7 +172,8 @@ const Profile = () => {
       // Recent completions
       const { data: completions } = await supabase
         .from('assignment_completions')
-        .select(`
+        .select(
+          `
           id,
           completed_at,
           assignments (
@@ -153,21 +182,25 @@ const Profile = () => {
               title
             )
           )
-        `)
+        `
+        )
         .eq('user_id', userId)
         .order('completed_at', { ascending: false })
         .limit(5)
 
       if (completions) {
         for (const completion of completions) {
-          const assignment = completion.assignments as { title: string; classrooms: { title: string } | null } | null
+          const assignment = completion.assignments as {
+            title: string
+            classrooms: { title: string } | null
+          } | null
           if (assignment) {
             activityItems.push({
               id: `completion-${completion.id}`,
               type: 'completion',
               title: `Completed "${assignment.title}"`,
               meta: assignment.classrooms?.title || 'Unknown class',
-              timestamp: completion.completed_at
+              timestamp: completion.completed_at,
             })
           }
         }
@@ -176,13 +209,15 @@ const Profile = () => {
       // Recent class joins
       const { data: joins } = await supabase
         .from('classroom_students')
-        .select(`
+        .select(
+          `
           id,
           joined_at,
           classrooms (
             title
           )
-        `)
+        `
+        )
         .eq('user_id', userId)
         .order('joined_at', { ascending: false })
         .limit(5)
@@ -196,14 +231,16 @@ const Profile = () => {
               type: 'class_join',
               title: `Joined "${classroom.title}"`,
               meta: 'Class',
-              timestamp: join.joined_at
+              timestamp: join.joined_at,
             })
           }
         }
       }
 
       // Sort by timestamp
-      activityItems.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      activityItems.sort(
+        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      )
       setActivity(activityItems.slice(0, 10))
     } catch (error) {
       console.error('Error fetching activity:', error)
@@ -232,16 +269,24 @@ const Profile = () => {
     setSaving(true)
     setEditError('')
 
+    // Validate username
+    if (editUsername) {
+      if (containsScriptInjection(editUsername)) {
+        setEditError('Username contains invalid characters')
+        setSaving(false)
+        return
+      }
+    }
+    const cleanUsername = editUsername ? sanitizeUsername(editUsername) : null
+
     try {
       // Update profiles table
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          username: editUsername || null,
-          profile_color: editProfileColor,
-          email: user.email || ''
-        })
+      const { error: profileError } = await supabase.from('profiles').upsert({
+        id: user.id,
+        username: cleanUsername,
+        profile_color: editProfileColor,
+        email: user.email || '',
+      })
 
       if (profileError) {
         throw profileError
@@ -250,8 +295,8 @@ const Profile = () => {
       // Update auth metadata
       const { error: authError } = await supabase.auth.updateUser({
         data: {
-          username: editUsername
-        }
+          username: cleanUsername,
+        },
       })
 
       if (authError) {
@@ -266,7 +311,7 @@ const Profile = () => {
       if (error instanceof Error) {
         setEditError(error.message)
       } else {
-        setEditError('Failed to save profile')
+        setEditError(t('errors.saveProfileFailed'))
       }
     } finally {
       setSaving(false)
@@ -293,7 +338,7 @@ const Profile = () => {
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     })
   }
 
@@ -314,9 +359,7 @@ const Profile = () => {
   if (loading) {
     return (
       <div className={styles.profileContainer}>
-        <div className={styles.loadingState}>
-          {t('common.loading')}
-        </div>
+        <div className={styles.loadingState}>{t('common.loading')}</div>
       </div>
     )
   }
@@ -357,14 +400,16 @@ const Profile = () => {
     )
   }
 
-
   // Edit modal
   const editModal = showEditModal ? (
-    <div className={styles.modalOverlay} onClick={(e) => {
-      if (e.target === e.currentTarget) {
-        setShowEditModal(false)
-      }
-    }}>
+    <div
+      className={styles.modalOverlay}
+      onClick={e => {
+        if (e.target === e.currentTarget) {
+          setShowEditModal(false)
+        }
+      }}
+    >
       <div className={styles.modal}>
         <div className={styles.modalHeader}>
           <h2 className={styles.modalTitle}>{t('profile.editProfile')}</h2>
@@ -384,7 +429,7 @@ const Profile = () => {
               type="text"
               className={styles.formInput}
               value={editUsername}
-              onChange={(e) => setEditUsername(e.target.value)}
+              onChange={e => setEditUsername(e.target.value)}
               placeholder={t('profile.enterUsername')}
             />
           </div>
@@ -392,32 +437,29 @@ const Profile = () => {
           <div className={styles.formGroup}>
             <label className={styles.formLabel}>Profile Color</label>
             <div className={styles.colorPicker}>
-              {PROFILE_COLORS.map((color) => (
+              {PROFILE_COLORS.map(color => (
                 <div
                   key={color.id}
                   role="button"
                   tabIndex={0}
                   className={`${styles.colorOption} ${editProfileColor === color.id ? styles.colorOptionSelected : ''}`}
                   onClick={() => setEditProfileColor(color.id)}
-                  onKeyDown={(e) => e.key === 'Enter' && setEditProfileColor(color.id)}
+                  onKeyDown={e => e.key === 'Enter' && setEditProfileColor(color.id)}
                   aria-label={color.label}
                   title={color.label}
                 >
-                  <span className={styles.colorOptionInner} style={{ background: color.gradient }} />
+                  <span
+                    className={styles.colorOptionInner}
+                    style={{ background: color.gradient }}
+                  />
                 </div>
               ))}
             </div>
           </div>
 
-          {editError && (
-            <div className={styles.errorMessage}>{editError}</div>
-          )}
+          {editError && <div className={styles.errorMessage}>{editError}</div>}
 
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={saving}
-          >
+          <button type="submit" className={styles.submitButton} disabled={saving}>
             {saving ? t('common.loading') : t('common.save')}
           </button>
         </form>
@@ -428,9 +470,17 @@ const Profile = () => {
   return (
     <>
       {editModal && createPortal(editModal, document.body)}
+      <SEOHead
+        title="Profile"
+        description="View your music practice profile, stats, and activity."
+        path="/profile"
+      />
 
       <div className={styles.profileContainer}>
-        <button className={styles.backButton} onClick={isOwnProfile ? navigateToHome : navigateToClassroom}>
+        <button
+          className={styles.backButton}
+          onClick={isOwnProfile ? navigateToHome : navigateToClassroom}
+        >
           <PiCaretLeftBold />
         </button>
 
@@ -450,7 +500,6 @@ const Profile = () => {
             <p className={styles.joinDate}>
               {t('profile.memberSince')} {formatDate(profile.created_at)}
             </p>
-
           </div>
 
           {isOwnProfile && (
@@ -485,9 +534,11 @@ const Profile = () => {
           <h2 className={styles.sectionTitle}>{t('profile.recentActivity')}</h2>
           {activity.length > 0 ? (
             <div className={styles.activityList}>
-              {activity.map((item) => (
+              {activity.map(item => (
                 <div key={item.id} className={styles.activityItem}>
-                  <div className={`${styles.activityIcon} ${item.type === 'completion' ? styles.completion : styles.classJoin}`}>
+                  <div
+                    className={`${styles.activityIcon} ${item.type === 'completion' ? styles.completion : styles.classJoin}`}
+                  >
                     {item.type === 'completion' ? (
                       <PiCheckCircleFill size={20} />
                     ) : (

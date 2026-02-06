@@ -13,7 +13,7 @@ export type InstrumentType = 'keyboard' | 'guitar' | 'bass'
 export const INSTRUMENT_TYPES = {
   KEYBOARD: 'keyboard' as const,
   GUITAR: 'guitar' as const,
-  BASS: 'bass' as const
+  BASS: 'bass' as const,
 } as const
 
 /**
@@ -31,7 +31,7 @@ export type ChordMode = 'arpeggiator' | 'progression'
  */
 export const CHORD_MODES = {
   ARPEGGIATOR: 'arpeggiator' as const,
-  PROGRESSION: 'progression' as const
+  PROGRESSION: 'progression' as const,
 } as const
 
 export interface InstrumentConfig {
@@ -54,14 +54,10 @@ export interface ToneSampler {
     time?: number,
     velocity?: number
   ) => void
-  triggerAttack: (
-    note: string | string[],
-    time?: number,
-    velocity?: number
-  ) => void
+  triggerAttack: (note: string | string[], time?: number, velocity?: number) => void
   triggerRelease: (note: string | string[], time?: number) => void
   disconnect: () => void
-  connect: (destination: any) => ToneSampler
+  connect: (destination: unknown) => ToneSampler
   toDestination: () => ToneSampler
   dispose: () => void
   volume: {

@@ -4,8 +4,6 @@ import {
   initialInstrumentState,
   type InstrumentType,
   type KeyboardSelectionMode,
-  type InstrumentState,
-  type InstrumentAction
 } from '../reducers/instrumentReducer'
 
 interface UseInstrumentConfigReturn {
@@ -96,6 +94,6 @@ export const useInstrumentConfig = (): UseInstrumentConfigReturn => {
     resetOctaves,
 
     // Derived state
-    hasExtendedOctaves
+    hasExtendedOctaves,
   }
 }

@@ -136,6 +136,7 @@
     "bass": "Bass",
     "scales": "Scales",
     "chords": "Chords",
+    "toggleScalesChords": "Toggle between scales and chords",
     "melody": "Melody",
     "melodies": "Melodies",
     "rootNote": "Root Note",
@@ -442,6 +443,11 @@
   "footer": {
     "allRightsReserved": "All Rights Reserved"
   },
+  "legal": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "cookiePolicy": "Cookie Policy"
+  },
   "errors": {
     "generic": "Something went wrong",
     "networkError": "Network error. Please check your connection.",
@@ -460,7 +466,21 @@
     "unexpectedError": "An unexpected error occurred",
     "accountCreatedSuccess": "Account created successfully! Logging you in...",
     "accountCreatedLoginFailed": "Account created but login failed. Please sign in manually.",
-    "deleteAccountFailed": "Failed to delete account. Please try again or contact support."
+    "deleteAccountFailed": "Failed to delete account. Please try again or contact support.",
+    "timeout": "Request timed out. Please try again.",
+    "authRequired": "Please sign in to continue.",
+    "sessionExpired": "Your session has expired. Please sign in again.",
+    "rateLimited": "Too many requests. Please wait a moment.",
+    "serverError": "Server error. Please try again later.",
+    "loadFailed": "Failed to load data. Please refresh the page.",
+    "enterTitle": "Please enter a title for the assignment",
+    "selectScale": "Please select at least one scale",
+    "selectChord": "Please select at least one chord",
+    "createAssignmentFailed": "Failed to create assignment",
+    "saveProfileFailed": "Failed to save profile",
+    "micDenied": "Microphone access denied. Please allow microphone access.",
+    "micNotFound": "No microphone found.",
+    "micError": "Microphone error. Please try again."
   },
   "passwordStrength": {
     "weak": "Weak - needs uppercase, lowercase, and number",

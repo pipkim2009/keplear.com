@@ -24,11 +24,7 @@ const STEPS: Step[] = ['instruments', 'join-class', 'tutorial']
  * Onboarding wizard modal that appears for new users
  * Guides them through instrument selection, class joining, and a tutorial
  */
-const OnboardingWizard = ({
-  isOpen,
-  userId,
-  onComplete
-}: OnboardingWizardProps) => {
+const OnboardingWizard = ({ isOpen, userId, onComplete }: OnboardingWizardProps) => {
   const [currentStep, setCurrentStep] = useState<Step>('instruments')
   const [selectedInstruments, setSelectedInstruments] = useState<InstrumentType[]>(['keyboard'])
   const [joinCode, setJoinCode] = useState('')
@@ -38,13 +34,13 @@ const OnboardingWizard = ({
 
   const { completeOnboarding } = useOnboarding(userId)
   const { mutate: joinClassroom } = useJoinClassroom()
-  const { setInstrument, navigateToDashboard, navigateToSandbox } = useInstrument()
+  const { setInstrument, navigateToDashboard } = useInstrument()
 
   // Focus trap for accessibility
   const { containerRef } = useFocusTrap<HTMLDivElement>({
     isActive: isOpen,
     restoreFocus: true,
-    initialFocus: 'first'
+    initialFocus: 'first',
   })
 
   // Lock body scroll when modal is open
@@ -61,7 +57,7 @@ const OnboardingWizard = ({
     const observer = new MutationObserver(checkDarkMode)
     observer.observe(document.body, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ['class'],
     })
 
     return () => observer.disconnect()
@@ -129,7 +125,17 @@ const OnboardingWizard = ({
     } finally {
       setIsSubmitting(false)
     }
-  }, [completeOnboarding, selectedInstruments, joinCode, selectedClassroomIds, joinClassroom, userId, setInstrument, navigateToDashboard, onComplete])
+  }, [
+    completeOnboarding,
+    selectedInstruments,
+    joinCode,
+    selectedClassroomIds,
+    joinClassroom,
+    userId,
+    setInstrument,
+    navigateToDashboard,
+    onComplete,
+  ])
 
   /**
    * Start the interactive tutorial
@@ -176,7 +182,16 @@ const OnboardingWizard = ({
     } finally {
       setIsSubmitting(false)
     }
-  }, [completeOnboarding, selectedInstruments, joinCode, selectedClassroomIds, joinClassroom, userId, setInstrument, onComplete])
+  }, [
+    completeOnboarding,
+    selectedInstruments,
+    joinCode,
+    selectedClassroomIds,
+    joinClassroom,
+    userId,
+    setInstrument,
+    onComplete,
+  ])
 
   /**
    * Navigate to the next step
@@ -227,7 +242,7 @@ const OnboardingWizard = ({
             joinCode={joinCode}
             onJoinCodeChange={setJoinCode}
             selectedClassroomIds={selectedClassroomIds}
-            onToggleClassroom={(id) => {
+            onToggleClassroom={id => {
               setSelectedClassroomIds(prev =>
                 prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
               )
@@ -260,10 +275,7 @@ const OnboardingWizard = ({
       aria-modal="true"
       aria-labelledby="onboarding-title"
     >
-      <div
-        ref={containerRef}
-        className={`${styles.onboardingModal} ${isDarkMode ? 'dark' : ''}`}
-      >
+      <div ref={containerRef} className={`${styles.onboardingModal} ${isDarkMode ? 'dark' : ''}`}>
         {/* Progress indicator */}
         <div className={styles.progressIndicator} style={{ padding: '20px 20px 0' }}>
           {STEPS.map((step, index) => (

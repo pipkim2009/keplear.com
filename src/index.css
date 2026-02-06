@@ -8,7 +8,9 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -16,20 +18,33 @@ html, body, #root {
   height: 100%;
   min-height: 100%;
   overflow-x: hidden;
-  font-family: 'Source Sans 3', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    'Source Sans 3',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
   background: var(--gray-900); /* Fallback dark background to prevent flash */
   color: var(--white);
-  transition: background 0.3s ease, color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
 }
 
-body.light, body.light #root {
+body.light,
+body.light #root {
   background: linear-gradient(145deg, var(--silver-light), var(--silver-dark));
   color: var(--gray-900);
 }
 
 /* Ensure full width and height on mobile landscape */
 @media screen and (orientation: landscape) and (max-height: 500px) {
-  html, body, #root {
+  html,
+  body,
+  #root {
     width: 100vw;
     min-width: 100vw;
     height: 100vh;
@@ -48,23 +63,62 @@ body.light, body.light #root {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(145deg, var(--scrollbar-thumb-primary), var(--scrollbar-thumb-secondary));
+  background: linear-gradient(
+    145deg,
+    var(--scrollbar-thumb-primary),
+    var(--scrollbar-thumb-secondary)
+  );
   border-radius: 6px;
   border: 2px solid var(--scrollbar-track);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(145deg, var(--scrollbar-thumb-hover-primary), var(--scrollbar-thumb-hover-secondary));
+  background: linear-gradient(
+    145deg,
+    var(--scrollbar-thumb-hover-primary),
+    var(--scrollbar-thumb-hover-secondary)
+  );
 }
 
 ::-webkit-scrollbar-thumb:active {
-  background: linear-gradient(145deg, var(--scrollbar-thumb-active-primary), var(--scrollbar-thumb-active-secondary));
+  background: linear-gradient(
+    145deg,
+    var(--scrollbar-thumb-active-primary),
+    var(--scrollbar-thumb-active-secondary)
+  );
 }
 
 /* Firefox scrollbar styling */
 html {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb-secondary) var(--scrollbar-track);
+}
+
+/* Focus-visible styles for keyboard navigation (WCAG 2.4.7) */
+:focus-visible {
+  outline: 2px solid var(--blue-400, #60a5fa);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip to main content link for screen readers */
+.skip-to-main {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--blue-600, #2563eb);
+  color: white;
+  padding: 8px 16px;
+  z-index: 10000;
+  font-size: 0.875rem;
+  transition: top 0.2s;
+}
+
+.skip-to-main:focus {
+  top: 0;
 }
 
 /* Screen reader only - hides visually but keeps accessible */

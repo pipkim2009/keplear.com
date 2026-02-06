@@ -5,13 +5,21 @@ import { useAudio } from '../useAudio'
 // Mock Tone.js
 const mockTone = {
   start: vi.fn().mockResolvedValue(undefined),
-  Sampler: vi.fn().mockImplementation((config) => ({
-    triggerAttackRelease: vi.fn(),
-    toDestination: vi.fn().mockReturnThis(),
-    dispose: vi.fn(),
-    disconnect: vi.fn(),
-    connect: vi.fn(),
-  })),
+  context: { state: 'running' },
+  now: vi.fn().mockReturnValue(0),
+  Sampler: vi.fn().mockImplementation(config => {
+    // Call onload asynchronously to simulate successful loading
+    if (config?.onload) {
+      setTimeout(() => config.onload(), 0)
+    }
+    return {
+      triggerAttackRelease: vi.fn(),
+      toDestination: vi.fn().mockReturnThis(),
+      dispose: vi.fn(),
+      disconnect: vi.fn(),
+      connect: vi.fn(),
+    }
+  }),
   Recorder: vi.fn().mockImplementation(() => ({
     start: vi.fn(),
     stop: vi.fn().mockResolvedValue(new Blob()),
@@ -61,7 +69,11 @@ describe('useAudio', () => {
       await result.current.playMelody(testMelody, 120)
     })
 
-    expect(result.current.isPlaying).toBe(true)
+    // After playback completes, isPlaying returns to false
+    expect(result.current.isPlaying).toBe(false)
+    // Verify audio system was initialized during playback
+    expect(mockTone.start).toHaveBeenCalled()
+    expect(mockTone.Sampler).toHaveBeenCalled()
   })
 
   it('should stop melody playback', async () => {

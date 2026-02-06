@@ -10,6 +10,7 @@ import Tooltip from '../common/Tooltip'
 import { GUITAR_SCALES } from '../../utils/instruments/guitar/guitarScales'
 import { GUITAR_CHORDS } from '../../utils/instruments/guitar/guitarChords'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const difficultyLabels = ['Learn', 'Custom']
 
 // Get scale and chord names from the definitions
@@ -49,14 +50,16 @@ export interface LessonSettings {
 }
 
 interface PracticeOptionsModalProps {
-  onStart: (instrument: string, selectedOptions: string[], difficulty: number, settings: LessonSettings) => void
+  onStart: (
+    instrument: string,
+    selectedOptions: string[],
+    difficulty: number,
+    settings: LessonSettings
+  ) => void
   onCancel: () => void
 }
 
-const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
-  onStart,
-  onCancel
-}) => {
+const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({ onStart, onCancel }) => {
   const { t } = useTranslation()
   const [selectedInstrument, setSelectedInstrument] = useState<string>('keyboard')
   const [selectedOption, setSelectedOption] = useState<string>('melodies')
@@ -82,9 +85,10 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
     octaveLow: 4,
     octaveHigh: 5,
     fretLow: 0,
-    fretHigh: 12
+    fretHigh: 12,
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDifficultyChange = (newDifficulty: number) => {
     setDifficulty(newDifficulty)
     // Learn mode (0) applies preset, Custom mode (1) keeps current settings
@@ -105,9 +109,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   const toggleScale = (scaleName: string) => {
     handleManualChange()
     setSelectedScales(prev =>
-      prev.includes(scaleName)
-        ? prev.filter(s => s !== scaleName)
-        : [...prev, scaleName]
+      prev.includes(scaleName) ? prev.filter(s => s !== scaleName) : [...prev, scaleName]
     )
   }
 
@@ -115,9 +117,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   const toggleChord = (chordName: string) => {
     handleManualChange()
     setSelectedChords(prev =>
-      prev.includes(chordName)
-        ? prev.filter(c => c !== chordName)
-        : [...prev, chordName]
+      prev.includes(chordName) ? prev.filter(c => c !== chordName) : [...prev, chordName]
     )
   }
 
@@ -146,7 +146,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         octaveLow: isKeyboard ? octaveLow : undefined,
         octaveHigh: isKeyboard ? octaveHigh : undefined,
         fretLow: isStringInstrument ? fretLow : undefined,
-        fretHigh: isStringInstrument ? fretHigh : undefined
+        fretHigh: isStringInstrument ? fretHigh : undefined,
       }
       onStart(selectedInstrument, [selectedOption], difficulty, settings)
     }
@@ -155,26 +155,25 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <button
-          className={styles.closeButton}
-          onClick={onCancel}
-          aria-label="Close"
-        >
+        <button className={styles.closeButton} onClick={onCancel} aria-label="Close">
           ×
         </button>
 
-        <h2 className={styles.modalTitle}>
-          Practice Session
-        </h2>
+        <h2 className={styles.modalTitle}>Practice Session</h2>
 
         <div className="control-group instrument-selector-group" style={{ marginBottom: 20 }}>
           {/* Desktop view - Cards */}
-          <div className="instrument-selector desktop-selector" style={{ justifyContent: 'center' }}>
+          <div
+            className="instrument-selector desktop-selector"
+            style={{ justifyContent: 'center' }}
+          >
             <div
               className={`instrument-card ${selectedInstrument === 'keyboard' ? 'active' : ''}`}
               onClick={() => setSelectedInstrument('keyboard')}
             >
-              <div className="instrument-icon"><PiPianoKeysFill /></div>
+              <div className="instrument-icon">
+                <PiPianoKeysFill />
+              </div>
               <div className="instrument-name">Keyboard</div>
               <div className="instrument-glow"></div>
             </div>
@@ -182,7 +181,9 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
               className={`instrument-card ${selectedInstrument === 'guitar' ? 'active' : ''}`}
               onClick={() => setSelectedInstrument('guitar')}
             >
-              <div className="instrument-icon"><GiGuitarHead /></div>
+              <div className="instrument-icon">
+                <GiGuitarHead />
+              </div>
               <div className="instrument-name">Guitar</div>
               <div className="instrument-glow"></div>
             </div>
@@ -190,7 +191,9 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
               className={`instrument-card ${selectedInstrument === 'bass' ? 'active' : ''}`}
               onClick={() => setSelectedInstrument('bass')}
             >
-              <div className="instrument-icon"><GiGuitarBassHead /></div>
+              <div className="instrument-icon">
+                <GiGuitarBassHead />
+              </div>
               <div className="instrument-name">Bass</div>
               <div className="instrument-glow"></div>
             </div>
@@ -213,46 +216,54 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                   {selectedInstrument === 'guitar' && 'Guitar'}
                   {selectedInstrument === 'bass' && 'Bass'}
                 </div>
-                <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}><IoMdArrowDropdown /></div>
+                <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}>
+                  <IoMdArrowDropdown />
+                </div>
               </div>
               {isInstrumentDropdownOpen && (
                 <div className="dropdown-options">
                   {selectedInstrument !== 'keyboard' && (
                     <div
                       className="dropdown-option keyboard-option"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedInstrument('keyboard');
-                        setIsInstrumentDropdownOpen(false);
+                      onClick={e => {
+                        e.stopPropagation()
+                        setSelectedInstrument('keyboard')
+                        setIsInstrumentDropdownOpen(false)
                       }}
                     >
-                      <div className="instrument-icon"><PiPianoKeysFill /></div>
+                      <div className="instrument-icon">
+                        <PiPianoKeysFill />
+                      </div>
                       <div className="instrument-name">Keyboard</div>
                     </div>
                   )}
                   {selectedInstrument !== 'guitar' && (
                     <div
                       className="dropdown-option guitar-option"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedInstrument('guitar');
-                        setIsInstrumentDropdownOpen(false);
+                      onClick={e => {
+                        e.stopPropagation()
+                        setSelectedInstrument('guitar')
+                        setIsInstrumentDropdownOpen(false)
                       }}
                     >
-                      <div className="instrument-icon"><GiGuitarHead /></div>
+                      <div className="instrument-icon">
+                        <GiGuitarHead />
+                      </div>
                       <div className="instrument-name">Guitar</div>
                     </div>
                   )}
                   {selectedInstrument !== 'bass' && (
                     <div
                       className="dropdown-option bass-option"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedInstrument('bass');
-                        setIsInstrumentDropdownOpen(false);
+                      onClick={e => {
+                        e.stopPropagation()
+                        setSelectedInstrument('bass')
+                        setIsInstrumentDropdownOpen(false)
                       }}
                     >
-                      <div className="instrument-icon"><GiGuitarBassHead /></div>
+                      <div className="instrument-icon">
+                        <GiGuitarBassHead />
+                      </div>
                       <div className="instrument-name">Bass</div>
                     </div>
                   )}
@@ -288,74 +299,83 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
             <div className="control-group octave-range-control">
               <div className="label-with-tooltip">
                 <label className="control-label">Octave Range</label>
-                <Tooltip title="Octave Range" text="Select which octaves are visible in the keyboard interface">
+                <Tooltip
+                  title="Octave Range"
+                  text="Select which octaves are visible in the keyboard interface"
+                >
                   <div className="tooltip-icon">?</div>
                 </Tooltip>
               </div>
               <div className="octave-range-slider">
-              <div className="range-labels-center">
-                <span className="range-label-center">
-                  {octaveLow} - {octaveHigh}
-                </span>
-              </div>
-              <div className="dual-range-container">
-                <div
-                  className="range-fill"
-                  style={{
-                    left: `${((octaveLow - 1) / 8) * 100}%`,
-                    right: `${((8 - octaveHigh) / 8) * 100}%`
-                  }}
-                />
-                <input
-                  type="range"
-                  min="1"
-                  max="8"
-                  value={octaveLow}
-                  onChange={(e) => {
-                    const val = Number(e.target.value)
-                    if (val <= octaveHigh) { setOctaveLow(val); handleManualChange() }
-                  }}
-                  className="range-slider range-low"
-                  title="Set lowest octave"
-                />
-                <input
-                  type="range"
-                  min="1"
-                  max="8"
-                  value={octaveHigh}
-                  onChange={(e) => {
-                    const val = Number(e.target.value)
-                    if (val >= octaveLow) { setOctaveHigh(val); handleManualChange() }
-                  }}
-                  className="range-slider range-high"
-                  title="Set highest octave"
-                />
-              </div>
-              <div className="octave-visual">
-                {(() => {
-                  const leftDimPercent = ((octaveLow - 1) / 8) * 100
-                  const rightDimPercent = ((8 - octaveHigh) / 8) * 100
+                <div className="range-labels-center">
+                  <span className="range-label-center">
+                    {octaveLow} - {octaveHigh}
+                  </span>
+                </div>
+                <div className="dual-range-container">
+                  <div
+                    className="range-fill"
+                    style={{
+                      left: `${((octaveLow - 1) / 8) * 100}%`,
+                      right: `${((8 - octaveHigh) / 8) * 100}%`,
+                    }}
+                  />
+                  <input
+                    type="range"
+                    min="1"
+                    max="8"
+                    value={octaveLow}
+                    onChange={e => {
+                      const val = Number(e.target.value)
+                      if (val <= octaveHigh) {
+                        setOctaveLow(val)
+                        handleManualChange()
+                      }
+                    }}
+                    className="range-slider range-low"
+                    title="Set lowest octave"
+                  />
+                  <input
+                    type="range"
+                    min="1"
+                    max="8"
+                    value={octaveHigh}
+                    onChange={e => {
+                      const val = Number(e.target.value)
+                      if (val >= octaveLow) {
+                        setOctaveHigh(val)
+                        handleManualChange()
+                      }
+                    }}
+                    className="range-slider range-high"
+                    title="Set highest octave"
+                  />
+                </div>
+                <div className="octave-visual">
+                  {(() => {
+                    const leftDimPercent = ((octaveLow - 1) / 8) * 100
+                    const rightDimPercent = ((8 - octaveHigh) / 8) * 100
 
-                  return (
-                    <div className="keyboard-range-container">
-                      <img
-                        src="/Keyboard.png"
-                        alt="Keyboard octave range"
-                        className="keyboard-range-image"
-                      />
-                      <div
-                        className="keyboard-dim-overlay keyboard-dim-left"
-                        style={{ width: `${leftDimPercent}%` }}
-                      />
-                      <div
-                        className="keyboard-dim-overlay keyboard-dim-right"
-                        style={{ width: `${rightDimPercent}%` }}
-                      />
-                    </div>
-                  )
-                })()}
+                    return (
+                      <div className="keyboard-range-container">
+                        <img
+                          src="/Keyboard.webp"
+                          alt="Keyboard octave range"
+                          className="keyboard-range-image"
+                        />
+                        <div
+                          className="keyboard-dim-overlay keyboard-dim-left"
+                          style={{ width: `${leftDimPercent}%` }}
+                        />
+                        <div
+                          className="keyboard-dim-overlay keyboard-dim-right"
+                          style={{ width: `${rightDimPercent}%` }}
+                        />
+                      </div>
+                    )
+                  })()}
+                </div>
               </div>
-            </div>
             </div>
           </div>
         )}
@@ -381,7 +401,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                     className="range-fill"
                     style={{
                       left: `${(fretLow / 24) * 100}%`,
-                      right: `${((24 - fretHigh) / 24) * 100}%`
+                      right: `${((24 - fretHigh) / 24) * 100}%`,
                     }}
                   />
                   <input
@@ -390,9 +410,12 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                     max="24"
                     step="4"
                     value={fretLow}
-                    onChange={(e) => {
+                    onChange={e => {
                       const val = Number(e.target.value)
-                      if (val < fretHigh) { setFretLow(val); handleManualChange() }
+                      if (val < fretHigh) {
+                        setFretLow(val)
+                        handleManualChange()
+                      }
                     }}
                     className="range-slider range-low fret-slider-low"
                     title="Set lowest fret"
@@ -403,9 +426,12 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                     max="24"
                     step="4"
                     value={fretHigh}
-                    onChange={(e) => {
+                    onChange={e => {
                       const val = Number(e.target.value)
-                      if (val > fretLow) { setFretHigh(val); handleManualChange() }
+                      if (val > fretLow) {
+                        setFretHigh(val)
+                        handleManualChange()
+                      }
                     }}
                     className="range-slider range-high fret-slider-high"
                     title="Set highest fret"
@@ -419,7 +445,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                     return (
                       <div className="fretboard-range-container">
                         <img
-                          src={isGuitar ? "/Guitar-fretboard.png" : "/Bass-fretboard.png"}
+                          src={isGuitar ? '/Guitar-fretboard.webp' : '/Bass-fretboard.webp'}
                           alt={`${isGuitar ? 'Guitar' : 'Bass'} fretboard range`}
                           className="fretboard-range-image"
                         />
@@ -481,7 +507,15 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         )}
 
         {/* BPM, Beats, and Chords - Single row that wraps on small screens */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 20, flexWrap: 'wrap' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 24,
+            marginBottom: 20,
+            flexWrap: 'wrap',
+          }}
+        >
           {/* BPM control */}
           <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
             <div className="label-with-tooltip">
@@ -494,21 +528,30 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
               <input
                 type="text"
                 value={bpm}
-                onChange={(e) => {
+                onChange={e => {
                   const val = Number(e.target.value)
-                  if (!isNaN(val) && val > 0) { setBpm(val); handleManualChange() }
+                  if (!isNaN(val) && val > 0) {
+                    setBpm(val)
+                    handleManualChange()
+                  }
                 }}
                 className="control-input with-internal-buttons"
               />
               <button
                 className="control-button-internal minus"
-                onClick={() => { setBpm(Math.max(30, bpm - 1)); handleManualChange() }}
+                onClick={() => {
+                  setBpm(Math.max(30, bpm - 1))
+                  handleManualChange()
+                }}
               >
                 −
               </button>
               <button
                 className="control-button-internal plus"
-                onClick={() => { setBpm(Math.min(300, bpm + 1)); handleManualChange() }}
+                onClick={() => {
+                  setBpm(Math.min(300, bpm + 1))
+                  handleManualChange()
+                }}
               >
                 +
               </button>
@@ -527,21 +570,30 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
               <input
                 type="text"
                 value={beats}
-                onChange={(e) => {
+                onChange={e => {
                   const val = Number(e.target.value)
-                  if (!isNaN(val) && val > 0) { setBeats(val); handleManualChange() }
+                  if (!isNaN(val) && val > 0) {
+                    setBeats(val)
+                    handleManualChange()
+                  }
                 }}
                 className="control-input with-internal-buttons"
               />
               <button
                 className="control-button-internal minus"
-                onClick={() => { setBeats(Math.max(1, beats - 1)); handleManualChange() }}
+                onClick={() => {
+                  setBeats(Math.max(1, beats - 1))
+                  handleManualChange()
+                }}
               >
                 −
               </button>
               <button
                 className="control-button-internal plus"
-                onClick={() => { setBeats(Math.min(16, beats + 1)); handleManualChange() }}
+                onClick={() => {
+                  setBeats(Math.min(16, beats + 1))
+                  handleManualChange()
+                }}
               >
                 +
               </button>
@@ -561,21 +613,30 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
                 <input
                   type="text"
                   value={chordCount}
-                  onChange={(e) => {
+                  onChange={e => {
                     const val = Number(e.target.value)
-                    if (!isNaN(val) && val > 0) { setChordCount(val); handleManualChange() }
+                    if (!isNaN(val) && val > 0) {
+                      setChordCount(val)
+                      handleManualChange()
+                    }
                   }}
                   className="control-input with-internal-buttons"
                 />
                 <button
                   className="control-button-internal minus"
-                  onClick={() => { setChordCount(Math.max(1, chordCount - 1)); handleManualChange() }}
+                  onClick={() => {
+                    setChordCount(Math.max(1, chordCount - 1))
+                    handleManualChange()
+                  }}
                 >
                   −
                 </button>
                 <button
                   className="control-button-internal plus"
-                  onClick={() => { setChordCount(Math.min(16, chordCount + 1)); handleManualChange() }}
+                  onClick={() => {
+                    setChordCount(Math.min(16, chordCount + 1))
+                    handleManualChange()
+                  }}
                 >
                   +
                 </button>
@@ -585,10 +646,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({
         </div>
 
         <div className={styles.modalActions}>
-          <button
-            onClick={handleStart}
-            className={styles.startButton}
-          >
+          <button onClick={handleStart} className={styles.startButton}>
             Begin
           </button>
         </div>

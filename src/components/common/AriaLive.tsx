@@ -13,6 +13,7 @@ const AriaLiveContext = createContext<AriaLiveContextType | null>(null)
  * Hook to access the aria-live announcement function
  * Use this to announce dynamic content changes to screen readers
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAriaLive(): AriaLiveContextType {
   const context = useContext(AriaLiveContext)
   if (!context) {
@@ -68,20 +69,10 @@ export const AriaLiveProvider: React.FC<AriaLiveProviderProps> = ({ children }) 
     <AriaLiveContext.Provider value={{ announce }}>
       {children}
       {/* Screen reader only live regions */}
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className={styles.srOnly}
-      >
+      <div role="status" aria-live="polite" aria-atomic="true" className={styles.srOnly}>
         {politeMessage}
       </div>
-      <div
-        role="alert"
-        aria-live="assertive"
-        aria-atomic="true"
-        className={styles.srOnly}
-      >
+      <div role="alert" aria-live="assertive" aria-atomic="true" className={styles.srOnly}>
         {assertiveMessage}
       </div>
     </AriaLiveContext.Provider>

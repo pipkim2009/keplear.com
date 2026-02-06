@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { validatePassword, containsScriptInjection } from '../../utils/security'
-import logo from '/Keplear-logo.png'
+import logo from '/Keplear-logo.webp'
 import styles from './AuthForms.module.css'
 
 interface SignupFormProps {
@@ -42,12 +42,12 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
   const [formData, setFormData] = useState<FormData>({
     username: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   })
   const [touched, setTouched] = useState<TouchedFields>({
     username: false,
     password: false,
-    confirmPassword: false
+    confirmPassword: false,
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -95,23 +95,27 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
   }, [formData.password])
 
   // Check if field is valid (has value, no errors)
-  const isFieldValid = useCallback((field: keyof FormData): boolean => {
-    if (!formData[field]) return false
-    if (fieldErrors[field]) return false
+  const isFieldValid = useCallback(
+    (field: keyof FormData): boolean => {
+      if (!formData[field]) return false
+      if (fieldErrors[field]) return false
 
-    // Additional checks per field
-    if (field === 'username') return formData.username.length >= 3
-    if (field === 'password') return validatePassword(formData.password).isValid
-    if (field === 'confirmPassword') return formData.password === formData.confirmPassword && formData.confirmPassword.length > 0
+      // Additional checks per field
+      if (field === 'username') return formData.username.length >= 3
+      if (field === 'password') return validatePassword(formData.password).isValid
+      if (field === 'confirmPassword')
+        return formData.password === formData.confirmPassword && formData.confirmPassword.length > 0
 
-    return true
-  }, [formData, fieldErrors])
+      return true
+    },
+    [formData, fieldErrors]
+  )
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
     // Clear global error when user starts typing
     if (error) setError('')
@@ -120,7 +124,7 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
   const handleBlur = (field: keyof TouchedFields) => {
     setTouched(prev => ({
       ...prev,
-      [field]: true
+      [field]: true,
     }))
   }
 
@@ -138,7 +142,7 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
     setTouched({
       username: true,
       password: true,
-      confirmPassword: true
+      confirmPassword: true,
     })
 
     // Check for validation errors
@@ -160,11 +164,9 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
     setMessageKey('')
 
     try {
-      const { error: signUpError } = await signUp(
-        formData.username,
-        formData.password,
-        { full_name: formData.username }
-      )
+      const { error: signUpError } = await signUp(formData.username, formData.password, {
+        full_name: formData.username,
+      })
 
       if (signUpError) {
         if (typeof signUpError === 'object' && signUpError && 'message' in signUpError) {
@@ -199,9 +201,12 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
       return validation.message
     }
     switch (strength) {
-      case 'weak': return t('passwordStrength.weak')
-      case 'medium': return t('passwordStrength.medium')
-      case 'strong': return t('passwordStrength.strong')
+      case 'weak':
+        return t('passwordStrength.weak')
+      case 'medium':
+        return t('passwordStrength.medium')
+      case 'strong':
+        return t('passwordStrength.strong')
     }
   }
 
@@ -247,9 +252,7 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
             </div>
           )}
           {touched.username && isFieldValid('username') && (
-            <div className={styles.fieldSuccess}>
-              ✓ {t('auth.usernameAvailable')}
-            </div>
+            <div className={styles.fieldSuccess}>✓ {t('auth.usernameAvailable')}</div>
           )}
         </div>
 
@@ -308,9 +311,7 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
             </div>
           )}
           {touched.confirmPassword && isFieldValid('confirmPassword') && (
-            <div className={styles.fieldSuccess}>
-              ✓ {t('auth.passwordsMatch')}
-            </div>
+            <div className={styles.fieldSuccess}>✓ {t('auth.passwordsMatch')}</div>
           )}
         </div>
 
@@ -326,11 +327,7 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
       <div className={styles.authFooter}>
         <p>
           {t('auth.alreadyHaveAccount')}{' '}
-          <button
-            type="button"
-            className={styles.linkButton}
-            onClick={() => onToggleForm('login')}
-          >
+          <button type="button" className={styles.linkButton} onClick={() => onToggleForm('login')}>
             {t('auth.signIn')}
           </button>
         </p>

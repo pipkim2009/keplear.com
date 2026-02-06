@@ -1,12 +1,11 @@
 import { useReducer, useCallback, useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router'
 import {
   uiReducer,
   initialUIState,
-  type UIState,
-  type UIAction,
   type PageType,
   type InputType,
-  type ChordMode
+  type ChordMode,
 } from '../reducers/uiReducer'
 
 interface UseUIStateReturn {
@@ -50,41 +49,78 @@ interface UseUIStateReturn {
 export const useUIState = (): UseUIStateReturn => {
   const [state, dispatch] = useReducer(uiReducer, initialUIState)
   const [profileUserId, setProfileUserId] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   // Refs to track initial render for flash prevention
   const isInitialBpm = useRef(true)
   const isInitialNotes = useRef(true)
-  const isInitialMode = useRef(true)
+
+  // Page-to-path mapping
+  const pageToPath = useCallback((page: PageType): string => {
+    switch (page) {
+      case 'home':
+        return '/'
+      case 'sandbox':
+        return '/sandbox'
+      case 'songs':
+        return '/songs'
+      case 'classroom':
+        return '/classroom'
+      case 'profile':
+        return '/profile'
+      case 'dashboard':
+        return '/dashboard'
+      default:
+        return '/'
+    }
+  }, [])
+
+  // Navigate using React Router and sync internal state
+  const navigateWithUrl = useCallback(
+    (page: PageType, path?: string) => {
+      dispatch({ type: 'SET_CURRENT_PAGE', payload: page })
+      const url = path || pageToPath(page)
+      navigate(url)
+    },
+    [pageToPath, navigate]
+  )
 
   // Navigation actions
   const navigateToHome = useCallback(() => {
-    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'home' })
-  }, [])
+    navigateWithUrl('home')
+  }, [navigateWithUrl])
 
   const navigateToSandbox = useCallback(() => {
-    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'sandbox' })
-  }, [])
+    navigateWithUrl('sandbox')
+  }, [navigateWithUrl])
 
   const navigateToSongs = useCallback(() => {
-    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'songs' })
-  }, [])
+    navigateWithUrl('songs')
+  }, [navigateWithUrl])
 
   const navigateToClassroom = useCallback(() => {
-    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'classroom' })
-  }, [])
+    navigateWithUrl('classroom')
+  }, [navigateWithUrl])
 
-  const navigateToProfile = useCallback((userId?: string) => {
-    setProfileUserId(userId || null)
-    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'profile' })
-  }, [])
+  const navigateToProfile = useCallback(
+    (userId?: string) => {
+      setProfileUserId(userId || null)
+      const path = userId ? `/profile/${userId}` : '/profile'
+      navigateWithUrl('profile', path)
+    },
+    [navigateWithUrl]
+  )
 
   const navigateToDashboard = useCallback(() => {
-    dispatch({ type: 'SET_CURRENT_PAGE', payload: 'dashboard' })
-  }, [])
+    navigateWithUrl('dashboard')
+  }, [navigateWithUrl])
 
-  const setCurrentPage = useCallback((page: PageType) => {
-    dispatch({ type: 'SET_CURRENT_PAGE', payload: page })
-  }, [])
+  const setCurrentPage = useCallback(
+    (page: PageType) => {
+      navigateWithUrl(page)
+    },
+    [navigateWithUrl]
+  )
 
   // Settings actions
   const setBpm = useCallback((bpm: number) => {
@@ -175,6 +211,6 @@ export const useUIState = (): UseUIStateReturn => {
     clearAllActive,
 
     // Utility actions
-    resetSettings
+    resetSettings,
   }
 }

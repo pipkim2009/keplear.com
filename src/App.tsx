@@ -1,4 +1,6 @@
 import { useEffect, useCallback, memo, useState } from 'react'
+import { BrowserRouter } from 'react-router'
+import { HelmetProvider } from 'react-helmet-async'
 import { AuthProvider } from './contexts/AuthContext'
 import { InstrumentProvider } from './contexts/InstrumentContext'
 import { TranslationProvider } from './contexts/TranslationContext'
@@ -9,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import SkipLink from './components/common/SkipLink'
 import ChatPanel from './components/common/ChatPanel'
+import SectionErrorBoundary from './components/common/SectionErrorBoundary'
 import { AriaLiveProvider } from './components/common/AriaLive'
 import { useTheme } from './hooks/useTheme'
 import { useAuth } from './hooks/useAuth'
@@ -45,13 +48,7 @@ const OnboardingController = memo(function OnboardingController() {
 
   if (!shouldShowOnboarding || !user) return null
 
-  return (
-    <OnboardingWizard
-      isOpen={true}
-      userId={user.id}
-      onComplete={handleOnboardingComplete}
-    />
-  )
+  return <OnboardingWizard isOpen={true} userId={user.id} onComplete={handleOnboardingComplete} />
 })
 
 /**
@@ -75,53 +72,63 @@ const App = memo(function App() {
 
   return (
     <ErrorBoundary>
-      <TranslationProvider>
-        <AuthProvider>
-          <AriaLiveProvider>
-            <InstrumentProvider>
-            <SkipLink targetId="main-content" />
-            <div className={`${styles.appContainer} ${isDarkMode ? styles.dark : styles.light}`}>
-              <Header
-                isDarkMode={isDarkMode}
-                onToggleTheme={memoizedToggleTheme}
-              />
+      <HelmetProvider>
+        <BrowserRouter>
+          <TranslationProvider>
+            <AuthProvider>
+              <AriaLiveProvider>
+                <InstrumentProvider>
+                  <SkipLink targetId="main-content" />
+                  <div
+                    className={`${styles.appContainer} ${isDarkMode ? styles.dark : styles.light}`}
+                  >
+                    <SectionErrorBoundary section="Header" silent>
+                      <Header isDarkMode={isDarkMode} onToggleTheme={memoizedToggleTheme} />
+                    </SectionErrorBoundary>
 
-              <main id="main-content" tabIndex={-1} className={styles.mainContent}>
-                <ErrorBoundary fallback={
-                  <div className={styles.errorFallback}>
-                    <div className={styles.errorCard}>
-                      <div className={styles.errorIcon}>
-                        <IoMusicalNotes />
-                      </div>
-                      <h3 className={styles.errorTitle}>
-                        Unable to load instrument interface
-                      </h3>
-                      <p className={styles.errorMessage}>
-                        Something went wrong while loading the music interface. Please refresh the page to try again.
-                      </p>
-                      <button
-                        onClick={() => window.location.reload()}
-                        className={styles.errorButton}
+                    <main id="main-content" tabIndex={-1} className={styles.mainContent}>
+                      <ErrorBoundary
+                        fallback={
+                          <div className={styles.errorFallback}>
+                            <div className={styles.errorCard}>
+                              <div className={styles.errorIcon}>
+                                <IoMusicalNotes />
+                              </div>
+                              <h3 className={styles.errorTitle}>
+                                Unable to load instrument interface
+                              </h3>
+                              <p className={styles.errorMessage}>
+                                Something went wrong while loading the music interface. Please
+                                refresh the page to try again.
+                              </p>
+                              <button
+                                onClick={() => window.location.reload()}
+                                className={styles.errorButton}
+                              >
+                                <MdRefresh /> Refresh Page
+                              </button>
+                            </div>
+                          </div>
+                        }
                       >
-                        <MdRefresh /> Refresh Page
-                      </button>
-                    </div>
-                  </div>
-                }>
-                  <ProtectedRoute>
-                    <Router />
-                  </ProtectedRoute>
-                </ErrorBoundary>
-              </main>
+                        <ProtectedRoute>
+                          <Router />
+                        </ProtectedRoute>
+                      </ErrorBoundary>
+                    </main>
 
-              <Footer />
-              <ChatPanel />
-              <OnboardingController />
-            </div>
-            </InstrumentProvider>
-          </AriaLiveProvider>
-        </AuthProvider>
-      </TranslationProvider>
+                    <Footer />
+                    <SectionErrorBoundary section="Chat" silent>
+                      <ChatPanel />
+                    </SectionErrorBoundary>
+                    <OnboardingController />
+                  </div>
+                </InstrumentProvider>
+              </AriaLiveProvider>
+            </AuthProvider>
+          </TranslationProvider>
+        </BrowserRouter>
+      </HelmetProvider>
     </ErrorBoundary>
   )
 })

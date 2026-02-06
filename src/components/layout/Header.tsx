@@ -1,11 +1,12 @@
 import { useState, useCallback, memo } from 'react'
+import { Link, useLocation } from 'react-router'
 import { useAuth } from '../../hooks/useAuth'
-import { useNavigation } from '../../hooks'
+import { useInstrument } from '../../contexts/InstrumentContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import ThemeToggle from '../common/ThemeToggle'
 import AuthModal from '../auth/AuthModal'
 import UserMenu from '../auth/UserMenu'
-import logo from '/Keplear-logo.png'
+import logo from '/Keplear-logo.webp'
 import '../../styles/Header.css'
 
 interface HeaderProps {
@@ -13,23 +14,15 @@ interface HeaderProps {
   readonly onToggleTheme: () => void
 }
 
-const Header = memo(function Header({
-  isDarkMode,
-  onToggleTheme
-}: HeaderProps) {
-  // Use focused navigation hook instead of full context
-  const {
-    currentPage,
-    navigateToHome,
-    navigateToDashboard,
-    navigateToSandbox,
-    navigateToSongs,
-    navigateToClassroom
-  } = useNavigation()
+const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) {
+  const location = useLocation()
+  const { navigateToSandbox } = useInstrument()
   const { user, loading } = useAuth()
   const { t } = useTranslation()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authForm, setAuthForm] = useState<'login' | 'signup'>('login')
+
+  const currentPath = location.pathname
 
   const handleShowLogin = useCallback(() => {
     setAuthForm('login')
@@ -45,6 +38,11 @@ const Header = memo(function Header({
     setShowAuthModal(false)
   }, [])
 
+  // Sandbox link resets instrument state before navigating
+  const handleSandboxClick = useCallback(() => {
+    navigateToSandbox()
+  }, [navigateToSandbox])
+
   return (
     <header className="header">
       <div className="header-content">
@@ -56,38 +54,36 @@ const Header = memo(function Header({
 
         <nav className="header-nav">
           {user ? (
-            <button
-              className={`nav-link ${currentPage === 'dashboard' ? 'nav-link-active' : ''}`}
-              onClick={navigateToDashboard}
+            <Link
+              to="/dashboard"
+              className={`nav-link ${currentPath === '/dashboard' ? 'nav-link-active' : ''}`}
             >
               {t('nav.dashboard')}
-            </button>
+            </Link>
           ) : (
-            <button
-              className={`nav-link ${currentPage === 'home' ? 'nav-link-active' : ''}`}
-              onClick={navigateToHome}
-            >
+            <Link to="/" className={`nav-link ${currentPath === '/' ? 'nav-link-active' : ''}`}>
               {t('nav.home')}
-            </button>
+            </Link>
           )}
-          <button
-            className={`nav-link ${currentPage === 'sandbox' ? 'nav-link-active' : ''}`}
-            onClick={navigateToSandbox}
+          <Link
+            to="/sandbox"
+            className={`nav-link ${currentPath === '/sandbox' ? 'nav-link-active' : ''}`}
+            onClick={handleSandboxClick}
           >
             {t('nav.sandbox')}
-          </button>
-          <button
-            className={`nav-link ${currentPage === 'songs' ? 'nav-link-active' : ''}`}
-            onClick={navigateToSongs}
+          </Link>
+          <Link
+            to="/songs"
+            className={`nav-link ${currentPath === '/songs' ? 'nav-link-active' : ''}`}
           >
             {t('nav.songs')}
-          </button>
-          <button
-            className={`nav-link ${currentPage === 'classroom' ? 'nav-link-active' : ''}`}
-            onClick={navigateToClassroom}
+          </Link>
+          <Link
+            to="/classroom"
+            className={`nav-link ${currentPath === '/classroom' ? 'nav-link-active' : ''}`}
           >
             {t('nav.classroom')}
-          </button>
+          </Link>
         </nav>
 
         <div className="header-right">
@@ -99,16 +95,10 @@ const Header = memo(function Header({
                 <UserMenu />
               ) : (
                 <div className="auth-buttons">
-                  <button
-                    className="auth-btn login-btn"
-                    onClick={handleShowLogin}
-                  >
+                  <button className="auth-btn login-btn" onClick={handleShowLogin}>
                     {t('auth.signIn')}
                   </button>
-                  <button
-                    className="auth-btn signup-btn"
-                    onClick={handleShowSignup}
-                  >
+                  <button className="auth-btn signup-btn" onClick={handleShowSignup}>
                     {t('auth.signUp')}
                   </button>
                 </div>
@@ -118,11 +108,7 @@ const Header = memo(function Header({
         </div>
       </div>
 
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={handleCloseModal}
-        initialForm={authForm}
-      />
+      <AuthModal isOpen={showAuthModal} onClose={handleCloseModal} initialForm={authForm} />
     </header>
   )
 })

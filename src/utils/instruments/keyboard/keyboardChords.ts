@@ -1,4 +1,4 @@
-import { GUITAR_CHORDS, getChordNotes, type GuitarChord } from '../guitar/guitarChords'
+import { getChordNotes, type GuitarChord } from '../guitar/guitarChords'
 import type { Note } from '../../notes'
 
 /**
@@ -89,7 +89,9 @@ export const getKeyboardChordVoicings = (
   // Get chord intervals for voicings
   const intervals = chord.intervals
   const chordToneNames = intervals.map(interval => {
-    const rootIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(rootNote)
+    const rootIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(
+      rootNote
+    )
     const noteIndex = (rootIndex + interval) % 12
     return ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'][noteIndex]
   })
@@ -99,7 +101,7 @@ export const getKeyboardChordVoicings = (
     root: [] as Note[],
     firstInversion: [] as Note[],
     secondInversion: [] as Note[],
-    spread: [] as Note[]
+    spread: [] as Note[],
   }
 
   // Find notes for each voicing type across octaves
@@ -121,4 +123,8 @@ export const getKeyboardChordVoicings = (
 }
 
 // Re-export guitar chords and utilities for keyboard use
-export { GUITAR_CHORDS as KEYBOARD_CHORDS, CHORD_ROOT_NOTES as KEYBOARD_CHORD_ROOT_NOTES, type GuitarChord as KeyboardChord } from '../guitar/guitarChords'
+export {
+  GUITAR_CHORDS as KEYBOARD_CHORDS,
+  CHORD_ROOT_NOTES as KEYBOARD_CHORD_ROOT_NOTES,
+  type GuitarChord as KeyboardChord,
+} from '../guitar/guitarChords'

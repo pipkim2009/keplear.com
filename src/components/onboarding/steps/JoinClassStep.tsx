@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { PiBookOpenFill, PiUserFill, PiPianoKeysFill, PiUsersFill } from 'react-icons/pi'
 import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
+import { containsScriptInjection } from '../../../utils/security'
+import { useFindClassroomByCode } from '../../../hooks/useClassrooms'
+import { useSupabaseQuery } from '../../../hooks/useSupabaseQuery'
 import { supabase } from '../../../lib/supabase'
-import { useFindClassroomByCode, type Classroom } from '../../../hooks/useClassrooms'
 import type { InstrumentType } from '../../../types/instrument'
 import styles from '../Onboarding.module.css'
 
@@ -28,7 +30,7 @@ interface AvailableClassroom {
 const INSTRUMENT_ICONS: Record<string, React.ReactNode> = {
   keyboard: <PiPianoKeysFill />,
   guitar: <GiGuitarHead />,
-  bass: <GiGuitarBassHead />
+  bass: <GiGuitarBassHead />,
 }
 
 /**
@@ -43,12 +45,10 @@ const JoinClassStep = ({
   selectedInstruments,
   onNext,
   onSkip,
-  onBack
+  onBack,
 }: JoinClassStepProps) => {
   const [debouncedCode, setDebouncedCode] = useState(joinCode)
   const [hasSearched, setHasSearched] = useState(false)
-  const [availableClassrooms, setAvailableClassrooms] = useState<AvailableClassroom[]>([])
-  const [isLoadingClassrooms, setIsLoadingClassrooms] = useState(true)
 
   // Debounce the join code input
   useEffect(() => {
@@ -61,68 +61,73 @@ const JoinClassStep = ({
     return () => clearTimeout(timer)
   }, [joinCode])
 
-  // Fetch available classrooms that match selected instruments
-  useEffect(() => {
-    const fetchClassrooms = async () => {
-      setIsLoadingClassrooms(true)
-      try {
-        const { data, error } = await supabase
-          .from('classrooms')
-          .select(`
-            id,
-            title,
-            profiles (username),
-            classroom_students (user_id),
-            assignments (instrument)
-          `)
-          .limit(10)
+  // Fetch available classrooms via useSupabaseQuery
+  const classroomQueryBuilder = useCallback(
+    (query: ReturnType<typeof supabase.from>) =>
+      query
+        .select(
+          `
+      id,
+      title,
+      profiles (username),
+      classroom_students (user_id),
+      assignments (instrument)
+    `
+        )
+        .limit(10),
+    []
+  )
 
-        if (error) throw error
+  const { data: rawClassrooms, isLoading: isLoadingClassrooms } = useSupabaseQuery<
+    Record<string, unknown>[]
+  >('classrooms', classroomQueryBuilder, {
+    dependencies: [selectedInstruments],
+    enabled: selectedInstruments.length > 0,
+  })
 
-        // Filter and transform classrooms
-        const classrooms: AvailableClassroom[] = (data || [])
-          .map((c: any) => {
-            const instruments = [...new Set(c.assignments?.map((a: any) => a.instrument).filter(Boolean) || [])]
-            return {
-              id: c.id,
-              title: c.title,
-              owner_username: c.profiles?.username || null,
-              student_count: c.classroom_students?.length || 0,
-              instruments
-            }
-          })
-          // Only show classrooms that have assignments for selected instruments
-          .filter(c =>
-            c.instruments.length > 0 &&
-            c.instruments.some(i => selectedInstruments.includes(i as InstrumentType))
-          )
-          .slice(0, 5)
-
-        setAvailableClassrooms(classrooms)
-      } catch (err) {
-        console.warn('Failed to fetch classrooms:', err)
-        setAvailableClassrooms([])
-      } finally {
-        setIsLoadingClassrooms(false)
-      }
-    }
-
-    if (selectedInstruments.length > 0) {
-      fetchClassrooms()
-    }
-  }, [selectedInstruments])
+  // Filter and transform classrooms based on selected instruments
+  const availableClassrooms = useMemo<AvailableClassroom[]>(() => {
+    if (!rawClassrooms) return []
+    return rawClassrooms
+      .map((c: Record<string, unknown>) => {
+        const assignments = c.assignments as Record<string, unknown>[] | undefined
+        const instruments = [
+          ...new Set(assignments?.map(a => a.instrument as string).filter(Boolean) || []),
+        ]
+        const profiles = c.profiles as Record<string, unknown> | null
+        const students = c.classroom_students as unknown[] | undefined
+        return {
+          id: c.id as string,
+          title: c.title as string,
+          owner_username: (profiles?.username as string) || null,
+          student_count: students?.length || 0,
+          instruments,
+        }
+      })
+      .filter(
+        c =>
+          c.instruments.length > 0 &&
+          c.instruments.some(i => selectedInstruments.includes(i as InstrumentType))
+      )
+      .slice(0, 5)
+  }, [rawClassrooms, selectedInstruments])
 
   // Look up classroom by code
-  const { data: classroom, isLoading, error } = useFindClassroomByCode(
-    debouncedCode.length >= 20 ? debouncedCode : null,
-    { enabled: debouncedCode.length >= 20 }
-  )
+  const {
+    data: classroom,
+    isLoading,
+    error,
+  } = useFindClassroomByCode(debouncedCode.length >= 20 ? debouncedCode : null, {
+    enabled: debouncedCode.length >= 20,
+  })
 
   const isValidCode = !!classroom && !error
   const showError = hasSearched && debouncedCode.length > 0 && !isLoading && !isValidCode
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onJoinCodeChange(e.target.value.toUpperCase().trim())
+    const value = e.target.value.toUpperCase().trim()
+    if (containsScriptInjection(value)) return
+    onJoinCodeChange(value)
   }
 
   const handleSelectClassroom = (classroomId: string) => {
@@ -190,9 +195,7 @@ const JoinClassStep = ({
         {/* Available classrooms for selected instruments */}
         {!isValidCode && availableClassrooms.length > 0 && (
           <div className={styles.availableClassrooms}>
-            <div className={styles.availableClassroomsLabel}>
-              Recommended Classes
-            </div>
+            <div className={styles.availableClassroomsLabel}>Recommended Classes</div>
             <div className={styles.classroomList}>
               {availableClassrooms.map(c => (
                 <button
@@ -235,11 +238,7 @@ const JoinClassStep = ({
       </div>
 
       <div className={styles.buttonGroup}>
-        <button
-          className={styles.secondaryButton}
-          onClick={onBack}
-          type="button"
-        >
+        <button className={styles.secondaryButton} onClick={onBack} type="button">
           Back
         </button>
         <button
@@ -252,11 +251,7 @@ const JoinClassStep = ({
         </button>
       </div>
 
-      <button
-        className={styles.skipButton}
-        onClick={onSkip}
-        type="button"
-      >
+      <button className={styles.skipButton} onClick={onSkip} type="button">
         Skip - I'll join a class later
       </button>
     </div>

@@ -112,10 +112,7 @@ export function memoizeWithCache<T extends (...args: unknown[]) => unknown>(
 /**
  * Shallow comparison for React.memo
  */
-export function shallowEqual<T extends Record<string, unknown>>(
-  objA: T,
-  objB: T
-): boolean {
+export function shallowEqual<T extends Record<string, unknown>>(objA: T, objB: T): boolean {
   if (objA === objB) return true
   if (!objA || !objB) return false
 
@@ -164,7 +161,11 @@ export function deepEqual(a: unknown, b: unknown): boolean {
 /**
  * Create a stable reference for objects/arrays that are structurally equal
  */
-export function useStableReference<T>(value: T, isEqual: (a: T, b: T) => boolean = shallowEqual as (a: T, b: T) => boolean): T {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function useStableReference<T>(
+  value: T,
+  _isEqual: (a: T, b: T) => boolean = shallowEqual as (a: T, b: T) => boolean
+): T {
   // Note: This is a utility function, not a hook. For hook version, see useStableValue
   return value
 }
@@ -229,5 +230,5 @@ export default {
   shallowEqual,
   deepEqual,
   batchUpdates,
-  RenderMonitor
+  RenderMonitor,
 }

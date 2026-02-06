@@ -1,12 +1,13 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useTheme } from '../../hooks/useTheme'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { PiCaretUpFill, PiSignOutFill, PiTrashFill, PiUserFill } from 'react-icons/pi'
 import { useInstrument } from '../../contexts/InstrumentContext'
+import { useSupabaseQuery } from '../../hooks/useSupabaseQuery'
 import { supabase } from '../../lib/supabase'
-import logo from '/Keplear-logo.png'
+import logo from '/Keplear-logo.webp'
 import styles from './UserMenu.module.css'
 import authStyles from './AuthForms.module.css'
 
@@ -30,9 +31,31 @@ const UserMenu = () => {
   const { isDarkMode } = useTheme()
   const { navigateToProfile } = useInstrument()
   const [isOpen, setIsOpen] = useState(false)
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+
+  // Fetch profile data via useSupabaseQuery
+  const profileQuery = useCallback(
+    (query: ReturnType<typeof supabase.from>) =>
+      query.select('profile_color, username').eq('id', user?.id).single(),
+    [user?.id]
+  )
+  const { data: profileData } = useSupabaseQuery<{ profile_color: string; username: string }>(
+    'profiles',
+    profileQuery,
+    { dependencies: [user?.id], enabled: !!user }
+  )
+
+  // Derive userProfile from auth metadata + fetched profile data
+  const userProfile = useMemo<UserProfile | null>(() => {
+    if (!user) return null
+    const authUsername = user.user_metadata?.username || user.user_metadata?.full_name || 'User'
+    return {
+      username: profileData?.username || authUsername,
+      avatarUrl: user.user_metadata?.avatar_url,
+      profileColor: profileData?.profile_color || 'purple',
+    }
+  }, [user, profileData])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -49,35 +72,6 @@ const UserMenu = () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [isOpen])
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (user) {
-        // Set initial values from auth metadata
-        setUserProfile({
-          username: user.user_metadata?.username || user.user_metadata?.full_name || 'User',
-          avatarUrl: user.user_metadata?.avatar_url,
-          profileColor: 'purple'
-        })
-
-        // Fetch profile color from database
-        const { data } = await supabase
-          .from('profiles')
-          .select('profile_color, username')
-          .eq('id', user.id)
-          .single()
-
-        if (data) {
-          setUserProfile(prev => prev ? {
-            ...prev,
-            username: data.username || prev.username,
-            profileColor: data.profile_color || 'purple'
-          } : null)
-        }
-      }
-    }
-    fetchProfile()
-  }, [user])
 
   const handleSignOut = async () => {
     try {
@@ -126,11 +120,14 @@ const UserMenu = () => {
   }
 
   const deleteConfirmModal = showDeleteConfirm ? (
-    <div className={`${authStyles.authModalOverlay} ${isDarkMode ? 'dark' : ''}`} onClick={(e) => {
-      if (e.target === e.currentTarget) {
-        setShowDeleteConfirm(false)
-      }
-    }}>
+    <div
+      className={`${authStyles.authModalOverlay} ${isDarkMode ? 'dark' : ''}`}
+      onClick={e => {
+        if (e.target === e.currentTarget) {
+          setShowDeleteConfirm(false)
+        }
+      }}
+    >
       <div className={`${authStyles.authModal} ${isDarkMode ? 'dark' : ''}`}>
         <button
           className={authStyles.closeButton}
@@ -157,7 +154,7 @@ const UserMenu = () => {
                 background: 'transparent',
                 color: 'var(--gray-100)',
                 border: '2px solid var(--gray-100)',
-                marginTop: 0
+                marginTop: 0,
               }}
             >
               {t('common.cancel')}
@@ -170,13 +167,13 @@ const UserMenu = () => {
                 minWidth: '120px',
                 background: '#ef4444',
                 border: '2px solid #ef4444',
-                marginTop: 0
+                marginTop: 0,
               }}
-              onMouseOver={(e) => {
+              onMouseOver={e => {
                 e.currentTarget.style.background = '#b91c1c'
                 e.currentTarget.style.borderColor = '#b91c1c'
               }}
-              onMouseOut={(e) => {
+              onMouseOut={e => {
                 e.currentTarget.style.background = '#ef4444'
                 e.currentTarget.style.borderColor = '#ef4444'
               }}
@@ -192,81 +189,70 @@ const UserMenu = () => {
   return (
     <>
       {deleteConfirmModal && createPortal(deleteConfirmModal, document.body)}
-      
+
       <div className={styles.userMenu} ref={menuRef}>
-        <button 
+        <button
           className={styles.userMenuTrigger}
           onClick={() => setIsOpen(!isOpen)}
           aria-expanded={isOpen}
           aria-haspopup="true"
         >
-        <div className={styles.userAvatar}>
-          {userProfile.avatarUrl ? (
-            <img
-              src={userProfile.avatarUrl}
-              alt={t('aria.userAvatar')}
-              onError={(e) => {
-                const img = e.target as HTMLImageElement
-                img.style.display = 'none'
-                const initials = img.nextSibling as HTMLElement
-                if (initials) initials.style.display = 'flex'
+          <div className={styles.userAvatar}>
+            {userProfile.avatarUrl ? (
+              <img
+                src={userProfile.avatarUrl}
+                alt={t('aria.userAvatar')}
+                onError={e => {
+                  const img = e.target as HTMLImageElement
+                  img.style.display = 'none'
+                  const initials = img.nextSibling as HTMLElement
+                  if (initials) initials.style.display = 'flex'
+                }}
+              />
+            ) : null}
+            <div
+              className={styles.avatarInitials}
+              style={{
+                display: userProfile.avatarUrl ? 'none' : 'flex',
+                background: PROFILE_COLOR_GRADIENTS[userProfile.profileColor || 'purple'],
               }}
-            />
-          ) : null}
-          <div
-            className={styles.avatarInitials}
-            style={{
-              display: userProfile.avatarUrl ? 'none' : 'flex',
-              background: PROFILE_COLOR_GRADIENTS[userProfile.profileColor || 'purple']
-            }}
-          >
-            {getInitials(userProfile.username)}
-          </div>
-        </div>
-        <span className={styles.userName}>
-          {userProfile.username}
-        </span>
-        <PiCaretUpFill
-          className={`${styles.chevron} ${isOpen ? styles.open : ''}`}
-          size={16}
-        />
-      </button>
-
-      {isOpen && (
-        <div className={styles.userMenuDropdown}>
-          <div className={styles.userMenuHeader}>
-            <div className={styles.userInfo}>
-              <div className={styles.userNameLarge}>{userProfile.username}</div>
+            >
+              {getInitials(userProfile.username)}
             </div>
           </div>
+          <span className={styles.userName}>{userProfile.username}</span>
+          <PiCaretUpFill className={`${styles.chevron} ${isOpen ? styles.open : ''}`} size={16} />
+        </button>
 
-          <div className={styles.userMenuDivider}></div>
+        {isOpen && (
+          <div className={styles.userMenuDropdown}>
+            <div className={styles.userMenuHeader}>
+              <div className={styles.userInfo}>
+                <div className={styles.userNameLarge}>{userProfile.username}</div>
+              </div>
+            </div>
 
-          <div className={styles.userMenuActions}>
-            <button
-              className={styles.menuItem}
-              onClick={handleViewProfile}
-            >
-              <PiUserFill size={16} />
-              {t('auth.profile')}
-            </button>
-            <button
-              className={`${styles.menuItem} ${styles.danger}`}
-              onClick={handleSignOut}
-            >
-              <PiSignOutFill size={16} />
-              {t('auth.signOut')}
-            </button>
-            <button
-              className={`${styles.menuItem} ${styles.danger}`}
-              onClick={handleDeleteAccount}
-            >
-              <PiTrashFill size={16} />
-              {t('auth.deleteAccount')}
-            </button>
+            <div className={styles.userMenuDivider}></div>
+
+            <div className={styles.userMenuActions}>
+              <button className={styles.menuItem} onClick={handleViewProfile}>
+                <PiUserFill size={16} />
+                {t('auth.profile')}
+              </button>
+              <button className={`${styles.menuItem} ${styles.danger}`} onClick={handleSignOut}>
+                <PiSignOutFill size={16} />
+                {t('auth.signOut')}
+              </button>
+              <button
+                className={`${styles.menuItem} ${styles.danger}`}
+                onClick={handleDeleteAccount}
+              >
+                <PiTrashFill size={16} />
+                {t('auth.deleteAccount')}
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
     </>
   )

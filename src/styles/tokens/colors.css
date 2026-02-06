@@ -325,5 +325,13 @@
   --btn-secondary-bg: rgb(45, 21, 102, 0.8);
   --btn-secondary-border: rgb(212, 196, 255, 0.3);
   --btn-secondary-text: var(--dark-text-primary);
+}
 
+/* ========================================
+   WCAG AA LIGHT MODE OVERRIDES
+   Higher-contrast text/border colors on light backgrounds
+   ======================================== */
+body.light {
+  --green-500: #15803d; /* 5.1:1 on white (was #22c55e at 2.3:1) */
+  --red-500: #b91c1c; /* 6.4:1 on white (was #ef4444 at 3.75:1) */
 }

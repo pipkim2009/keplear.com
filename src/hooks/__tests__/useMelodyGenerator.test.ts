@@ -132,8 +132,13 @@ describe('useMelodyGenerator', () => {
     it('should check if note is in melody', () => {
       const { result } = renderHook(() => useMelodyGenerator())
 
+      // Set guitar notes first, then generate in a separate act
+      // so that selectedNotes state is updated before generateMelody reads it
       act(() => {
         result.current.setGuitarNotes([mockNotes[0]])
+      })
+
+      act(() => {
         result.current.generateMelody(mockNotes, 1, 'guitar')
       })
 
@@ -144,8 +149,13 @@ describe('useMelodyGenerator', () => {
     it('should clear selection', () => {
       const { result } = renderHook(() => useMelodyGenerator())
 
+      // Select a note first so selectedNotes state is updated
       act(() => {
         result.current.selectNote(mockNotes[0], 'multi')
+      })
+
+      // Generate melody in a separate act so it can read the updated selectedNotes
+      act(() => {
         result.current.generateMelody([mockNotes[0]], 1, 'guitar')
       })
 
@@ -154,6 +164,7 @@ describe('useMelodyGenerator', () => {
 
       act(() => {
         result.current.clearSelection()
+        result.current.clearMelody()
       })
 
       expect(result.current.selectedNotes).toHaveLength(0)

@@ -3,7 +3,7 @@
  * Combines caching, pagination, and retry for robust data fetching
  */
 
-import { useCallback, useState, useMemo } from 'react'
+import { useCallback, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useQueryCache, invalidateCache, setCache, type CacheOptions } from './useQueryCache'
 import { withRetry, type RetryOptions } from '../utils/errorHandler'
@@ -80,18 +80,10 @@ export function useSupabaseQuery<T>(
   queryBuilder: (query: ReturnType<typeof supabase.from>) => ReturnType<typeof supabase.from>,
   options: QueryOptions<T> = {}
 ): UseSupabaseQueryResult<T> {
-  const {
-    retry,
-    transform,
-    dependencies = [],
-    enabled = true,
-    ...cacheOptions
-  } = options
+  const { retry, transform, dependencies = [], enabled = true, ...cacheOptions } = options
 
   // Generate cache key based on table and dependencies
-  const cacheKey = enabled
-    ? generateCacheKey(table, { deps: dependencies })
-    : null
+  const cacheKey = enabled ? generateCacheKey(table, { deps: dependencies }) : null
 
   // Fetcher function with retry
   const fetcher = useCallback(async (): Promise<T> => {
@@ -100,7 +92,7 @@ export function useSupabaseQuery<T>(
       const { data, error } = await query
 
       if (error) throw error
-      return transform ? transform(data) : data as T
+      return transform ? transform(data) : (data as T)
     }
 
     if (retry) {
@@ -133,9 +125,7 @@ export function usePaginatedQuery<T>(
   const [page, setPage] = useState(initialPage)
 
   // Generate cache key with pagination
-  const cacheKey = enabled
-    ? generateCacheKey(table, { deps: dependencies }, page, pageSize)
-    : null
+  const cacheKey = enabled ? generateCacheKey(table, { deps: dependencies }, page, pageSize) : null
 
   // Fetcher with pagination
   const fetcher = useCallback(async (): Promise<PaginatedResult<T>> => {
@@ -153,14 +143,14 @@ export function usePaginatedQuery<T>(
 
       if (error) throw error
 
-      const transformedData = transform ? transform(data) : data as T[]
+      const transformedData = transform ? transform(data) : (data as T[])
 
       return {
         data: transformedData,
         page,
         pageSize,
         hasMore: (count ?? 0) > to,
-        totalCount: count ?? undefined
+        totalCount: count ?? undefined,
       }
     }
 
@@ -191,7 +181,7 @@ export function usePaginatedQuery<T>(
     nextPage,
     prevPage,
     hasNextPage: result.data?.hasMore ?? false,
-    hasPrevPage: page > 0
+    hasPrevPage: page > 0,
   }
 }
 
@@ -205,7 +195,7 @@ export function invalidateQueries(table: string): void {
 /**
  * Prefetch a query (useful for preloading data)
  */
-export async function prefetchQuery<T>(
+export async function prefetchQuery(
   table: string,
   queryBuilder: (query: ReturnType<typeof supabase.from>) => ReturnType<typeof supabase.from>,
   dependencies: unknown[] = []

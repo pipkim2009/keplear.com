@@ -125,11 +125,11 @@
 }
 
 .textMutedLight {
-  color: var(--gray-900);
+  color: var(--gray-500);
 }
 
 .textMutedDark {
-  color: var(--gray-900);
+  color: var(--gray-500);
 }
 
 /*
@@ -167,11 +167,11 @@
 */
 
 .borderLight {
-  border-color: var(--gray-900);
+  border-color: var(--gray-200);
 }
 
 .borderDark {
-  border-color: var(--gray-900);
+  border-color: var(--gray-700);
 }
 
 .borderAccentLight {

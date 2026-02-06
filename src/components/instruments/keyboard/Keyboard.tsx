@@ -1,8 +1,15 @@
 import { memo, useMemo, useCallback } from 'react'
 import KeyboardKey from './KeyboardKey'
-import { whiteKeys, blackKeys, getBlackKeyLeft, getBlackKeyLeftDynamic, generateWhiteKeysWithSeparateOctaves, generateBlackKeysWithSeparateOctaves, type Note } from '../../../utils/notes'
+import {
+  whiteKeys,
+  blackKeys,
+  getBlackKeyLeft,
+  getBlackKeyLeftDynamic,
+  generateWhiteKeysWithSeparateOctaves,
+  generateBlackKeysWithSeparateOctaves,
+  type Note,
+} from '../../../utils/notes'
 import type { KeyboardPreview } from '../../common/ScaleChordOptions'
-import { useTranslation } from '../../../contexts/TranslationContext'
 import '../../../styles/Keyboard.css'
 
 interface KeyboardProps {
@@ -33,10 +40,9 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   isNoteRoot,
   isNoteInChord,
   isNoteChordRoot,
-  currentlyPlayingNote = null,
   currentlyPlayingNoteNames = [],
   previewNotes = null,
-  disableNoteSelection = false
+  disableNoteSelection = false,
 }) {
   const hasExtendedRange = lowerOctaves !== 0 || higherOctaves !== 0
 
@@ -46,67 +52,100 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   }, [])
 
   // Check if a note is in scale or chord layer
-  const isInScaleChordLayer = useCallback((note: Note): boolean => {
-    const inScale = isNoteInScale ? isNoteInScale(note) : false
-    const inChord = isNoteInChord ? isNoteInChord(note) : false
-    return inScale || inChord
-  }, [isNoteInScale, isNoteInChord])
+  const isInScaleChordLayer = useCallback(
+    (note: Note): boolean => {
+      const inScale = isNoteInScale ? isNoteInScale(note) : false
+      const inChord = isNoteInChord ? isNoteInChord(note) : false
+      return inScale || inChord
+    },
+    [isNoteInScale, isNoteInChord]
+  )
 
   // Check if a note is manually selected
   // After the architecture change, selectedNotes only contains manually clicked notes
   // Scale/chord notes are NOT in selectedNotes
-  const isManuallySelected = useCallback((note: Note): boolean => {
-    return isSelected(note)
-  }, [isSelected])
+  const isManuallySelected = useCallback(
+    (note: Note): boolean => {
+      return isSelected(note)
+    },
+    [isSelected]
+  )
 
   // Check if a note should be visible (either manual OR in scale/chord)
-  const isNoteVisible = useCallback((note: Note): boolean => {
-    return isManuallySelected(note) || isInScaleChordLayer(note)
-  }, [isManuallySelected, isInScaleChordLayer])
+  const isNoteVisible = useCallback(
+    (note: Note): boolean => {
+      return isManuallySelected(note) || isInScaleChordLayer(note)
+    },
+    [isManuallySelected, isInScaleChordLayer]
+  )
 
   // Wrapped click handler that respects disableNoteSelection
-  const handleNoteClick = useCallback((note: Note) => {
-    if (disableNoteSelection) return
-    onNoteClick(note)
-  }, [onNoteClick, disableNoteSelection])
+  const handleNoteClick = useCallback(
+    (note: Note) => {
+      if (disableNoteSelection) return
+      onNoteClick(note)
+    },
+    [onNoteClick, disableNoteSelection]
+  )
 
   // Check if a note is currently playing (only highlight when notes are shown)
   // Supports both single notes and chords (multiple notes playing simultaneously)
-  const isNoteCurrentlyPlaying = useCallback((note: Note): boolean => {
-    return showNotes && currentlyPlayingNoteNames.length > 0 && currentlyPlayingNoteNames.includes(note.name)
-  }, [currentlyPlayingNoteNames, showNotes])
+  const isNoteCurrentlyPlaying = useCallback(
+    (note: Note): boolean => {
+      return (
+        showNotes &&
+        currentlyPlayingNoteNames.length > 0 &&
+        currentlyPlayingNoteNames.includes(note.name)
+      )
+    },
+    [currentlyPlayingNoteNames, showNotes]
+  )
 
   // Check if a note is in the scale/chord preview from the menu
-  const isNoteInPreview = useCallback((note: Note): boolean => {
-    if (!previewNotes) return false
-    return previewNotes.notes.some(n => n.name === note.name)
-  }, [previewNotes])
+  const isNoteInPreview = useCallback(
+    (note: Note): boolean => {
+      if (!previewNotes) return false
+      return previewNotes.notes.some(n => n.name === note.name)
+    },
+    [previewNotes]
+  )
 
   // Check if a note is a root note in the preview
-  const isNotePreviewRoot = useCallback((note: Note): boolean => {
-    if (!previewNotes) return false
-    return previewNotes.rootNotes.some(n => n.name === note.name)
-  }, [previewNotes])
+  const isNotePreviewRoot = useCallback(
+    (note: Note): boolean => {
+      if (!previewNotes) return false
+      return previewNotes.rootNotes.some(n => n.name === note.name)
+    },
+    [previewNotes]
+  )
 
   // Check if the preview is showing a chord (vs scale)
   const isPreviewChord = previewNotes?.isChord ?? false
 
   // Memoize expensive key generation
   const currentWhiteKeys = useMemo(
-    () => hasExtendedRange ? generateWhiteKeysWithSeparateOctaves(lowerOctaves, higherOctaves) : whiteKeys,
+    () =>
+      hasExtendedRange
+        ? generateWhiteKeysWithSeparateOctaves(lowerOctaves, higherOctaves)
+        : whiteKeys,
     [hasExtendedRange, lowerOctaves, higherOctaves]
   )
 
   const currentBlackKeys = useMemo(
-    () => hasExtendedRange ? generateBlackKeysWithSeparateOctaves(lowerOctaves, higherOctaves) : blackKeys,
+    () =>
+      hasExtendedRange
+        ? generateBlackKeysWithSeparateOctaves(lowerOctaves, higherOctaves)
+        : blackKeys,
     [hasExtendedRange, lowerOctaves, higherOctaves]
   )
 
   return (
     <div className="keyboard-container">
-      <div className={`keyboard ${!hasExtendedRange ? 'default-mode' : ''} ${showNotes ? 'melody-active' : ''}`}>
+      <div
+        className={`keyboard ${!hasExtendedRange ? 'default-mode' : ''} ${showNotes ? 'melody-active' : ''}`}
+      >
         {/* White Keys */}
-        {currentWhiteKeys.map((note) => (
+        {currentWhiteKeys.map(note => (
           <KeyboardKey
             key={note.name}
             note={note}
@@ -128,7 +167,7 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
 
         {/* Black Keys */}
         <div className="black-keys">
-          {currentBlackKeys.map((note) => {
+          {currentBlackKeys.map(note => {
             const leftPosition = hasExtendedRange
               ? getBlackKeyLeftDynamic(note, currentWhiteKeys)
               : getBlackKeyLeft(note.position)

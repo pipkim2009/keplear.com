@@ -67,7 +67,7 @@ const DEFAULT_CONFIG: TranscriberConfig = {
   hopSizeMs: 100,
   onsetThreshold: 0.3, // Lowered for better detection
   frameThreshold: 0.2,
-  instrument: 'keyboard'
+  instrument: 'keyboard',
 }
 
 // MIDI pitch to note name mapping
@@ -75,9 +75,9 @@ const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 
 
 // Instrument frequency ranges (Hz)
 const INSTRUMENT_FREQ_RANGES = {
-  keyboard: { min: 27.5, max: 4186 },   // A0 to C8
-  guitar: { min: 82, max: 1319 },       // E2 to E6
-  bass: { min: 41, max: 392 }           // E1 to G4
+  keyboard: { min: 27.5, max: 4186 }, // A0 to C8
+  guitar: { min: 82, max: 1319 }, // E2 to E6
+  bass: { min: 41, max: 392 }, // E1 to G4
 } as const
 
 // ============================================================================
@@ -131,7 +131,8 @@ export class MagentaTranscriber {
   private samplesReceived: number = 0
 
   // Note tracking for persistence filtering
-  private noteHistory: Map<number, { count: number; lastSeen: number; totalDuration: number }> = new Map()
+  private noteHistory: Map<number, { count: number; lastSeen: number; totalDuration: number }> =
+    new Map()
   private lastDetectedPitch: number = -1
   private lastPitchTimestamp: number = 0
   private silenceFrameCount: number = 0
@@ -167,7 +168,6 @@ export class MagentaTranscriber {
     const bufferSamples = Math.ceil((this.config.windowSizeMs / 1000) * rate)
     this.audioBuffer = new Float32Array(bufferSamples)
     this.bufferWriteIndex = 0
-    console.log(`[MagentaTranscriber] Sample rate set to ${rate}Hz, buffer size: ${bufferSamples}`)
   }
 
   getStatus(): TranscriberStatus {
@@ -196,7 +196,6 @@ export class MagentaTranscriber {
     try {
       // No model to load - using YIN pitch detection
       this.setStatus('ready')
-      console.log('[MagentaTranscriber] Ready (using YIN pitch detection)')
     } catch (error) {
       console.error('[MagentaTranscriber] Failed to initialize:', error)
       this.setStatus('error')
@@ -297,7 +296,7 @@ export class MagentaTranscriber {
             activeNotes: [],
             newOnsets: [],
             timestamp: startTime,
-            latency: performance.now() - startTime
+            latency: performance.now() - startTime,
           })
         }
         return
@@ -339,7 +338,7 @@ export class MagentaTranscriber {
             onsetProbability: confidence,
             frameProbability: confidence,
             timestamp: startTime,
-            duration: 0
+            duration: 0,
           })
         }
       }
@@ -352,7 +351,7 @@ export class MagentaTranscriber {
         activeNotes: filteredNotes,
         newOnsets: filteredNotes.filter(n => n.duration <= this.config.hopSizeMs * 2),
         timestamp: startTime,
-        latency: performance.now() - startTime
+        latency: performance.now() - startTime,
       }
 
       // Emit result
@@ -378,7 +377,10 @@ export class MagentaTranscriber {
   /**
    * YIN pitch detection algorithm
    */
-  private computePitchYIN(audio: Float32Array, sampleRate: number): { frequency: number; confidence: number } {
+  private computePitchYIN(
+    audio: Float32Array,
+    sampleRate: number
+  ): { frequency: number; confidence: number } {
     const bufferSize = audio.length
 
     // YIN needs at least 2 periods of the lowest frequency we want to detect
@@ -412,7 +414,7 @@ export class MagentaTranscriber {
 
     for (let tau = minTau + 1; tau < maxTau; tau++) {
       runningSum += difference[tau]
-      cmndf[tau] = difference[tau] * (tau - minTau + 1) / runningSum
+      cmndf[tau] = (difference[tau] * (tau - minTau + 1)) / runningSum
     }
 
     // Step 3: Find first minimum below threshold
@@ -495,7 +497,7 @@ export class MagentaTranscriber {
           this.noteHistory.set(note.pitch, {
             count: 1,
             lastSeen: timestamp,
-            totalDuration: this.config.hopSizeMs
+            totalDuration: this.config.hopSizeMs,
           })
         }
       } else {
@@ -503,7 +505,7 @@ export class MagentaTranscriber {
         this.noteHistory.set(note.pitch, {
           count: 1,
           lastSeen: timestamp,
-          totalDuration: this.config.hopSizeMs
+          totalDuration: this.config.hopSizeMs,
         })
       }
     }
@@ -518,12 +520,15 @@ export class MagentaTranscriber {
       }
 
       // Check persistence criteria - more lenient
-      if (history.count >= this.PERSISTENCE_FRAMES || history.totalDuration >= this.MIN_DURATION_MS) {
+      if (
+        history.count >= this.PERSISTENCE_FRAMES ||
+        history.totalDuration >= this.MIN_DURATION_MS
+      ) {
         const note = notes.find(n => n.pitch === pitch)
         if (note) {
           validNotes.push({
             ...note,
-            duration: history.totalDuration
+            duration: history.totalDuration,
           })
         }
       }

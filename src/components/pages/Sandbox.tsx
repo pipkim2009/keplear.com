@@ -12,120 +12,83 @@ import { useTranslation } from '../../contexts/TranslationContext'
 import { AuthContext } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
 import TutorialOverlay from '../onboarding/TutorialOverlay'
+import SEOHead from '../common/SEOHead'
 import { useTutorial } from '../../hooks/useTutorial'
 // Old feedback system removed - now using useMelodyFeedback in CustomAudioPlayer
 import type { Note } from '../../utils/notes'
 import { KEYBOARD_SCALES, ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardScales'
-import { KEYBOARD_CHORDS, KEYBOARD_CHORD_ROOT_NOTES } from '../../utils/instruments/keyboard/keyboardChords'
-import { GUITAR_SCALES, ROOT_NOTES as GUITAR_ROOT_NOTES, getScalePositions, getScaleBoxes } from '../../utils/instruments/guitar/guitarScales'
-import { GUITAR_CHORDS, CHORD_ROOT_NOTES as GUITAR_CHORD_ROOT_NOTES, getChordBoxes } from '../../utils/instruments/guitar/guitarChords'
+import {
+  KEYBOARD_CHORDS,
+  KEYBOARD_CHORD_ROOT_NOTES,
+} from '../../utils/instruments/keyboard/keyboardChords'
+import {
+  GUITAR_SCALES,
+  type GuitarScale,
+  ROOT_NOTES as GUITAR_ROOT_NOTES,
+  getScalePositions,
+  getScaleBoxes,
+} from '../../utils/instruments/guitar/guitarScales'
+import {
+  GUITAR_CHORDS,
+  type GuitarChord,
+  CHORD_ROOT_NOTES as GUITAR_CHORD_ROOT_NOTES,
+  getChordBoxes,
+} from '../../utils/instruments/guitar/guitarChords'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
-import { BASS_SCALES, BASS_ROOT_NOTES, getBassScalePositions, getBassScaleBoxes } from '../../utils/instruments/bass/bassScales'
-import { BASS_CHORDS, BASS_CHORD_ROOT_NOTES, getBassChordBoxes } from '../../utils/instruments/bass/bassChords'
+import {
+  BASS_SCALES,
+  type BassScale,
+  BASS_ROOT_NOTES,
+  getBassScalePositions,
+  getBassScaleBoxes,
+} from '../../utils/instruments/bass/bassScales'
+import {
+  BASS_CHORDS,
+  type BassChord,
+  BASS_CHORD_ROOT_NOTES,
+  getBassChordBoxes,
+} from '../../utils/instruments/bass/bassChords'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
 import {
   getGuitarNoteById,
   getBassNoteById,
-  getKeyboardNoteById
+  getKeyboardNoteById,
 } from '../../utils/practice/practiceNotes'
 import { useRecordPracticeSession } from '../../hooks/usePracticeSessions'
+import AssignmentComplete from '../sandbox/AssignmentComplete'
+import WelcomeSubtitle from '../sandbox/WelcomeSubtitle'
 import type { AppliedScale, AppliedChord } from '../common/ScaleChordOptions'
 import styles from '../../styles/Practice.module.css'
 
-// Moved to component to access translations
-
-// Assignment Complete Animation Component
-interface AssignmentCompleteProps {
-  onComplete?: () => void
+// Type for serialized scale data from JSON
+interface SerializedScaleData {
+  root: string
+  scaleName: string
+  octave?: number
+  displayName?: string
 }
 
-const AssignmentComplete: React.FC<AssignmentCompleteProps> = ({ onComplete }) => {
-  const { t } = useTranslation()
-  const [isVisible, setIsVisible] = useState(true)
-
-  useEffect(() => {
-    // Auto-hide after animation completes
-    const timer = setTimeout(() => {
-      setIsVisible(false)
-      if (onComplete) {
-        onComplete()
-      }
-    }, 3000)
-
-    return () => clearTimeout(timer)
-  }, [onComplete])
-
-  if (!isVisible) return null
-
-  return (
-    <div className={styles.assignmentCompleteOverlay}>
-      <div className={styles.assignmentCompleteContent}>
-        <div className={styles.assignmentCompleteIcon}>✓</div>
-        <h2 className={styles.assignmentCompleteTitle}>{t('classroom.assignment.assignmentComplete')}</h2>
-      </div>
-    </div>
-  )
+// Type for serialized chord data from JSON
+interface SerializedChordData {
+  root: string
+  chordName: string
+  octave?: number
+  fretZone?: number
+  displayName?: string
 }
 
-// Welcome Subtitle Component with Text-to-Speech
-interface WelcomeSubtitleProps {
-  message: string
-  onSpeechEnd?: () => void
-}
-
-const WelcomeSubtitle: React.FC<WelcomeSubtitleProps> = ({ message, onSpeechEnd }) => {
-  const [isVisible, setIsVisible] = useState(true)
-  const hasSpoken = useRef(false)
-  const speechFinished = useRef(false)
-
-  useEffect(() => {
-    // Text-to-speech functionality - only speak once
-    if ('speechSynthesis' in window && !hasSpoken.current) {
-      hasSpoken.current = true
-
-      const utterance = new SpeechSynthesisUtterance(message)
-      utterance.rate = 0.9 // Slightly slower for clarity
-      utterance.pitch = 1
-      utterance.volume = 1
-
-      // Call onSpeechEnd when speech finishes
-      utterance.onend = () => {
-        speechFinished.current = true
-        if (onSpeechEnd) {
-          onSpeechEnd()
-        }
-      }
-
-      window.speechSynthesis.speak(utterance)
-    } else if (!('speechSynthesis' in window) && onSpeechEnd) {
-      // If no TTS, call onSpeechEnd immediately
-      onSpeechEnd()
-    }
-
-    // Hide subtitle after 5 seconds
-    const timer = setTimeout(() => {
-      setIsVisible(false)
-    }, 5000)
-
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [message, onSpeechEnd])
-
-  if (!isVisible) return null
-
-  return (
-    <div className={styles.welcomeSubtitle}>
-      {message}
-    </div>
-  )
+// Type for scale/chord box with shared shape
+interface ScaleChordBoxData {
+  root: string
+  chordObj?: unknown
+  boxIndex?: number
 }
 
 function Sandbox() {
   const { t } = useTranslation()
   const authContext = useContext(AuthContext)
   const user = authContext?.user ?? null
-  const { navigateToClassroom, navigateToDashboard } = useInstrument()
+  const { navigateToClassroom } = useInstrument()
 
   // Tutorial overlay state
   const {
@@ -137,7 +100,7 @@ function Sandbox() {
     skipTutorial,
     completeTutorial,
     shouldShowTutorial,
-    startTutorial
+    startTutorial,
   } = useTutorial()
 
   // Handle tutorial completion
@@ -149,11 +112,14 @@ function Sandbox() {
   const recordPracticeSession = useRecordPracticeSession()
 
   // Translated instrument names
-  const instrumentNames: Record<string, string> = useMemo(() => ({
-    keyboard: t('instruments.keyboard'),
-    guitar: t('instruments.guitar'),
-    bass: t('instruments.bass')
-  }), [t])
+  const instrumentNames: Record<string, string> = useMemo(
+    () => ({
+      keyboard: t('instruments.keyboard'),
+      guitar: t('instruments.guitar'),
+      bass: t('instruments.bass'),
+    }),
+    [t]
+  )
 
   const {
     handleNoteClick,
@@ -180,6 +146,7 @@ function Sandbox() {
     triggerInputFlash,
     setInputActive,
     clearChordsAndScalesTrigger,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     triggerClearChordsAndScales,
     handleGenerateMelody,
     handlePlayMelody,
@@ -199,9 +166,10 @@ function Sandbox() {
     currentlyPlayingNoteIndex,
     handleCurrentlyPlayingNoteChange,
     scaleChordManagement,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     melodyBpm,
     lowerOctaves,
-    higherOctaves
+    higherOctaves,
   } = useInstrument()
 
   // Generate demo melody when tutorial reaches the play step
@@ -222,7 +190,13 @@ function Sandbox() {
     if (!isTutorialActive) {
       tutorialDemoGenerated.current = false
     }
-  }, [isTutorialActive, tutorialStepData, generatedMelody.length, selectedNotes.length, handleGenerateMelody])
+  }, [
+    isTutorialActive,
+    tutorialStepData,
+    generatedMelody.length,
+    selectedNotes.length,
+    handleGenerateMelody,
+  ])
 
   // Auto-play melody when tutorial reaches 'sandbox-play' step
   const tutorialAutoPlayed = useRef(false)
@@ -246,14 +220,26 @@ function Sandbox() {
     if (!isTutorialActive) {
       tutorialAutoPlayed.current = false
     }
-  }, [isTutorialActive, tutorialStepData, generatedMelody.length, recordedAudioBlob, isPlaying, handlePlayMelody])
+  }, [
+    isTutorialActive,
+    tutorialStepData,
+    generatedMelody.length,
+    recordedAudioBlob,
+    isPlaying,
+    handlePlayMelody,
+  ])
 
   // Track if melody finished playing during tutorial
   const [melodyFinishedInTutorial, setMelodyFinishedInTutorial] = useState(false)
   const wasPlayingRef = useRef(false)
   useEffect(() => {
     // Detect when melody stops playing (was playing, now not playing)
-    if (wasPlayingRef.current && !isPlaying && isTutorialActive && tutorialStepData?.id === 'sandbox-play') {
+    if (
+      wasPlayingRef.current &&
+      !isPlaying &&
+      isTutorialActive &&
+      tutorialStepData?.id === 'sandbox-play'
+    ) {
       setMelodyFinishedInTutorial(true)
     }
     wasPlayingRef.current = isPlaying
@@ -281,7 +267,13 @@ function Sandbox() {
       default:
         return false
     }
-  }, [isTutorialActive, tutorialStepData, selectedNotes.length, generatedMelody.length, melodyFinishedInTutorial])
+  }, [
+    isTutorialActive,
+    tutorialStepData,
+    selectedNotes.length,
+    generatedMelody.length,
+    melodyFinishedInTutorial,
+  ])
 
   // Auto-advance for Generate and Play steps
   const lastAutoAdvancedStep = useRef<string | null>(null)
@@ -299,7 +291,13 @@ function Sandbox() {
       }, 800)
       return () => clearTimeout(timeoutId)
     }
-  }, [isTutorialActive, tutorialStepData, generatedMelody.length, melodyFinishedInTutorial, tutorialNextStep])
+  }, [
+    isTutorialActive,
+    tutorialStepData,
+    generatedMelody.length,
+    melodyFinishedInTutorial,
+    tutorialNextStep,
+  ])
 
   // Assignment creation state
   const [assigningToClassroomId, setAssigningToClassroomId] = useState<string | null>(null)
@@ -307,7 +305,6 @@ function Sandbox() {
   const [assignmentTitle, setAssignmentTitle] = useState('')
   const [isSavingAssignment, setIsSavingAssignment] = useState(false)
   const [assignmentError, setAssignmentError] = useState<string | null>(null)
-
 
   // Loading state - check on initial render if we have assignment to load
   const [isLoadingFromAssignment, setIsLoadingFromAssignment] = useState(() => {
@@ -318,16 +315,21 @@ function Sandbox() {
   const [forceInitFromAssignment, setForceInitFromAssignment] = useState(false)
 
   // Pending selection data for guitar/bass (applied when handlers become ready)
-  const [pendingSelectionData, setPendingSelectionData] = useState<any>(null)
+  const [pendingSelectionData, setPendingSelectionData] = useState<{
+    instrument: string
+    selectionData: Record<string, unknown>
+  } | null>(null)
 
   // Practice session state
   const [sessionStarted, setSessionStarted] = useState(false)
   const [selectedInstrument, setSelectedInstrument] = useState<string | null>(null)
   const [practiceOptions, setPracticeOptions] = useState<string[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [difficulty, setDifficulty] = useState<number>(2)
   const [lessonSettings, setLessonSettings] = useState<LessonSettings | null>(null)
 
   // Lesson State
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
   const [welcomeSpeechDone, setWelcomeSpeechDone] = useState(false)
   const [hasGeneratedMelody, setHasGeneratedMelody] = useState(false)
@@ -336,7 +338,10 @@ function Sandbox() {
   const hasAppliedVisualDisplay = useRef(false)
   const [melodySetupMessage, setMelodySetupMessage] = useState<string>('')
   const [congratulationsMessage, setCongratulationsMessage] = useState<string>('')
-  const [setupDetails, setSetupDetails] = useState<{ type: string; details: any } | null>(null)
+  const [setupDetails, setSetupDetails] = useState<{
+    type: string
+    details: Record<string, unknown>
+  } | null>(null)
   const [autoPlayAudio, setAutoPlayAudio] = useState(false)
   const [showAssignmentComplete, setShowAssignmentComplete] = useState(false)
   const [isFromAssignment, setIsFromAssignment] = useState(false)
@@ -387,7 +392,7 @@ function Sandbox() {
           octaveHigh: settings.octaveHigh,
           fretLow: settings.fretLow,
           fretHigh: settings.fretHigh,
-          selectionData: settings.selectionData
+          selectionData: settings.selectionData,
         }
         setLessonSettings(newLessonSettings)
 
@@ -401,6 +406,7 @@ function Sandbox() {
         setSessionStarted(true)
         setIsLoadingFromAssignment(false)
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         // Error parsing assignment settings
         localStorage.removeItem('assignmentSettings')
@@ -424,7 +430,13 @@ function Sandbox() {
   // Feedback system is now self-contained in CustomAudioPlayer
 
   // Practice options modal handlers
-  const handleOptionsStart = (instrumentId: string, selectedOptions: string[], selectedDifficulty: number, settings: LessonSettings) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleOptionsStart = (
+    instrumentId: string,
+    selectedOptions: string[],
+    selectedDifficulty: number,
+    settings: LessonSettings
+  ) => {
     setSelectedInstrument(instrumentId)
     // Use setInstrument directly instead of handleInstrumentChange to avoid
     // triggering clearChordsAndScales which would clear scales added by initialization
@@ -515,15 +527,15 @@ function Sandbox() {
         root: s.root,
         scaleName: s.scale?.name || 'Major',
         octave: s.octave,
-        displayName: s.displayName
+        displayName: s.displayName,
       })),
       appliedChords: scaleChordManagement.appliedChords.map(c => ({
         root: c.root,
         chordName: c.chord?.name || 'Major',
         octave: c.octave,
         fretZone: c.fretZone,
-        displayName: c.displayName
-      }))
+        displayName: c.displayName,
+      })),
     }
 
     // Calculate octave range from current state
@@ -537,25 +549,23 @@ function Sandbox() {
       setIsSavingAssignment(true)
       setAssignmentError(null)
 
-      const { error: insertError } = await supabase
-        .from('assignments')
-        .insert({
-          classroom_id: assigningToClassroomId,
-          title: assignmentTitle.trim(),
-          lesson_type: lessonType,
-          instrument: instrument,
-          bpm: bpm,
-          beats: numberOfBeats,
-          chord_count: hasChords ? scaleChordManagement.appliedChords.length : 4,
-          scales: appliedScaleNames.length > 0 ? appliedScaleNames : ['Major', 'Minor'],
-          chords: appliedChordNames.length > 0 ? appliedChordNames : ['Major', 'Minor'],
-          octave_low: octaveLow,
-          octave_high: octaveHigh,
-          fret_low: 0,
-          fret_high: 12,
-          selection_data: (hasNotes || hasScales || hasChords) ? selectionData : null,
-          created_by: user.id
-        })
+      const { error: insertError } = await supabase.from('assignments').insert({
+        classroom_id: assigningToClassroomId,
+        title: assignmentTitle.trim(),
+        lesson_type: lessonType,
+        instrument: instrument,
+        bpm: bpm,
+        beats: numberOfBeats,
+        chord_count: hasChords ? scaleChordManagement.appliedChords.length : 4,
+        scales: appliedScaleNames.length > 0 ? appliedScaleNames : ['Major', 'Minor'],
+        chords: appliedChordNames.length > 0 ? appliedChordNames : ['Major', 'Minor'],
+        octave_low: octaveLow,
+        octave_high: octaveHigh,
+        fret_low: 0,
+        fret_high: 12,
+        selection_data: hasNotes || hasScales || hasChords ? selectionData : null,
+        created_by: user.id,
+      })
 
       if (insertError) {
         setAssignmentError(insertError.message)
@@ -601,15 +611,15 @@ function Sandbox() {
         root: s.root,
         scaleName: s.scale?.name || 'Major',
         octave: s.octave,
-        displayName: s.displayName
+        displayName: s.displayName,
       })),
       appliedChords: scaleChordManagement.appliedChords.map(c => ({
         root: c.root,
         chordName: c.chord?.name || 'Major',
         octave: c.octave,
         fretZone: c.fretZone,
-        displayName: c.displayName
-      }))
+        displayName: c.displayName,
+      })),
     }
 
     // Calculate octave range
@@ -628,7 +638,7 @@ function Sandbox() {
       chords: appliedChordNames.length > 0 ? appliedChordNames : ['Major', 'Minor'],
       octaveLow,
       octaveHigh,
-      selectionData: (hasNotes || hasScales || hasChords) ? selectionData : null
+      selectionData: hasNotes || hasScales || hasChords ? selectionData : null,
     }
 
     localStorage.setItem('exportToClassroomData', JSON.stringify(exportData))
@@ -649,7 +659,7 @@ function Sandbox() {
         recordPracticeSession.mutate({
           type: 'sandbox',
           instrument: instrument,
-          melodiesCompleted: 1
+          melodiesCompleted: 1,
         })
       }
     }
@@ -671,7 +681,7 @@ function Sandbox() {
         recordPracticeSession.mutate({
           type: 'sandbox',
           instrument: instrument,
-          melodiesCompleted: 1
+          melodiesCompleted: 1,
         })
       }
       handleBackToSelection()
@@ -679,13 +689,19 @@ function Sandbox() {
   }, [isFromAssignment, handleBackToSelection, user?.id, instrument, recordPracticeSession])
 
   // Helper function to filter scales based on user selection
-  const getFilteredScales = (scales: typeof KEYBOARD_SCALES, selectedScales: string[] | undefined) => {
+  const getFilteredScales = (
+    scales: typeof KEYBOARD_SCALES,
+    selectedScales: string[] | undefined
+  ) => {
     if (!selectedScales || selectedScales.length === 0) return scales
     return scales.filter(s => selectedScales.includes(s.name))
   }
 
   // Helper function to filter chords based on user selection
-  const getFilteredChords = (chords: typeof KEYBOARD_CHORDS, selectedChords: string[] | undefined) => {
+  const getFilteredChords = (
+    chords: typeof KEYBOARD_CHORDS,
+    selectedChords: string[] | undefined
+  ) => {
     if (!selectedChords || selectedChords.length === 0) return chords
     return chords.filter(c => selectedChords.includes(c.name))
   }
@@ -697,9 +713,10 @@ function Sandbox() {
       return
     }
 
-    const hasNoContent = selectedNotes.length === 0 &&
-                         scaleChordManagement.appliedScales.length === 0 &&
-                         scaleChordManagement.appliedChords.length === 0
+    const hasNoContent =
+      selectedNotes.length === 0 &&
+      scaleChordManagement.appliedScales.length === 0 &&
+      scaleChordManagement.appliedChords.length === 0
 
     // For assignment-loaded sessions, force initialization regardless of current content
     const shouldInitialize = hasNoContent || forceInitFromAssignment
@@ -743,7 +760,11 @@ function Sandbox() {
             selectionData.appliedScales.forEach(scaleData => {
               const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
               if (scaleObj) {
-                scaleChordManagement.handleKeyboardScaleApply(scaleData.root, scaleObj, scaleData.octave || 4)
+                scaleChordManagement.handleKeyboardScaleApply(
+                  scaleData.root,
+                  scaleObj,
+                  scaleData.octave || 4
+                )
               }
             })
           } else if (selectedInstrument === 'guitar') {
@@ -757,7 +778,10 @@ function Sandbox() {
             selectionData.appliedScales.forEach(scaleData => {
               const scaleObj = BASS_SCALES.find(s => s.name === scaleData.scaleName)
               if (scaleObj) {
-                scaleChordManagement.handleScaleSelect(scaleData.root, scaleObj as any)
+                scaleChordManagement.handleScaleSelect(
+                  scaleData.root,
+                  scaleObj as unknown as GuitarScale
+                )
               }
             })
           }
@@ -770,21 +794,33 @@ function Sandbox() {
             selectionData.appliedChords.forEach(chordData => {
               const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
               if (chordObj) {
-                scaleChordManagement.handleKeyboardChordApply(chordData.root, chordObj, chordData.octave || 4)
+                scaleChordManagement.handleKeyboardChordApply(
+                  chordData.root,
+                  chordObj,
+                  chordData.octave || 4
+                )
               }
             })
           } else if (selectedInstrument === 'guitar') {
             selectionData.appliedChords.forEach(chordData => {
               const chordObj = GUITAR_CHORDS.find(c => c.name === chordData.chordName)
               if (chordObj) {
-                scaleChordManagement.handleGuitarChordApply(chordData.root, chordObj, chordData.fretZone || 0)
+                scaleChordManagement.handleGuitarChordApply(
+                  chordData.root,
+                  chordObj,
+                  chordData.fretZone || 0
+                )
               }
             })
           } else if (selectedInstrument === 'bass') {
             selectionData.appliedChords.forEach(chordData => {
               const chordObj = BASS_CHORDS.find(c => c.name === chordData.chordName)
               if (chordObj) {
-                scaleChordManagement.handleBassChordApply(chordData.root, chordObj, chordData.fretZone || 0)
+                scaleChordManagement.handleBassChordApply(
+                  chordData.root,
+                  chordObj,
+                  chordData.fretZone || 0
+                )
               }
             })
           }
@@ -821,7 +857,7 @@ function Sandbox() {
                   name: noteObj.name,
                   frequency: noteObj.frequency,
                   isBlack: noteObj.name.includes('#'),
-                  position: noteObj.position
+                  position: noteObj.position,
                 }
                 selectNote(note, 'multi')
               }
@@ -836,7 +872,7 @@ function Sandbox() {
                   name: noteObj.name,
                   frequency: noteObj.frequency,
                   isBlack: noteObj.name.includes('#'),
-                  position: noteObj.position
+                  position: noteObj.position,
                 }
                 selectNote(note, 'multi')
               }
@@ -854,16 +890,21 @@ function Sandbox() {
         setPendingSelectionData({
           instrument: selectedInstrument,
           selectionData: selectionData,
-          lessonSettings: lessonSettings
+          lessonSettings: lessonSettings,
         })
       }
 
       // Set up details for display
-      const scaleNames = selectionData.appliedScales?.map(s => `${s.root} ${s.scaleName}`).join(', ') || ''
-      const chordNames = selectionData.appliedChords?.map(c => `${c.root} ${c.chordName}`).join(', ') || ''
+      const scaleNames =
+        selectionData.appliedScales?.map(s => `${s.root} ${s.scaleName}`).join(', ') || ''
+      const chordNames =
+        selectionData.appliedChords?.map(c => `${c.root} ${c.chordName}`).join(', ') || ''
 
       if (selectionData.appliedChords && selectionData.appliedChords.length > 0) {
-        setSetupDetails({ type: 'chords', details: { chordCount: selectionData.appliedChords.length, description: chordNames } })
+        setSetupDetails({
+          type: 'chords',
+          details: { chordCount: selectionData.appliedChords.length, description: chordNames },
+        })
       } else if (selectionData.appliedScales && selectionData.appliedScales.length > 0) {
         setSetupDetails({ type: 'melodies', details: { description: scaleNames } })
       }
@@ -892,7 +933,10 @@ function Sandbox() {
       handleOctaveRangeChange(lowerOctavesForRange, higherOctavesForRange)
 
       // Pick a random octave within the selected range for the lesson
-      const octaveRange = Array.from({ length: octaveHigh - octaveLow + 1 }, (_, i) => octaveLow + i)
+      const octaveRange = Array.from(
+        { length: octaveHigh - octaveLow + 1 },
+        (_, i) => octaveLow + i
+      )
 
       // SCALES: Scale spanning all octaves in the selected range
       if (practiceOptions.includes('melodies')) {
@@ -907,7 +951,14 @@ function Sandbox() {
           })
         }, 50)
 
-        setSetupDetails({ type: 'melodies', details: { scaleName: randomScale.name, root: randomRoot, octaveRange: `${octaveLow}-${octaveHigh}` } })
+        setSetupDetails({
+          type: 'melodies',
+          details: {
+            scaleName: randomScale.name,
+            root: randomRoot,
+            octaveRange: `${octaveLow}-${octaveHigh}`,
+          },
+        })
       }
 
       // CHORDS: chords with progression mode
@@ -942,7 +993,8 @@ function Sandbox() {
         // Build chord details first
         for (let i = 0; i < selectedChordCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
-          const randomRoot = KEYBOARD_CHORD_ROOT_NOTES[Math.floor(Math.random() * KEYBOARD_CHORD_ROOT_NOTES.length)]
+          const randomRoot =
+            KEYBOARD_CHORD_ROOT_NOTES[Math.floor(Math.random() * KEYBOARD_CHORD_ROOT_NOTES.length)]
           const chordOctave = octavesToUse[i]
           chordDetails.push({ root: randomRoot, chord: randomChord.name, octave: chordOctave })
         }
@@ -957,9 +1009,15 @@ function Sandbox() {
           })
         }, 50)
 
-        setSetupDetails({ type: 'chords', details: { chordCount: selectedChordCount, chords: chordDetails, octaveRange: `${octaveLow}-${octaveHigh}` } })
+        setSetupDetails({
+          type: 'chords',
+          details: {
+            chordCount: selectedChordCount,
+            chords: chordDetails,
+            octaveRange: `${octaveLow}-${octaveHigh}`,
+          },
+        })
       }
-
     }
 
     // GUITAR LESSONS
@@ -978,8 +1036,8 @@ function Sandbox() {
         const fretHigh = lessonSettings.fretHigh ?? 12
 
         const allPositions = getScalePositions(randomRoot, randomScale, guitarNotes)
-        const filteredPositions = allPositions.filter(pos =>
-          pos.fret >= fretLow && pos.fret <= fretHigh
+        const filteredPositions = allPositions.filter(
+          pos => pos.fret >= fretLow && pos.fret <= fretHigh
         )
 
         if (filteredPositions.length > 0) {
@@ -991,15 +1049,15 @@ function Sandbox() {
               name: pos.note,
               frequency: guitarNote?.frequency || 0,
               isBlack: pos.note.includes('#'),
-              position: guitarNote?.position || 0
+              position: guitarNote?.position || 0,
             }
           })
 
           setGuitarNotes(scaleNotes)
 
           const allScaleBoxes = getScaleBoxes(randomRoot, randomScale, guitarNotes)
-          const scaleBoxes = allScaleBoxes.filter(box =>
-            box.minFret >= fretLow && box.maxFret <= fretHigh
+          const scaleBoxes = allScaleBoxes.filter(
+            box => box.minFret >= fretLow && box.maxFret <= fretHigh
           )
 
           setSetupDetails({
@@ -1010,8 +1068,8 @@ function Sandbox() {
               position: `frets ${fretLow} to ${fretHigh}`,
               fretRange: `${fretLow}-${fretHigh}`,
               noteIds: scaleNotes.map(n => n.id),
-              scaleBoxes: scaleBoxes
-            }
+              scaleBoxes: scaleBoxes,
+            },
           })
         }
       }
@@ -1021,7 +1079,12 @@ function Sandbox() {
         setChordMode('progression')
 
         const filteredChords = getFilteredChords(GUITAR_CHORDS, lessonSettings.chords)
-        const chordDetails: { root: string; chord: string; chordObj: typeof GUITAR_CHORDS[0]; boxIndex: number }[] = []
+        const chordDetails: {
+          root: string
+          chord: string
+          chordObj: (typeof GUITAR_CHORDS)[0]
+          boxIndex: number
+        }[] = []
 
         const fretLow = lessonSettings.fretLow ?? 0
         const fretHigh = lessonSettings.fretHigh ?? 12
@@ -1030,46 +1093,62 @@ function Sandbox() {
 
         for (let i = 0; i < selectedChordCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
-          const randomRoot = GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
+          const randomRoot =
+            GUITAR_CHORD_ROOT_NOTES[Math.floor(Math.random() * GUITAR_CHORD_ROOT_NOTES.length)]
 
           const chordBoxes = getChordBoxes(randomRoot, randomChord, guitarNotes)
-          const validBoxes = chordBoxes.filter(box =>
-            box.minFret >= fretLow && box.maxFret <= fretHigh
+          const validBoxes = chordBoxes.filter(
+            box => box.minFret >= fretLow && box.maxFret <= fretHigh
           )
 
           if (validBoxes.length > 0) {
-            const unusedBoxes = validBoxes.filter(box =>
-              !usedBoxPositions.has(`${box.minFret}-${box.maxFret}`)
+            const unusedBoxes = validBoxes.filter(
+              box => !usedBoxPositions.has(`${box.minFret}-${box.maxFret}`)
             )
 
             const targetBoxes = unusedBoxes.length > 0 ? unusedBoxes : validBoxes
             const selectedBoxIndex = Math.floor(Math.random() * targetBoxes.length)
             const selectedBox = targetBoxes[selectedBoxIndex]
 
-            const boxIndex = chordBoxes.findIndex(box =>
-              box.minFret === selectedBox.minFret && box.maxFret === selectedBox.maxFret
+            const boxIndex = chordBoxes.findIndex(
+              box => box.minFret === selectedBox.minFret && box.maxFret === selectedBox.maxFret
             )
 
             usedBoxPositions.add(`${selectedBox.minFret}-${selectedBox.maxFret}`)
-            chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord, boxIndex })
+            chordDetails.push({
+              root: randomRoot,
+              chord: randomChord.name,
+              chordObj: randomChord,
+              boxIndex,
+            })
           }
         }
 
         // Shuffle the chord details
         for (let i = chordDetails.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [chordDetails[i], chordDetails[j]] = [chordDetails[j], chordDetails[i]]
+          const j = Math.floor(Math.random() * (i + 1))
+          ;[chordDetails[i], chordDetails[j]] = [chordDetails[j], chordDetails[i]]
         }
 
         setTimeout(() => {
           chordDetails.forEach(detail => {
-            scaleChordManagement.handleGuitarChordApply(detail.root, detail.chordObj, detail.boxIndex)
+            scaleChordManagement.handleGuitarChordApply(
+              detail.root,
+              detail.chordObj,
+              detail.boxIndex
+            )
           })
         }, 50)
 
-        setSetupDetails({ type: 'chords', details: { chordCount: selectedChordCount, chords: chordDetails, fretRange: `${fretLow}-${fretHigh}` } })
+        setSetupDetails({
+          type: 'chords',
+          details: {
+            chordCount: selectedChordCount,
+            chords: chordDetails,
+            fretRange: `${fretLow}-${fretHigh}`,
+          },
+        })
       }
-
     }
 
     // BASS LESSONS
@@ -1088,8 +1167,8 @@ function Sandbox() {
         const fretHigh = lessonSettings.fretHigh ?? 12
 
         const allPositions = getBassScalePositions(randomRoot, randomScale, bassNotes)
-        const filteredPositions = allPositions.filter(pos =>
-          pos.fret >= fretLow && pos.fret <= fretHigh
+        const filteredPositions = allPositions.filter(
+          pos => pos.fret >= fretLow && pos.fret <= fretHigh
         )
 
         if (filteredPositions.length > 0) {
@@ -1101,15 +1180,15 @@ function Sandbox() {
               name: pos.note,
               frequency: bassNote?.frequency || 0,
               isBlack: pos.note.includes('#'),
-              position: bassNote?.position || 0
+              position: bassNote?.position || 0,
             }
           })
 
           setGuitarNotes(scaleNotes)
 
           const allScaleBoxes = getBassScaleBoxes(randomRoot, randomScale, bassNotes)
-          const scaleBoxes = allScaleBoxes.filter(box =>
-            box.minFret >= fretLow && box.maxFret <= fretHigh
+          const scaleBoxes = allScaleBoxes.filter(
+            box => box.minFret >= fretLow && box.maxFret <= fretHigh
           )
 
           setSetupDetails({
@@ -1120,8 +1199,8 @@ function Sandbox() {
               position: `frets ${fretLow} to ${fretHigh}`,
               fretRange: `${fretLow}-${fretHigh}`,
               noteIds: scaleNotes.map(n => n.id),
-              scaleBoxes: scaleBoxes
-            }
+              scaleBoxes: scaleBoxes,
+            },
           })
         }
       }
@@ -1131,7 +1210,12 @@ function Sandbox() {
         setChordMode('progression')
 
         const filteredChords = getFilteredChords(BASS_CHORDS, lessonSettings.chords)
-        const chordDetails: { root: string; chord: string; chordObj: typeof BASS_CHORDS[0]; boxIndex: number }[] = []
+        const chordDetails: {
+          root: string
+          chord: string
+          chordObj: (typeof BASS_CHORDS)[0]
+          boxIndex: number
+        }[] = []
 
         const fretLow = lessonSettings.fretLow ?? 0
         const fretHigh = lessonSettings.fretHigh ?? 12
@@ -1140,35 +1224,41 @@ function Sandbox() {
 
         for (let i = 0; i < selectedChordCount; i++) {
           const randomChord = filteredChords[Math.floor(Math.random() * filteredChords.length)]
-          const randomRoot = BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
+          const randomRoot =
+            BASS_CHORD_ROOT_NOTES[Math.floor(Math.random() * BASS_CHORD_ROOT_NOTES.length)]
 
           const chordBoxes = getBassChordBoxes(randomRoot, randomChord, bassNotes)
-          const validBoxes = chordBoxes.filter(box =>
-            box.minFret >= fretLow && box.maxFret <= fretHigh
+          const validBoxes = chordBoxes.filter(
+            box => box.minFret >= fretLow && box.maxFret <= fretHigh
           )
 
           if (validBoxes.length > 0) {
-            const unusedBoxes = validBoxes.filter(box =>
-              !usedBoxPositions.has(`${box.minFret}-${box.maxFret}`)
+            const unusedBoxes = validBoxes.filter(
+              box => !usedBoxPositions.has(`${box.minFret}-${box.maxFret}`)
             )
 
             const targetBoxes = unusedBoxes.length > 0 ? unusedBoxes : validBoxes
             const selectedBoxIndex = Math.floor(Math.random() * targetBoxes.length)
             const selectedBox = targetBoxes[selectedBoxIndex]
 
-            const boxIndex = chordBoxes.findIndex(box =>
-              box.minFret === selectedBox.minFret && box.maxFret === selectedBox.maxFret
+            const boxIndex = chordBoxes.findIndex(
+              box => box.minFret === selectedBox.minFret && box.maxFret === selectedBox.maxFret
             )
 
             usedBoxPositions.add(`${selectedBox.minFret}-${selectedBox.maxFret}`)
-            chordDetails.push({ root: randomRoot, chord: randomChord.name, chordObj: randomChord, boxIndex })
+            chordDetails.push({
+              root: randomRoot,
+              chord: randomChord.name,
+              chordObj: randomChord,
+              boxIndex,
+            })
           }
         }
 
         // Shuffle the chord details
         for (let i = chordDetails.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [chordDetails[i], chordDetails[j]] = [chordDetails[j], chordDetails[i]]
+          const j = Math.floor(Math.random() * (i + 1))
+          ;[chordDetails[i], chordDetails[j]] = [chordDetails[j], chordDetails[i]]
         }
 
         setTimeout(() => {
@@ -1177,11 +1267,33 @@ function Sandbox() {
           })
         }, 50)
 
-        setSetupDetails({ type: 'chords', details: { chordCount: selectedChordCount, chords: chordDetails, fretRange: `${fretLow}-${fretHigh}` } })
+        setSetupDetails({
+          type: 'chords',
+          details: {
+            chordCount: selectedChordCount,
+            chords: chordDetails,
+            fretRange: `${fretLow}-${fretHigh}`,
+          },
+        })
       }
-
     }
-  }, [sessionStarted, practiceOptions, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, setGuitarNotes, setBpm, setNumberOfBeats, selectedInstrument, setChordMode, handleOctaveRangeChange, scaleChordManagement, lessonSettings, forceInitFromAssignment, selectNote])
+  }, [
+    sessionStarted,
+    practiceOptions,
+    selectedNotes.length,
+    scaleChordManagement.appliedScales.length,
+    scaleChordManagement.appliedChords.length,
+    setGuitarNotes,
+    setBpm,
+    setNumberOfBeats,
+    selectedInstrument,
+    setChordMode,
+    handleOctaveRangeChange,
+    scaleChordManagement,
+    lessonSettings,
+    forceInitFromAssignment,
+    selectNote,
+  ])
 
   // Set visual display on fretboard once handlers become available
   useEffect(() => {
@@ -1194,9 +1306,11 @@ function Sandbox() {
     const timeoutId = setTimeout(() => {
       // Scales - apply each scale box individually for proper display
       if (type === 'melodies' && details.scaleBoxes) {
-        if ((instrument === 'guitar' && scaleChordManagement.scaleHandlers) ||
-            (instrument === 'bass' && scaleChordManagement.bassScaleHandlers)) {
-          details.scaleBoxes.forEach((box: any) => {
+        if (
+          (instrument === 'guitar' && scaleChordManagement.scaleHandlers) ||
+          (instrument === 'bass' && scaleChordManagement.bassScaleHandlers)
+        ) {
+          ;(details.scaleBoxes as unknown[]).forEach((box: unknown) => {
             scaleChordManagement.handleScaleBoxSelect(box)
           })
           hasAppliedVisualDisplay.current = true
@@ -1206,14 +1320,14 @@ function Sandbox() {
       // Chord progressions - use standard chord apply functions with fretZone
       if (type === 'chords' && details.chords) {
         if (instrument === 'guitar' && scaleChordManagement.chordHandlers) {
-          details.chords.forEach((c: any) => {
+          ;(details.chords as ScaleChordBoxData[]).forEach((c: ScaleChordBoxData) => {
             if (c.chordObj) {
               scaleChordManagement.handleGuitarChordApply(c.root, c.chordObj, c.boxIndex ?? 0)
             }
           })
           hasAppliedVisualDisplay.current = true
         } else if (instrument === 'bass' && scaleChordManagement.bassChordHandlers) {
-          details.chords.forEach((c: any) => {
+          ;(details.chords as ScaleChordBoxData[]).forEach((c: ScaleChordBoxData) => {
             if (c.chordObj) {
               scaleChordManagement.handleBassChordApply(c.root, c.chordObj, c.boxIndex ?? 0)
             }
@@ -1224,7 +1338,19 @@ function Sandbox() {
     }, 100)
 
     return () => clearTimeout(timeoutId)
-  }, [setupDetails, instrument, scaleChordManagement.noteHandlers, scaleChordManagement.bassNoteHandlers, scaleChordManagement.scaleHandlers, scaleChordManagement.bassScaleHandlers, scaleChordManagement.chordHandlers, scaleChordManagement.bassChordHandlers, scaleChordManagement.handleScaleBoxSelect, scaleChordManagement.handleGuitarChordApply, scaleChordManagement.handleBassChordApply])
+  }, [
+    setupDetails,
+    instrument,
+    scaleChordManagement.noteHandlers,
+    scaleChordManagement.bassNoteHandlers,
+    scaleChordManagement.scaleHandlers,
+    scaleChordManagement.bassScaleHandlers,
+    scaleChordManagement.chordHandlers,
+    scaleChordManagement.bassChordHandlers,
+    scaleChordManagement.handleScaleBoxSelect,
+    scaleChordManagement.handleGuitarChordApply,
+    scaleChordManagement.handleBassChordApply,
+  ])
 
   // Apply pending selection data for guitar/bass using direct setters
   // This bypasses handlers and sets appliedScales/appliedChords directly
@@ -1236,213 +1362,227 @@ function Sandbox() {
 
     // Delay to ensure Guitar/Bass components have mounted and their sync effects are ready
     const applyTimeoutId = setTimeout(() => {
-    // Apply scales using direct setter
-    if (selectionData.appliedScales && selectionData.appliedScales.length > 0) {
-      const scalesToApply: AppliedScale[] = []
+      // Apply scales using direct setter
+      if (selectionData.appliedScales && selectionData.appliedScales.length > 0) {
+        const scalesToApply: AppliedScale[] = []
 
-      if (pendingInstrument === 'guitar') {
-        selectionData.appliedScales.forEach((scaleData: any) => {
-          // Handle scale box names like "Major (Frets 0-4)" by extracting base scale name and fret range
-          const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
-          const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-          const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-          const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-          const scaleObj = GUITAR_SCALES.find(s => s.name === baseScaleName || s.name === scaleData.scaleName)
-          if (scaleObj) {
-            // Get scale positions and filter to the specific fret range
-            const allPositions = getScalePositions(scaleData.root, scaleObj, guitarNotes)
-            const positions = allPositions.filter(pos => pos.fret >= fretLow && pos.fret <= fretHigh)
-            const scaleNotes = positions.map(pos => {
-              const noteId = `g-s${pos.string}-f${pos.fret}`
-              const guitarNote = getGuitarNoteById(noteId)
-              // Visual coordinates for the Guitar component
-              const stringIndex = 6 - pos.string
-              const fretIndex = pos.fret
-              return {
-                id: noteId,
-                name: pos.note,
-                frequency: guitarNote?.frequency || 0,
-                isBlack: pos.note.includes('#'),
-                position: guitarNote?.position || 0,
-                __guitarCoord: { stringIndex, fretIndex }
-              }
-            })
-
-            scalesToApply.push({
-              id: `guitar-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-              root: scaleData.root,
-              scale: scaleObj,
-              displayName: `${scaleData.root} ${scaleObj.name}`,
-              notes: scaleNotes
-            })
-          }
-        })
-      } else if (pendingInstrument === 'bass') {
-        selectionData.appliedScales.forEach((scaleData: any) => {
-          // Handle scale box names like "Major (Frets 0-4)" by extracting base scale name and fret range
-          const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
-          const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-          const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-          const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-          const scaleObj = BASS_SCALES.find(s => s.name === baseScaleName || s.name === scaleData.scaleName)
-          if (scaleObj) {
-            const allPositions = getBassScalePositions(scaleData.root, scaleObj, bassNotes)
-            const positions = allPositions.filter(pos => pos.fret >= fretLow && pos.fret <= fretHigh)
-            const scaleNotes = positions.map(pos => {
-              const noteId = `b-s${pos.string}-f${pos.fret}`
-              const bassNote = getBassNoteById(noteId)
-              // Visual coordinates for the Bass component
-              const stringIndex = 4 - pos.string
-              const fretIndex = pos.fret
-              return {
-                id: noteId,
-                name: pos.note,
-                frequency: bassNote?.frequency || 0,
-                isBlack: pos.note.includes('#'),
-                position: bassNote?.position || 0,
-                __bassCoord: { stringIndex, fretIndex }
-              }
-            })
-
-            scalesToApply.push({
-              id: `bass-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-              root: scaleData.root,
-              scale: scaleObj as any,
-              displayName: `${scaleData.root} ${scaleObj.name}`,
-              notes: scaleNotes
-            })
-          }
-        })
-      }
-
-      if (scalesToApply.length > 0) {
-        scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-      }
-    }
-
-    // Apply chords using direct setter
-    if (selectionData.appliedChords && selectionData.appliedChords.length > 0) {
-      setChordMode('progression')
-
-      const chordsToApply: AppliedChord[] = []
-
-      if (pendingInstrument === 'guitar') {
-        selectionData.appliedChords.forEach((chordData: any) => {
-          // Handle chord shape names like "C Major (Frets 0-4)" by extracting base chord type
-          // First remove fret range, then remove root note prefix
-          let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-          // Remove root note prefix (e.g., "C Major" -> "Major", "C# Minor" -> "Minor")
-          baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
-          const chordObj = GUITAR_CHORDS.find(c => c.name === baseChordName || c.name === chordData.chordName)
-          if (chordObj) {
-            const chordBoxes = getChordBoxes(chordData.root, chordObj, guitarNotes)
-            if (chordBoxes.length > 0) {
-              const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
-              const chordBox = chordBoxes[boxIndex]
-
-              // Build note keys for the chord
-              const noteKeys = chordBox.positions.map(pos => {
+        if (pendingInstrument === 'guitar') {
+          selectionData.appliedScales.forEach((scaleData: SerializedScaleData) => {
+            // Handle scale box names like "Major (Frets 0-4)" by extracting base scale name and fret range
+            const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
+            const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
+            const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
+            const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
+            const scaleObj = GUITAR_SCALES.find(
+              s => s.name === baseScaleName || s.name === scaleData.scaleName
+            )
+            if (scaleObj) {
+              // Get scale positions and filter to the specific fret range
+              const allPositions = getScalePositions(scaleData.root, scaleObj, guitarNotes)
+              const positions = allPositions.filter(
+                pos => pos.fret >= fretLow && pos.fret <= fretHigh
+              )
+              const scaleNotes = positions.map(pos => {
+                const noteId = `g-s${pos.string}-f${pos.fret}`
+                const guitarNote = getGuitarNoteById(noteId)
+                // Visual coordinates for the Guitar component
                 const stringIndex = 6 - pos.string
                 const fretIndex = pos.fret
-                return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                return {
+                  id: noteId,
+                  name: pos.note,
+                  frequency: guitarNote?.frequency || 0,
+                  isBlack: pos.note.includes('#'),
+                  position: guitarNote?.position || 0,
+                  __guitarCoord: { stringIndex, fretIndex },
+                }
               })
 
-              chordsToApply.push({
-                id: `guitar-${chordData.root}-${chordObj.name}-${Date.now()}`,
-                root: chordData.root,
-                chord: chordObj as any,
-                displayName: `${chordData.root} ${chordObj.name}`,
-                noteKeys: noteKeys,
-                fretZone: boxIndex
+              scalesToApply.push({
+                id: `guitar-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
+                root: scaleData.root,
+                scale: scaleObj,
+                displayName: `${scaleData.root} ${scaleObj.name}`,
+                notes: scaleNotes,
               })
             }
-          }
-        })
-      } else if (pendingInstrument === 'bass') {
-        selectionData.appliedChords.forEach((chordData: any) => {
-          // Handle chord shape names like "C Major (Frets 0-4)" by extracting base chord type
-          let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-          baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
-          const chordObj = BASS_CHORDS.find(c => c.name === baseChordName || c.name === chordData.chordName)
-          if (chordObj) {
-            const chordBoxes = getBassChordBoxes(chordData.root, chordObj, bassNotes)
-            if (chordBoxes.length > 0) {
-              const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
-              const chordBox = chordBoxes[boxIndex]
-
-              // Build note keys for the chord
-              const noteKeys = chordBox.positions.map(pos => {
+          })
+        } else if (pendingInstrument === 'bass') {
+          selectionData.appliedScales.forEach((scaleData: SerializedScaleData) => {
+            // Handle scale box names like "Major (Frets 0-4)" by extracting base scale name and fret range
+            const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
+            const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
+            const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
+            const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
+            const scaleObj = BASS_SCALES.find(
+              s => s.name === baseScaleName || s.name === scaleData.scaleName
+            )
+            if (scaleObj) {
+              const allPositions = getBassScalePositions(scaleData.root, scaleObj, bassNotes)
+              const positions = allPositions.filter(
+                pos => pos.fret >= fretLow && pos.fret <= fretHigh
+              )
+              const scaleNotes = positions.map(pos => {
+                const noteId = `b-s${pos.string}-f${pos.fret}`
+                const bassNote = getBassNoteById(noteId)
+                // Visual coordinates for the Bass component
                 const stringIndex = 4 - pos.string
                 const fretIndex = pos.fret
-                return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                return {
+                  id: noteId,
+                  name: pos.note,
+                  frequency: bassNote?.frequency || 0,
+                  isBlack: pos.note.includes('#'),
+                  position: bassNote?.position || 0,
+                  __bassCoord: { stringIndex, fretIndex },
+                }
               })
 
-              chordsToApply.push({
-                id: `bass-${chordData.root}-${chordObj.name}-${Date.now()}`,
-                root: chordData.root,
-                chord: chordObj as any,
-                displayName: `${chordData.root} ${chordObj.name}`,
-                noteKeys: noteKeys,
-                fretZone: boxIndex
+              scalesToApply.push({
+                id: `bass-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
+                root: scaleData.root,
+                scale: scaleObj as GuitarScale | BassScale,
+                displayName: `${scaleData.root} ${scaleObj.name}`,
+                notes: scaleNotes,
               })
             }
+          })
+        }
+
+        if (scalesToApply.length > 0) {
+          scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
+        }
+      }
+
+      // Apply chords using direct setter
+      if (selectionData.appliedChords && selectionData.appliedChords.length > 0) {
+        setChordMode('progression')
+
+        const chordsToApply: AppliedChord[] = []
+
+        if (pendingInstrument === 'guitar') {
+          selectionData.appliedChords.forEach((chordData: SerializedChordData) => {
+            // Handle chord shape names like "C Major (Frets 0-4)" by extracting base chord type
+            // First remove fret range, then remove root note prefix
+            let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
+            // Remove root note prefix (e.g., "C Major" -> "Major", "C# Minor" -> "Minor")
+            baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
+            const chordObj = GUITAR_CHORDS.find(
+              c => c.name === baseChordName || c.name === chordData.chordName
+            )
+            if (chordObj) {
+              const chordBoxes = getChordBoxes(chordData.root, chordObj, guitarNotes)
+              if (chordBoxes.length > 0) {
+                const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
+                const chordBox = chordBoxes[boxIndex]
+
+                // Build note keys for the chord
+                const noteKeys = chordBox.positions.map(pos => {
+                  const stringIndex = 6 - pos.string
+                  const fretIndex = pos.fret
+                  return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                })
+
+                chordsToApply.push({
+                  id: `guitar-${chordData.root}-${chordObj.name}-${Date.now()}`,
+                  root: chordData.root,
+                  chord: chordObj as GuitarChord | BassChord,
+                  displayName: `${chordData.root} ${chordObj.name}`,
+                  noteKeys: noteKeys,
+                  fretZone: boxIndex,
+                })
+              }
+            }
+          })
+        } else if (pendingInstrument === 'bass') {
+          selectionData.appliedChords.forEach((chordData: SerializedChordData) => {
+            // Handle chord shape names like "C Major (Frets 0-4)" by extracting base chord type
+            let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
+            baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
+            const chordObj = BASS_CHORDS.find(
+              c => c.name === baseChordName || c.name === chordData.chordName
+            )
+            if (chordObj) {
+              const chordBoxes = getBassChordBoxes(chordData.root, chordObj, bassNotes)
+              if (chordBoxes.length > 0) {
+                const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
+                const chordBox = chordBoxes[boxIndex]
+
+                // Build note keys for the chord
+                const noteKeys = chordBox.positions.map(pos => {
+                  const stringIndex = 4 - pos.string
+                  const fretIndex = pos.fret
+                  return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
+                })
+
+                chordsToApply.push({
+                  id: `bass-${chordData.root}-${chordObj.name}-${Date.now()}`,
+                  root: chordData.root,
+                  chord: chordObj as GuitarChord | BassChord,
+                  displayName: `${chordData.root} ${chordObj.name}`,
+                  noteKeys: noteKeys,
+                  fretZone: boxIndex,
+                })
+              }
+            }
+          })
+        }
+
+        if (chordsToApply.length > 0) {
+          scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
+        }
+      }
+
+      // Apply individual notes - filter out nulls from old assignments
+      const validNoteIds = (selectionData.selectedNoteIds || []).filter(
+        (id: string | null) => id !== null && id !== undefined
+      )
+      if (validNoteIds.length > 0) {
+        if (pendingInstrument === 'guitar') {
+          // Use note handler if available to set manual notes directly on guitar
+          if (scaleChordManagement.noteHandlers?.handleSetManualNotes) {
+            scaleChordManagement.noteHandlers.handleSetManualNotes(validNoteIds)
+          } else {
+            // Fallback to context selectNote
+            validNoteIds.forEach((noteId: string) => {
+              const noteObj = getGuitarNoteById(noteId)
+              if (noteObj) {
+                const note = {
+                  id: noteObj.id,
+                  name: noteObj.name,
+                  frequency: noteObj.frequency,
+                  isBlack: noteObj.name.includes('#'),
+                  position: noteObj.position,
+                }
+                selectNote(note, 'multi')
+              }
+            })
           }
-        })
-      }
-
-      if (chordsToApply.length > 0) {
-        scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-      }
-    }
-
-    // Apply individual notes - filter out nulls from old assignments
-    const validNoteIds = (selectionData.selectedNoteIds || []).filter((id: string | null) => id !== null && id !== undefined)
-    if (validNoteIds.length > 0) {
-      if (pendingInstrument === 'guitar') {
-        // Use note handler if available to set manual notes directly on guitar
-        if (scaleChordManagement.noteHandlers?.handleSetManualNotes) {
-          scaleChordManagement.noteHandlers.handleSetManualNotes(validNoteIds)
-        } else {
-          // Fallback to context selectNote
-          validNoteIds.forEach((noteId: string) => {
-            const noteObj = getGuitarNoteById(noteId)
-            if (noteObj) {
-              const note = {
-                id: noteObj.id,
-                name: noteObj.name,
-                frequency: noteObj.frequency,
-                isBlack: noteObj.name.includes('#'),
-                position: noteObj.position
+        } else if (pendingInstrument === 'bass') {
+          // Use bass note handler if available
+          if (scaleChordManagement.bassNoteHandlers?.handleSetManualNotes) {
+            scaleChordManagement.bassNoteHandlers.handleSetManualNotes(validNoteIds)
+          } else {
+            // Fallback to context selectNote
+            validNoteIds.forEach((noteId: string) => {
+              const noteObj = getBassNoteById(noteId)
+              if (noteObj) {
+                const note = {
+                  id: noteObj.id,
+                  name: noteObj.name,
+                  frequency: noteObj.frequency,
+                  isBlack: noteObj.name.includes('#'),
+                  position: noteObj.position,
+                }
+                selectNote(note, 'multi')
               }
-              selectNote(note, 'multi')
-            }
-          })
-        }
-      } else if (pendingInstrument === 'bass') {
-        // Use bass note handler if available
-        if (scaleChordManagement.bassNoteHandlers?.handleSetManualNotes) {
-          scaleChordManagement.bassNoteHandlers.handleSetManualNotes(validNoteIds)
-        } else {
-          // Fallback to context selectNote
-          validNoteIds.forEach((noteId: string) => {
-            const noteObj = getBassNoteById(noteId)
-            if (noteObj) {
-              const note = {
-                id: noteObj.id,
-                name: noteObj.name,
-                frequency: noteObj.frequency,
-                isBlack: noteObj.name.includes('#'),
-                position: noteObj.position
-              }
-              selectNote(note, 'multi')
-            }
-          })
+            })
+          }
         }
       }
-    }
 
-    // Clear pending data after applying
-    setPendingSelectionData(null)
+      // Clear pending data after applying
+      setPendingSelectionData(null)
     }, 300) // 300ms delay to ensure components are mounted
 
     return () => clearTimeout(applyTimeoutId)
@@ -1451,9 +1591,10 @@ function Sandbox() {
 
   // Trigger melody generation once notes/scales/chords are selected (for all lesson types)
   useEffect(() => {
-    const hasContent = selectedNotes.length > 0 ||
-                       scaleChordManagement.appliedScales.length > 0 ||
-                       scaleChordManagement.appliedChords.length > 0
+    const hasContent =
+      selectedNotes.length > 0 ||
+      scaleChordManagement.appliedScales.length > 0 ||
+      scaleChordManagement.appliedChords.length > 0
 
     if (sessionStarted && hasContent && !hasGeneratedMelody) {
       // Delay to let React update handleGenerateMelody callback with new appliedScales/appliedChords
@@ -1463,16 +1604,28 @@ function Sandbox() {
       }, 150)
       return () => clearTimeout(timeoutId)
     }
-  }, [sessionStarted, selectedNotes.length, scaleChordManagement.appliedScales.length, scaleChordManagement.appliedChords.length, hasGeneratedMelody, handleGenerateMelody])
+  }, [
+    sessionStarted,
+    selectedNotes.length,
+    scaleChordManagement.appliedScales.length,
+    scaleChordManagement.appliedChords.length,
+    hasGeneratedMelody,
+    handleGenerateMelody,
+  ])
 
   // Announce and play when welcome speech is done and melody is ready (for all lesson types)
   useEffect(() => {
-    if (welcomeSpeechDone && generatedMelody.length > 0 && recordedAudioBlob && !hasAnnouncedMelody.current && setupDetails) {
+    if (
+      welcomeSpeechDone &&
+      generatedMelody.length > 0 &&
+      recordedAudioBlob &&
+      !hasAnnouncedMelody.current &&
+      setupDetails
+    ) {
       hasAnnouncedMelody.current = true
       setMelodySetupMessage(t('sandbox.melodySetup'))
     }
   }, [welcomeSpeechDone, generatedMelody, recordedAudioBlob, setupDetails, t])
-
 
   // If loading from assignment, show nothing (prevents flash of sandbox mode)
   if (isLoadingFromAssignment) {
@@ -1493,11 +1646,11 @@ function Sandbox() {
 
     // Get fret range for guitar/bass lessons
     // For assignments with selection data, don't restrict fret range (show full fretboard)
-    const hasSelectionData = lessonSettings?.selectionData && (
-      lessonSettings.selectionData.appliedScales?.length > 0 ||
-      lessonSettings.selectionData.appliedChords?.length > 0 ||
-      lessonSettings.selectionData.selectedNoteIds?.length > 0
-    )
+    const hasSelectionData =
+      lessonSettings?.selectionData &&
+      (lessonSettings.selectionData.appliedScales?.length > 0 ||
+        lessonSettings.selectionData.appliedChords?.length > 0 ||
+        lessonSettings.selectionData.selectedNoteIds?.length > 0)
     const fretLow = hasSelectionData ? undefined : lessonSettings?.fretLow
     const fretHigh = hasSelectionData ? undefined : lessonSettings?.fretHigh
 
@@ -1545,7 +1698,7 @@ function Sandbox() {
           flashingInputs={{
             bpm: flashingInputs.bpm || activeInputs.bpm,
             beats: flashingInputs.beats || activeInputs.beats,
-            mode: flashingInputs.mode || activeInputs.mode
+            mode: flashingInputs.mode || activeInputs.mode,
           }}
           triggerInputFlash={triggerInputFlash}
           setInputActive={setInputActive}
@@ -1589,10 +1742,7 @@ function Sandbox() {
         />
 
         {/* Welcome Subtitle Overlay */}
-        <WelcomeSubtitle
-          message={welcomeMessage}
-          onSpeechEnd={() => setWelcomeSpeechDone(true)}
-        />
+        <WelcomeSubtitle message={welcomeMessage} onSpeechEnd={() => setWelcomeSpeechDone(true)} />
 
         {/* Melody Setup Subtitle Overlay */}
         {melodySetupMessage && (
@@ -1604,95 +1754,102 @@ function Sandbox() {
 
         {/* Congratulations Subtitle Overlay */}
         {congratulationsMessage && (
-          <WelcomeSubtitle
-            message={congratulationsMessage}
-            onSpeechEnd={handleBackToSelection}
-          />
+          <WelcomeSubtitle message={congratulationsMessage} onSpeechEnd={handleBackToSelection} />
         )}
 
         {/* Assignment Complete Animation */}
-        {showAssignmentComplete && (
-          <AssignmentComplete onComplete={handleAssignmentCompleteEnd} />
-        )}
+        {showAssignmentComplete && <AssignmentComplete onComplete={handleAssignmentCompleteEnd} />}
       </>
     )
   }
 
   // Assignment title modal
-  const assignTitleModal = showAssignTitleModal && createPortal(
-    <div
-      className={styles.modalOverlay}
-      onClick={(e) => e.target === e.currentTarget && handleCloseAssignModal()}
-    >
-      <div className={styles.assignModal}>
-        <div className={styles.assignModalHeader}>
-          <h2 className={styles.assignModalTitle}>{t('sandbox.createAssignment')}</h2>
-          <button
-            className={styles.assignModalClose}
-            onClick={handleCloseAssignModal}
-            aria-label={t('common.close')}
-          >
-            ×
-          </button>
-        </div>
-
-        <div className={styles.assignModalContent}>
-          {assignmentError && <div className={styles.assignModalError}>{assignmentError}</div>}
-
-          <div className={styles.assignModalField}>
-            <label className={styles.assignModalLabel} htmlFor="assignmentTitle">
-              {t('sandbox.assignmentTitle')}
-            </label>
-            <input
-              id="assignmentTitle"
-              type="text"
-              className={styles.assignModalInput}
-              value={assignmentTitle}
-              onChange={(e) => setAssignmentTitle(e.target.value)}
-              placeholder={t('sandbox.enterAssignmentTitle')}
-              autoFocus
-              disabled={isSavingAssignment}
-            />
+  const assignTitleModal =
+    showAssignTitleModal &&
+    createPortal(
+      <div
+        className={styles.modalOverlay}
+        onClick={e => e.target === e.currentTarget && handleCloseAssignModal()}
+      >
+        <div className={styles.assignModal}>
+          <div className={styles.assignModalHeader}>
+            <h2 className={styles.assignModalTitle}>{t('sandbox.createAssignment')}</h2>
+            <button
+              className={styles.assignModalClose}
+              onClick={handleCloseAssignModal}
+              aria-label={t('common.close')}
+            >
+              ×
+            </button>
           </div>
 
-          <div className={styles.assignModalInfo}>
-            <p><strong>{t('sandbox.instrument')}:</strong> {instrumentNames[instrument]}</p>
-            <p><strong>{t('sandbox.bpm')}:</strong> {bpm}</p>
-            <p><strong>{t('sandbox.beats')}:</strong> {numberOfBeats}</p>
-            <p><strong>{t('sandbox.type')}:</strong> {scaleChordManagement.appliedChords.length > 0 ? t('sandbox.chords') : t('sandbox.melodies')}</p>
-          </div>
+          <div className={styles.assignModalContent}>
+            {assignmentError && <div className={styles.assignModalError}>{assignmentError}</div>}
 
-          <button
-            className={styles.assignModalSubmit}
-            onClick={handleSaveAssignment}
-            disabled={isSavingAssignment || !assignmentTitle.trim()}
-          >
-            {isSavingAssignment ? t('sandbox.saving') : t('sandbox.createAssignment')}
-          </button>
+            <div className={styles.assignModalField}>
+              <label className={styles.assignModalLabel} htmlFor="assignmentTitle">
+                {t('sandbox.assignmentTitle')}
+              </label>
+              <input
+                id="assignmentTitle"
+                type="text"
+                className={styles.assignModalInput}
+                value={assignmentTitle}
+                onChange={e => setAssignmentTitle(e.target.value)}
+                placeholder={t('sandbox.enterAssignmentTitle')}
+                autoFocus
+                disabled={isSavingAssignment}
+              />
+            </div>
+
+            <div className={styles.assignModalInfo}>
+              <p>
+                <strong>{t('sandbox.instrument')}:</strong> {instrumentNames[instrument]}
+              </p>
+              <p>
+                <strong>{t('sandbox.bpm')}:</strong> {bpm}
+              </p>
+              <p>
+                <strong>{t('sandbox.beats')}:</strong> {numberOfBeats}
+              </p>
+              <p>
+                <strong>{t('sandbox.type')}:</strong>{' '}
+                {scaleChordManagement.appliedChords.length > 0
+                  ? t('sandbox.chords')
+                  : t('sandbox.melodies')}
+              </p>
+            </div>
+
+            <button
+              className={styles.assignModalSubmit}
+              onClick={handleSaveAssignment}
+              disabled={isSavingAssignment || !assignmentTitle.trim()}
+            >
+              {isSavingAssignment ? t('sandbox.saving') : t('sandbox.createAssignment')}
+            </button>
+          </div>
         </div>
-      </div>
-    </div>,
-    document.body
-  )
+      </div>,
+      document.body
+    )
 
   // Default: Free play sandbox mode
   return (
     <>
+      <SEOHead
+        title="Sandbox"
+        description="Free play ear training sandbox. Select notes, generate melodies, and practice with keyboard, guitar, or bass."
+        path="/sandbox"
+      />
       {/* Assignment mode buttons - only show when coming from Classroom page */}
       {assigningToClassroomId && (
         <div className={styles.assignmentModeBar}>
           <span className={styles.assignmentModeText}>{t('sandbox.assignmentEditor')}</span>
           <div className={styles.assignmentModeButtons}>
-            <button
-              className={styles.assignmentCancelButton}
-              onClick={handleCancelAssignment}
-            >
+            <button className={styles.assignmentCancelButton} onClick={handleCancelAssignment}>
               {t('common.cancel')}
             </button>
-            <button
-              className={styles.assignmentAssignButton}
-              onClick={handleOpenAssignModal}
-            >
+            <button className={styles.assignmentAssignButton} onClick={handleOpenAssignModal}>
               {t('common.apply')}
             </button>
           </div>
@@ -1721,7 +1878,7 @@ function Sandbox() {
         flashingInputs={{
           bpm: flashingInputs.bpm || activeInputs.bpm,
           beats: flashingInputs.beats || activeInputs.beats,
-          mode: flashingInputs.mode || activeInputs.mode
+          mode: flashingInputs.mode || activeInputs.mode,
         }}
         triggerInputFlash={triggerInputFlash}
         setInputActive={setInputActive}
@@ -1746,7 +1903,11 @@ function Sandbox() {
         onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
         onExportToClassroom={handleExportToClassroom}
         canExportToClassroom={!!user && !assigningToClassroomId}
-        hasExportableContent={selectedNotes.length > 0 || scaleChordManagement.appliedScales.length > 0 || scaleChordManagement.appliedChords.length > 0}
+        hasExportableContent={
+          selectedNotes.length > 0 ||
+          scaleChordManagement.appliedScales.length > 0 ||
+          scaleChordManagement.appliedChords.length > 0
+        }
         onLessonComplete={handleLessonComplete}
         autoStartFeedback={isTutorialActive && tutorialStepData?.id === 'sandbox-play'}
       />

@@ -47,7 +47,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
   isDarkMode,
   onSubmit,
   onCancel,
-  onPreview
+  onPreview,
 }) => {
   const { t } = useTranslation()
   const [title, setTitle] = useState('')
@@ -79,9 +79,9 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         // Set default voice if not already set
         if (!selectedVoice && englishVoices.length > 0) {
           // Prefer voices with "Google" or "Microsoft" for better quality
-          const preferredVoice = englishVoices.find(v =>
-            v.name.includes('Google') || v.name.includes('Microsoft')
-          ) || englishVoices[0]
+          const preferredVoice =
+            englishVoices.find(v => v.name.includes('Google') || v.name.includes('Microsoft')) ||
+            englishVoices[0]
           setSelectedVoice(preferredVoice.name)
         }
       }
@@ -102,17 +102,13 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
 
   const toggleScale = (scaleName: string) => {
     setSelectedScales(prev =>
-      prev.includes(scaleName)
-        ? prev.filter(s => s !== scaleName)
-        : [...prev, scaleName]
+      prev.includes(scaleName) ? prev.filter(s => s !== scaleName) : [...prev, scaleName]
     )
   }
 
   const toggleChord = (chordName: string) => {
     setSelectedChords(prev =>
-      prev.includes(chordName)
-        ? prev.filter(c => c !== chordName)
-        : [...prev, chordName]
+      prev.includes(chordName) ? prev.filter(c => c !== chordName) : [...prev, chordName]
     )
   }
 
@@ -123,17 +119,17 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      setError('Please enter a title for the assignment')
+      setError(t('errors.enterTitle'))
       return
     }
 
     if (selectedOption === 'melodies' && selectedScales.length === 0) {
-      setError('Please select at least one scale')
+      setError(t('errors.selectScale'))
       return
     }
 
     if (selectedOption === 'chords' && selectedChords.length === 0) {
-      setError('Please select at least one chord')
+      setError(t('errors.selectChord'))
       return
     }
 
@@ -154,10 +150,10 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         octaveHigh,
         fretLow,
         fretHigh,
-        ttsVoice: selectedVoice || undefined
+        ttsVoice: selectedVoice || undefined,
       })
     } catch (err) {
-      setError('Failed to create assignment')
+      setError(t('errors.createAssignmentFailed'))
       console.error(err)
     } finally {
       setSubmitting(false)
@@ -185,7 +181,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         octaveHigh,
         fretLow,
         fretHigh,
-        ttsVoice: selectedVoice || undefined
+        ttsVoice: selectedVoice || undefined,
       })
     }
   }
@@ -195,18 +191,15 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
       className={`${styles.modalOverlay} ${isDarkMode ? 'dark' : ''}`}
       onClick={handleBackdropClick}
     >
-      <div className={`${styles.modalContent} ${isDarkMode ? 'dark' : ''}`} style={{ maxHeight: '90vh', overflowY: 'auto' }}>
-        <button
-          className={styles.closeButton}
-          onClick={onCancel}
-          aria-label="Close"
-        >
+      <div
+        className={`${styles.modalContent} ${isDarkMode ? 'dark' : ''}`}
+        style={{ maxHeight: '90vh', overflowY: 'auto' }}
+      >
+        <button className={styles.closeButton} onClick={onCancel} aria-label="Close">
           ×
         </button>
 
-        <h2 className={styles.modalTitle}>
-          Create Assignment
-        </h2>
+        <h2 className={styles.modalTitle}>Create Assignment</h2>
 
         {error && <div className={classroomStyles.errorMessage}>{error}</div>}
 
@@ -217,7 +210,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             type="text"
             className={classroomStyles.formInput}
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={e => setTitle(e.target.value)}
             placeholder="Enter assignment title"
             disabled={submitting}
           />
@@ -225,12 +218,17 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
 
         {/* Instrument Selection */}
         <div className="control-group instrument-selector-group" style={{ marginBottom: 20 }}>
-          <div className="instrument-selector desktop-selector" style={{ justifyContent: 'center' }}>
+          <div
+            className="instrument-selector desktop-selector"
+            style={{ justifyContent: 'center' }}
+          >
             <div
               className={`instrument-card ${selectedInstrument === 'keyboard' ? 'active' : ''}`}
               onClick={() => setSelectedInstrument('keyboard')}
             >
-              <div className="instrument-icon"><PiPianoKeysFill /></div>
+              <div className="instrument-icon">
+                <PiPianoKeysFill />
+              </div>
               <div className="instrument-name">Keyboard</div>
               <div className="instrument-glow"></div>
             </div>
@@ -238,7 +236,9 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
               className={`instrument-card ${selectedInstrument === 'guitar' ? 'active' : ''}`}
               onClick={() => setSelectedInstrument('guitar')}
             >
-              <div className="instrument-icon"><GiGuitarHead /></div>
+              <div className="instrument-icon">
+                <GiGuitarHead />
+              </div>
               <div className="instrument-name">Guitar</div>
               <div className="instrument-glow"></div>
             </div>
@@ -246,7 +246,9 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
               className={`instrument-card ${selectedInstrument === 'bass' ? 'active' : ''}`}
               onClick={() => setSelectedInstrument('bass')}
             >
-              <div className="instrument-icon"><GiGuitarBassHead /></div>
+              <div className="instrument-icon">
+                <GiGuitarBassHead />
+              </div>
               <div className="instrument-name">Bass</div>
               <div className="instrument-glow"></div>
             </div>
@@ -268,46 +270,54 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                   {selectedInstrument === 'guitar' && 'Guitar'}
                   {selectedInstrument === 'bass' && 'Bass'}
                 </div>
-                <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}><IoMdArrowDropdown /></div>
+                <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}>
+                  <IoMdArrowDropdown />
+                </div>
               </div>
               {isInstrumentDropdownOpen && (
                 <div className="dropdown-options">
                   {selectedInstrument !== 'keyboard' && (
                     <div
                       className="dropdown-option keyboard-option"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedInstrument('keyboard');
-                        setIsInstrumentDropdownOpen(false);
+                      onClick={e => {
+                        e.stopPropagation()
+                        setSelectedInstrument('keyboard')
+                        setIsInstrumentDropdownOpen(false)
                       }}
                     >
-                      <div className="instrument-icon"><PiPianoKeysFill /></div>
+                      <div className="instrument-icon">
+                        <PiPianoKeysFill />
+                      </div>
                       <div className="instrument-name">Keyboard</div>
                     </div>
                   )}
                   {selectedInstrument !== 'guitar' && (
                     <div
                       className="dropdown-option guitar-option"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedInstrument('guitar');
-                        setIsInstrumentDropdownOpen(false);
+                      onClick={e => {
+                        e.stopPropagation()
+                        setSelectedInstrument('guitar')
+                        setIsInstrumentDropdownOpen(false)
                       }}
                     >
-                      <div className="instrument-icon"><GiGuitarHead /></div>
+                      <div className="instrument-icon">
+                        <GiGuitarHead />
+                      </div>
                       <div className="instrument-name">Guitar</div>
                     </div>
                   )}
                   {selectedInstrument !== 'bass' && (
                     <div
                       className="dropdown-option bass-option"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedInstrument('bass');
-                        setIsInstrumentDropdownOpen(false);
+                      onClick={e => {
+                        e.stopPropagation()
+                        setSelectedInstrument('bass')
+                        setIsInstrumentDropdownOpen(false)
                       }}
                     >
-                      <div className="instrument-icon"><GiGuitarBassHead /></div>
+                      <div className="instrument-icon">
+                        <GiGuitarBassHead />
+                      </div>
                       <div className="instrument-name">Bass</div>
                     </div>
                   )}
@@ -344,7 +354,10 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
             <div className="control-group octave-range-control">
               <div className="label-with-tooltip">
                 <label className="control-label">Octave Range</label>
-                <Tooltip title="Octave Range" text="Select which octaves are visible in the keyboard interface">
+                <Tooltip
+                  title="Octave Range"
+                  text="Select which octaves are visible in the keyboard interface"
+                >
                   <div className="tooltip-icon">?</div>
                 </Tooltip>
               </div>
@@ -359,7 +372,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                     className="range-fill"
                     style={{
                       left: `${((octaveLow - 1) / 8) * 100}%`,
-                      right: `${((8 - octaveHigh) / 8) * 100}%`
+                      right: `${((8 - octaveHigh) / 8) * 100}%`,
                     }}
                   />
                   <input
@@ -367,7 +380,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                     min="1"
                     max="8"
                     value={octaveLow}
-                    onChange={(e) => {
+                    onChange={e => {
                       const val = Number(e.target.value)
                       if (val <= octaveHigh) setOctaveLow(val)
                     }}
@@ -379,7 +392,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                     min="1"
                     max="8"
                     value={octaveHigh}
-                    onChange={(e) => {
+                    onChange={e => {
                       const val = Number(e.target.value)
                       if (val >= octaveLow) setOctaveHigh(val)
                     }}
@@ -394,7 +407,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                     return (
                       <div className="keyboard-range-container">
                         <img
-                          src="/Keyboard.png"
+                          src="/Keyboard.webp"
                           alt="Keyboard octave range"
                           className="keyboard-range-image"
                         />
@@ -436,7 +449,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                     className="range-fill"
                     style={{
                       left: `${(fretLow / 24) * 100}%`,
-                      right: `${((24 - fretHigh) / 24) * 100}%`
+                      right: `${((24 - fretHigh) / 24) * 100}%`,
                     }}
                   />
                   <input
@@ -445,7 +458,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                     max="24"
                     step="4"
                     value={fretLow}
-                    onChange={(e) => {
+                    onChange={e => {
                       const val = Number(e.target.value)
                       if (val < fretHigh) setFretLow(val)
                     }}
@@ -458,7 +471,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                     max="24"
                     step="4"
                     value={fretHigh}
-                    onChange={(e) => {
+                    onChange={e => {
                       const val = Number(e.target.value)
                       if (val > fretLow) setFretHigh(val)
                     }}
@@ -473,7 +486,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                     return (
                       <div className="fretboard-range-container">
                         <img
-                          src={isGuitar ? "/Guitar-fretboard.png" : "/Bass-fretboard.png"}
+                          src={isGuitar ? '/Guitar-fretboard.webp' : '/Bass-fretboard.webp'}
                           alt={`${isGuitar ? 'Guitar' : 'Bass'} fretboard range`}
                           className="fretboard-range-image"
                         />
@@ -535,7 +548,15 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
         )}
 
         {/* BPM, Beats, Chords controls */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginBottom: 20, flexWrap: 'wrap' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: 24,
+            marginBottom: 20,
+            flexWrap: 'wrap',
+          }}
+        >
           <div className="modern-control-item" style={{ flex: '0 0 auto' }}>
             <div className="label-with-tooltip">
               <label className="control-label">{t('bpm')}</label>
@@ -547,7 +568,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
               <input
                 type="text"
                 value={bpm}
-                onChange={(e) => {
+                onChange={e => {
                   const val = Number(e.target.value)
                   if (!isNaN(val) && val > 0) setBpm(val)
                 }}
@@ -579,7 +600,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
               <input
                 type="text"
                 value={beats}
-                onChange={(e) => {
+                onChange={e => {
                   const val = Number(e.target.value)
                   if (!isNaN(val) && val > 0) setBeats(val)
                 }}
@@ -612,7 +633,7 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
                 <input
                   type="text"
                   value={chordCount}
-                  onChange={(e) => {
+                  onChange={e => {
                     const val = Number(e.target.value)
                     if (!isNaN(val) && val > 0) setChordCount(val)
                   }}
@@ -640,17 +661,20 @@ const AssignmentModal: React.FC<AssignmentModalProps> = ({
           <div className={styles.formGroup} style={{ marginBottom: 20 }}>
             <div className="label-with-tooltip">
               <label className={styles.formLabel}>Text-to-Speech Voice</label>
-              <Tooltip title="TTS Voice" text="Select a voice for reading assignment instructions aloud">
+              <Tooltip
+                title="TTS Voice"
+                text="Select a voice for reading assignment instructions aloud"
+              >
                 <div className="tooltip-icon">?</div>
               </Tooltip>
             </div>
             <select
               value={selectedVoice}
-              onChange={(e) => setSelectedVoice(e.target.value)}
+              onChange={e => setSelectedVoice(e.target.value)}
               className={classroomStyles.formInput}
               style={{ width: '100%', cursor: 'pointer' }}
             >
-              {availableVoices.map((voice) => (
+              {availableVoices.map(voice => (
                 <option key={voice.name} value={voice.name}>
                   {voice.name} ({voice.lang})
                 </option>

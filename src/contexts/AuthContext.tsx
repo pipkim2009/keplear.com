@@ -32,7 +32,11 @@ interface AuthContextType {
   /** Clear the isNewUser flag after onboarding completes */
   clearNewUserFlag: () => void
   /** Sign up a new user with username and password */
-  signUp: (username: string, password: string, metadata?: Record<string, unknown>) => Promise<AuthResult>
+  signUp: (
+    username: string,
+    password: string,
+    metadata?: Record<string, unknown>
+  ) => Promise<AuthResult>
   /** Sign in an existing user */
   signIn: (username: string, password: string) => Promise<AuthResult>
   /** Sign out the current user */
@@ -47,6 +51,7 @@ interface AuthContextType {
  * Authentication context - provides auth state and methods to child components
  * Exported directly to ensure proper module initialization
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 /**
@@ -95,19 +100,21 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     const getSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
       setLoading(false)
     }
 
     getSession()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setUser(session?.user ?? null)
-        setLoading(false)
-      }
-    )
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
 
     return () => subscription.unsubscribe()
   }, [])
@@ -119,64 +126,72 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
    * @param metadata - Additional user metadata
    * @returns Promise with auth result
    */
-  const signUp = useCallback(async (
-    username: string, 
-    password: string, 
-    metadata: Record<string, unknown> = {}
-  ): Promise<AuthResult> => {
-    try {
-      // Validate inputs
-      if (!isValidUsername(username)) {
+  const signUp = useCallback(
+    async (
+      username: string,
+      password: string,
+      metadata: Record<string, unknown> = {}
+    ): Promise<AuthResult> => {
+      try {
+        // Validate inputs
+        if (!isValidUsername(username)) {
+          return {
+            data: null,
+            error: new Error(
+              'Username must be at least 3 characters and contain only letters, numbers, and underscores'
+            ),
+          }
+        }
+
+        if (!isValidPassword(password)) {
+          const validation = validatePassword(password)
+          return {
+            data: null,
+            error: new Error(
+              validation.message ||
+                'Password must be at least 8 characters with uppercase, lowercase, and number'
+            ),
+          }
+        }
+
+        // Check rate limiting
+        if (!authRateLimiter.isAllowed('signup')) {
+          const resetTime = authRateLimiter.getResetTime('signup')
+          return {
+            data: null,
+            error: new Error(`Too many attempts. Please try again in ${resetTime} seconds.`),
+          }
+        }
+        authRateLimiter.recordAttempt('signup')
+
+        // Generate placeholder email for Supabase compatibility
+        // Sanitize username for email format
+        const sanitizedUsername = sanitizeUsername(username)
+        const placeholderEmail = createPlaceholderEmail(sanitizedUsername)
+
+        const { data, error } = await supabase.auth.signUp({
+          email: placeholderEmail,
+          password,
+          options: {
+            data: { ...metadata, username, display_name: username },
+          },
+        })
+
+        // Set isNewUser flag on successful signup
+        if (!error && data?.user) {
+          setIsNewUser(true)
+        }
+
+        return { data, error }
+      } catch (error) {
         return {
           data: null,
-          error: new Error('Username must be at least 3 characters and contain only letters, numbers, and underscores')
+          error: error instanceof Error ? error : new Error('Unknown sign up error'),
         }
       }
-
-      if (!isValidPassword(password)) {
-        const validation = validatePassword(password)
-        return {
-          data: null,
-          error: new Error(validation.message || 'Password must be at least 8 characters with uppercase, lowercase, and number')
-        }
-      }
-
-      // Check rate limiting
-      if (!authRateLimiter.isAllowed('signup')) {
-        const resetTime = authRateLimiter.getResetTime('signup')
-        return {
-          data: null,
-          error: new Error(`Too many attempts. Please try again in ${resetTime} seconds.`)
-        }
-      }
-      authRateLimiter.recordAttempt('signup')
-
-      // Generate placeholder email for Supabase compatibility
-      // Sanitize username for email format
-      const sanitizedUsername = sanitizeUsername(username)
-      const placeholderEmail = createPlaceholderEmail(sanitizedUsername)
-      
-      const { data, error } = await supabase.auth.signUp({
-        email: placeholderEmail,
-        password,
-        options: {
-          data: { ...metadata, username, display_name: username }
-        }
-      })
-
-      // Set isNewUser flag on successful signup
-      if (!error && data?.user) {
-        setIsNewUser(true)
-      }
-
-      return { data, error }
-    } catch (error) {
-      return { 
-        data: null, 
-        error: error instanceof Error ? error : new Error('Unknown sign up error')
-      }
-    }
-  }, [])
+    },
+    []
+  )
 
   /**
    * Sign in an existing user with username and password
@@ -190,14 +205,14 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       if (!isValidUsername(username)) {
         return {
           data: null,
-          error: new Error('Invalid username format')
+          error: new Error('Invalid username format'),
         }
       }
 
       if (!isValidPassword(password)) {
         return {
           data: null,
-          error: new Error('Invalid password format')
+          error: new Error('Invalid password format'),
         }
       }
 
@@ -206,7 +221,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
         const resetTime = authRateLimiter.getResetTime('signin')
         return {
           data: null,
-          error: new Error(`Too many login attempts. Please try again in ${resetTime} seconds.`)
+          error: new Error(`Too many login attempts. Please try again in ${resetTime} seconds.`),
         }
       }
       authRateLimiter.recordAttempt('signin')
@@ -214,16 +229,16 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       // Generate the same placeholder email format for sign in
       const sanitizedUsername = sanitizeUsername(username)
       const placeholderEmail = createPlaceholderEmail(sanitizedUsername)
-      
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email: placeholderEmail,
-        password
+        password,
       })
       return { data, error }
     } catch (error) {
-      return { 
-        data: null, 
-        error: error instanceof Error ? error : new Error('Unknown sign in error')
+      return {
+        data: null,
+        error: error instanceof Error ? error : new Error('Unknown sign in error'),
       }
     }
   }, [])
@@ -237,8 +252,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       const { error } = await supabase.auth.signOut()
       return { error }
     } catch (error) {
-      return { 
-        error: error instanceof Error ? error : new Error('Unknown sign out error')
+      return {
+        error: error instanceof Error ? error : new Error('Unknown sign out error'),
       }
     }
   }, [])
@@ -253,17 +268,20 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       if (!isValidPassword(newPassword)) {
         const validation = validatePassword(newPassword)
         return {
-          error: new Error(validation.message || 'Password must be at least 8 characters with uppercase, lowercase, and number')
+          error: new Error(
+            validation.message ||
+              'Password must be at least 8 characters with uppercase, lowercase, and number'
+          ),
         }
       }
 
       const { error } = await supabase.auth.updateUser({
-        password: newPassword
+        password: newPassword,
       })
       return { error }
     } catch (error) {
-      return { 
-        error: error instanceof Error ? error : new Error('Unknown password update error')
+      return {
+        error: error instanceof Error ? error : new Error('Unknown password update error'),
       }
     }
   }, [])
@@ -283,7 +301,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
       return { error }
     } catch (error) {
       return {
-        error: error instanceof Error ? error : new Error('Unknown account deletion error')
+        error: error instanceof Error ? error : new Error('Unknown account deletion error'),
       }
     }
   }, [])
@@ -304,14 +322,10 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     signIn,
     signOut,
     updatePassword,
-    deleteAccount
+    deleteAccount,
   }
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export { AuthProvider }

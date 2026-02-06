@@ -41,7 +41,7 @@ export const initialMelodyState: MelodyState = {
       return false
     }
   })(),
-  currentlyPlayingNoteIndex: null
+  currentlyPlayingNoteIndex: null,
 }
 
 export function melodyReducer(state: MelodyState, action: MelodyAction): MelodyState {
@@ -49,35 +49,35 @@ export function melodyReducer(state: MelodyState, action: MelodyAction): MelodyS
     case 'SET_PLAYBACK_PROGRESS':
       return {
         ...state,
-        playbackProgress: Math.max(0, Math.min(action.payload, state.melodyDuration))
+        playbackProgress: Math.max(0, Math.min(action.payload, state.melodyDuration)),
       }
 
     case 'SET_MELODY_DURATION':
       return {
         ...state,
-        melodyDuration: Math.max(0, action.payload)
+        melodyDuration: Math.max(0, action.payload),
       }
 
     case 'SET_HAS_RECORDED_AUDIO':
       return {
         ...state,
-        hasRecordedAudio: action.payload
+        hasRecordedAudio: action.payload,
       }
 
     case 'SET_RECORDED_AUDIO_BLOB':
       return {
         ...state,
         recordedAudioBlob: action.payload,
-        hasRecordedAudio: action.payload !== null
+        hasRecordedAudio: action.payload !== null,
       }
 
     case 'SET_IS_AUTO_RECORDING':
       return {
         ...state,
-        isAutoRecording: action.payload
+        isAutoRecording: action.payload,
       }
 
-    case 'TOGGLE_SHOW_NOTES':
+    case 'TOGGLE_SHOW_NOTES': {
       const newShowNotes = !state.showNotes
       // Persist to localStorage
       try {
@@ -87,8 +87,9 @@ export function melodyReducer(state: MelodyState, action: MelodyAction): MelodyS
       }
       return {
         ...state,
-        showNotes: newShowNotes
+        showNotes: newShowNotes,
       }
+    }
 
     case 'SET_SHOW_NOTES':
       // Persist to localStorage
@@ -99,20 +100,20 @@ export function melodyReducer(state: MelodyState, action: MelodyAction): MelodyS
       }
       return {
         ...state,
-        showNotes: action.payload
+        showNotes: action.payload,
       }
 
     case 'SET_CURRENTLY_PLAYING_NOTE':
       return {
         ...state,
-        currentlyPlayingNoteIndex: action.payload
+        currentlyPlayingNoteIndex: action.payload,
       }
 
     case 'RESET_PLAYBACK':
       return {
         ...state,
         playbackProgress: 0,
-        currentlyPlayingNoteIndex: null
+        currentlyPlayingNoteIndex: null,
       }
 
     case 'RESET_RECORDING':
@@ -127,7 +128,7 @@ export function melodyReducer(state: MelodyState, action: MelodyAction): MelodyS
         hasRecordedAudio: false,
         recordedAudioBlob: null,
         isAutoRecording: false,
-        showNotes: false
+        showNotes: false,
       }
 
     case 'CLEAR_ALL_AUDIO':
@@ -138,7 +139,7 @@ export function melodyReducer(state: MelodyState, action: MelodyAction): MelodyS
         hasRecordedAudio: false,
         recordedAudioBlob: null,
         isAutoRecording: false,
-        currentlyPlayingNoteIndex: null
+        currentlyPlayingNoteIndex: null,
       }
 
     default:

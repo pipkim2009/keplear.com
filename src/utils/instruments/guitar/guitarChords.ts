@@ -8,8 +8,8 @@ export type GuitarChord = {
 
 export type ChordPosition = {
   string: number // 1-6
-  fret: number   // 0-24
-  note: string   // Note name
+  fret: number // 0-24
+  note: string // Note name
   isRoot: boolean // Is this the root note of the chord
 }
 
@@ -41,63 +41,63 @@ export const GUITAR_CHORDS: GuitarChord[] = [
   {
     name: 'Major',
     intervals: [0, 4, 7],
-    description: 'Happy, bright sound - foundation of Western music'
+    description: 'Happy, bright sound - foundation of Western music',
   },
   {
     name: 'Minor',
     intervals: [0, 3, 7],
-    description: 'Sad, melancholic sound'
+    description: 'Sad, melancholic sound',
   },
   {
     name: 'Dominant 7th',
     intervals: [0, 4, 7, 10],
-    description: 'Bluesy, wants to resolve - great for blues and jazz'
+    description: 'Bluesy, wants to resolve - great for blues and jazz',
   },
   {
     name: 'Major 7th',
     intervals: [0, 4, 7, 11],
-    description: 'Dreamy, sophisticated jazz sound'
+    description: 'Dreamy, sophisticated jazz sound',
   },
   {
     name: 'Minor 7th',
     intervals: [0, 3, 7, 10],
-    description: 'Smooth, jazzy minor sound'
+    description: 'Smooth, jazzy minor sound',
   },
   {
     name: 'Diminished',
     intervals: [0, 3, 6],
-    description: 'Tense, unstable sound - often used as passing chord'
+    description: 'Tense, unstable sound - often used as passing chord',
   },
   {
     name: 'Augmented',
     intervals: [0, 4, 8],
-    description: 'Dreamy, mysterious sound'
+    description: 'Dreamy, mysterious sound',
   },
   {
     name: 'Sus2',
     intervals: [0, 2, 7],
-    description: 'Open, unresolved sound without the 3rd'
+    description: 'Open, unresolved sound without the 3rd',
   },
   {
     name: 'Sus4',
     intervals: [0, 5, 7],
-    description: 'Suspended sound that wants to resolve'
+    description: 'Suspended sound that wants to resolve',
   },
   {
     name: 'Add9',
     intervals: [0, 4, 7, 14],
-    description: 'Major chord with added color tone'
+    description: 'Major chord with added color tone',
   },
   {
     name: 'Major 9th',
     intervals: [0, 4, 7, 11, 14],
-    description: 'Rich, complex major sound'
+    description: 'Rich, complex major sound',
   },
   {
     name: 'Minor 9th',
     intervals: [0, 3, 7, 10, 14],
-    description: 'Rich, complex minor sound'
-  }
+    description: 'Rich, complex minor sound',
+  },
 ]
 
 // Root notes available for chords (same as scales)
@@ -106,263 +106,977 @@ export const CHORD_ROOT_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#'
 // Predefined chord fingerings for common chords
 // Format: [low E, A, D, G, B, high E] - fret numbers or 'x' for muted
 export const CHORD_FINGERINGS: { [key: string]: { [chordType: string]: ChordFingering[] } } = {
-  'C': {
-    'Major': [
-      { name: 'Open C', frets: ['x', 3, 2, 0, 1, 0], baseFret: 0, difficulty: 'Easy', description: 'Basic open C chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 5, 5, 3], baseFret: 3, difficulty: 'Medium', description: 'C major barre chord 3rd fret' },
-      { name: 'Barre 8th', frets: [8, 10, 10, 9, 8, 8], baseFret: 8, difficulty: 'Hard', description: 'C major barre chord 8th fret' }
+  C: {
+    Major: [
+      {
+        name: 'Open C',
+        frets: ['x', 3, 2, 0, 1, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Basic open C chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 5, 5, 3],
+        baseFret: 3,
+        difficulty: 'Medium',
+        description: 'C major barre chord 3rd fret',
+      },
+      {
+        name: 'Barre 8th',
+        frets: [8, 10, 10, 9, 8, 8],
+        baseFret: 8,
+        difficulty: 'Hard',
+        description: 'C major barre chord 8th fret',
+      },
     ],
-    'Minor': [
-      { name: 'Open Cm', frets: ['x', 3, 1, 0, 1, 3], baseFret: 0, difficulty: 'Medium', description: 'Open C minor' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 5, 4, 3], baseFret: 3, difficulty: 'Medium', description: 'C minor barre chord 3rd fret' },
-      { name: 'Barre 8th', frets: [8, 10, 10, 8, 8, 8], baseFret: 8, difficulty: 'Hard', description: 'C minor barre chord 8th fret' }
+    Minor: [
+      {
+        name: 'Open Cm',
+        frets: ['x', 3, 1, 0, 1, 3],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'Open C minor',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 5, 4, 3],
+        baseFret: 3,
+        difficulty: 'Medium',
+        description: 'C minor barre chord 3rd fret',
+      },
+      {
+        name: 'Barre 8th',
+        frets: [8, 10, 10, 8, 8, 8],
+        baseFret: 8,
+        difficulty: 'Hard',
+        description: 'C minor barre chord 8th fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Open C7', frets: ['x', 3, 2, 3, 1, 0], baseFret: 0, difficulty: 'Medium', description: 'Open C7 chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 3, 5, 3], baseFret: 3, difficulty: 'Medium', description: 'C7 barre chord 3rd fret' }
+      {
+        name: 'Open C7',
+        frets: ['x', 3, 2, 3, 1, 0],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'Open C7 chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 3, 5, 3],
+        baseFret: 3,
+        difficulty: 'Medium',
+        description: 'C7 barre chord 3rd fret',
+      },
     ],
     'Major 7th': [
-      { name: 'Open Cmaj7', frets: ['x', 3, 2, 0, 0, 0], baseFret: 0, difficulty: 'Easy', description: 'Open C major 7th chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 4, 5, 3], baseFret: 3, difficulty: 'Hard', description: 'Cmaj7 barre chord 3rd fret' }
+      {
+        name: 'Open Cmaj7',
+        frets: ['x', 3, 2, 0, 0, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open C major 7th chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 4, 5, 3],
+        baseFret: 3,
+        difficulty: 'Hard',
+        description: 'Cmaj7 barre chord 3rd fret',
+      },
     ],
     'Minor 7th': [
-      { name: 'Partial Cm7', frets: ['x', 3, 1, 3, 1, 3], baseFret: 0, difficulty: 'Medium', description: 'C minor 7th partial chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 3, 4, 3], baseFret: 3, difficulty: 'Hard', description: 'Cm7 barre chord 3rd fret' }
+      {
+        name: 'Partial Cm7',
+        frets: ['x', 3, 1, 3, 1, 3],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'C minor 7th partial chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 3, 4, 3],
+        baseFret: 3,
+        difficulty: 'Hard',
+        description: 'Cm7 barre chord 3rd fret',
+      },
     ],
-    'Sus2': [
-      { name: 'Open Csus2', frets: ['x', 3, 0, 0, 1, 'x'], baseFret: 0, difficulty: 'Easy', description: 'Open C sus2 chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 5, 3, 3], baseFret: 3, difficulty: 'Medium', description: 'Csus2 barre chord 3rd fret' }
+    Sus2: [
+      {
+        name: 'Open Csus2',
+        frets: ['x', 3, 0, 0, 1, 'x'],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open C sus2 chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 5, 3, 3],
+        baseFret: 3,
+        difficulty: 'Medium',
+        description: 'Csus2 barre chord 3rd fret',
+      },
     ],
-    'Sus4': [
-      { name: 'Open Csus4', frets: ['x', 3, 3, 0, 1, 1], baseFret: 0, difficulty: 'Medium', description: 'Open C sus4 chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 6, 6, 6, 3], baseFret: 3, difficulty: 'Hard', description: 'Csus4 barre chord 3rd fret' }
+    Sus4: [
+      {
+        name: 'Open Csus4',
+        frets: ['x', 3, 3, 0, 1, 1],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'Open C sus4 chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 6, 6, 6, 3],
+        baseFret: 3,
+        difficulty: 'Hard',
+        description: 'Csus4 barre chord 3rd fret',
+      },
     ],
-    'Diminished': [
-      { name: 'Cdim', frets: ['x', 3, 4, 2, 4, 2], baseFret: 0, difficulty: 'Hard', description: 'C diminished chord' },
-      { name: 'Barre 3rd', frets: [3, 4, 2, 4, 2, 'x'], baseFret: 3, difficulty: 'Hard', description: 'Cdim barre shape' }
+    Diminished: [
+      {
+        name: 'Cdim',
+        frets: ['x', 3, 4, 2, 4, 2],
+        baseFret: 0,
+        difficulty: 'Hard',
+        description: 'C diminished chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 4, 2, 4, 2, 'x'],
+        baseFret: 3,
+        difficulty: 'Hard',
+        description: 'Cdim barre shape',
+      },
     ],
-    'Augmented': [
-      { name: 'Caug', frets: ['x', 3, 2, 1, 1, 0], baseFret: 0, difficulty: 'Hard', description: 'C augmented chord' },
-      { name: 'Barre 4th', frets: [4, 3, 2, 1, 1, 0], baseFret: 4, difficulty: 'Hard', description: 'Caug alternative shape' }
+    Augmented: [
+      {
+        name: 'Caug',
+        frets: ['x', 3, 2, 1, 1, 0],
+        baseFret: 0,
+        difficulty: 'Hard',
+        description: 'C augmented chord',
+      },
+      {
+        name: 'Barre 4th',
+        frets: [4, 3, 2, 1, 1, 0],
+        baseFret: 4,
+        difficulty: 'Hard',
+        description: 'Caug alternative shape',
+      },
     ],
-    'Add9': [
-      { name: 'Open Cadd9', frets: ['x', 3, 2, 0, 3, 0], baseFret: 0, difficulty: 'Medium', description: 'Open C add9 chord' },
-      { name: 'Partial Cadd9', frets: ['x', 3, 2, 0, 3, 3], baseFret: 0, difficulty: 'Medium', description: 'C add9 partial chord' }
+    Add9: [
+      {
+        name: 'Open Cadd9',
+        frets: ['x', 3, 2, 0, 3, 0],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'Open C add9 chord',
+      },
+      {
+        name: 'Partial Cadd9',
+        frets: ['x', 3, 2, 0, 3, 3],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'C add9 partial chord',
+      },
     ],
     'Major 9th': [
-      { name: 'Cmaj9', frets: ['x', 3, 2, 4, 3, 0], baseFret: 0, difficulty: 'Hard', description: 'C major 9th chord' },
-      { name: 'Barre Cmaj9', frets: [3, 3, 5, 4, 5, 5], baseFret: 3, difficulty: 'Hard', description: 'Cmaj9 barre chord' }
+      {
+        name: 'Cmaj9',
+        frets: ['x', 3, 2, 4, 3, 0],
+        baseFret: 0,
+        difficulty: 'Hard',
+        description: 'C major 9th chord',
+      },
+      {
+        name: 'Barre Cmaj9',
+        frets: [3, 3, 5, 4, 5, 5],
+        baseFret: 3,
+        difficulty: 'Hard',
+        description: 'Cmaj9 barre chord',
+      },
     ],
     'Minor 9th': [
-      { name: 'Cm9', frets: ['x', 3, 1, 3, 3, 3], baseFret: 0, difficulty: 'Hard', description: 'C minor 9th chord' },
-      { name: 'Barre Cm9', frets: [3, 3, 5, 3, 4, 6], baseFret: 3, difficulty: 'Hard', description: 'Cm9 barre chord' }
-    ]
-  },
-  'D': {
-    'Major': [
-      { name: 'Open D', frets: ['x', 'x', 0, 2, 3, 2], baseFret: 0, difficulty: 'Easy', description: 'Basic open D chord' },
-      { name: 'Barre 5th', frets: [5, 5, 7, 7, 7, 5], baseFret: 5, difficulty: 'Medium', description: 'D major barre chord 5th fret' },
-      { name: 'Barre 10th', frets: [10, 12, 12, 11, 10, 10], baseFret: 10, difficulty: 'Hard', description: 'D major barre chord 10th fret' }
+      {
+        name: 'Cm9',
+        frets: ['x', 3, 1, 3, 3, 3],
+        baseFret: 0,
+        difficulty: 'Hard',
+        description: 'C minor 9th chord',
+      },
+      {
+        name: 'Barre Cm9',
+        frets: [3, 3, 5, 3, 4, 6],
+        baseFret: 3,
+        difficulty: 'Hard',
+        description: 'Cm9 barre chord',
+      },
     ],
-    'Minor': [
-      { name: 'Open Dm', frets: ['x', 'x', 0, 2, 3, 1], baseFret: 0, difficulty: 'Easy', description: 'Basic open D minor' },
-      { name: 'Barre 5th', frets: [5, 5, 7, 7, 6, 5], baseFret: 5, difficulty: 'Medium', description: 'D minor barre chord 5th fret' },
-      { name: 'Barre 10th', frets: [10, 12, 12, 10, 10, 10], baseFret: 10, difficulty: 'Hard', description: 'D minor barre chord 10th fret' }
+  },
+  D: {
+    Major: [
+      {
+        name: 'Open D',
+        frets: ['x', 'x', 0, 2, 3, 2],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Basic open D chord',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 7, 7, 7, 5],
+        baseFret: 5,
+        difficulty: 'Medium',
+        description: 'D major barre chord 5th fret',
+      },
+      {
+        name: 'Barre 10th',
+        frets: [10, 12, 12, 11, 10, 10],
+        baseFret: 10,
+        difficulty: 'Hard',
+        description: 'D major barre chord 10th fret',
+      },
+    ],
+    Minor: [
+      {
+        name: 'Open Dm',
+        frets: ['x', 'x', 0, 2, 3, 1],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Basic open D minor',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 7, 7, 6, 5],
+        baseFret: 5,
+        difficulty: 'Medium',
+        description: 'D minor barre chord 5th fret',
+      },
+      {
+        name: 'Barre 10th',
+        frets: [10, 12, 12, 10, 10, 10],
+        baseFret: 10,
+        difficulty: 'Hard',
+        description: 'D minor barre chord 10th fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Open D7', frets: ['x', 'x', 0, 2, 1, 2], baseFret: 0, difficulty: 'Easy', description: 'Open D7 chord' },
-      { name: 'Barre 5th', frets: [5, 5, 7, 5, 7, 5], baseFret: 5, difficulty: 'Medium', description: 'D7 barre chord 5th fret' }
+      {
+        name: 'Open D7',
+        frets: ['x', 'x', 0, 2, 1, 2],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open D7 chord',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 7, 5, 7, 5],
+        baseFret: 5,
+        difficulty: 'Medium',
+        description: 'D7 barre chord 5th fret',
+      },
     ],
     'Major 7th': [
-      { name: 'Open Dmaj7', frets: ['x', 'x', 0, 2, 2, 2], baseFret: 0, difficulty: 'Easy', description: 'Open D major 7th chord' },
-      { name: 'Barre 5th', frets: [5, 5, 7, 6, 7, 5], baseFret: 5, difficulty: 'Hard', description: 'Dmaj7 barre chord 5th fret' }
+      {
+        name: 'Open Dmaj7',
+        frets: ['x', 'x', 0, 2, 2, 2],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open D major 7th chord',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 7, 6, 7, 5],
+        baseFret: 5,
+        difficulty: 'Hard',
+        description: 'Dmaj7 barre chord 5th fret',
+      },
     ],
     'Minor 7th': [
-      { name: 'Open Dm7', frets: ['x', 'x', 0, 2, 1, 1], baseFret: 0, difficulty: 'Easy', description: 'Open D minor 7th chord' },
-      { name: 'Barre 5th', frets: [5, 5, 7, 5, 6, 5], baseFret: 5, difficulty: 'Hard', description: 'Dm7 barre chord 5th fret' }
+      {
+        name: 'Open Dm7',
+        frets: ['x', 'x', 0, 2, 1, 1],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open D minor 7th chord',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 7, 5, 6, 5],
+        baseFret: 5,
+        difficulty: 'Hard',
+        description: 'Dm7 barre chord 5th fret',
+      },
     ],
-    'Sus2': [
-      { name: 'Open Dsus2', frets: ['x', 'x', 0, 2, 3, 0], baseFret: 0, difficulty: 'Easy', description: 'Open D sus2 chord' },
-      { name: 'Barre 5th', frets: [5, 5, 7, 7, 5, 5], baseFret: 5, difficulty: 'Medium', description: 'Dsus2 barre chord 5th fret' }
+    Sus2: [
+      {
+        name: 'Open Dsus2',
+        frets: ['x', 'x', 0, 2, 3, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open D sus2 chord',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 7, 7, 5, 5],
+        baseFret: 5,
+        difficulty: 'Medium',
+        description: 'Dsus2 barre chord 5th fret',
+      },
     ],
-    'Sus4': [
-      { name: 'Open Dsus4', frets: ['x', 'x', 0, 2, 3, 3], baseFret: 0, difficulty: 'Easy', description: 'Open D sus4 chord' },
-      { name: 'Barre 5th', frets: [5, 5, 8, 8, 8, 5], baseFret: 5, difficulty: 'Hard', description: 'Dsus4 barre chord 5th fret' }
-    ]
+    Sus4: [
+      {
+        name: 'Open Dsus4',
+        frets: ['x', 'x', 0, 2, 3, 3],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open D sus4 chord',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 8, 8, 8, 5],
+        baseFret: 5,
+        difficulty: 'Hard',
+        description: 'Dsus4 barre chord 5th fret',
+      },
+    ],
   },
-  'E': {
-    'Major': [
-      { name: 'Open E', frets: [0, 2, 2, 1, 0, 0], baseFret: 0, difficulty: 'Easy', description: 'Basic open E chord' },
-      { name: 'Barre 7th', frets: [7, 7, 9, 9, 9, 7], baseFret: 7, difficulty: 'Medium', description: 'E major barre chord 7th fret' },
-      { name: 'Barre 12th', frets: [12, 14, 14, 13, 12, 12], baseFret: 12, difficulty: 'Hard', description: 'E major barre chord 12th fret' }
+  E: {
+    Major: [
+      {
+        name: 'Open E',
+        frets: [0, 2, 2, 1, 0, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Basic open E chord',
+      },
+      {
+        name: 'Barre 7th',
+        frets: [7, 7, 9, 9, 9, 7],
+        baseFret: 7,
+        difficulty: 'Medium',
+        description: 'E major barre chord 7th fret',
+      },
+      {
+        name: 'Barre 12th',
+        frets: [12, 14, 14, 13, 12, 12],
+        baseFret: 12,
+        difficulty: 'Hard',
+        description: 'E major barre chord 12th fret',
+      },
     ],
-    'Minor': [
-      { name: 'Open Em', frets: [0, 2, 2, 0, 0, 0], baseFret: 0, difficulty: 'Easy', description: 'Basic open E minor' },
-      { name: 'Barre 7th', frets: [7, 7, 9, 9, 8, 7], baseFret: 7, difficulty: 'Medium', description: 'E minor barre chord 7th fret' },
-      { name: 'Barre 12th', frets: [12, 14, 14, 12, 12, 12], baseFret: 12, difficulty: 'Hard', description: 'E minor barre chord 12th fret' }
+    Minor: [
+      {
+        name: 'Open Em',
+        frets: [0, 2, 2, 0, 0, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Basic open E minor',
+      },
+      {
+        name: 'Barre 7th',
+        frets: [7, 7, 9, 9, 8, 7],
+        baseFret: 7,
+        difficulty: 'Medium',
+        description: 'E minor barre chord 7th fret',
+      },
+      {
+        name: 'Barre 12th',
+        frets: [12, 14, 14, 12, 12, 12],
+        baseFret: 12,
+        difficulty: 'Hard',
+        description: 'E minor barre chord 12th fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Open E7', frets: [0, 2, 0, 1, 0, 0], baseFret: 0, difficulty: 'Easy', description: 'Open E7 chord' },
-      { name: 'Barre 7th', frets: [7, 7, 9, 7, 9, 7], baseFret: 7, difficulty: 'Medium', description: 'E7 barre chord 7th fret' }
+      {
+        name: 'Open E7',
+        frets: [0, 2, 0, 1, 0, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open E7 chord',
+      },
+      {
+        name: 'Barre 7th',
+        frets: [7, 7, 9, 7, 9, 7],
+        baseFret: 7,
+        difficulty: 'Medium',
+        description: 'E7 barre chord 7th fret',
+      },
     ],
     'Major 7th': [
-      { name: 'Open Emaj7', frets: [0, 2, 1, 1, 0, 0], baseFret: 0, difficulty: 'Easy', description: 'Open E major 7th chord' },
-      { name: 'Barre 7th', frets: [7, 7, 9, 8, 9, 7], baseFret: 7, difficulty: 'Hard', description: 'Emaj7 barre chord 7th fret' }
+      {
+        name: 'Open Emaj7',
+        frets: [0, 2, 1, 1, 0, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open E major 7th chord',
+      },
+      {
+        name: 'Barre 7th',
+        frets: [7, 7, 9, 8, 9, 7],
+        baseFret: 7,
+        difficulty: 'Hard',
+        description: 'Emaj7 barre chord 7th fret',
+      },
     ],
     'Minor 7th': [
-      { name: 'Open Em7', frets: [0, 2, 0, 0, 0, 0], baseFret: 0, difficulty: 'Easy', description: 'Open E minor 7th chord' },
-      { name: 'Barre 7th', frets: [7, 7, 9, 7, 8, 7], baseFret: 7, difficulty: 'Hard', description: 'Em7 barre chord 7th fret' }
-    ]
-  },
-  'F': {
-    'Major': [
-      { name: 'Barre 1st', frets: [1, 3, 3, 2, 1, 1], baseFret: 1, difficulty: 'Medium', description: 'F major barre chord 1st fret' },
-      { name: 'Partial F', frets: ['x', 'x', 3, 2, 1, 1], baseFret: 0, difficulty: 'Medium', description: 'Partial F chord' },
-      { name: 'Barre 8th', frets: [8, 8, 10, 10, 10, 8], baseFret: 8, difficulty: 'Medium', description: 'F major barre chord 8th fret' }
+      {
+        name: 'Open Em7',
+        frets: [0, 2, 0, 0, 0, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open E minor 7th chord',
+      },
+      {
+        name: 'Barre 7th',
+        frets: [7, 7, 9, 7, 8, 7],
+        baseFret: 7,
+        difficulty: 'Hard',
+        description: 'Em7 barre chord 7th fret',
+      },
     ],
-    'Minor': [
-      { name: 'Barre 1st', frets: [1, 3, 3, 1, 1, 1], baseFret: 1, difficulty: 'Medium', description: 'F minor barre chord 1st fret' },
-      { name: 'Barre 8th', frets: [8, 8, 10, 10, 9, 8], baseFret: 8, difficulty: 'Medium', description: 'F minor barre chord 8th fret' }
+  },
+  F: {
+    Major: [
+      {
+        name: 'Barre 1st',
+        frets: [1, 3, 3, 2, 1, 1],
+        baseFret: 1,
+        difficulty: 'Medium',
+        description: 'F major barre chord 1st fret',
+      },
+      {
+        name: 'Partial F',
+        frets: ['x', 'x', 3, 2, 1, 1],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'Partial F chord',
+      },
+      {
+        name: 'Barre 8th',
+        frets: [8, 8, 10, 10, 10, 8],
+        baseFret: 8,
+        difficulty: 'Medium',
+        description: 'F major barre chord 8th fret',
+      },
+    ],
+    Minor: [
+      {
+        name: 'Barre 1st',
+        frets: [1, 3, 3, 1, 1, 1],
+        baseFret: 1,
+        difficulty: 'Medium',
+        description: 'F minor barre chord 1st fret',
+      },
+      {
+        name: 'Barre 8th',
+        frets: [8, 8, 10, 10, 9, 8],
+        baseFret: 8,
+        difficulty: 'Medium',
+        description: 'F minor barre chord 8th fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Barre 1st', frets: [1, 3, 1, 2, 1, 1], baseFret: 1, difficulty: 'Medium', description: 'F7 barre chord 1st fret' },
-      { name: 'Barre 8th', frets: [8, 8, 10, 8, 10, 8], baseFret: 8, difficulty: 'Medium', description: 'F7 barre chord 8th fret' }
-    ]
-  },
-  'G': {
-    'Major': [
-      { name: 'Open G', frets: [3, 2, 0, 0, 3, 3], baseFret: 0, difficulty: 'Easy', description: 'Basic open G chord' },
-      { name: 'Open G Alt', frets: [3, 2, 0, 0, 0, 3], baseFret: 0, difficulty: 'Easy', description: 'Alternative open G chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 5, 5, 3], baseFret: 3, difficulty: 'Medium', description: 'G major barre chord 3rd fret' }
+      {
+        name: 'Barre 1st',
+        frets: [1, 3, 1, 2, 1, 1],
+        baseFret: 1,
+        difficulty: 'Medium',
+        description: 'F7 barre chord 1st fret',
+      },
+      {
+        name: 'Barre 8th',
+        frets: [8, 8, 10, 8, 10, 8],
+        baseFret: 8,
+        difficulty: 'Medium',
+        description: 'F7 barre chord 8th fret',
+      },
     ],
-    'Minor': [
-      { name: 'Open Gm', frets: [3, 5, 5, 3, 3, 3], baseFret: 0, difficulty: 'Medium', description: 'Open G minor' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 5, 4, 3], baseFret: 3, difficulty: 'Medium', description: 'G minor barre chord 3rd fret' }
+  },
+  G: {
+    Major: [
+      {
+        name: 'Open G',
+        frets: [3, 2, 0, 0, 3, 3],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Basic open G chord',
+      },
+      {
+        name: 'Open G Alt',
+        frets: [3, 2, 0, 0, 0, 3],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Alternative open G chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 5, 5, 3],
+        baseFret: 3,
+        difficulty: 'Medium',
+        description: 'G major barre chord 3rd fret',
+      },
+    ],
+    Minor: [
+      {
+        name: 'Open Gm',
+        frets: [3, 5, 5, 3, 3, 3],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'Open G minor',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 5, 4, 3],
+        baseFret: 3,
+        difficulty: 'Medium',
+        description: 'G minor barre chord 3rd fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Open G7', frets: [3, 2, 0, 0, 0, 1], baseFret: 0, difficulty: 'Easy', description: 'Open G7 chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 3, 5, 3], baseFret: 3, difficulty: 'Medium', description: 'G7 barre chord 3rd fret' }
+      {
+        name: 'Open G7',
+        frets: [3, 2, 0, 0, 0, 1],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open G7 chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 3, 5, 3],
+        baseFret: 3,
+        difficulty: 'Medium',
+        description: 'G7 barre chord 3rd fret',
+      },
     ],
     'Major 7th': [
-      { name: 'Open Gmaj7', frets: [3, 2, 0, 0, 0, 2], baseFret: 0, difficulty: 'Easy', description: 'Open G major 7th chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 4, 5, 3], baseFret: 3, difficulty: 'Hard', description: 'Gmaj7 barre chord 3rd fret' }
+      {
+        name: 'Open Gmaj7',
+        frets: [3, 2, 0, 0, 0, 2],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open G major 7th chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 4, 5, 3],
+        baseFret: 3,
+        difficulty: 'Hard',
+        description: 'Gmaj7 barre chord 3rd fret',
+      },
     ],
     'Minor 7th': [
-      { name: 'Open Gm7', frets: [3, 5, 3, 3, 3, 3], baseFret: 0, difficulty: 'Medium', description: 'Open G minor 7th chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 3, 4, 3], baseFret: 3, difficulty: 'Hard', description: 'Gm7 barre chord 3rd fret' }
+      {
+        name: 'Open Gm7',
+        frets: [3, 5, 3, 3, 3, 3],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'Open G minor 7th chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 3, 4, 3],
+        baseFret: 3,
+        difficulty: 'Hard',
+        description: 'Gm7 barre chord 3rd fret',
+      },
     ],
-    'Sus2': [
-      { name: 'Open Gsus2', frets: [3, 0, 0, 0, 3, 3], baseFret: 0, difficulty: 'Easy', description: 'Open G sus2 chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 5, 5, 3, 3], baseFret: 3, difficulty: 'Medium', description: 'Gsus2 barre chord 3rd fret' }
+    Sus2: [
+      {
+        name: 'Open Gsus2',
+        frets: [3, 0, 0, 0, 3, 3],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open G sus2 chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 5, 5, 3, 3],
+        baseFret: 3,
+        difficulty: 'Medium',
+        description: 'Gsus2 barre chord 3rd fret',
+      },
     ],
-    'Sus4': [
-      { name: 'Open Gsus4', frets: [3, 3, 0, 0, 1, 3], baseFret: 0, difficulty: 'Medium', description: 'Open G sus4 chord' },
-      { name: 'Barre 3rd', frets: [3, 3, 6, 6, 6, 3], baseFret: 3, difficulty: 'Hard', description: 'Gsus4 barre chord 3rd fret' }
-    ]
+    Sus4: [
+      {
+        name: 'Open Gsus4',
+        frets: [3, 3, 0, 0, 1, 3],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'Open G sus4 chord',
+      },
+      {
+        name: 'Barre 3rd',
+        frets: [3, 3, 6, 6, 6, 3],
+        baseFret: 3,
+        difficulty: 'Hard',
+        description: 'Gsus4 barre chord 3rd fret',
+      },
+    ],
   },
-  'A': {
-    'Major': [
-      { name: 'Open A', frets: ['x', 0, 2, 2, 2, 0], baseFret: 0, difficulty: 'Easy', description: 'Basic open A chord' },
-      { name: 'Barre 5th', frets: [5, 5, 7, 7, 7, 5], baseFret: 5, difficulty: 'Medium', description: 'A major barre chord 5th fret' }
+  A: {
+    Major: [
+      {
+        name: 'Open A',
+        frets: ['x', 0, 2, 2, 2, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Basic open A chord',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 7, 7, 7, 5],
+        baseFret: 5,
+        difficulty: 'Medium',
+        description: 'A major barre chord 5th fret',
+      },
     ],
-    'Minor': [
-      { name: 'Open Am', frets: ['x', 0, 2, 2, 1, 0], baseFret: 0, difficulty: 'Easy', description: 'Basic open A minor' },
-      { name: 'Barre 5th', frets: [5, 5, 7, 7, 6, 5], baseFret: 5, difficulty: 'Medium', description: 'A minor barre chord 5th fret' }
+    Minor: [
+      {
+        name: 'Open Am',
+        frets: ['x', 0, 2, 2, 1, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Basic open A minor',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 7, 7, 6, 5],
+        baseFret: 5,
+        difficulty: 'Medium',
+        description: 'A minor barre chord 5th fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Open A7', frets: ['x', 0, 2, 0, 2, 0], baseFret: 0, difficulty: 'Easy', description: 'Open A7 chord' },
-      { name: 'Barre 5th', frets: [5, 5, 7, 5, 7, 5], baseFret: 5, difficulty: 'Medium', description: 'A7 barre chord 5th fret' }
+      {
+        name: 'Open A7',
+        frets: ['x', 0, 2, 0, 2, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open A7 chord',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 7, 5, 7, 5],
+        baseFret: 5,
+        difficulty: 'Medium',
+        description: 'A7 barre chord 5th fret',
+      },
     ],
     'Major 7th': [
-      { name: 'Open Amaj7', frets: ['x', 0, 2, 1, 2, 0], baseFret: 0, difficulty: 'Medium', description: 'Open A major 7th chord' },
-      { name: 'Barre 5th', frets: [5, 5, 7, 6, 7, 5], baseFret: 5, difficulty: 'Hard', description: 'Amaj7 barre chord 5th fret' }
+      {
+        name: 'Open Amaj7',
+        frets: ['x', 0, 2, 1, 2, 0],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'Open A major 7th chord',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 7, 6, 7, 5],
+        baseFret: 5,
+        difficulty: 'Hard',
+        description: 'Amaj7 barre chord 5th fret',
+      },
     ],
     'Minor 7th': [
-      { name: 'Open Am7', frets: ['x', 0, 2, 0, 1, 0], baseFret: 0, difficulty: 'Easy', description: 'Open A minor 7th chord' },
-      { name: 'Barre 5th', frets: [5, 5, 7, 5, 6, 5], baseFret: 5, difficulty: 'Hard', description: 'Am7 barre chord 5th fret' }
-    ]
-  },
-  'B': {
-    'Major': [
-      { name: 'Barre 2nd', frets: [2, 2, 4, 4, 4, 2], baseFret: 2, difficulty: 'Medium', description: 'B major barre chord 2nd fret' },
-      { name: 'Barre 7th', frets: [7, 9, 9, 8, 7, 7], baseFret: 7, difficulty: 'Hard', description: 'B major barre chord 7th fret' }
+      {
+        name: 'Open Am7',
+        frets: ['x', 0, 2, 0, 1, 0],
+        baseFret: 0,
+        difficulty: 'Easy',
+        description: 'Open A minor 7th chord',
+      },
+      {
+        name: 'Barre 5th',
+        frets: [5, 5, 7, 5, 6, 5],
+        baseFret: 5,
+        difficulty: 'Hard',
+        description: 'Am7 barre chord 5th fret',
+      },
     ],
-    'Minor': [
-      { name: 'Barre 2nd', frets: [2, 2, 4, 4, 3, 2], baseFret: 2, difficulty: 'Medium', description: 'B minor barre chord 2nd fret' },
-      { name: 'Barre 7th', frets: [7, 9, 9, 7, 7, 7], baseFret: 7, difficulty: 'Hard', description: 'B minor barre chord 7th fret' }
+  },
+  B: {
+    Major: [
+      {
+        name: 'Barre 2nd',
+        frets: [2, 2, 4, 4, 4, 2],
+        baseFret: 2,
+        difficulty: 'Medium',
+        description: 'B major barre chord 2nd fret',
+      },
+      {
+        name: 'Barre 7th',
+        frets: [7, 9, 9, 8, 7, 7],
+        baseFret: 7,
+        difficulty: 'Hard',
+        description: 'B major barre chord 7th fret',
+      },
+    ],
+    Minor: [
+      {
+        name: 'Barre 2nd',
+        frets: [2, 2, 4, 4, 3, 2],
+        baseFret: 2,
+        difficulty: 'Medium',
+        description: 'B minor barre chord 2nd fret',
+      },
+      {
+        name: 'Barre 7th',
+        frets: [7, 9, 9, 7, 7, 7],
+        baseFret: 7,
+        difficulty: 'Hard',
+        description: 'B minor barre chord 7th fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Barre 2nd', frets: [2, 2, 4, 2, 4, 2], baseFret: 2, difficulty: 'Medium', description: 'B7 barre chord 2nd fret' },
-      { name: 'Open B7', frets: ['x', 2, 1, 2, 0, 2], baseFret: 0, difficulty: 'Medium', description: 'Open B7 chord' }
-    ]
+      {
+        name: 'Barre 2nd',
+        frets: [2, 2, 4, 2, 4, 2],
+        baseFret: 2,
+        difficulty: 'Medium',
+        description: 'B7 barre chord 2nd fret',
+      },
+      {
+        name: 'Open B7',
+        frets: ['x', 2, 1, 2, 0, 2],
+        baseFret: 0,
+        difficulty: 'Medium',
+        description: 'Open B7 chord',
+      },
+    ],
   },
   'C#': {
-    'Major': [
-      { name: 'Barre 4th', frets: [4, 4, 6, 6, 6, 4], baseFret: 4, difficulty: 'Medium', description: 'C# major barre chord 4th fret' },
-      { name: 'Barre 9th', frets: [9, 11, 11, 10, 9, 9], baseFret: 9, difficulty: 'Hard', description: 'C# major barre chord 9th fret' }
+    Major: [
+      {
+        name: 'Barre 4th',
+        frets: [4, 4, 6, 6, 6, 4],
+        baseFret: 4,
+        difficulty: 'Medium',
+        description: 'C# major barre chord 4th fret',
+      },
+      {
+        name: 'Barre 9th',
+        frets: [9, 11, 11, 10, 9, 9],
+        baseFret: 9,
+        difficulty: 'Hard',
+        description: 'C# major barre chord 9th fret',
+      },
     ],
-    'Minor': [
-      { name: 'Barre 4th', frets: [4, 4, 6, 6, 5, 4], baseFret: 4, difficulty: 'Medium', description: 'C# minor barre chord 4th fret' },
-      { name: 'Barre 9th', frets: [9, 11, 11, 9, 9, 9], baseFret: 9, difficulty: 'Hard', description: 'C# minor barre chord 9th fret' }
+    Minor: [
+      {
+        name: 'Barre 4th',
+        frets: [4, 4, 6, 6, 5, 4],
+        baseFret: 4,
+        difficulty: 'Medium',
+        description: 'C# minor barre chord 4th fret',
+      },
+      {
+        name: 'Barre 9th',
+        frets: [9, 11, 11, 9, 9, 9],
+        baseFret: 9,
+        difficulty: 'Hard',
+        description: 'C# minor barre chord 9th fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Barre 4th', frets: [4, 4, 6, 4, 6, 4], baseFret: 4, difficulty: 'Medium', description: 'C#7 barre chord 4th fret' }
-    ]
+      {
+        name: 'Barre 4th',
+        frets: [4, 4, 6, 4, 6, 4],
+        baseFret: 4,
+        difficulty: 'Medium',
+        description: 'C#7 barre chord 4th fret',
+      },
+    ],
   },
   'D#': {
-    'Major': [
-      { name: 'Barre 6th', frets: [6, 6, 8, 8, 8, 6], baseFret: 6, difficulty: 'Medium', description: 'D# major barre chord 6th fret' },
-      { name: 'Barre 11th', frets: [11, 13, 13, 12, 11, 11], baseFret: 11, difficulty: 'Hard', description: 'D# major barre chord 11th fret' }
+    Major: [
+      {
+        name: 'Barre 6th',
+        frets: [6, 6, 8, 8, 8, 6],
+        baseFret: 6,
+        difficulty: 'Medium',
+        description: 'D# major barre chord 6th fret',
+      },
+      {
+        name: 'Barre 11th',
+        frets: [11, 13, 13, 12, 11, 11],
+        baseFret: 11,
+        difficulty: 'Hard',
+        description: 'D# major barre chord 11th fret',
+      },
     ],
-    'Minor': [
-      { name: 'Barre 6th', frets: [6, 6, 8, 8, 7, 6], baseFret: 6, difficulty: 'Medium', description: 'D# minor barre chord 6th fret' },
-      { name: 'Barre 11th', frets: [11, 13, 13, 11, 11, 11], baseFret: 11, difficulty: 'Hard', description: 'D# minor barre chord 11th fret' }
+    Minor: [
+      {
+        name: 'Barre 6th',
+        frets: [6, 6, 8, 8, 7, 6],
+        baseFret: 6,
+        difficulty: 'Medium',
+        description: 'D# minor barre chord 6th fret',
+      },
+      {
+        name: 'Barre 11th',
+        frets: [11, 13, 13, 11, 11, 11],
+        baseFret: 11,
+        difficulty: 'Hard',
+        description: 'D# minor barre chord 11th fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Barre 6th', frets: [6, 6, 8, 6, 8, 6], baseFret: 6, difficulty: 'Medium', description: 'D#7 barre chord 6th fret' }
-    ]
+      {
+        name: 'Barre 6th',
+        frets: [6, 6, 8, 6, 8, 6],
+        baseFret: 6,
+        difficulty: 'Medium',
+        description: 'D#7 barre chord 6th fret',
+      },
+    ],
   },
   'F#': {
-    'Major': [
-      { name: 'Barre 2nd', frets: [2, 4, 4, 3, 2, 2], baseFret: 2, difficulty: 'Medium', description: 'F# major barre chord 2nd fret' },
-      { name: 'Barre 9th', frets: [9, 9, 11, 11, 11, 9], baseFret: 9, difficulty: 'Medium', description: 'F# major barre chord 9th fret' }
+    Major: [
+      {
+        name: 'Barre 2nd',
+        frets: [2, 4, 4, 3, 2, 2],
+        baseFret: 2,
+        difficulty: 'Medium',
+        description: 'F# major barre chord 2nd fret',
+      },
+      {
+        name: 'Barre 9th',
+        frets: [9, 9, 11, 11, 11, 9],
+        baseFret: 9,
+        difficulty: 'Medium',
+        description: 'F# major barre chord 9th fret',
+      },
     ],
-    'Minor': [
-      { name: 'Barre 2nd', frets: [2, 4, 4, 2, 2, 2], baseFret: 2, difficulty: 'Medium', description: 'F# minor barre chord 2nd fret' },
-      { name: 'Barre 9th', frets: [9, 9, 11, 11, 10, 9], baseFret: 9, difficulty: 'Medium', description: 'F# minor barre chord 9th fret' }
+    Minor: [
+      {
+        name: 'Barre 2nd',
+        frets: [2, 4, 4, 2, 2, 2],
+        baseFret: 2,
+        difficulty: 'Medium',
+        description: 'F# minor barre chord 2nd fret',
+      },
+      {
+        name: 'Barre 9th',
+        frets: [9, 9, 11, 11, 10, 9],
+        baseFret: 9,
+        difficulty: 'Medium',
+        description: 'F# minor barre chord 9th fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Barre 2nd', frets: [2, 4, 2, 3, 2, 2], baseFret: 2, difficulty: 'Medium', description: 'F#7 barre chord 2nd fret' },
-      { name: 'Barre 9th', frets: [9, 9, 11, 9, 11, 9], baseFret: 9, difficulty: 'Medium', description: 'F#7 barre chord 9th fret' }
-    ]
+      {
+        name: 'Barre 2nd',
+        frets: [2, 4, 2, 3, 2, 2],
+        baseFret: 2,
+        difficulty: 'Medium',
+        description: 'F#7 barre chord 2nd fret',
+      },
+      {
+        name: 'Barre 9th',
+        frets: [9, 9, 11, 9, 11, 9],
+        baseFret: 9,
+        difficulty: 'Medium',
+        description: 'F#7 barre chord 9th fret',
+      },
+    ],
   },
   'G#': {
-    'Major': [
-      { name: 'Barre 4th', frets: [4, 6, 6, 5, 4, 4], baseFret: 4, difficulty: 'Medium', description: 'G# major barre chord 4th fret' },
-      { name: 'Barre 11th', frets: [11, 11, 13, 13, 13, 11], baseFret: 11, difficulty: 'Hard', description: 'G# major barre chord 11th fret' }
+    Major: [
+      {
+        name: 'Barre 4th',
+        frets: [4, 6, 6, 5, 4, 4],
+        baseFret: 4,
+        difficulty: 'Medium',
+        description: 'G# major barre chord 4th fret',
+      },
+      {
+        name: 'Barre 11th',
+        frets: [11, 11, 13, 13, 13, 11],
+        baseFret: 11,
+        difficulty: 'Hard',
+        description: 'G# major barre chord 11th fret',
+      },
     ],
-    'Minor': [
-      { name: 'Barre 4th', frets: [4, 6, 6, 4, 4, 4], baseFret: 4, difficulty: 'Medium', description: 'G# minor barre chord 4th fret' },
-      { name: 'Barre 11th', frets: [11, 11, 13, 13, 12, 11], baseFret: 11, difficulty: 'Hard', description: 'G# minor barre chord 11th fret' }
+    Minor: [
+      {
+        name: 'Barre 4th',
+        frets: [4, 6, 6, 4, 4, 4],
+        baseFret: 4,
+        difficulty: 'Medium',
+        description: 'G# minor barre chord 4th fret',
+      },
+      {
+        name: 'Barre 11th',
+        frets: [11, 11, 13, 13, 12, 11],
+        baseFret: 11,
+        difficulty: 'Hard',
+        description: 'G# minor barre chord 11th fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Barre 4th', frets: [4, 6, 4, 5, 4, 4], baseFret: 4, difficulty: 'Medium', description: 'G#7 barre chord 4th fret' }
-    ]
+      {
+        name: 'Barre 4th',
+        frets: [4, 6, 4, 5, 4, 4],
+        baseFret: 4,
+        difficulty: 'Medium',
+        description: 'G#7 barre chord 4th fret',
+      },
+    ],
   },
   'A#': {
-    'Major': [
-      { name: 'Barre 6th', frets: [6, 6, 8, 8, 8, 6], baseFret: 6, difficulty: 'Medium', description: 'A# major barre chord 6th fret' },
-      { name: 'Barre 1st', frets: [1, 1, 3, 3, 3, 1], baseFret: 1, difficulty: 'Medium', description: 'A# major barre chord 1st fret' }
+    Major: [
+      {
+        name: 'Barre 6th',
+        frets: [6, 6, 8, 8, 8, 6],
+        baseFret: 6,
+        difficulty: 'Medium',
+        description: 'A# major barre chord 6th fret',
+      },
+      {
+        name: 'Barre 1st',
+        frets: [1, 1, 3, 3, 3, 1],
+        baseFret: 1,
+        difficulty: 'Medium',
+        description: 'A# major barre chord 1st fret',
+      },
     ],
-    'Minor': [
-      { name: 'Barre 6th', frets: [6, 6, 8, 8, 7, 6], baseFret: 6, difficulty: 'Medium', description: 'A# minor barre chord 6th fret' },
-      { name: 'Barre 1st', frets: [1, 1, 3, 3, 2, 1], baseFret: 1, difficulty: 'Medium', description: 'A# minor barre chord 1st fret' }
+    Minor: [
+      {
+        name: 'Barre 6th',
+        frets: [6, 6, 8, 8, 7, 6],
+        baseFret: 6,
+        difficulty: 'Medium',
+        description: 'A# minor barre chord 6th fret',
+      },
+      {
+        name: 'Barre 1st',
+        frets: [1, 1, 3, 3, 2, 1],
+        baseFret: 1,
+        difficulty: 'Medium',
+        description: 'A# minor barre chord 1st fret',
+      },
     ],
     'Dominant 7th': [
-      { name: 'Barre 6th', frets: [6, 6, 8, 6, 8, 6], baseFret: 6, difficulty: 'Medium', description: 'A#7 barre chord 6th fret' },
-      { name: 'Barre 1st', frets: [1, 1, 3, 1, 3, 1], baseFret: 1, difficulty: 'Medium', description: 'A#7 barre chord 1st fret' }
-    ]
-  }
+      {
+        name: 'Barre 6th',
+        frets: [6, 6, 8, 6, 8, 6],
+        baseFret: 6,
+        difficulty: 'Medium',
+        description: 'A#7 barre chord 6th fret',
+      },
+      {
+        name: 'Barre 1st',
+        frets: [1, 1, 3, 1, 3, 1],
+        baseFret: 1,
+        difficulty: 'Medium',
+        description: 'A#7 barre chord 1st fret',
+      },
+    ],
+  },
 }
 
 // Function to get note name from semitone offset
@@ -405,7 +1119,7 @@ export const getChordPositions = (
         string: guitarNote.string,
         fret: guitarNote.fret,
         note: guitarNote.name,
-        isRoot: noteNameWithoutOctave === rootNote
+        isRoot: noteNameWithoutOctave === rootNote,
       })
     }
   })
@@ -432,11 +1146,16 @@ export const getGuitarChordFingerings = (
 // Helper function to normalize chord root (handle enharmonic equivalents)
 const normalizeChordRoot = (rootNote: string): string => {
   const enharmonicMap: { [key: string]: string } = {
-    'C#': 'C#', 'Db': 'C#',
-    'D#': 'D#', 'Eb': 'D#',
-    'F#': 'F#', 'Gb': 'F#',
-    'G#': 'G#', 'Ab': 'G#',
-    'A#': 'A#', 'Bb': 'A#'
+    'C#': 'C#',
+    Db: 'C#',
+    'D#': 'D#',
+    Eb: 'D#',
+    'F#': 'F#',
+    Gb: 'F#',
+    'G#': 'G#',
+    Ab: 'G#',
+    'A#': 'A#',
+    Bb: 'A#',
   }
   return enharmonicMap[rootNote] || rootNote
 }
@@ -466,7 +1185,7 @@ const getTransposedBarreChords = (rootNote: string, chord: GuitarChord): ChordFi
 
   return CHORD_FINGERINGS[referenceRoot][chord.name].map(fingering => {
     const transposedFrets = fingering.frets.map(fret =>
-      fret === 'x' ? 'x' : (typeof fret === 'number' ? fret + semitoneOffset : fret)
+      fret === 'x' ? 'x' : typeof fret === 'number' ? fret + semitoneOffset : fret
     )
 
     return {
@@ -474,7 +1193,7 @@ const getTransposedBarreChords = (rootNote: string, chord: GuitarChord): ChordFi
       frets: transposedFrets,
       baseFret: fingering.baseFret + semitoneOffset,
       difficulty: semitoneOffset > 7 ? 'Hard' : fingering.difficulty,
-      description: fingering.description?.replace(referenceRoot, rootNote)
+      description: fingering.description?.replace(referenceRoot, rootNote),
     }
   })
 }
@@ -482,9 +1201,10 @@ const getTransposedBarreChords = (rootNote: string, chord: GuitarChord): ChordFi
 // Function to convert chord fingering to guitar positions for selection
 export const applyChordFingeringToGuitar = (
   fingering: ChordFingering,
-  guitarNotes: GuitarNote[]
-): { stringIndex: number, fretIndex: number }[] => {
-  const selections: { stringIndex: number, fretIndex: number }[] = []
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _guitarNotes: GuitarNote[]
+): { stringIndex: number; fretIndex: number }[] => {
+  const selections: { stringIndex: number; fretIndex: number }[] = []
 
   fingering.frets.forEach((fret, stringNumber) => {
     if (fret === 'x') return // Skip muted strings
@@ -522,7 +1242,7 @@ export const getChordShapes = (
       minFret,
       maxFret,
       positions,
-      difficulty: fingering.difficulty
+      difficulty: fingering.difficulty,
     })
   })
 
@@ -543,8 +1263,8 @@ const convertFingeringToPositions = (
     const guitarString = stringNumber + 1 // Convert 0-based to 1-based
 
     // Find the corresponding guitar note
-    const guitarNote = guitarNotes.find((note: GuitarNote) =>
-      note.string === guitarString && note.fret === actualFret
+    const guitarNote = guitarNotes.find(
+      (note: GuitarNote) => note.string === guitarString && note.fret === actualFret
     )
 
     if (guitarNote) {
@@ -552,7 +1272,7 @@ const convertFingeringToPositions = (
         string: guitarString,
         fret: actualFret,
         note: guitarNote.name,
-        isRoot: false // We'll determine this separately
+        isRoot: false, // We'll determine this separately
       })
     }
   })
@@ -565,7 +1285,7 @@ export const applyChordToGuitar = (
   rootNote: string,
   chord: GuitarChord,
   guitarNotes: GuitarNote[]
-): { stringIndex: number, fretIndex: number }[] => {
+): { stringIndex: number; fretIndex: number }[] => {
   const fingerings = getGuitarChordFingerings(rootNote, chord)
 
   if (fingerings.length > 0) {
@@ -575,7 +1295,7 @@ export const applyChordToGuitar = (
 
   // Fallback to theoretical approach if no fingerings available
   const chordPositions = getChordPositions(rootNote, chord, guitarNotes)
-  const selections: { stringIndex: number, fretIndex: number }[] = []
+  const selections: { stringIndex: number; fretIndex: number }[] = []
 
   chordPositions.forEach(position => {
     const stringIndex = 6 - position.string
@@ -589,8 +1309,8 @@ export const applyChordToGuitar = (
 // Function to apply a specific chord shape to guitar note selection
 export const applyChordShapeToGuitar = (
   chordShape: ChordShape
-): { stringIndex: number, fretIndex: number }[] => {
-  const selections: { stringIndex: number, fretIndex: number }[] = []
+): { stringIndex: number; fretIndex: number }[] => {
+  const selections: { stringIndex: number; fretIndex: number }[] = []
 
   chordShape.positions.forEach(position => {
     // Convert guitar string number (1-6) to visual string index (0-5)
@@ -620,12 +1340,12 @@ export const getChordBoxes = (
     { name: 'Position 3', minFret: 9, maxFret: 12 },
     { name: 'Position 4', minFret: 13, maxFret: 16 },
     { name: 'Position 5', minFret: 17, maxFret: 20 },
-    { name: 'Position 6', minFret: 21, maxFret: 24 }
+    { name: 'Position 6', minFret: 21, maxFret: 24 },
   ]
 
   boxRanges.forEach(range => {
-    const boxPositions = allPositions.filter(pos =>
-      pos.fret >= range.minFret && pos.fret <= range.maxFret
+    const boxPositions = allPositions.filter(
+      pos => pos.fret >= range.minFret && pos.fret <= range.maxFret
     )
 
     // Build a map of best note per string (prefer root, then lowest fret)
@@ -676,9 +1396,7 @@ export const getChordBoxes = (
     }
 
     // Only include positions from the largest consecutive group
-    const consecutivePositions = bestGroup
-      .map(str => notePerString.get(str)!)
-      .filter(Boolean)
+    const consecutivePositions = bestGroup.map(str => notePerString.get(str)!).filter(Boolean)
 
     // Only create a chord box if we have at least 3 notes (minimum for a chord)
     if (consecutivePositions.length >= 3) {
@@ -686,7 +1404,7 @@ export const getChordBoxes = (
         name: range.name,
         minFret: range.minFret,
         maxFret: range.maxFret,
-        positions: consecutivePositions
+        positions: consecutivePositions,
       })
     }
   })
@@ -697,8 +1415,8 @@ export const getChordBoxes = (
 // Function to apply a specific chord box to guitar note selection
 export const applyChordBoxToGuitar = (
   chordBox: ChordBox
-): { stringIndex: number, fretIndex: number }[] => {
-  const selections: { stringIndex: number, fretIndex: number }[] = []
+): { stringIndex: number; fretIndex: number }[] => {
+  const selections: { stringIndex: number; fretIndex: number }[] = []
 
   chordBox.positions.forEach(position => {
     // Convert guitar string number (1-6) to visual string index (0-5)

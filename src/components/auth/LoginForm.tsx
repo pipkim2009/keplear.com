@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { containsScriptInjection } from '../../utils/security'
-import logo from '/Keplear-logo.png'
+import logo from '/Keplear-logo.webp'
 import styles from './AuthForms.module.css'
 
 interface LoginFormProps {
@@ -27,15 +27,20 @@ interface TouchedFields {
   password: boolean
 }
 
-const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess }: LoginFormProps) => {
+const LoginForm = ({
+  onToggleForm,
+  onClose,
+  disableSignup = false,
+  onAuthSuccess,
+}: LoginFormProps) => {
   const { t } = useTranslation()
   const [formData, setFormData] = useState<FormData>({
     username: '',
-    password: ''
+    password: '',
   })
   const [touched, setTouched] = useState<TouchedFields>({
     username: false,
-    password: false
+    password: false,
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -64,21 +69,25 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
   }, [formData, t])
 
   // Check if field is valid
-  const isFieldValid = useCallback((field: keyof FormData): boolean => {
-    if (!formData[field]) return false
-    if (fieldErrors[field]) return false
+  const isFieldValid = useCallback(
+    (field: keyof FormData): boolean => {
+      if (!formData[field]) return false
+      if (fieldErrors[field]) return false
 
-    if (field === 'username') return formData.username.length >= 3 && !containsScriptInjection(formData.username)
-    if (field === 'password') return formData.password.length >= 6
+      if (field === 'username')
+        return formData.username.length >= 3 && !containsScriptInjection(formData.username)
+      if (field === 'password') return formData.password.length >= 6
 
-    return true
-  }, [formData, fieldErrors])
+      return true
+    },
+    [formData, fieldErrors]
+  )
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
     // Clear global error when user starts typing
     if (error) setError('')
@@ -87,7 +96,7 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
   const handleBlur = (field: keyof TouchedFields) => {
     setTouched(prev => ({
       ...prev,
-      [field]: true
+      [field]: true,
     }))
   }
 
@@ -104,7 +113,7 @@ const LoginForm = ({ onToggleForm, onClose, disableSignup = false, onAuthSuccess
     // Mark all fields as touched
     setTouched({
       username: true,
-      password: true
+      password: true,
     })
 
     // Check for validation errors

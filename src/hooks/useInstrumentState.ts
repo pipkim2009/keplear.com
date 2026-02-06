@@ -1,5 +1,4 @@
 import { useState, useCallback, useMemo } from 'react'
-import type { Note } from '../utils/notes'
 
 interface InstrumentScale<T> {
   root: string
@@ -20,11 +19,11 @@ export function useInstrumentState<TScale, TChord>(options: UseInstrumentStateOp
   const { stringCount, fretCount } = options
 
   // Initialize state with factory functions for better performance
-  const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(
-    () => new Array(stringCount).fill(false)
+  const [stringCheckboxes, setStringCheckboxes] = useState<boolean[]>(() =>
+    new Array(stringCount).fill(false)
   )
-  const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(
-    () => new Array(fretCount + 1).fill(false)
+  const [fretCheckboxes, setFretCheckboxes] = useState<boolean[]>(() =>
+    new Array(fretCount + 1).fill(false)
   )
   const [selectedNotes, setSelectedNotes] = useState<Set<string>>(() => new Set())
   const [currentScale, setCurrentScale] = useState<InstrumentScale<TScale> | null>(null)
@@ -74,10 +73,7 @@ export function useInstrumentState<TScale, TChord>(options: UseInstrumentStateOp
   }, [])
 
   // Batch update notes
-  const batchUpdateNotes = useCallback((
-    notesToAdd: string[],
-    notesToRemove: string[]
-  ) => {
+  const batchUpdateNotes = useCallback((notesToAdd: string[], notesToRemove: string[]) => {
     setSelectedNotes(prev => {
       const newSet = new Set(prev)
       notesToAdd.forEach(note => newSet.add(note))
@@ -87,74 +83,86 @@ export function useInstrumentState<TScale, TChord>(options: UseInstrumentStateOp
   }, [])
 
   // Check if note is selected
-  const isNoteSelected = useCallback((noteKey: string): boolean => {
-    return selectedNotes.has(noteKey)
-  }, [selectedNotes])
+  const isNoteSelected = useCallback(
+    (noteKey: string): boolean => {
+      return selectedNotes.has(noteKey)
+    },
+    [selectedNotes]
+  )
 
   // Check if note is in scale
-  const isNoteInScale = useCallback((noteKey: string): boolean => {
-    return scaleSelectedNotes.has(noteKey)
-  }, [scaleSelectedNotes])
+  const isNoteInScale = useCallback(
+    (noteKey: string): boolean => {
+      return scaleSelectedNotes.has(noteKey)
+    },
+    [scaleSelectedNotes]
+  )
 
   // Check if note is in chord
-  const isNoteInChord = useCallback((noteKey: string): boolean => {
-    return chordSelectedNotes.has(noteKey)
-  }, [chordSelectedNotes])
+  const isNoteInChord = useCallback(
+    (noteKey: string): boolean => {
+      return chordSelectedNotes.has(noteKey)
+    },
+    [chordSelectedNotes]
+  )
 
-  return useMemo(() => ({
-    // State
-    stringCheckboxes,
-    fretCheckboxes,
-    selectedNotes,
-    currentScale,
-    scaleSelectedNotes,
-    currentChord,
-    chordSelectedNotes,
-    hoveredString,
-    hoveredFret,
-    hoveredNote,
+  return useMemo(
+    () => ({
+      // State
+      stringCheckboxes,
+      fretCheckboxes,
+      selectedNotes,
+      currentScale,
+      scaleSelectedNotes,
+      currentChord,
+      chordSelectedNotes,
+      hoveredString,
+      hoveredFret,
+      hoveredNote,
 
-    // State setters
-    setStringCheckboxes,
-    setFretCheckboxes,
-    setSelectedNotes,
-    setCurrentScale,
-    setScaleSelectedNotes,
-    setCurrentChord,
-    setChordSelectedNotes,
-    setHoveredString,
-    setHoveredFret,
-    setHoveredNote,
+      // State setters
+      setStringCheckboxes,
+      setFretCheckboxes,
+      setSelectedNotes,
+      setCurrentScale,
+      setScaleSelectedNotes,
+      setCurrentChord,
+      setChordSelectedNotes,
+      setHoveredString,
+      setHoveredFret,
+      setHoveredNote,
 
-    // Helper functions
-    clearAllSelections,
-    clearScaleSelections,
-    clearChordSelections,
-    toggleNoteSelection,
-    batchUpdateNotes,
-    isNoteSelected,
-    isNoteInScale,
-    isNoteInChord
-  }), [
-    stringCheckboxes,
-    fretCheckboxes,
-    selectedNotes,
-    currentScale,
-    scaleSelectedNotes,
-    currentChord,
-    chordSelectedNotes,
-    hoveredString,
-    hoveredFret,
-    hoveredNote,
-    clearAllSelections,
-    clearScaleSelections,
-    clearChordSelections,
-    toggleNoteSelection,
-    batchUpdateNotes,
-    isNoteSelected,
-    isNoteInScale,
-    isNoteInChord
-  ])
+      // Helper functions
+      clearAllSelections,
+      clearScaleSelections,
+      clearChordSelections,
+      toggleNoteSelection,
+      batchUpdateNotes,
+      isNoteSelected,
+      isNoteInScale,
+      isNoteInChord,
+    }),
+    [
+      stringCheckboxes,
+      fretCheckboxes,
+      selectedNotes,
+      currentScale,
+      scaleSelectedNotes,
+      currentChord,
+      chordSelectedNotes,
+      hoveredString,
+      hoveredFret,
+      hoveredNote,
+      clearAllSelections,
+      clearScaleSelections,
+      clearChordSelections,
+      toggleNoteSelection,
+      batchUpdateNotes,
+      isNoteSelected,
+      isNoteInScale,
+      isNoteInChord,
+    ]
+  )
 }
 
 export default useInstrumentState
