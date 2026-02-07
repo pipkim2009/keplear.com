@@ -77,7 +77,7 @@ async function fetchAndDecodePeaks(videoId: string, signal: AbortSignal): Promis
   const audioContext = new AudioContext()
   try {
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
-    return extractPeaks(audioBuffer, 200)
+    return extractPeaks(audioBuffer, 800)
   } finally {
     await audioContext.close()
   }

@@ -64,6 +64,8 @@ import {
   PiRepeat,
   PiX,
   PiArrowCounterClockwise,
+  PiArrowClockwise,
+  PiTrash,
   PiSpeakerHigh,
   PiSpeakerLow,
   PiSpeakerNone,
@@ -2480,7 +2482,7 @@ function Classroom() {
   const handleClearSong = useCallback(() => {
     // Stop time updates
     if (songTimeUpdateRef.current) {
-      clearInterval(songTimeUpdateRef.current)
+      cancelAnimationFrame(songTimeUpdateRef.current)
       songTimeUpdateRef.current = null
     }
     // Destroy player
@@ -2527,6 +2529,16 @@ function Classroom() {
     [songIsPlayerReady]
   )
 
+  const handleSongSkip = useCallback(
+    (seconds: number) => {
+      if (!songPlayerRef.current || !songIsPlayerReady) return
+      const target = Math.max(0, Math.min(songDuration, songCurrentTime + seconds))
+      setSongCurrentTime(target)
+      songPlayerRef.current.seekTo(target, true)
+    },
+    [songIsPlayerReady, songDuration, songCurrentTime]
+  )
+
   const handleSongVolumeChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const vol = parseInt(e.target.value)
@@ -2539,17 +2551,23 @@ function Classroom() {
   )
 
   const setMarkerAAtCurrent = useCallback(() => {
-    setSongMarkerA(songCurrentTime)
-    if (songMarkerB !== null && songCurrentTime >= songMarkerB) {
-      setSongMarkerB(null)
-      setSongIsABLooping(false)
+    const t = songCurrentTime
+    if (songMarkerB !== null && t >= songMarkerB) {
+      setSongMarkerA(songMarkerB)
+      setSongMarkerB(t)
+    } else {
+      setSongMarkerA(t)
     }
   }, [songCurrentTime, songMarkerB])
 
   const setMarkerBAtCurrent = useCallback(() => {
-    if (songMarkerA !== null && songCurrentTime > songMarkerA) {
-      setSongMarkerB(songCurrentTime)
-      setSongIsABLooping(true)
+    const t = songCurrentTime
+    if (songMarkerA !== null && t <= songMarkerA) {
+      setSongMarkerB(songMarkerA)
+      setSongMarkerA(t)
+    } else {
+      setSongMarkerB(t)
+      if (songMarkerA !== null) setSongIsABLooping(true)
     }
   }, [songCurrentTime, songMarkerA])
 
@@ -2564,6 +2582,53 @@ function Classroom() {
       setSongIsABLooping(!songIsABLooping)
     }
   }, [songMarkerA, songMarkerB, songIsABLooping])
+
+  // Keyboard shortcuts: Space=play/pause, Arrows=skip, L=loop, A/B=markers
+  useEffect(() => {
+    if (!songVideoId) return
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+
+      switch (e.key) {
+        case ' ':
+          e.preventDefault()
+          toggleSongPlayPause()
+          break
+        case 'ArrowLeft':
+          e.preventDefault()
+          handleSongSkip(-10)
+          break
+        case 'ArrowRight':
+          e.preventDefault()
+          handleSongSkip(10)
+          break
+        case 'l':
+        case 'L':
+          setSongIsLooping(prev => !prev)
+          break
+        case 'a':
+        case 'A':
+          setMarkerAAtCurrent()
+          break
+        case 'b':
+        case 'B':
+          setMarkerBAtCurrent()
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [
+    songVideoId,
+    toggleSongPlayPause,
+    handleSongSkip,
+    setMarkerAAtCurrent,
+    setMarkerBAtCurrent,
+    songMarkerA,
+  ])
 
   // Apply song to current exercise in timeline
   const applySongToExercise = useCallback(
@@ -2694,8 +2759,8 @@ function Classroom() {
           event.target.setVolume(songVolume)
           event.target.setPlaybackRate(songPlaybackRate)
           // Start time update
-          if (songTimeUpdateRef.current) clearInterval(songTimeUpdateRef.current)
-          songTimeUpdateRef.current = window.setInterval(() => {
+          if (songTimeUpdateRef.current) cancelAnimationFrame(songTimeUpdateRef.current)
+          const tick = () => {
             if (songPlayerRef.current) {
               try {
                 setSongCurrentTime(songPlayerRef.current.getCurrentTime())
@@ -2703,7 +2768,9 @@ function Classroom() {
                 /* ignore */
               }
             }
-          }, 250)
+            songTimeUpdateRef.current = requestAnimationFrame(tick)
+          }
+          songTimeUpdateRef.current = requestAnimationFrame(tick)
         },
         onStateChange: (event: {
           data: number
@@ -2726,7 +2793,7 @@ function Classroom() {
 
     return () => {
       if (songTimeUpdateRef.current) {
-        clearInterval(songTimeUpdateRef.current)
+        cancelAnimationFrame(songTimeUpdateRef.current)
         songTimeUpdateRef.current = null
       }
     }
@@ -3931,6 +3998,7 @@ function Classroom() {
               onSeek={handleSongSeek}
               onVolumeChange={handleSongVolumeChange}
               onPlaybackRateChange={setSongPlaybackRate}
+              onSkip={handleSongSkip}
               formatTime={formatSongTime}
             />
 
@@ -4143,6 +4211,7 @@ function Classroom() {
               onSeek={handleSongSeek}
               onVolumeChange={handleSongVolumeChange}
               onPlaybackRateChange={setSongPlaybackRate}
+              onSkip={handleSongSkip}
               formatTime={formatSongTime}
             />
 
@@ -4868,6 +4937,27 @@ function Classroom() {
                     </div>
                   </div>
                   <button
+                    className={`${songStyles.controlButton} ${songIsLooping ? songStyles.controlButtonActive : ''}`}
+                    onClick={() => setSongIsLooping(!songIsLooping)}
+                    aria-label="Loop"
+                    title="Loop"
+                  >
+                    <PiRepeat />
+                  </button>
+                  <div className={songStyles.volumeControl}>
+                    <SongVolumeIcon className={songStyles.volumeIcon} />
+                    <input
+                      type="range"
+                      className={songStyles.volumeSlider}
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={songVolume}
+                      onChange={handleSongVolumeChange}
+                      style={{ '--volume-percent': `${songVolume}%` } as React.CSSProperties}
+                    />
+                  </div>
+                  <button
                     className={songStyles.closePlayerButton}
                     onClick={handleClearSong}
                     aria-label="Close"
@@ -4887,7 +4977,7 @@ function Classroom() {
                     {/* Waveform visualization - 1 bar per 0.1 seconds */}
                     <div className={songStyles.waveformContainer}>
                       {(() => {
-                        const numBars = Math.min(300, Math.max(1, Math.ceil(songDuration * 10)))
+                        const numBars = Math.min(600, Math.max(1, Math.ceil(songDuration * 10)))
                         const bars = songRealPeaks
                           ? resamplePeaks(songRealPeaks, numBars)
                           : generateFallbackWaveform(songVideoId, numBars)
@@ -4949,95 +5039,88 @@ function Classroom() {
                   </div>
                 </div>
 
-                {/* Practice Controls */}
-                <div className={songStyles.practiceControls}>
-                  {/* Play/Pause */}
-                  <button
-                    className={songStyles.controlButton}
-                    onClick={toggleSongPlayPause}
-                    disabled={!songIsPlayerReady}
-                    aria-label={isSongPlaying ? 'Pause' : 'Play'}
-                  >
-                    {isSongPlaying ? <PiPause /> : <PiPlay />}
-                  </button>
-
-                  {/* Volume */}
-                  <div className={songStyles.volumeControl}>
-                    <SongVolumeIcon className={songStyles.volumeIcon} />
-                    <input
-                      type="range"
-                      className={songStyles.volumeSlider}
-                      min={0}
-                      max={100}
-                      step={1}
-                      value={songVolume}
-                      onChange={handleSongVolumeChange}
-                      style={{ '--volume-percent': `${songVolume}%` } as React.CSSProperties}
-                    />
-                  </div>
-
-                  {/* Speed Control */}
-                  <div className={songStyles.speedControl}>
-                    <div className={songStyles.speedButtons}>
-                      {[0.5, 0.75, 1, 1.25, 1.5, 2].map(speed => (
-                        <button
-                          key={speed}
-                          className={`${songStyles.speedButton} ${songPlaybackRate === speed ? songStyles.speedButtonActive : ''}`}
-                          onClick={() => setSongPlaybackRate(speed)}
-                        >
-                          {speed}x
-                        </button>
-                      ))}
+                {/* Controls + Looper Grid */}
+                <div className={songStyles.controlsGrid}>
+                  <div className={songStyles.controlsLeft}>
+                    <div className={songStyles.transportRow}>
+                      <button
+                        className={songStyles.controlButtonSmall}
+                        onClick={() => handleSongSkip(-10)}
+                        disabled={!songIsPlayerReady}
+                        aria-label="Rewind 10 seconds"
+                        title="Rewind 10s"
+                      >
+                        <PiArrowCounterClockwise />
+                      </button>
+                      <button
+                        className={songStyles.controlButton}
+                        onClick={toggleSongPlayPause}
+                        disabled={!songIsPlayerReady}
+                        aria-label={isSongPlaying ? 'Pause' : 'Play'}
+                      >
+                        {isSongPlaying ? <PiPause /> : <PiPlay />}
+                      </button>
+                      <button
+                        className={songStyles.controlButtonSmall}
+                        onClick={() => handleSongSkip(10)}
+                        disabled={!songIsPlayerReady}
+                        aria-label="Forward 10 seconds"
+                        title="Forward 10s"
+                      >
+                        <PiArrowClockwise />
+                      </button>
+                    </div>
+                    <div className={songStyles.speedControl}>
+                      <div className={songStyles.speedButtons}>
+                        {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
+                          <button
+                            key={speed}
+                            className={`${songStyles.speedButton} ${songPlaybackRate === speed ? songStyles.speedButtonActive : ''}`}
+                            onClick={() => setSongPlaybackRate(speed)}
+                          >
+                            {speed}x
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Loop Toggle */}
-                  <button
-                    className={`${songStyles.controlButton} ${songIsLooping ? songStyles.controlButtonActive : ''}`}
-                    onClick={() => setSongIsLooping(!songIsLooping)}
-                    aria-label="Loop"
-                    title="Loop"
-                  >
-                    <PiRepeat />
-                  </button>
-                </div>
-
-                {/* A-B Repeat Controls */}
-                <div className={songStyles.abControls}>
-                  <span className={songStyles.controlLabel}>Looper</span>
-                  <div className={songStyles.abButtons}>
-                    <button
-                      className={`${songStyles.markerButton} ${songMarkerA !== null ? songStyles.markerButtonSet : ''}`}
-                      onClick={setMarkerAAtCurrent}
-                      disabled={!songIsPlayerReady}
-                      title="Set marker A at current position"
-                    >
-                      A {songMarkerA !== null && `(${formatSongTime(songMarkerA)})`}
-                    </button>
-                    <button
-                      className={`${songStyles.markerButton} ${songMarkerB !== null ? songStyles.markerButtonSet : ''}`}
-                      onClick={setMarkerBAtCurrent}
-                      disabled={songMarkerA === null || !songIsPlayerReady}
-                      title="Set marker B at current position"
-                    >
-                      B {songMarkerB !== null && `(${formatSongTime(songMarkerB)})`}
-                    </button>
-                    <button
-                      className={`${songStyles.abToggleButton} ${songIsABLooping ? songStyles.abToggleButtonActive : ''}`}
-                      onClick={toggleSongABLoop}
-                      disabled={songMarkerA === null || songMarkerB === null}
-                      title="Toggle A-B loop"
-                    >
-                      <PiRepeat />
-                    </button>
-                    <button
-                      className={songStyles.clearMarkersButton}
-                      onClick={clearSongMarkers}
-                      disabled={songMarkerA === null && songMarkerB === null}
-                      title="Clear markers"
-                    >
-                      <PiArrowCounterClockwise />
-                    </button>
+                  <div className={songStyles.abControls}>
+                    <span className={songStyles.controlLabel}>Looper</span>
+                    <div className={songStyles.abButtons}>
+                      <button
+                        className={`${songStyles.markerButton} ${songMarkerA !== null ? songStyles.markerButtonSet : ''}`}
+                        onClick={setMarkerAAtCurrent}
+                        disabled={!songIsPlayerReady}
+                        title="Set marker A at current position"
+                      >
+                        A {songMarkerA !== null && `(${formatSongTime(songMarkerA)})`}
+                      </button>
+                      <button
+                        className={`${songStyles.markerButton} ${songMarkerB !== null ? songStyles.markerButtonSet : ''}`}
+                        onClick={setMarkerBAtCurrent}
+                        disabled={songMarkerA === null || !songIsPlayerReady}
+                        title="Set marker B at current position"
+                      >
+                        B {songMarkerB !== null && `(${formatSongTime(songMarkerB)})`}
+                      </button>
+                      <button
+                        className={`${songStyles.abToggleButton} ${songIsABLooping ? songStyles.abToggleButtonActive : ''}`}
+                        onClick={toggleSongABLoop}
+                        disabled={songMarkerA === null || songMarkerB === null}
+                        title="Toggle A-B loop"
+                      >
+                        <PiRepeat />
+                      </button>
+                      <button
+                        className={songStyles.clearMarkersButton}
+                        onClick={clearSongMarkers}
+                        disabled={songMarkerA === null && songMarkerB === null}
+                        title="Clear markers"
+                      >
+                        <PiTrash />
+                      </button>
+                    </div>
                   </div>
                 </div>
 

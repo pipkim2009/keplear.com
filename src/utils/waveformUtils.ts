@@ -32,38 +32,62 @@ export function generateFallbackWaveform(videoId: string, numBars: number = 150)
 }
 
 /**
- * Extract waveform data from a decoded AudioBuffer using RMS (root mean square).
- * RMS measures average loudness per segment rather than peak amplitude,
- * giving much more visual contrast between quiet and loud sections
- * (intros, verses, choruses, bridges all look distinct).
- * Returns `numPeaks` normalized values (0.12–1.0).
+ * Extract waveform data from a decoded AudioBuffer.
+ * Uses hybrid RMS + peak amplitude (0.7/0.3 blend) with stereo channel merging.
+ * Returns `numPeaks` normalized values (0.04–1.0).
  */
-export function extractPeaks(audioBuffer: AudioBuffer, numPeaks: number = 200): number[] {
-  const channelData = audioBuffer.getChannelData(0)
-  const samplesPerPeak = Math.floor(channelData.length / numPeaks)
+export function extractPeaks(audioBuffer: AudioBuffer, numPeaks: number = 800): number[] {
+  const ch0 = audioBuffer.getChannelData(0)
+  const ch1 = audioBuffer.numberOfChannels >= 2 ? audioBuffer.getChannelData(1) : null
+  const totalSamples = ch0.length
+  const samplesPerPeak = Math.floor(totalSamples / numPeaks)
 
-  // First pass: calculate RMS per segment
+  // First pass: hybrid RMS + peak amplitude, stereo merged
   let globalMax = 0
-  const rawRms: number[] = []
+  const rawValues: number[] = []
   for (let i = 0; i < numPeaks; i++) {
     const start = i * samplesPerPeak
-    const end = Math.min(start + samplesPerPeak, channelData.length)
-    let sumSquares = 0
+    const end = Math.min(start + samplesPerPeak, totalSamples)
+    const count = end - start
+
+    let sum0 = 0,
+      peak0 = 0
     for (let j = start; j < end; j++) {
-      sumSquares += channelData[j] * channelData[j]
+      const s = ch0[j]
+      sum0 += s * s
+      const a = Math.abs(s)
+      if (a > peak0) peak0 = a
     }
-    const rms = Math.sqrt(sumSquares / (end - start))
-    rawRms.push(rms)
-    if (rms > globalMax) globalMax = rms
+    let rms = Math.sqrt(sum0 / count)
+    let peakAbs = peak0
+
+    if (ch1) {
+      let sum1 = 0,
+        peak1 = 0
+      for (let j = start; j < end; j++) {
+        const s = ch1[j]
+        sum1 += s * s
+        const a = Math.abs(s)
+        if (a > peak1) peak1 = a
+      }
+      const rms1 = Math.sqrt(sum1 / count)
+      const peakAbs1 = peak1
+      rms = Math.max(rms, rms1)
+      peakAbs = Math.max(peakAbs, peakAbs1)
+    }
+
+    const value = 0.7 * rms + 0.3 * peakAbs
+    rawValues.push(value)
+    if (value > globalMax) globalMax = value
   }
 
   // Second pass: normalize and apply power curve for visual spread
-  // pow(x, 0.6) expands the mid-range so quiet sections aren't crushed flat
+  // pow(x, 0.8) preserves dynamic range while still giving mid-range some lift
   const peaks: number[] = []
-  for (let i = 0; i < rawRms.length; i++) {
-    const normalized = globalMax > 0 ? rawRms[i] / globalMax : 0
-    const shaped = Math.pow(normalized, 0.6)
-    peaks.push(Math.max(0.12, shaped))
+  for (let i = 0; i < rawValues.length; i++) {
+    const normalized = globalMax > 0 ? rawValues[i] / globalMax : 0
+    const shaped = Math.pow(normalized, 0.8)
+    peaks.push(Math.max(0.04, shaped))
   }
 
   return peaks

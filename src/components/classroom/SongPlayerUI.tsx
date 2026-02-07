@@ -4,7 +4,15 @@
  * lesson mode (legacy + multi-exercise) and assignment editor views
  */
 
-import { PiPlay, PiPause, PiSpeakerHigh, PiSpeakerLow, PiSpeakerNone } from 'react-icons/pi'
+import {
+  PiPlay,
+  PiPause,
+  PiSpeakerHigh,
+  PiSpeakerLow,
+  PiSpeakerNone,
+  PiArrowCounterClockwise,
+  PiArrowClockwise,
+} from 'react-icons/pi'
 import { useWaveformData } from '../../hooks/useWaveformData'
 import { generateFallbackWaveform, resamplePeaks } from '../../utils/waveformUtils'
 import songStyles from '../../styles/Songs.module.css'
@@ -24,6 +32,7 @@ interface SongPlayerUIProps {
   readonly onSeek: (e: React.ChangeEvent<HTMLInputElement>) => void
   readonly onVolumeChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   readonly onPlaybackRateChange: (rate: number) => void
+  readonly onSkip: (seconds: number) => void
   readonly formatTime: (time: number) => string
 }
 
@@ -42,6 +51,7 @@ export default function SongPlayerUI({
   onSeek,
   onVolumeChange,
   onPlaybackRateChange,
+  onSkip,
   formatTime,
 }: SongPlayerUIProps) {
   const hasLoop =
@@ -69,6 +79,20 @@ export default function SongPlayerUI({
             <p className={songStyles.playerArtist}>YouTube</p>
           </div>
         </div>
+        <div className={songStyles.volumeControl}>
+          <VolumeIcon className={songStyles.volumeIcon} />
+          <input
+            type="range"
+            className={songStyles.volumeSlider}
+            min={0}
+            max={100}
+            step={1}
+            value={volume}
+            onChange={onVolumeChange}
+            style={{ '--volume-percent': `${volume}%` } as React.CSSProperties}
+            aria-label="Volume"
+          />
+        </div>
       </div>
 
       {/* Loading indicator */}
@@ -79,7 +103,7 @@ export default function SongPlayerUI({
         <div className={songStyles.timelineWrapper}>
           <div className={songStyles.waveformContainer}>
             {(() => {
-              const numBars = Math.min(300, Math.max(1, Math.ceil(loopDuration * 10)))
+              const numBars = Math.min(600, Math.max(1, Math.ceil(loopDuration * 10)))
 
               let bars: number[]
               if (realPeaks && hasLoop && duration > 0) {
@@ -132,34 +156,39 @@ export default function SongPlayerUI({
       </div>
 
       {/* Playback Controls */}
-      <div className={songStyles.practiceControls}>
-        <button
-          className={songStyles.controlButton}
-          onClick={onTogglePlayPause}
-          disabled={!isPlayerReady}
-          aria-label={isPlaying ? 'Pause' : 'Play'}
-        >
-          {isPlaying ? <PiPause /> : <PiPlay />}
-        </button>
-
-        <div className={songStyles.volumeControl}>
-          <VolumeIcon className={songStyles.volumeIcon} />
-          <input
-            type="range"
-            className={songStyles.volumeSlider}
-            min={0}
-            max={100}
-            step={1}
-            value={volume}
-            onChange={onVolumeChange}
-            style={{ '--volume-percent': `${volume}%` } as React.CSSProperties}
-            aria-label="Volume"
-          />
+      <div className={songStyles.controlsLeft}>
+        <div className={songStyles.transportRow}>
+          <button
+            className={songStyles.controlButtonSmall}
+            onClick={() => onSkip(-10)}
+            disabled={!isPlayerReady}
+            aria-label="Rewind 10 seconds"
+            title="Rewind 10s"
+          >
+            <PiArrowCounterClockwise />
+          </button>
+          <button
+            className={songStyles.controlButton}
+            onClick={onTogglePlayPause}
+            disabled={!isPlayerReady}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
+            {isPlaying ? <PiPause /> : <PiPlay />}
+          </button>
+          <button
+            className={songStyles.controlButtonSmall}
+            onClick={() => onSkip(10)}
+            disabled={!isPlayerReady}
+            aria-label="Forward 10 seconds"
+            title="Forward 10s"
+          >
+            <PiArrowClockwise />
+          </button>
         </div>
 
         <div className={songStyles.speedControl}>
           <div className={songStyles.speedButtons}>
-            {[0.5, 0.75, 1, 1.25, 1.5, 2].map(speed => (
+            {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
               <button
                 key={speed}
                 className={`${songStyles.speedButton} ${playbackRate === speed ? songStyles.speedButtonActive : ''}`}

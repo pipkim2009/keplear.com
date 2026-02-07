@@ -14,6 +14,8 @@ import {
   PiSpeakerLow,
   PiSpeakerNone,
   PiArrowCounterClockwise,
+  PiArrowClockwise,
+  PiTrash,
   PiX,
   PiMagnifyingGlass,
   PiLink,
@@ -343,28 +345,29 @@ const Songs = () => {
     return count.toString()
   }
 
-  // Time update loop - uses refs to avoid stale closure issues
+  // Time update loop - uses rAF for smooth waveform playhead tracking
   const startTimeUpdate = useCallback(() => {
     if (timeUpdateInterval.current) {
-      clearInterval(timeUpdateInterval.current)
+      cancelAnimationFrame(timeUpdateInterval.current)
     }
 
-    timeUpdateInterval.current = window.setInterval(() => {
+    const tick = () => {
       const player = playerRef.current
-      if (!player) return
-
-      try {
-        const current = player.getCurrentTime()
-        setCurrentTime(current)
-      } catch {
-        // Player might not be ready yet
+      if (player) {
+        try {
+          setCurrentTime(player.getCurrentTime())
+        } catch {
+          // Player might not be ready yet
+        }
       }
-    }, 250)
+      timeUpdateInterval.current = requestAnimationFrame(tick)
+    }
+    timeUpdateInterval.current = requestAnimationFrame(tick)
   }, [])
 
   const stopTimeUpdate = useCallback(() => {
     if (timeUpdateInterval.current) {
-      clearInterval(timeUpdateInterval.current)
+      cancelAnimationFrame(timeUpdateInterval.current)
       timeUpdateInterval.current = null
     }
   }, [])
@@ -558,19 +561,37 @@ const Songs = () => {
     setPlaybackRate(speed)
   }, [])
 
+  const skipTime = useCallback(
+    (seconds: number) => {
+      if (!playerRef.current || !isPlayerReady) return
+      const target = Math.max(0, Math.min(duration, currentTime + seconds))
+      setCurrentTime(target)
+      playerRef.current.seekTo(target, true)
+    },
+    [isPlayerReady, duration, currentTime]
+  )
+
   // A-B repeat controls
   const setMarkerAAtCurrent = useCallback(() => {
-    setMarkerA(currentTime)
-    if (markerB !== null && currentTime >= markerB) {
-      setMarkerB(null)
-      setIsABLooping(false)
+    const t = currentTime
+    if (markerB !== null && t >= markerB) {
+      // A moved past B — swap: old B becomes A, current becomes new B
+      setMarkerA(markerB)
+      setMarkerB(t)
+    } else {
+      setMarkerA(t)
     }
   }, [currentTime, markerB])
 
   const setMarkerBAtCurrent = useCallback(() => {
-    if (markerA !== null && currentTime > markerA) {
-      setMarkerB(currentTime)
-      setIsABLooping(true)
+    const t = currentTime
+    if (markerA !== null && t <= markerA) {
+      // B moved before A — swap: current becomes new A, old A becomes B
+      setMarkerB(markerA)
+      setMarkerA(t)
+    } else {
+      setMarkerB(t)
+      if (markerA !== null) setIsABLooping(true)
     }
   }, [currentTime, markerA])
 
@@ -585,6 +606,53 @@ const Songs = () => {
       setIsABLooping(!isABLooping)
     }
   }, [markerA, markerB, isABLooping])
+
+  // Keyboard shortcuts: Space=play/pause, Arrows=skip, L=loop, A/B=markers
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      if (!currentVideo) return
+
+      switch (e.key) {
+        case ' ':
+          e.preventDefault()
+          togglePlayPause()
+          break
+        case 'ArrowLeft':
+          e.preventDefault()
+          skipTime(-10)
+          break
+        case 'ArrowRight':
+          e.preventDefault()
+          skipTime(10)
+          break
+        case 'l':
+        case 'L':
+          toggleLoop()
+          break
+        case 'a':
+        case 'A':
+          setMarkerAAtCurrent()
+          break
+        case 'b':
+        case 'B':
+          setMarkerBAtCurrent()
+          break
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [
+    currentVideo,
+    togglePlayPause,
+    skipTime,
+    toggleLoop,
+    setMarkerAAtCurrent,
+    setMarkerBAtCurrent,
+    markerA,
+  ])
 
   // Format time display (0.1 second precision)
   const formatTime = (seconds: number) => {
@@ -631,7 +699,7 @@ const Songs = () => {
     })
   }, [])
 
-  const speedOptions = [0.5, 0.75, 1, 1.25, 1.5, 2]
+  const speedOptions = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 
   return (
     <div className={styles.songsContainer}>
@@ -812,6 +880,27 @@ const Songs = () => {
               </div>
             </div>
             <button
+              className={`${styles.controlButton} ${isLooping ? styles.controlButtonActive : ''}`}
+              onClick={toggleLoop}
+              aria-label={t('songs.loop')}
+              title={t('songs.loop')}
+            >
+              <PiRepeat />
+            </button>
+            <div className={styles.volumeControl}>
+              <VolumeIcon className={styles.volumeIcon} />
+              <input
+                type="range"
+                className={styles.volumeSlider}
+                min={0}
+                max={100}
+                step={1}
+                value={volume}
+                onChange={handleVolumeChange}
+                style={{ '--volume-percent': `${volume}%` } as React.CSSProperties}
+              />
+            </div>
+            <button
               className={styles.closePlayerButton}
               onClick={closePlayer}
               aria-label={t('common.close')}
@@ -829,7 +918,7 @@ const Songs = () => {
               {/* Waveform visualization - 1 bar per 0.1 seconds */}
               <div className={styles.waveformContainer}>
                 {(() => {
-                  const numBars = Math.min(300, Math.max(1, Math.ceil(duration * 10)))
+                  const numBars = Math.min(600, Math.max(1, Math.ceil(duration * 10)))
                   const videoId = currentVideo!.videoId
                   const bars = realPeaks
                     ? resamplePeaks(realPeaks, numBars)
@@ -891,95 +980,88 @@ const Songs = () => {
             </div>
           </div>
 
-          {/* Practice Controls */}
-          <div className={styles.practiceControls}>
-            {/* Play/Pause */}
-            <button
-              className={styles.controlButton}
-              onClick={togglePlayPause}
-              disabled={!isPlayerReady}
-              aria-label={isPlaying ? t('common.stop') : t('sandbox.play')}
-            >
-              {isPlaying ? <PiPause /> : <PiPlay />}
-            </button>
-
-            {/* Volume */}
-            <div className={styles.volumeControl}>
-              <VolumeIcon className={styles.volumeIcon} />
-              <input
-                type="range"
-                className={styles.volumeSlider}
-                min={0}
-                max={100}
-                step={1}
-                value={volume}
-                onChange={handleVolumeChange}
-                style={{ '--volume-percent': `${volume}%` } as React.CSSProperties}
-              />
-            </div>
-
-            {/* Speed Control */}
-            <div className={styles.speedControl}>
-              <div className={styles.speedButtons}>
-                {speedOptions.map(speed => (
-                  <button
-                    key={speed}
-                    className={`${styles.speedButton} ${playbackRate === speed ? styles.speedButtonActive : ''}`}
-                    onClick={() => changeSpeed(speed)}
-                  >
-                    {speed}x
-                  </button>
-                ))}
+          {/* Controls + Looper Grid */}
+          <div className={styles.controlsGrid}>
+            <div className={styles.controlsLeft}>
+              <div className={styles.transportRow}>
+                <button
+                  className={styles.controlButtonSmall}
+                  onClick={() => skipTime(-10)}
+                  disabled={!isPlayerReady}
+                  aria-label="Rewind 10 seconds"
+                  title="Rewind 10s"
+                >
+                  <PiArrowCounterClockwise />
+                </button>
+                <button
+                  className={styles.controlButton}
+                  onClick={togglePlayPause}
+                  disabled={!isPlayerReady}
+                  aria-label={isPlaying ? t('common.stop') : t('sandbox.play')}
+                >
+                  {isPlaying ? <PiPause /> : <PiPlay />}
+                </button>
+                <button
+                  className={styles.controlButtonSmall}
+                  onClick={() => skipTime(10)}
+                  disabled={!isPlayerReady}
+                  aria-label="Forward 10 seconds"
+                  title="Forward 10s"
+                >
+                  <PiArrowClockwise />
+                </button>
+              </div>
+              <div className={styles.speedControl}>
+                <div className={styles.speedButtons}>
+                  {speedOptions.map(speed => (
+                    <button
+                      key={speed}
+                      className={`${styles.speedButton} ${playbackRate === speed ? styles.speedButtonActive : ''}`}
+                      onClick={() => changeSpeed(speed)}
+                    >
+                      {speed}x
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Loop Toggle */}
-            <button
-              className={`${styles.controlButton} ${isLooping ? styles.controlButtonActive : ''}`}
-              onClick={toggleLoop}
-              aria-label={t('songs.loop')}
-              title={t('songs.loop')}
-            >
-              <PiRepeat />
-            </button>
-          </div>
-
-          {/* A-B Repeat Controls */}
-          <div className={styles.abControls}>
-            <span className={styles.controlLabel}>Looper</span>
-            <div className={styles.abButtons}>
-              <button
-                className={`${styles.markerButton} ${markerA !== null ? styles.markerButtonSet : ''}`}
-                onClick={setMarkerAAtCurrent}
-                disabled={!isPlayerReady}
-                title={t('songs.setMarkerA')}
-              >
-                A {markerA !== null && `(${formatTime(markerA)})`}
-              </button>
-              <button
-                className={`${styles.markerButton} ${markerB !== null ? styles.markerButtonSet : ''}`}
-                onClick={setMarkerBAtCurrent}
-                disabled={markerA === null || !isPlayerReady}
-                title={t('songs.setMarkerB')}
-              >
-                B {markerB !== null && `(${formatTime(markerB)})`}
-              </button>
-              <button
-                className={`${styles.abToggleButton} ${isABLooping ? styles.abToggleButtonActive : ''}`}
-                onClick={toggleABLoop}
-                disabled={markerA === null || markerB === null}
-                title={t('songs.toggleABLoop')}
-              >
-                <PiRepeat />
-              </button>
-              <button
-                className={styles.clearMarkersButton}
-                onClick={clearABMarkers}
-                disabled={markerA === null && markerB === null}
-                title={t('songs.clearMarkers')}
-              >
-                <PiArrowCounterClockwise />
-              </button>
+            <div className={styles.abControls}>
+              <span className={styles.controlLabel}>Looper</span>
+              <div className={styles.abButtons}>
+                <button
+                  className={`${styles.markerButton} ${markerA !== null ? styles.markerButtonSet : ''}`}
+                  onClick={setMarkerAAtCurrent}
+                  disabled={!isPlayerReady}
+                  title={t('songs.setMarkerA')}
+                >
+                  A {markerA !== null && `(${formatTime(markerA)})`}
+                </button>
+                <button
+                  className={`${styles.markerButton} ${markerB !== null ? styles.markerButtonSet : ''}`}
+                  onClick={setMarkerBAtCurrent}
+                  disabled={markerA === null || !isPlayerReady}
+                  title={t('songs.setMarkerB')}
+                >
+                  B {markerB !== null && `(${formatTime(markerB)})`}
+                </button>
+                <button
+                  className={`${styles.abToggleButton} ${isABLooping ? styles.abToggleButtonActive : ''}`}
+                  onClick={toggleABLoop}
+                  disabled={markerA === null || markerB === null}
+                  title={t('songs.toggleABLoop')}
+                >
+                  <PiRepeat />
+                </button>
+                <button
+                  className={styles.clearMarkersButton}
+                  onClick={clearABMarkers}
+                  disabled={markerA === null && markerB === null}
+                  title={t('songs.clearMarkers')}
+                >
+                  <PiTrash />
+                </button>
+              </div>
             </div>
           </div>
         </div>
