@@ -100,6 +100,14 @@
   background: linear-gradient(145deg, var(--blue-800), var(--blue-900));
 }
 
+body.light .instrument-wrapper {
+  scrollbar-color: var(--blue-500) var(--white);
+}
+
+body.light .instrument-wrapper::-webkit-scrollbar-track {
+  background: var(--white);
+}
+
 /* Mobile adjustments for octave controls */
 @media (max-width: 768px) {
   .octave-controls {

@@ -389,6 +389,14 @@ body.light .instrument-controls-container {
   background: linear-gradient(145deg, var(--blue-700), var(--blue-900));
 }
 
+body.light .keyboard-container {
+  scrollbar-color: var(--blue-500) var(--white);
+}
+
+body.light .keyboard-container::-webkit-scrollbar-track {
+  background: var(--white);
+}
+
 @media (max-width: 480px) {
   .keyboard-container {
     justify-content: flex-start;

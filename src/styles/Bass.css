@@ -779,6 +779,14 @@
   background: linear-gradient(145deg, var(--red-700), var(--red-800));
 }
 
+body.light .bass-container {
+  scrollbar-color: var(--red-500) var(--white);
+}
+
+body.light .bass-container::-webkit-scrollbar-track {
+  background: var(--white);
+}
+
 /*
   ===========================================
   REDUCED MOTION ACCESSIBILITY

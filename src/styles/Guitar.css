@@ -213,6 +213,14 @@
   background: linear-gradient(145deg, var(--green-700), var(--green-800));
 }
 
+body.light .guitar-container {
+  scrollbar-color: var(--green-500) var(--white);
+}
+
+body.light .guitar-container::-webkit-scrollbar-track {
+  background: var(--white);
+}
+
 /* Fret checkboxes styling */
 .fret-checkbox-container {
   position: absolute;
