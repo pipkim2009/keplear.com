@@ -164,7 +164,7 @@ function isAllowedAudioUrl(urlStr: string): boolean {
  * Parses clen from URL to request the exact file size - YouTube rejects oversized ranges.
  */
 async function downloadAudio(audioUrl: string, signal: AbortSignal): Promise<Buffer> {
-  const MAX_SIZE = 10 * 1024 * 1024 // 10MB safety cap
+  const MAX_SIZE = 50 * 1024 * 1024 // 50MB — enough for ~50 min at 128kbps
 
   const parsedUrl = new URL(audioUrl)
   const isGV = parsedUrl.hostname.endsWith('.googlevideo.com')
@@ -283,6 +283,44 @@ export function pipedDevPlugin(): Plugin {
         } catch {
           clearTimeout(timeout)
           jsonResponse(res, 500, { error: 'Internal error', audioStreams: [] })
+        }
+      })
+
+      // /api/demucs-model - proxy model download to avoid CORS (GitHub releases lack CORS headers)
+      server.middlewares.use(async (req, res, next) => {
+        if (!req.url?.startsWith('/api/demucs-model')) return next()
+
+        const modelUrl =
+          'https://github.com/mixxxdj/demucs/releases/download/v4.0.1-19-gd182d42-onnxmodel/htdemucs.onnx'
+
+        try {
+          console.log('[demucs-model] Fetching model from GitHub releases...')
+          const response = await fetch(modelUrl)
+          if (!response.ok) {
+            res.writeHead(response.status)
+            res.end(`Failed to fetch model: HTTP ${response.status}`)
+            return
+          }
+
+          res.setHeader('Content-Type', 'application/octet-stream')
+          const contentLength = response.headers.get('content-length')
+          if (contentLength) res.setHeader('Content-Length', contentLength)
+          res.writeHead(200)
+
+          const reader = (response.body as ReadableStream<Uint8Array>).getReader()
+          let totalBytes = 0
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            res.write(value)
+            totalBytes += value.byteLength
+          }
+          console.log(`[demucs-model] Streamed ${(totalBytes / 1024 / 1024).toFixed(1)} MB`)
+          res.end()
+        } catch (e) {
+          console.error('[demucs-model] Failed:', (e as Error).message)
+          if (!res.headersSent) res.writeHead(502)
+          res.end()
         }
       })
 

@@ -7,7 +7,7 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from 'react'
-import { downloadAudioBuffer, getCachedAudioBuffer } from './useWaveformData'
+import { downloadFullAudioBuffer } from './useWaveformData'
 
 export type StemType = 'vocals' | 'drums' | 'bass' | 'other'
 
@@ -92,11 +92,8 @@ export function useStemSeparation(videoId: string | null) {
     abortRef.current = abortController
 
     try {
-      // Step 1: Get audio data (reuse cached buffer from waveform generation)
-      let arrayBuffer = getCachedAudioBuffer(videoId)
-      if (!arrayBuffer) {
-        arrayBuffer = await downloadAudioBuffer(videoId, abortController.signal)
-      }
+      // Step 1: Get full-quality audio data (highest bitrate for best stem separation)
+      const arrayBuffer = await downloadFullAudioBuffer(videoId, abortController.signal)
       if (!arrayBuffer) {
         throw new Error('Failed to download audio. The song may be too long or unavailable.')
       }

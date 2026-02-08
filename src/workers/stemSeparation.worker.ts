@@ -1,15 +1,12 @@
 /**
  * Web Worker for audio stem separation using ONNX Runtime Web + Demucs HTDemucs model.
  *
- * Uses onnxruntime-web (npm package) with a Demucs ONNX model loaded from
- * HuggingFace on demand. The model requires two inputs:
- *   1. Waveform: float32[1, 2, samples] (stereo audio)
- *   2. Spectrogram: float32[1, 2, 2048, time_frames, 2] (STFT with real/imag)
+ * Uses the self-contained Demucs ONNX model from mixxxdj/demucs which bakes
+ * STFT/ISTFT into the model as 1D convolutions. It accepts a single waveform
+ * input and outputs stems directly — no manual FFT/STFT computation needed.
  *
- * STFT parameters: n_fft=4096, hop_length=1024, Hann window
- * Audio is processed in 10-second segments (441000 samples at 44.1kHz).
- *
- * Output: float32[1, 4, 2, samples] — drums=0, bass=1, other=2, vocals=3
+ * Input: float32[1, 2, 343980] (stereo waveform at 44.1kHz, ~7.8s segments)
+ * Output: float32[1, 4, 2, 343980] — drums=0, bass=1, other=2, vocals=3
  *
  * Communication protocol:
  * - Main → Worker: { type: 'SEPARATE', leftChannel: ArrayBuffer, rightChannel: ArrayBuffer, sampleRate: number }
@@ -20,18 +17,14 @@
 
 import * as ort from 'onnxruntime-web'
 
-// Model URL — Demucs v4 HTDemucs, freely hosted on HuggingFace
-const MODEL_URL =
-  'https://huggingface.co/timcsy/demucs-web-onnx/resolve/main/htdemucs_embedded.onnx'
+// Model URL — self-contained Demucs v4 HTDemucs from mixxxdj/demucs (MIT license)
+// Proxied through the dev server to avoid CORS issues (GitHub releases lack CORS headers).
+// For production, host the model on a CORS-friendly CDN (e.g. HuggingFace) and update this URL.
+const MODEL_URL = '/api/demucs-model'
 
 // Stem order in Demucs output: drums=0, bass=1, other=2, vocals=3
 const STEM_NAMES = ['drums', 'bass', 'other', 'vocals'] as const
 const NUM_STEMS = 4
-
-// STFT parameters matching Demucs HTDemucs
-const N_FFT = 4096
-const HOP_LENGTH = 1024
-const FREQ_BINS = N_FFT / 2 // 2048 (Demucs drops the Nyquist bin)
 
 // Demucs processes audio at 44100 Hz in 7.8-second segments (default htdemucs segment)
 const MODEL_SAMPLE_RATE = 44100
@@ -41,161 +34,6 @@ const SEGMENT_SAMPLES = 343980 // 7.8 * 44100 — fixed by model export
 ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/'
 
 let session: ort.InferenceSession | null = null
-
-// ─── Hann Window ───────────────────────────────────────────────────────────
-
-function createHannWindow(size: number): Float32Array {
-  const window = new Float32Array(size)
-  for (let i = 0; i < size; i++) {
-    window[i] = 0.5 * (1 - Math.cos((2 * Math.PI * i) / size))
-  }
-  return window
-}
-
-const hannWindow = createHannWindow(N_FFT)
-
-// ─── FFT (radix-2 Cooley-Tukey) ───────────────────────────────────────────
-
-/**
- * In-place radix-2 FFT. Input arrays are modified in place.
- * real and imag must have length that is a power of 2.
- */
-function fft(real: Float64Array, imag: Float64Array): void {
-  const n = real.length
-  if (n <= 1) return
-
-  // Bit-reversal permutation
-  let j = 0
-  for (let i = 1; i < n; i++) {
-    let bit = n >> 1
-    while (j & bit) {
-      j ^= bit
-      bit >>= 1
-    }
-    j ^= bit
-    if (i < j) {
-      let tmp = real[i]
-      real[i] = real[j]
-      real[j] = tmp
-      tmp = imag[i]
-      imag[i] = imag[j]
-      imag[j] = tmp
-    }
-  }
-
-  // FFT butterfly
-  for (let len = 2; len <= n; len <<= 1) {
-    const halfLen = len >> 1
-    const angle = (-2 * Math.PI) / len
-    const wReal = Math.cos(angle)
-    const wImag = Math.sin(angle)
-
-    for (let i = 0; i < n; i += len) {
-      let curReal = 1,
-        curImag = 0
-      for (let k = 0; k < halfLen; k++) {
-        const evenIdx = i + k
-        const oddIdx = i + k + halfLen
-        const tReal = curReal * real[oddIdx] - curImag * imag[oddIdx]
-        const tImag = curReal * imag[oddIdx] + curImag * real[oddIdx]
-        real[oddIdx] = real[evenIdx] - tReal
-        imag[oddIdx] = imag[evenIdx] - tImag
-        real[evenIdx] += tReal
-        imag[evenIdx] += tImag
-        const newCurReal = curReal * wReal - curImag * wImag
-        curImag = curReal * wImag + curImag * wReal
-        curReal = newCurReal
-      }
-    }
-  }
-}
-
-// ─── STFT ──────────────────────────────────────────────────────────────────
-
-/**
- * Get a sample with reflect padding (matches PyTorch's center=True, pad_mode='reflect').
- */
-function getReflectPadded(signal: Float32Array, numSamples: number, idx: number): number {
-  if (idx >= 0 && idx < numSamples) return signal[idx]
-  // Reflect: for negative indices, mirror around 0; for indices >= N, mirror around N-1
-  if (idx < 0) {
-    idx = -idx
-    if (idx >= numSamples) idx = numSamples - 1
-  } else if (idx >= numSamples) {
-    idx = 2 * numSamples - 2 - idx
-    if (idx < 0) idx = 0
-  }
-  return signal[idx]
-}
-
-/**
- * Compute STFT for a single channel with center reflect padding (matching PyTorch default).
- * Returns real and imaginary arrays, each of shape [FREQ_BINS, numFrames].
- */
-function computeSTFTChannel(
-  signal: Float32Array,
-  numSamples: number
-): { real: Float32Array; imag: Float32Array; numFrames: number } {
-  // Center padding: pad n_fft//2 on each side using reflect mode
-  const padSize = N_FFT >> 1
-  const paddedLen = numSamples + 2 * padSize
-  const numFrames = Math.floor((paddedLen - N_FFT) / HOP_LENGTH) + 1
-
-  const real = new Float32Array(FREQ_BINS * numFrames)
-  const imag = new Float32Array(FREQ_BINS * numFrames)
-
-  const fftReal = new Float64Array(N_FFT)
-  const fftImag = new Float64Array(N_FFT)
-
-  for (let t = 0; t < numFrames; t++) {
-    const start = t * HOP_LENGTH // position in padded signal
-
-    // Apply window with reflect padding
-    fftReal.fill(0)
-    fftImag.fill(0)
-    for (let i = 0; i < N_FFT; i++) {
-      const sampleIdx = start + i - padSize // map padded index to original signal
-      const sample = getReflectPadded(signal, numSamples, sampleIdx)
-      fftReal[i] = sample * hannWindow[i]
-    }
-
-    fft(fftReal, fftImag)
-
-    // Store first FREQ_BINS (drop Nyquist bin at index 2048)
-    for (let f = 0; f < FREQ_BINS; f++) {
-      real[f * numFrames + t] = fftReal[f]
-      imag[f * numFrames + t] = fftImag[f]
-    }
-  }
-
-  return { real, imag, numFrames }
-}
-
-/**
- * Build STFT tensor in complex-as-channels (CaC) format.
- * Shape: [1, 4, FREQ_BINS, numFrames]
- * Channel order: left_real, left_imag, right_real, right_imag
- */
-function computeSTFTTensor(
-  leftChannel: Float32Array,
-  rightChannel: Float32Array,
-  numSamples: number
-): ort.Tensor {
-  const leftSTFT = computeSTFTChannel(leftChannel, numSamples)
-  const rightSTFT = computeSTFTChannel(rightChannel, numSamples)
-  const numFrames = leftSTFT.numFrames
-  const channelSize = FREQ_BINS * numFrames
-
-  // CaC layout: [1, 4, FREQ_BINS, numFrames]
-  const data = new Float32Array(4 * channelSize)
-  data.set(leftSTFT.real, 0 * channelSize)
-  data.set(leftSTFT.imag, 1 * channelSize)
-  data.set(rightSTFT.real, 2 * channelSize)
-  data.set(rightSTFT.imag, 3 * channelSize)
-
-  console.log(`STFT tensor shape: [1, 4, ${FREQ_BINS}, ${numFrames}]`)
-  return new ort.Tensor('float32', data, [1, 4, FREQ_BINS, numFrames])
-}
 
 // ─── Model Loading ─────────────────────────────────────────────────────────
 
@@ -264,7 +102,7 @@ async function loadModel(): Promise<ort.InferenceSession> {
 
 const DB_NAME = 'keplear_demucs'
 const STORE_NAME = 'models'
-const MODEL_KEY = 'htdemucs_embedded'
+const MODEL_KEY = 'htdemucs_selfcontained'
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -309,9 +147,30 @@ async function saveToCache(data: Uint8Array): Promise<void> {
 
 // ─── Stem Separation ───────────────────────────────────────────────────────
 
+// Overlap between segments — matches Demucs default (0.25 = 25%)
+const OVERLAP = 0.25
+const SEGMENT_STRIDE = Math.round(SEGMENT_SAMPLES * (1 - OVERLAP))
+
 /**
- * Run Demucs inference on the given stereo audio.
- * Processes in 10-second segments and stitches results.
+ * Build triangle crossfade weight matching Demucs apply.py:
+ *   weight = cat([arange(1, S//2+1), arange(S - S//2, 0, -1)])
+ * Ramps from 1 up to S//2 then back down to 1.
+ */
+function buildTriangleWeight(length: number): Float32Array {
+  const weight = new Float32Array(length)
+  const half = Math.floor(length / 2)
+  for (let i = 0; i < half; i++) {
+    weight[i] = i + 1
+  }
+  for (let i = half; i < length; i++) {
+    weight[i] = length - i
+  }
+  return weight
+}
+
+/**
+ * Run Demucs inference on stereo audio.
+ * Uses overlapping segments with triangle crossfade (matching Demucs apply.py).
  */
 async function separateStems(
   leftChannel: Float32Array,
@@ -323,7 +182,7 @@ async function separateStems(
 
   self.postMessage({ type: 'PROGRESS', progress: 0, stage: 'separating' })
 
-  // Resample to 44100 if needed (simple linear interpolation)
+  // Resample to 44100 if needed
   let left = leftChannel
   let right = rightChannel
   let totalSamples = numSamples
@@ -335,10 +194,17 @@ async function separateStems(
     right = resample(rightChannel, totalSamples)
   }
 
-  // Process in segments
-  const numSegments = Math.ceil(totalSamples / SEGMENT_SAMPLES)
+  // Build segment offsets with overlap
+  const offsets: number[] = []
+  for (let off = 0; off < totalSamples; off += SEGMENT_STRIDE) {
+    offsets.push(off)
+  }
+  const numSegments = offsets.length
 
-  // Allocate output buffers
+  // Triangle crossfade weight (matching Demucs)
+  const weight = buildTriangleWeight(SEGMENT_SAMPLES)
+
+  // Allocate weighted output buffers + weight accumulator
   const stemOutputs: Record<string, { left: Float32Array; right: Float32Array }> = {}
   for (const name of STEM_NAMES) {
     stemOutputs[name] = {
@@ -346,148 +212,67 @@ async function separateStems(
       right: new Float32Array(totalSamples),
     }
   }
+  const sumWeight = new Float32Array(totalSamples)
 
-  // Get input/output names
-  const inputNames = inferSession.inputNames
-  const outputNames = inferSession.outputNames
-  console.log(`Processing ${numSegments} segment(s), ${totalSamples} total samples`)
+  console.log(
+    `Processing ${numSegments} overlapping segment(s), stride=${SEGMENT_STRIDE}, total=${totalSamples}`
+  )
 
   for (let seg = 0; seg < numSegments; seg++) {
-    const segStart = seg * SEGMENT_SAMPLES
+    const segStart = offsets[seg]
     const segEnd = Math.min(segStart + SEGMENT_SAMPLES, totalSamples)
     const segLen = segEnd - segStart
 
-    // Pad to full segment length for consistent tensor shapes
-    const paddedLen = SEGMENT_SAMPLES
-    const segLeft = new Float32Array(paddedLen)
-    const segRight = new Float32Array(paddedLen)
+    // Extract segment, zero-pad to full length if at end
+    const segLeft = new Float32Array(SEGMENT_SAMPLES)
+    const segRight = new Float32Array(SEGMENT_SAMPLES)
     segLeft.set(left.subarray(segStart, segEnd))
     segRight.set(right.subarray(segStart, segEnd))
 
-    // Build waveform tensor [1, 2, paddedLen]
-    const waveformData = new Float32Array(2 * paddedLen)
+    // Build waveform tensor [1, 2, SEGMENT_SAMPLES]
+    const waveformData = new Float32Array(2 * SEGMENT_SAMPLES)
     waveformData.set(segLeft, 0)
-    waveformData.set(segRight, paddedLen)
-    const waveformTensor = new ort.Tensor('float32', waveformData, [1, 2, paddedLen])
+    waveformData.set(segRight, SEGMENT_SAMPLES)
+    const waveformTensor = new ort.Tensor('float32', waveformData, [1, 2, SEGMENT_SAMPLES])
 
-    // Build feeds:
-    // - "input" = waveform [1, 2, samples] (rank 3)
-    // - "x" = STFT spectrogram in complex-as-channels format [1, 4, freq_bins, time_frames] (rank 4)
-    const feeds: Record<string, ort.Tensor> = {}
+    // Run inference — single input, single output
+    const results = await inferSession.run({ input: waveformTensor })
+    const outputData = results.output.data as Float32Array
+    // Output shape: [1, 4, 2, SEGMENT_SAMPLES]
 
-    // Compute STFT for the spectrogram input
-    const specTensor = computeSTFTTensor(segLeft, segRight, paddedLen)
+    // Accumulate weighted stem output (triangle crossfade in overlap regions)
+    for (let s = 0; s < NUM_STEMS; s++) {
+      const lStart = s * 2 * SEGMENT_SAMPLES
+      const rStart = lStart + SEGMENT_SAMPLES
 
-    for (const name of inputNames) {
-      if (name === 'input') {
-        feeds[name] = waveformTensor
-      } else {
-        // 'x' or any other name gets the spectrogram
-        feeds[name] = specTensor
+      for (let i = 0; i < segLen; i++) {
+        const outIdx = segStart + i
+        const w = weight[i]
+        stemOutputs[STEM_NAMES[s]].left[outIdx] += w * outputData[lStart + i]
+        stemOutputs[STEM_NAMES[s]].right[outIdx] += w * outputData[rStart + i]
       }
     }
 
-    console.log(
-      `Segment ${seg + 1}/${numSegments}: feeds =`,
-      Object.keys(feeds).map(k => `${k}: [${feeds[k].dims}]`)
-    )
-
-    // Run inference
-    const results = await inferSession.run(feeds)
-
-    // Parse output — model has 2 outputs:
-    //   "output"  = frequency-domain stems [1, 4, 4, 2048, T] (CaC spectrogram)
-    //   "add_67"  = time-domain stems [1, 4, 2, samples] (waveform — this is what we want)
-    // Find the time-domain output (rank 4 with last dim matching input samples)
-    let outputTensor: ort.Tensor | null = null
-    for (const name of outputNames) {
-      const t = results[name]
-      console.log(`Output "${name}" shape: [${t.dims}]`)
-      if (t.dims.length === 4 && Number(t.dims[3]) === paddedLen) {
-        outputTensor = t
-      }
-    }
-    // Fallback: use whichever output is rank 4 with a samples-like last dim
-    if (!outputTensor) {
-      for (const name of outputNames) {
-        const t = results[name]
-        if (t.dims.length === 4) {
-          outputTensor = t
-          break
-        }
-      }
-    }
-    if (!outputTensor) {
-      throw new Error(
-        `No suitable time-domain output found. Outputs: ${outputNames.map(n => `${n}:[${results[n].dims}]`).join(', ')}`
-      )
-    }
-
-    const outputData = outputTensor.data as Float32Array
-    const outputShape = outputTensor.dims
-
-    console.log(`Segment ${seg + 1} using output shape: [${outputShape}]`)
-
-    // Diagnostic: check if output has actual audio data
-    let maxVal = 0,
-      sumSq = 0
-    for (let i = 0; i < Math.min(outputData.length, 100000); i++) {
-      const v = Math.abs(outputData[i])
-      if (v > maxVal) maxVal = v
-      sumSq += outputData[i] * outputData[i]
-    }
-    const rms = Math.sqrt(sumSq / Math.min(outputData.length, 100000))
-    console.log(
-      `Segment ${seg + 1} output stats: max=${maxVal.toFixed(6)}, rms=${rms.toFixed(6)}, length=${outputData.length}`
-    )
-
-    // Extract stems from output
-    if (outputShape.length === 4) {
-      // Shape: [1, numStems, 2, samples]
-      const outSamples = Number(outputShape[3])
-      const outStems = Number(outputShape[1])
-      const outChannels = Number(outputShape[2])
-
-      for (let s = 0; s < Math.min(outStems, NUM_STEMS); s++) {
-        const leftStart = s * outChannels * outSamples
-        const rightStart = leftStart + outSamples
-        const copyLen = Math.min(segLen, outSamples)
-
-        stemOutputs[STEM_NAMES[s]].left.set(
-          outputData.subarray(leftStart, leftStart + copyLen),
-          segStart
-        )
-        stemOutputs[STEM_NAMES[s]].right.set(
-          outputData.subarray(rightStart, rightStart + copyLen),
-          segStart
-        )
-      }
-    } else if (outputShape.length === 3) {
-      // Shape: [numStems, 2, samples]
-      const outSamples = Number(outputShape[2])
-      const outStems = Number(outputShape[0])
-      const outChannels = Number(outputShape[1])
-
-      for (let s = 0; s < Math.min(outStems, NUM_STEMS); s++) {
-        const leftStart = s * outChannels * outSamples
-        const rightStart = leftStart + outSamples
-        const copyLen = Math.min(segLen, outSamples)
-
-        stemOutputs[STEM_NAMES[s]].left.set(
-          outputData.subarray(leftStart, leftStart + copyLen),
-          segStart
-        )
-        stemOutputs[STEM_NAMES[s]].right.set(
-          outputData.subarray(rightStart, rightStart + copyLen),
-          segStart
-        )
-      }
-    } else {
-      throw new Error(`Unexpected output shape: [${outputShape.join(', ')}]`)
+    // Accumulate weight
+    for (let i = 0; i < segLen; i++) {
+      sumWeight[segStart + i] += weight[i]
     }
 
     const progress = Math.round(((seg + 1) / numSegments) * 90)
     self.postMessage({ type: 'PROGRESS', progress, stage: 'separating' })
+  }
+
+  // Normalize by accumulated weight
+  for (const name of STEM_NAMES) {
+    const l = stemOutputs[name].left
+    const r = stemOutputs[name].right
+    for (let i = 0; i < totalSamples; i++) {
+      const w = sumWeight[i]
+      if (w > 0) {
+        l[i] /= w
+        r[i] /= w
+      }
+    }
   }
 
   // Resample back to original sample rate if needed

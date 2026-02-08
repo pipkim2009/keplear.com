@@ -61,6 +61,65 @@ export async function downloadAudioBuffer(
   return arrayBuffer
 }
 
+/**
+ * Pick the best quality audio stream for stem separation.
+ * Prefers highest bitrate for best separation results.
+ */
+function pickBestStream(audioStreams: AudioStream[]): AudioStream | null {
+  if (!audioStreams || audioStreams.length === 0) return null
+
+  const seen = new Set<string>()
+  const unique = audioStreams.filter(s => {
+    if (!s.url || seen.has(s.url)) return false
+    seen.add(s.url)
+    return true
+  })
+
+  // Sort by bitrate descending — highest quality first
+  const candidates = [...unique]
+  candidates.sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0))
+  return candidates[0]
+}
+
+// Separate cache for full-quality audio (stem separation)
+const fullAudioCache = new Map<string, ArrayBuffer>()
+
+/** Download full-quality audio for stem separation (picks highest bitrate, no size cap). */
+export async function downloadFullAudioBuffer(
+  videoId: string,
+  signal?: AbortSignal
+): Promise<ArrayBuffer | null> {
+  const cached = fullAudioCache.get(videoId)
+  if (cached) return cached
+
+  const streamsRes = await fetch(
+    apiUrl(`/api/piped-streams?videoId=${encodeURIComponent(videoId)}`),
+    { signal }
+  )
+  if (!streamsRes.ok) return null
+
+  const data = await streamsRes.json()
+  const stream = pickBestStream(data.audioStreams)
+  if (!stream?.url) return null
+
+  const audioRes = await fetch(apiUrl(`/api/audio-proxy?url=${encodeURIComponent(stream.url)}`), {
+    signal,
+  })
+  if (!audioRes.ok) return null
+
+  const arrayBuffer = await audioRes.arrayBuffer()
+
+  fullAudioCache.set(videoId, arrayBuffer)
+
+  // Limit cache to 2 entries (these are larger files)
+  if (fullAudioCache.size > 2) {
+    const firstKey = fullAudioCache.keys().next().value
+    if (firstKey) fullAudioCache.delete(firstKey)
+  }
+
+  return arrayBuffer
+}
+
 interface UseWaveformDataResult {
   peaks: number[] | null
   isLoading: boolean
