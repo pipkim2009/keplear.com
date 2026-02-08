@@ -8,6 +8,7 @@
   -webkit-backdrop-filter: blur(10px);
   padding: 0;
   margin-top: 1rem;
+  margin-bottom: 150px;
   border-radius: 0;
   border: 1px solid var(--white);
   width: auto;
@@ -16,6 +17,14 @@
   min-height: 350px;
   overflow-y: visible;
   box-sizing: border-box;
+}
+
+.instrument-container:has(.guitar-container) {
+  margin-bottom: 200px;
+}
+
+.instrument-container:has(.bass-container) {
+  margin-bottom: 225px;
 }
 
 .instrument-header-controls {
@@ -37,7 +46,7 @@
 .instrument-container:has(.keyboard-container) .instrument-header-controls,
 .instrument-container:has(.guitar-container) .instrument-header-controls,
 .instrument-container:has(.bass-container) .instrument-header-controls,
-.instrument-container[data-practice-mode="true"] .instrument-header-controls {
+.instrument-container[data-practice-mode='true'] .instrument-header-controls {
   min-height: 50px;
 }
 
@@ -146,7 +155,7 @@
   .instrument-container:has(.keyboard-container) .instrument-header-controls,
   .instrument-container:has(.guitar-container) .instrument-header-controls,
   .instrument-container:has(.bass-container) .instrument-header-controls,
-  .instrument-container[data-practice-mode="true"] .instrument-header-controls {
+  .instrument-container[data-practice-mode='true'] .instrument-header-controls {
     min-height: 43px;
   }
 
@@ -425,7 +434,9 @@ body.light .instrument-controls-container {
   cursor: pointer;
   transition: all 0.1s ease;
   flex-shrink: 0;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    0 4px 8px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .white-key:focus-visible {
@@ -563,7 +574,9 @@ body.light .instrument-controls-container {
   cursor: pointer;
   pointer-events: all;
   transition: all 0.1s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .black-key:focus-visible {
@@ -1151,7 +1164,6 @@ body.light .instrument-controls-container {
   cursor: not-allowed;
   border-color: var(--gray-500);
 }
-
 
 .chord-mode-switch.flashing {
   border-color: var(--green-500) !important;

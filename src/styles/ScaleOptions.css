@@ -706,7 +706,7 @@ input:checked + .toggle-slider:hover {
 .instrument-guitar .applied-item-preview .learn-chord-button,
 .instrument-bass .applied-item-preview .learn-scale-button,
 .instrument-bass .applied-item-preview .learn-chord-button {
-  margin-left: 8px;
+  margin-left: 55px;
 }
 
 /* Bass entries need more height */
@@ -921,7 +921,7 @@ input:checked + .toggle-slider:hover {
 .learn-scale-button {
   width: 24px;
   height: 24px;
-  margin-left: 8px;
+  margin-left: 15px;
   background: rgb(76, 175, 80, 0.1);
   border: 1px solid rgb(76, 175, 80, 0.4);
   color: var(--green-500);
@@ -951,7 +951,7 @@ input:checked + .toggle-slider:hover {
 .learn-chord-button {
   width: 24px;
   height: 24px;
-  margin-left: 8px;
+  margin-left: 15px;
   background: rgb(76, 175, 80, 0.1);
   border: 1px solid rgb(76, 175, 80, 0.4);
   color: var(--green-500);
