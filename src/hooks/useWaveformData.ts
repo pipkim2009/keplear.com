@@ -13,6 +13,54 @@ import { useState, useEffect, useRef } from 'react'
 import { extractPeaks, getCachedPeaks, setCachedPeaks } from '../utils/waveformUtils'
 import { apiUrl } from '../lib/api'
 
+// Module-level cache for raw audio ArrayBuffers (reused by stem separation)
+const audioBufferCache = new Map<string, ArrayBuffer>()
+
+/** Get a cached raw audio ArrayBuffer for a video ID, if available. */
+export function getCachedAudioBuffer(videoId: string): ArrayBuffer | null {
+  return audioBufferCache.get(videoId) ?? null
+}
+
+/** Download raw audio for a video ID via the proxy pipeline. Returns ArrayBuffer or null. */
+export async function downloadAudioBuffer(
+  videoId: string,
+  signal?: AbortSignal
+): Promise<ArrayBuffer | null> {
+  // Return cached if available
+  const cached = audioBufferCache.get(videoId)
+  if (cached) return cached
+
+  // Step 1: Get audio stream info
+  const streamsRes = await fetch(
+    apiUrl(`/api/piped-streams?videoId=${encodeURIComponent(videoId)}`),
+    { signal }
+  )
+  if (!streamsRes.ok) return null
+
+  const data = await streamsRes.json()
+  const stream = pickStream(data.audioStreams)
+  if (!stream?.url) return null
+
+  // Step 2: Download audio data through server-side proxy
+  const audioRes = await fetch(apiUrl(`/api/audio-proxy?url=${encodeURIComponent(stream.url)}`), {
+    signal,
+  })
+  if (!audioRes.ok) return null
+
+  const arrayBuffer = await audioRes.arrayBuffer()
+
+  // Cache for reuse by stem separation
+  audioBufferCache.set(videoId, arrayBuffer)
+
+  // Limit cache to 3 entries to avoid memory pressure
+  if (audioBufferCache.size > 3) {
+    const firstKey = audioBufferCache.keys().next().value
+    if (firstKey) audioBufferCache.delete(firstKey)
+  }
+
+  return arrayBuffer
+}
+
 interface UseWaveformDataResult {
   peaks: number[] | null
   isLoading: boolean
@@ -57,32 +105,14 @@ function pickStream(audioStreams: AudioStream[]): AudioStream | null {
 }
 
 async function fetchAndDecodePeaks(videoId: string, signal: AbortSignal): Promise<number[] | null> {
-  // Step 1: Get audio stream info
-  const streamsRes = await fetch(
-    apiUrl(`/api/piped-streams?videoId=${encodeURIComponent(videoId)}`),
-    {
-      signal,
-    }
-  )
-  if (!streamsRes.ok) return null
+  const arrayBuffer = await downloadAudioBuffer(videoId, signal)
+  if (!arrayBuffer) return null
 
-  const data = await streamsRes.json()
-  const stream = pickStream(data.audioStreams)
-  if (!stream?.url) return null
-
-  // Step 2: Download audio data through server-side proxy
-  // Direct browser fetch won't work - YouTube doesn't set CORS headers on googlevideo.com
-  const audioRes = await fetch(apiUrl(`/api/audio-proxy?url=${encodeURIComponent(stream.url)}`), {
-    signal,
-  })
-  if (!audioRes.ok) return null
-
-  const arrayBuffer = await audioRes.arrayBuffer()
-
-  // Step 3: Decode and extract peaks
+  // Decode and extract peaks (use a copy since decodeAudioData detaches the buffer)
+  const bufferCopy = arrayBuffer.slice(0)
   const audioContext = new AudioContext()
   try {
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)
+    const audioBuffer = await audioContext.decodeAudioData(bufferCopy)
     return extractPeaks(audioBuffer, 800)
   } finally {
     await audioContext.close()

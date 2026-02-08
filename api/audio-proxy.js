@@ -6,7 +6,7 @@
 
 const ANDROID_UA = 'com.google.android.youtube/19.02.39 (Linux; U; Android 14) gzip'
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-const MAX_SIZE = 10 * 1024 * 1024 // 10MB safety cap
+const MAX_SIZE = 25 * 1024 * 1024 // 25MB - supports ~8-10min songs for stem separation
 
 const ALLOWED_HOST_SUFFIXES = [
   '.kavin.rocks',

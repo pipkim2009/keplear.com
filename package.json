@@ -47,6 +47,7 @@
     "@tensorflow/tfjs": "^4.22.0",
     "flag-icons": "^7.5.0",
     "lucide-react": "^0.541.0",
+    "onnxruntime-web": "^1.24.1",
     "pitchfinder": "^2.3.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
