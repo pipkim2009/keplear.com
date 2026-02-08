@@ -93,6 +93,7 @@ import {
 import SongPlayerUI from '../classroom/SongPlayerUI'
 import { useWaveformData } from '../../hooks/useWaveformData'
 import { generateFallbackWaveform, resamplePeaks } from '../../utils/waveformUtils'
+import { apiUrl } from '../../lib/api'
 
 // Type for serialized scale data from JSON
 interface SerializedScaleData {
@@ -2396,7 +2397,7 @@ function Classroom() {
 
   // Song search for song assignments
   const PIPED_PROXIES = import.meta.env.PROD
-    ? ['/api/piped']
+    ? [apiUrl('/api/piped')]
     : ['/api/piped1', '/api/piped2', '/api/piped3', '/api/piped4']
 
   const handleSongSearch = useCallback(async (query: string) => {

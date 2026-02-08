@@ -4,19 +4,23 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/webp" href="/Keplear-favicon.webp" />
     <link rel="apple-touch-icon" href="/Keplear-favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#7c3aed" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Keplear - Master music by ear with keyboard, guitar, and bass. Generate melodies from scales and chords, record your practice, and learn music theory hands-on." />
 
-    <!-- Content Security Policy - allows Supabase, fonts, audio samples, Tone.js workers, SoundCloud, and YouTube -->
+    <!-- Content Security Policy - allows Supabase, fonts, audio samples, Tone.js workers, SoundCloud, YouTube, and Google Ads -->
     <meta http-equiv="Content-Security-Policy" content="
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://*.youtube.com https://*.google.com https://w.soundcloud.com https://connect.soundcloud.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.youtube.com https://*.youtube.com https://*.google.com https://w.soundcloud.com https://connect.soundcloud.com https://pagead2.googlesyndication.com https://*.googleadservices.com https://*.googlesyndication.com https://adservice.google.com https://www.googletagmanager.com https://tpc.googlesyndication.com;
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src 'self' https://fonts.gstatic.com;
       img-src 'self' data: blob: https:;
       media-src 'self' blob: https://nbrosowsky.github.io https://*.soundcloud.com https://*.sndcdn.com https://*.dzcdn.net https://*.googlevideo.com https://*.youtube.com;
-      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io https://api-v2.soundcloud.com https://*.soundcloud.com https://*.youtube.com https://*.google.com https://*.googlevideo.com https://api.piped.private.coffee https://pipedapi.kavin.rocks https://pipedapi.adminforge.de https://piped-api.garudalinux.org https://pipedapi.r4fo.com https://pipedapi.darkness.services https://pipedapi.simpleprivacy.fr;
-      frame-src 'self' https://www.youtube.com https://*.youtube.com https://w.soundcloud.com;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://nbrosowsky.github.io https://api-v2.soundcloud.com https://*.soundcloud.com https://*.youtube.com https://*.google.com https://*.googlevideo.com https://api.piped.private.coffee https://pipedapi.kavin.rocks https://pipedapi.adminforge.de https://piped-api.garudalinux.org https://pipedapi.r4fo.com https://pipedapi.darkness.services https://pipedapi.simpleprivacy.fr https://pagead2.googlesyndication.com https://*.googlesyndication.com https://*.googleadservices.com https://*.doubleclick.net;
+      frame-src 'self' https://www.youtube.com https://*.youtube.com https://w.soundcloud.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.googlesyndication.com;
       worker-src 'self' blob:;
       base-uri 'self';
       form-action 'self';

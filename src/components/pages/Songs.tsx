@@ -18,18 +18,18 @@ import {
   PiTrash,
   PiX,
   PiMagnifyingGlass,
-  PiLink,
 } from 'react-icons/pi'
 import SEOHead from '../common/SEOHead'
 import { useWaveformData } from '../../hooks/useWaveformData'
 import { generateFallbackWaveform, resamplePeaks } from '../../utils/waveformUtils'
 import styles from '../../styles/Songs.module.css'
+import { apiUrl } from '../../lib/api'
 
 // Piped API proxy endpoints for search
 const IS_PRODUCTION = import.meta.env.PROD
 
 const PIPED_PROXIES = IS_PRODUCTION
-  ? ['/api/piped'] // Single serverless endpoint handles all fallback logic
+  ? [apiUrl('/api/piped')] // Single serverless endpoint handles all fallback logic
   : [
       '/api/piped1', // api.piped.private.coffee
       '/api/piped2', // pipedapi.kavin.rocks
@@ -95,6 +95,7 @@ interface YTPlayer {
 interface VideoInfo {
   videoId: string
   title: string
+  author?: string
 }
 
 // Recent videos stored in localStorage
@@ -109,11 +110,6 @@ const Songs = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [searchError, setSearchError] = useState('')
-  const [showUrlInput, setShowUrlInput] = useState(false)
-
-  // URL input state
-  const [urlInput, setUrlInput] = useState('')
-  const [urlError, setUrlError] = useState('')
   const [recentVideos, setRecentVideos] = useState<VideoInfo[]>([])
 
   // Player state
@@ -132,6 +128,9 @@ const Songs = () => {
   const [markerA, setMarkerA] = useState<number | null>(null)
   const [markerB, setMarkerB] = useState<number | null>(null)
   const [isABLooping, setIsABLooping] = useState(false)
+
+  // Waveform color extracted from thumbnail
+  const [waveformColor, setWaveformColor] = useState<string | null>(null)
 
   // Real waveform data hook
   const { peaks: realPeaks } = useWaveformData(currentVideo?.videoId ?? null)
@@ -174,6 +173,61 @@ const Songs = () => {
       console.error('Failed to load recent videos:', e)
     }
   }, [])
+
+  // Analyze thumbnail to extract average color for waveform
+  useEffect(() => {
+    if (!currentVideo) {
+      setWaveformColor(null)
+      return
+    }
+
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return
+
+        canvas.width = 64
+        canvas.height = 36
+        ctx.drawImage(img, 0, 0, 64, 36)
+
+        const imageData = ctx.getImageData(0, 0, 64, 36)
+        const data = imageData.data
+        let r = 0,
+          g = 0,
+          b = 0
+        const pixelCount = data.length / 4
+
+        for (let i = 0; i < data.length; i += 4) {
+          r += data[i]
+          g += data[i + 1]
+          b += data[i + 2]
+        }
+
+        r = Math.round(r / pixelCount)
+        g = Math.round(g / pixelCount)
+        b = Math.round(b / pixelCount)
+
+        // Boost brightness if too dark so waveform stays visible
+        const brightness = (r * 299 + g * 587 + b * 114) / 1000
+        if (brightness < 80) {
+          const boost = 80 / Math.max(brightness, 1)
+          r = Math.min(255, Math.round(r * boost))
+          g = Math.min(255, Math.round(g * boost))
+          b = Math.min(255, Math.round(b * boost))
+        }
+
+        setWaveformColor(`${r}, ${g}, ${b}`)
+      } catch {
+        // CORS or other error — keep default colors
+        setWaveformColor(null)
+      }
+    }
+    img.onerror = () => setWaveformColor(null)
+    img.src = `https://i.ytimg.com/vi/${currentVideo.videoId}/mqdefault.jpg`
+  }, [currentVideo?.videoId])
 
   // Save video to recent list
   const saveToRecent = useCallback((video: VideoInfo) => {
@@ -303,13 +357,30 @@ const Songs = () => {
     [t]
   )
 
-  // Handle search submission
+  // Handle search submission - also detects YouTube URLs automatically
   const handleSearch = useCallback(
     (e?: React.FormEvent) => {
       e?.preventDefault()
-      searchYouTube(searchQuery)
+      const trimmed = searchQuery.trim()
+      if (!trimmed) return
+
+      // Check if it's a YouTube URL or video ID
+      const videoId = extractVideoId(trimmed)
+      if (videoId) {
+        const video: VideoInfo = {
+          videoId,
+          title: `Video ${videoId}`,
+        }
+        setCurrentVideo(video)
+        saveToRecent(video)
+        setSearchQuery('')
+        setSearchResults([])
+        return
+      }
+
+      searchYouTube(trimmed)
     },
-    [searchQuery, searchYouTube]
+    [searchQuery, searchYouTube, saveToRecent]
   )
 
   // Load a search result
@@ -318,11 +389,10 @@ const Songs = () => {
       const video: VideoInfo = {
         videoId: result.videoId,
         title: result.title,
+        author: result.author,
       }
       setCurrentVideo(video)
       saveToRecent(video)
-      setSearchResults([])
-      setSearchQuery('')
     },
     [saveToRecent]
   )
@@ -443,7 +513,11 @@ const Songs = () => {
               const videoData = event.target.getVideoData()
               if (videoData?.title) {
                 setVideoTitle(videoData.title)
-                saveToRecent({ videoId: currentVideo.videoId, title: videoData.title })
+                saveToRecent({
+                  videoId: currentVideo.videoId,
+                  title: videoData.title,
+                  author: videoData.author || currentVideo.author,
+                })
               }
             } catch (e) {
               console.error('Failed to get video data:', e)
@@ -493,30 +567,6 @@ const Songs = () => {
       playerRef.current.setPlaybackRate(playbackRate)
     }
   }, [playbackRate, isPlayerReady])
-
-  // Handle URL submission
-  const handleUrlSubmit = useCallback(
-    (e?: React.FormEvent) => {
-      e?.preventDefault()
-      setUrlError('')
-
-      const videoId = extractVideoId(urlInput.trim())
-      if (!videoId) {
-        setUrlError(t('songs.invalidUrl'))
-        return
-      }
-
-      const video: VideoInfo = {
-        videoId,
-        title: `Video ${videoId}`, // Will be updated if we can get title
-      }
-
-      setCurrentVideo(video)
-      saveToRecent(video)
-      setUrlInput('')
-    },
-    [urlInput, t, saveToRecent]
-  )
 
   // Load a recent video
   const loadRecentVideo = useCallback(
@@ -729,10 +779,7 @@ const Songs = () => {
             <button
               type="button"
               className={styles.clearSearchButton}
-              onClick={() => {
-                setSearchQuery('')
-                setSearchResults([])
-              }}
+              onClick={() => setSearchQuery('')}
               aria-label={t('common.clear')}
             >
               <PiX />
@@ -746,85 +793,6 @@ const Songs = () => {
 
       {/* Search Error */}
       {searchError && <div className={styles.searchError}>{searchError}</div>}
-
-      {/* URL Toggle */}
-      <button className={styles.urlToggle} onClick={() => setShowUrlInput(!showUrlInput)}>
-        <PiLink /> {showUrlInput ? t('songs.hideUrl') : t('songs.pasteUrl')}
-      </button>
-
-      {/* URL Input Section (collapsible) */}
-      {showUrlInput && (
-        <form className={styles.urlSection} onSubmit={handleUrlSubmit}>
-          <div className={styles.searchInputWrapper}>
-            <PiLink className={styles.searchIcon} />
-            <input
-              type="text"
-              className={styles.searchInput}
-              placeholder={t('songs.urlPlaceholder')}
-              value={urlInput}
-              onChange={e => setUrlInput(e.target.value)}
-            />
-            {urlInput && (
-              <button
-                type="button"
-                className={styles.clearSearchButton}
-                onClick={() => setUrlInput('')}
-                aria-label={t('common.clear')}
-              >
-                <PiX />
-              </button>
-            )}
-          </div>
-          <button type="submit" className={styles.loadButton}>
-            {t('songs.load')}
-          </button>
-        </form>
-      )}
-
-      {/* URL Error */}
-      {urlError && <div className={styles.searchError}>{urlError}</div>}
-
-      {/* Search Results */}
-      {searchResults.length > 0 && !currentVideo && (
-        <div className={styles.resultsSection}>
-          <div className={styles.resultsSectionHeader}>
-            <h2 className={styles.sectionTitle}>{t('songs.searchResults')}</h2>
-            <span className={styles.resultsCount}>
-              {searchResults.length} {t('songs.results')}
-            </span>
-          </div>
-          <div className={styles.searchResultsList}>
-            {searchResults.map(result => (
-              <div
-                key={result.videoId}
-                className={styles.searchResultItem}
-                onClick={() => loadSearchResult(result)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={e => e.key === 'Enter' && loadSearchResult(result)}
-              >
-                <img
-                  src={`https://i.ytimg.com/vi/${result.videoId}/mqdefault.jpg`}
-                  alt={result.title}
-                  className={styles.resultThumbnail}
-                />
-                <div className={styles.resultInfo}>
-                  <span className={styles.resultTitle}>{result.title}</span>
-                  <span className={styles.resultAuthor}>{result.author}</span>
-                  <div className={styles.resultMeta}>
-                    <span className={styles.resultDuration}>
-                      {formatDuration(result.lengthSeconds)}
-                    </span>
-                    <span className={styles.resultViews}>
-                      {formatViews(result.viewCount)} views
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Recent Videos */}
       {recentVideos.length > 0 && !currentVideo && searchResults.length === 0 && (
@@ -866,7 +834,22 @@ const Songs = () => {
 
       {/* Player Section */}
       {currentVideo && (
-        <div className={styles.playerSection}>
+        <div
+          className={styles.playerSection}
+          style={
+            waveformColor
+              ? ({ '--waveform-color': waveformColor } as React.CSSProperties)
+              : undefined
+          }
+        >
+          {/* Thumbnail background */}
+          <div
+            className={styles.playerThumbnailBg}
+            style={{
+              backgroundImage: `url(https://i.ytimg.com/vi/${currentVideo.videoId}/mqdefault.jpg)`,
+            }}
+          />
+          {/* Header: track info, volume, close */}
           <div className={styles.playerHeader}>
             <div className={styles.playerTrackInfo}>
               <img
@@ -876,7 +859,7 @@ const Songs = () => {
               />
               <div className={styles.playerTrackDetails}>
                 <h2 className={styles.nowPlaying}>{videoTitle || currentVideo.videoId}</h2>
-                <p className={styles.playerArtist}>YouTube</p>
+                <p className={styles.playerArtist}>{currentVideo.author || 'YouTube'}</p>
               </div>
             </div>
             <button
@@ -912,10 +895,93 @@ const Songs = () => {
           {/* Loading indicator */}
           {!isPlayerReady && <div className={styles.audioLoading}>{t('songs.loadingAudio')}</div>}
 
-          {/* Timeline with A-B markers */}
+          {/* Transport: centered play/pause with skip */}
+          <div className={styles.transportSection}>
+            <div className={styles.transportRow}>
+              <button
+                className={styles.controlButtonSmall}
+                onClick={() => skipTime(-10)}
+                disabled={!isPlayerReady}
+                aria-label="Rewind 10 seconds"
+                title="Rewind 10s"
+              >
+                <PiArrowCounterClockwise />
+              </button>
+              <button
+                className={styles.playButton}
+                onClick={togglePlayPause}
+                disabled={!isPlayerReady}
+                aria-label={isPlaying ? t('common.stop') : t('sandbox.play')}
+              >
+                {isPlaying ? <PiPause /> : <PiPlay />}
+              </button>
+              <button
+                className={styles.controlButtonSmall}
+                onClick={() => skipTime(10)}
+                disabled={!isPlayerReady}
+                aria-label="Forward 10 seconds"
+                title="Forward 10s"
+              >
+                <PiArrowClockwise />
+              </button>
+            </div>
+            <div className={styles.speedControl}>
+              <div className={styles.speedButtons}>
+                {speedOptions.map(speed => (
+                  <button
+                    key={speed}
+                    className={`${styles.speedButton} ${playbackRate === speed ? styles.speedButtonActive : ''}`}
+                    onClick={() => changeSpeed(speed)}
+                  >
+                    {speed}x
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Looper */}
+          <div className={styles.abControls}>
+            <span className={styles.controlLabel}>Looper</span>
+            <div className={styles.abButtons}>
+              <button
+                className={`${styles.markerButton} ${markerA !== null ? styles.markerButtonSet : ''}`}
+                onClick={setMarkerAAtCurrent}
+                disabled={!isPlayerReady}
+                title={t('songs.setMarkerA')}
+              >
+                A {markerA !== null && `(${formatTime(markerA)})`}
+              </button>
+              <button
+                className={`${styles.markerButton} ${markerB !== null ? styles.markerButtonSet : ''}`}
+                onClick={setMarkerBAtCurrent}
+                disabled={markerA === null || !isPlayerReady}
+                title={t('songs.setMarkerB')}
+              >
+                B {markerB !== null && `(${formatTime(markerB)})`}
+              </button>
+              <button
+                className={`${styles.abToggleButton} ${isABLooping ? styles.abToggleButtonActive : ''}`}
+                onClick={toggleABLoop}
+                disabled={markerA === null || markerB === null}
+                title={t('songs.toggleABLoop')}
+              >
+                <PiRepeat />
+              </button>
+              <button
+                className={styles.clearMarkersButton}
+                onClick={clearABMarkers}
+                disabled={markerA === null && markerB === null}
+                title={t('songs.clearMarkers')}
+              >
+                <PiTrash />
+              </button>
+            </div>
+          </div>
+
+          {/* Timeline / waveform at the bottom */}
           <div className={styles.timelineSection}>
             <div className={styles.timelineWrapper}>
-              {/* Waveform visualization - 1 bar per 0.1 seconds */}
               <div className={styles.waveformContainer}>
                 {(() => {
                   const numBars = Math.min(600, Math.max(1, Math.ceil(duration * 10)))
@@ -939,7 +1005,6 @@ const Songs = () => {
                   })
                 })()}
               </div>
-              {/* A-B marker visualization */}
               {markerA !== null && duration > 0 && (
                 <div
                   className={styles.markerA}
@@ -979,90 +1044,47 @@ const Songs = () => {
               <span>{formatTime(duration)}</span>
             </div>
           </div>
+        </div>
+      )}
 
-          {/* Controls + Looper Grid */}
-          <div className={styles.controlsGrid}>
-            <div className={styles.controlsLeft}>
-              <div className={styles.transportRow}>
-                <button
-                  className={styles.controlButtonSmall}
-                  onClick={() => skipTime(-10)}
-                  disabled={!isPlayerReady}
-                  aria-label="Rewind 10 seconds"
-                  title="Rewind 10s"
-                >
-                  <PiArrowCounterClockwise />
-                </button>
-                <button
-                  className={styles.controlButton}
-                  onClick={togglePlayPause}
-                  disabled={!isPlayerReady}
-                  aria-label={isPlaying ? t('common.stop') : t('sandbox.play')}
-                >
-                  {isPlaying ? <PiPause /> : <PiPlay />}
-                </button>
-                <button
-                  className={styles.controlButtonSmall}
-                  onClick={() => skipTime(10)}
-                  disabled={!isPlayerReady}
-                  aria-label="Forward 10 seconds"
-                  title="Forward 10s"
-                >
-                  <PiArrowClockwise />
-                </button>
-              </div>
-              <div className={styles.speedControl}>
-                <div className={styles.speedButtons}>
-                  {speedOptions.map(speed => (
-                    <button
-                      key={speed}
-                      className={`${styles.speedButton} ${playbackRate === speed ? styles.speedButtonActive : ''}`}
-                      onClick={() => changeSpeed(speed)}
-                    >
-                      {speed}x
-                    </button>
-                  ))}
+      {/* Search Results (shown below player if playing) */}
+      {searchResults.length > 0 && (
+        <div className={styles.resultsSection}>
+          <div className={styles.resultsSectionHeader}>
+            <h2 className={styles.sectionTitle}>{t('songs.searchResults')}</h2>
+            <span className={styles.resultsCount}>
+              {searchResults.length} {t('songs.results')}
+            </span>
+          </div>
+          <div className={styles.searchResultsList}>
+            {searchResults.map(result => (
+              <div
+                key={result.videoId}
+                className={styles.searchResultItem}
+                onClick={() => loadSearchResult(result)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => e.key === 'Enter' && loadSearchResult(result)}
+              >
+                <img
+                  src={`https://i.ytimg.com/vi/${result.videoId}/mqdefault.jpg`}
+                  alt={result.title}
+                  className={styles.resultThumbnail}
+                />
+                <div className={styles.resultInfo}>
+                  <span className={styles.resultTitle}>{result.title}</span>
+                  <span className={styles.resultAuthor}>{result.author}</span>
+                  <div className={styles.resultMeta}>
+                    <span className={styles.resultDuration}>
+                      {formatDuration(result.lengthSeconds)}
+                    </span>
+                    <span className={styles.resultViews}>
+                      {formatViews(result.viewCount)} views
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className={styles.abControls}>
-              <span className={styles.controlLabel}>Looper</span>
-              <div className={styles.abButtons}>
-                <button
-                  className={`${styles.markerButton} ${markerA !== null ? styles.markerButtonSet : ''}`}
-                  onClick={setMarkerAAtCurrent}
-                  disabled={!isPlayerReady}
-                  title={t('songs.setMarkerA')}
-                >
-                  A {markerA !== null && `(${formatTime(markerA)})`}
-                </button>
-                <button
-                  className={`${styles.markerButton} ${markerB !== null ? styles.markerButtonSet : ''}`}
-                  onClick={setMarkerBAtCurrent}
-                  disabled={markerA === null || !isPlayerReady}
-                  title={t('songs.setMarkerB')}
-                >
-                  B {markerB !== null && `(${formatTime(markerB)})`}
-                </button>
-                <button
-                  className={`${styles.abToggleButton} ${isABLooping ? styles.abToggleButtonActive : ''}`}
-                  onClick={toggleABLoop}
-                  disabled={markerA === null || markerB === null}
-                  title={t('songs.toggleABLoop')}
-                >
-                  <PiRepeat />
-                </button>
-                <button
-                  className={styles.clearMarkersButton}
-                  onClick={clearABMarkers}
-                  disabled={markerA === null && markerB === null}
-                  title={t('songs.clearMarkers')}
-                >
-                  <PiTrash />
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       )}

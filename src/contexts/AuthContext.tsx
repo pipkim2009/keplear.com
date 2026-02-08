@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { supabase } from '../lib/supabase'
 import type { User, AuthError } from '@supabase/supabase-js'
 import { validatePassword, sanitizeUsername, authRateLimiter } from '../utils/security'
+import { initPushNotifications, removePushToken } from '../lib/pushNotifications'
 
 /**
  * Authentication result type for operations that return data
@@ -111,9 +112,19 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null)
       setLoading(false)
+
+      // Initialize push notifications after sign in
+      if (event === 'SIGNED_IN' && session?.user) {
+        initPushNotifications(session.user.id)
+      }
+
+      // Remove push token on sign out
+      if (event === 'SIGNED_OUT' && user) {
+        removePushToken(user.id)
+      }
     })
 
     return () => subscription.unsubscribe()

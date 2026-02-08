@@ -15,9 +15,7 @@
 }
 
 .onboardingModal {
-  background: linear-gradient(145deg,
-    rgb(55, 65, 81, 0.95) 0%,
-    rgb(18, 18, 18, 0.98) 100%);
+  background: linear-gradient(145deg, rgb(55, 65, 81, 0.95) 0%, rgb(18, 18, 18, 0.98) 100%);
   backdrop-filter: blur(20px);
   border: 2px solid var(--gray-600);
   border-radius: 20px;
@@ -109,7 +107,7 @@
 
 .instrumentButton:hover {
   background: var(--gray-600);
-  }
+}
 
 .instrumentButton.selected {
   background: var(--purple-alpha-20);
@@ -193,7 +191,8 @@
 }
 
 .formGroup input::placeholder {
-  color: var(--gray-400);
+  color: var(--white);
+  opacity: 0.6;
   font-weight: 500;
 }
 
@@ -201,7 +200,7 @@
   outline: none;
   border-color: var(--blue-500);
   background: var(--black-alpha-90);
-  }
+}
 
 /* Code input - monospace centered style */
 .codeInput {
@@ -605,6 +604,11 @@
 :global(body.light) .formGroup input::placeholder {
   color: var(--gray-900);
   opacity: 0.6;
+}
+
+:global(body.light) .formGroup input:hover {
+  background: linear-gradient(145deg, var(--silver-mid), var(--silver-dark));
+  border-color: var(--gray-900);
 }
 
 :global(body.light) .formGroup input:focus {

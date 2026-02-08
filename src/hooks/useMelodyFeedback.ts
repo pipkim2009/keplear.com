@@ -54,6 +54,8 @@ export interface FeedbackNote {
   isCurrent: boolean
   /** Index in the melody */
   index: number
+  /** Whether this note is part of a chord */
+  isChord: boolean
 }
 
 export interface MelodyFeedbackState {
@@ -361,6 +363,7 @@ export function useMelodyFeedback(
       isPlayed: false,
       isCurrent: index === 0,
       index,
+      isChord: !!note.chordGroup,
     }))
 
     setState(prev => ({

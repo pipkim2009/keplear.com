@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { extractPeaks, getCachedPeaks, setCachedPeaks } from '../utils/waveformUtils'
+import { apiUrl } from '../lib/api'
 
 interface UseWaveformDataResult {
   peaks: number[] | null
@@ -57,9 +58,12 @@ function pickStream(audioStreams: AudioStream[]): AudioStream | null {
 
 async function fetchAndDecodePeaks(videoId: string, signal: AbortSignal): Promise<number[] | null> {
   // Step 1: Get audio stream info
-  const streamsRes = await fetch(`/api/piped-streams?videoId=${encodeURIComponent(videoId)}`, {
-    signal,
-  })
+  const streamsRes = await fetch(
+    apiUrl(`/api/piped-streams?videoId=${encodeURIComponent(videoId)}`),
+    {
+      signal,
+    }
+  )
   if (!streamsRes.ok) return null
 
   const data = await streamsRes.json()
@@ -68,7 +72,9 @@ async function fetchAndDecodePeaks(videoId: string, signal: AbortSignal): Promis
 
   // Step 2: Download audio data through server-side proxy
   // Direct browser fetch won't work - YouTube doesn't set CORS headers on googlevideo.com
-  const audioRes = await fetch(`/api/audio-proxy?url=${encodeURIComponent(stream.url)}`, { signal })
+  const audioRes = await fetch(apiUrl(`/api/audio-proxy?url=${encodeURIComponent(stream.url)}`), {
+    signal,
+  })
   if (!audioRes.ok) return null
 
   const arrayBuffer = await audioRes.arrayBuffer()

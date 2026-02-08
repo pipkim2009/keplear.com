@@ -30,5 +30,16 @@ dist-ssr
 # Claude Code settings (personal AI assistant config)
 .claude/
 
+# Capacitor build artifacts (keep ios/ and android/ tracked)
+ios/App/Pods/
+android/.gradle/
+android/app/build/
+android/build/
+*.keystore
+*.jks
+
+# Generated icons from capacitor-assets (root level)
+/icons/
+
 # Windows reserved device names
 nul

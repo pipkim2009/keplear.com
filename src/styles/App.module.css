@@ -5,27 +5,35 @@
   width: 100%;
   min-width: 100%;
   min-height: 100vh;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
   position: relative;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
 }
 
 .appContainer.dark {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     var(--dark-bg-surface) 0%,
     var(--dark-bg-primary) 25%,
     var(--dark-bg-quaternary) 50%,
     var(--dark-bg-tertiary) 75%,
-    var(--dark-bg-primary) 100%);
+    var(--dark-bg-primary) 100%
+  );
   color: var(--dark-text-primary);
 }
 
 .appContainer.light {
-  background: linear-gradient(135deg,
+  background: linear-gradient(
+    135deg,
     var(--light-bg-gradient-1) 0%,
     var(--light-bg-gradient-2) 25%,
     var(--light-bg-gradient-3) 50%,
     var(--light-bg-gradient-4) 75%,
-    var(--light-bg-gradient-2) 100%);
+    var(--light-bg-gradient-2) 100%
+  );
   color: var(--light-text-primary);
 }
 

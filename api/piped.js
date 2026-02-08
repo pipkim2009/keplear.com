@@ -13,7 +13,9 @@ const PIPED_INSTANCES = [
 const ALLOWED_ORIGINS = [
   'https://keplear.com',
   'https://www.keplear.com',
-  'http://localhost:5173'
+  'http://localhost:5173',
+  'capacitor://localhost',
+  'http://localhost'
 ]
 
 function getCorsOrigin(req) {

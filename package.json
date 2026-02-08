@@ -24,9 +24,24 @@
     "test:components": "vitest run src/components/__tests__",
     "analyze": "vite build --mode analyze",
     "typecheck": "tsc --noEmit",
-    "prepare": "husky"
+    "prepare": "husky",
+    "cap:build": "npm run build && node scripts/strip-csp-for-capacitor.js && npx cap sync",
+    "cap:android": "npm run cap:build && npx cap open android",
+    "cap:ios": "npm run cap:build"
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.2",
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/cli": "^8.0.2",
+    "@capacitor/core": "^8.0.2",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/ios": "^8.0.2",
+    "@capacitor/keyboard": "^8.0.0",
+    "@capacitor/network": "^8.0.0",
+    "@capacitor/preferences": "^8.0.0",
+    "@capacitor/push-notifications": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0",
     "@sentry/react": "^10.38.0",
     "@supabase/supabase-js": "^2.56.0",
     "@tensorflow/tfjs": "^4.22.0",
@@ -42,6 +57,7 @@
     "youtube-info-streams": "^1.1.3"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@eslint/js": "^9.33.0",
     "@playwright/test": "^1.58.1",
     "@testing-library/dom": "^10.4.1",
@@ -73,7 +89,9 @@
     "typescript-eslint": "^8.39.1",
     "vite": "^7.1.2",
     "vite-bundle-analyzer": "^0.7.0",
-    "vitest": "^2.0.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^2.0.0",
+    "workbox-window": "^7.4.0"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

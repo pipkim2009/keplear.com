@@ -19,6 +19,7 @@ import { useEffect, useCallback, useMemo } from 'react'
 import { Mic, MicOff, Check, RotateCcw, Music, Volume2 } from 'lucide-react'
 import { useMelodyFeedback, type FeedbackNote } from '../../hooks/useMelodyFeedback'
 import type { Note } from '../../utils/notes'
+import { getNoteSymbol } from '../../utils/noteEmojis'
 import styles from '../../styles/MelodyFeedback.module.css'
 
 // ============================================================================
@@ -56,7 +57,7 @@ function NoteChip({ note, showAnimation = false }: NoteChipProps) {
 
   return (
     <div className={classes}>
-      <span className={styles.noteChipName}>{note.name}</span>
+      <span className={styles.noteChipSymbol}>{getNoteSymbol(note.isChord)}</span>
       {note.isPlayed && (
         <span className={styles.noteChipCheck}>
           <Check size={12} />

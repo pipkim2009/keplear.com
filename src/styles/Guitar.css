@@ -264,7 +264,7 @@
   font-weight: 700;
   cursor: pointer;
   text-align: center;
-  color: var(--green-100);
+  color: var(--green-500);
   pointer-events: none;
   user-select: none;
 }
@@ -343,7 +343,7 @@
   font-weight: 700;
   cursor: pointer;
   text-align: center;
-  color: var(--green-100);
+  color: var(--green-500);
   pointer-events: none;
   user-select: none;
 }

@@ -203,7 +203,7 @@
   font-weight: 700;
   cursor: pointer;
   text-align: center;
-  color: var(--red-light);
+  color: var(--red-500);
   pointer-events: none;
   user-select: none;
 }
@@ -280,7 +280,7 @@
   font-weight: 700;
   cursor: pointer;
   text-align: center;
-  color: var(--red-light);
+  color: var(--red-500);
   pointer-events: none;
   user-select: none;
 }

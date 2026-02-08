@@ -327,11 +327,4 @@
   --btn-secondary-text: var(--dark-text-primary);
 }
 
-/* ========================================
-   WCAG AA LIGHT MODE OVERRIDES
-   Higher-contrast text/border colors on light backgrounds
-   ======================================== */
-body.light {
-  --green-500: #15803d; /* 5.1:1 on white (was #22c55e at 2.3:1) */
-  --red-500: #b91c1c; /* 6.4:1 on white (was #ef4444 at 3.75:1) */
-}
+/* Red, green, and blue accent colors are identical in both modes */

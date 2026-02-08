@@ -96,16 +96,22 @@
   color: var(--gray-900);
   border-color: var(--orange-100);
   transform: scale(1.1);
-  box-shadow: 0 0 16px var(--orange-alpha-50), 0 0 32px var(--orange-alpha-50);
+  box-shadow:
+    0 0 16px var(--orange-alpha-50),
+    0 0 32px var(--orange-alpha-50);
   animation: noteGlow 0.6s ease-in-out infinite alternate;
 }
 
 @keyframes noteGlow {
   from {
-    box-shadow: 0 0 12px var(--orange-alpha-50), 0 0 24px var(--orange-alpha-50);
+    box-shadow:
+      0 0 12px var(--orange-alpha-50),
+      0 0 24px var(--orange-alpha-50);
   }
   to {
-    box-shadow: 0 0 20px var(--orange-alpha-50), 0 0 40px var(--orange-alpha-50);
+    box-shadow:
+      0 0 20px var(--orange-alpha-50),
+      0 0 40px var(--orange-alpha-50);
   }
 }
 
@@ -338,20 +344,26 @@
   justify-content: center;
 }
 
-.volume-slider input[type="range"] {
+.volume-slider input[type='range'] {
   writing-mode: vertical-lr;
   direction: rtl;
   -webkit-appearance: none;
   appearance: none;
   width: 4px;
   height: 80px;
-  background: linear-gradient(to top, var(--blue-100) 0%, var(--blue-100) var(--volume-percentage, 100%), var(--gray-600) var(--volume-percentage, 100%), var(--gray-600) 100%);
+  background: linear-gradient(
+    to top,
+    var(--blue-100) 0%,
+    var(--blue-100) var(--volume-percentage, 100%),
+    var(--gray-600) var(--volume-percentage, 100%),
+    var(--gray-600) 100%
+  );
   outline: none;
   cursor: pointer;
   border-radius: 2px;
 }
 
-.volume-slider input[type="range"]::-webkit-slider-thumb {
+.volume-slider input[type='range']::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 16px;
@@ -361,7 +373,7 @@
   cursor: pointer;
 }
 
-.volume-slider input[type="range"]::-moz-range-thumb {
+.volume-slider input[type='range']::-moz-range-thumb {
   width: 16px;
   height: 16px;
   background: linear-gradient(145deg, var(--blue-100), var(--blue-700));
@@ -486,7 +498,7 @@
     bottom: 35px;
   }
 
-  .volume-slider input[type="range"] {
+  .volume-slider input[type='range'] {
     height: 60px;
   }
 }
@@ -624,7 +636,8 @@
 }
 
 @keyframes pulse-listening {
-  0%, 100% {
+  0%,
+  100% {
   }
   50% {
   }
@@ -741,7 +754,8 @@
 }
 
 @keyframes pulse-checkbox {
-  0%, 100% {
+  0%,
+  100% {
   }
   50% {
   }
@@ -751,7 +765,6 @@
   background: var(--gray-900);
   border-color: var(--gray-900);
 }
-
 
 /* Tuner Display - Radio Style */
 .feedback-tuner {
@@ -879,14 +892,14 @@
   background: var(--green-500);
 }
 
-
 /* Pulse effect for wrong note */
 .tuner-indicator.wrong {
   animation: pulse-indicator 0.3s ease;
 }
 
 @keyframes pulse-indicator {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -1059,7 +1072,6 @@
   }
 }
 
-
 /* ===========================================
    FEEDBACK EXPANSION UI
    =========================================== */
@@ -1190,7 +1202,8 @@
 }
 
 @keyframes pulseCurrent {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 var(--blue-alpha-40);
   }
   50% {
@@ -1345,7 +1358,6 @@
     font-size: 10px;
   }
 }
-
 
 /* ========================================
    NEW MELODY FEEDBACK STYLES
@@ -1515,6 +1527,12 @@
   border: 2px solid transparent;
 }
 
+.feedback-note-chip .feedback-note-name {
+  color: white;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
 /* Current note (next to play) */
 .feedback-note-chip.current {
   background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%);
@@ -1525,7 +1543,8 @@
 }
 
 @keyframes chipPulse {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
   }
   50% {
