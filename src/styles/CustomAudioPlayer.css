@@ -1480,7 +1480,7 @@
 .feedback-detected-label {
   font-size: 12px;
   font-weight: 600;
-  color: var(--gray-900);
+  color: white;
 }
 
 .feedback-detected-note {
