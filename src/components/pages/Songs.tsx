@@ -147,8 +147,11 @@ const Songs = () => {
   const stemPlayer = useStemPlayer(
     stemSeparation.stems,
     useCallback(() => {
-      // Stems reached end of buffer — unmute YouTube so user hears audio
-      setStemMode(false)
+      // Stems reached end of buffer — unmute YouTube for remaining audio
+      // Keep stem mode active so controls stay visible and user can seek back
+      if (playerRef.current) {
+        playerRef.current.unMute()
+      }
     }, [])
   )
   const stemStemsRef = useRef(stemSeparation.stems)
@@ -552,7 +555,10 @@ const Songs = () => {
             // Only start if not already playing to avoid restarting (which causes double audio)
             if (stemModeRef.current && stemStemsRef.current && !stemPlayer.isPlaying) {
               const ytTime = event.target.getCurrentTime()
-              stemPlayer.play(ytTime)
+              if (ytTime < stemStemsRef.current.duration) {
+                event.target.mute()
+                stemPlayer.play(ytTime)
+              }
             }
           } else if (event.data === window.YT.PlayerState.PAUSED) {
             setIsPlaying(false)
@@ -605,11 +611,16 @@ const Songs = () => {
     if (!player || !isPlayerReady) return
 
     if (stemMode && stemSeparation.stems) {
-      player.mute()
       // If YouTube is currently playing, start stems at its position
       if (isPlaying) {
         const ytTime = player.getCurrentTime()
-        stemPlayer.play(ytTime)
+        if (ytTime < stemSeparation.stems.duration) {
+          player.mute()
+          stemPlayer.play(ytTime)
+        }
+        // Past stem duration — keep YouTube unmuted so user hears audio
+      } else {
+        player.mute()
       }
     } else {
       player.unMute()
@@ -652,9 +663,16 @@ const Songs = () => {
       if (playerRef.current && isPlayerReady) {
         playerRef.current.seekTo(time, true)
       }
-      // Sync stem player when seeking
+      // Sync stem player when seeking — use play() directly so it works
+      // even after stems ended naturally (seek() requires isPlaying)
       if (stemMode && stemSeparation.stems) {
-        stemPlayer.seek(time)
+        if (time < stemSeparation.stems.duration) {
+          stemPlayer.play(time)
+          if (playerRef.current) playerRef.current.mute()
+        } else {
+          stemPlayer.pause()
+          if (playerRef.current) playerRef.current.unMute()
+        }
       }
     },
     [isPlayerReady, stemMode, stemSeparation.stems, stemPlayer]
@@ -679,7 +697,13 @@ const Songs = () => {
       setCurrentTime(target)
       playerRef.current.seekTo(target, true)
       if (stemMode && stemSeparation.stems) {
-        stemPlayer.seek(target)
+        if (target < stemSeparation.stems.duration) {
+          stemPlayer.play(target)
+          if (playerRef.current) playerRef.current.mute()
+        } else {
+          stemPlayer.pause()
+          if (playerRef.current) playerRef.current.unMute()
+        }
       }
     },
     [isPlayerReady, duration, currentTime, stemMode, stemSeparation.stems, stemPlayer]

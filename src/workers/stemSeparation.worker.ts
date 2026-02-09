@@ -86,6 +86,9 @@ async function loadModel(): Promise<ort.InferenceSession> {
 
   self.postMessage({ type: 'PROGRESS', progress: 80, stage: 'initializing_model' })
 
+  // WebGPU is not used: the Demucs model is too heavy for most consumer GPUs
+  // and causes DXGI_ERROR_DEVICE_HUNG / device lost errors mid-inference.
+  // WASM multi-threading is also off (requires COOP/COEP headers that break YouTube iframe).
   session = await ort.InferenceSession.create(modelBuffer.buffer, {
     executionProviders: ['wasm'],
     graphOptimizationLevel: 'all',
@@ -218,26 +221,34 @@ async function separateStems(
     `Processing ${numSegments} overlapping segment(s), stride=${SEGMENT_STRIDE}, total=${totalSamples}`
   )
 
+  // Pre-allocate reusable buffers to avoid per-segment GC pressure
+  const segLeft = new Float32Array(SEGMENT_SAMPLES)
+  const segRight = new Float32Array(SEGMENT_SAMPLES)
+  const waveformData = new Float32Array(2 * SEGMENT_SAMPLES)
+
   for (let seg = 0; seg < numSegments; seg++) {
     const segStart = offsets[seg]
     const segEnd = Math.min(segStart + SEGMENT_SAMPLES, totalSamples)
     const segLen = segEnd - segStart
 
-    // Extract segment, zero-pad to full length if at end
-    const segLeft = new Float32Array(SEGMENT_SAMPLES)
-    const segRight = new Float32Array(SEGMENT_SAMPLES)
+    // Zero-fill segment buffers (mandatory — final segment relies on zero-padding)
+    segLeft.fill(0)
+    segRight.fill(0)
+
+    // Extract segment into reused buffers
     segLeft.set(left.subarray(segStart, segEnd))
     segRight.set(right.subarray(segStart, segEnd))
 
     // Build waveform tensor [1, 2, SEGMENT_SAMPLES]
-    const waveformData = new Float32Array(2 * SEGMENT_SAMPLES)
+    // waveformData doesn't need .fill(0) — fully overwritten by the two .set() calls
     waveformData.set(segLeft, 0)
     waveformData.set(segRight, SEGMENT_SAMPLES)
     const waveformTensor = new ort.Tensor('float32', waveformData, [1, 2, SEGMENT_SAMPLES])
 
     // Run inference — single input, single output
     const results = await inferSession.run({ input: waveformTensor })
-    const outputData = results.output.data as Float32Array
+    // getData() is async — required for WebGPU (downloads from GPU), instant for CPU/WASM
+    const outputData = (await results.output.getData()) as Float32Array
     // Output shape: [1, 4, 2, SEGMENT_SAMPLES]
 
     // Accumulate weighted stem output (triangle crossfade in overlap regions)
@@ -257,6 +268,10 @@ async function separateStems(
     for (let i = 0; i < segLen; i++) {
       sumWeight[segStart + i] += weight[i]
     }
+
+    // Dispose ONNX tensors to free WASM/GPU memory immediately
+    waveformTensor.dispose()
+    results.output.dispose()
 
     const progress = Math.round(((seg + 1) / numSegments) * 90)
     self.postMessage({ type: 'PROGRESS', progress, stage: 'separating' })

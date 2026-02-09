@@ -176,6 +176,11 @@ export function useStemSeparation(videoId: string | null) {
               duration: decodedBuffer.duration,
             }
 
+            console.log(
+              `Stem separation complete: audio duration=${decodedBuffer.duration.toFixed(1)}s, ` +
+                `vocals samples=${stems.vocals.left.length}, sampleRate=${sampleRate}`
+            )
+
             resolve(stemData)
           } else if (msgType === 'ERROR') {
             reject(new Error(e.data.error))

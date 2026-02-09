@@ -182,14 +182,25 @@ async function downloadAudio(audioUrl: string, signal: AbortSignal): Promise<Buf
     })
 
     if (response.status === 200 || response.status === 206) {
-      return Buffer.from(await response.arrayBuffer())
+      const buffer = Buffer.from(await response.arrayBuffer())
+      // Verify we got the full file — YouTube servers sometimes close connections early
+      if (clen > 0 && buffer.byteLength >= clen * 0.99) {
+        return buffer
+      }
+      console.warn(
+        `[audio-proxy] Truncated single-range response: got ${buffer.byteLength} of ${clen} bytes, falling back to chunks`
+      )
+    } else {
+      console.warn(`[audio-proxy] Single range failed (HTTP ${response.status}), trying chunks...`)
     }
 
-    // If single request fails, fall back to chunked 256KB downloads
-    console.warn(`[audio-proxy] Single range failed (HTTP ${response.status}), trying chunks...`)
-    const CHUNK_SIZE = 256 * 1024
+    // Chunked download — fetches in 2MB pieces until we have the full file.
+    // Uses clen (not short-chunk heuristic) to know when we're done, because
+    // YouTube servers can return less than requested per chunk even when more data remains.
+    const CHUNK_SIZE = 2 * 1024 * 1024
     const chunks: Buffer[] = []
     let offset = 0
+    let consecutiveFailures = 0
 
     while (offset < downloadSize) {
       const end = Math.min(offset + CHUNK_SIZE - 1, downloadSize - 1)
@@ -198,18 +209,26 @@ async function downloadAudio(audioUrl: string, signal: AbortSignal): Promise<Buf
         headers: { 'User-Agent': ua, Range: `bytes=${offset}-${end}` },
       })
 
-      if (chunkRes.status !== 206 && chunkRes.status !== 200) break
+      if (chunkRes.status !== 206 && chunkRes.status !== 200) {
+        consecutiveFailures++
+        if (consecutiveFailures >= 3) break
+        continue
+      }
+      consecutiveFailures = 0
 
       const chunk = Buffer.from(await chunkRes.arrayBuffer())
+      if (chunk.byteLength === 0) break
+
       chunks.push(chunk)
       offset += chunk.byteLength
-
-      if (chunk.byteLength === 0) break
-      if (chunk.byteLength < CHUNK_SIZE) break
     }
 
     if (chunks.length === 0) throw new Error('No data received')
-    return Buffer.concat(chunks)
+    const result = Buffer.concat(chunks)
+    console.log(
+      `[audio-proxy] Chunked download: ${result.byteLength} of ${clen} bytes (${chunks.length} chunks)`
+    )
+    return result
   }
 
   // Non-googlevideo URLs - direct fetch
