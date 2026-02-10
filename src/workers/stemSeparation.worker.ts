@@ -1,130 +1,89 @@
 /**
- * Web Worker for audio stem separation using ONNX Runtime Web + Demucs HTDemucs model.
+ * Web Worker for audio stem separation using ONNX Runtime + Spleeter.
  *
- * Uses the self-contained Demucs ONNX model from mixxxdj/demucs which bakes
- * STFT/ISTFT into the model as 1D convolutions. It accepts a single waveform
- * input and outputs stems directly — no manual FFT/STFT computation needed.
+ * Supports all Spleeter model variants:
+ *   - 2stems: vocals + accompaniment
+ *   - 4stems: vocals + drums + bass + other
+ *   - 5stems: vocals + drums + bass + piano + other
  *
- * Input: float32[1, 2, 343980] (stereo waveform at 44.1kHz, ~7.8s segments)
- * Output: float32[1, 4, 2, 343980] — drums=0, bass=1, other=2, vocals=3
- *
- * Communication protocol:
- * - Main → Worker: { type: 'SEPARATE', leftChannel: ArrayBuffer, rightChannel: ArrayBuffer, sampleRate: number }
- * - Worker → Main: { type: 'PROGRESS', progress: number, stage: string }
- * - Worker → Main: { type: 'RESULT', stems: Record<string, {left: Float32Array, right: Float32Array}> }
- * - Worker → Main: { type: 'ERROR', error: string }
+ * Pipeline:
+ *   Input: stereo PCM (44100 Hz)
+ *     → STFT (n_fft=4096, hop=1024, Hann window, no center padding)
+ *     → magnitude spectrogram (first 1024 of 2049 freq bins)
+ *     → pad frames to multiple of 512, reshape to [2, chunks, 512, 1024]
+ *     → run each stem's ONNX model → magnitude estimates
+ *     → Wiener-like soft mask normalization
+ *     → apply masks to original STFT magnitude (zero-pad to 2049 bins)
+ *     → ISTFT (overlap-add) → time-domain stems
+ *   Output: { stemName: {left, right}, ... }
  */
 
 import * as ort from 'onnxruntime-web'
 
-// Model URL — self-contained Demucs v4 HTDemucs from mixxxdj/demucs (MIT license)
-// Proxied through the dev server to avoid CORS issues (GitHub releases lack CORS headers).
-// For production, host the model on a CORS-friendly CDN (e.g. HuggingFace) and update this URL.
-const MODEL_URL = '/api/demucs-model'
-
-// Stem order in Demucs output: drums=0, bass=1, other=2, vocals=3
-const STEM_NAMES = ['drums', 'bass', 'other', 'vocals'] as const
-const NUM_STEMS = 4
-
-// Demucs processes audio at 44100 Hz in 7.8-second segments (default htdemucs segment)
+// STFT parameters (matching Spleeter defaults)
+const FRAME_LENGTH = 4096
+const HOP_LENGTH = 1024
+const FREQ_BINS = FRAME_LENGTH / 2 + 1 // 2049
+const MODEL_FREQ_BINS = 1024 // model uses only first 1024 bins
+const CHUNK_FRAMES = 512 // model expects frames grouped in 512
 const MODEL_SAMPLE_RATE = 44100
-const SEGMENT_SAMPLES = 343980 // 7.8 * 44100 — fixed by model export
 
-// Configure ONNX Runtime WASM paths to use CDN
-ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/'
-
-let session: ort.InferenceSession | null = null
-
-// ─── Model Loading ─────────────────────────────────────────────────────────
-
-async function loadModel(): Promise<ort.InferenceSession> {
-  if (session) return session
-
-  self.postMessage({ type: 'PROGRESS', progress: 0, stage: 'loading_model' })
-
-  let modelBuffer = await loadFromCache()
-
-  if (!modelBuffer) {
-    self.postMessage({ type: 'PROGRESS', progress: 5, stage: 'downloading_model' })
-
-    const response = await fetch(MODEL_URL)
-    if (!response.ok) throw new Error(`Failed to download model: HTTP ${response.status}`)
-
-    const contentLength = parseInt(response.headers.get('content-length') || '0')
-    const reader = response.body?.getReader()
-    if (!reader) throw new Error('Failed to read model response')
-
-    const chunks: Uint8Array[] = []
-    let received = 0
-
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      chunks.push(value)
-      received += value.length
-      if (contentLength > 0) {
-        const progress = 5 + (received / contentLength) * 70
-        self.postMessage({
-          type: 'PROGRESS',
-          progress: Math.round(progress),
-          stage: 'downloading_model',
-        })
-      }
-    }
-
-    modelBuffer = new Uint8Array(received)
-    let offset = 0
-    for (const chunk of chunks) {
-      modelBuffer.set(chunk, offset)
-      offset += chunk.length
-    }
-
-    await saveToCache(modelBuffer)
-  } else {
-    self.postMessage({ type: 'PROGRESS', progress: 75, stage: 'loading_cached_model' })
-  }
-
-  self.postMessage({ type: 'PROGRESS', progress: 80, stage: 'initializing_model' })
-
-  // WebGPU is not used: the Demucs model is too heavy for most consumer GPUs
-  // and causes DXGI_ERROR_DEVICE_HUNG / device lost errors mid-inference.
-  // WASM multi-threading is also off (requires COOP/COEP headers that break YouTube iframe).
-  session = await ort.InferenceSession.create(modelBuffer.buffer, {
-    executionProviders: ['wasm'],
-    graphOptimizationLevel: 'all',
-  })
-
-  console.log('Model input names:', JSON.stringify(session.inputNames))
-  console.log('Model output names:', JSON.stringify(session.outputNames))
-
-  self.postMessage({ type: 'PROGRESS', progress: 100, stage: 'model_ready' })
-  return session
+// Stem names per model variant
+const MODEL_STEMS: Record<string, string[]> = {
+  '2stems': ['vocals', 'accompaniment'],
+  '4stems': ['vocals', 'drums', 'bass', 'other'],
+  '5stems': ['vocals', 'drums', 'bass', 'piano', 'other'],
 }
 
-// ─── IndexedDB Cache ───────────────────────────────────────────────────────
+// HuggingFace model URLs per variant (fp32)
+// Only 2stems has publicly available ONNX models from sherpa-onnx.
+// 4stems/5stems need to be converted and hosted — these are placeholder URLs.
+const HF_BASE_URLS: Record<string, string> = {
+  '2stems': 'https://huggingface.co/csukuangfj/sherpa-onnx-spleeter-2stems/resolve/main',
+  '4stems': 'https://huggingface.co/csukuangfj/sherpa-onnx-spleeter-4stems/resolve/main',
+  '5stems': 'https://huggingface.co/csukuangfj/sherpa-onnx-spleeter-5stems/resolve/main',
+}
 
-const DB_NAME = 'keplear_demucs'
+/** In dev mode, proxy through the Vite dev server to avoid CSP issues. */
+function getModelUrl(model: string, stem: string): string {
+  const isDev = typeof location !== 'undefined' && location.origin.includes('localhost')
+  if (isDev) {
+    return `/api/spleeter-model?model=${model}&stem=${stem}`
+  }
+  return `${HF_BASE_URLS[model]}/${stem}.onnx`
+}
+
+// Configure ONNX Runtime — single-threaded WASM (no COOP/COEP required)
+// Point to CDN for WASM files (Vite dev server doesn't serve node_modules .wasm correctly)
+ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.1/dist/'
+ort.env.wasm.numThreads = 1
+
+// ─── IndexedDB Model Cache ──────────────────────────────────────────────────
+
+const DB_NAME = 'keplear_spleeter_onnx'
 const STORE_NAME = 'models'
-const MODEL_KEY = 'htdemucs_selfcontained'
+const DB_VERSION = 1
 
 function openDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 1)
+    const req = indexedDB.open(DB_NAME, DB_VERSION)
     req.onupgradeneeded = () => {
-      req.result.createObjectStore(STORE_NAME)
+      if (!req.result.objectStoreNames.contains(STORE_NAME)) {
+        req.result.createObjectStore(STORE_NAME)
+      }
     }
     req.onsuccess = () => resolve(req.result)
     req.onerror = () => reject(req.error)
   })
 }
 
-async function loadFromCache(): Promise<Uint8Array | null> {
+async function getCachedModel(name: string): Promise<ArrayBuffer | null> {
   try {
     const db = await openDB()
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, 'readonly')
       const store = tx.objectStore(STORE_NAME)
-      const req = store.get(MODEL_KEY)
+      const req = store.get(name)
       req.onsuccess = () => resolve(req.result ?? null)
       req.onerror = () => reject(req.error)
     })
@@ -133,178 +92,295 @@ async function loadFromCache(): Promise<Uint8Array | null> {
   }
 }
 
-async function saveToCache(data: Uint8Array): Promise<void> {
+async function cacheModel(name: string, data: ArrayBuffer): Promise<void> {
   try {
     const db = await openDB()
     return new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, 'readwrite')
       const store = tx.objectStore(STORE_NAME)
-      const req = store.put(data, MODEL_KEY)
+      const req = store.put(data, name)
       req.onsuccess = () => resolve()
       req.onerror = () => reject(req.error)
     })
   } catch {
-    // Cache failure is non-fatal
+    // Caching failure is non-fatal
   }
 }
 
-// ─── Stem Separation ───────────────────────────────────────────────────────
+// ─── ONNX Model Loading ────────────────────────────────────────────────────
 
-// Overlap between segments — matches Demucs default (0.25 = 25%)
-const OVERLAP = 0.25
-const SEGMENT_STRIDE = Math.round(SEGMENT_SAMPLES * (1 - OVERLAP))
+const loadedSessions: Map<string, ort.InferenceSession> = new Map()
+let loadedModelName: string | null = null
 
-/**
- * Build triangle crossfade weight matching Demucs apply.py:
- *   weight = cat([arange(1, S//2+1), arange(S - S//2, 0, -1)])
- * Ramps from 1 up to S//2 then back down to 1.
- */
-function buildTriangleWeight(length: number): Float32Array {
-  const weight = new Float32Array(length)
-  const half = Math.floor(length / 2)
-  for (let i = 0; i < half; i++) {
-    weight[i] = i + 1
-  }
-  for (let i = half; i < length; i++) {
-    weight[i] = length - i
-  }
-  return weight
-}
+async function loadOnnxModel(
+  name: string,
+  url: string,
+  onProgress?: (loaded: number, total: number) => void
+): Promise<ort.InferenceSession> {
+  // Try IndexedDB cache
+  let buffer = await getCachedModel(name)
 
-/**
- * Run Demucs inference on stereo audio.
- * Uses overlapping segments with triangle crossfade (matching Demucs apply.py).
- */
-async function separateStems(
-  leftChannel: Float32Array,
-  rightChannel: Float32Array,
-  sampleRate: number,
-  inferSession: ort.InferenceSession
-): Promise<Record<string, { left: Float32Array; right: Float32Array }>> {
-  const numSamples = leftChannel.length
+  if (buffer) {
+    console.log(
+      `[spleeter] Loaded ${name} from cache (${(buffer.byteLength / 1024 / 1024).toFixed(1)} MB)`
+    )
+  } else {
+    console.log(`[spleeter] Downloading ${name}...`)
+    const response = await fetch(url)
+    if (!response.ok) throw new Error(`Failed to download ${name}: HTTP ${response.status}`)
 
-  self.postMessage({ type: 'PROGRESS', progress: 0, stage: 'separating' })
+    const contentLength = parseInt(response.headers.get('content-length') || '0')
+    const reader = response.body!.getReader()
+    const chunks: Uint8Array[] = []
+    let loaded = 0
 
-  // Resample to 44100 if needed
-  let left = leftChannel
-  let right = rightChannel
-  let totalSamples = numSamples
-
-  if (sampleRate !== MODEL_SAMPLE_RATE) {
-    const ratio = MODEL_SAMPLE_RATE / sampleRate
-    totalSamples = Math.round(numSamples * ratio)
-    left = resample(leftChannel, totalSamples)
-    right = resample(rightChannel, totalSamples)
-  }
-
-  // Build segment offsets with overlap
-  const offsets: number[] = []
-  for (let off = 0; off < totalSamples; off += SEGMENT_STRIDE) {
-    offsets.push(off)
-  }
-  const numSegments = offsets.length
-
-  // Triangle crossfade weight (matching Demucs)
-  const weight = buildTriangleWeight(SEGMENT_SAMPLES)
-
-  // Allocate weighted output buffers + weight accumulator
-  const stemOutputs: Record<string, { left: Float32Array; right: Float32Array }> = {}
-  for (const name of STEM_NAMES) {
-    stemOutputs[name] = {
-      left: new Float32Array(totalSamples),
-      right: new Float32Array(totalSamples),
-    }
-  }
-  const sumWeight = new Float32Array(totalSamples)
-
-  console.log(
-    `Processing ${numSegments} overlapping segment(s), stride=${SEGMENT_STRIDE}, total=${totalSamples}`
-  )
-
-  // Pre-allocate reusable buffers to avoid per-segment GC pressure
-  const segLeft = new Float32Array(SEGMENT_SAMPLES)
-  const segRight = new Float32Array(SEGMENT_SAMPLES)
-  const waveformData = new Float32Array(2 * SEGMENT_SAMPLES)
-
-  for (let seg = 0; seg < numSegments; seg++) {
-    const segStart = offsets[seg]
-    const segEnd = Math.min(segStart + SEGMENT_SAMPLES, totalSamples)
-    const segLen = segEnd - segStart
-
-    // Zero-fill segment buffers (mandatory — final segment relies on zero-padding)
-    segLeft.fill(0)
-    segRight.fill(0)
-
-    // Extract segment into reused buffers
-    segLeft.set(left.subarray(segStart, segEnd))
-    segRight.set(right.subarray(segStart, segEnd))
-
-    // Build waveform tensor [1, 2, SEGMENT_SAMPLES]
-    // waveformData doesn't need .fill(0) — fully overwritten by the two .set() calls
-    waveformData.set(segLeft, 0)
-    waveformData.set(segRight, SEGMENT_SAMPLES)
-    const waveformTensor = new ort.Tensor('float32', waveformData, [1, 2, SEGMENT_SAMPLES])
-
-    // Run inference — single input, single output
-    const results = await inferSession.run({ input: waveformTensor })
-    // getData() is async — required for WebGPU (downloads from GPU), instant for CPU/WASM
-    const outputData = (await results.output.getData()) as Float32Array
-    // Output shape: [1, 4, 2, SEGMENT_SAMPLES]
-
-    // Accumulate weighted stem output (triangle crossfade in overlap regions)
-    for (let s = 0; s < NUM_STEMS; s++) {
-      const lStart = s * 2 * SEGMENT_SAMPLES
-      const rStart = lStart + SEGMENT_SAMPLES
-
-      for (let i = 0; i < segLen; i++) {
-        const outIdx = segStart + i
-        const w = weight[i]
-        stemOutputs[STEM_NAMES[s]].left[outIdx] += w * outputData[lStart + i]
-        stemOutputs[STEM_NAMES[s]].right[outIdx] += w * outputData[rStart + i]
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      chunks.push(value)
+      loaded += value.byteLength
+      if (onProgress && contentLength > 0) {
+        onProgress(loaded, contentLength)
       }
     }
 
-    // Accumulate weight
-    for (let i = 0; i < segLen; i++) {
-      sumWeight[segStart + i] += weight[i]
+    // Combine chunks into single buffer
+    buffer = new Uint8Array(loaded).buffer
+    const combined = new Uint8Array(buffer)
+    let offset = 0
+    for (const chunk of chunks) {
+      combined.set(chunk, offset)
+      offset += chunk.byteLength
     }
 
-    // Dispose ONNX tensors to free WASM/GPU memory immediately
-    waveformTensor.dispose()
-    results.output.dispose()
+    console.log(`[spleeter] Downloaded ${name}: ${(loaded / 1024 / 1024).toFixed(1)} MB`)
 
-    const progress = Math.round(((seg + 1) / numSegments) * 90)
-    self.postMessage({ type: 'PROGRESS', progress, stage: 'separating' })
+    // Cache for next time
+    await cacheModel(name, buffer)
   }
 
-  // Normalize by accumulated weight
-  for (const name of STEM_NAMES) {
-    const l = stemOutputs[name].left
-    const r = stemOutputs[name].right
-    for (let i = 0; i < totalSamples; i++) {
-      const w = sumWeight[i]
-      if (w > 0) {
-        l[i] /= w
-        r[i] /= w
+  return ort.InferenceSession.create(buffer, {
+    executionProviders: ['wasm'],
+  })
+}
+
+async function loadModels(modelName: string): Promise<void> {
+  const stemNames = MODEL_STEMS[modelName]
+  if (!stemNames) throw new Error(`Unknown model: ${modelName}`)
+
+  // Reuse if same model is already loaded
+  if (loadedModelName === modelName && loadedSessions.size === stemNames.length) return
+
+  // Dispose previous sessions if switching models
+  for (const [, session] of loadedSessions) {
+    try {
+      await session.release()
+    } catch {
+      /* ignore */
+    }
+  }
+  loadedSessions.clear()
+  loadedModelName = null
+
+  self.postMessage({ type: 'PROGRESS', progress: 0, stage: 'loading_model' })
+
+  const progressPerStem = 75 / stemNames.length
+
+  for (let i = 0; i < stemNames.length; i++) {
+    const stem = stemNames[i]
+    const baseProgress = 5 + i * progressPerStem
+
+    self.postMessage({
+      type: 'PROGRESS',
+      progress: Math.round(baseProgress),
+      stage: 'downloading_model',
+    })
+
+    const session = await loadOnnxModel(
+      `${modelName}_${stem}`,
+      getModelUrl(modelName, stem),
+      (loaded, total) => {
+        const p = baseProgress + (loaded / total) * progressPerStem
+        self.postMessage({ type: 'PROGRESS', progress: Math.round(p), stage: 'downloading_model' })
+      }
+    )
+
+    loadedSessions.set(stem, session)
+  }
+
+  loadedModelName = modelName
+  self.postMessage({ type: 'PROGRESS', progress: 80, stage: 'model_ready' })
+  console.log(`[spleeter] Loaded ${stemNames.length} models for ${modelName}`)
+}
+
+// ─── Hann Window ────────────────────────────────────────────────────────────
+
+function createHannWindow(length: number): Float32Array {
+  const window = new Float32Array(length)
+  for (let i = 0; i < length; i++) {
+    window[i] = 0.5 * (1 - Math.cos((2 * Math.PI * i) / length))
+  }
+  return window
+}
+
+// ─── FFT (Cooley-Tukey radix-2) ────────────────────────────────────────────
+
+function fft(real: Float32Array, imag: Float32Array, n: number): void {
+  let j = 0
+  for (let i = 0; i < n; i++) {
+    if (i < j) {
+      let tmp = real[i]
+      real[i] = real[j]
+      real[j] = tmp
+      tmp = imag[i]
+      imag[i] = imag[j]
+      imag[j] = tmp
+    }
+    let m = n >> 1
+    while (m >= 1 && j >= m) {
+      j -= m
+      m >>= 1
+    }
+    j += m
+  }
+
+  for (let size = 2; size <= n; size *= 2) {
+    const halfSize = size >> 1
+    const angle = (-2 * Math.PI) / size
+    const wReal = Math.cos(angle)
+    const wImag = Math.sin(angle)
+
+    for (let i = 0; i < n; i += size) {
+      let curReal = 1
+      let curImag = 0
+
+      for (let k = 0; k < halfSize; k++) {
+        const evenIdx = i + k
+        const oddIdx = i + k + halfSize
+
+        const tReal = curReal * real[oddIdx] - curImag * imag[oddIdx]
+        const tImag = curReal * imag[oddIdx] + curImag * real[oddIdx]
+
+        real[oddIdx] = real[evenIdx] - tReal
+        imag[oddIdx] = imag[evenIdx] - tImag
+        real[evenIdx] += tReal
+        imag[evenIdx] += tImag
+
+        const newReal = curReal * wReal - curImag * wImag
+        curImag = curReal * wImag + curImag * wReal
+        curReal = newReal
+      }
+    }
+  }
+}
+
+function ifft(real: Float32Array, imag: Float32Array, n: number): void {
+  for (let i = 0; i < n; i++) imag[i] = -imag[i]
+  fft(real, imag, n)
+  const scale = 1 / n
+  for (let i = 0; i < n; i++) {
+    real[i] *= scale
+    imag[i] = -imag[i] * scale
+  }
+}
+
+// ─── STFT ───────────────────────────────────────────────────────────────────
+
+interface STFTResult {
+  magnitude: Float32Array[] // [numFrames][FREQ_BINS]
+  phase: Float32Array[] // [numFrames][FREQ_BINS]
+  numFrames: number
+}
+
+function computeSTFT(signal: Float32Array, hannWindow: Float32Array): STFTResult {
+  const numFrames = Math.floor((signal.length - FRAME_LENGTH) / HOP_LENGTH) + 1
+  const magnitude: Float32Array[] = []
+  const phase: Float32Array[] = []
+
+  const frame = new Float32Array(FRAME_LENGTH)
+  const real = new Float32Array(FRAME_LENGTH)
+  const imag = new Float32Array(FRAME_LENGTH)
+
+  for (let f = 0; f < numFrames; f++) {
+    const start = f * HOP_LENGTH
+
+    for (let i = 0; i < FRAME_LENGTH; i++) {
+      frame[i] = (signal[start + i] || 0) * hannWindow[i]
+    }
+
+    real.set(frame)
+    imag.fill(0)
+    fft(real, imag, FRAME_LENGTH)
+
+    const mag = new Float32Array(FREQ_BINS)
+    const ph = new Float32Array(FREQ_BINS)
+
+    for (let k = 0; k < FREQ_BINS; k++) {
+      const r = real[k]
+      const im = imag[k]
+      mag[k] = Math.sqrt(r * r + im * im)
+      ph[k] = Math.atan2(im, r)
+    }
+
+    magnitude.push(mag)
+    phase.push(ph)
+  }
+
+  return { magnitude, phase, numFrames }
+}
+
+// ─── ISTFT ──────────────────────────────────────────────────────────────────
+
+function computeISTFT(
+  magnitude: Float32Array[],
+  phase: Float32Array[],
+  numFrames: number,
+  outputLength: number,
+  hannWindow: Float32Array
+): Float32Array {
+  const output = new Float32Array(outputLength)
+  const windowSum = new Float32Array(outputLength)
+
+  const real = new Float32Array(FRAME_LENGTH)
+  const imag = new Float32Array(FRAME_LENGTH)
+
+  for (let f = 0; f < numFrames; f++) {
+    const mag = magnitude[f]
+    const ph = phase[f]
+
+    for (let k = 0; k < FREQ_BINS; k++) {
+      real[k] = mag[k] * Math.cos(ph[k])
+      imag[k] = mag[k] * Math.sin(ph[k])
+    }
+    for (let k = FREQ_BINS; k < FRAME_LENGTH; k++) {
+      const mirrorK = FRAME_LENGTH - k
+      real[k] = real[mirrorK]
+      imag[k] = -imag[mirrorK]
+    }
+
+    ifft(real, imag, FRAME_LENGTH)
+
+    const start = f * HOP_LENGTH
+    for (let i = 0; i < FRAME_LENGTH; i++) {
+      const outIdx = start + i
+      if (outIdx < outputLength) {
+        output[outIdx] += real[i] * hannWindow[i]
+        windowSum[outIdx] += hannWindow[i] * hannWindow[i]
       }
     }
   }
 
-  // Resample back to original sample rate if needed
-  if (sampleRate !== MODEL_SAMPLE_RATE) {
-    for (const name of STEM_NAMES) {
-      stemOutputs[name].left = resample(stemOutputs[name].left, numSamples)
-      stemOutputs[name].right = resample(stemOutputs[name].right, numSamples)
+  for (let i = 0; i < outputLength; i++) {
+    if (windowSum[i] > 1e-8) {
+      output[i] /= windowSum[i]
     }
   }
 
-  self.postMessage({ type: 'PROGRESS', progress: 100, stage: 'separating' })
-  return stemOutputs
+  return output
 }
 
-/**
- * Simple linear interpolation resampler.
- */
+// ─── Resampling ─────────────────────────────────────────────────────────────
+
 function resample(input: Float32Array, targetLength: number): Float32Array {
   if (input.length === targetLength) return input
   const output = new Float32Array(targetLength)
@@ -322,6 +398,208 @@ function resample(input: Float32Array, targetLength: number): Float32Array {
   return output
 }
 
+// ─── Stem Separation ────────────────────────────────────────────────────────
+
+async function separateStems(
+  leftChannel: Float32Array,
+  rightChannel: Float32Array,
+  sampleRate: number,
+  modelName: string
+): Promise<Record<string, { left: Float32Array; right: Float32Array }>> {
+  const stemNames = MODEL_STEMS[modelName]
+  const numSamples = leftChannel.length
+
+  self.postMessage({ type: 'PROGRESS', progress: 0, stage: 'separating' })
+
+  // Resample to 44100 Hz if needed
+  let left = leftChannel
+  let right = rightChannel
+  let totalSamples = numSamples
+
+  if (sampleRate !== MODEL_SAMPLE_RATE) {
+    const ratio = MODEL_SAMPLE_RATE / sampleRate
+    totalSamples = Math.round(numSamples * ratio)
+    left = resample(leftChannel, totalSamples)
+    right = resample(rightChannel, totalSamples)
+  }
+
+  // Ensure signal is long enough for at least one STFT frame
+  const minLength = FRAME_LENGTH
+  if (left.length < minLength) {
+    const padded = new Float32Array(minLength)
+    padded.set(left)
+    left = padded
+    const paddedR = new Float32Array(minLength)
+    paddedR.set(right)
+    right = paddedR
+  }
+  const signalLength = left.length
+
+  self.postMessage({ type: 'PROGRESS', progress: 5, stage: 'separating' })
+
+  // STFT both channels
+  const hannWindow = createHannWindow(FRAME_LENGTH)
+  const leftSTFT = computeSTFT(left, hannWindow)
+  const rightSTFT = computeSTFT(right, hannWindow)
+  const numFrames = leftSTFT.numFrames
+
+  self.postMessage({ type: 'PROGRESS', progress: 15, stage: 'separating' })
+  console.log(`[spleeter] STFT: ${numFrames} frames, ${FREQ_BINS} freq bins`)
+
+  // Pad frame count to multiple of CHUNK_FRAMES
+  const numChunks = Math.ceil(numFrames / CHUNK_FRAMES)
+  const paddedFrames = numChunks * CHUNK_FRAMES
+
+  // Build input tensor [2, numChunks, 512, 1024]
+  // Channel layout: [left_chunks..., right_chunks...]
+  const inputSize = 2 * numChunks * CHUNK_FRAMES * MODEL_FREQ_BINS
+  const inputData = new Float32Array(inputSize)
+
+  for (let c = 0; c < 2; c++) {
+    const stft = c === 0 ? leftSTFT : rightSTFT
+    const channelOffset = c * paddedFrames * MODEL_FREQ_BINS
+
+    for (let f = 0; f < numFrames; f++) {
+      const frameOffset = channelOffset + f * MODEL_FREQ_BINS
+      for (let k = 0; k < MODEL_FREQ_BINS; k++) {
+        inputData[frameOffset + k] = stft.magnitude[f][k]
+      }
+    }
+    // Padded frames (numFrames..paddedFrames) stay zero
+  }
+
+  self.postMessage({ type: 'PROGRESS', progress: 20, stage: 'separating' })
+
+  // Run both ONNX models
+  const inputTensor = new ort.Tensor('float32', inputData, [
+    2,
+    numChunks,
+    CHUNK_FRAMES,
+    MODEL_FREQ_BINS,
+  ])
+
+  console.log(
+    `[spleeter] Running inference: input shape [2, ${numChunks}, ${CHUNK_FRAMES}, ${MODEL_FREQ_BINS}], stems=${stemNames.join(',')}`
+  )
+
+  // Run each stem's ONNX model and collect magnitude estimates
+  const stemModelOutputs: Map<string, Float32Array> = new Map()
+  const inferenceProgressRange = 40 // 20% to 60%
+
+  for (let s = 0; s < stemNames.length; s++) {
+    const stem = stemNames[s]
+    const session = loadedSessions.get(stem)
+    if (!session) throw new Error(`No session loaded for stem: ${stem}`)
+
+    const result = await session.run({ x: inputTensor })
+    stemModelOutputs.set(stem, result.y.data as Float32Array)
+
+    const progress = 20 + ((s + 1) / stemNames.length) * inferenceProgressRange
+    self.postMessage({ type: 'PROGRESS', progress: Math.round(progress), stage: 'separating' })
+  }
+
+  // Apply Wiener-like soft mask normalization with power α for sharper separation.
+  // Higher α = harder masks = less bleed between stems (at cost of some artifacts).
+  // α=2 is standard Wiener; α=4 gives noticeably less bleed for multi-stem.
+  const MASK_POWER = stemNames.length > 2 ? 4 : 2
+
+  const stemMags: Record<string, [Float32Array[], Float32Array[]]> = {}
+  for (const stem of stemNames) {
+    stemMags[stem] = [[], []]
+  }
+
+  for (let c = 0; c < 2; c++) {
+    const stft = c === 0 ? leftSTFT : rightSTFT
+    const channelOffset = c * paddedFrames * MODEL_FREQ_BINS
+
+    for (let f = 0; f < numFrames; f++) {
+      const frameOffset = channelOffset + f * MODEL_FREQ_BINS
+
+      // Compute sum of powered estimates across all stems
+      const sumPow = new Float32Array(MODEL_FREQ_BINS)
+      for (const stem of stemNames) {
+        const data = stemModelOutputs.get(stem)!
+        for (let k = 0; k < MODEL_FREQ_BINS; k++) {
+          const v = Math.abs(data[frameOffset + k])
+          let p = v * v // v^2
+          if (MASK_POWER === 4) p = p * p // v^4
+          sumPow[k] += p
+        }
+      }
+
+      // Compute masks and apply to original magnitude
+      // Also compute per-stem average mask for extending to high frequencies
+      for (const stem of stemNames) {
+        const mag = new Float32Array(FREQ_BINS)
+        const data = stemModelOutputs.get(stem)!
+        let maskSum = 0
+        for (let k = 0; k < MODEL_FREQ_BINS; k++) {
+          const v = Math.abs(data[frameOffset + k])
+          let p = v * v
+          if (MASK_POWER === 4) p = p * p
+          const mask = (p + 1e-12) / (sumPow[k] + 1e-10)
+          mag[k] = mask * stft.magnitude[f][k]
+          maskSum += mask
+        }
+
+        // Extend mask to high frequencies (1024-2048) using average mask value.
+        // This preserves high-frequency content that Spleeter's model doesn't process.
+        const avgMask = maskSum / MODEL_FREQ_BINS
+        for (let k = MODEL_FREQ_BINS; k < FREQ_BINS; k++) {
+          mag[k] = avgMask * stft.magnitude[f][k]
+        }
+
+        stemMags[stem][c].push(mag)
+      }
+    }
+  }
+
+  self.postMessage({ type: 'PROGRESS', progress: 70, stage: 'separating' })
+
+  // ISTFT to reconstruct time-domain audio for each stem
+  const stemOutputs: Record<string, { left: Float32Array; right: Float32Array }> = {}
+
+  for (let s = 0; s < stemNames.length; s++) {
+    const stem = stemNames[s]
+    const leftStem = computeISTFT(
+      stemMags[stem][0],
+      leftSTFT.phase,
+      numFrames,
+      signalLength,
+      hannWindow
+    )
+    const rightStem = computeISTFT(
+      stemMags[stem][1],
+      rightSTFT.phase,
+      numFrames,
+      signalLength,
+      hannWindow
+    )
+
+    stemOutputs[stem] = {
+      left: leftStem.slice(0, totalSamples),
+      right: rightStem.slice(0, totalSamples),
+    }
+
+    self.postMessage({
+      type: 'PROGRESS',
+      progress: 70 + ((s + 1) / stemNames.length) * 25,
+      stage: 'separating',
+    })
+  }
+
+  // Resample back to original sample rate if needed
+  if (sampleRate !== MODEL_SAMPLE_RATE) {
+    for (const name of stemNames) {
+      stemOutputs[name].left = resample(stemOutputs[name].left, numSamples)
+      stemOutputs[name].right = resample(stemOutputs[name].right, numSamples)
+    }
+  }
+
+  self.postMessage({ type: 'PROGRESS', progress: 100, stage: 'separating' })
+  return stemOutputs
+}
+
 // ─── Worker Message Handler ────────────────────────────────────────────────
 
 self.onmessage = async (e: MessageEvent) => {
@@ -329,15 +607,15 @@ self.onmessage = async (e: MessageEvent) => {
 
   try {
     if (type === 'SEPARATE') {
-      const { leftChannel, rightChannel, sampleRate } = e.data
+      const { leftChannel, rightChannel, sampleRate, model: modelName = '2stems' } = e.data
 
-      const inferSession = await loadModel()
+      await loadModels(modelName)
 
       const stems = await separateStems(
         new Float32Array(leftChannel),
         new Float32Array(rightChannel),
         sampleRate,
-        inferSession
+        modelName
       )
 
       const transferables: ArrayBuffer[] = []
@@ -346,7 +624,11 @@ self.onmessage = async (e: MessageEvent) => {
       }
 
       self.postMessage(
-        { type: 'RESULT', stems },
+        {
+          type: 'RESULT',
+          stems,
+          stemNames: MODEL_STEMS[modelName],
+        },
         // @ts-expect-error — transferables typing
         transferables
       )

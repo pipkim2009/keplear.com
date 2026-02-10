@@ -2,16 +2,25 @@
  * Vite dev server middleware plugin for YouTube audio stream extraction.
  * Handles /api/piped-streams and /api/audio-proxy requests server-side in dev.
  *
- * Stream extraction priority:
- * 1. YouTube ANDROID InnerTube API (direct un-throttled URLs)
- * 2. youtube-info-streams (throttled - 127KB limit)
- * 3. Piped API instances (frequently down)
+ * Audio download strategy:
+ * 1. yt-dlp subprocess (handles PO tokens, most reliable)
+ * 2. Direct fetch with IOS client UA (for non-googlevideo URLs)
+ *
+ * Stream info extraction (for waveform preview):
+ * 1. YouTube IOS InnerTube API
+ * 2. youtube-info-streams
+ * 3. Piped API instances
  */
 
 import type { Plugin } from 'vite'
 import type { ServerResponse } from 'http'
+import { execFile } from 'child_process'
+import { readFile, unlink, mkdtemp } from 'fs/promises'
+import { tmpdir } from 'os'
+import { join } from 'path'
 
-const ANDROID_UA = 'com.google.android.youtube/19.02.39 (Linux; U; Android 14) gzip'
+// IOS client for stream metadata (stream URLs used for waveform preview sizing/picking)
+const IOS_UA = 'com.google.ios.youtube/19.45.4 (iPhone16,2; U; CPU iOS 18_1_0 like Mac OS X;)'
 const BROWSER_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
@@ -30,26 +39,31 @@ function jsonResponse(res: ServerResponse, status: number, data: unknown) {
 }
 
 /**
- * Primary: YouTube ANDROID InnerTube API.
- * Returns direct URLs with no n-sig throttle.
+ * Primary: YouTube IOS InnerTube API.
+ * Returns stream metadata (URLs, bitrates, sizes) for the frontend to pick a stream.
+ * Note: The stream URLs themselves may return 403 for large downloads due to PO token
+ * requirements. The actual audio download is handled by yt-dlp in the audio-proxy.
  */
-async function tryAndroidClient(videoId: string) {
+async function tryIOSClient(videoId: string) {
   const apiUrl = 'https://www.youtube.com/youtubei/v1/player?prettyPrint=false&alt=json'
   const response = await fetch(apiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'User-Agent': ANDROID_UA,
-      'X-YouTube-Client-Name': '3',
-      'X-YouTube-Client-Version': '19.02.39',
+      'User-Agent': IOS_UA,
+      'X-YouTube-Client-Name': '5',
+      'X-YouTube-Client-Version': '19.45.4',
     },
     body: JSON.stringify({
       videoId,
       context: {
         client: {
-          clientName: 'ANDROID',
-          clientVersion: '19.02.39',
-          androidSdkVersion: 34,
+          clientName: 'IOS',
+          clientVersion: '19.45.4',
+          deviceMake: 'Apple',
+          deviceModel: 'iPhone16,2',
+          osName: 'iPhone',
+          osVersion: '18.1.0.22B83',
           hl: 'en',
           gl: 'US',
         },
@@ -86,7 +100,7 @@ async function tryAndroidClient(videoId: string) {
     )
 
   if (audioStreams.length === 0) throw new Error('No audio streams with URLs')
-  return { audioStreams, source: 'android' }
+  return { audioStreams, source: 'ios' }
 }
 
 /**
@@ -141,105 +155,135 @@ async function tryPipedInstance(instance: string, videoId: string, signal: Abort
   return data
 }
 
-const ALLOWED_AUDIO_HOSTS = [
-  '.googlevideo.com',
-  '.youtube.com',
-  '.kavin.rocks',
-  '.private.coffee',
-  '.adminforge.de',
-]
+// ─── yt-dlp Audio Download ──────────────────────────────────────────────────
 
-function isAllowedAudioUrl(urlStr: string): boolean {
-  try {
-    const host = new URL(urlStr).hostname
-    return ALLOWED_AUDIO_HOSTS.some(suffix => host.endsWith(suffix))
-  } catch {
-    return false
+/**
+ * Find yt-dlp executable path.
+ * Checks common install locations on Windows and PATH.
+ */
+let ytdlpPath: string | null = null
+
+async function findYtdlp(): Promise<string> {
+  if (ytdlpPath) return ytdlpPath
+
+  // Try common paths
+  const candidates = [
+    'yt-dlp', // PATH
+    'yt-dlp.exe', // PATH (Windows)
+  ]
+
+  for (const candidate of candidates) {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        execFile(candidate, ['--version'], err => {
+          if (err) reject(err)
+          else resolve()
+        })
+      })
+      ytdlpPath = candidate
+      return candidate
+    } catch {
+      // try next
+    }
   }
+
+  // Try WinGet default location
+  const { homedir } = await import('os')
+  const wingetPath = join(
+    homedir(),
+    'AppData/Local/Microsoft/WinGet/Packages',
+    'yt-dlp.yt-dlp_Microsoft.Winget.Source_8wekyb3d8bbwe',
+    'yt-dlp.exe'
+  )
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      execFile(wingetPath, ['--version'], err => {
+        if (err) reject(err)
+        else resolve()
+      })
+    })
+    ytdlpPath = wingetPath
+    return wingetPath
+  } catch {
+    // not found
+  }
+
+  throw new Error('yt-dlp not found. Install it: winget install yt-dlp.yt-dlp')
 }
 
 /**
- * Download audio from a URL. Uses Range header for googlevideo.com
- * (required even for un-throttled ANDROID URLs).
- * Parses clen from URL to request the exact file size - YouTube rejects oversized ranges.
+ * Download audio using yt-dlp subprocess.
+ * Returns the audio file as a Buffer.
  */
-async function downloadAudio(audioUrl: string, signal: AbortSignal): Promise<Buffer> {
-  const MAX_SIZE = 50 * 1024 * 1024 // 50MB — enough for ~50 min at 128kbps
+async function downloadWithYtdlp(videoId: string): Promise<Buffer> {
+  const ytdlp = await findYtdlp()
 
-  const parsedUrl = new URL(audioUrl)
-  const isGV = parsedUrl.hostname.endsWith('.googlevideo.com')
-  const ua = isGV ? ANDROID_UA : BROWSER_UA
+  // Create temp directory for the download
+  const tempDir = await mkdtemp(join(tmpdir(), 'keplear-audio-'))
+  const outputPath = join(tempDir, '%(id)s.%(ext)s')
 
-  if (isGV) {
-    // Parse actual file size from clen URL parameter
-    const clen = parseInt(parsedUrl.searchParams.get('clen') || '0') || 0
-    const downloadSize = clen > 0 ? Math.min(clen, MAX_SIZE) : MAX_SIZE
+  try {
+    // Download best audio only, no post-processing (no ffmpeg needed)
+    const args = [
+      '-f',
+      'bestaudio',
+      '--no-playlist',
+      '--no-part',
+      '--no-mtime',
+      '-o',
+      outputPath,
+      `https://www.youtube.com/watch?v=${videoId}`,
+    ]
 
-    // Single Range request sized to actual file (YouTube rejects ranges beyond file size)
-    const response = await fetch(audioUrl, {
-      signal,
-      headers: { 'User-Agent': ua, Range: `bytes=0-${downloadSize - 1}` },
-    })
+    console.log(`[audio-proxy] Running yt-dlp for ${videoId}...`)
 
-    if (response.status === 200 || response.status === 206) {
-      const buffer = Buffer.from(await response.arrayBuffer())
-      // Verify we got the full file — YouTube servers sometimes close connections early
-      if (clen > 0 && buffer.byteLength >= clen * 0.99) {
-        return buffer
-      }
-      console.warn(
-        `[audio-proxy] Truncated single-range response: got ${buffer.byteLength} of ${clen} bytes, falling back to chunks`
-      )
-    } else {
-      console.warn(`[audio-proxy] Single range failed (HTTP ${response.status}), trying chunks...`)
-    }
-
-    // Chunked download — fetches in 2MB pieces until we have the full file.
-    // Uses clen (not short-chunk heuristic) to know when we're done, because
-    // YouTube servers can return less than requested per chunk even when more data remains.
-    const CHUNK_SIZE = 2 * 1024 * 1024
-    const chunks: Buffer[] = []
-    let offset = 0
-    let consecutiveFailures = 0
-
-    while (offset < downloadSize) {
-      const end = Math.min(offset + CHUNK_SIZE - 1, downloadSize - 1)
-      const chunkRes = await fetch(audioUrl, {
-        signal,
-        headers: { 'User-Agent': ua, Range: `bytes=${offset}-${end}` },
+    await new Promise<void>((resolve, reject) => {
+      const proc = execFile(ytdlp, args, { timeout: 60000 }, err => {
+        if (err) reject(new Error(`yt-dlp failed: ${err.message}`))
+        else resolve()
       })
 
-      if (chunkRes.status !== 206 && chunkRes.status !== 200) {
-        consecutiveFailures++
-        if (consecutiveFailures >= 3) break
-        continue
-      }
-      consecutiveFailures = 0
+      // Log stderr for debugging
+      proc.stderr?.on('data', (data: Buffer) => {
+        const msg = data.toString().trim()
+        if (msg) console.log(`[yt-dlp] ${msg}`)
+      })
+    })
 
-      const chunk = Buffer.from(await chunkRes.arrayBuffer())
-      if (chunk.byteLength === 0) break
+    // Find the downloaded file (extension varies: webm, m4a, opus, etc.)
+    const { readdirSync } = await import('fs')
+    const files = readdirSync(tempDir)
+    const audioFile = files.find(f => f.startsWith(videoId))
 
-      chunks.push(chunk)
-      offset += chunk.byteLength
+    if (!audioFile) throw new Error('yt-dlp produced no output file')
+
+    const filePath = join(tempDir, audioFile)
+    const buffer = await readFile(filePath)
+    console.log(
+      `[audio-proxy] yt-dlp downloaded ${(buffer.byteLength / 1024 / 1024).toFixed(2)} MB`
+    )
+
+    // Clean up
+    try {
+      await unlink(filePath)
+      const { rmdirSync } = await import('fs')
+      rmdirSync(tempDir)
+    } catch {
+      // cleanup failure is non-fatal
     }
 
-    if (chunks.length === 0) throw new Error('No data received')
-    const result = Buffer.concat(chunks)
-    console.log(
-      `[audio-proxy] Chunked download: ${result.byteLength} of ${clen} bytes (${chunks.length} chunks)`
-    )
-    return result
+    return buffer
+  } catch (e) {
+    // Clean up temp dir on error
+    try {
+      const { rmSync } = await import('fs')
+      rmSync(tempDir, { recursive: true, force: true })
+    } catch {
+      // ignore
+    }
+    throw e
   }
-
-  // Non-googlevideo URLs - direct fetch
-  const response = await fetch(audioUrl, {
-    signal,
-    headers: { 'User-Agent': ua },
-  })
-  if (!response.ok) throw new Error(`HTTP ${response.status}`)
-  const buffer = Buffer.from(await response.arrayBuffer())
-  if (buffer.byteLength > MAX_SIZE) throw new Error('Audio too large')
-  return buffer
 }
 
 export function pipedDevPlugin(): Plugin {
@@ -257,16 +301,16 @@ export function pipedDevPlugin(): Plugin {
           return
         }
 
-        // Primary: ANDROID InnerTube API (un-throttled URLs)
+        // Primary: IOS InnerTube API
         try {
-          const data = await tryAndroidClient(videoId)
+          const data = await tryIOSClient(videoId)
           console.log(
-            `[piped-streams] ${videoId}: got ${data.audioStreams.length} streams via Android client`
+            `[piped-streams] ${videoId}: got ${data.audioStreams.length} streams via iOS client`
           )
           jsonResponse(res, 200, data)
           return
         } catch (e) {
-          console.warn('[piped-streams] Android client failed:', (e as Error).message)
+          console.warn('[piped-streams] iOS client failed:', (e as Error).message)
         }
 
         // Fallback 1: youtube-info-streams (throttled URLs)
@@ -305,15 +349,42 @@ export function pipedDevPlugin(): Plugin {
         }
       })
 
-      // /api/demucs-model - proxy model download to avoid CORS (GitHub releases lack CORS headers)
+      // /api/spleeter-model - serve ONNX model files (local first, then HuggingFace)
       server.middlewares.use(async (req, res, next) => {
-        if (!req.url?.startsWith('/api/demucs-model')) return next()
+        if (!req.url?.startsWith('/api/spleeter-model')) return next()
 
-        const modelUrl =
-          'https://github.com/mixxxdj/demucs/releases/download/v4.0.1-19-gd182d42-onnxmodel/htdemucs.onnx'
+        const url = new URL(req.url, 'http://localhost')
+        const model = url.searchParams.get('model') || '2stems'
+        const stem = url.searchParams.get('stem') || 'vocals'
+
+        const validModels = ['2stems', '4stems', '5stems']
+        if (!validModels.includes(model)) {
+          res.writeHead(400)
+          res.end('Invalid model parameter')
+          return
+        }
+
+        // Try local file first (from conversion script output)
+        const localPath = join(process.cwd(), 'spleeter-onnx', model, `${stem}.onnx`)
+        try {
+          const localBuffer = await readFile(localPath)
+          console.log(
+            `[spleeter-model] Serving local ${model}/${stem}.onnx (${(localBuffer.byteLength / 1024 / 1024).toFixed(1)} MB)`
+          )
+          res.setHeader('Content-Type', 'application/octet-stream')
+          res.setHeader('Content-Length', localBuffer.byteLength.toString())
+          res.writeHead(200)
+          res.end(localBuffer)
+          return
+        } catch {
+          // No local file, fall through to HuggingFace
+        }
+
+        // Fall back to HuggingFace
+        const modelUrl = `https://huggingface.co/csukuangfj/sherpa-onnx-spleeter-${model}/resolve/main/${stem}.onnx`
 
         try {
-          console.log('[demucs-model] Fetching model from GitHub releases...')
+          console.log(`[spleeter-model] Fetching ${stem}.onnx from HuggingFace...`)
           const response = await fetch(modelUrl)
           if (!response.ok) {
             res.writeHead(response.status)
@@ -322,6 +393,7 @@ export function pipedDevPlugin(): Plugin {
           }
 
           res.setHeader('Content-Type', 'application/octet-stream')
+          res.setHeader('Access-Control-Allow-Origin', '*')
           const contentLength = response.headers.get('content-length')
           if (contentLength) res.setHeader('Content-Length', contentLength)
           res.writeHead(200)
@@ -334,51 +406,68 @@ export function pipedDevPlugin(): Plugin {
             res.write(value)
             totalBytes += value.byteLength
           }
-          console.log(`[demucs-model] Streamed ${(totalBytes / 1024 / 1024).toFixed(1)} MB`)
+          console.log(
+            `[spleeter-model] Streamed ${stem}.onnx: ${(totalBytes / 1024 / 1024).toFixed(1)} MB`
+          )
           res.end()
         } catch (e) {
-          console.error('[demucs-model] Failed:', (e as Error).message)
+          console.error('[spleeter-model] Failed:', (e as Error).message)
           if (!res.headersSent) res.writeHead(502)
           res.end()
         }
       })
 
-      // /api/audio-proxy - proxy audio data to avoid CORS issues
+      // /api/audio-proxy - download audio via yt-dlp (primary) or direct fetch (fallback)
+      // Accepts: ?url=<googlevideo URL>&videoId=<YouTube video ID>
+      // When videoId is provided, uses yt-dlp for reliable download.
+      // When only url is provided, falls back to direct fetch.
       server.middlewares.use(async (req, res, next) => {
         if (!req.url?.startsWith('/api/audio-proxy')) return next()
 
         const url = new URL(req.url, 'http://localhost')
         const audioUrl = url.searchParams.get('url')
-        if (!audioUrl) {
-          jsonResponse(res, 400, { error: 'Missing url parameter' })
-          return
-        }
+        const videoId = url.searchParams.get('videoId')
 
-        if (!isAllowedAudioUrl(audioUrl)) {
-          jsonResponse(res, 403, { error: 'URL not allowed' })
+        if (!audioUrl && !videoId) {
+          jsonResponse(res, 400, { error: 'Missing url or videoId parameter' })
           return
         }
 
         try {
-          const parsedAudioUrl = new URL(audioUrl)
-          const clen = parsedAudioUrl.searchParams.get('clen')
-          console.log(
-            `[audio-proxy] Downloading: host=${parsedAudioUrl.hostname} clen=${clen} itag=${parsedAudioUrl.searchParams.get('itag')}`
-          )
+          let buffer: Buffer
 
-          const controller = new AbortController()
-          const timeout = setTimeout(() => controller.abort(), 60000)
+          // Primary: yt-dlp download (handles PO tokens, most reliable)
+          if (videoId) {
+            console.log(`[audio-proxy] Using yt-dlp for ${videoId}`)
+            buffer = await downloadWithYtdlp(videoId)
+          } else if (audioUrl) {
+            // Fallback: direct fetch (for non-YouTube URLs or if yt-dlp unavailable)
+            const parsedAudioUrl = new URL(audioUrl)
+            console.log(`[audio-proxy] Direct download: host=${parsedAudioUrl.hostname}`)
 
-          const buffer = await downloadAudio(audioUrl, controller.signal)
-          clearTimeout(timeout)
+            const controller = new AbortController()
+            const timeout = setTimeout(() => controller.abort(), 60000)
+            const ua = parsedAudioUrl.hostname.endsWith('.googlevideo.com') ? IOS_UA : BROWSER_UA
 
-          console.log(`[audio-proxy] Success: ${buffer.byteLength} bytes`)
-          res.setHeader('Content-Type', 'audio/mp4')
+            const response = await fetch(audioUrl, {
+              signal: controller.signal,
+              headers: { 'User-Agent': ua },
+            })
+            clearTimeout(timeout)
+
+            if (!response.ok) throw new Error(`HTTP ${response.status}`)
+            buffer = Buffer.from(await response.arrayBuffer())
+          } else {
+            throw new Error('No download source')
+          }
+
+          console.log(`[audio-proxy] Success: ${(buffer.byteLength / 1024 / 1024).toFixed(2)} MB`)
+          res.setHeader('Content-Type', 'audio/webm')
           res.writeHead(200)
           res.end(buffer)
         } catch (e) {
           console.warn('[audio-proxy] Download failed:', (e as Error).message)
-          res.writeHead(502)
+          if (!res.headersSent) res.writeHead(502)
           res.end()
         }
       })

@@ -3,8 +3,8 @@
  *
  * Flow:
  * 1. Check localStorage cache → return immediately if found
- * 2. Fetch audio stream URL via /api/piped-streams (ANDROID InnerTube API → un-throttled URLs)
- * 3. Download audio via /api/audio-proxy (server-side proxy for CORS) → decode → extract peaks
+ * 2. Fetch audio stream URL via /api/piped-streams (IOS InnerTube API → stream metadata)
+ * 3. Download audio via /api/audio-proxy (yt-dlp in dev, server proxy in prod) → decode → extract peaks
  * 4. Cache result in localStorage for future instant loads
  * 5. On any error → peaks stays null, component shows fallback waveform
  */
@@ -41,10 +41,15 @@ export async function downloadAudioBuffer(
   const stream = pickStream(data.audioStreams)
   if (!stream?.url) return null
 
-  // Step 2: Download audio data through server-side proxy
-  const audioRes = await fetch(apiUrl(`/api/audio-proxy?url=${encodeURIComponent(stream.url)}`), {
-    signal,
-  })
+  // Step 2: Download audio data through server-side proxy (pass videoId for yt-dlp)
+  const audioRes = await fetch(
+    apiUrl(
+      `/api/audio-proxy?url=${encodeURIComponent(stream.url)}&videoId=${encodeURIComponent(videoId)}`
+    ),
+    {
+      signal,
+    }
+  )
   if (!audioRes.ok) return null
 
   const arrayBuffer = await audioRes.arrayBuffer()
@@ -102,9 +107,14 @@ export async function downloadFullAudioBuffer(
   const stream = pickBestStream(data.audioStreams)
   if (!stream?.url) return null
 
-  const audioRes = await fetch(apiUrl(`/api/audio-proxy?url=${encodeURIComponent(stream.url)}`), {
-    signal,
-  })
+  const audioRes = await fetch(
+    apiUrl(
+      `/api/audio-proxy?url=${encodeURIComponent(stream.url)}&videoId=${encodeURIComponent(videoId)}`
+    ),
+    {
+      signal,
+    }
+  )
   if (!audioRes.ok) return null
 
   const arrayBuffer = await audioRes.arrayBuffer()

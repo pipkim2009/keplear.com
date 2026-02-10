@@ -3,14 +3,19 @@
  * Extracts audio stream URLs from YouTube videos.
  *
  * Stream extraction priority:
- * 1. YouTube ANDROID InnerTube API (direct un-throttled URLs)
+ * 1. YouTube IOS InnerTube API (no PO token required, direct URLs)
  * 2. youtube-info-streams (throttled - 127KB limit)
  * 3. Piped API instances (frequently down)
  */
 
 import { info as ytInfo } from 'youtube-info-streams'
 
-const ANDROID_UA = 'com.google.android.youtube/19.02.39 (Linux; U; Android 14) gzip'
+// IOS client — doesn't require PO tokens for stream downloads.
+// The plain ANDROID client now requires DroidGuard PO tokens, causing 403 on googlevideo.com.
+// ANDROID_VR works for some videos but returns LOGIN_REQUIRED for many others.
+// IOS is the most reliable client currently.
+const IOS_UA =
+  'com.google.ios.youtube/19.45.4 (iPhone16,2; U; CPU iOS 18_1_0 like Mac OS X;)'
 
 const PIPED_INSTANCES = [
   'https://pipedapi.kavin.rocks',
@@ -35,26 +40,29 @@ function getCorsOrigin(req) {
 }
 
 /**
- * Primary: YouTube ANDROID InnerTube API.
- * Returns direct URLs with no n-sig throttle.
+ * Primary: YouTube IOS InnerTube API.
+ * Returns direct URLs without requiring PO tokens for stream downloads.
  */
-async function tryAndroidClient(videoId) {
+async function tryIOSClient(videoId) {
   const apiUrl = 'https://www.youtube.com/youtubei/v1/player?prettyPrint=false&alt=json'
   const response = await fetch(apiUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'User-Agent': ANDROID_UA,
-      'X-YouTube-Client-Name': '3',
-      'X-YouTube-Client-Version': '19.02.39',
+      'User-Agent': IOS_UA,
+      'X-YouTube-Client-Name': '5',
+      'X-YouTube-Client-Version': '19.45.4',
     },
     body: JSON.stringify({
       videoId,
       context: {
         client: {
-          clientName: 'ANDROID',
-          clientVersion: '19.02.39',
-          androidSdkVersion: 34,
+          clientName: 'IOS',
+          clientVersion: '19.45.4',
+          deviceMake: 'Apple',
+          deviceModel: 'iPhone16,2',
+          osName: 'iPhone',
+          osVersion: '18.1.0.22B83',
           hl: 'en',
           gl: 'US',
         }
@@ -81,7 +89,7 @@ async function tryAndroidClient(videoId) {
     }))
 
   if (audioStreams.length === 0) throw new Error('No audio streams with URLs')
-  return { audioStreams, source: 'android' }
+  return { audioStreams, source: 'ios' }
 }
 
 async function tryYoutubeInfoStreams(videoId) {
@@ -114,7 +122,7 @@ async function tryPipedInstance(instance, videoId, signal) {
   const url = `${instance}/streams/${encodeURIComponent(videoId)}`
   const response = await fetch(url, {
     signal,
-    headers: { 'Accept': 'application/json', 'User-Agent': ANDROID_UA }
+    headers: { 'Accept': 'application/json' }
   })
   if (!response.ok) throw new Error(`HTTP ${response.status}`)
   const data = await response.json()
@@ -144,12 +152,12 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET')
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=7200')
 
-  // Primary: ANDROID InnerTube API (un-throttled URLs)
+  // Primary: IOS InnerTube API (no PO token required)
   try {
-    const data = await tryAndroidClient(videoId)
+    const data = await tryIOSClient(videoId)
     return res.status(200).json(data)
   } catch (error) {
-    console.warn('Android client failed:', error.message)
+    console.warn('iOS client failed:', error.message)
   }
 
   // Fallback 1: youtube-info-streams (throttled URLs)

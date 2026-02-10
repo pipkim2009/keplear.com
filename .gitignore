@@ -41,5 +41,15 @@ android/build/
 # Generated icons from capacitor-assets (root level)
 /icons/
 
+# Spleeter ONNX models (converted locally, ~37.5 MB each)
+spleeter-onnx/
+*.tar.gz
+2stems/
+4stems/
+5stems/
+
+# Python virtual environments
+.venv*/
+
 # Windows reserved device names
 nul

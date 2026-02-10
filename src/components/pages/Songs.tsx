@@ -1082,6 +1082,7 @@ const Songs = () => {
               progress={stemSeparation.progress}
               error={stemSeparation.error}
               hasStemData={stemSeparation.stems !== null}
+              stemNames={stemSeparation.stems?.stemNames ?? []}
               onSeparate={stemSeparation.separate}
               onCancel={stemSeparation.cancel}
               onClearStems={stemPlayer.resetMixer}

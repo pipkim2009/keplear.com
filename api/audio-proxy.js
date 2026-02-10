@@ -1,10 +1,11 @@
 /**
  * Vercel Serverless Function - Audio Proxy
  * Proxies audio data from YouTube to avoid CORS restrictions.
- * Uses ANDROID User-Agent for googlevideo.com URLs.
+ * Uses IOS User-Agent for googlevideo.com URLs (matches the client used in piped-streams.js).
  */
 
-const ANDROID_UA = 'com.google.android.youtube/19.02.39 (Linux; U; Android 14) gzip'
+const IOS_UA =
+  'com.google.ios.youtube/19.45.4 (iPhone16,2; U; CPU iOS 18_1_0 like Mac OS X;)'
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 const MAX_SIZE = 25 * 1024 * 1024 // 25MB - supports ~8-10min songs for stem separation
 
@@ -54,11 +55,11 @@ function getCorsOrigin(req) {
 }
 
 /**
- * Download audio, using Range header and ANDROID UA for googlevideo.com.
+ * Download audio, using Range header and IOS UA for googlevideo.com.
  */
 async function downloadAudio(url, signal) {
   const isGV = isGoogleVideoUrl(url)
-  const ua = isGV ? ANDROID_UA : BROWSER_UA
+  const ua = isGV ? IOS_UA : BROWSER_UA
 
   if (isGV) {
     // Parse actual file size from clen URL parameter - YouTube rejects oversized ranges
