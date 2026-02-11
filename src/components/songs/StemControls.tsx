@@ -8,8 +8,9 @@
  * - Error: Error message with retry button
  */
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import type { StemType, SeparationStatus } from '../../hooks/useStemSeparation'
+import { checkAllModelAvailability, getModelForInstrument } from '../../hooks/useStemSeparation'
 import styles from '../../styles/Songs.module.css'
 
 interface StemControlsProps {
@@ -98,6 +99,17 @@ export default function StemControls({
   // Remember the last selection so Retry uses the same instruments
   const lastSelectionRef = useRef<string[]>(['vocals'])
 
+  // Model availability: maps model name → available boolean
+  const [modelAvail, setModelAvail] = useState<Record<string, boolean>>({
+    '2stems': true,
+    '4stems': false,
+    '5stems': false,
+  })
+
+  useEffect(() => {
+    checkAllModelAvailability().then(setModelAvail)
+  }, [])
+
   const toggleInstrument = useCallback((id: string) => {
     setSelected(prev => {
       const next = new Set(prev)
@@ -137,20 +149,29 @@ export default function StemControls({
         <div className={styles.stemInstrumentPicker}>
           {AVAILABLE_INSTRUMENTS.map(inst => {
             const isActive = selected.has(inst.id)
+            const requiredModel = getModelForInstrument(inst.id)
+            const isAvailable = modelAvail[requiredModel] !== false
             return (
               <button
                 key={inst.id}
-                className={`${styles.stemInstrumentChip} ${isActive ? styles.stemInstrumentChipActive : ''}`}
+                className={`${styles.stemInstrumentChip} ${isActive ? styles.stemInstrumentChipActive : ''} ${!isAvailable ? styles.stemInstrumentChipUnavailable : ''}`}
                 style={
                   {
-                    '--chip-color': inst.color,
-                    '--chip-bg': `${inst.color}20`,
+                    '--chip-color': isAvailable ? inst.color : '#6b7280',
+                    '--chip-bg': isAvailable ? `${inst.color}20` : '#6b728015',
                   } as React.CSSProperties
                 }
-                onClick={() => toggleInstrument(inst.id)}
+                onClick={() => isAvailable && toggleInstrument(inst.id)}
+                disabled={!isAvailable}
+                title={
+                  !isAvailable
+                    ? `${inst.label} requires the ${requiredModel} model (not yet available)`
+                    : undefined
+                }
               >
                 <span className={styles.stemChipIcon}>{inst.icon}</span>
                 {inst.label}
+                {!isAvailable && <span className={styles.stemChipBadge}>soon</span>}
               </button>
             )
           })}

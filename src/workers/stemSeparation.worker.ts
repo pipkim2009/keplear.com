@@ -36,12 +36,21 @@ const MODEL_STEMS: Record<string, string[]> = {
 }
 
 // HuggingFace model URLs per variant (fp32)
-// Only 2stems has publicly available ONNX models from sherpa-onnx.
-// 4stems/5stems need to be converted and hosted — these are placeholder URLs.
+// 2stems: publicly available from sherpa-onnx (csukuangfj)
+// 4stems/5stems: must be converted from Spleeter TF checkpoints and hosted.
+//   Run: python scripts/convert-spleeter-onnx.py --model 4stems
+//   Then upload to HuggingFace and update the URL below.
 const HF_BASE_URLS: Record<string, string> = {
   '2stems': 'https://huggingface.co/csukuangfj/sherpa-onnx-spleeter-2stems/resolve/main',
   '4stems': 'https://huggingface.co/csukuangfj/sherpa-onnx-spleeter-4stems/resolve/main',
   '5stems': 'https://huggingface.co/csukuangfj/sherpa-onnx-spleeter-5stems/resolve/main',
+}
+
+// Track which models have been verified as available (avoids repeated HEAD checks)
+const modelAvailability: Record<string, boolean | null> = {
+  '2stems': true, // known available
+  '4stems': null, // unknown until checked
+  '5stems': null,
 }
 
 /** In dev mode, proxy through the Vite dev server to avoid CSP issues. */
@@ -600,14 +609,59 @@ async function separateStems(
   return stemOutputs
 }
 
+// ─── Model Availability Check ──────────────────────────────────────────────
+
+async function checkModelAvailability(modelName: string): Promise<boolean> {
+  // Already verified
+  if (modelAvailability[modelName] === true) return true
+  if (modelAvailability[modelName] === false) return false
+
+  // Check if models are cached in IndexedDB (if cached, they're available)
+  const stemNames = MODEL_STEMS[modelName]
+  if (!stemNames) return false
+
+  const firstStem = stemNames[0]
+  const cached = await getCachedModel(`${modelName}_${firstStem}`)
+  if (cached) {
+    modelAvailability[modelName] = true
+    return true
+  }
+
+  // HEAD request to check if the first stem's model file exists
+  try {
+    const url = getModelUrl(modelName, firstStem)
+    const response = await fetch(url, { method: 'HEAD' })
+    const available = response.ok
+    modelAvailability[modelName] = available
+    return available
+  } catch {
+    modelAvailability[modelName] = false
+    return false
+  }
+}
+
 // ─── Worker Message Handler ────────────────────────────────────────────────
 
 self.onmessage = async (e: MessageEvent) => {
   const { type } = e.data
 
   try {
-    if (type === 'SEPARATE') {
+    if (type === 'CHECK_AVAILABILITY') {
+      const { model: modelName } = e.data
+      const available = await checkModelAvailability(modelName)
+      self.postMessage({ type: 'AVAILABILITY', model: modelName, available })
+    } else if (type === 'SEPARATE') {
       const { leftChannel, rightChannel, sampleRate, model: modelName = '2stems' } = e.data
+
+      // Verify model is available before starting expensive work
+      const available = await checkModelAvailability(modelName)
+      if (!available) {
+        throw new Error(
+          `The ${modelName} model is not yet available. ` +
+            'Only 2-stem separation (vocals) is currently supported. ' +
+            'Run scripts/convert-spleeter-onnx.py to generate 4/5-stem models.'
+        )
+      }
 
       await loadModels(modelName)
 

@@ -385,7 +385,16 @@ const Songs = () => {
     (e?: React.FormEvent) => {
       e?.preventDefault()
       const trimmed = searchQuery.trim()
-      if (!trimmed) return
+
+      // Empty search → if no song playing, load most recent; otherwise just clear search results
+      if (!trimmed) {
+        setSearchResults([])
+        if (!currentVideo && recentVideos.length > 0) {
+          setCurrentVideo(recentVideos[0])
+          saveToRecent(recentVideos[0])
+        }
+        return
+      }
 
       // Check if it's a YouTube URL or video ID
       const videoId = extractVideoId(trimmed)
@@ -403,7 +412,7 @@ const Songs = () => {
 
       searchYouTube(trimmed)
     },
-    [searchQuery, searchYouTube, saveToRecent]
+    [searchQuery, searchYouTube, saveToRecent, recentVideos, currentVideo]
   )
 
   // Load a search result
@@ -611,6 +620,9 @@ const Songs = () => {
     if (!player || !isPlayerReady) return
 
     if (stemMode && stemSeparation.stems) {
+      // Sync playback rate so stems match YouTube speed
+      stemPlayer.setPlaybackRate(playbackRate)
+
       // If YouTube is currently playing, start stems at its position
       if (isPlaying) {
         const ytTime = player.getCurrentTime()
@@ -686,9 +698,13 @@ const Songs = () => {
     setIsLooping(!isLooping)
   }, [isLooping])
 
-  const changeSpeed = useCallback((speed: number) => {
-    setPlaybackRate(speed)
-  }, [])
+  const changeSpeed = useCallback(
+    (speed: number) => {
+      setPlaybackRate(speed)
+      stemPlayer.setPlaybackRate(speed)
+    },
+    [stemPlayer]
+  )
 
   const skipTime = useCallback(
     (seconds: number) => {
@@ -890,7 +906,7 @@ const Songs = () => {
       {/* Search Error */}
       {searchError && <div className={styles.searchError}>{searchError}</div>}
 
-      {/* Recent Videos */}
+      {/* Recent Videos (shown when no search results) */}
       {recentVideos.length > 0 && !currentVideo && searchResults.length === 0 && (
         <div className={styles.resultsSection}>
           <div className={styles.resultsSectionHeader}>
@@ -1203,6 +1219,43 @@ const Songs = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recent Videos (shown below player when no search results) */}
+      {recentVideos.length > 0 && currentVideo && searchResults.length === 0 && (
+        <div className={styles.resultsSection}>
+          <div className={styles.resultsSectionHeader}>
+            <h2 className={styles.sectionTitle}>{t('songs.recentVideos')}</h2>
+          </div>
+          <div className={styles.recentList}>
+            {recentVideos
+              .filter(video => video.videoId !== currentVideo.videoId)
+              .map(video => (
+                <div
+                  key={video.videoId}
+                  className={styles.recentItem}
+                  onClick={() => loadRecentVideo(video)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => e.key === 'Enter' && loadRecentVideo(video)}
+                >
+                  <img
+                    src={`https://i.ytimg.com/vi/${video.videoId}/mqdefault.jpg`}
+                    alt={video.title}
+                    className={styles.recentThumbnail}
+                  />
+                  <span className={styles.recentVideoId}>{video.title || video.videoId}</span>
+                  <button
+                    className={styles.removeRecentButton}
+                    onClick={e => removeFromRecent(video.videoId, e)}
+                    aria-label={t('common.remove')}
+                  >
+                    <PiX />
+                  </button>
+                </div>
+              ))}
           </div>
         </div>
       )}

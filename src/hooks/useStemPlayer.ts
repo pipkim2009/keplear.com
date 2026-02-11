@@ -64,6 +64,7 @@ export function useStemPlayer(stems: StemData | null, onStemsEnded?: () => void)
   const volumesRef = useRef(volumes)
   const mutesRef = useRef(mutes)
   const soloedRef = useRef(soloed)
+  const playbackRateRef = useRef(1)
   const playingRef = useRef(false)
   const generationRef = useRef(0) // Incremented on each play() to invalidate stale onended handlers
   const onStemsEndedRef = useRef(onStemsEnded)
@@ -143,12 +144,15 @@ export function useStemPlayer(stems: StemData | null, onStemsEnded?: () => void)
       // Use the first stem for onended detection (vocals is always first)
       const firstStem = names[0]
 
+      const rate = playbackRateRef.current
+
       for (const stemType of names) {
         const buffer = currentStems.stems[stemType]
         if (!buffer) continue
 
         const source = ctx.createBufferSource()
         source.buffer = buffer
+        source.playbackRate.value = rate
 
         const gain = ctx.createGain()
         source.connect(gain)
@@ -235,6 +239,14 @@ export function useStemPlayer(stems: StemData | null, onStemsEnded?: () => void)
     [updateGains]
   )
 
+  // Update playback rate on all active source nodes
+  const setPlaybackRate = useCallback((rate: number) => {
+    playbackRateRef.current = rate
+    for (const [, node] of nodesRef.current) {
+      node.source.playbackRate.value = rate
+    }
+  }, [])
+
   const resetMixer = useCallback(() => {
     const names = stemNamesRef.current
     const vols = buildVolumes(names)
@@ -270,6 +282,7 @@ export function useStemPlayer(stems: StemData | null, onStemsEnded?: () => void)
     toggleMute,
     toggleSolo,
     resetMixer,
+    setPlaybackRate,
     volumes,
     mutes,
     soloed,
