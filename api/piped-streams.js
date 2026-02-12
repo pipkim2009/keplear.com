@@ -115,7 +115,8 @@ async function tryIOSClient(videoId) {
     context.client.visitorData = visitorData
   }
 
-  const response = await fetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false&alt=json', {
+  const apiKey = 'AIzaSyB-63vPrdThhKuerbB2N_l7Kwwcxj6yUAc'
+  const response = await fetch(`https://www.youtube.com/youtubei/v1/player?key=${apiKey}&prettyPrint=false&alt=json`, {
     method: 'POST',
     headers,
     body: JSON.stringify({ videoId, context })
