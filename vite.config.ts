@@ -14,8 +14,20 @@ export default defineConfig(({ mode }) => ({
       registerType: 'autoUpdate',
       manifest: false, // Use static public/manifest.json
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+        // Only precache the app shell (HTML, core CSS, icons). Page JS chunks
+        // are lazy-loaded via the router and cached at runtime by the browser,
+        // so eagerly downloading them all wastes bandwidth on first visit.
+        globPatterns: ['**/*.html', 'assets/index-*.css', '**/*.{ico,png,svg,webp,woff,woff2}'],
         runtimeCaching: [
+          {
+            // App JS/CSS chunks — cache when visited, not eagerly
+            urlPattern: /\/assets\/.*\.(js|css)$/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'app-chunks',
+              expiration: { maxEntries: 80, maxAgeSeconds: 7 * 24 * 60 * 60 },
+            },
+          },
           {
             // Instrument samples from nbrosowsky.github.io
             urlPattern: /^https:\/\/nbrosowsky\.github\.io\/.*/i,

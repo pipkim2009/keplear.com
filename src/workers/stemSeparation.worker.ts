@@ -62,10 +62,11 @@ function getModelUrl(model: string, stem: string): string {
   return `${HF_BASE_URLS[model]}/${stem}.onnx`
 }
 
-// Configure ONNX Runtime — single-threaded WASM (no COOP/COEP required)
-// Point to CDN for WASM files (Vite dev server doesn't serve node_modules .wasm correctly)
+// Configure ONNX Runtime — use multi-threading when SharedArrayBuffer is available
+// (requires Cross-Origin-Embedder-Policy: require-corp + Cross-Origin-Opener-Policy: same-origin)
 ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web@1.24.1/dist/'
-ort.env.wasm.numThreads = 1
+const canUseThreads = typeof SharedArrayBuffer !== 'undefined'
+ort.env.wasm.numThreads = canUseThreads ? navigator.hardwareConcurrency || 4 : 1
 
 // ─── IndexedDB Model Cache ──────────────────────────────────────────────────
 
@@ -232,11 +233,45 @@ function createHannWindow(length: number): Float32Array {
   return window
 }
 
-// ─── FFT (Cooley-Tukey radix-2) ────────────────────────────────────────────
+// ─── FFT (Cooley-Tukey radix-2, pre-computed twiddle factors) ───────────────
 
-function fft(real: Float32Array, imag: Float32Array, n: number): void {
-  let j = 0
-  for (let i = 0; i < n; i++) {
+// Pre-compute bit-reversal table and twiddle factors for FRAME_LENGTH.
+// Eliminates thousands of Math.cos/sin calls during STFT/ISTFT processing.
+const bitRevTable = new Uint32Array(FRAME_LENGTH)
+{
+  for (let i = 0; i < FRAME_LENGTH; i++) {
+    let j = 0
+    let x = i
+    for (let bit = 0; bit < Math.log2(FRAME_LENGTH); bit++) {
+      j = (j << 1) | (x & 1)
+      x >>= 1
+    }
+    bitRevTable[i] = j
+  }
+}
+
+// Twiddle factors: twiddleReal[stage][k], twiddleImag[stage][k]
+// stage index corresponds to FFT size = 2^(stage+1)
+const numStages = Math.log2(FRAME_LENGTH)
+const twiddleReal: Float64Array[] = []
+const twiddleImag: Float64Array[] = []
+for (let s = 0; s < numStages; s++) {
+  const halfSize = 1 << s
+  const re = new Float64Array(halfSize)
+  const im = new Float64Array(halfSize)
+  const angle = (-2 * Math.PI) / (halfSize * 2)
+  for (let k = 0; k < halfSize; k++) {
+    re[k] = Math.cos(angle * k)
+    im[k] = Math.sin(angle * k)
+  }
+  twiddleReal.push(re)
+  twiddleImag.push(im)
+}
+
+function fft(real: Float32Array, imag: Float32Array): void {
+  // Bit-reversal permutation
+  for (let i = 0; i < FRAME_LENGTH; i++) {
+    const j = bitRevTable[i]
     if (i < j) {
       let tmp = real[i]
       real[i] = real[j]
@@ -245,49 +280,37 @@ function fft(real: Float32Array, imag: Float32Array, n: number): void {
       imag[i] = imag[j]
       imag[j] = tmp
     }
-    let m = n >> 1
-    while (m >= 1 && j >= m) {
-      j -= m
-      m >>= 1
-    }
-    j += m
   }
 
-  for (let size = 2; size <= n; size *= 2) {
-    const halfSize = size >> 1
-    const angle = (-2 * Math.PI) / size
-    const wReal = Math.cos(angle)
-    const wImag = Math.sin(angle)
+  // Butterfly stages with pre-computed twiddle factors
+  for (let s = 0; s < numStages; s++) {
+    const halfSize = 1 << s
+    const size = halfSize << 1
+    const twRe = twiddleReal[s]
+    const twIm = twiddleImag[s]
 
-    for (let i = 0; i < n; i += size) {
-      let curReal = 1
-      let curImag = 0
-
+    for (let i = 0; i < FRAME_LENGTH; i += size) {
       for (let k = 0; k < halfSize; k++) {
         const evenIdx = i + k
-        const oddIdx = i + k + halfSize
+        const oddIdx = evenIdx + halfSize
 
-        const tReal = curReal * real[oddIdx] - curImag * imag[oddIdx]
-        const tImag = curReal * imag[oddIdx] + curImag * real[oddIdx]
+        const tReal = twRe[k] * real[oddIdx] - twIm[k] * imag[oddIdx]
+        const tImag = twRe[k] * imag[oddIdx] + twIm[k] * real[oddIdx]
 
         real[oddIdx] = real[evenIdx] - tReal
         imag[oddIdx] = imag[evenIdx] - tImag
         real[evenIdx] += tReal
         imag[evenIdx] += tImag
-
-        const newReal = curReal * wReal - curImag * wImag
-        curImag = curReal * wImag + curImag * wReal
-        curReal = newReal
       }
     }
   }
 }
 
-function ifft(real: Float32Array, imag: Float32Array, n: number): void {
-  for (let i = 0; i < n; i++) imag[i] = -imag[i]
-  fft(real, imag, n)
-  const scale = 1 / n
-  for (let i = 0; i < n; i++) {
+function ifft(real: Float32Array, imag: Float32Array): void {
+  for (let i = 0; i < FRAME_LENGTH; i++) imag[i] = -imag[i]
+  fft(real, imag)
+  const scale = 1 / FRAME_LENGTH
+  for (let i = 0; i < FRAME_LENGTH; i++) {
     real[i] *= scale
     imag[i] = -imag[i] * scale
   }
@@ -303,36 +326,37 @@ interface STFTResult {
 
 function computeSTFT(signal: Float32Array, hannWindow: Float32Array): STFTResult {
   const numFrames = Math.floor((signal.length - FRAME_LENGTH) / HOP_LENGTH) + 1
-  const magnitude: Float32Array[] = []
-  const phase: Float32Array[] = []
 
-  const frame = new Float32Array(FRAME_LENGTH)
+  // Pre-allocate all output arrays at once to reduce GC pressure
+  const magnitude = new Array<Float32Array>(numFrames)
+  const phase = new Array<Float32Array>(numFrames)
+  for (let f = 0; f < numFrames; f++) {
+    magnitude[f] = new Float32Array(FREQ_BINS)
+    phase[f] = new Float32Array(FREQ_BINS)
+  }
+
+  // Reuse working buffers across all frames
   const real = new Float32Array(FRAME_LENGTH)
   const imag = new Float32Array(FRAME_LENGTH)
 
   for (let f = 0; f < numFrames; f++) {
     const start = f * HOP_LENGTH
 
+    // Apply window directly into real buffer — skip separate frame array
     for (let i = 0; i < FRAME_LENGTH; i++) {
-      frame[i] = (signal[start + i] || 0) * hannWindow[i]
+      real[i] = (signal[start + i] || 0) * hannWindow[i]
     }
-
-    real.set(frame)
     imag.fill(0)
-    fft(real, imag, FRAME_LENGTH)
+    fft(real, imag)
 
-    const mag = new Float32Array(FREQ_BINS)
-    const ph = new Float32Array(FREQ_BINS)
-
+    const mag = magnitude[f]
+    const ph = phase[f]
     for (let k = 0; k < FREQ_BINS; k++) {
       const r = real[k]
       const im = imag[k]
       mag[k] = Math.sqrt(r * r + im * im)
       ph[k] = Math.atan2(im, r)
     }
-
-    magnitude.push(mag)
-    phase.push(ph)
   }
 
   return { magnitude, phase, numFrames }
@@ -350,6 +374,7 @@ function computeISTFT(
   const output = new Float32Array(outputLength)
   const windowSum = new Float32Array(outputLength)
 
+  // Reuse working buffers across all frames
   const real = new Float32Array(FRAME_LENGTH)
   const imag = new Float32Array(FRAME_LENGTH)
 
@@ -367,15 +392,14 @@ function computeISTFT(
       imag[k] = -imag[mirrorK]
     }
 
-    ifft(real, imag, FRAME_LENGTH)
+    ifft(real, imag)
 
     const start = f * HOP_LENGTH
-    for (let i = 0; i < FRAME_LENGTH; i++) {
+    const end = Math.min(FRAME_LENGTH, outputLength - start)
+    for (let i = 0; i < end; i++) {
       const outIdx = start + i
-      if (outIdx < outputLength) {
-        output[outIdx] += real[i] * hannWindow[i]
-        windowSum[outIdx] += hannWindow[i] * hannWindow[i]
-      }
+      output[outIdx] += real[i] * hannWindow[i]
+      windowSum[outIdx] += hannWindow[i] * hannWindow[i]
     }
   }
 
@@ -507,54 +531,208 @@ async function separateStems(
     self.postMessage({ type: 'PROGRESS', progress: Math.round(progress), stage: 'separating' })
   }
 
-  // Apply Wiener-like soft mask normalization with power α for sharper separation.
-  // Higher α = harder masks = less bleed between stems (at cost of some artifacts).
-  // α=2 is standard Wiener; α=4 gives noticeably less bleed for multi-stem.
-  const MASK_POWER = stemNames.length > 2 ? 4 : 2
+  // ── Aggressive masking pipeline for minimal bleed ──────────────────────
+  //
+  // 1. α=6 Wiener masking (v^6 power — much harder than standard α=2)
+  // 2. Sigmoid sharpening pushes masks toward 0/1 binary
+  // 3. Median temporal filtering (preserves transients, kills isolated bleed)
+  // 4. Per-band high-frequency extension (8 sub-bands)
+
+  // Median-of-5 helper (sort-free for exactly 5 values)
+  function median5(a: number, b: number, c: number, d: number, e: number): number {
+    // Sorting network for 5 elements — 9 comparisons
+    let t: number
+    if (a > b) {
+      t = a
+      a = b
+      b = t
+    }
+    if (c > d) {
+      t = c
+      c = d
+      d = t
+    }
+    if (a > c) {
+      t = a
+      a = c
+      c = t
+      t = b
+      b = d
+      d = t
+    }
+    if (b > e) {
+      t = b
+      b = e
+      e = t
+    }
+    if (b > c) {
+      t = b
+      b = c
+      c = t
+    }
+    if (d > e) {
+      t = d
+      d = e
+      e = t
+    }
+    if (c > d) {
+      c = d
+    }
+    return b > c ? b : c
+  }
+
+  // Median-of-3 helper
+  function median3(a: number, b: number, c: number): number {
+    if (a > b) {
+      const t = a
+      a = b
+      b = t
+    }
+    return c < a ? a : c > b ? b : c
+  }
+
+  // Sigmoid sharpening: pushes mask values toward 0 or 1
+  // gain controls steepness (higher = harder mask), center is the crossover point
+  const SIGMOID_GAIN = 12
+  const SIGMOID_CENTER = 0.5
+  function sharpen(mask: number): number {
+    return 1 / (1 + Math.exp(-SIGMOID_GAIN * (mask - SIGMOID_CENTER)))
+  }
+
+  // Temporal smoothing radius for median filter
+  const SMOOTH_RADIUS = 2 // 5-frame median window
+
+  // High-frequency extension config
+  const HF_BANDS = 8
+  const HF_RANGE = FREQ_BINS - MODEL_FREQ_BINS // 1025 bins
+  const HF_BAND_SIZE = Math.ceil(HF_RANGE / HF_BANDS)
+  const HF_SRC_BAND = Math.floor(MODEL_FREQ_BINS / HF_BANDS)
 
   const stemMags: Record<string, [Float32Array[], Float32Array[]]> = {}
   for (const stem of stemNames) {
     stemMags[stem] = [[], []]
   }
 
+  // First pass: compute raw Wiener masks with α=6
+  const rawMasks: Record<string, [Float32Array, Float32Array]> = {}
+  for (const stem of stemNames) {
+    rawMasks[stem] = [
+      new Float32Array(numFrames * MODEL_FREQ_BINS),
+      new Float32Array(numFrames * MODEL_FREQ_BINS),
+    ]
+  }
+
+  const sumPow = new Float32Array(MODEL_FREQ_BINS)
+
   for (let c = 0; c < 2; c++) {
-    const stft = c === 0 ? leftSTFT : rightSTFT
     const channelOffset = c * paddedFrames * MODEL_FREQ_BINS
 
     for (let f = 0; f < numFrames; f++) {
       const frameOffset = channelOffset + f * MODEL_FREQ_BINS
+      const maskOffset = f * MODEL_FREQ_BINS
 
-      // Compute sum of powered estimates across all stems
-      const sumPow = new Float32Array(MODEL_FREQ_BINS)
+      // Sum v^6 across all stems
+      sumPow.fill(0)
       for (const stem of stemNames) {
         const data = stemModelOutputs.get(stem)!
         for (let k = 0; k < MODEL_FREQ_BINS; k++) {
           const v = Math.abs(data[frameOffset + k])
-          let p = v * v // v^2
-          if (MASK_POWER === 4) p = p * p // v^4
-          sumPow[k] += p
+          const v2 = v * v
+          const v3 = v2 * v
+          sumPow[k] += v3 * v3 // v^6
         }
       }
 
-      // Compute masks and apply to original magnitude
-      // Also compute per-stem average mask for extending to high frequencies
       for (const stem of stemNames) {
-        const mag = new Float32Array(FREQ_BINS)
         const data = stemModelOutputs.get(stem)!
-        let maskSum = 0
+        const masks = rawMasks[stem][c]
         for (let k = 0; k < MODEL_FREQ_BINS; k++) {
           const v = Math.abs(data[frameOffset + k])
-          let p = v * v
-          if (MASK_POWER === 4) p = p * p
-          const mask = (p + 1e-12) / (sumPow[k] + 1e-10)
-          mag[k] = mask * stft.magnitude[f][k]
-          maskSum += mask
+          const v2 = v * v
+          const v3 = v2 * v
+          masks[maskOffset + k] = (v3 * v3 + 1e-12) / (sumPow[k] + 1e-10)
+        }
+      }
+    }
+  }
+
+  self.postMessage({ type: 'PROGRESS', progress: 63, stage: 'separating' })
+
+  // Second pass: sigmoid sharpening (in-place on rawMasks)
+  for (const stem of stemNames) {
+    for (let c = 0; c < 2; c++) {
+      const masks = rawMasks[stem][c]
+      const len = numFrames * MODEL_FREQ_BINS
+      for (let i = 0; i < len; i++) {
+        masks[i] = sharpen(masks[i])
+      }
+    }
+  }
+
+  self.postMessage({ type: 'PROGRESS', progress: 65, stage: 'separating' })
+
+  // Third pass: median temporal filter + apply to magnitudes + HF extension
+  for (let c = 0; c < 2; c++) {
+    const stft = c === 0 ? leftSTFT : rightSTFT
+
+    for (let f = 0; f < numFrames; f++) {
+      for (const stem of stemNames) {
+        const mag = new Float32Array(FREQ_BINS)
+        const masks = rawMasks[stem][c]
+
+        const bandMaskSums = new Float32Array(HF_BANDS)
+        const bandMaskCounts = new Float32Array(HF_BANDS)
+
+        // Clamp window to valid frames
+        const f0 = Math.max(0, f - SMOOTH_RADIUS)
+        const f4 = Math.min(numFrames - 1, f + SMOOTH_RADIUS)
+        const windowSize = f4 - f0 + 1
+
+        for (let k = 0; k < MODEL_FREQ_BINS; k++) {
+          // Median filter across temporal window
+          let m: number
+          if (windowSize >= 5) {
+            m = median5(
+              masks[f0 * MODEL_FREQ_BINS + k],
+              masks[(f0 + 1) * MODEL_FREQ_BINS + k],
+              masks[(f0 + 2) * MODEL_FREQ_BINS + k],
+              masks[(f0 + 3) * MODEL_FREQ_BINS + k],
+              masks[f4 * MODEL_FREQ_BINS + k]
+            )
+          } else if (windowSize === 4) {
+            // Median of 4 = average of middle 2; approximate with median of 3 center values
+            m = median3(
+              masks[(f0 + 1) * MODEL_FREQ_BINS + k],
+              masks[(f0 + 2) * MODEL_FREQ_BINS + k],
+              masks[f0 * MODEL_FREQ_BINS + k]
+            )
+          } else if (windowSize === 3) {
+            m = median3(
+              masks[f0 * MODEL_FREQ_BINS + k],
+              masks[(f0 + 1) * MODEL_FREQ_BINS + k],
+              masks[f4 * MODEL_FREQ_BINS + k]
+            )
+          } else {
+            m = masks[f * MODEL_FREQ_BINS + k]
+          }
+
+          mag[k] = m * stft.magnitude[f][k]
+
+          // Accumulate for HF band extension
+          const bandIdx = Math.floor(k / HF_SRC_BAND)
+          if (bandIdx < HF_BANDS) {
+            bandMaskSums[bandIdx] += m
+            bandMaskCounts[bandIdx] += 1
+          }
         }
 
-        // Extend mask to high frequencies (1024-2048) using average mask value.
-        // This preserves high-frequency content that Spleeter's model doesn't process.
-        const avgMask = maskSum / MODEL_FREQ_BINS
+        // Extend to high frequencies using per-band averages
         for (let k = MODEL_FREQ_BINS; k < FREQ_BINS; k++) {
+          const hfOffset = k - MODEL_FREQ_BINS
+          const bandIdx = Math.min(HF_BANDS - 1, Math.floor(hfOffset / HF_BAND_SIZE))
+          const srcBand = HF_BANDS - 1 - bandIdx
+          const avgMask =
+            bandMaskCounts[srcBand] > 0 ? bandMaskSums[srcBand] / bandMaskCounts[srcBand] : 0
           mag[k] = avgMask * stft.magnitude[f][k]
         }
 
