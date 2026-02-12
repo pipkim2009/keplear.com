@@ -3,12 +3,15 @@
  * Extracts audio stream URLs from YouTube videos.
  *
  * Stream extraction priority:
- * 1. YouTube IOS client (direct URLs, no PO token)
+ * 1. YouTube IOS client (with visitor data, direct URLs)
  * 2. youtube-info-streams library (throttled)
  * 3. Piped API instances (frequently down)
  */
 
 import { info as ytInfo } from 'youtube-info-streams'
+
+const IOS_CLIENT_VERSION = '21.02.3'
+const IOS_USER_AGENT = `com.google.ios.youtube/${IOS_CLIENT_VERSION} (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)`
 
 const PIPED_INSTANCES = [
   'https://pipedapi.kavin.rocks',
@@ -45,32 +48,69 @@ function extractAudioStreams(adaptiveFormats) {
 }
 
 /**
+ * Fetch visitor data from YouTube. Required for iOS client requests.
+ * Extracts visitorData from the YouTube homepage's embedded config.
+ */
+async function fetchVisitorData() {
+  const response = await fetch('https://www.youtube.com/sw.js_data', {
+    headers: { 'User-Agent': 'Mozilla/5.0' }
+  })
+  if (response.ok) {
+    const text = await response.text()
+    const match = text.match(/"visitorData"\s*:\s*"([^"]+)"/)
+    if (match) return match[1]
+  }
+
+  // Fallback: extract from YouTube homepage
+  const pageRes = await fetch('https://www.youtube.com/', {
+    headers: { 'User-Agent': 'Mozilla/5.0', 'Accept-Language': 'en' }
+  })
+  if (pageRes.ok) {
+    const html = await pageRes.text()
+    const vdMatch = html.match(/visitorData"\s*:\s*"([^"]+)"/)
+    if (vdMatch) return vdMatch[1]
+  }
+
+  return null
+}
+
+/**
  * iOS client — doesn't require PO tokens for stream downloads.
+ * Requires valid visitorData from YouTube.
  */
 async function tryIOSClient(videoId) {
+  const visitorData = await fetchVisitorData()
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'User-Agent': IOS_USER_AGENT,
+    'X-YouTube-Client-Name': '5',
+    'X-YouTube-Client-Version': IOS_CLIENT_VERSION,
+  }
+  if (visitorData) {
+    headers['X-Goog-Visitor-Id'] = visitorData
+  }
+
+  const context = {
+    client: {
+      clientName: 'IOS',
+      clientVersion: IOS_CLIENT_VERSION,
+      deviceMake: 'Apple',
+      deviceModel: 'iPhone16,2',
+      osName: 'iPhone',
+      osVersion: '18.3.2.22D82',
+      hl: 'en',
+      gl: 'US',
+    }
+  }
+  if (visitorData) {
+    context.client.visitorData = visitorData
+  }
+
   const response = await fetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false&alt=json', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': 'com.google.ios.youtube/20.03.2 (iPhone16,2; U; CPU iOS 18_3_0 like Mac OS X;)',
-      'X-YouTube-Client-Name': '5',
-      'X-YouTube-Client-Version': '20.03.2',
-    },
-    body: JSON.stringify({
-      videoId,
-      context: {
-        client: {
-          clientName: 'IOS',
-          clientVersion: '20.03.2',
-          deviceMake: 'Apple',
-          deviceModel: 'iPhone16,2',
-          osName: 'iPhone',
-          osVersion: '18.3.0.22C150',
-          hl: 'en',
-          gl: 'US',
-        }
-      }
-    })
+    headers,
+    body: JSON.stringify({ videoId, context })
   })
 
   if (!response.ok) throw new Error(`iOS API HTTP ${response.status}`)

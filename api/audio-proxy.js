@@ -8,7 +8,7 @@
  */
 
 const IOS_UA =
-  'com.google.ios.youtube/20.03.2 (iPhone16,2; U; CPU iOS 18_3_0 like Mac OS X;)'
+  'com.google.ios.youtube/21.02.3 (iPhone16,2; U; CPU iOS 18_3_2 like Mac OS X;)'
 const BROWSER_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
 const ALLOWED_HOST_SUFFIXES = [
