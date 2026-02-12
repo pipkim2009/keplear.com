@@ -9,6 +9,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react'
+import { PiX } from 'react-icons/pi'
 import type { StemType, SeparationStatus } from '../../hooks/useStemSeparation'
 import { checkAllModelAvailability, getModelForInstrument } from '../../hooks/useStemSeparation'
 import styles from '../../styles/Songs.module.css'
@@ -85,7 +86,6 @@ export default function StemControls({
   stemNames,
   onSeparate,
   onCancel,
-  onClearStems,
   volumes,
   mutes,
   soloed,
@@ -134,9 +134,12 @@ export default function StemControls({
 
   const handleVolumeInput = useCallback(
     (stem: StemType, e: React.ChangeEvent<HTMLInputElement>) => {
+      // If the stem is muted or silenced by solo, clear that state first
+      if (mutes[stem]) onToggleMute(stem)
+      if (soloed !== null && soloed !== stem) onToggleSolo(soloed)
       onVolumeChange(stem, parseFloat(e.target.value))
     },
-    [onVolumeChange]
+    [onVolumeChange, mutes, soloed, onToggleMute, onToggleSolo]
   )
 
   const isLoading =
@@ -192,19 +195,19 @@ export default function StemControls({
     return (
       <div className={styles.stemControls}>
         <div className={styles.stemLoadingSection}>
-          <span className={styles.stemLoadingLabel}>{getStageLabel(status)}</span>
+          <div className={styles.stemLoadingHeader}>
+            <span className={styles.stemLoadingLabel}>{getStageLabel(status)}</span>
+            <button className={styles.closePlayerButton} onClick={onCancel} title="Cancel">
+              <PiX />
+            </button>
+          </div>
           <div className={styles.stemProgressTrack}>
             <div
               className={styles.stemProgressFill}
               style={{ width: `${Math.max(2, progress)}%` }}
             />
           </div>
-          <div className={styles.stemLoadingActions}>
-            <span className={styles.stemProgressText}>{progress}%</span>
-            <button className={styles.stemCancelBtn} onClick={onCancel}>
-              Cancel
-            </button>
-          </div>
+          <span className={styles.stemProgressText}>{progress}%</span>
         </div>
       </div>
     )
@@ -231,20 +234,15 @@ export default function StemControls({
         <div className={styles.stemMixerHeader}>
           <span className={styles.controlLabel}>Stem Mixer</span>
           <div className={styles.stemMixerActions}>
-            {stemMode ? (
-              <button className={styles.stemOriginalBtn} onClick={onToggleStemMode}>
-                Original Audio
-              </button>
-            ) : (
-              <button
-                className={`${styles.stemOriginalBtn} ${styles.stemOriginalBtnActive}`}
-                onClick={onToggleStemMode}
-              >
-                Play Stems
-              </button>
-            )}
-            <button className={styles.stemResetBtn} onClick={onClearStems}>
-              Reset
+            <button
+              className={`${styles.stemToggleBtn} ${stemMode ? styles.stemToggleBtnOn : ''}`}
+              onClick={onToggleStemMode}
+              title={stemMode ? 'Switch to original audio' : 'Play separated stems'}
+            >
+              <span className={styles.stemToggleTrack}>
+                <span className={styles.stemToggleThumb} />
+              </span>
+              <span className={styles.stemToggleLabel}>{stemMode ? 'On' : 'Off'}</span>
             </button>
           </div>
         </div>
@@ -258,14 +256,12 @@ export default function StemControls({
               }
               const isMuted = mutes[stemName] ?? false
               const isSoloed = soloed === stemName
-              const isInactive = isMuted || (soloed !== null && !isSoloed)
-              const displayVolume = volumes[stemName] ?? 1
+              const silenced = isMuted || (soloed !== null && !isSoloed)
+              const rawVolume = volumes[stemName] ?? 1
+              const displayVolume = silenced ? 0 : rawVolume
 
               return (
-                <div
-                  key={stemName}
-                  className={`${styles.stemRow} ${isInactive ? styles.stemRowInactive : ''}`}
-                >
+                <div key={stemName} className={styles.stemRow}>
                   <span
                     className={styles.stemLabel}
                     style={{ '--stem-color': config.color } as React.CSSProperties}

@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const { q, filter = 'videos' } = req.query
+  const { q, filter = 'videos', type } = req.query
 
   if (!q) {
     return res.status(400).json({ error: 'Missing search query parameter "q"' })
@@ -46,12 +46,14 @@ export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', getCorsOrigin(req))
   res.setHeader('Access-Control-Allow-Methods', 'GET')
-  res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600')
+  res.setHeader('Cache-Control', type === 'suggestions' ? 's-maxage=60, stale-while-revalidate=120' : 's-maxage=300, stale-while-revalidate=600')
 
   // Try each instance until one works
   for (const instance of PIPED_INSTANCES) {
     try {
-      const url = `${instance}/search?q=${encodeURIComponent(q)}&filter=${encodeURIComponent(filter)}`
+      const url = type === 'suggestions'
+        ? `${instance}/suggestions?query=${encodeURIComponent(q)}`
+        : `${instance}/search?q=${encodeURIComponent(q)}&filter=${encodeURIComponent(filter)}`
 
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 12000)
@@ -81,7 +83,12 @@ export default async function handler(req, res) {
       const data = await response.json()
 
       // Validate response has expected structure
-      if (!data.items && !Array.isArray(data)) {
+      if (type === 'suggestions') {
+        if (!Array.isArray(data)) {
+          console.warn(`Piped instance ${instance} returned non-array for suggestions`)
+          continue
+        }
+      } else if (!data.items && !Array.isArray(data)) {
         console.warn(`Piped instance ${instance} returned unexpected format`)
         continue
       }

@@ -117,6 +117,13 @@ const Songs = () => {
   const [searchError, setSearchError] = useState('')
   const [recentVideos, setRecentVideos] = useState<VideoInfo[]>([])
 
+  // Suggestions state
+  const [suggestions, setSuggestions] = useState<string[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [selectedSuggestion, setSelectedSuggestion] = useState(-1)
+  const suggestionsTimerRef = useRef<number | null>(null)
+  const searchWrapperRef = useRef<HTMLDivElement>(null)
+
   // Player state
   const [currentVideo, setCurrentVideo] = useState<VideoInfo | null>(null)
   const [videoTitle, setVideoTitle] = useState<string>('')
@@ -380,10 +387,87 @@ const Songs = () => {
     [t]
   )
 
+  // Fetch search suggestions (debounced)
+  const fetchSuggestions = useCallback(async (query: string) => {
+    if (!query.trim() || query.trim().length < 2) {
+      setSuggestions([])
+      return
+    }
+
+    const cachedProxy = sessionStorage.getItem(WORKING_INSTANCE_KEY)
+    const proxies = cachedProxy
+      ? [cachedProxy, ...PIPED_PROXIES.filter(p => p !== cachedProxy)]
+      : PIPED_PROXIES
+
+    for (const proxy of proxies) {
+      try {
+        const url = IS_PRODUCTION
+          ? `${proxy}?q=${encodeURIComponent(query)}&type=suggestions`
+          : `${proxy}/suggestions?query=${encodeURIComponent(query)}`
+
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+        const response = await fetch(url, {
+          signal: controller.signal,
+          credentials: 'omit',
+          headers: { Accept: 'application/json' },
+        })
+
+        clearTimeout(timeoutId)
+
+        if (!response.ok) continue
+
+        const data = await response.json()
+        if (Array.isArray(data)) {
+          setSuggestions(data.slice(0, 8))
+          return
+        }
+      } catch {
+        // Continue to next proxy
+      }
+    }
+  }, [])
+
+  // Debounce suggestions on input change
+  useEffect(() => {
+    if (suggestionsTimerRef.current) {
+      clearTimeout(suggestionsTimerRef.current)
+    }
+
+    if (!searchQuery.trim() || searchQuery.trim().length < 2) {
+      setSuggestions([])
+      return
+    }
+
+    suggestionsTimerRef.current = window.setTimeout(() => {
+      fetchSuggestions(searchQuery)
+    }, 100)
+
+    return () => {
+      if (suggestionsTimerRef.current) {
+        clearTimeout(suggestionsTimerRef.current)
+      }
+    }
+  }, [searchQuery, fetchSuggestions])
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchWrapperRef.current && !searchWrapperRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   // Handle search submission - also detects YouTube URLs automatically
   const handleSearch = useCallback(
     (e?: React.FormEvent) => {
       e?.preventDefault()
+      setShowSuggestions(false)
+      setSelectedSuggestion(-1)
       const trimmed = searchQuery.trim()
 
       // Empty search → if no song playing, load most recent; otherwise just clear search results
@@ -413,6 +497,40 @@ const Songs = () => {
       searchYouTube(trimmed)
     },
     [searchQuery, searchYouTube, saveToRecent, recentVideos, currentVideo]
+  )
+
+  // Select a suggestion and trigger search
+  const selectSuggestion = useCallback(
+    (suggestion: string) => {
+      setSearchQuery(suggestion)
+      setSuggestions([])
+      setShowSuggestions(false)
+      setSelectedSuggestion(-1)
+      searchYouTube(suggestion)
+    },
+    [searchYouTube]
+  )
+
+  // Handle keyboard navigation in suggestions
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!showSuggestions || suggestions.length === 0) return
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setSelectedSuggestion(prev => (prev < suggestions.length - 1 ? prev + 1 : 0))
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSelectedSuggestion(prev => (prev > 0 ? prev - 1 : suggestions.length - 1))
+      } else if (e.key === 'Enter' && selectedSuggestion >= 0) {
+        e.preventDefault()
+        selectSuggestion(suggestions[selectedSuggestion])
+      } else if (e.key === 'Escape') {
+        setShowSuggestions(false)
+        setSelectedSuggestion(-1)
+      }
+    },
+    [showSuggestions, suggestions, selectedSuggestion, selectSuggestion]
   )
 
   // Load a search result
@@ -642,6 +760,13 @@ const Songs = () => {
     // Only trigger on stemMode toggle — NOT on isPlaying changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stemMode, stemSeparation.stems, isPlayerReady])
+
+  // Auto-enable stem mode when separation finishes
+  useEffect(() => {
+    if (stemSeparation.status === 'ready') {
+      setStemMode(true)
+    }
+  }, [stemSeparation.status])
 
   // Reset stem mode when video changes
   useEffect(() => {
@@ -877,7 +1002,7 @@ const Songs = () => {
       </div>
 
       {/* Search Section */}
-      <form className={styles.searchSection} onSubmit={handleSearch}>
+      <form className={styles.searchSection} onSubmit={handleSearch} ref={searchWrapperRef}>
         <div className={styles.searchInputWrapper}>
           <PiMagnifyingGlass className={styles.searchIcon} />
           <input
@@ -885,17 +1010,44 @@ const Songs = () => {
             className={styles.searchInput}
             placeholder={t('songs.searchPlaceholder')}
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={e => {
+              setSearchQuery(e.target.value)
+              setShowSuggestions(true)
+              setSelectedSuggestion(-1)
+            }}
+            onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+            onKeyDown={handleSearchKeyDown}
+            autoComplete="off"
           />
           {searchQuery && (
             <button
               type="button"
               className={styles.clearSearchButton}
-              onClick={() => setSearchQuery('')}
+              onClick={() => {
+                setSearchQuery('')
+                setSuggestions([])
+                setShowSuggestions(false)
+              }}
               aria-label={t('common.clear')}
             >
               <PiX />
             </button>
+          )}
+          {showSuggestions && suggestions.length > 0 && (
+            <div className={styles.suggestionsDropdown}>
+              {suggestions.map((suggestion, i) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  className={`${styles.suggestionItem} ${i === selectedSuggestion ? styles.suggestionItemActive : ''}`}
+                  onMouseDown={() => selectSuggestion(suggestion)}
+                  onMouseEnter={() => setSelectedSuggestion(i)}
+                >
+                  <PiMagnifyingGlass className={styles.suggestionIcon} />
+                  {suggestion}
+                </button>
+              ))}
+            </div>
           )}
         </div>
         <button type="submit" className={styles.loadButton} disabled={isSearching}>

@@ -143,6 +143,68 @@
   color: white;
 }
 
+/* Search Suggestions Dropdown */
+.suggestionsDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--gray-800);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 50;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.suggestionItem {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  border: none;
+  background: transparent;
+  color: var(--dark-text-secondary);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.suggestionItem:hover,
+.suggestionItemActive {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--dark-text-primary);
+}
+
+.suggestionIcon {
+  font-size: 0.875rem;
+  color: var(--gray-400);
+  flex-shrink: 0;
+}
+
+:global(body.light) .suggestionsDropdown {
+  background: var(--silver-light);
+  border-color: var(--gray-300);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+:global(body.light) .suggestionItem {
+  color: var(--gray-700);
+}
+
+:global(body.light) .suggestionItem:hover,
+:global(body.light) .suggestionItemActive {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--gray-900);
+}
+
+:global(body.light) .suggestionIcon {
+  color: var(--gray-500);
+}
+
 .searchError {
   background: rgba(239, 68, 68, 0.15);
   color: var(--red-500);
@@ -1196,6 +1258,12 @@
   transition: width 0.3s ease;
 }
 
+.stemLoadingHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .stemLoadingActions {
   display: flex;
   justify-content: space-between;
@@ -1247,48 +1315,80 @@
   gap: 0.375rem;
 }
 
-.stemOriginalBtn {
-  padding: 0.375rem 0.75rem;
-  border: 1px solid var(--primary-purple-alpha-30);
-  border-radius: 6px;
-  background: var(--purple-700);
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 600;
+.stemToggleBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem;
+  border: none;
+  background: none;
   cursor: pointer;
-  transition: all 0.2s ease;
+  user-select: none;
 }
 
-.stemOriginalBtn:hover {
-  background: var(--purple-500);
+.stemToggleTrack {
+  position: relative;
+  width: 2rem;
+  height: 1.125rem;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: background 0.2s ease;
 }
 
-.stemOriginalBtnActive {
-  background: var(--primary-purple-alpha-15);
-  color: var(--primary-purple);
-  border-color: var(--primary-purple-alpha-50);
+.stemToggleBtnOn .stemToggleTrack {
+  background: var(--primary-purple);
 }
 
-.stemOriginalBtnActive:hover {
-  background: var(--primary-purple-alpha-25);
+.stemToggleThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  background: var(--gray-300);
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
 }
 
-.stemResetBtn {
-  padding: 0.375rem 0.75rem;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--red-500);
-  font-size: 0.75rem;
+.stemToggleBtnOn .stemToggleThumb {
+  transform: translateX(0.875rem);
+  background: white;
+}
+
+.stemToggleLabel {
+  font-size: 0.6875rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  opacity: 0.7;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 
-.stemResetBtn:hover {
-  background: rgba(239, 68, 68, 0.1);
-  opacity: 1;
+.stemToggleBtnOn .stemToggleLabel {
+  color: var(--primary-purple-light);
+}
+
+.stemCloseBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--gray-400);
+  font-size: 1.125rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.stemCloseBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--red-400);
 }
 
 /* Stem rows */
