@@ -12,6 +12,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { extractPeaks, getCachedPeaks, setCachedPeaks } from '../utils/waveformUtils'
 import { apiUrl } from '../lib/api'
+import { fetchAudioStreams, type AudioStream } from '../lib/youtubeStreams'
 
 // Module-level cache for raw audio ArrayBuffers (reused by stem separation)
 const audioBufferCache = new Map<string, ArrayBuffer>()
@@ -30,15 +31,9 @@ export async function downloadAudioBuffer(
   const cached = audioBufferCache.get(videoId)
   if (cached) return cached
 
-  // Step 1: Get audio stream info
-  const streamsRes = await fetch(
-    apiUrl(`/api/piped-streams?videoId=${encodeURIComponent(videoId)}`),
-    { signal }
-  )
-  if (!streamsRes.ok) return null
-
-  const data = await streamsRes.json()
-  const stream = pickStream(data.audioStreams)
+  // Step 1: Get audio stream info (tries Vercel, external proxy, direct)
+  const data = await fetchAudioStreams(videoId, signal)
+  const stream = pickStream(data?.audioStreams ?? [])
   if (!stream?.url) return null
 
   // Step 2: Download audio data through server-side proxy (pass videoId for yt-dlp)
@@ -97,14 +92,8 @@ export async function downloadFullAudioBuffer(
   const cached = fullAudioCache.get(videoId)
   if (cached) return cached
 
-  const streamsRes = await fetch(
-    apiUrl(`/api/piped-streams?videoId=${encodeURIComponent(videoId)}`),
-    { signal }
-  )
-  if (!streamsRes.ok) return null
-
-  const data = await streamsRes.json()
-  const stream = pickBestStream(data.audioStreams)
+  const data = await fetchAudioStreams(videoId, signal)
+  const stream = pickBestStream(data?.audioStreams ?? [])
   if (!stream?.url) return null
 
   const audioRes = await fetch(
@@ -135,13 +124,7 @@ interface UseWaveformDataResult {
   isLoading: boolean
 }
 
-interface AudioStream {
-  url: string
-  mimeType?: string
-  bitrate?: number
-  quality?: string
-  contentLength?: number
-}
+// AudioStream type imported from youtubeStreams.ts
 
 /**
  * Pick the smallest audio stream for waveform extraction.
