@@ -1,18 +1,18 @@
 /**
- * StemControls - Custom instrument picker + stem mixer.
+ * StemControls - Custom instrument picker + file upload + stem mixer.
  *
  * States:
- * - Idle: toggleable instrument chips + "Separate Stems" button
+ * - Idle: toggleable instrument chips + file upload + "Separate Stems" button
  * - Loading: Progress bar with stage description
  * - Ready: Dynamic stem mixer (selected instruments + Music remainder)
  * - Error: Error message with retry button
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react'
-import { PiX } from 'react-icons/pi'
+import { PiX, PiUploadSimple } from 'react-icons/pi'
 import type { StemType, SeparationStatus } from '../../hooks/useStemSeparation'
 import { checkAllModelAvailability, getModelForInstrument } from '../../hooks/useStemSeparation'
-import styles from '../../styles/Songs.module.css'
+import styles from '../../styles/Stems.module.css'
 
 interface StemControlsProps {
   // Separation state
@@ -25,7 +25,7 @@ interface StemControlsProps {
   stemNames: string[]
 
   // Actions
-  onSeparate: (instruments: string[]) => void
+  onSeparate: (instruments: string[], audioData: ArrayBuffer) => void
   onCancel: () => void
   onClearStems: () => void
 
@@ -38,10 +38,6 @@ interface StemControlsProps {
   onVolumeChange: (stem: StemType, volume: number) => void
   onToggleMute: (stem: StemType) => void
   onToggleSolo: (stem: StemType) => void
-
-  // Stem mode
-  stemMode: boolean
-  onToggleStemMode: () => void
 }
 
 // Instruments the user can choose to isolate
@@ -65,10 +61,12 @@ const STEM_CONFIGS: Record<string, { label: string; icon: string; color: string 
 
 const DEFAULT_STEM_CONFIG = { label: 'Track', icon: '\uD83C\uDFB5', color: '#6b7280' }
 
+const ACCEPTED_AUDIO_TYPES = '.mp3,.wav,.flac,.ogg,.m4a,.aac,.wma,.opus,.webm'
+
 function getStageLabel(status: SeparationStatus): string {
   switch (status) {
-    case 'downloading':
-      return 'Downloading audio...'
+    case 'decoding':
+      return 'Decoding audio...'
     case 'loading_model':
       return 'Loading AI model...'
     case 'separating':
@@ -86,18 +84,22 @@ export default function StemControls({
   stemNames,
   onSeparate,
   onCancel,
+  onClearStems,
   volumes,
   mutes,
   soloed,
   onVolumeChange,
   onToggleMute,
   onToggleSolo,
-  stemMode,
-  onToggleStemMode,
 }: StemControlsProps) {
   const [selected, setSelected] = useState<Set<string>>(() => new Set(['vocals']))
   // Remember the last selection so Retry uses the same instruments
   const lastSelectionRef = useRef<string[]>(['vocals'])
+  const lastAudioRef = useRef<ArrayBuffer | null>(null)
+
+  // File upload state
+  const [audioFile, setAudioFile] = useState<{ name: string; data: ArrayBuffer } | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Model availability: maps model name → available boolean
   const [modelAvail, setModelAvail] = useState<Record<string, boolean>>({
@@ -122,14 +124,29 @@ export default function StemControls({
     })
   }, [])
 
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (reader.result instanceof ArrayBuffer) {
+        setAudioFile({ name: file.name, data: reader.result })
+      }
+    }
+    reader.readAsArrayBuffer(file)
+  }, [])
+
   const handleSeparate = useCallback(() => {
+    if (!audioFile) return
     const instruments = Array.from(selected)
     lastSelectionRef.current = instruments
-    onSeparate(instruments)
-  }, [onSeparate, selected])
+    lastAudioRef.current = audioFile.data
+    onSeparate(instruments, audioFile.data)
+  }, [onSeparate, selected, audioFile])
 
   const handleRetry = useCallback(() => {
-    onSeparate(lastSelectionRef.current)
+    if (!lastAudioRef.current) return
+    onSeparate(lastSelectionRef.current, lastAudioRef.current)
   }, [onSeparate])
 
   const handleVolumeInput = useCallback(
@@ -142,10 +159,9 @@ export default function StemControls({
     [onVolumeChange, mutes, soloed, onToggleMute, onToggleSolo]
   )
 
-  const isLoading =
-    status === 'downloading' || status === 'loading_model' || status === 'separating'
+  const isLoading = status === 'decoding' || status === 'loading_model' || status === 'separating'
 
-  // Idle state — instrument picker + separate button
+  // Idle state — instrument picker + file upload + separate button
   if (status === 'idle' && !hasStemData) {
     return (
       <div className={styles.stemControls}>
@@ -179,10 +195,28 @@ export default function StemControls({
             )
           })}
         </div>
+
+        <div className={styles.stemFileUpload}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={ACCEPTED_AUDIO_TYPES}
+            onChange={handleFileChange}
+            className={styles.stemFileInput}
+          />
+          <button
+            className={`${styles.stemUploadBtn} ${audioFile ? styles.stemUploadBtnActive : ''}`}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <PiUploadSimple />
+            {audioFile ? audioFile.name : 'Upload Audio File'}
+          </button>
+        </div>
+
         <button
           className={styles.stemSeparateBtn}
           onClick={handleSeparate}
-          disabled={selected.size === 0}
+          disabled={selected.size === 0 || !audioFile}
         >
           Separate Stems
         </button>
@@ -234,76 +268,67 @@ export default function StemControls({
         <div className={styles.stemMixerHeader}>
           <span className={styles.controlLabel}>Stem Mixer</span>
           <div className={styles.stemMixerActions}>
-            <button
-              className={`${styles.stemToggleBtn} ${stemMode ? styles.stemToggleBtnOn : ''}`}
-              onClick={onToggleStemMode}
-              title={stemMode ? 'Switch to original audio' : 'Play separated stems'}
-            >
-              <span className={styles.stemToggleTrack}>
-                <span className={styles.stemToggleThumb} />
-              </span>
-              <span className={styles.stemToggleLabel}>{stemMode ? 'On' : 'Off'}</span>
+            <button className={styles.stemSeparateBtn} onClick={onClearStems}>
+              New Separation
             </button>
           </div>
         </div>
 
-        {stemMode && (
-          <div className={styles.stemRows}>
-            {stemNames.map(stemName => {
-              const config = STEM_CONFIGS[stemName] || {
-                ...DEFAULT_STEM_CONFIG,
-                label: stemName.charAt(0).toUpperCase() + stemName.slice(1),
-              }
-              const isMuted = mutes[stemName] ?? false
-              const isSoloed = soloed === stemName
-              const silenced = isMuted || (soloed !== null && !isSoloed)
-              const rawVolume = volumes[stemName] ?? 1
-              const displayVolume = silenced ? 0 : rawVolume
+        <div className={styles.stemRows}>
+          {stemNames.map(stemName => {
+            const config = STEM_CONFIGS[stemName] || {
+              ...DEFAULT_STEM_CONFIG,
+              label: stemName.charAt(0).toUpperCase() + stemName.slice(1),
+            }
+            const isMuted = mutes[stemName] ?? false
+            const isSoloed = soloed === stemName
+            const silenced = isMuted || (soloed !== null && !isSoloed)
+            const rawVolume = volumes[stemName] ?? 1
+            const displayVolume = silenced ? 0 : rawVolume
 
-              return (
-                <div key={stemName} className={styles.stemRow}>
-                  <span
-                    className={styles.stemLabel}
-                    style={{ '--stem-color': config.color } as React.CSSProperties}
-                  >
-                    <span className={styles.stemIcon}>{config.icon}</span>
-                    {config.label}
-                  </span>
-                  <input
-                    type="range"
-                    className={styles.stemSlider}
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={displayVolume}
-                    onChange={e => handleVolumeInput(stemName, e)}
-                    style={
-                      {
-                        '--stem-color': config.color,
-                        '--stem-volume': `${displayVolume * 100}%`,
-                      } as React.CSSProperties
-                    }
-                  />
-                  <span className={styles.stemVolumeText}>{Math.round(displayVolume * 100)}%</span>
-                  <button
-                    className={`${styles.stemMuteBtn} ${isMuted ? styles.stemMuteBtnActive : ''}`}
-                    onClick={() => onToggleMute(stemName)}
-                    title={isMuted ? 'Unmute' : 'Mute'}
-                  >
-                    M
-                  </button>
-                  <button
-                    className={`${styles.stemSoloBtn} ${isSoloed ? styles.stemSoloBtnActive : ''}`}
-                    onClick={() => onToggleSolo(stemName)}
-                    title={isSoloed ? 'Unsolo' : 'Solo'}
-                  >
-                    S
-                  </button>
-                </div>
-              )
-            })}
-          </div>
-        )}
+            return (
+              <div key={stemName} className={styles.stemRow}>
+                <span
+                  className={styles.stemLabel}
+                  style={{ '--stem-color': config.color } as React.CSSProperties}
+                >
+                  <span className={styles.stemIcon}>{config.icon}</span>
+                  {config.label}
+                </span>
+                <input
+                  type="range"
+                  className={styles.stemSlider}
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={displayVolume}
+                  onChange={e => handleVolumeInput(stemName, e)}
+                  style={
+                    {
+                      '--stem-color': config.color,
+                      '--stem-volume': `${displayVolume * 100}%`,
+                    } as React.CSSProperties
+                  }
+                />
+                <span className={styles.stemVolumeText}>{Math.round(displayVolume * 100)}%</span>
+                <button
+                  className={`${styles.stemMuteBtn} ${isMuted ? styles.stemMuteBtnActive : ''}`}
+                  onClick={() => onToggleMute(stemName)}
+                  title={isMuted ? 'Unmute' : 'Mute'}
+                >
+                  M
+                </button>
+                <button
+                  className={`${styles.stemSoloBtn} ${isSoloed ? styles.stemSoloBtnActive : ''}`}
+                  onClick={() => onToggleSolo(stemName)}
+                  title={isSoloed ? 'Unsolo' : 'Solo'}
+                >
+                  S
+                </button>
+              </div>
+            )
+          })}
+        </div>
       </div>
     )
   }

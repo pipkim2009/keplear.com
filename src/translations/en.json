@@ -4,6 +4,7 @@
     "dashboard": "Dashboard",
     "sandbox": "Sandbox",
     "songs": "Songs",
+    "stems": "Stems",
     "classroom": "Classroom"
   },
   "auth": {
@@ -246,6 +247,11 @@
     "setMarkerB": "Set marker B at current position",
     "toggleABLoop": "Toggle A-B loop",
     "clearMarkers": "Clear markers"
+  },
+  "stems": {
+    "title": "Stems",
+    "subtitle": "Separate audio into individual stems and mix them independently",
+    "emptyState": "Upload an audio file to separate it into individual stems"
   },
   "theme": {
     "switchToLight": "Switch to Light Mode",

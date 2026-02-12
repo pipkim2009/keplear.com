@@ -10,6 +10,7 @@ const Home = lazy(() => import('./pages/Home'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Sandbox = lazy(() => import('./pages/Sandbox'))
 const Songs = lazy(() => import('./pages/Songs'))
+const Stems = lazy(() => import('./pages/Stems'))
 const Classroom = lazy(() => import('./pages/Classroom'))
 const Profile = lazy(() => import('./pages/Profile'))
 const NotFound = lazy(() => import('./pages/NotFound'))
@@ -54,6 +55,14 @@ function Router() {
           element={
             <SectionErrorBoundary section="Songs">
               <Songs />
+            </SectionErrorBoundary>
+          }
+        />
+        <Route
+          path="/stems"
+          element={
+            <SectionErrorBoundary section="Stems">
+              <Stems />
             </SectionErrorBoundary>
           }
         />

@@ -21,9 +21,6 @@ import {
 } from 'react-icons/pi'
 import SEOHead from '../common/SEOHead'
 import { useWaveformData } from '../../hooks/useWaveformData'
-import { useStemSeparation } from '../../hooks/useStemSeparation'
-import { useStemPlayer } from '../../hooks/useStemPlayer'
-import StemControls from '../songs/StemControls'
 import { generateFallbackWaveform, resamplePeaks } from '../../utils/waveformUtils'
 import styles from '../../styles/Songs.module.css'
 import { apiUrl } from '../../lib/api'
@@ -146,24 +143,6 @@ const Songs = () => {
 
   // Real waveform data hook
   const { peaks: realPeaks } = useWaveformData(currentVideo?.videoId ?? null)
-
-  // Stem separation
-  const [stemMode, setStemMode] = useState(false)
-  const stemModeRef = useRef(false)
-  const stemSeparation = useStemSeparation(currentVideo?.videoId ?? null)
-  const stemPlayer = useStemPlayer(
-    stemSeparation.stems,
-    useCallback(() => {
-      // Stems reached end of buffer — unmute YouTube for remaining audio
-      // Keep stem mode active so controls stay visible and user can seek back
-      if (playerRef.current) {
-        playerRef.current.unMute()
-      }
-    }, [])
-  )
-  const stemStemsRef = useRef(stemSeparation.stems)
-  stemModeRef.current = stemMode
-  stemStemsRef.current = stemSeparation.stems
 
   // Refs
   const playerRef = useRef<YTPlayer | null>(null)
@@ -678,24 +657,10 @@ const Songs = () => {
           if (event.data === window.YT.PlayerState.PLAYING) {
             setIsPlaying(true)
             startTimeUpdate()
-            // Sync stem player — play from YouTube's current position
-            // Only start if not already playing to avoid restarting (which causes double audio)
-            if (stemModeRef.current && stemStemsRef.current && !stemPlayer.isPlaying) {
-              const ytTime = event.target.getCurrentTime()
-              if (ytTime < stemStemsRef.current.duration) {
-                event.target.mute()
-                stemPlayer.play(ytTime)
-              }
-            }
           } else if (event.data === window.YT.PlayerState.PAUSED) {
             setIsPlaying(false)
-            // Sync stem player — pause
-            if (stemModeRef.current && stemStemsRef.current) {
-              stemPlayer.pause()
-            }
           } else if (event.data === window.YT.PlayerState.ENDED) {
             setIsPlaying(false)
-            stemPlayer.pause()
             if (isLooping) {
               event.target.seekTo(0, true)
               event.target.playVideo()
@@ -704,7 +669,7 @@ const Songs = () => {
         },
         onError: event => {
           console.error('YouTube player error:', event.data)
-          setUrlError(t('songs.playbackError'))
+          console.error(t('songs.playbackError'))
         },
       },
     })
@@ -731,47 +696,6 @@ const Songs = () => {
       playerRef.current.setPlaybackRate(playbackRate)
     }
   }, [playbackRate, isPlayerReady])
-
-  // Stem mode toggle: mute/unmute YouTube and start/stop stem player
-  useEffect(() => {
-    const player = playerRef.current
-    if (!player || !isPlayerReady) return
-
-    if (stemMode && stemSeparation.stems) {
-      // Sync playback rate so stems match YouTube speed
-      stemPlayer.setPlaybackRate(playbackRate)
-
-      // If YouTube is currently playing, start stems at its position
-      if (isPlaying) {
-        const ytTime = player.getCurrentTime()
-        if (ytTime < stemSeparation.stems.duration) {
-          player.mute()
-          stemPlayer.play(ytTime)
-        }
-        // Past stem duration — keep YouTube unmuted so user hears audio
-      } else {
-        player.mute()
-      }
-    } else {
-      player.unMute()
-      player.setVolume(volume)
-      stemPlayer.pause()
-    }
-    // Only trigger on stemMode toggle — NOT on isPlaying changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stemMode, stemSeparation.stems, isPlayerReady])
-
-  // Auto-enable stem mode when separation finishes
-  useEffect(() => {
-    if (stemSeparation.status === 'ready') {
-      setStemMode(true)
-    }
-  }, [stemSeparation.status])
-
-  // Reset stem mode when video changes
-  useEffect(() => {
-    setStemMode(false)
-  }, [currentVideo?.videoId])
 
   // Load a recent video
   const loadRecentVideo = useCallback(
@@ -800,19 +724,8 @@ const Songs = () => {
       if (playerRef.current && isPlayerReady) {
         playerRef.current.seekTo(time, true)
       }
-      // Sync stem player when seeking — use play() directly so it works
-      // even after stems ended naturally (seek() requires isPlaying)
-      if (stemMode && stemSeparation.stems) {
-        if (time < stemSeparation.stems.duration) {
-          stemPlayer.play(time)
-          if (playerRef.current) playerRef.current.mute()
-        } else {
-          stemPlayer.pause()
-          if (playerRef.current) playerRef.current.unMute()
-        }
-      }
     },
-    [isPlayerReady, stemMode, stemSeparation.stems, stemPlayer]
+    [isPlayerReady]
   )
 
   const handleVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -823,13 +736,9 @@ const Songs = () => {
     setIsLooping(!isLooping)
   }, [isLooping])
 
-  const changeSpeed = useCallback(
-    (speed: number) => {
-      setPlaybackRate(speed)
-      stemPlayer.setPlaybackRate(speed)
-    },
-    [stemPlayer]
-  )
+  const changeSpeed = useCallback((speed: number) => {
+    setPlaybackRate(speed)
+  }, [])
 
   const skipTime = useCallback(
     (seconds: number) => {
@@ -837,17 +746,8 @@ const Songs = () => {
       const target = Math.max(0, Math.min(duration, currentTime + seconds))
       setCurrentTime(target)
       playerRef.current.seekTo(target, true)
-      if (stemMode && stemSeparation.stems) {
-        if (target < stemSeparation.stems.duration) {
-          stemPlayer.play(target)
-          if (playerRef.current) playerRef.current.mute()
-        } else {
-          stemPlayer.pause()
-          if (playerRef.current) playerRef.current.unMute()
-        }
-      }
     },
-    [isPlayerReady, duration, currentTime, stemMode, stemSeparation.stems, stemPlayer]
+    [isPlayerReady, duration, currentTime]
   )
 
   // A-B repeat controls
@@ -962,10 +862,7 @@ const Songs = () => {
     setMarkerA(null)
     setMarkerB(null)
     setIsABLooping(false)
-    setStemMode(false)
-    stemSeparation.clearStems()
-    stemPlayer.pause()
-  }, [stopTimeUpdate, stemSeparation, stemPlayer])
+  }, [stopTimeUpdate])
 
   // Remove from recent
   const removeFromRecent = useCallback((videoId: string, e: React.MouseEvent) => {
@@ -979,11 +876,6 @@ const Songs = () => {
       }
       return updated
     })
-  }, [])
-
-  // Toggle stem mode (switch between YouTube audio and stem player)
-  const toggleStemMode = useCallback(() => {
-    setStemMode(prev => !prev)
   }, [])
 
   const speedOptions = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
@@ -1242,28 +1134,6 @@ const Songs = () => {
               </button>
             </div>
           </div>
-
-          {/* Stem Controls */}
-          {isPlayerReady && (
-            <StemControls
-              status={stemSeparation.status}
-              progress={stemSeparation.progress}
-              error={stemSeparation.error}
-              hasStemData={stemSeparation.stems !== null}
-              stemNames={stemSeparation.stems?.stemNames ?? []}
-              onSeparate={stemSeparation.separate}
-              onCancel={stemSeparation.cancel}
-              onClearStems={stemPlayer.resetMixer}
-              volumes={stemPlayer.volumes}
-              mutes={stemPlayer.mutes}
-              soloed={stemPlayer.soloed}
-              onVolumeChange={stemPlayer.setVolume}
-              onToggleMute={stemPlayer.toggleMute}
-              onToggleSolo={stemPlayer.toggleSolo}
-              stemMode={stemMode}
-              onToggleStemMode={toggleStemMode}
-            />
-          )}
 
           {/* Timeline / waveform at the bottom */}
           <div className={styles.timelineSection}>

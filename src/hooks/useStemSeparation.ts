@@ -1,14 +1,13 @@
 /**
  * useStemSeparation - React hook for audio stem separation.
  *
- * The user picks individual instruments (vocals, drums, bass, piano).
- * The hook auto-selects the smallest Spleeter model that covers all
- * selected instruments, runs inference, and combines any unselected
- * model stems into a "Music" remainder track.
+ * The user picks individual instruments (vocals, drums, bass, piano)
+ * and uploads an audio file. The hook auto-selects the smallest Spleeter
+ * model that covers all selected instruments, runs inference, and combines
+ * any unselected model stems into a "Music" remainder track.
  */
 
-import { useState, useRef, useCallback, useEffect } from 'react'
-import { downloadFullAudioBuffer } from './useWaveformData'
+import { useState, useRef, useCallback } from 'react'
 
 export type StemType = string // 'vocals' | 'drums' | 'bass' | 'piano' | 'music'
 
@@ -98,7 +97,7 @@ export interface StemData {
 
 export type SeparationStatus =
   | 'idle'
-  | 'downloading'
+  | 'decoding'
   | 'loading_model'
   | 'separating'
   | 'ready'
@@ -126,7 +125,7 @@ function createAudioBufferFromChannels(
   return buffer
 }
 
-export function useStemSeparation(videoId: string | null) {
+export function useStemSeparation() {
   const [state, setState] = useState<StemSeparationState>({
     status: 'idle',
     progress: 0,
@@ -136,220 +135,187 @@ export function useStemSeparation(videoId: string | null) {
 
   const workerRef = useRef<Worker | null>(null)
   const abortRef = useRef<AbortController | null>(null)
-  const videoIdRef = useRef<string | null>(null)
 
-  // Clean up worker on unmount or video change
-  useEffect(() => {
-    return () => {
-      workerRef.current?.terminate()
-      workerRef.current = null
-      abortRef.current?.abort()
-    }
-  }, [])
+  const separate = useCallback(async (selectedInstruments: string[], audioData: ArrayBuffer) => {
+    if (selectedInstruments.length === 0 || !audioData) return
 
-  // Reset when video changes
-  useEffect(() => {
-    if (videoId !== videoIdRef.current) {
-      videoIdRef.current = videoId
-      setState({ status: 'idle', progress: 0, stems: null, error: null })
-      workerRef.current?.terminate()
-      workerRef.current = null
-      abortRef.current?.abort()
-    }
-  }, [videoId])
+    const model = getRequiredModel(selectedInstruments)
+    const modelStems = MODEL_STEMS[model]
 
-  const separate = useCallback(
-    async (selectedInstruments: string[]) => {
-      if (!videoId || selectedInstruments.length === 0) return
+    // Reset state
+    setState({ status: 'decoding', progress: 0, stems: null, error: null })
 
-      const model = getRequiredModel(selectedInstruments)
-      const modelStems = MODEL_STEMS[model]
+    const abortController = new AbortController()
+    abortRef.current = abortController
 
-      // Reset state
-      setState({ status: 'downloading', progress: 0, stems: null, error: null })
-
-      const abortController = new AbortController()
-      abortRef.current = abortController
-
+    try {
+      // Step 1: Decode uploaded audio to get raw PCM channels
+      const audioCtx = new AudioContext()
+      let decodedBuffer: AudioBuffer
       try {
-        // Step 1: Get full-quality audio data (highest bitrate for best stem separation)
-        const arrayBuffer = await downloadFullAudioBuffer(videoId, abortController.signal)
-        if (!arrayBuffer) {
-          throw new Error('Failed to download audio. The song may be too long or unavailable.')
-        }
+        decodedBuffer = await audioCtx.decodeAudioData(audioData.slice(0))
+      } finally {
+        await audioCtx.close()
+      }
 
-        if (abortController.signal.aborted) return
+      const leftChannel = decodedBuffer.getChannelData(0)
+      const rightChannel =
+        decodedBuffer.numberOfChannels >= 2
+          ? decodedBuffer.getChannelData(1)
+          : decodedBuffer.getChannelData(0)
+      const sampleRate = decodedBuffer.sampleRate
 
-        // Step 2: Decode audio to get raw PCM channels
-        setState(prev => ({ ...prev, status: 'downloading', progress: 50 }))
-        const audioCtx = new AudioContext()
-        let decodedBuffer: AudioBuffer
-        try {
-          decodedBuffer = await audioCtx.decodeAudioData(arrayBuffer.slice(0))
-        } finally {
-          await audioCtx.close()
-        }
+      if (abortController.signal.aborted) return
 
-        const leftChannel = decodedBuffer.getChannelData(0)
-        const rightChannel =
-          decodedBuffer.numberOfChannels >= 2
-            ? decodedBuffer.getChannelData(1)
-            : decodedBuffer.getChannelData(0)
-        const sampleRate = decodedBuffer.sampleRate
+      // Warn for very long audio (> 10 minutes)
+      if (decodedBuffer.duration > 600) {
+        console.warn(
+          `Audio is ${Math.round(decodedBuffer.duration / 60)} minutes long. ` +
+            'Stem separation may use significant memory for the full spectrogram.'
+        )
+      }
 
-        if (abortController.signal.aborted) return
+      // Step 2: Create and initialize worker
+      setState(prev => ({ ...prev, status: 'loading_model', progress: 0 }))
 
-        // Warn for very long songs (> 10 minutes)
-        if (decodedBuffer.duration > 600) {
-          console.warn(
-            `Song is ${Math.round(decodedBuffer.duration / 60)} minutes long. ` +
-              'Stem separation may use significant memory for the full spectrogram.'
-          )
-        }
+      // Terminate previous worker if exists
+      workerRef.current?.terminate()
 
-        // Step 3: Create and initialize worker
-        setState(prev => ({ ...prev, status: 'loading_model', progress: 0 }))
+      const worker = new Worker(new URL('../workers/stemSeparation.worker.ts', import.meta.url), {
+        type: 'module',
+      })
+      workerRef.current = worker
 
-        // Terminate previous worker if exists
-        workerRef.current?.terminate()
+      // Set up message handling
+      const stemPromise = new Promise<StemData>((resolve, reject) => {
+        worker.onmessage = (e: MessageEvent) => {
+          const { type: msgType } = e.data
 
-        const worker = new Worker(new URL('../workers/stemSeparation.worker.ts', import.meta.url), {
-          type: 'module',
-        })
-        workerRef.current = worker
+          if (msgType === 'PROGRESS') {
+            const { progress, stage } = e.data
+            let status: SeparationStatus = 'loading_model'
+            if (stage === 'separating') {
+              status = 'separating'
+            } else if (
+              stage === 'loading_model' ||
+              stage === 'downloading_model' ||
+              stage === 'loading_cached_model' ||
+              stage === 'initializing_model' ||
+              stage === 'model_ready'
+            ) {
+              status = 'loading_model'
+            }
+            setState(prev => ({ ...prev, status, progress: Math.round(progress) }))
+          } else if (msgType === 'RESULT') {
+            const { stems } = e.data
 
-        // Set up message handling
-        const stemPromise = new Promise<StemData>((resolve, reject) => {
-          worker.onmessage = (e: MessageEvent) => {
-            const { type: msgType } = e.data
+            // Build output: selected instruments as individual tracks,
+            // everything else combined into a "music" remainder track.
+            const stemBuffers: Record<string, AudioBuffer> = {}
+            const outputNames: string[] = []
 
-            if (msgType === 'PROGRESS') {
-              const { progress, stage } = e.data
-              let status: SeparationStatus = 'loading_model'
-              if (stage === 'separating') {
-                status = 'separating'
-              } else if (
-                stage === 'loading_model' ||
-                stage === 'downloading_model' ||
-                stage === 'loading_cached_model' ||
-                stage === 'initializing_model' ||
-                stage === 'model_ready'
-              ) {
-                status = 'loading_model'
+            // Add each selected instrument that exists in the model
+            for (const name of selectedInstruments) {
+              if (stems[name]) {
+                stemBuffers[name] = createAudioBufferFromChannels(
+                  stems[name].left,
+                  stems[name].right,
+                  sampleRate
+                )
+                outputNames.push(name)
               }
-              setState(prev => ({ ...prev, status, progress: Math.round(progress) }))
-            } else if (msgType === 'RESULT') {
-              const { stems } = e.data
+            }
 
-              // Build output: selected instruments as individual tracks,
-              // everything else combined into a "music" remainder track.
-              const stemBuffers: Record<string, AudioBuffer> = {}
-              const outputNames: string[] = []
-
-              // Add each selected instrument that exists in the model
-              for (const name of selectedInstruments) {
-                if (stems[name]) {
-                  stemBuffers[name] = createAudioBufferFromChannels(
-                    stems[name].left,
-                    stems[name].right,
-                    sampleRate
-                  )
-                  outputNames.push(name)
-                }
-              }
-
-              // Combine unselected model stems into "music"
-              const unselected = modelStems.filter(s => !selectedInstruments.includes(s))
-              if (unselected.length > 0) {
-                const firstUnselected = stems[unselected[0]]
-                if (firstUnselected) {
-                  const len = firstUnselected.left.length
-                  const musicLeft = new Float32Array(len)
-                  const musicRight = new Float32Array(len)
-                  for (const s of unselected) {
-                    if (stems[s]) {
-                      const l = new Float32Array(stems[s].left)
-                      const r = new Float32Array(stems[s].right)
-                      for (let i = 0; i < len; i++) {
-                        musicLeft[i] += l[i]
-                        musicRight[i] += r[i]
-                      }
+            // Combine unselected model stems into "music"
+            const unselected = modelStems.filter(s => !selectedInstruments.includes(s))
+            if (unselected.length > 0) {
+              const firstUnselected = stems[unselected[0]]
+              if (firstUnselected) {
+                const len = firstUnselected.left.length
+                const musicLeft = new Float32Array(len)
+                const musicRight = new Float32Array(len)
+                for (const s of unselected) {
+                  if (stems[s]) {
+                    const l = new Float32Array(stems[s].left)
+                    const r = new Float32Array(stems[s].right)
+                    for (let i = 0; i < len; i++) {
+                      musicLeft[i] += l[i]
+                      musicRight[i] += r[i]
                     }
                   }
-                  stemBuffers['music'] = createAudioBufferFromChannels(
-                    musicLeft,
-                    musicRight,
-                    sampleRate
-                  )
-                  outputNames.push('music')
                 }
+                stemBuffers['music'] = createAudioBufferFromChannels(
+                  musicLeft,
+                  musicRight,
+                  sampleRate
+                )
+                outputNames.push('music')
               }
-
-              const stemData: StemData = {
-                stems: stemBuffers,
-                stemNames: outputNames,
-                sampleRate,
-                duration: decodedBuffer.duration,
-              }
-
-              console.log(
-                `Stem separation complete: model=${model}, selected=[${selectedInstruments.join(', ')}], ` +
-                  `output=[${outputNames.join(', ')}], duration=${decodedBuffer.duration.toFixed(1)}s`
-              )
-
-              resolve(stemData)
-            } else if (msgType === 'ERROR') {
-              reject(new Error(e.data.error))
             }
-          }
 
-          worker.onerror = err => {
-            reject(new Error(err.message || 'Worker error'))
-          }
-
-          // Handle abort
-          abortController.signal.addEventListener('abort', () => {
-            reject(new Error('Cancelled'))
-            worker.terminate()
-          })
-
-          // Send audio data to worker (worker receives the internal model name)
-          worker.postMessage(
-            {
-              type: 'SEPARATE',
-              leftChannel: leftChannel.buffer,
-              rightChannel: rightChannel.buffer,
+            const stemData: StemData = {
+              stems: stemBuffers,
+              stemNames: outputNames,
               sampleRate,
-              model,
-            },
-            [leftChannel.buffer, rightChannel.buffer]
-          )
+              duration: decodedBuffer.duration,
+            }
+
+            console.log(
+              `Stem separation complete: model=${model}, selected=[${selectedInstruments.join(', ')}], ` +
+                `output=[${outputNames.join(', ')}], duration=${decodedBuffer.duration.toFixed(1)}s`
+            )
+
+            resolve(stemData)
+          } else if (msgType === 'ERROR') {
+            reject(new Error(e.data.error))
+          }
+        }
+
+        worker.onerror = err => {
+          reject(new Error(err.message || 'Worker error'))
+        }
+
+        // Handle abort
+        abortController.signal.addEventListener('abort', () => {
+          reject(new Error('Cancelled'))
+          worker.terminate()
         })
 
-        const stems = await stemPromise
+        // Send audio data to worker (worker receives the internal model name)
+        worker.postMessage(
+          {
+            type: 'SEPARATE',
+            leftChannel: leftChannel.buffer,
+            rightChannel: rightChannel.buffer,
+            sampleRate,
+            model,
+          },
+          [leftChannel.buffer, rightChannel.buffer]
+        )
+      })
 
-        if (abortController.signal.aborted) return
+      const stems = await stemPromise
 
-        setState({
-          status: 'ready',
-          progress: 100,
-          stems,
-          error: null,
-        })
-      } catch (err) {
-        if (abortController.signal.aborted) return
+      if (abortController.signal.aborted) return
 
-        const message = err instanceof Error ? err.message : 'Stem separation failed'
-        setState({
-          status: 'error',
-          progress: 0,
-          stems: null,
-          error: message,
-        })
-      }
-    },
-    [videoId]
-  )
+      setState({
+        status: 'ready',
+        progress: 100,
+        stems,
+        error: null,
+      })
+    } catch (err) {
+      if (abortController.signal.aborted) return
+
+      const message = err instanceof Error ? err.message : 'Stem separation failed'
+      setState({
+        status: 'error',
+        progress: 0,
+        stems: null,
+        error: message,
+      })
+    }
+  }, [])
 
   const clearStems = useCallback(() => {
     setState({ status: 'idle', progress: 0, stems: null, error: null })
