@@ -3,19 +3,12 @@
  * Extracts audio stream URLs from YouTube videos.
  *
  * Stream extraction priority:
- * 1. YouTube IOS InnerTube API (no PO token required, direct URLs)
- * 2. youtube-info-streams (throttled - 127KB limit)
+ * 1. YouTube IOS client (direct URLs, no PO token)
+ * 2. youtube-info-streams library (throttled)
  * 3. Piped API instances (frequently down)
  */
 
 import { info as ytInfo } from 'youtube-info-streams'
-
-// IOS client — doesn't require PO tokens for stream downloads.
-// The plain ANDROID client now requires DroidGuard PO tokens, causing 403 on googlevideo.com.
-// ANDROID_VR works for some videos but returns LOGIN_REQUIRED for many others.
-// IOS is the most reliable client currently.
-const IOS_UA =
-  'com.google.ios.youtube/19.45.4 (iPhone16,2; U; CPU iOS 18_1_0 like Mac OS X;)'
 
 const PIPED_INSTANCES = [
   'https://pipedapi.kavin.rocks',
@@ -39,46 +32,8 @@ function getCorsOrigin(req) {
   return ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0]
 }
 
-/**
- * Primary: YouTube IOS InnerTube API.
- * Returns direct URLs without requiring PO tokens for stream downloads.
- */
-async function tryIOSClient(videoId) {
-  const apiUrl = 'https://www.youtube.com/youtubei/v1/player?prettyPrint=false&alt=json'
-  const response = await fetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': IOS_UA,
-      'X-YouTube-Client-Name': '5',
-      'X-YouTube-Client-Version': '19.45.4',
-    },
-    body: JSON.stringify({
-      videoId,
-      context: {
-        client: {
-          clientName: 'IOS',
-          clientVersion: '19.45.4',
-          deviceMake: 'Apple',
-          deviceModel: 'iPhone16,2',
-          osName: 'iPhone',
-          osVersion: '18.1.0.22B83',
-          hl: 'en',
-          gl: 'US',
-        }
-      }
-    })
-  })
-
-  if (!response.ok) throw new Error(`InnerTube API HTTP ${response.status}`)
-  const data = await response.json()
-
-  if (data.playabilityStatus?.status !== 'OK') {
-    throw new Error(`Video not playable: ${data.playabilityStatus?.reason || data.playabilityStatus?.status}`)
-  }
-
-  const adaptiveFormats = data.streamingData?.adaptiveFormats || []
-  const audioStreams = adaptiveFormats
+function extractAudioStreams(adaptiveFormats) {
+  return adaptiveFormats
     .filter(f => f.mimeType?.startsWith('audio/') && f.url)
     .map(f => ({
       url: f.url,
@@ -87,8 +42,46 @@ async function tryIOSClient(videoId) {
       quality: f.audioQuality || 'unknown',
       contentLength: parseInt(f.contentLength || '0') || 0
     }))
+}
 
-  if (audioStreams.length === 0) throw new Error('No audio streams with URLs')
+/**
+ * iOS client — doesn't require PO tokens for stream downloads.
+ */
+async function tryIOSClient(videoId) {
+  const response = await fetch('https://www.youtube.com/youtubei/v1/player?prettyPrint=false&alt=json', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': 'com.google.ios.youtube/20.03.2 (iPhone16,2; U; CPU iOS 18_3_0 like Mac OS X;)',
+      'X-YouTube-Client-Name': '5',
+      'X-YouTube-Client-Version': '20.03.2',
+    },
+    body: JSON.stringify({
+      videoId,
+      context: {
+        client: {
+          clientName: 'IOS',
+          clientVersion: '20.03.2',
+          deviceMake: 'Apple',
+          deviceModel: 'iPhone16,2',
+          osName: 'iPhone',
+          osVersion: '18.3.0.22C150',
+          hl: 'en',
+          gl: 'US',
+        }
+      }
+    })
+  })
+
+  if (!response.ok) throw new Error(`iOS API HTTP ${response.status}`)
+  const data = await response.json()
+
+  if (data.playabilityStatus?.status !== 'OK') {
+    throw new Error(`iOS: ${data.playabilityStatus?.reason || data.playabilityStatus?.status}`)
+  }
+
+  const audioStreams = extractAudioStreams(data.streamingData?.adaptiveFormats || [])
+  if (audioStreams.length === 0) throw new Error('iOS: No audio streams with URLs')
   return { audioStreams, source: 'ios' }
 }
 
@@ -152,23 +145,25 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET')
   res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=7200')
 
-  // Primary: IOS InnerTube API (no PO token required)
+  const errors = []
+
+  // 1. iOS client (primary)
   try {
     const data = await tryIOSClient(videoId)
     return res.status(200).json(data)
   } catch (error) {
-    console.warn('iOS client failed:', error.message)
+    errors.push(`ios: ${error.message}`)
   }
 
-  // Fallback 1: youtube-info-streams (throttled URLs)
+  // 2. youtube-info-streams (throttled URLs)
   try {
     const data = await tryYoutubeInfoStreams(videoId)
     return res.status(200).json(data)
   } catch (error) {
-    console.warn('youtube-info-streams failed:', error.message)
+    errors.push(`youtube-info-streams: ${error.message}`)
   }
 
-  // Fallback 2: Piped instances
+  // 3. Piped instances
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), 15000)
 
@@ -179,20 +174,17 @@ export default async function handler(req, res) {
         clearTimeout(timeoutId)
         return res.status(200).json(data)
       } catch (error) {
-        console.warn(`Piped ${instance} failed:`, error.message)
+        errors.push(`piped(${instance}): ${error.message}`)
       }
     }
-
+  } finally {
     clearTimeout(timeoutId)
-    return res.status(503).json({
-      error: 'All sources are currently unavailable',
-      audioStreams: []
-    })
-  } catch (error) {
-    clearTimeout(timeoutId)
-    return res.status(500).json({
-      error: error.message || 'Internal server error',
-      audioStreams: []
-    })
   }
+
+  console.error(`All stream sources failed for ${videoId}:`, errors.join('; '))
+  return res.status(503).json({
+    error: 'All sources are currently unavailable',
+    details: errors,
+    audioStreams: []
+  })
 }
