@@ -274,12 +274,6 @@ const Stems = () => {
           </div>
         </div>
       )}
-
-      {!stemsReady && stemSeparation.status === 'idle' && (
-        <div className={styles.emptyState}>
-          <p className={styles.emptyStateText}>{t('stems.emptyState')}</p>
-        </div>
-      )}
     </div>
   )
 }

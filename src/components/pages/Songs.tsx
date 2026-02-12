@@ -1281,13 +1281,6 @@ const Songs = () => {
           </div>
         </div>
       )}
-
-      {/* Empty State */}
-      {!currentVideo && recentVideos.length === 0 && searchResults.length === 0 && (
-        <div className={styles.emptyState}>
-          <p className={styles.emptyStateText}>{t('songs.emptyState')}</p>
-        </div>
-      )}
     </div>
   )
 }
