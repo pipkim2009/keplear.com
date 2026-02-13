@@ -79,8 +79,14 @@ const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) 
             {t('nav.songs')}
           </Link>
           <Link
-            to="/stems"
-            className={`nav-link ${currentPath === '/stems' ? 'nav-link-active' : ''}`}
+            to="/instrument"
+            className={`nav-link ${currentPath === '/instrument' ? 'nav-link-active' : ''}`}
+          >
+            {t('nav.instrument')}
+          </Link>
+          <Link
+            to="/isolater"
+            className={`nav-link ${currentPath === '/isolater' ? 'nav-link-active' : ''}`}
           >
             {t('nav.stems')}
           </Link>

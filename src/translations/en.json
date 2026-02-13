@@ -4,7 +4,8 @@
     "dashboard": "Dashboard",
     "sandbox": "Sandbox",
     "songs": "Songs",
-    "stems": "Stems",
+    "stems": "Isolater",
+    "instrument": "Instrument",
     "classroom": "Classroom"
   },
   "auth": {
@@ -220,6 +221,10 @@
     "detected": "Detected",
     "reset": "Reset"
   },
+  "instrument": {
+    "title": "Instrument",
+    "subtitle": "Play virtual keyboard, guitar, and bass instruments"
+  },
   "songs": {
     "title": "Songs",
     "subtitle": "Search for songs and practice with playback controls",
@@ -249,7 +254,7 @@
     "clearMarkers": "Clear markers"
   },
   "stems": {
-    "title": "Stems",
+    "title": "Isolater",
     "subtitle": "Separate audio into individual stems and mix them independently",
     "emptyState": "Upload an audio file to separate it into individual stems"
   },

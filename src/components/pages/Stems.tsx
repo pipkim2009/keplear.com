@@ -186,7 +186,7 @@ const Stems = () => {
 
   return (
     <div className={styles.stemsContainer}>
-      <SEOHead title={t('stems.title')} description={t('stems.subtitle')} path="/stems" />
+      <SEOHead title={t('stems.title')} description={t('stems.subtitle')} path="/isolater" />
 
       <div className={styles.headerSection}>
         <h1 className={styles.pageTitle}>{t('stems.title')}</h1>

@@ -42,24 +42,24 @@ interface StemControlsProps {
 
 // Instruments the user can choose to isolate
 const AVAILABLE_INSTRUMENTS = [
-  { id: 'vocals', label: 'Vocals', icon: '\uD83C\uDFA4', color: '#a855f7' },
-  { id: 'drums', label: 'Drums', icon: '\uD83E\uDD41', color: '#f97316' },
-  { id: 'bass', label: 'Bass', icon: '\uD83C\uDFB8', color: '#ef4444' },
-  { id: 'piano', label: 'Piano', icon: '\uD83C\uDFB9', color: '#6366f1' },
+  { id: 'vocals', label: 'Vocals', icon: '\uD83C\uDFA4\uFE0E', color: '#f97316' },
+  { id: 'drums', label: 'Drums', icon: '\uD83E\uDD41\uFE0E', color: '#22c55e' },
+  { id: 'bass', label: 'Bass', icon: '\uD83C\uDFB5\uFE0E', color: '#ef4444' },
+  { id: 'piano', label: 'Piano', icon: '\uD83C\uDFB9\uFE0E', color: '#3b82f6' },
 ]
 
 // Visual config for mixer rows (including the auto-generated "music" remainder)
 const STEM_CONFIGS: Record<string, { label: string; icon: string; color: string }> = {
-  vocals: { label: 'Vocals', icon: '\uD83C\uDFA4', color: '#a855f7' },
-  drums: { label: 'Drums', icon: '\uD83E\uDD41', color: '#f97316' },
-  bass: { label: 'Bass', icon: '\uD83C\uDFB8', color: '#ef4444' },
-  piano: { label: 'Piano', icon: '\uD83C\uDFB9', color: '#6366f1' },
-  music: { label: 'Music', icon: '\uD83C\uDFB5', color: '#10b981' },
-  other: { label: 'Other', icon: '\uD83C\uDFB9', color: '#3b82f6' },
-  accompaniment: { label: 'Music', icon: '\uD83C\uDFB5', color: '#10b981' },
+  vocals: { label: 'Vocals', icon: '\uD83C\uDFA4\uFE0E', color: '#f97316' },
+  drums: { label: 'Drums', icon: '\uD83E\uDD41\uFE0E', color: '#22c55e' },
+  bass: { label: 'Bass', icon: '\uD83C\uDFB5\uFE0E', color: '#ef4444' },
+  piano: { label: 'Piano', icon: '\uD83C\uDFB9\uFE0E', color: '#3b82f6' },
+  music: { label: 'Music', icon: '\uD83C\uDFB6\uFE0E', color: '#9333ea' },
+  other: { label: 'Other', icon: '\uD83C\uDFB6\uFE0E', color: '#6b7280' },
+  accompaniment: { label: 'Music', icon: '\uD83C\uDFB6\uFE0E', color: '#9333ea' },
 }
 
-const DEFAULT_STEM_CONFIG = { label: 'Track', icon: '\uD83C\uDFB5', color: '#6b7280' }
+const DEFAULT_STEM_CONFIG = { label: 'Track', icon: '\uD83C\uDFB5\uFE0E', color: '#6b7280' }
 
 const ACCEPTED_AUDIO_TYPES = '.mp3,.wav,.flac,.ogg,.m4a,.aac,.wma,.opus,.webm'
 

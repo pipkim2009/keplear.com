@@ -812,8 +812,7 @@ body.light .bass-container::-webkit-scrollbar-track {
 
 .bass-container.practice-mode .bass-fret-position,
 .bass-container.practice-mode .bass-open-string-position {
-  cursor: default;
-  pointer-events: none;
+  cursor: pointer;
 }
 
 /* Fret range dimming for practice mode */

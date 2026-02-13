@@ -125,11 +125,6 @@ const Bass: React.FC<BassProps> = ({
   )
 
   const handleOpenStringClick = async (stringIndex: number) => {
-    // Don't allow selection changes in practice mode
-    if (disableNoteSelection) return
-
-    const noteKey = `${stringIndex}-open`
-
     if (onNoteClick) {
       const bassString = STRING_MAPPING[stringIndex]
       const openNote = bassNotes.find(note => note.string === bassString && note.fret === 0)
@@ -145,6 +140,11 @@ const Bass: React.FC<BassProps> = ({
         await onNoteClick(noteObj)
       }
     }
+
+    // Don't allow selection changes in practice mode
+    if (disableNoteSelection) return
+
+    const noteKey = `${stringIndex}-open`
 
     // Check current state - note is visible if it's in ANY layer
     const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
@@ -216,11 +216,6 @@ const Bass: React.FC<BassProps> = ({
   }
 
   const handleNoteClick = async (stringIndex: number, fretIndex: number) => {
-    // Don't allow selection changes in practice mode
-    if (disableNoteSelection) return
-
-    const noteKey = `${stringIndex}-${fretIndex}`
-
     if (onNoteClick) {
       const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
       if (noteName) {
@@ -241,6 +236,11 @@ const Bass: React.FC<BassProps> = ({
         }
       }
     }
+
+    // Don't allow selection changes in practice mode
+    if (disableNoteSelection) return
+
+    const noteKey = `${stringIndex}-${fretIndex}`
 
     const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
     const isManuallySelected = manualSelectedNotes.has(noteKey)

@@ -133,11 +133,6 @@ const Guitar: React.FC<GuitarProps> = ({
 
   // Handle clicking on open strings (fret 0)
   const handleOpenStringClick = async (stringIndex: number) => {
-    // Don't allow selection changes in practice mode
-    if (disableNoteSelection) return
-
-    const noteKey = `${stringIndex}-open`
-
     // Play the note sound if onNoteClick is provided
     if (onNoteClick) {
       // Get open string note (fret 0)
@@ -156,6 +151,11 @@ const Guitar: React.FC<GuitarProps> = ({
         await onNoteClick(noteObj)
       }
     }
+
+    // Don't allow selection changes in practice mode
+    if (disableNoteSelection) return
+
+    const noteKey = `${stringIndex}-open`
 
     // Check current state - note is visible if it's in ANY layer
     const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)
@@ -228,11 +228,6 @@ const Guitar: React.FC<GuitarProps> = ({
 
   // Handle clicking on individual fret positions
   const handleNoteClick = async (stringIndex: number, fretIndex: number) => {
-    // Don't allow selection changes in practice mode
-    if (disableNoteSelection) return
-
-    const noteKey = `${stringIndex}-${fretIndex}`
-
     // Play the note sound if onNoteClick is provided
     if (onNoteClick) {
       const noteName = getNoteForStringAndFret(stringIndex, fretIndex)
@@ -256,6 +251,11 @@ const Guitar: React.FC<GuitarProps> = ({
         }
       }
     }
+
+    // Don't allow selection changes in practice mode
+    if (disableNoteSelection) return
+
+    const noteKey = `${stringIndex}-${fretIndex}`
 
     // Check current state - note is visible if it's in ANY layer
     const isInScaleChordLayer = scaleSelectedNotes.has(noteKey) || chordSelectedNotes.has(noteKey)

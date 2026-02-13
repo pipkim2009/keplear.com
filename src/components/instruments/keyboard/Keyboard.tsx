@@ -42,7 +42,6 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
   isNoteChordRoot,
   currentlyPlayingNoteNames = [],
   previewNotes = null,
-  disableNoteSelection = false,
 }) {
   const hasExtendedRange = lowerOctaves !== 0 || higherOctaves !== 0
 
@@ -79,13 +78,12 @@ const Keyboard: React.FC<KeyboardProps> = memo(function Keyboard({
     [isManuallySelected, isInScaleChordLayer]
   )
 
-  // Wrapped click handler that respects disableNoteSelection
+  // Always forward to parent — parent controls whether sound-only or sound+select
   const handleNoteClick = useCallback(
     (note: Note) => {
-      if (disableNoteSelection) return
       onNoteClick(note)
     },
-    [onNoteClick, disableNoteSelection]
+    [onNoteClick]
   )
 
   // Check if a note is currently playing (only highlight when notes are shown)

@@ -679,28 +679,31 @@ const InstrumentControls = memo(function InstrumentControls({
       )}
 
       {/* Generate Melody, BPM, Notes - Modern styled row */}
-      <div className="control-group modern-controls-row">
-        <div className="controls-container">
-          <div className="modern-control-item">
-            <div className="label-with-tooltip">
-              <label className="control-label">{t('sandbox.bpm')}</label>
-              <Tooltip title={t('sandbox.bpm')} text={t('sandbox.bpmTooltip')}>
-                <div className="tooltip-icon">?</div>
-              </Tooltip>
-            </div>
-            <div className="input-with-buttons">
-              <input
-                type="text"
-                value={bpmDisplay}
-                onChange={e => !disableBpmInput && handleBpmChange(e.target.value)}
-                onKeyPress={e => !disableBpmInput && handleBpmKeyPress(e)}
-                onBlur={() => !disableBpmInput && handleBpmBlur()}
-                className={`control-input bpm-input ${hideBpmButtons ? '' : 'with-internal-buttons'} ${flashingInputs.bpm ? 'flashing' : ''}`}
-                disabled={disableBpmInput}
-                readOnly={disableBpmInput}
-              />
-              {!hideBpmButtons && (
-                <>
+      {(!hideBpmButtons ||
+        !hideBeatsButtons ||
+        !hideGenerateButton ||
+        (setChordMode && !hideChordMode)) && (
+        <div className="control-group modern-controls-row">
+          <div className="controls-container">
+            {!hideBpmButtons && (
+              <div className="modern-control-item">
+                <div className="label-with-tooltip">
+                  <label className="control-label">{t('sandbox.bpm')}</label>
+                  <Tooltip title={t('sandbox.bpm')} text={t('sandbox.bpmTooltip')}>
+                    <div className="tooltip-icon">?</div>
+                  </Tooltip>
+                </div>
+                <div className="input-with-buttons">
+                  <input
+                    type="text"
+                    value={bpmDisplay}
+                    onChange={e => !disableBpmInput && handleBpmChange(e.target.value)}
+                    onKeyPress={e => !disableBpmInput && handleBpmKeyPress(e)}
+                    onBlur={() => !disableBpmInput && handleBpmBlur()}
+                    className={`control-input bpm-input with-internal-buttons ${flashingInputs.bpm ? 'flashing' : ''}`}
+                    disabled={disableBpmInput}
+                    readOnly={disableBpmInput}
+                  />
                   <button
                     className="control-button-internal minus"
                     onMouseDown={e => {
@@ -727,41 +730,39 @@ const InstrumentControls = memo(function InstrumentControls({
                   >
                     +
                   </button>
-                </>
-              )}
-            </div>
-          </div>
+                </div>
+              </div>
+            )}
 
-          <div className="modern-control-item">
-            <div className="label-with-tooltip">
-              <label className="control-label">{t('sandbox.beats')}</label>
-              <Tooltip title={t('sandbox.beats')} text={t('sandbox.beatsTooltip')}>
-                <div className="tooltip-icon">?</div>
-              </Tooltip>
-              {!hasEnoughBeats && hasContent && (
-                <Tooltip
-                  title={t('sandbox.warning')}
-                  text={t('sandbox.notEnoughBeats', { count: totalNotesCount })}
-                >
-                  <div className="beats-warning">
-                    <IoWarning />
-                  </div>
-                </Tooltip>
-              )}
-            </div>
-            <div className="input-with-buttons">
-              <input
-                type="text"
-                value={beatsDisplay}
-                onChange={e => !disableBeatsInput && handleNotesChange(e.target.value)}
-                onKeyPress={e => !disableBeatsInput && handleNotesKeyPress(e)}
-                onBlur={() => !disableBeatsInput && handleNotesBlur()}
-                className={`control-input beats-input ${hideBeatsButtons ? '' : 'with-internal-buttons'} ${flashingInputs.beats ? 'flashing' : ''} ${!hasEnoughBeats && hasContent ? 'warning' : ''}`}
-                disabled={disableBeatsInput}
-                readOnly={disableBeatsInput}
-              />
-              {!hideBeatsButtons && (
-                <>
+            {!hideBeatsButtons && (
+              <div className="modern-control-item">
+                <div className="label-with-tooltip">
+                  <label className="control-label">{t('sandbox.beats')}</label>
+                  <Tooltip title={t('sandbox.beats')} text={t('sandbox.beatsTooltip')}>
+                    <div className="tooltip-icon">?</div>
+                  </Tooltip>
+                  {!hasEnoughBeats && hasContent && (
+                    <Tooltip
+                      title={t('sandbox.warning')}
+                      text={t('sandbox.notEnoughBeats', { count: totalNotesCount })}
+                    >
+                      <div className="beats-warning">
+                        <IoWarning />
+                      </div>
+                    </Tooltip>
+                  )}
+                </div>
+                <div className="input-with-buttons">
+                  <input
+                    type="text"
+                    value={beatsDisplay}
+                    onChange={e => !disableBeatsInput && handleNotesChange(e.target.value)}
+                    onKeyPress={e => !disableBeatsInput && handleNotesKeyPress(e)}
+                    onBlur={() => !disableBeatsInput && handleNotesBlur()}
+                    className={`control-input beats-input with-internal-buttons ${flashingInputs.beats ? 'flashing' : ''} ${!hasEnoughBeats && hasContent ? 'warning' : ''}`}
+                    disabled={disableBeatsInput}
+                    readOnly={disableBeatsInput}
+                  />
                   <button
                     className="control-button-internal minus"
                     onMouseDown={e => {
@@ -788,135 +789,135 @@ const InstrumentControls = memo(function InstrumentControls({
                   >
                     +
                   </button>
-                </>
-              )}
-            </div>
+                </div>
+              </div>
+            )}
+
+            {/* Chord Mode Select */}
+            {setChordMode && !hideChordMode && (
+              <div className="modern-control-item">
+                <div className="label-with-tooltip">
+                  <label className="control-label">{t('sandbox.chordMode')}</label>
+                  <Tooltip title={t('sandbox.chordMode')} text={t('sandbox.chordModeTooltip')}>
+                    <div className="tooltip-icon">?</div>
+                  </Tooltip>
+                </div>
+                <div>
+                  {disableChordMode ? (
+                    <div className="chord-mode-switch single-option">
+                      <span className="switch-option active">
+                        {chordMode === 'arpeggiator'
+                          ? t('sandbox.arpeggiator')
+                          : t('sandbox.progression')}
+                      </span>
+                    </div>
+                  ) : (
+                    <div
+                      className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''} ${appliedChordsCount === 0 ? 'disabled' : ''}`}
+                    >
+                      <button
+                        className={`switch-option ${chordMode === 'progression' ? 'active' : ''}`}
+                        onClick={() => {
+                          if (appliedChordsCount > 0 && chordMode !== 'progression') {
+                            setChordMode('progression')
+                            setIsChordModeFlashing(true)
+                            setTimeout(() => setIsChordModeFlashing(false), 500)
+                          }
+                        }}
+                        title={
+                          appliedChordsCount === 0
+                            ? t('sandbox.applyChord')
+                            : t('sandbox.progression')
+                        }
+                        disabled={appliedChordsCount === 0}
+                      >
+                        {t('sandbox.progression')}
+                      </button>
+                      <button
+                        className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
+                        onClick={() => {
+                          if (appliedChordsCount > 0 && chordMode !== 'arpeggiator') {
+                            setChordMode('arpeggiator')
+                            setIsChordModeFlashing(true)
+                            setTimeout(() => setIsChordModeFlashing(false), 500)
+                          }
+                        }}
+                        title={
+                          appliedChordsCount === 0
+                            ? t('sandbox.applyChord')
+                            : t('sandbox.arpeggiator')
+                        }
+                        disabled={appliedChordsCount === 0}
+                      >
+                        {t('sandbox.arpeggiator')}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {!hideGenerateButton && (
+              <button
+                onClick={() => {
+                  // Clear recorded audio when generating new melody
+                  if (audioFileUrl) {
+                    URL.revokeObjectURL(audioFileUrl)
+                    setAudioFileUrl(null)
+                  }
+                  setAudioFileBlob(null)
+                  if (onClearRecordedAudio) {
+                    onClearRecordedAudio()
+                  }
+                  if (onGenerateMelody) {
+                    onGenerateMelody(true) // Always use inclusive mode
+                  }
+                }}
+                disabled={!canGenerateMelody}
+                className={`modern-generate-button ${hasChanges && canGenerateMelody ? 'has-changes' : ''}`}
+                title={t('sandbox.generate')}
+                style={{ position: 'relative' }}
+              >
+                {t('sandbox.generate')}
+                {hasChanges && canGenerateMelody && <span className="change-badge">●</span>}
+              </button>
+            )}
           </div>
 
-          {/* Chord Mode Select */}
-          {setChordMode && !hideChordMode && (
-            <div className="modern-control-item">
-              <div className="label-with-tooltip">
-                <label className="control-label">{t('sandbox.chordMode')}</label>
-                <Tooltip title={t('sandbox.chordMode')} text={t('sandbox.chordModeTooltip')}>
-                  <div className="tooltip-icon">?</div>
-                </Tooltip>
-              </div>
-              <div>
-                {disableChordMode ? (
-                  <div className="chord-mode-switch single-option">
-                    <span className="switch-option active">
-                      {chordMode === 'arpeggiator'
-                        ? t('sandbox.arpeggiator')
-                        : t('sandbox.progression')}
-                    </span>
+          {/* Second row - Auto-recorded audio player or generating indicator */}
+          {(audioFileBlob || isGeneratingMelody || isAutoRecording) && (
+            <div className="controls-container second-row">
+              <div className="modern-control-item audio-player-section centered">
+                {isGeneratingMelody || isAutoRecording ? (
+                  <div className="generating-indicator">
+                    <div className="generating-spinner"></div>
+                    <span className="generating-text">{t('sandbox.generatingMelody')}</span>
                   </div>
                 ) : (
-                  <div
-                    className={`chord-mode-switch ${isChordModeFlashing ? 'flashing' : ''} ${appliedChordsCount === 0 ? 'disabled' : ''}`}
-                  >
-                    <button
-                      className={`switch-option ${chordMode === 'progression' ? 'active' : ''}`}
-                      onClick={() => {
-                        if (appliedChordsCount > 0 && chordMode !== 'progression') {
-                          setChordMode('progression')
-                          setIsChordModeFlashing(true)
-                          setTimeout(() => setIsChordModeFlashing(false), 500)
-                        }
-                      }}
-                      title={
-                        appliedChordsCount === 0
-                          ? t('sandbox.applyChord')
-                          : t('sandbox.progression')
-                      }
-                      disabled={appliedChordsCount === 0}
-                    >
-                      {t('sandbox.progression')}
-                    </button>
-                    <button
-                      className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
-                      onClick={() => {
-                        if (appliedChordsCount > 0 && chordMode !== 'arpeggiator') {
-                          setChordMode('arpeggiator')
-                          setIsChordModeFlashing(true)
-                          setTimeout(() => setIsChordModeFlashing(false), 500)
-                        }
-                      }}
-                      title={
-                        appliedChordsCount === 0
-                          ? t('sandbox.applyChord')
-                          : t('sandbox.arpeggiator')
-                      }
-                      disabled={appliedChordsCount === 0}
-                    >
-                      {t('sandbox.arpeggiator')}
-                    </button>
-                  </div>
+                  audioFileUrl && (
+                    <CustomAudioPlayer
+                      src={audioFileUrl}
+                      preload="metadata"
+                      bpm={bpm}
+                      melodyLength={generatedMelody?.length || 0}
+                      onNoteIndexChange={onCurrentlyPlayingNoteChange}
+                      audioRef={audioPlayerRef}
+                      autoPlayAudio={autoPlayAudio}
+                      showNotes={showNotes}
+                      onToggleNotes={onToggleNotes}
+                      melody={generatedMelody}
+                      currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
+                      onMelodyComplete={onMelodyComplete}
+                      autoStartFeedback={autoStartFeedback}
+                      instrument={instrument as 'keyboard' | 'guitar' | 'bass'}
+                    />
+                  )
                 )}
               </div>
             </div>
           )}
-
-          {!hideGenerateButton && (
-            <button
-              onClick={() => {
-                // Clear recorded audio when generating new melody
-                if (audioFileUrl) {
-                  URL.revokeObjectURL(audioFileUrl)
-                  setAudioFileUrl(null)
-                }
-                setAudioFileBlob(null)
-                if (onClearRecordedAudio) {
-                  onClearRecordedAudio()
-                }
-                if (onGenerateMelody) {
-                  onGenerateMelody(true) // Always use inclusive mode
-                }
-              }}
-              disabled={!canGenerateMelody}
-              className={`modern-generate-button ${hasChanges && canGenerateMelody ? 'has-changes' : ''}`}
-              title={t('sandbox.generate')}
-              style={{ position: 'relative' }}
-            >
-              {t('sandbox.generate')}
-              {hasChanges && canGenerateMelody && <span className="change-badge">●</span>}
-            </button>
-          )}
         </div>
-
-        {/* Second row - Auto-recorded audio player or generating indicator */}
-        {(audioFileBlob || isGeneratingMelody || isAutoRecording) && (
-          <div className="controls-container second-row">
-            <div className="modern-control-item audio-player-section centered">
-              {isGeneratingMelody || isAutoRecording ? (
-                <div className="generating-indicator">
-                  <div className="generating-spinner"></div>
-                  <span className="generating-text">{t('sandbox.generatingMelody')}</span>
-                </div>
-              ) : (
-                audioFileUrl && (
-                  <CustomAudioPlayer
-                    src={audioFileUrl}
-                    preload="metadata"
-                    bpm={bpm}
-                    melodyLength={generatedMelody?.length || 0}
-                    onNoteIndexChange={onCurrentlyPlayingNoteChange}
-                    audioRef={audioPlayerRef}
-                    autoPlayAudio={autoPlayAudio}
-                    showNotes={showNotes}
-                    onToggleNotes={onToggleNotes}
-                    melody={generatedMelody}
-                    currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
-                    onMelodyComplete={onMelodyComplete}
-                    autoStartFeedback={autoStartFeedback}
-                    instrument={instrument as 'keyboard' | 'guitar' | 'bass'}
-                  />
-                )
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   )
 })
