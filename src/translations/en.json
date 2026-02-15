@@ -135,6 +135,7 @@
   },
   "generator": {
     "title": "Generator",
+    "subtitle": "Select notes, generate melodies, and practice with real-time feedback",
     "instrument": "Instrument",
     "keyboard": "Keyboard",
     "guitar": "Guitar",

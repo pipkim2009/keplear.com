@@ -240,22 +240,23 @@
   color: var(--dark-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  min-width: 60px;
+  min-width: 45px;
 }
 
 .volumeBar {
   flex: 1;
-  height: 8px;
-  background: rgba(148, 163, 184, 0.2);
-  border-radius: 4px;
+  height: 6px;
+  background: rgba(148, 163, 184, 0.15);
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .volumeFill {
   height: 100%;
-  background: linear-gradient(90deg, var(--green-500), var(--green-100));
-  border-radius: 4px;
-  transition: width 0.05s ease-out;
+  background: var(--green-500);
+  border-radius: 3px;
+  transition: width 0.08s ease-out;
+  min-width: 0;
 }
 
 .volumeValue {
@@ -329,11 +330,11 @@
 
   .volumeLabel {
     font-size: 10px;
-    min-width: 50px;
+    min-width: 40px;
   }
 
   .volumeBar {
-    height: 6px;
+    height: 5px;
   }
 
   .volumeValue {
@@ -356,6 +357,10 @@
 
 :global(body.light) .volumeLabel {
   color: var(--gray-600);
+}
+
+:global(body.light) .volumeBar {
+  background: rgba(0, 0, 0, 0.08);
 }
 
 :global(body.light) .volumeValue {

@@ -10,7 +10,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
+}
+
+/* Remove extra margin that stacks on top of flex gap */
+.instrumentsContainer :global(.instrument-container) {
+  margin-top: 0;
 }
 
 .headerSection {

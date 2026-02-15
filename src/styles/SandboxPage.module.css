@@ -120,3 +120,87 @@
 :global(.light) .menuItem:hover {
   background: rgba(0, 0, 0, 0.05);
 }
+
+/* ── Mobile tab bar ── */
+.tabBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  background: var(--gray-900, #121212);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 200;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.625rem;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary, #999);
+  font-size: 0.75rem;
+  font-family: inherit;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tabActive {
+  background: rgba(100, 140, 255, 0.15);
+  color: var(--text-primary);
+}
+
+:global(.light) .tabBar {
+  background: rgba(248, 249, 252, 0.98);
+  border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+:global(.light) .tab {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--text-secondary, #666);
+}
+
+:global(.light) .tabActive {
+  background: rgba(60, 100, 220, 0.1);
+  color: var(--text-primary);
+}
+
+/* ── Mobile responsive ── */
+@media (max-width: 767px) {
+  .page {
+    height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
+  }
+
+  .canvas {
+    bottom: 0;
+  }
+
+  .menuWrapper {
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+
+  .addBtn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+}
+
+/* ── Tablet ── */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .page {
+    height: calc(100vh - 80px);
+  }
+}

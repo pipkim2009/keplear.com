@@ -1841,6 +1841,11 @@ function Generator() {
         description="Free play ear training Generator. Select notes, generate melodies, and practice with keyboard, guitar, or bass."
         path="/generator"
       />
+      <div className={styles.headerSection}>
+        <h1 className={styles.pageTitle}>{t('generator.title')}</h1>
+        <p className={styles.pageSubtitle}>{t('generator.subtitle')}</p>
+      </div>
+
       {/* Assignment mode buttons - only show when coming from Classroom page */}
       {assigningToClassroomId && (
         <div className={styles.assignmentModeBar}>

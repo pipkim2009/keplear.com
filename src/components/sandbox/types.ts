@@ -3,10 +3,13 @@ import { lazy, type LazyExoticComponent, type ComponentType } from 'react'
 export type SnapZone =
   | 'left'
   | 'right'
+  | 'top'
+  | 'bottom'
   | 'top-left'
   | 'top-right'
   | 'bottom-left'
   | 'bottom-right'
+  | 'full'
   | null
 
 export interface SandboxWindowState {
@@ -17,6 +20,7 @@ export interface SandboxWindowState {
   width: number
   height: number
   zIndex: number
+  scale: number
 }
 
 export interface ToolConfig {

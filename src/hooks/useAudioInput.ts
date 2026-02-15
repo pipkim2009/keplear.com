@@ -56,6 +56,7 @@ export const useAudioInput = (config: AudioInputConfig = {}): UseAudioInputRetur
   const mediaStreamRef = useRef<MediaStream | null>(null)
   const timeDomainBufferRef = useRef<Float32Array | null>(null)
   const frequencyBufferRef = useRef<Uint8Array | null>(null)
+  const smoothedVolumeRef = useRef(0)
 
   /**
    * Calculate RMS volume from audio buffer
@@ -83,9 +84,14 @@ export const useAudioInput = (config: AudioInputConfig = {}): UseAudioInputRetur
 
     analyserRef.current.getFloatTimeDomainData(timeDomainBufferRef.current)
 
-    // Update volume level
+    // Update volume level with smoothing
     const rms = calculateRMS(timeDomainBufferRef.current)
-    setVolumeLevel(Math.min(1, rms * 10))
+    const raw = Math.min(1, rms * 8)
+    // Smooth: fast attack, slow decay
+    const prev = smoothedVolumeRef.current
+    const smoothed = raw > prev ? raw : prev * 0.85 + raw * 0.15
+    smoothedVolumeRef.current = smoothed
+    setVolumeLevel(smoothed)
 
     return timeDomainBufferRef.current
   }, [calculateRMS])
@@ -124,6 +130,7 @@ export const useAudioInput = (config: AudioInputConfig = {}): UseAudioInputRetur
     analyserRef.current = null
     timeDomainBufferRef.current = null
     frequencyBufferRef.current = null
+    smoothedVolumeRef.current = 0
     setVolumeLevel(0)
   }, [])
 
