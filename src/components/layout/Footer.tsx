@@ -22,6 +22,12 @@ function Footer() {
               <Link to="/generator" className="footer-nav-link">
                 {t('nav.generator')}
               </Link>
+              <Link to="/classroom" className="footer-nav-link">
+                {t('nav.classroom')}
+              </Link>
+              <Link to="/sandbox" className="footer-nav-link">
+                {t('nav.sandbox')}
+              </Link>
               <Link to="/songs" className="footer-nav-link">
                 {t('nav.songs')}
               </Link>
@@ -30,9 +36,6 @@ function Footer() {
               </Link>
               <Link to="/isolater" className="footer-nav-link">
                 {t('nav.stems')}
-              </Link>
-              <Link to="/classroom" className="footer-nav-link">
-                {t('nav.classroom')}
               </Link>
               <Link to="/metronome" className="footer-nav-link">
                 {t('nav.metronome')}

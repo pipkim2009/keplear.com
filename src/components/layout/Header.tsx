@@ -76,6 +76,12 @@ const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) 
             {t('nav.generator')}
           </Link>
           <Link
+            to="/classroom"
+            className={`nav-link ${currentPath === '/classroom' ? 'nav-link-active' : ''}`}
+          >
+            {t('nav.classroom')}
+          </Link>
+          <Link
             to="/sandbox"
             className={`nav-link ${currentPath === '/sandbox' ? 'nav-link-active' : ''}`}
           >
@@ -98,12 +104,6 @@ const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) 
             className={`nav-link ${currentPath === '/isolater' ? 'nav-link-active' : ''}`}
           >
             {t('nav.stems')}
-          </Link>
-          <Link
-            to="/classroom"
-            className={`nav-link ${currentPath === '/classroom' ? 'nav-link-active' : ''}`}
-          >
-            {t('nav.classroom')}
           </Link>
           <Link
             to="/metronome"

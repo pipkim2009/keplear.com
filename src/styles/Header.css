@@ -27,6 +27,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem 2rem;
@@ -78,9 +79,10 @@
   display: flex;
   align-items: center;
   gap: 2rem;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  order: 3;
+  width: 100%;
+  justify-content: center;
+  padding-top: 0.5rem;
 }
 
 .nav-link {
@@ -372,34 +374,20 @@
   background: var(--blue-700);
 }
 
-@media (min-width: 1024px) {
-  .header-content {
-    flex-wrap: nowrap;
-  }
-
-  .header-nav {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
+.header-right {
+  order: 2;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 @media (max-width: 1023px) {
   .header-content {
     padding: 1rem;
-    flex-wrap: wrap;
     gap: 1rem;
   }
 
   .header-nav {
     gap: 1.5rem;
-    order: 3;
-    width: 100%;
-    justify-content: center;
-    padding-top: 0.5rem;
-    position: static;
-    transform: none;
-    left: auto;
   }
 
   .nav-link {
@@ -408,9 +396,6 @@
 
   .header-right {
     gap: 0.5rem;
-    order: 2;
-    justify-content: flex-end;
-    flex: 1;
   }
 
   .auth-buttons {
