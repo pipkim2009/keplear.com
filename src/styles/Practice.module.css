@@ -1,4 +1,4 @@
-/* ========================================
+﻿/* ========================================
    PRACTICE PAGE STYLES
    Matches Keplear design system conventions
    ======================================== */
@@ -747,7 +747,7 @@
   max-width: 600px;
 }
 
-.sandboxButton {
+.GeneratorButton {
   padding: 1rem 2rem;
   border: none;
   border-radius: 12px;
@@ -762,12 +762,12 @@
   border: 2px solid var(--primary-purple-alpha-30);
 }
 
-.sandboxButton:hover {
+.GeneratorButton:hover {
   background: var(--black-alpha-90);
   border-color: var(--primary-purple-alpha-60);
 }
 
-.sandboxButton:focus-visible {
+.GeneratorButton:focus-visible {
   outline: 3px solid var(--primary-purple);
   outline-offset: 2px;
 }
@@ -977,7 +977,7 @@
   .featuredLessonCard,
   .startButton,
   .startSessionButton,
-  .sandboxButton,
+  .GeneratorButton,
   .generateButton,
   .playButton,
   .checkButton,
@@ -1000,7 +1000,7 @@
   .featuredLessonCard:hover,
   .startButton:hover,
   .startSessionButton:hover,
-  .sandboxButton:hover,
+  .GeneratorButton:hover,
   .generateButton:hover,
   .playButton:hover,
   .checkButton:hover {
@@ -2097,7 +2097,7 @@
   color: var(--gray-700);
 }
 
-:global(body.light) .sandboxButton {
+:global(body.light) .GeneratorButton {
   background: linear-gradient(145deg, var(--silver-light), var(--silver-dark));
   color: var(--gray-700);
 }

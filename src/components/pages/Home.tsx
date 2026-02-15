@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useContext } from 'react'
+﻿import { useState, useEffect, useMemo, useContext } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import { useTranslation } from '../../contexts/TranslationContext'
@@ -21,7 +21,7 @@ function Home() {
   const authContext = useContext(AuthContext)
   const user = authContext?.user
   const loading = authContext?.loading
-  const { navigateToSandbox, navigateToDashboard } = useInstrument()
+  const { navigateToGenerator, navigateToDashboard } = useInstrument()
 
   const { t } = useTranslation()
   const [wordIndex, setWordIndex] = useState(0)
@@ -122,7 +122,7 @@ function Home() {
           <p className={styles.heroSubtitle}>{t('home.heroSubtitle')}</p>
 
           <div className={styles.heroCta}>
-            <button className={styles.primaryButton} onClick={navigateToSandbox}>
+            <button className={styles.primaryButton} onClick={navigateToGenerator}>
               <PiPlayFill />
               {t('home.startTraining')}
             </button>
@@ -196,7 +196,7 @@ function Home() {
         <div className={styles.ctaContent}>
           <h2>{t('home.readyToStart')}</h2>
           <p>{t('home.ctaDescription')}</p>
-          <button className={styles.primaryButton} onClick={navigateToSandbox}>
+          <button className={styles.primaryButton} onClick={navigateToGenerator}>
             <PiPlayFill />
             {t('home.startTraining')}
           </button>

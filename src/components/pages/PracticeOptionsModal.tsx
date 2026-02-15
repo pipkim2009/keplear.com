@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useTranslation } from '../../contexts/TranslationContext'
 import styles from '../../styles/PracticeOptionsModal.module.css'
 import '../../styles/Controls.css'
@@ -293,7 +293,7 @@ const PracticeOptionsModal: React.FC<PracticeOptionsModalProps> = ({ onStart, on
           </div>
         </div>
 
-        {/* Octave range slider - only for keyboard (using sandbox mode UI) */}
+        {/* Octave range slider - only for keyboard (using Generator mode UI) */}
         {isKeyboard && (
           <div style={{ marginBottom: 20 }}>
             <div className="control-group octave-range-control">

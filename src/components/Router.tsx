@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+﻿import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router'
 import PageLoader from './common/PageLoader'
 import SectionErrorBoundary from './common/SectionErrorBoundary'
@@ -8,7 +8,7 @@ import SectionErrorBoundary from './common/SectionErrorBoundary'
  */
 const Home = lazy(() => import('./pages/Home'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
-const Sandbox = lazy(() => import('./pages/Sandbox'))
+const Generator = lazy(() => import('./pages/Sandbox'))
 const Songs = lazy(() => import('./pages/Songs'))
 const Instruments = lazy(() => import('./pages/Instruments'))
 const Stems = lazy(() => import('./pages/Stems'))
@@ -16,6 +16,7 @@ const Classroom = lazy(() => import('./pages/Classroom'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Metronome = lazy(() => import('./pages/Metronome'))
 const Tuner = lazy(() => import('./pages/Tuner'))
+const SandboxPage = lazy(() => import('./pages/SandboxPage'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
 const TermsOfService = lazy(() => import('./pages/TermsOfService'))
@@ -46,10 +47,10 @@ function Router() {
           }
         />
         <Route
-          path="/sandbox"
+          path="/generator"
           element={
-            <SectionErrorBoundary section="Sandbox">
-              <Sandbox />
+            <SectionErrorBoundary section="generator">
+              <Generator />
             </SectionErrorBoundary>
           }
         />
@@ -122,6 +123,14 @@ function Router() {
           element={
             <SectionErrorBoundary section="Tuner">
               <Tuner />
+            </SectionErrorBoundary>
+          }
+        />
+        <Route
+          path="/sandbox"
+          element={
+            <SectionErrorBoundary section="Sandbox">
+              <SandboxPage />
             </SectionErrorBoundary>
           }
         />

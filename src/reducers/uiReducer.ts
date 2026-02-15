@@ -1,9 +1,9 @@
-/**
+﻿/**
  * UI state management reducer
  * Consolidates UI interaction state like page navigation, input flashing, and settings
  */
 
-export type PageType = 'home' | 'sandbox' | 'songs' | 'classroom' | 'profile' | 'dashboard'
+export type PageType = 'home' | 'generator' | 'songs' | 'classroom' | 'profile' | 'dashboard'
 export type InputType = 'bpm' | 'beats' | 'mode'
 export type ChordMode = 'arpeggiator' | 'progression'
 
@@ -38,7 +38,7 @@ export const DEFAULT_SETTINGS = {
 export const getInitialPage = (): PageType => {
   if (typeof window === 'undefined') return 'home'
   const path = window.location.pathname
-  if (path === '/sandbox' || path.startsWith('/sandbox')) return 'sandbox'
+  if (path === '/generator' || path.startsWith('/generator')) return 'generator'
   if (path === '/songs' || path.startsWith('/songs')) return 'songs'
   if (path === '/dashboard' || path.startsWith('/dashboard')) return 'dashboard'
   if (path === '/classroom' || path.startsWith('/classroom')) return 'classroom'

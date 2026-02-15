@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Songs Page - YouTube-based practice tool
  * Paste YouTube URLs and practice with loop, speed, and A-B repeat controls
  * Uses YouTube IFrame API for reliable playback
@@ -1067,7 +1067,7 @@ const Songs = () => {
                 className={styles.playButton}
                 onClick={togglePlayPause}
                 disabled={!isPlayerReady}
-                aria-label={isPlaying ? t('common.stop') : t('sandbox.play')}
+                aria-label={isPlaying ? t('common.stop') : t('generator.play')}
               >
                 {isPlaying ? <PiPause /> : <PiPlay />}
               </button>

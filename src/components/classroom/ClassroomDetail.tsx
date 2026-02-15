@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ClassroomDetail - Renders the detail view for a selected classroom
  * Shows students, assignments, edit form, join/leave actions
  * Extracted from Classroom.tsx for maintainability
@@ -174,7 +174,7 @@ const ClassroomDetail = memo(function ClassroomDetail({
                   onClick={onSaveEdit}
                   disabled={isSavingEdit || !editTitle.trim()}
                 >
-                  {isSavingEdit ? t('sandbox.saving') : t('common.save')}
+                  {isSavingEdit ? t('generator.saving') : t('common.save')}
                 </button>
               </div>
             </>

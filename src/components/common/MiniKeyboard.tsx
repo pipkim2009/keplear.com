@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+﻿import React, { useState } from 'react'
 import '../../styles/MiniKeyboard.css'
 import '../../styles/Controls.css'
 import Tooltip from './Tooltip'
@@ -44,7 +44,7 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({
   const [selectedOctave, setSelectedOctave] = useState(minAvailableOctave)
 
   if (!notes || notes.length === 0) {
-    return <div className="mini-keyboard-empty">{t('sandbox.noNotesAvailable')}</div>
+    return <div className="mini-keyboard-empty">{t('generator.noNotesAvailable')}</div>
   }
 
   // Extract note names without octave numbers
@@ -103,8 +103,8 @@ const MiniKeyboard: React.FC<MiniKeyboardProps> = ({
       {/* Octave range selector */}
       <div className="control-group octave-range-control">
         <div className="label-with-tooltip">
-          <label className="control-label">{t('sandbox.octaveRange')}</label>
-          <Tooltip title={t('sandbox.octaveRange')} text={t('sandbox.octaveRangeTooltip')}>
+          <label className="control-label">{t('generator.octaveRange')}</label>
+          <Tooltip title={t('generator.octaveRange')} text={t('generator.octaveRangeTooltip')}>
             <div className="tooltip-icon">?</div>
           </Tooltip>
         </div>

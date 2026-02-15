@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, memo } from 'react'
+﻿import React, { useState, useEffect, useRef, useCallback, memo } from 'react'
 import '../../../styles/Controls.css'
 import '../../../styles/MelodyControls.css'
 import { type GuitarScale, type ScaleBox } from '../../../utils/instruments/guitar/guitarScales'
@@ -416,7 +416,7 @@ const InstrumentControls = memo(function InstrumentControls({
               <div className="instrument-icon">
                 <PiPianoKeysFill />
               </div>
-              <div className="instrument-name">{t('sandbox.keyboard')}</div>
+              <div className="instrument-name">{t('generator.keyboard')}</div>
               <div className="instrument-glow"></div>
             </div>
             <div
@@ -437,7 +437,7 @@ const InstrumentControls = memo(function InstrumentControls({
               <div className="instrument-icon">
                 <GiGuitarHead />
               </div>
-              <div className="instrument-name">{t('sandbox.guitar')}</div>
+              <div className="instrument-name">{t('generator.guitar')}</div>
               <div className="instrument-glow"></div>
             </div>
             <div
@@ -458,7 +458,7 @@ const InstrumentControls = memo(function InstrumentControls({
               <div className="instrument-icon">
                 <GiGuitarBassHead />
               </div>
-              <div className="instrument-name">{t('sandbox.bass')}</div>
+              <div className="instrument-name">{t('generator.bass')}</div>
               <div className="instrument-glow"></div>
             </div>
           </div>
@@ -476,9 +476,9 @@ const InstrumentControls = memo(function InstrumentControls({
                   {instrument === 'bass' && <GiGuitarBassHead />}
                 </div>
                 <div className="instrument-name">
-                  {instrument === 'keyboard' && t('sandbox.keyboard')}
-                  {instrument === 'guitar' && t('sandbox.guitar')}
-                  {instrument === 'bass' && t('sandbox.bass')}
+                  {instrument === 'keyboard' && t('generator.keyboard')}
+                  {instrument === 'guitar' && t('generator.guitar')}
+                  {instrument === 'bass' && t('generator.bass')}
                 </div>
                 <div className={`dropdown-arrow ${isInstrumentDropdownOpen ? 'rotated' : ''}`}>
                   <IoMdArrowDropdown />
@@ -507,7 +507,7 @@ const InstrumentControls = memo(function InstrumentControls({
                       <div className="instrument-icon">
                         <PiPianoKeysFill />
                       </div>
-                      <div className="instrument-name">{t('sandbox.keyboard')}</div>
+                      <div className="instrument-name">{t('generator.keyboard')}</div>
                     </div>
                   )}
                   {instrument !== 'guitar' && (
@@ -531,7 +531,7 @@ const InstrumentControls = memo(function InstrumentControls({
                       <div className="instrument-icon">
                         <GiGuitarHead />
                       </div>
-                      <div className="instrument-name">{t('sandbox.guitar')}</div>
+                      <div className="instrument-name">{t('generator.guitar')}</div>
                     </div>
                   )}
                   {instrument !== 'bass' && (
@@ -555,7 +555,7 @@ const InstrumentControls = memo(function InstrumentControls({
                       <div className="instrument-icon">
                         <GiGuitarBassHead />
                       </div>
-                      <div className="instrument-name">{t('sandbox.bass')}</div>
+                      <div className="instrument-name">{t('generator.bass')}</div>
                     </div>
                   )}
                 </div>
@@ -569,8 +569,8 @@ const InstrumentControls = memo(function InstrumentControls({
       {!hideOctaveRange && instrument === 'keyboard' && (
         <div className="control-group octave-range-control">
           <div className="label-with-tooltip">
-            <label className="control-label">{t('sandbox.octaveRange')}</label>
-            <Tooltip title={t('sandbox.octaveRange')} text={t('sandbox.octaveRangeTooltip')}>
+            <label className="control-label">{t('generator.octaveRange')}</label>
+            <Tooltip title={t('generator.octaveRange')} text={t('generator.octaveRangeTooltip')}>
               <div className="tooltip-icon">?</div>
             </Tooltip>
           </div>
@@ -616,7 +616,7 @@ const InstrumentControls = memo(function InstrumentControls({
                     }
                   }}
                   className="range-slider range-low"
-                  title={t('sandbox.setLowestOctave')}
+                  title={t('generator.setLowestOctave')}
                 />
                 <input
                   type="range"
@@ -644,7 +644,7 @@ const InstrumentControls = memo(function InstrumentControls({
                     }
                   }}
                   className="range-slider range-high"
-                  title={t('sandbox.setHighestOctave')}
+                  title={t('generator.setHighestOctave')}
                 />
               </div>
             )}
@@ -688,8 +688,8 @@ const InstrumentControls = memo(function InstrumentControls({
             {!hideBpmButtons && (
               <div className="modern-control-item">
                 <div className="label-with-tooltip">
-                  <label className="control-label">{t('sandbox.bpm')}</label>
-                  <Tooltip title={t('sandbox.bpm')} text={t('sandbox.bpmTooltip')}>
+                  <label className="control-label">{t('generator.bpm')}</label>
+                  <Tooltip title={t('generator.bpm')} text={t('generator.bpmTooltip')}>
                     <div className="tooltip-icon">?</div>
                   </Tooltip>
                 </div>
@@ -737,14 +737,14 @@ const InstrumentControls = memo(function InstrumentControls({
             {!hideBeatsButtons && (
               <div className="modern-control-item">
                 <div className="label-with-tooltip">
-                  <label className="control-label">{t('sandbox.beats')}</label>
-                  <Tooltip title={t('sandbox.beats')} text={t('sandbox.beatsTooltip')}>
+                  <label className="control-label">{t('generator.beats')}</label>
+                  <Tooltip title={t('generator.beats')} text={t('generator.beatsTooltip')}>
                     <div className="tooltip-icon">?</div>
                   </Tooltip>
                   {!hasEnoughBeats && hasContent && (
                     <Tooltip
-                      title={t('sandbox.warning')}
-                      text={t('sandbox.notEnoughBeats', { count: totalNotesCount })}
+                      title={t('generator.warning')}
+                      text={t('generator.notEnoughBeats', { count: totalNotesCount })}
                     >
                       <div className="beats-warning">
                         <IoWarning />
@@ -797,8 +797,8 @@ const InstrumentControls = memo(function InstrumentControls({
             {setChordMode && !hideChordMode && (
               <div className="modern-control-item">
                 <div className="label-with-tooltip">
-                  <label className="control-label">{t('sandbox.chordMode')}</label>
-                  <Tooltip title={t('sandbox.chordMode')} text={t('sandbox.chordModeTooltip')}>
+                  <label className="control-label">{t('generator.chordMode')}</label>
+                  <Tooltip title={t('generator.chordMode')} text={t('generator.chordModeTooltip')}>
                     <div className="tooltip-icon">?</div>
                   </Tooltip>
                 </div>
@@ -807,8 +807,8 @@ const InstrumentControls = memo(function InstrumentControls({
                     <div className="chord-mode-switch single-option">
                       <span className="switch-option active">
                         {chordMode === 'arpeggiator'
-                          ? t('sandbox.arpeggiator')
-                          : t('sandbox.progression')}
+                          ? t('generator.arpeggiator')
+                          : t('generator.progression')}
                       </span>
                     </div>
                   ) : (
@@ -826,12 +826,12 @@ const InstrumentControls = memo(function InstrumentControls({
                         }}
                         title={
                           appliedChordsCount === 0
-                            ? t('sandbox.applyChord')
-                            : t('sandbox.progression')
+                            ? t('generator.applyChord')
+                            : t('generator.progression')
                         }
                         disabled={appliedChordsCount === 0}
                       >
-                        {t('sandbox.progression')}
+                        {t('generator.progression')}
                       </button>
                       <button
                         className={`switch-option ${chordMode === 'arpeggiator' ? 'active' : ''}`}
@@ -844,12 +844,12 @@ const InstrumentControls = memo(function InstrumentControls({
                         }}
                         title={
                           appliedChordsCount === 0
-                            ? t('sandbox.applyChord')
-                            : t('sandbox.arpeggiator')
+                            ? t('generator.applyChord')
+                            : t('generator.arpeggiator')
                         }
                         disabled={appliedChordsCount === 0}
                       >
-                        {t('sandbox.arpeggiator')}
+                        {t('generator.arpeggiator')}
                       </button>
                     </div>
                   )}
@@ -875,10 +875,10 @@ const InstrumentControls = memo(function InstrumentControls({
                 }}
                 disabled={!canGenerateMelody}
                 className={`modern-generate-button ${hasChanges && canGenerateMelody ? 'has-changes' : ''}`}
-                title={t('sandbox.generate')}
+                title={t('generator.generate')}
                 style={{ position: 'relative' }}
               >
-                {t('sandbox.generate')}
+                {t('generator.generate')}
                 {hasChanges && canGenerateMelody && <span className="change-badge">●</span>}
               </button>
             )}
@@ -891,7 +891,7 @@ const InstrumentControls = memo(function InstrumentControls({
                 {isGeneratingMelody || isAutoRecording ? (
                   <div className="generating-indicator">
                     <div className="generating-spinner"></div>
-                    <span className="generating-text">{t('sandbox.generatingMelody')}</span>
+                    <span className="generating-text">{t('generator.generatingMelody')}</span>
                   </div>
                 ) : (
                   audioFileUrl && (

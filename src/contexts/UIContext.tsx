@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from 'react'
+﻿import { createContext, useContext, ReactNode } from 'react'
 import { useUIState } from '../hooks/useUIState'
 import type { ChordMode } from '../reducers/uiReducer'
 
@@ -6,7 +6,7 @@ interface UIContextType {
   // Navigation
   currentPage: string
   navigateToHome: () => void
-  navigateToSandbox: () => void
+  navigateToGenerator: () => void
   navigateToPractice: () => void
   setCurrentPage: (page: string) => void
 
@@ -46,7 +46,7 @@ export const UIProvider: React.FC<UIProviderProps> = ({ children }) => {
   const value: UIContextType = {
     currentPage: uiState.currentPage,
     navigateToHome: uiState.navigateToHome,
-    navigateToSandbox: uiState.navigateToSandbox,
+    navigateToGenerator: uiState.navigateToGenerator,
     navigateToPractice: uiState.navigateToPractice,
     setCurrentPage: uiState.setCurrentPage,
     bpm: uiState.bpm,

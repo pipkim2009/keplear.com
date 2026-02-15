@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react'
+﻿import { memo, useMemo } from 'react'
 import { useTranslation } from '../../../contexts/TranslationContext'
 import ScaleChordOptions, {
   type AppliedChord,
@@ -107,10 +107,10 @@ const InstrumentHeader = memo(function InstrumentHeader({
             className="export-to-classroom-button"
             onClick={onExportToClassroom}
             disabled={!hasExportableContent}
-            title={t('sandbox.exportToClassroom')}
+            title={t('generator.exportToClassroom')}
           >
             <PiExportFill />
-            <span>{t('sandbox.exportToClassroom')}</span>
+            <span>{t('generator.exportToClassroom')}</span>
           </button>
         )}
 

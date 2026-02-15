@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Practice Sessions Hook
  * Handles saving and fetching practice sessions from Supabase
  */
@@ -11,14 +11,14 @@ import { AuthContext } from '../contexts/AuthContext'
 export interface PracticeSession {
   id: string
   user_id: string
-  type: 'sandbox' | 'classroom'
+  type: 'generator' | 'classroom'
   instrument: string
   melodies_completed: number
   created_at: string
 }
 
 export interface RecordPracticeSessionParams {
-  type: 'sandbox' | 'classroom'
+  type: 'generator' | 'classroom'
   instrument: string
   melodiesCompleted: number
 }
@@ -27,7 +27,7 @@ export type TimeRange = 'week' | 'month' | 'year' | 'all'
 
 export interface PracticeStats {
   totalMelodies: number
-  sandboxMelodies: number
+  GeneratorMelodies: number
   classroomMelodies: number
   byInstrument: {
     keyboard: number
@@ -66,7 +66,7 @@ export function useRecordPracticeSession() {
           user_id: user.id,
           type,
           instrument,
-          melodies_completed: melodiesCompleted
+          melodies_completed: melodiesCompleted,
         })
         .select()
         .single()
@@ -75,7 +75,7 @@ export function useRecordPracticeSession() {
       return data as PracticeSession
     },
     {
-      invalidateTables: ['practice_sessions']
+      invalidateTables: ['practice_sessions'],
     }
   )
 }
@@ -83,7 +83,10 @@ export function useRecordPracticeSession() {
 /**
  * Fetch recent practice sessions for the current user
  */
-export async function fetchRecentPracticeSessions(userId: string, limit: number = 10): Promise<PracticeSession[]> {
+export async function fetchRecentPracticeSessions(
+  userId: string,
+  limit: number = 10
+): Promise<PracticeSession[]> {
   const { data, error } = await supabase
     .from('practice_sessions')
     .select('*')
@@ -102,14 +105,20 @@ export async function fetchRecentPracticeSessions(userId: string, limit: number 
 /**
  * Get practice statistics for the current user
  */
-export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 'week'): Promise<PracticeStats> {
+export async function fetchPracticeStats(
+  userId: string,
+  timeRange: TimeRange = 'week'
+): Promise<PracticeStats> {
   const { data: sessions, error } = await supabase
     .from('practice_sessions')
     .select('*')
     .eq('user_id', userId)
 
   // Generate time-based data structure
-  const generateTimeData = (): { data: PracticeStats['weeklyData'], dateRange: { start: string, end: string } } => {
+  const generateTimeData = (): {
+    data: PracticeStats['weeklyData']
+    dateRange: { start: string; end: string }
+  } => {
     const timeData: PracticeStats['weeklyData'] = []
     const today = new Date()
     let startDate: Date
@@ -172,8 +181,8 @@ export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 
       data: timeData,
       dateRange: {
         start: startDate.toISOString().split('T')[0],
-        end: endDate.toISOString().split('T')[0]
-      }
+        end: endDate.toISOString().split('T')[0],
+      },
     }
   }
 
@@ -183,21 +192,21 @@ export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 
     console.error('Error fetching practice stats:', error)
     return {
       totalMelodies: 0,
-      sandboxMelodies: 0,
+      GeneratorMelodies: 0,
       classroomMelodies: 0,
       byInstrument: { keyboard: 0, guitar: 0, bass: 0 },
       weeklyData: timeData,
-      dateRange
+      dateRange,
     }
   }
 
-  let sandboxMelodies = 0
+  let GeneratorMelodies = 0
   let classroomMelodies = 0
   const byInstrument = { keyboard: 0, guitar: 0, bass: 0 }
 
   sessions?.forEach((session: PracticeSession) => {
-    if (session.type === 'sandbox') {
-      sandboxMelodies += session.melodies_completed
+    if (session.type === 'generator') {
+      GeneratorMelodies += session.melodies_completed
     } else {
       classroomMelodies += session.melodies_completed
     }
@@ -206,7 +215,7 @@ export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 
       byInstrument[session.instrument as keyof typeof byInstrument] += session.melodies_completed
     }
 
-    // Add to time data - categorize by instrument regardless of sandbox/classroom
+    // Add to time data - categorize by instrument regardless of Generator/classroom
     const sessionDate = session.created_at.split('T')[0]
 
     if (timeRange === 'all') {
@@ -233,11 +242,11 @@ export async function fetchPracticeStats(userId: string, timeRange: TimeRange = 
   })
 
   return {
-    totalMelodies: sandboxMelodies + classroomMelodies,
-    sandboxMelodies,
+    totalMelodies: GeneratorMelodies + classroomMelodies,
+    GeneratorMelodies,
     classroomMelodies,
     byInstrument,
     weeklyData: timeData,
-    dateRange
+    dateRange,
   }
 }

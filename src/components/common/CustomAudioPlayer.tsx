@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react'
+﻿import React, { useState, useRef, useEffect, useCallback } from 'react'
 import {
   PiPlayFill,
   PiPauseFill,
@@ -382,8 +382,8 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           <button
             className={`reveal-btn ${showNotes ? 'active' : ''}`}
             onClick={onToggleNotes}
-            aria-label={showNotes ? t('sandbox.hideNotes') : t('sandbox.revealNotes')}
-            title={showNotes ? t('sandbox.hideNotes') : t('sandbox.revealNotes')}
+            aria-label={showNotes ? t('generator.hideNotes') : t('generator.revealNotes')}
+            title={showNotes ? t('generator.hideNotes') : t('generator.revealNotes')}
           >
             {showNotes ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
@@ -395,10 +395,14 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
             onClick={handleToggleFeedback}
             disabled={melodyFeedback.modelStatus === 'loading'}
             aria-label={
-              melodyFeedback.state.isActive ? t('sandbox.stopFeedback') : t('sandbox.startFeedback')
+              melodyFeedback.state.isActive
+                ? t('generator.stopFeedback')
+                : t('generator.startFeedback')
             }
             title={
-              melodyFeedback.state.isActive ? t('sandbox.stopFeedback') : t('sandbox.startFeedback')
+              melodyFeedback.state.isActive
+                ? t('generator.stopFeedback')
+                : t('generator.startFeedback')
             }
           >
             {melodyFeedback.state.isActive ? <MicOff size={18} /> : <Mic size={18} />}
@@ -408,7 +412,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
         <button
           className="play-pause-btn"
           onClick={togglePlay}
-          aria-label={isPlaying ? t('sandbox.stop') : t('sandbox.play')}
+          aria-label={isPlaying ? t('generator.stop') : t('generator.play')}
         >
           {isPlaying ? <PiPauseFill size={24} /> : <PiPlayFill size={24} />}
         </button>
@@ -448,7 +452,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           <button
             className="volume-btn"
             onClick={() => setShowVolumeSlider(!showVolumeSlider)}
-            aria-label={t('sandbox.volume')}
+            aria-label={t('generator.volume')}
           >
             {volume === 0 ? (
               <PiSpeakerSlashFill size={20} />
@@ -462,7 +466,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           {showVolumeSlider && (
             <div className="volume-slider">
               <label htmlFor="volume-slider" className="sr-only">
-                {t('sandbox.volume')}
+                {t('generator.volume')}
               </label>
               <input
                 id="volume-slider"
@@ -473,7 +477,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
                 step="0.1"
                 value={volume}
                 onChange={handleVolumeChange}
-                aria-label={t('sandbox.volume')}
+                aria-label={t('generator.volume')}
                 style={
                   {
                     '--volume-percentage': `${volume * 100}%`,
@@ -508,13 +512,13 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           {melodyFeedback.state.isComplete && (
             <div className="feedback-complete">
               <Check size={20} />
-              <span>{t('sandbox.complete')}</span>
+              <span>{t('generator.complete')}</span>
               {!autoStartFeedback && (
                 <button
                   className="feedback-restart-btn"
                   onClick={handleResetFeedback}
-                  aria-label={t('sandbox.reset')}
-                  title={t('sandbox.reset')}
+                  aria-label={t('generator.reset')}
+                  title={t('generator.reset')}
                 >
                   <RotateCcw size={16} />
                 </button>
@@ -527,7 +531,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
             melodyFeedback.state.lastDetectedNote &&
             !melodyFeedback.state.isComplete && (
               <div className="feedback-detected">
-                <span className="feedback-detected-label">{t('sandbox.detected')}:</span>
+                <span className="feedback-detected-label">{t('generator.detected')}:</span>
                 <span className="feedback-detected-note">
                   {melodyFeedback.state.lastDetectedNote}
                 </span>
@@ -552,7 +556,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           {/* Volume indicator */}
           {melodyFeedback.state.isActive && (
             <div className="volume-indicator">
-              <span className="volume-indicator-label">{t('sandbox.micLevel')}</span>
+              <span className="volume-indicator-label">{t('generator.micLevel')}</span>
               <div className="volume-indicator-bar">
                 <div
                   className="volume-indicator-fill"
@@ -568,7 +572,7 @@ const CustomAudioPlayer: React.FC<CustomAudioPlayerProps> = ({
           {/* Instructions when not active */}
           {!melodyFeedback.state.isActive && melodyFeedback.state.playedCount === 0 && (
             <div className="feedback-instructions">
-              <p>{t('sandbox.feedbackInstructions')}</p>
+              <p>{t('generator.feedbackInstructions')}</p>
             </div>
           )}
         </div>

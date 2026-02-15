@@ -1,11 +1,11 @@
-/**
+﻿/**
  * Practice Session Tracker
- * Tracks sandbox and classroom melody completions in localStorage
+ * Tracks Generator and classroom melody completions in localStorage
  */
 
 export interface PracticeSession {
   id: string
-  type: 'sandbox' | 'classroom'
+  type: 'generator' | 'classroom'
   instrument: string
   melodiesCompleted: number
   timestamp: string
@@ -17,7 +17,7 @@ export interface PracticeSession {
 
 export interface PracticeStats {
   totalMelodies: number
-  sandboxMelodies: number
+  GeneratorMelodies: number
   classroomMelodies: number
   byInstrument: {
     keyboard: number
@@ -27,7 +27,7 @@ export interface PracticeStats {
   // Stats for the last 7 days
   weeklyData: {
     date: string
-    sandbox: number
+    Generator: number
     classroom: number
   }[]
 }
@@ -68,13 +68,15 @@ export function getPracticeSessions(): PracticeSession[] {
 /**
  * Record a new practice session
  */
-export function recordPracticeSession(session: Omit<PracticeSession, 'id' | 'timestamp'>): PracticeSession {
+export function recordPracticeSession(
+  session: Omit<PracticeSession, 'id' | 'timestamp'>
+): PracticeSession {
   const sessions = getPracticeSessions()
 
   const newSession: PracticeSession = {
     ...session,
     id: `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   }
 
   // Add to beginning of array
@@ -100,13 +102,13 @@ export function getPracticeStats(): PracticeStats {
   const sessions = getPracticeSessions()
 
   // Calculate totals
-  let sandboxMelodies = 0
+  let GeneratorMelodies = 0
   let classroomMelodies = 0
   const byInstrument = { keyboard: 0, guitar: 0, bass: 0 }
 
   sessions.forEach(session => {
-    if (session.type === 'sandbox') {
-      sandboxMelodies += session.melodiesCompleted
+    if (session.type === 'generator') {
+      GeneratorMelodies += session.melodiesCompleted
     } else {
       classroomMelodies += session.melodiesCompleted
     }
@@ -132,29 +134,29 @@ export function getPracticeStats(): PracticeStats {
     date.setDate(monday.getDate() + i)
     const dateStr = date.toISOString().split('T')[0]
 
-    let sandbox = 0
+    let Generator = 0
     let classroom = 0
 
     sessions.forEach(session => {
       const sessionDate = session.timestamp.split('T')[0]
       if (sessionDate === dateStr) {
-        if (session.type === 'sandbox') {
-          sandbox += session.melodiesCompleted
+        if (session.type === 'generator') {
+          Generator += session.melodiesCompleted
         } else {
           classroom += session.melodiesCompleted
         }
       }
     })
 
-    weeklyData.push({ date: dateStr, sandbox, classroom })
+    weeklyData.push({ date: dateStr, Generator, classroom })
   }
 
   return {
-    totalMelodies: sandboxMelodies + classroomMelodies,
-    sandboxMelodies,
+    totalMelodies: GeneratorMelodies + classroomMelodies,
+    GeneratorMelodies,
     classroomMelodies,
     byInstrument,
-    weeklyData
+    weeklyData,
   }
 }
 

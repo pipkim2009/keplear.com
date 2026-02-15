@@ -123,10 +123,6 @@ const ChatPanel = memo(function ChatPanel() {
     }
   }
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-  }
-
   // Simple markdown-like formatting using pure React elements (no dangerouslySetInnerHTML)
   const formatMessage = (text: string) => {
     return text.split('\n').map((line, i) => {
@@ -185,7 +181,6 @@ const ChatPanel = memo(function ChatPanel() {
                     <p>{message.text}</p>
                   )}
                 </div>
-                <span className={styles.messageTime}>{formatTime(message.timestamp)}</span>
               </div>
             </div>
           ))}

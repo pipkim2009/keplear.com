@@ -1,7 +1,8 @@
-{
+﻿{
   "nav": {
     "home": "Home",
     "dashboard": "Dashboard",
+    "generator": "Generator",
     "sandbox": "Sandbox",
     "songs": "Songs",
     "stems": "Isolater",
@@ -122,8 +123,8 @@
         "title": "Track Progress",
         "description": "See your improvement over time with detailed performance metrics and history."
       },
-      "sandbox": {
-        "title": "Sandbox Mode",
+      "generator": {
+        "title": "Generator Mode",
         "description": "Explore scales, chords, and melodies at your own pace"
       },
       "instruments": {
@@ -132,8 +133,8 @@
       }
     }
   },
-  "sandbox": {
-    "title": "Sandbox",
+  "generator": {
+    "title": "Generator",
     "instrument": "Instrument",
     "keyboard": "Keyboard",
     "guitar": "Guitar",
@@ -281,6 +282,13 @@
     "title": "Isolater",
     "subtitle": "Separate audio into individual stems and mix them independently",
     "emptyState": "Upload an audio file to separate it into individual stems"
+  },
+  "search": {
+    "placeholder": "Search pages and songs...",
+    "pages": "Pages",
+    "songs": "Songs",
+    "noResults": "No results found",
+    "searching": "Searching..."
   },
   "theme": {
     "switchToLight": "Switch to Light Mode",
@@ -451,7 +459,7 @@
     "noRecentActivity": "No recent activity yet.",
     "completedAssignment": "Completed",
     "joinedClass": "Joined",
-    "goToSandbox": "Go to Sandbox",
+    "goToGenerator": "Go to Generator",
     "viewAll": "View All"
   },
   "profile": {
@@ -556,8 +564,8 @@
     "userAvatar": "User avatar"
   },
   "chatAI": {
-    "welcome": "Hello! I'm your Keplear assistant. I can help you navigate the app, explain features, or answer questions about ear training. What would you like to know?\n\n💡 Try asking about scales, chords, or how to use the sandbox!",
-    "followUpTip": "Try asking about scales, chords, or how to use the sandbox!",
+    "welcome": "Hello! I'm your Keplear assistant. I can help you navigate the app, explain features, or answer questions about ear training. What would you like to know?\n\n💡 Try asking about scales, chords, or how to use the generator!",
+    "followUpTip": "Try asking about scales, chords, or how to use the generator!",
     "greetings": {
       "response": "Hello! I'm your Keplear assistant. I can help you navigate the app, explain features, or answer questions about ear training. What would you like to know?"
     },
@@ -566,17 +574,17 @@
     },
     "navigation": {
       "home": "To go to the **Home page**, click on the **Keplear logo** in the top left corner of the header. The home page shows an overview of the app and has a 'Start Training Now' button to jump into practice!",
-      "sandbox": "To access the **Sandbox** (practice mode):\n\n1. Click **'Start Training Now'** on the home page, or\n2. Click **'Sandbox'** in the header navigation\n\nIn Sandbox mode you can select instruments, apply scales/chords, and generate melodies to practice!",
+      "generator": "To access the **Generator** (practice mode):\n\n1. Click **'Start Training Now'** on the home page, or\n2. Click **'Generator'** in the header navigation\n\nIn Generator mode you can select instruments, apply scales/chords, and generate melodies to practice!",
       "classroom": "To access the **Classroom**:\n\n1. Click **'Classroom'** in the header navigation\n2. You'll need to **sign in** to use classroom features\n\n**Teachers** can:\n• Create classrooms (public or private)\n• Create assignments with specific scales/chords\n\n**Students** can:\n• Join classrooms using a class code\n• Complete assignments"
     },
     "features": {
-      "scales": "**Scales** highlight specific note patterns on your instrument!\n\n**How to use:**\n1. Go to **Sandbox** mode\n2. Find the **Scales** section in the controls\n3. Select a **root note** (C, D, E, etc.)\n4. Choose a **scale type** (Major, Minor, Pentatonic, Blues, etc.)\n5. Click **'Apply'**\n\nThe scale notes will be highlighted on your instrument. Generate a melody to hear them in action!",
-      "chords": "**Chords** add harmony to your practice!\n\n**How to use:**\n1. Go to **Sandbox** mode\n2. Find the **Chords** section\n3. Select a **root note** and **chord type** (Major, Minor, 7th, etc.)\n4. Click **'Apply'**\n\n**Tip:** Use the **Progression/Arpeggiator** toggle:\n• **Progression** = plays full chords together\n• **Arpeggiator** = plays chord notes one at a time",
-      "melody": "To **generate a melody**:\n\n1. Go to **Sandbox** mode\n2. **Apply scales or chords** first (the melody uses these notes)\n3. Set your **BPM** (tempo) and **number of beats**\n4. Click the **'Generate'** button\n5. Click **'Play'** to hear your melody!\n\nThe generated melody will use notes from your selected scales/chords. Try different combinations!",
-      "bpm": "**BPM (Beats Per Minute)** controls the tempo:\n\n• Find the **BPM input** in Sandbox mode controls\n• Enter a number between **1-999**\n• **Higher BPM** = faster playback\n• **Lower BPM** = slower playback\n\n**Tip:** Start slow (60-80 BPM) when learning, then increase speed as you improve!",
-      "beats": "**Number of Beats** controls melody length:\n\n• Find the **beats input** next to BPM in Sandbox\n• Enter how many notes you want in your melody\n• More beats = longer melody\n\n**Tip:** Start with 4-8 beats for simple practice, increase for more challenge!",
-      "microphone": "**Microphone/Pitch Detection** lets you practice with a real instrument!\n\n**How to use:**\n1. In Sandbox mode, find the **microphone** button\n2. Click to **enable** microphone access\n3. Allow browser permission when prompted\n4. Play notes on your real instrument\n5. The app will **detect and highlight** the notes you play!\n\nGreat for checking if you're playing the right notes in a melody.",
-      "instruments": "**Keplear supports 3 instruments:**\n\n🎹 **Keyboard** - Piano keys with adjustable octave range\n🎸 **Guitar** - 6-string fretboard\n🎸 **Bass** - 4-string bass fretboard\n\n**To switch instruments:**\n1. Go to Sandbox mode\n2. Click on the instrument name/tab at the top\n3. The display will change to show that instrument\n\nAll features work with all instruments!",
+      "scales": "**Scales** highlight specific note patterns on your instrument!\n\n**How to use:**\n1. Go to **Generator** mode\n2. Find the **Scales** section in the controls\n3. Select a **root note** (C, D, E, etc.)\n4. Choose a **scale type** (Major, Minor, Pentatonic, Blues, etc.)\n5. Click **'Apply'**\n\nThe scale notes will be highlighted on your instrument. Generate a melody to hear them in action!",
+      "chords": "**Chords** add harmony to your practice!\n\n**How to use:**\n1. Go to **Generator** mode\n2. Find the **Chords** section\n3. Select a **root note** and **chord type** (Major, Minor, 7th, etc.)\n4. Click **'Apply'**\n\n**Tip:** Use the **Progression/Arpeggiator** toggle:\n• **Progression** = plays full chords together\n• **Arpeggiator** = plays chord notes one at a time",
+      "melody": "To **generate a melody**:\n\n1. Go to **Generator** mode\n2. **Apply scales or chords** first (the melody uses these notes)\n3. Set your **BPM** (tempo) and **number of beats**\n4. Click the **'Generate'** button\n5. Click **'Play'** to hear your melody!\n\nThe generated melody will use notes from your selected scales/chords. Try different combinations!",
+      "bpm": "**BPM (Beats Per Minute)** controls the tempo:\n\n• Find the **BPM input** in Generator mode controls\n• Enter a number between **1-999**\n• **Higher BPM** = faster playback\n• **Lower BPM** = slower playback\n\n**Tip:** Start slow (60-80 BPM) when learning, then increase speed as you improve!",
+      "beats": "**Number of Beats** controls melody length:\n\n• Find the **beats input** next to BPM In Generator\n• Enter how many notes you want in your melody\n• More beats = longer melody\n\n**Tip:** Start with 4-8 beats for simple practice, increase for more challenge!",
+      "microphone": "**Microphone/Pitch Detection** lets you practice with a real instrument!\n\n**How to use:**\n1. In Generator mode, find the **microphone** button\n2. Click to **enable** microphone access\n3. Allow browser permission when prompted\n4. Play notes on your real instrument\n5. The app will **detect and highlight** the notes you play!\n\nGreat for checking if you're playing the right notes in a melody.",
+      "instruments": "**Keplear supports 3 instruments:**\n\n🎹 **Keyboard** - Piano keys with adjustable octave range\n🎸 **Guitar** - 6-string fretboard\n🎸 **Bass** - 4-string bass fretboard\n\n**To switch instruments:**\n1. Go to Generator mode\n2. Click on the instrument name/tab at the top\n3. The display will change to show that instrument\n\nAll features work with all instruments!",
       "octaveRange": "**Octave Range** (keyboard only):\n\n• Look for **+/-** buttons near the keyboard display\n• Click **+** to add more octaves (higher/lower keys)\n• Click **-** to remove octaves\n\nThis lets you focus on specific ranges or see the full keyboard!",
       "theme": "To **change the theme**:\n\n• Look for the **sun/moon icon** in the header\n• Click it to toggle between **dark** and **light** mode\n\nYour preference is saved automatically!",
       "auth": "**To sign in or create an account:**\n\n1. Click **'Sign In'** in the header (top right)\n2. Enter your email and password to sign in\n3. Or click **'Sign Up'** to create a new account\n\n**Why sign in?**\n• Access **Classroom** features\n• Create and join classes\n• Save your progress",
@@ -592,7 +600,7 @@
       "response": "Goodbye! Happy practicing! 🎶 Feel free to come back anytime you need help with Keplear."
     },
     "fallback": {
-      "option1": "I'm not sure I understand. Could you rephrase that? I can help with:\n• Navigation (home, sandbox, classroom)\n• Features (scales, chords, melodies)\n• Instruments (keyboard, guitar, bass)\n• Settings (BPM, themes)",
+      "option1": "I'm not sure I understand. Could you rephrase that? I can help with:\n• Navigation (home, generator, classroom)\n• Features (scales, chords, melodies)\n• Instruments (keyboard, guitar, bass)\n• Settings (BPM, themes)",
       "option2": "Hmm, I don't have information about that. Try asking about:\n• How to use scales or chords\n• How to generate melodies\n• How to access the classroom\n• How to change instruments",
       "option3": "I didn't quite catch that. I'm best at helping with Keplear features! Ask me about scales, chords, melodies, or how to navigate the app."
     },
@@ -608,49 +616,49 @@
         "scales": {
           "name": "Scales",
           "description": "Musical scales that highlight specific notes on your instrument. Available scales include Major, Minor, Pentatonic, Blues, and more.",
-          "location": "In Sandbox mode, look for the \"Scales\" section in the control panel.",
+          "location": "In Generator mode, look for the \"Scales\" section in the control panel.",
           "howToUse": "Select a root note (like C, D, E), choose a scale type, then click \"Apply\" to highlight those notes on your instrument."
         },
         "chords": {
           "name": "Chords",
           "description": "Chord patterns that can be applied to your instrument. Includes Major, Minor, 7th, and other chord types.",
-          "location": "In Sandbox mode, look for the \"Chords\" section in the control panel.",
+          "location": "In Generator mode, look for the \"Chords\" section in the control panel.",
           "howToUse": "Select a root note, choose a chord type, then click \"Apply\". Use the Progression/Arpeggiator toggle to control how chords are played in melodies."
         },
         "melodyGeneration": {
           "name": "Melody Generation",
           "description": "Automatically generates melodies based on your selected scales and chords.",
-          "location": "In Sandbox mode, click the \"Generate\" button after applying scales or chords.",
+          "location": "In Generator mode, click the \"Generate\" button after applying scales or chords.",
           "howToUse": "First apply some scales or chords, set your BPM and number of beats, then click \"Generate\" to create a melody. Click \"Play\" to hear it."
         },
         "bpm": {
           "name": "BPM (Beats Per Minute)",
           "description": "Controls the tempo/speed of melody playback.",
-          "location": "In the control panel in Sandbox mode, look for the BPM input field.",
+          "location": "In the control panel in Generator mode, look for the BPM input field.",
           "howToUse": "Enter a number between 1-999 to set the tempo. Higher numbers = faster playback."
         },
         "beats": {
           "name": "Number of Beats",
           "description": "Controls how many notes are in a generated melody.",
-          "location": "In the control panel in Sandbox mode, next to the BPM setting.",
+          "location": "In the control panel in Generator mode, next to the BPM setting.",
           "howToUse": "Enter a number to set how many beats/notes will be in your generated melody."
         },
         "microphone": {
           "name": "Microphone / Pitch Detection",
           "description": "Uses your microphone to detect what notes you're playing and provides real-time feedback.",
-          "location": "In Sandbox mode, look for the microphone icon or \"Start Listening\" button.",
+          "location": "In Generator mode, look for the microphone icon or \"Start Listening\" button.",
           "howToUse": "Click to enable microphone access. Play notes on your real instrument and the app will detect and highlight them."
         },
         "instruments": {
           "name": "Instrument Selection",
           "description": "Switch between Keyboard, Guitar, and Bass instruments.",
-          "location": "At the top of the Sandbox page, you'll see instrument tabs or a selector.",
+          "location": "At the top of the generator page, you'll see instrument tabs or a selector.",
           "howToUse": "Click on Keyboard, Guitar, or Bass to switch instruments. Each has its own visual layout."
         },
         "octaveRange": {
           "name": "Octave Range",
           "description": "Adjust the range of octaves displayed on the keyboard.",
-          "location": "In Sandbox mode when using Keyboard, look for octave controls.",
+          "location": "In Generator mode when using Keyboard, look for octave controls.",
           "howToUse": "Use the +/- buttons to add or remove octaves from the keyboard display."
         },
         "chordMode": {
@@ -679,10 +687,10 @@
           "howToAccess": "Click on the Keplear logo in the header or navigate to the home page.",
           "features": "Start Training button, App overview, Instrument showcase"
         },
-        "sandbox": {
-          "name": "Sandbox / Practice Mode",
+        "generator": {
+          "name": "Generator / Practice Mode",
           "description": "The main practice area where you can select instruments, apply scales and chords, generate melodies, and train your ear.",
-          "howToAccess": "Click \"Start Training Now\" on the home page, or click \"Sandbox\" in the header navigation.",
+          "howToAccess": "Click \"Start Training Now\" on the home page, or click \"Generator\" in the header navigation.",
           "features": "Instrument selection, Scale selection, Chord selection, Melody generation, BPM and beats control, Microphone pitch detection, Octave range adjustment, Fret zone selection"
         },
         "classroom": {

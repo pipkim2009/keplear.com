@@ -1,4 +1,4 @@
-/* ===========================================
+﻿/* ===========================================
    KEPLEAR DASHBOARD - Modern & Bold
    =========================================== */
 
@@ -618,7 +618,7 @@
   stroke-linejoin: round;
 }
 
-.chartLineSandbox,
+.chartLineGenerator,
 .chartLineClassroom {
   stroke: white;
   filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.3));
@@ -628,7 +628,7 @@
   opacity: 0.08;
 }
 
-.chartAreaFillSandbox {
+.chartAreaFillGenerator {
   fill: url(#areaGradient);
 }
 
@@ -1587,7 +1587,7 @@
   color: var(--blue-100);
 }
 
-.activityIcon.sandbox {
+.activityIcon.Generator {
   background: linear-gradient(
     135deg,
     var(--primary-purple-alpha-25) 0%,
@@ -1935,7 +1935,7 @@
   background: linear-gradient(90deg, var(--black-alpha-10) 0%, var(--black-alpha-05) 100%);
 }
 
-:global(body.light) .chartLineSandbox,
+:global(body.light) .chartLineGenerator,
 :global(body.light) .chartLineClassroom {
   stroke: var(--gray-900);
   filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.2));

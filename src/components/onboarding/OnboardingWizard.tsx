@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+﻿import { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { useFocusTrap, useBodyScrollLock } from '../../hooks/useFocusTrap'
 import { useOnboarding } from '../../hooks/useOnboarding'
@@ -139,7 +139,7 @@ const OnboardingWizard = ({ isOpen, userId, onComplete }: OnboardingWizardProps)
 
   /**
    * Start the interactive tutorial
-   * Saves onboarding, sets tutorial flag, and navigates to sandbox
+   * Saves onboarding, sets tutorial flag, and navigates to Generator
    */
   const handleStartTutorial = useCallback(async () => {
     setIsSubmitting(true)
@@ -171,14 +171,14 @@ const OnboardingWizard = ({ isOpen, userId, onComplete }: OnboardingWizardProps)
         setInstrument(selectedInstruments[0])
       }
 
-      // Close wizard and navigate to sandbox with tutorial param
+      // Close wizard and navigate to Generator with tutorial param
       onComplete()
-      window.location.href = '/sandbox?tutorial=start'
+      window.location.href = '/generator?tutorial=start'
     } catch (err) {
       console.error('Onboarding error:', err)
       // Still navigate on error
       onComplete()
-      window.location.href = '/sandbox?tutorial=start'
+      window.location.href = '/generator?tutorial=start'
     } finally {
       setIsSubmitting(false)
     }

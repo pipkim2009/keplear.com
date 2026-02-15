@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from 'react'
+﻿import { createContext, useContext, ReactNode } from 'react'
 import { useAudio } from '../hooks/useAudio'
 import { useMelodyGenerator } from '../hooks/useMelodyGenerator'
 import { useUIState } from '../hooks/useUIState'
@@ -38,7 +38,7 @@ interface InstrumentContextType {
   flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
   activeInputs: { bpm: boolean; beats: boolean; mode: boolean }
   navigateToHome: () => void
-  navigateToSandbox: () => void
+  navigateToGenerator: () => void
   navigateToSongs: () => void
   navigateToClassroom: () => void
   navigateToProfile: (userId?: string) => void
@@ -177,7 +177,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     flashingInputs,
     activeInputs,
     navigateToHome,
-    navigateToSandbox: navigateToSandboxOriginal,
+    navigateToGenerator: navigateToGeneratorOriginal,
     navigateToSongs,
     navigateToClassroom,
     navigateToProfile,
@@ -470,8 +470,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     [setCurrentlyPlayingNoteIndex]
   )
 
-  // Custom navigateToSandbox that resets all state for a fresh sandbox environment
-  const navigateToSandbox = useCallback((): void => {
+  // Custom navigateToGenerator that resets all state for a fresh Generator environment
+  const navigateToGenerator = useCallback((): void => {
     // Stop any playing melody
     if (isPlaying) {
       stopMelody()
@@ -497,8 +497,8 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     setLowerOctaves(0)
     setHigherOctaves(0)
 
-    // Finally navigate to sandbox
-    navigateToSandboxOriginal()
+    // Finally navigate to Generator
+    navigateToGeneratorOriginal()
   }, [
     isPlaying,
     stopMelody,
@@ -512,7 +512,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     setMelodyDuration,
     resetSettings,
     setInstrument,
-    navigateToSandboxOriginal,
+    navigateToGeneratorOriginal,
   ])
 
   const value: InstrumentContextType = {
@@ -536,7 +536,7 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     flashingInputs,
     activeInputs,
     navigateToHome,
-    navigateToSandbox,
+    navigateToGenerator,
     navigateToSongs,
     navigateToClassroom,
     navigateToProfile,

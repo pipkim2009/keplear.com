@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Dashboard Page - Personalized landing page for logged-in users
  * Shows practice stats, classrooms, pending assignments, and recent activity
  */
@@ -36,7 +36,7 @@ function Dashboard() {
   const loading = authContext?.loading
 
   const { t } = useTranslation()
-  const { navigateToSandbox, navigateToClassroom, navigateToProfile } = useNavigation()
+  const { navigateToGenerator, navigateToClassroom, navigateToProfile } = useNavigation()
   const { setInstrument, setBpm, setNumberOfBeats } = useInstrument()
 
   // Tutorial
@@ -186,9 +186,9 @@ function Dashboard() {
               </button>
             </div>
             <div className={styles.quickActions}>
-              <button className={styles.actionButton} onClick={navigateToSandbox}>
+              <button className={styles.actionButton} onClick={navigateToGenerator}>
                 <PiPlayFill />
-                {t('dashboard.goToSandbox')}
+                {t('dashboard.goToGenerator')}
               </button>
               <button className={styles.actionButtonSecondary} onClick={navigateToClassroom}>
                 <PiBookOpenFill />
@@ -413,9 +413,9 @@ function Dashboard() {
                           {activities.map(activity => (
                             <div key={activity.id} className={styles.activityItem}>
                               <div
-                                className={`${styles.activityIcon} ${activity.type === 'sandbox' || activity.type === 'completion' ? getInstrumentTagClass(activity.instrument || 'keyboard') : styles.classJoin}`}
+                                className={`${styles.activityIcon} ${activity.type === 'generator' || activity.type === 'completion' ? getInstrumentTagClass(activity.instrument || 'keyboard') : styles.classJoin}`}
                               >
-                                {activity.type === 'sandbox' || activity.type === 'completion' ? (
+                                {activity.type === 'generator' || activity.type === 'completion' ? (
                                   getInstrumentIcon(activity.instrument || 'keyboard')
                                 ) : (
                                   <PiUsersFill />

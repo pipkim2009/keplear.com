@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+﻿import { useMemo, useState, useEffect } from 'react'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useInstrumentType } from '../../hooks'
 import { useTuner } from '../../hooks/useTuner'
@@ -109,7 +109,7 @@ export default function Tuner() {
         <p className={styles.pageSubtitle}>{t('tuner.subtitle')}</p>
       </div>
 
-      {/* Instrument selector — same UI as sandbox, keyboard hidden */}
+      {/* Instrument selector — same UI as Generator, keyboard hidden */}
       <InstrumentSelector exclude={['keyboard']} />
 
       {/* String reference */}

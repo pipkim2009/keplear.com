@@ -1,4 +1,4 @@
-import { memo, useMemo, useEffect } from 'react'
+﻿import { memo, useMemo, useEffect } from 'react'
 import { useInstrumentType } from '../../../hooks'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
@@ -8,9 +8,9 @@ import '../../../styles/components/InstrumentSelector.css'
 type InstrumentValue = 'keyboard' | 'guitar' | 'bass'
 
 const ALL_INSTRUMENTS = [
-  { value: 'keyboard' as const, labelKey: 'sandbox.keyboard', icon: PiPianoKeysFill },
-  { value: 'guitar' as const, labelKey: 'sandbox.guitar', icon: GiGuitarHead },
-  { value: 'bass' as const, labelKey: 'sandbox.bass', icon: GiGuitarBassHead },
+  { value: 'keyboard' as const, labelKey: 'generator.keyboard', icon: PiPianoKeysFill },
+  { value: 'guitar' as const, labelKey: 'generator.guitar', icon: GiGuitarHead },
+  { value: 'bass' as const, labelKey: 'generator.bass', icon: GiGuitarBassHead },
 ] as const
 
 interface InstrumentSelectorProps {

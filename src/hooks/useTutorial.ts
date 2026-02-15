@@ -1,17 +1,17 @@
-/**
+﻿/**
  * Tutorial Hook
- * Manages interactive tutorial state across Dashboard, Sandbox, and Classroom pages
+ * Manages interactive tutorial state across Dashboard, Generator, and Classroom pages
  */
 
 import { useState, useCallback, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 
-export type TutorialPage = 'dashboard' | 'sandbox' | 'classroom'
+export type TutorialPage = 'dashboard' | 'generator' | 'classroom'
 
 export interface TutorialStep {
   id: string
   page: TutorialPage
-  target: string  // CSS selector
+  target: string // CSS selector
   title: string
   description: string
   position: 'top' | 'bottom' | 'left' | 'right'
@@ -56,61 +56,64 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     page: 'dashboard',
     target: '[class*="mainContent"]',
     title: 'Welcome',
-    description: 'This is your dashboard - here you can track your progress and preview your classroom data.',
-    position: 'bottom'
+    description:
+      'This is your dashboard - here you can track your progress and preview your classroom data.',
+    position: 'bottom',
   },
 
-  // Sandbox Steps
+  // Generator Steps
   {
-    id: 'sandbox-welcome',
-    page: 'sandbox',
+    id: 'Generator-welcome',
+    page: 'generator',
     target: '[class*="instrumentContainer"], [class*="mainContent"]',
     title: 'Welcome',
-    description: 'Welcome to sandbox mode - here you can freely create melodies to practice your note recognition abilities.',
-    position: 'bottom'
+    description:
+      'Welcome to Generator mode - here you can freely create melodies to practice your note recognition abilities.',
+    position: 'bottom',
   },
   {
-    id: 'sandbox-select-instrument',
-    page: 'sandbox',
+    id: 'Generator-select-instrument',
+    page: 'generator',
     target: '[class*="instrumentSelector"], [class*="instrumentTabs"]',
     title: 'Select Instrument',
-    description: 'Let\'s setup a melody! Begin by selecting an instrument.',
-    position: 'bottom'
+    description: "Let's setup a melody! Begin by selecting an instrument.",
+    position: 'bottom',
   },
   {
-    id: 'sandbox-instrument',
-    page: 'sandbox',
+    id: 'Generator-instrument',
+    page: 'generator',
     target: '.keyboard-container, .guitar-container, .bass-container',
     title: 'Select Notes',
     description: 'Great, now select some notes, scales or chords you want your melody to include.',
     position: 'bottom',
-    requiresInteraction: true
+    requiresInteraction: true,
   },
   {
-    id: 'sandbox-tempo-beats',
-    page: 'sandbox',
+    id: 'Generator-tempo-beats',
+    page: 'generator',
     target: '.modern-controls-row',
     title: 'Generation Options',
-    description: 'Here are your generation options. You can adjust BPM for speed, Beats for note count, and Chord Mode for how chords are played.',
-    position: 'top'
+    description:
+      'Here are your generation options. You can adjust BPM for speed, Beats for note count, and Chord Mode for how chords are played.',
+    position: 'top',
   },
   {
-    id: 'sandbox-generate',
-    page: 'sandbox',
+    id: 'Generator-generate',
+    page: 'generator',
     target: '.modern-generate-button',
     title: 'Generate',
     description: 'Click the generate button to create your melody.',
     position: 'top',
-    requiresInteraction: true
+    requiresInteraction: true,
   },
   {
-    id: 'sandbox-play',
-    page: 'sandbox',
+    id: 'Generator-play',
+    page: 'generator',
     target: '.custom-audio-player',
     title: 'Play & Practice',
     description: 'Now you can listen to your melody and play it back for live feedback.',
     position: 'top',
-    requiresInteraction: true
+    requiresInteraction: true,
   },
 
   // Classroom Steps
@@ -119,8 +122,9 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     page: 'classroom',
     target: '[class*="mainContent"]',
     title: 'Classrooms',
-    description: 'This is your classrooms page - here you can join, create and explore classes you\'re interested in.',
-    position: 'bottom'
+    description:
+      "This is your classrooms page - here you can join, create and explore classes you're interested in.",
+    position: 'bottom',
   },
 
   // Conclusion Step
@@ -130,8 +134,8 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     target: '[class*="mainContent"]',
     title: 'Complete',
     description: 'Your tour is complete! Welcome to Keplear.',
-    position: 'bottom'
-  }
+    position: 'bottom',
+  },
 ]
 
 const TUTORIAL_IN_PROGRESS_KEY = 'keplear_tutorial_in_progress'
@@ -144,7 +148,7 @@ function getCurrentPage(): TutorialPage | null {
   if (typeof window === 'undefined') return null
   const path = window.location.pathname
   if (path === '/dashboard' || path.startsWith('/dashboard')) return 'dashboard'
-  if (path === '/sandbox' || path.startsWith('/sandbox')) return 'sandbox'
+  if (path === '/generator' || path.startsWith('/generator')) return 'generator'
   if (path === '/classroom' || path.startsWith('/classroom')) return 'classroom'
   return null
 }
@@ -162,7 +166,9 @@ export function useTutorial(): UseTutorialResult {
   // Get current user and check tutorial completion status
   useEffect(() => {
     const checkTutorialStatus = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
       if (!user) {
         setTutorialCompleted(null)
@@ -314,20 +320,23 @@ export function useTutorial(): UseTutorialResult {
   }, [currentStep, navigateToPage])
 
   // Go to specific step
-  const goToStep = useCallback((step: number) => {
-    if (step >= 0 && step < TUTORIAL_STEPS.length) {
-      const stepData = TUTORIAL_STEPS[step]
-      const currentPage = getCurrentPage()
+  const goToStep = useCallback(
+    (step: number) => {
+      if (step >= 0 && step < TUTORIAL_STEPS.length) {
+        const stepData = TUTORIAL_STEPS[step]
+        const currentPage = getCurrentPage()
 
-      if (stepData.page !== currentPage) {
-        sessionStorage.setItem(TUTORIAL_STEP_KEY, String(step))
-        navigateToPage(stepData.page)
-      } else {
-        setCurrentStep(step)
-        sessionStorage.setItem(TUTORIAL_STEP_KEY, String(step))
+        if (stepData.page !== currentPage) {
+          sessionStorage.setItem(TUTORIAL_STEP_KEY, String(step))
+          navigateToPage(stepData.page)
+        } else {
+          setCurrentStep(step)
+          sessionStorage.setItem(TUTORIAL_STEP_KEY, String(step))
+        }
       }
-    }
-  }, [navigateToPage])
+    },
+    [navigateToPage]
+  )
 
   // Skip tutorial
   const skipTutorial = useCallback(() => {
@@ -358,7 +367,7 @@ export function useTutorial(): UseTutorialResult {
     skipTutorial,
     completeTutorial,
     shouldShowTutorial,
-    currentTutorialPage
+    currentTutorialPage,
   }
 }
 
@@ -366,12 +375,11 @@ export function useTutorial(): UseTutorialResult {
  * Clear tutorial completion (for testing)
  */
 export async function resetTutorial() {
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (user) {
-    await supabase
-      .from('profiles')
-      .update({ tutorial_completed: false })
-      .eq('id', user.id)
+    await supabase.from('profiles').update({ tutorial_completed: false }).eq('id', user.id)
   }
   sessionStorage.removeItem(TUTORIAL_IN_PROGRESS_KEY)
   sessionStorage.removeItem(TUTORIAL_STEP_KEY)

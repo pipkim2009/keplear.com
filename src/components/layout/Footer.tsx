@@ -1,4 +1,4 @@
-import { Link } from 'react-router'
+﻿import { Link } from 'react-router'
 import logo from '/Keplear-logo.webp'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { FaInstagram, FaTiktok } from 'react-icons/fa'
@@ -19,8 +19,8 @@ function Footer() {
               <Link to="/dashboard" className="footer-nav-link">
                 {t('nav.dashboard')}
               </Link>
-              <Link to="/sandbox" className="footer-nav-link">
-                {t('nav.sandbox')}
+              <Link to="/generator" className="footer-nav-link">
+                {t('nav.generator')}
               </Link>
               <Link to="/songs" className="footer-nav-link">
                 {t('nav.songs')}

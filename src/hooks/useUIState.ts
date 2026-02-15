@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useEffect, useRef, useState } from 'react'
+﻿import { useReducer, useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router'
 import {
   uiReducer,
@@ -19,7 +19,7 @@ interface UseUIStateReturn {
 
   // Navigation actions
   navigateToHome: () => void
-  navigateToSandbox: () => void
+  navigateToGenerator: () => void
   navigateToSongs: () => void
   navigateToClassroom: () => void
   navigateToProfile: (userId?: string) => void
@@ -60,8 +60,8 @@ export const useUIState = (): UseUIStateReturn => {
     switch (page) {
       case 'home':
         return '/'
-      case 'sandbox':
-        return '/sandbox'
+      case 'generator':
+        return '/generator'
       case 'songs':
         return '/songs'
       case 'classroom':
@@ -90,8 +90,8 @@ export const useUIState = (): UseUIStateReturn => {
     navigateWithUrl('home')
   }, [navigateWithUrl])
 
-  const navigateToSandbox = useCallback(() => {
-    navigateWithUrl('sandbox')
+  const navigateToGenerator = useCallback(() => {
+    navigateWithUrl('generator')
   }, [navigateWithUrl])
 
   const navigateToSongs = useCallback(() => {
@@ -191,7 +191,7 @@ export const useUIState = (): UseUIStateReturn => {
 
     // Navigation actions
     navigateToHome,
-    navigateToSandbox,
+    navigateToGenerator,
     navigateToSongs,
     navigateToClassroom,
     navigateToProfile,

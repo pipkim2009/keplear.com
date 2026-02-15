@@ -1,4 +1,4 @@
-/**
+﻿/**
  * ClassroomModals - Portal modals for classroom CRUD operations
  * Extracted from Classroom.tsx for maintainability
  */
@@ -230,7 +230,7 @@ export function AssignmentTitleModal({
       <div className={practiceStyles.assignModal}>
         <div className={practiceStyles.assignModalHeader}>
           <h2 className={practiceStyles.assignModalTitle}>
-            {isEditing ? t('classroom.assignment.update') : t('sandbox.createAssignment')}
+            {isEditing ? t('classroom.assignment.update') : t('generator.createAssignment')}
           </h2>
           <button
             className={practiceStyles.assignModalClose}
@@ -246,7 +246,7 @@ export function AssignmentTitleModal({
           )}
           <div className={practiceStyles.assignModalField}>
             <label className={practiceStyles.assignModalLabel} htmlFor="assignmentTitle">
-              {t('sandbox.assignmentTitle')}
+              {t('generator.assignmentTitle')}
             </label>
             <input
               id="assignmentTitle"
@@ -254,24 +254,24 @@ export function AssignmentTitleModal({
               className={practiceStyles.assignModalInput}
               value={title}
               onChange={e => onTitleChange(e.target.value)}
-              placeholder={t('sandbox.enterAssignmentTitle')}
+              placeholder={t('generator.enterAssignmentTitle')}
               autoFocus
               disabled={isSaving}
             />
           </div>
           <div className={practiceStyles.assignModalInfo}>
             <p>
-              <strong>{t('sandbox.instrument')}:</strong> {instrumentName}
+              <strong>{t('generator.instrument')}:</strong> {instrumentName}
             </p>
             <p>
-              <strong>{t('sandbox.bpm')}:</strong> {bpm}
+              <strong>{t('generator.bpm')}:</strong> {bpm}
             </p>
             <p>
-              <strong>{t('sandbox.beats')}:</strong> {beats}
+              <strong>{t('generator.beats')}:</strong> {beats}
             </p>
             <p>
-              <strong>{t('sandbox.type')}:</strong>{' '}
-              {hasChords ? t('sandbox.chords') : t('sandbox.melodies')}
+              <strong>{t('generator.type')}:</strong>{' '}
+              {hasChords ? t('generator.chords') : t('generator.melodies')}
             </p>
           </div>
           <button
@@ -280,10 +280,10 @@ export function AssignmentTitleModal({
             disabled={isSaving || !title.trim()}
           >
             {isSaving
-              ? t('sandbox.saving')
+              ? t('generator.saving')
               : isEditing
                 ? t('classroom.assignment.update')
-                : t('sandbox.createAssignment')}
+                : t('generator.createAssignment')}
           </button>
         </div>
       </div>

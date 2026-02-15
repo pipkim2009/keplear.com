@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Classroom Page - View and create classrooms
  * Now includes embedded instrument UI for creating assignments and taking lessons
  */
@@ -125,7 +125,7 @@ interface SerializedExerciseData {
   selectedNoteIds?: string[]
   appliedScales?: SerializedScaleData[]
   appliedChords?: SerializedChordData[]
-  type?: 'sandbox' | 'song'
+  type?: 'generator' | 'song'
   songData?: {
     videoId: string
     videoTitle: string
@@ -226,7 +226,7 @@ interface ExerciseData {
     displayName: string
   }>
   // Song exercise fields (optional - if present, this is a song exercise)
-  type?: 'sandbox' | 'song'
+  type?: 'generator' | 'song'
   songData?: {
     videoId: string
     videoTitle: string
@@ -489,7 +489,7 @@ function Classroom() {
     fetchClassrooms()
   }, [])
 
-  // Check for export data from Sandbox and apply it
+  // Check for export data from Generator and apply it
   useEffect(() => {
     const exportDataStr = localStorage.getItem('exportToClassroomData')
     if (exportDataStr) {
@@ -1649,7 +1649,7 @@ function Classroom() {
             },
           }
         } else {
-          // Save as sandbox exercise
+          // Save as Generator exercise
           updated[currentExerciseIndex] = {
             ...existingExercise,
             transcript: currentExerciseTranscript,
@@ -1676,7 +1676,7 @@ function Classroom() {
         }
       }
 
-      // Add new exercise (always starts as sandbox)
+      // Add new exercise (always starts as Generator)
       const newExercise: ExerciseData = {
         id: `exercise-${Date.now()}`,
         name: `Exercise ${updated.length + 1}`,
@@ -1698,7 +1698,7 @@ function Classroom() {
     triggerClearChordsAndScales()
     setCurrentExerciseTranscript('')
 
-    // Reset to sandbox mode and clear song state for new exercise
+    // Reset to Generator mode and clear song state for new exercise
     setAssignmentType('practice')
     setSongVideoId(null)
     setSongVideoTitle('')
@@ -1738,7 +1738,7 @@ function Classroom() {
     (index: number) => {
       if (index === currentExerciseIndex || index < 0 || index >= exercises.length) return
 
-      // Save current state before switching - handle song vs sandbox exercises
+      // Save current state before switching - handle song vs Generator exercises
       const currentData = saveCurrentToExercise()
 
       // Build updated exercises array synchronously so we can read target exercise from it
@@ -1769,7 +1769,7 @@ function Classroom() {
           },
         }
       } else {
-        // Save as sandbox exercise
+        // Save as Generator exercise
         updatedExercises[currentExerciseIndex] = {
           ...existingExercise,
           transcript: currentExerciseTranscript,
@@ -1807,7 +1807,7 @@ function Classroom() {
       // Load the target exercise data from the UPDATED array
       const targetExercise = updatedExercises[index]
       if (targetExercise) {
-        // Handle song vs sandbox exercise type switching
+        // Handle song vs Generator exercise type switching
         if (targetExercise.type === 'song' && targetExercise.songData) {
           // Switching TO a song exercise - load song data
           setAssignmentType('songs')
@@ -1819,7 +1819,7 @@ function Classroom() {
           setSongPlaybackRate(targetExercise.songData.playbackRate || 1)
           setSongIsPlayerReady(false)
           setIsSongPlaying(false)
-          // Clear sandbox state since we're on a song exercise
+          // Clear Generator state since we're on a song exercise
           clearSelection()
           scaleChordManagement.setAppliedScalesDirectly([])
           scaleChordManagement.setAppliedChordsDirectly([])
@@ -1828,7 +1828,7 @@ function Classroom() {
           setCurrentExerciseIndex(index)
           return // Exit early - song exercises don't need scale/chord/note loading
         } else {
-          // Switching TO a sandbox exercise - clear song state
+          // Switching TO a Generator exercise - clear song state
           setSongVideoId(null)
           setSongVideoTitle('')
           setSongMarkerA(null)
@@ -2127,7 +2127,7 @@ function Classroom() {
       setExternalSelectedNoteIds([])
 
       if (targetExercise) {
-        // Handle song vs sandbox exercise
+        // Handle song vs Generator exercise
         if (targetExercise.type === 'song' && targetExercise.songData) {
           // Switching TO a song exercise - load song data
           setAssignmentType('songs')
@@ -2141,7 +2141,7 @@ function Classroom() {
           setCurrentExerciseTranscript(targetExercise.transcript || '')
           return // Exit early - song exercises don't need scale/chord/note loading
         } else {
-          // Switching TO a sandbox exercise - clear song state
+          // Switching TO a Generator exercise - clear song state
           setSongVideoId(null)
           setSongVideoTitle('')
           setSongMarkerA(null)
@@ -2152,7 +2152,7 @@ function Classroom() {
           setAssignmentType('practice')
         }
 
-        // Apply sandbox exercise settings
+        // Apply Generator exercise settings
         setCurrentExerciseTranscript(targetExercise.transcript || '')
         if (targetExercise.bpm) setBpm(targetExercise.bpm)
         if (targetExercise.beats) setNumberOfBeats(targetExercise.beats)
@@ -2901,7 +2901,7 @@ function Classroom() {
           },
         }
       } else {
-        // Sandbox mode - save notes/scales/chords
+        // Generator mode - save notes/scales/chords
         updatedExercises[currentExerciseIndex] = {
           ...existingExercise,
           // Use current state if it has content, otherwise keep original
@@ -2923,7 +2923,7 @@ function Classroom() {
             currentData.appliedChords.length > 0
               ? currentData.appliedChords
               : existingExercise.appliedChords,
-          // Clear song data if switching from song to sandbox
+          // Clear song data if switching from song to Generator
           type: undefined,
           songData: undefined,
         }
@@ -3148,7 +3148,7 @@ function Classroom() {
         typeof songData.markerA === 'number' && typeof songData.markerB === 'number'
       )
     } else {
-      // Clear song state for sandbox exercises
+      // Clear song state for Generator exercises
       setSongVideoId(null)
       setSongVideoTitle('')
       setSongMarkerA(null)
@@ -3400,7 +3400,7 @@ function Classroom() {
         return // Song exercises don't need scale/chord/note loading
       }
 
-      // Clear song state when switching to sandbox exercise
+      // Clear song state when switching to Generator exercise
       setSongVideoId(null)
       setSongVideoTitle('')
       setSongMarkerA(null)
@@ -3934,7 +3934,7 @@ function Classroom() {
 
       // Welcome message for song assignment
       const songAssignmentWelcome = !genericWelcomeDone
-        ? t('sandbox.welcomeToLesson', { instrument: currentAssignment.title })
+        ? t('generator.welcomeToLesson', { instrument: currentAssignment.title })
         : ''
 
       // Auto-play handler for when welcome ends
@@ -4069,7 +4069,7 @@ function Classroom() {
     // ========== PRACTICE ASSIGNMENT VIEW ==========
     // Generic welcome message for the lesson
     const genericWelcomeMessage = !genericWelcomeDone
-      ? t('sandbox.welcomeToLesson', { instrument: currentAssignment.title })
+      ? t('generator.welcomeToLesson', { instrument: currentAssignment.title })
       : ''
 
     // Get custom transcript from current exercise (only show after generic welcome)
@@ -4107,7 +4107,7 @@ function Classroom() {
         typeof exerciseSongData.markerB === 'number' &&
         !isNaN(exerciseSongData.markerB)
 
-      // Get transcript for song exercise (same pattern as sandbox)
+      // Get transcript for song exercise (same pattern as Generator)
       const songExerciseTranscript = genericWelcomeDone ? currentExercise.transcript || '' : ''
       const hasTranscript = (currentExercise.transcript || '').trim().length > 0
 
@@ -4483,7 +4483,7 @@ function Classroom() {
       appliedScales: scaleChordManagement.appliedScales,
       appliedChords: scaleChordManagement.appliedChords,
     }
-    // Current has content if sandbox mode with notes OR song mode with video selected
+    // Current has content if Generator mode with notes OR song mode with video selected
     const currentHasContent =
       assignmentType === 'songs'
         ? !!songVideoId
@@ -4567,7 +4567,7 @@ function Classroom() {
               style={{ flex: 1 }}
               value={assignmentTitle}
               onChange={e => setAssignmentTitle(e.target.value)}
-              placeholder={t('sandbox.assignmentTitle')}
+              placeholder={t('generator.assignmentTitle')}
             />
             <button
               className={practiceStyles.assignmentPreviewButton}
@@ -4610,7 +4610,7 @@ function Classroom() {
               }}
             >
               {isSavingAssignment
-                ? t('sandbox.saving')
+                ? t('generator.saving')
                 : editingAssignmentId
                   ? t('common.update')
                   : t('classroom.assign')}
@@ -4758,7 +4758,7 @@ function Classroom() {
             {instrument === 'keyboard' && <PiPianoKeysFill size={20} />}
             {instrument === 'guitar' && <GiGuitarHead size={20} />}
             {instrument === 'bass' && <GiGuitarBassHead size={20} />}
-            Sandbox
+            Generator
           </button>
           <button
             onClick={() => setAssignmentType('songs')}

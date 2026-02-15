@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Focused selector hooks for InstrumentContext
  *
  * These hooks allow components to subscribe to specific slices of state
@@ -18,27 +18,30 @@ import { useInstrument } from '../contexts/InstrumentContext'
 export const useNavigation = () => {
   const context = useInstrument()
 
-  return useMemo(() => ({
-    currentPage: context.currentPage,
-    navigateToHome: context.navigateToHome,
-    navigateToSandbox: context.navigateToSandbox,
-    navigateToSongs: context.navigateToSongs,
-    navigateToClassroom: context.navigateToClassroom,
-    navigateToProfile: context.navigateToProfile,
-    navigateToDashboard: context.navigateToDashboard,
-    setCurrentPage: context.setCurrentPage,
-    profileUserId: context.profileUserId
-  }), [
-    context.currentPage,
-    context.navigateToHome,
-    context.navigateToSandbox,
-    context.navigateToSongs,
-    context.navigateToClassroom,
-    context.navigateToProfile,
-    context.navigateToDashboard,
-    context.setCurrentPage,
-    context.profileUserId
-  ])
+  return useMemo(
+    () => ({
+      currentPage: context.currentPage,
+      navigateToHome: context.navigateToHome,
+      navigateToGenerator: context.navigateToGenerator,
+      navigateToSongs: context.navigateToSongs,
+      navigateToClassroom: context.navigateToClassroom,
+      navigateToProfile: context.navigateToProfile,
+      navigateToDashboard: context.navigateToDashboard,
+      setCurrentPage: context.setCurrentPage,
+      profileUserId: context.profileUserId,
+    }),
+    [
+      context.currentPage,
+      context.navigateToHome,
+      context.navigateToGenerator,
+      context.navigateToSongs,
+      context.navigateToClassroom,
+      context.navigateToProfile,
+      context.navigateToDashboard,
+      context.setCurrentPage,
+      context.profileUserId,
+    ]
+  )
 }
 
 /**
@@ -48,15 +51,14 @@ export const useNavigation = () => {
 export const useInstrumentType = () => {
   const context = useInstrument()
 
-  return useMemo(() => ({
-    instrument: context.instrument,
-    handleInstrumentChange: context.handleInstrumentChange,
-    setInstrument: context.setInstrument
-  }), [
-    context.instrument,
-    context.handleInstrumentChange,
-    context.setInstrument
-  ])
+  return useMemo(
+    () => ({
+      instrument: context.instrument,
+      handleInstrumentChange: context.handleInstrumentChange,
+      setInstrument: context.setInstrument,
+    }),
+    [context.instrument, context.handleInstrumentChange, context.setInstrument]
+  )
 }
 
 /**
@@ -66,29 +68,32 @@ export const useInstrumentType = () => {
 export const useMelodySettings = () => {
   const context = useInstrument()
 
-  return useMemo(() => ({
-    bpm: context.bpm,
-    numberOfBeats: context.numberOfBeats,
-    chordMode: context.chordMode,
-    flashingInputs: context.flashingInputs,
-    activeInputs: context.activeInputs,
-    setBpm: context.setBpm,
-    setNumberOfBeats: context.setNumberOfBeats,
-    setChordMode: context.setChordMode,
-    triggerInputFlash: context.triggerInputFlash,
-    setInputActive: context.setInputActive
-  }), [
-    context.bpm,
-    context.numberOfBeats,
-    context.chordMode,
-    context.flashingInputs,
-    context.activeInputs,
-    context.setBpm,
-    context.setNumberOfBeats,
-    context.setChordMode,
-    context.triggerInputFlash,
-    context.setInputActive
-  ])
+  return useMemo(
+    () => ({
+      bpm: context.bpm,
+      numberOfBeats: context.numberOfBeats,
+      chordMode: context.chordMode,
+      flashingInputs: context.flashingInputs,
+      activeInputs: context.activeInputs,
+      setBpm: context.setBpm,
+      setNumberOfBeats: context.setNumberOfBeats,
+      setChordMode: context.setChordMode,
+      triggerInputFlash: context.triggerInputFlash,
+      setInputActive: context.setInputActive,
+    }),
+    [
+      context.bpm,
+      context.numberOfBeats,
+      context.chordMode,
+      context.flashingInputs,
+      context.activeInputs,
+      context.setBpm,
+      context.setNumberOfBeats,
+      context.setChordMode,
+      context.triggerInputFlash,
+      context.setInputActive,
+    ]
+  )
 }
 
 /**
@@ -98,51 +103,54 @@ export const useMelodySettings = () => {
 export const useMelodyPlayback = () => {
   const context = useInstrument()
 
-  return useMemo(() => ({
-    isPlaying: context.isPlaying,
-    isRecording: context.isRecording,
-    playbackProgress: context.playbackProgress,
-    melodyDuration: context.melodyDuration,
-    recordedAudioBlob: context.recordedAudioBlob,
-    showNotes: context.showNotes,
-    currentlyPlayingNoteIndex: context.currentlyPlayingNoteIndex,
-    isGeneratingMelody: context.isGeneratingMelody,
-    isAutoRecording: context.isAutoRecording,
-    hasChanges: context.hasChanges,
-    generatedMelody: context.generatedMelody,
-    handlePlayMelody: context.handlePlayMelody,
-    handleGenerateMelody: context.handleGenerateMelody,
-    handleRecordMelody: context.handleRecordMelody,
-    handleClearRecordedAudio: context.handleClearRecordedAudio,
-    toggleShowNotes: context.toggleShowNotes,
-    setPlaybackProgress: context.setPlaybackProgress,
-    setMelodyDuration: context.setMelodyDuration,
-    calculateMelodyDuration: context.calculateMelodyDuration,
-    handleCurrentlyPlayingNoteChange: context.handleCurrentlyPlayingNoteChange,
-    clearChanges: context.clearChanges
-  }), [
-    context.isPlaying,
-    context.isRecording,
-    context.playbackProgress,
-    context.melodyDuration,
-    context.recordedAudioBlob,
-    context.showNotes,
-    context.currentlyPlayingNoteIndex,
-    context.isGeneratingMelody,
-    context.isAutoRecording,
-    context.hasChanges,
-    context.generatedMelody,
-    context.handlePlayMelody,
-    context.handleGenerateMelody,
-    context.handleRecordMelody,
-    context.handleClearRecordedAudio,
-    context.toggleShowNotes,
-    context.setPlaybackProgress,
-    context.setMelodyDuration,
-    context.calculateMelodyDuration,
-    context.handleCurrentlyPlayingNoteChange,
-    context.clearChanges
-  ])
+  return useMemo(
+    () => ({
+      isPlaying: context.isPlaying,
+      isRecording: context.isRecording,
+      playbackProgress: context.playbackProgress,
+      melodyDuration: context.melodyDuration,
+      recordedAudioBlob: context.recordedAudioBlob,
+      showNotes: context.showNotes,
+      currentlyPlayingNoteIndex: context.currentlyPlayingNoteIndex,
+      isGeneratingMelody: context.isGeneratingMelody,
+      isAutoRecording: context.isAutoRecording,
+      hasChanges: context.hasChanges,
+      generatedMelody: context.generatedMelody,
+      handlePlayMelody: context.handlePlayMelody,
+      handleGenerateMelody: context.handleGenerateMelody,
+      handleRecordMelody: context.handleRecordMelody,
+      handleClearRecordedAudio: context.handleClearRecordedAudio,
+      toggleShowNotes: context.toggleShowNotes,
+      setPlaybackProgress: context.setPlaybackProgress,
+      setMelodyDuration: context.setMelodyDuration,
+      calculateMelodyDuration: context.calculateMelodyDuration,
+      handleCurrentlyPlayingNoteChange: context.handleCurrentlyPlayingNoteChange,
+      clearChanges: context.clearChanges,
+    }),
+    [
+      context.isPlaying,
+      context.isRecording,
+      context.playbackProgress,
+      context.melodyDuration,
+      context.recordedAudioBlob,
+      context.showNotes,
+      context.currentlyPlayingNoteIndex,
+      context.isGeneratingMelody,
+      context.isAutoRecording,
+      context.hasChanges,
+      context.generatedMelody,
+      context.handlePlayMelody,
+      context.handleGenerateMelody,
+      context.handleRecordMelody,
+      context.handleClearRecordedAudio,
+      context.toggleShowNotes,
+      context.setPlaybackProgress,
+      context.setMelodyDuration,
+      context.calculateMelodyDuration,
+      context.handleCurrentlyPlayingNoteChange,
+      context.clearChanges,
+    ]
+  )
 }
 
 /**
@@ -152,29 +160,32 @@ export const useMelodyPlayback = () => {
 export const useNoteSelection = () => {
   const context = useInstrument()
 
-  return useMemo(() => ({
-    selectedNotes: context.selectedNotes,
-    generatedMelody: context.generatedMelody,
-    clearTrigger: context.clearTrigger,
-    selectNote: context.selectNote,
-    setGuitarNotes: context.setGuitarNotes,
-    isSelected: context.isSelected,
-    isInMelody: context.isInMelody,
-    clearSelection: context.clearSelection,
-    generateMelody: context.generateMelody,
-    handleNoteClick: context.handleNoteClick
-  }), [
-    context.selectedNotes,
-    context.generatedMelody,
-    context.clearTrigger,
-    context.selectNote,
-    context.setGuitarNotes,
-    context.isSelected,
-    context.isInMelody,
-    context.clearSelection,
-    context.generateMelody,
-    context.handleNoteClick
-  ])
+  return useMemo(
+    () => ({
+      selectedNotes: context.selectedNotes,
+      generatedMelody: context.generatedMelody,
+      clearTrigger: context.clearTrigger,
+      selectNote: context.selectNote,
+      setGuitarNotes: context.setGuitarNotes,
+      isSelected: context.isSelected,
+      isInMelody: context.isInMelody,
+      clearSelection: context.clearSelection,
+      generateMelody: context.generateMelody,
+      handleNoteClick: context.handleNoteClick,
+    }),
+    [
+      context.selectedNotes,
+      context.generatedMelody,
+      context.clearTrigger,
+      context.selectNote,
+      context.setGuitarNotes,
+      context.isSelected,
+      context.isInMelody,
+      context.clearSelection,
+      context.generateMelody,
+      context.handleNoteClick,
+    ]
+  )
 }
 
 /**
@@ -184,29 +195,32 @@ export const useNoteSelection = () => {
 export const useAudioPlayback = () => {
   const context = useInstrument()
 
-  return useMemo(() => ({
-    playNote: context.playNote,
-    playGuitarNote: context.playGuitarNote,
-    playBassNote: context.playBassNote,
-    playMelody: context.playMelody,
-    playGuitarMelody: context.playGuitarMelody,
-    playBassMelody: context.playBassMelody,
-    stopMelody: context.stopMelody,
-    recordMelody: context.recordMelody,
-    isPlaying: context.isPlaying,
-    isRecording: context.isRecording
-  }), [
-    context.playNote,
-    context.playGuitarNote,
-    context.playBassNote,
-    context.playMelody,
-    context.playGuitarMelody,
-    context.playBassMelody,
-    context.stopMelody,
-    context.recordMelody,
-    context.isPlaying,
-    context.isRecording
-  ])
+  return useMemo(
+    () => ({
+      playNote: context.playNote,
+      playGuitarNote: context.playGuitarNote,
+      playBassNote: context.playBassNote,
+      playMelody: context.playMelody,
+      playGuitarMelody: context.playGuitarMelody,
+      playBassMelody: context.playBassMelody,
+      stopMelody: context.stopMelody,
+      recordMelody: context.recordMelody,
+      isPlaying: context.isPlaying,
+      isRecording: context.isRecording,
+    }),
+    [
+      context.playNote,
+      context.playGuitarNote,
+      context.playBassNote,
+      context.playMelody,
+      context.playGuitarMelody,
+      context.playBassMelody,
+      context.stopMelody,
+      context.recordMelody,
+      context.isPlaying,
+      context.isRecording,
+    ]
+  )
 }
 
 /**
@@ -216,19 +230,22 @@ export const useAudioPlayback = () => {
 export const useScaleChordState = () => {
   const context = useInstrument()
 
-  return useMemo(() => ({
-    appliedChords: context.appliedChords,
-    appliedScales: context.appliedScales,
-    scaleChordManagement: context.scaleChordManagement,
-    clearChordsAndScalesTrigger: context.clearChordsAndScalesTrigger,
-    triggerClearChordsAndScales: context.triggerClearChordsAndScales
-  }), [
-    context.appliedChords,
-    context.appliedScales,
-    context.scaleChordManagement,
-    context.clearChordsAndScalesTrigger,
-    context.triggerClearChordsAndScales
-  ])
+  return useMemo(
+    () => ({
+      appliedChords: context.appliedChords,
+      appliedScales: context.appliedScales,
+      scaleChordManagement: context.scaleChordManagement,
+      clearChordsAndScalesTrigger: context.clearChordsAndScalesTrigger,
+      triggerClearChordsAndScales: context.triggerClearChordsAndScales,
+    }),
+    [
+      context.appliedChords,
+      context.appliedScales,
+      context.scaleChordManagement,
+      context.clearChordsAndScalesTrigger,
+      context.triggerClearChordsAndScales,
+    ]
+  )
 }
 
 /**
@@ -238,15 +255,18 @@ export const useScaleChordState = () => {
 export const useOctaveRange = () => {
   const context = useInstrument()
 
-  return useMemo(() => ({
-    lowerOctaves: context.lowerOctaves,
-    higherOctaves: context.higherOctaves,
-    keyboardOctaves: context.keyboardOctaves,
-    handleOctaveRangeChange: context.handleOctaveRangeChange
-  }), [
-    context.lowerOctaves,
-    context.higherOctaves,
-    context.keyboardOctaves,
-    context.handleOctaveRangeChange
-  ])
+  return useMemo(
+    () => ({
+      lowerOctaves: context.lowerOctaves,
+      higherOctaves: context.higherOctaves,
+      keyboardOctaves: context.keyboardOctaves,
+      handleOctaveRangeChange: context.handleOctaveRangeChange,
+    }),
+    [
+      context.lowerOctaves,
+      context.higherOctaves,
+      context.keyboardOctaves,
+      context.handleOctaveRangeChange,
+    ]
+  )
 }

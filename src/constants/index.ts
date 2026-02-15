@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Application-wide constants and configuration
  */
 
@@ -8,7 +8,7 @@
 export const DEFAULT_SETTINGS = {
   bpm: 120,
   numberOfNotes: 5,
-  instrument: 'keyboard'
+  instrument: 'keyboard',
 } as const
 
 /**
@@ -28,7 +28,7 @@ export const AUDIO_CONFIG = {
   /** Default note duration for guitar */
   guitarDuration: '0.5',
   /** Default note duration for bass */
-  bassDuration: '0.7'
+  bassDuration: '0.7',
 } as const
 
 /**
@@ -48,8 +48,8 @@ export const AUTH_CONFIG = {
   /** Rate limiting for auth attempts */
   rateLimit: {
     maxAttempts: 5,
-    windowMs: 60000
-  }
+    windowMs: 60000,
+  },
 } as const
 
 /**
@@ -63,7 +63,7 @@ export const LAYOUT_CONFIG = {
   /** Header height in pixels */
   headerHeight: 80,
   /** Footer height in pixels */
-  footerHeight: 60
+  footerHeight: 60,
 } as const
 
 /**
@@ -75,7 +75,7 @@ export const SERVICE_URLS = {
   /** Acoustic guitar samples base URL from tonejs-instruments */
   guitarSamples: 'https://nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/',
   /** Bass samples base URL from tonejs-instruments */
-  bassSamples: 'https://nbrosowsky.github.io/tonejs-instruments/samples/bass-electric/'
+  bassSamples: 'https://nbrosowsky.github.io/tonejs-instruments/samples/bass-electric/',
 } as const
 
 /**
@@ -91,8 +91,8 @@ export const MUSIC_CONFIG = {
   /** Keyboard range */
   keyboardRange: {
     startOctave: 4,
-    endOctave: 5
-  }
+    endOctave: 5,
+  },
 } as const
 
 /**
@@ -100,8 +100,8 @@ export const MUSIC_CONFIG = {
  */
 export const ROUTES = {
   home: 'home',
-  sandbox: 'sandbox',
-  practice: 'practice'
+  Generator: 'generator',
+  practice: 'practice',
 } as const
 
 /**
@@ -110,7 +110,7 @@ export const ROUTES = {
 export const INSTRUMENTS = {
   keyboard: 'keyboard',
   guitar: 'guitar',
-  bass: 'bass'
+  bass: 'bass',
 } as const
 
 /**
@@ -121,14 +121,14 @@ export const THEME_CONFIG = {
   cssVariables: {
     primaryPurple: '--primary-purple',
     textPrimary: '--text-primary',
-    bgPrimary: '--bg-primary'
+    bgPrimary: '--bg-primary',
   },
   /** Animation durations in ms */
   transitions: {
     fast: 150,
     normal: 300,
-    slow: 500
-  }
+    slow: 500,
+  },
 } as const
 
 /**
@@ -140,7 +140,7 @@ export const PERFORMANCE_CONFIG = {
   /** Throttle delay for scroll/resize events */
   throttleDelay: 100,
   /** Maximum number of melody history items to keep */
-  maxMelodyHistory: 50
+  maxMelodyHistory: 50,
 } as const
 
 /**
@@ -148,24 +148,25 @@ export const PERFORMANCE_CONFIG = {
  */
 export const ERROR_MESSAGES = {
   auth: {
-    invalidUsername: 'Username must be 3-20 characters and contain only letters, numbers, and underscores',
+    invalidUsername:
+      'Username must be 3-20 characters and contain only letters, numbers, and underscores',
     invalidPassword: 'Password must be 8+ characters with uppercase, lowercase, and number',
     signUpFailed: 'Failed to create account. Please try again.',
     signInFailed: 'Invalid username or password',
     updatePasswordFailed: 'Failed to update password',
     deleteAccountFailed: 'Failed to delete account',
-    rateLimited: 'Too many attempts. Please try again later.'
+    rateLimited: 'Too many attempts. Please try again later.',
   },
   audio: {
     initializationFailed: 'Failed to initialize audio system',
     playbackFailed: 'Failed to play audio',
-    contextBlocked: 'Audio blocked - user interaction required'
+    contextBlocked: 'Audio blocked - user interaction required',
   },
   melody: {
     noNotesSelected: 'Please select notes before generating a melody',
     invalidNoteCount: 'Number of notes must be between 1 and 16',
-    generationFailed: 'Failed to generate melody'
-  }
+    generationFailed: 'Failed to generate melody',
+  },
 } as const
 
 /**
@@ -176,12 +177,12 @@ export const SUCCESS_MESSAGES = {
     signUpSuccess: 'Account created successfully!',
     signInSuccess: 'Welcome back!',
     passwordUpdated: 'Password updated successfully',
-    accountDeleted: 'Account deleted successfully'
+    accountDeleted: 'Account deleted successfully',
   },
   melody: {
     generated: 'Melody generated successfully!',
-    saved: 'Melody saved to your collection'
-  }
+    saved: 'Melody saved to your collection',
+  },
 } as const
 
 /**
@@ -189,4 +190,4 @@ export const SUCCESS_MESSAGES = {
  */
 export type InstrumentType = keyof typeof INSTRUMENTS
 export type RouteType = keyof typeof ROUTES
-export type ChromaticNote = typeof MUSIC_CONFIG.chromaticNotes[number]
+export type ChromaticNote = (typeof MUSIC_CONFIG.chromaticNotes)[number]

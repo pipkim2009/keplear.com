@@ -28,19 +28,11 @@
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--white);
+  padding: 0.5rem 1rem;
+  border-bottom: none;
   background: transparent;
   border-radius: 0;
-  min-height: 72px;
-}
-
-/* Reduce height for keyboard, guitar and bass */
-.instrument-container:has(.keyboard-container) .instrument-header-controls,
-.instrument-container:has(.guitar-container) .instrument-header-controls,
-.instrument-container:has(.bass-container) .instrument-header-controls,
-.instrument-container[data-practice-mode="true"] .instrument-header-controls {
-  min-height: 50px;
+  min-height: auto;
 }
 
 .header-controls-left {
@@ -156,13 +148,6 @@
 
 /* Very small screens - one button per row, centered */
 @media (max-width: 360px) {
-  /* Reduce height for guitar and bass on very small screens */
-  .instrument-container:has(.guitar-container) .instrument-header-controls,
-  .instrument-container:has(.bass-container) .instrument-header-controls,
-  .instrument-container[data-practice-mode="true"] .instrument-header-controls {
-    min-height: 43px !important;
-  }
-
   .header-controls-left {
     flex-direction: column !important;
     align-items: center !important;
@@ -186,16 +171,16 @@
   }
 
   /* Remove top margins on very small screens for vertical stacking */
-  body:has([data-instrument="keyboard"]) .control-group.scale-chord-options,
-  body:has([data-instrument="guitar"]) .control-group.scale-chord-options,
-  body:has([data-instrument="bass"]) .control-group.scale-chord-options {
+  body:has([data-instrument='keyboard']) .control-group.scale-chord-options,
+  body:has([data-instrument='guitar']) .control-group.scale-chord-options,
+  body:has([data-instrument='bass']) .control-group.scale-chord-options {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
   }
 
-  body:has([data-instrument="keyboard"]) .control-button.delete-selection,
-  body:has([data-instrument="guitar"]) .control-button.delete-selection,
-  body:has([data-instrument="bass"]) .control-button.delete-selection {
+  body:has([data-instrument='keyboard']) .control-button.delete-selection,
+  body:has([data-instrument='guitar']) .control-button.delete-selection,
+  body:has([data-instrument='bass']) .control-button.delete-selection {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
   }

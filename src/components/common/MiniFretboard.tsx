@@ -1,4 +1,4 @@
-import React from 'react'
+﻿import React from 'react'
 import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
 import { bassNotes } from '../../utils/instruments/bass/bassNotes'
 import { useTranslation } from '../../contexts/TranslationContext'
@@ -9,24 +9,32 @@ interface MiniFretboardProps {
   instrument: 'guitar' | 'bass'
   root: string
   mode?: 'scale' | 'chord'
-  playingNotes?: string[]  // Note names that are currently playing
+  playingNotes?: string[] // Note names that are currently playing
 }
 
-const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, root, mode = 'scale', playingNotes = [] }) => {
+const MiniFretboard: React.FC<MiniFretboardProps> = ({
+  noteKeys,
+  instrument,
+  root,
+  mode = 'scale',
+  playingNotes = [],
+}) => {
   const { t } = useTranslation()
   const stringCount = instrument === 'guitar' ? 6 : 4
   const notesData = instrument === 'guitar' ? guitarNotes : bassNotes
 
   // Parse noteKeys to get positions
-  const positions = noteKeys.map(key => {
-    const parts = key.split('-')
-    const stringIndex = parseInt(parts[0], 10)
-    const fret = parts[1] === 'open' ? 0 : parseInt(parts[1], 10) + 1
-    return { stringIndex, fret }
-  }).filter(p => !isNaN(p.stringIndex) && !isNaN(p.fret))
+  const positions = noteKeys
+    .map(key => {
+      const parts = key.split('-')
+      const stringIndex = parseInt(parts[0], 10)
+      const fret = parts[1] === 'open' ? 0 : parseInt(parts[1], 10) + 1
+      return { stringIndex, fret }
+    })
+    .filter(p => !isNaN(p.stringIndex) && !isNaN(p.fret))
 
   if (positions.length === 0) {
-    return <div className="mini-fretboard-empty">{t('sandbox.noPositionsAvailable')}</div>
+    return <div className="mini-fretboard-empty">{t('generator.noPositionsAvailable')}</div>
   }
 
   // Determine fret range
@@ -39,9 +47,10 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
   // For scales (which span all frets), limit to first position (frets 0-4)
   const startFret = hasOpenStrings ? 1 : Math.max(1, minFret)
   const maxDisplayFrets = 4
-  const endFret = mode === 'scale' && (maxFret - startFret) > maxDisplayFrets
-    ? startFret + maxDisplayFrets - 1
-    : Math.max(startFret + 3, maxFret)
+  const endFret =
+    mode === 'scale' && maxFret - startFret > maxDisplayFrets
+      ? startFret + maxDisplayFrets - 1
+      : Math.max(startFret + 3, maxFret)
 
   // Find root positions
   const isRootPosition = (stringIndex: number, fret: number): boolean => {
@@ -53,8 +62,8 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
   }
 
   // Filter positions to only include those within the display range
-  const displayPositions = positions.filter(p =>
-    p.fret === 0 || (p.fret >= startFret && p.fret <= endFret)
+  const displayPositions = positions.filter(
+    p => p.fret === 0 || (p.fret >= startFret && p.fret <= endFret)
   )
 
   const hasNoteAt = (stringIndex: number, fret: number): boolean => {
@@ -83,17 +92,18 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
         className="mini-fb"
         style={{
           width: `${totalWidth}px`,
-          height: `${totalHeight}px`
+          height: `${totalHeight}px`,
         }}
       >
         {/* Open string positions - individual boxes per string */}
-        {hasOpenStrings && Array.from({ length: stringCount }, (_, i) => (
-          <div
-            key={`open-pos-${i}`}
-            className="mini-fb-open-position"
-            style={{ top: `${14 + i * stringSpacing - 12}px` }}
-          />
-        ))}
+        {hasOpenStrings &&
+          Array.from({ length: stringCount }, (_, i) => (
+            <div
+              key={`open-pos-${i}`}
+              className="mini-fb-open-position"
+              style={{ top: `${14 + i * stringSpacing - 12}px` }}
+            />
+          ))}
 
         {/* Strings */}
         {Array.from({ length: stringCount }, (_, i) => (
@@ -155,28 +165,34 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
         ))}
 
         {/* Open string notes */}
-        {hasOpenStrings && Array.from({ length: stringCount }, (_, stringIndex) => {
-          if (!hasNoteAt(stringIndex, 0)) return null
-          const isRoot = isRootPosition(stringIndex, 0)
-          const noteClass = mode === 'chord'
-            ? (isRoot ? 'chord-root-note' : 'chord-note')
-            : (isRoot ? 'scale-root-note' : 'scale-note')
-          const noteName = getNoteName(stringIndex, 0)
-          const displayName = noteName
-          const isPlaying = playingNotes.includes(noteName)
-          return (
-            <div
-              key={`open-note-${stringIndex}`}
-              className={`mini-fb-note ${noteClass}${isPlaying ? ' playing' : ''}`}
-              style={{
-                left: `-3px`,
-                top: `${14 + stringIndex * stringSpacing - 10}px`
-              }}
-            >
-              <span className="note-name">{displayName}</span>
-            </div>
-          )
-        })}
+        {hasOpenStrings &&
+          Array.from({ length: stringCount }, (_, stringIndex) => {
+            if (!hasNoteAt(stringIndex, 0)) return null
+            const isRoot = isRootPosition(stringIndex, 0)
+            const noteClass =
+              mode === 'chord'
+                ? isRoot
+                  ? 'chord-root-note'
+                  : 'chord-note'
+                : isRoot
+                  ? 'scale-root-note'
+                  : 'scale-note'
+            const noteName = getNoteName(stringIndex, 0)
+            const displayName = noteName
+            const isPlaying = playingNotes.includes(noteName)
+            return (
+              <div
+                key={`open-note-${stringIndex}`}
+                className={`mini-fb-note ${noteClass}${isPlaying ? ' playing' : ''}`}
+                style={{
+                  left: `-3px`,
+                  top: `${14 + stringIndex * stringSpacing - 10}px`,
+                }}
+              >
+                <span className="note-name">{displayName}</span>
+              </div>
+            )
+          })}
 
         {/* Fretted notes */}
         {Array.from({ length: stringCount }, (_, stringIndex) =>
@@ -184,21 +200,26 @@ const MiniFretboard: React.FC<MiniFretboardProps> = ({ noteKeys, instrument, roo
             const fret = startFret + fretIdx
             if (!hasNoteAt(stringIndex, fret)) return null
             const isRoot = isRootPosition(stringIndex, fret)
-            const noteClass = mode === 'chord'
-              ? (isRoot ? 'chord-root-note' : 'chord-note')
-              : (isRoot ? 'scale-root-note' : 'scale-note')
+            const noteClass =
+              mode === 'chord'
+                ? isRoot
+                  ? 'chord-root-note'
+                  : 'chord-note'
+                : isRoot
+                  ? 'scale-root-note'
+                  : 'scale-note'
             const noteName = getNoteName(stringIndex, fret)
             const displayName = noteName
             const isPlaying = playingNotes.includes(noteName)
             // Push first fret notes to the right when showing frets 0-4
-            const firstFretOffset = (fretIdx === 0 && startFret === 1) ? 8 : 0
+            const firstFretOffset = fretIdx === 0 && startFret === 1 ? 8 : 0
             return (
               <div
                 key={`note-${stringIndex}-${fret}`}
                 className={`mini-fb-note ${noteClass}${isPlaying ? ' playing' : ''}`}
                 style={{
                   left: `${fretIdx * fretWidth + fretWidth / 2 - 10 + firstFretOffset}px`,
-                  top: `${14 + stringIndex * stringSpacing - 10}px`
+                  top: `${14 + stringIndex * stringSpacing - 10}px`,
                 }}
               >
                 <span className="note-name">{displayName}</span>

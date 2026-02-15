@@ -6,10 +6,10 @@ test.describe('Navigation', () => {
     await expect(page).toHaveTitle(/Keplear/)
   })
 
-  test('navigates to sandbox', async ({ page }) => {
+  test('navigates to generator', async ({ page }) => {
     await page.goto('/')
     await page.click('text=Start Training')
-    await expect(page).toHaveURL(/\/sandbox/)
+    await expect(page).toHaveURL(/\/generator/)
   })
 
   test('navigates to dashboard via header', async ({ page }) => {
@@ -29,7 +29,7 @@ test.describe('Navigation', () => {
   test('back button works', async ({ page }) => {
     await page.goto('/')
     await page.click('text=Start Training')
-    await expect(page).toHaveURL(/\/sandbox/)
+    await expect(page).toHaveURL(/\/generator/)
     await page.goBack()
     await expect(page).toHaveURL('/')
   })

@@ -1,5 +1,5 @@
-/**
- * Sandbox Page - Free play mode with optional pitch detection feedback
+﻿/**
+ * Generator Page - Free play mode with optional pitch detection feedback
  * Also includes Practice session functionality
  */
 
@@ -84,7 +84,7 @@ interface ScaleChordBoxData {
   boxIndex?: number
 }
 
-function Sandbox() {
+function Generator() {
   const { t } = useTranslation()
   const authContext = useContext(AuthContext)
   const user = authContext?.user ?? null
@@ -177,7 +177,7 @@ function Sandbox() {
   useEffect(() => {
     if (
       isTutorialActive &&
-      tutorialStepData?.id === 'sandbox-play' &&
+      tutorialStepData?.id === 'Generator-play' &&
       !tutorialDemoGenerated.current &&
       generatedMelody.length === 0 &&
       selectedNotes.length > 0
@@ -198,12 +198,12 @@ function Sandbox() {
     handleGenerateMelody,
   ])
 
-  // Auto-play melody when tutorial reaches 'sandbox-play' step
+  // Auto-play melody when tutorial reaches 'Generator-play' step
   const tutorialAutoPlayed = useRef(false)
   useEffect(() => {
     if (
       isTutorialActive &&
-      tutorialStepData?.id === 'sandbox-play' &&
+      tutorialStepData?.id === 'Generator-play' &&
       !tutorialAutoPlayed.current &&
       generatedMelody.length > 0 &&
       recordedAudioBlob &&
@@ -238,7 +238,7 @@ function Sandbox() {
       wasPlayingRef.current &&
       !isPlaying &&
       isTutorialActive &&
-      tutorialStepData?.id === 'sandbox-play'
+      tutorialStepData?.id === 'Generator-play'
     ) {
       setMelodyFinishedInTutorial(true)
     }
@@ -254,14 +254,14 @@ function Sandbox() {
     if (!isTutorialActive || !tutorialStepData) return false
 
     switch (tutorialStepData.id) {
-      case 'sandbox-instrument':
+      case 'Generator-instrument':
         return selectedNotes.length > 0
-      case 'sandbox-tempo-beats':
+      case 'Generator-tempo-beats':
         // Always complete - user can adjust if they want
         return true
-      case 'sandbox-generate':
+      case 'Generator-generate':
         return generatedMelody.length > 0
-      case 'sandbox-play':
+      case 'Generator-play':
         // Show Next when playing or finished
         return isPlaying || melodyFinishedInTutorial
       default:
@@ -281,8 +281,8 @@ function Sandbox() {
     if (!isTutorialActive || !tutorialStepData) return
 
     const shouldAutoAdvance =
-      (tutorialStepData.id === 'sandbox-generate' && generatedMelody.length > 0) ||
-      (tutorialStepData.id === 'sandbox-play' && melodyFinishedInTutorial)
+      (tutorialStepData.id === 'Generator-generate' && generatedMelody.length > 0) ||
+      (tutorialStepData.id === 'Generator-play' && melodyFinishedInTutorial)
 
     if (shouldAutoAdvance && lastAutoAdvancedStep.current !== tutorialStepData.id) {
       lastAutoAdvancedStep.current = tutorialStepData.id
@@ -589,7 +589,7 @@ function Sandbox() {
   }
 
   const handleExportToClassroom = () => {
-    // Build export data from current sandbox state
+    // Build export data from current Generator state
     const hasScales = scaleChordManagement.appliedScales.length > 0
     const hasChords = scaleChordManagement.appliedChords.length > 0
     const hasNotes = selectedNotes.length > 0
@@ -651,13 +651,13 @@ function Sandbox() {
       setShowAssignmentComplete(true)
     } else {
       // Show regular congratulations for free practice
-      const message = t('sandbox.congratulations')
+      const message = t('generator.congratulations')
       setCongratulationsMessage(message)
 
-      // Record sandbox practice session to Supabase
+      // Record Generator practice session to Supabase
       if (user?.id) {
         recordPracticeSession.mutate({
-          type: 'sandbox',
+          type: 'generator',
           instrument: instrument,
           melodiesCompleted: 1,
         })
@@ -671,15 +671,15 @@ function Sandbox() {
     handleBackToSelection()
   }, [handleBackToSelection])
 
-  // Handle Done button click - show animation for assignments, record for sandbox
+  // Handle Done button click - show animation for assignments, record for Generator
   const handleDoneClick = useCallback(() => {
     if (isFromAssignment) {
       setShowAssignmentComplete(true)
     } else {
-      // Record sandbox practice session to Supabase when user clicks Done
+      // Record Generator practice session to Supabase when user clicks Done
       if (user?.id) {
         recordPracticeSession.mutate({
-          type: 'sandbox',
+          type: 'generator',
           instrument: instrument,
           melodiesCompleted: 1,
         })
@@ -1623,11 +1623,11 @@ function Sandbox() {
       setupDetails
     ) {
       hasAnnouncedMelody.current = true
-      setMelodySetupMessage(t('sandbox.melodySetup'))
+      setMelodySetupMessage(t('generator.melodySetup'))
     }
   }, [welcomeSpeechDone, generatedMelody, recordedAudioBlob, setupDetails, t])
 
-  // If loading from assignment, show nothing (prevents flash of sandbox mode)
+  // If loading from assignment, show nothing (prevents flash of Generator mode)
   if (isLoadingFromAssignment) {
     return null
   }
@@ -1635,7 +1635,7 @@ function Sandbox() {
   // If session started, show the practice session UI
   if (sessionStarted && selectedInstrument) {
     const instrumentName = instrumentNames[selectedInstrument] || 'Instrument'
-    const welcomeMessage = t('sandbox.welcomeToLesson', { instrument: instrumentName })
+    const welcomeMessage = t('generator.welcomeToLesson', { instrument: instrumentName })
 
     // Calculate octave range for keyboard based on lesson settings
     // Default keyboard range is 4-5
@@ -1660,16 +1660,16 @@ function Sandbox() {
           <button
             className={styles.backButton}
             onClick={handleBackToSelection}
-            aria-label={t('sandbox.endSession')}
+            aria-label={t('generator.endSession')}
           >
-            {t('sandbox.endSession')}
+            {t('generator.endSession')}
           </button>
           <button
             className={styles.doneButton}
             onClick={handleDoneClick}
-            aria-label={t('sandbox.done')}
+            aria-label={t('generator.done')}
           >
-            {t('sandbox.done')}
+            {t('generator.done')}
           </button>
         </div>
 
@@ -1773,7 +1773,7 @@ function Sandbox() {
       >
         <div className={styles.assignModal}>
           <div className={styles.assignModalHeader}>
-            <h2 className={styles.assignModalTitle}>{t('sandbox.createAssignment')}</h2>
+            <h2 className={styles.assignModalTitle}>{t('generator.createAssignment')}</h2>
             <button
               className={styles.assignModalClose}
               onClick={handleCloseAssignModal}
@@ -1788,7 +1788,7 @@ function Sandbox() {
 
             <div className={styles.assignModalField}>
               <label className={styles.assignModalLabel} htmlFor="assignmentTitle">
-                {t('sandbox.assignmentTitle')}
+                {t('generator.assignmentTitle')}
               </label>
               <input
                 id="assignmentTitle"
@@ -1796,7 +1796,7 @@ function Sandbox() {
                 className={styles.assignModalInput}
                 value={assignmentTitle}
                 onChange={e => setAssignmentTitle(e.target.value)}
-                placeholder={t('sandbox.enterAssignmentTitle')}
+                placeholder={t('generator.enterAssignmentTitle')}
                 autoFocus
                 disabled={isSavingAssignment}
               />
@@ -1804,19 +1804,19 @@ function Sandbox() {
 
             <div className={styles.assignModalInfo}>
               <p>
-                <strong>{t('sandbox.instrument')}:</strong> {instrumentNames[instrument]}
+                <strong>{t('generator.instrument')}:</strong> {instrumentNames[instrument]}
               </p>
               <p>
-                <strong>{t('sandbox.bpm')}:</strong> {bpm}
+                <strong>{t('generator.bpm')}:</strong> {bpm}
               </p>
               <p>
-                <strong>{t('sandbox.beats')}:</strong> {numberOfBeats}
+                <strong>{t('generator.beats')}:</strong> {numberOfBeats}
               </p>
               <p>
-                <strong>{t('sandbox.type')}:</strong>{' '}
+                <strong>{t('generator.type')}:</strong>{' '}
                 {scaleChordManagement.appliedChords.length > 0
-                  ? t('sandbox.chords')
-                  : t('sandbox.melodies')}
+                  ? t('generator.chords')
+                  : t('generator.melodies')}
               </p>
             </div>
 
@@ -1825,7 +1825,7 @@ function Sandbox() {
               onClick={handleSaveAssignment}
               disabled={isSavingAssignment || !assignmentTitle.trim()}
             >
-              {isSavingAssignment ? t('sandbox.saving') : t('sandbox.createAssignment')}
+              {isSavingAssignment ? t('generator.saving') : t('generator.createAssignment')}
             </button>
           </div>
         </div>
@@ -1833,18 +1833,18 @@ function Sandbox() {
       document.body
     )
 
-  // Default: Free play sandbox mode
+  // Default: Free play Generator mode
   return (
     <>
       <SEOHead
-        title="Sandbox"
-        description="Free play ear training sandbox. Select notes, generate melodies, and practice with keyboard, guitar, or bass."
-        path="/sandbox"
+        title="generator"
+        description="Free play ear training Generator. Select notes, generate melodies, and practice with keyboard, guitar, or bass."
+        path="/generator"
       />
       {/* Assignment mode buttons - only show when coming from Classroom page */}
       {assigningToClassroomId && (
         <div className={styles.assignmentModeBar}>
-          <span className={styles.assignmentModeText}>{t('sandbox.assignmentEditor')}</span>
+          <span className={styles.assignmentModeText}>{t('generator.assignmentEditor')}</span>
           <div className={styles.assignmentModeButtons}>
             <button className={styles.assignmentCancelButton} onClick={handleCancelAssignment}>
               {t('common.cancel')}
@@ -1909,7 +1909,7 @@ function Sandbox() {
           scaleChordManagement.appliedChords.length > 0
         }
         onLessonComplete={handleLessonComplete}
-        autoStartFeedback={isTutorialActive && tutorialStepData?.id === 'sandbox-play'}
+        autoStartFeedback={isTutorialActive && tutorialStepData?.id === 'Generator-play'}
       />
 
       {assignTitleModal}
@@ -1930,4 +1930,4 @@ function Sandbox() {
   )
 }
 
-export default Sandbox
+export default Generator

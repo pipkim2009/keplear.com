@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Dashboard Data Hook
  * Encapsulates all dashboard data fetching from Supabase
  */
@@ -38,7 +38,7 @@ export interface PendingAssignment {
 
 export interface ActivityItem {
   id: string
-  type: 'completion' | 'class_join' | 'sandbox'
+  type: 'completion' | 'class_join' | 'generator'
   title: string
   subtitle: string
   timestamp: string
@@ -228,7 +228,7 @@ export function useDashboardData(userId: string | undefined, timeRange: TimeRang
       const recentSessions = await fetchRecentPracticeSessions(userId, 50)
       const sessionsByKey = new Map<
         string,
-        { count: number; timestamp: string; instrument: string; type: 'sandbox' | 'classroom' }
+        { count: number; timestamp: string; instrument: string; type: 'generator' | 'classroom' }
       >()
 
       recentSessions.forEach((session: PracticeSession) => {
@@ -253,9 +253,9 @@ export function useDashboardData(userId: string | undefined, timeRange: TimeRang
       sessionsByKey.forEach((sessionData, key) => {
         activities.push({
           id: `${sessionData.type}-${key}`,
-          type: sessionData.type === 'sandbox' ? 'sandbox' : 'completion',
+          type: sessionData.type === 'generator' ? 'generator' : 'completion',
           title: `Completed ${sessionData.count} ${sessionData.count === 1 ? 'melody' : 'melodies'}`,
-          subtitle: `${sessionData.instrument} in ${sessionData.type === 'sandbox' ? 'Sandbox' : 'Classroom'}`,
+          subtitle: `${sessionData.instrument} in ${sessionData.type === 'generator' ? 'generator' : 'Classroom'}`,
           timestamp: sessionData.timestamp,
           count: sessionData.count,
           instrument: sessionData.instrument,

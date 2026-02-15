@@ -1,6 +1,6 @@
-/**
+﻿/**
  * Tutorial Overlay Component
- * Interactive spotlight overlay that guides users through the Sandbox UI
+ * Interactive spotlight overlay that guides users through the Generator UI
  */
 
 import { useState, useEffect, useCallback } from 'react'
@@ -46,7 +46,7 @@ function getSpotlightPosition(target: string): SpotlightPosition | null {
       ],
       '[class*="statsSection"]': ['[class*="stats"]', '[class*="activity"]'],
       '[class*="classesSection"]': ['[class*="classes"]', '[class*="classrooms"]'],
-      // Sandbox fallbacks
+      // Generator fallbacks
       '.keyboard-container, .guitar-container, .bass-container': [
         '.keyboard-container',
         '.guitar-container',

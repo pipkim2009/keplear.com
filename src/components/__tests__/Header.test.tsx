@@ -13,7 +13,7 @@ vi.mock('../../hooks/useAuth', () => ({
 
 vi.mock('../../contexts/InstrumentContext', () => ({
   useInstrument: () => ({
-    navigateToSandbox: vi.fn(),
+    navigateToGenerator: vi.fn(),
   }),
 }))
 
@@ -23,7 +23,7 @@ vi.mock('../../contexts/TranslationContext', () => ({
       const translations: Record<string, string> = {
         'nav.home': 'Home',
         'nav.dashboard': 'Dashboard',
-        'nav.sandbox': 'Sandbox',
+        'nav.generator': 'Generator',
         'nav.songs': 'Songs',
         'nav.classroom': 'Classroom',
         'auth.signIn': 'Sign In',
@@ -88,7 +88,7 @@ describe('Header', () => {
 
     expect(screen.getByAltText('Keplear')).toBeInTheDocument()
     expect(screen.getByText('Home')).toBeInTheDocument()
-    expect(screen.getByText('Sandbox')).toBeInTheDocument()
+    expect(screen.getByText('Generator')).toBeInTheDocument()
     expect(screen.getByText('Songs')).toBeInTheDocument()
     expect(screen.getByText('Classroom')).toBeInTheDocument()
   })

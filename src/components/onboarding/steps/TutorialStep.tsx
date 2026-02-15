@@ -1,4 +1,4 @@
-import { PiPlayFill, PiSparkle, PiRocketLaunch } from 'react-icons/pi'
+﻿import { PiPlayFill, PiSparkle, PiRocketLaunch } from 'react-icons/pi'
 import styles from '../Onboarding.module.css'
 
 interface TutorialStepProps {
@@ -11,7 +11,7 @@ interface TutorialStepProps {
 
 /**
  * Third onboarding step - offers interactive tutorial
- * User can start the interactive tutorial or skip to sandbox
+ * User can start the interactive tutorial or skip to Generator
  */
 const TutorialStep = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -28,7 +28,7 @@ const TutorialStep = ({
           <PiSparkle />
         </span>
         <h2 className={styles.stepTitle}>You're All Set!</h2>
-        <p className={styles.stepDescription}>Would you like a quick tour of the sandbox?</p>
+        <p className={styles.stepDescription}>Would you like a quick tour of the Generator?</p>
       </div>
 
       <div className={styles.tutorialContent}>

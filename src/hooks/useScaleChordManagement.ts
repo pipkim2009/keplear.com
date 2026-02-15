@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+﻿import { useState, useEffect, useCallback } from 'react'
 import type { Note } from '../utils/notes'
 import type { GuitarScale, ScaleBox } from '../utils/instruments/guitar/guitarScales'
 import type { BassScale, BassScaleBox } from '../utils/instruments/bass/bassScales'
@@ -673,10 +673,10 @@ export const useScaleChordManagement = ({
     setAppliedChords([])
   }, [instrument, chordHandlers, bassChordHandlers])
 
-  // Guitar chord apply handler - uses the same chord box system as sandbox mode
+  // Guitar chord apply handler - uses the same chord box system as Generator mode
   const handleGuitarChordApply = useCallback(
     (rootNote: string, chord: GuitarChord, boxIndex: number = 0) => {
-      // Get chord boxes (same as sandbox mode)
+      // Get chord boxes (same as Generator mode)
       const chordBoxes = getChordBoxes(rootNote, chord, guitarNotes)
 
       if (chordBoxes.length === 0) {
@@ -687,7 +687,7 @@ export const useScaleChordManagement = ({
       const actualBoxIndex = Math.min(boxIndex, chordBoxes.length - 1)
       const chordBox = chordBoxes[actualBoxIndex]
 
-      // Create chord shape from box - exactly like sandbox mode does
+      // Create chord shape from box - exactly like Generator mode does
       const chordShapeFromBox = {
         name: `${rootNote} ${chord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
         minFret: chordBox.minFret,
@@ -698,16 +698,16 @@ export const useScaleChordManagement = ({
         fretZone: actualBoxIndex, // Store the fret zone for export
       }
 
-      // Use handleChordShapeSelect - same as sandbox mode
+      // Use handleChordShapeSelect - same as Generator mode
       handleChordShapeSelect(chordShapeFromBox as ChordShape & { root?: string; fretZone?: number })
     },
     [handleChordShapeSelect]
   )
 
-  // Bass chord apply handler - uses the same chord box system as sandbox mode
+  // Bass chord apply handler - uses the same chord box system as Generator mode
   const handleBassChordApply = useCallback(
     (rootNote: string, chord: BassChord, boxIndex: number = 0) => {
-      // Get chord boxes (same as sandbox mode)
+      // Get chord boxes (same as Generator mode)
       const chordBoxes = getBassChordBoxes(rootNote, chord, bassNotes)
 
       if (chordBoxes.length === 0) {
@@ -718,7 +718,7 @@ export const useScaleChordManagement = ({
       const actualBoxIndex = Math.min(boxIndex, chordBoxes.length - 1)
       const chordBox = chordBoxes[actualBoxIndex]
 
-      // Create chord shape from box - exactly like sandbox mode does
+      // Create chord shape from box - exactly like Generator mode does
       const bassChordShapeFromBox = {
         name: `${rootNote} ${chord.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
         minFret: chordBox.minFret,
@@ -729,7 +729,7 @@ export const useScaleChordManagement = ({
         fretZone: actualBoxIndex, // Store the fret zone for export
       }
 
-      // Use handleChordShapeSelect - same as sandbox mode
+      // Use handleChordShapeSelect - same as Generator mode
       handleChordShapeSelect(
         bassChordShapeFromBox as unknown as ChordShape & { root?: string; fretZone?: number }
       )

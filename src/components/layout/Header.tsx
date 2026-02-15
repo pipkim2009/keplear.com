@@ -1,9 +1,11 @@
-import { useState, useCallback, memo } from 'react'
+﻿import { useState, useCallback, memo } from 'react'
 import { Link, useLocation } from 'react-router'
+import { PiMagnifyingGlass } from 'react-icons/pi'
 import { useAuth } from '../../hooks/useAuth'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import ThemeToggle from '../common/ThemeToggle'
+import SearchOverlay from '../common/SearchOverlay'
 import AuthModal from '../auth/AuthModal'
 import UserMenu from '../auth/UserMenu'
 import logo from '/Keplear-logo.webp'
@@ -16,9 +18,10 @@ interface HeaderProps {
 
 const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) {
   const location = useLocation()
-  const { navigateToSandbox } = useInstrument()
+  const { navigateToGenerator } = useInstrument()
   const { user, loading } = useAuth()
   const { t } = useTranslation()
+  const [showSearch, setShowSearch] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authForm, setAuthForm] = useState<'login' | 'signup'>('login')
 
@@ -38,10 +41,10 @@ const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) 
     setShowAuthModal(false)
   }, [])
 
-  // Sandbox link resets instrument state before navigating
-  const handleSandboxClick = useCallback(() => {
-    navigateToSandbox()
-  }, [navigateToSandbox])
+  // Generator link resets instrument state before navigating
+  const handleGeneratorClick = useCallback(() => {
+    navigateToGenerator()
+  }, [navigateToGenerator])
 
   return (
     <header className="header">
@@ -66,9 +69,15 @@ const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) 
             </Link>
           )}
           <Link
+            to="/generator"
+            className={`nav-link ${currentPath === '/generator' ? 'nav-link-active' : ''}`}
+            onClick={handleGeneratorClick}
+          >
+            {t('nav.generator')}
+          </Link>
+          <Link
             to="/sandbox"
             className={`nav-link ${currentPath === '/sandbox' ? 'nav-link-active' : ''}`}
-            onClick={handleSandboxClick}
           >
             {t('nav.sandbox')}
           </Link>
@@ -111,6 +120,17 @@ const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) 
         </nav>
 
         <div className="header-right">
+          {showSearch ? (
+            <SearchOverlay isOpen={showSearch} onClose={() => setShowSearch(false)} />
+          ) : (
+            <button
+              className="search-btn"
+              onClick={() => setShowSearch(true)}
+              aria-label={t('common.search')}
+            >
+              <PiMagnifyingGlass size={18} />
+            </button>
+          )}
           <ThemeToggle isDarkMode={isDarkMode} onToggle={onToggleTheme} />
 
           {!loading && (
