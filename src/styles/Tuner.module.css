@@ -1,0 +1,371 @@
+/* ========================================
+   TUNER PAGE STYLES
+   ======================================== */
+
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.headerSection {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.pageTitle {
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.pageSubtitle {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--dark-text-secondary);
+  margin: 0;
+  max-width: 700px;
+  line-height: 1.6;
+}
+
+/* ========================================
+   STRING REFERENCE
+   ======================================== */
+
+.stringsSection {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.stringDot {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--dark-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.stringDot:hover {
+  opacity: 0.75;
+}
+
+.stringDot.stringSelected {
+  opacity: 1;
+  border-color: var(--primary-purple);
+  border-width: 3px;
+}
+
+.stringDot.stringActive {
+  opacity: 1;
+  border-color: var(--primary-purple);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+}
+
+.stringDot.stringInTune {
+  border-color: #27ae60;
+  box-shadow: 0 0 12px rgba(39, 174, 96, 0.4);
+}
+
+.stringNote {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--dark-text-primary);
+}
+
+.stringDot.stringInTune .stringNote {
+  color: #27ae60;
+}
+
+/* ========================================
+   GAUGE
+   ======================================== */
+
+.gauge {
+  position: relative;
+  width: 100%;
+  max-width: 350px;
+  padding: 1.5rem 0 1.8rem;
+}
+
+.gaugeTicks {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 32px;
+  padding: 0 4px;
+}
+
+.tick {
+  width: 2px;
+  height: 12px;
+  background: var(--dark-text-secondary);
+  opacity: 0.25;
+  border-radius: 1px;
+}
+
+.tick.tickMajor {
+  height: 20px;
+  opacity: 0.4;
+}
+
+.tick.tickCenter {
+  height: 28px;
+  width: 3px;
+  opacity: 0.6;
+  background: var(--primary-purple);
+}
+
+.needle {
+  position: absolute;
+  top: 0.5rem;
+  width: 4px;
+  height: 40px;
+  background: var(--primary-purple);
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: left 0.12s ease-out;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+}
+
+.gaugeLabels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.4rem;
+}
+
+.gaugeLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--dark-text-secondary);
+  text-transform: uppercase;
+}
+
+/* ========================================
+   NOTE DISPLAY
+   ======================================== */
+
+.noteSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.noteName {
+  font-size: 5rem;
+  font-weight: 800;
+  color: var(--dark-text-primary);
+  line-height: 1;
+}
+
+.noteOctave {
+  font-size: 2rem;
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+.centsDisplay {
+  font-size: 1.2rem;
+  font-weight: 600;
+  padding: 0.3rem 1rem;
+  border-radius: 8px;
+}
+
+.centsDisplay.inTune {
+  color: #27ae60;
+  background: rgba(39, 174, 96, 0.12);
+}
+
+.centsDisplay.sharp {
+  color: #e74c3c;
+  background: rgba(231, 76, 60, 0.12);
+}
+
+.centsDisplay.flat {
+  color: #f39c12;
+  background: rgba(243, 156, 18, 0.12);
+}
+
+.frequencyDisplay {
+  font-size: 0.9rem;
+  color: var(--dark-text-secondary);
+  font-weight: 500;
+}
+
+.waitingText {
+  font-size: 1.2rem;
+  color: var(--dark-text-secondary);
+  font-weight: 500;
+  padding: 2rem 0;
+}
+
+/* ========================================
+   VOLUME INDICATOR
+   ======================================== */
+
+.volumeIndicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  width: 100%;
+  max-width: 350px;
+}
+
+.volumeLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dark-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 60px;
+}
+
+.volumeBar {
+  flex: 1;
+  height: 8px;
+  background: rgba(148, 163, 184, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.volumeFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-500), var(--green-100));
+  border-radius: 4px;
+  transition: width 0.05s ease-out;
+}
+
+.volumeValue {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dark-text-secondary);
+  min-width: 35px;
+  text-align: right;
+}
+
+/* ========================================
+   ACTION BUTTON
+   ======================================== */
+
+.startBtn {
+  padding: 0.8rem 2.5rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary-purple);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.startBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.startBtn.listening {
+  background: #e74c3c;
+}
+
+.errorText {
+  color: #e74c3c;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 767px) {
+  .container {
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
+  }
+
+  .pageTitle {
+    font-size: 2rem;
+  }
+
+  .pageSubtitle {
+    font-size: 1rem;
+  }
+
+  .noteName {
+    font-size: 4rem;
+  }
+
+  .gauge {
+    max-width: 280px;
+  }
+
+  .volumeIndicator {
+    padding: 8px 12px;
+  }
+
+  .volumeLabel {
+    font-size: 10px;
+    min-width: 50px;
+  }
+
+  .volumeBar {
+    height: 6px;
+  }
+
+  .volumeValue {
+    font-size: 10px;
+    min-width: 30px;
+  }
+}
+
+/* ========================================
+   LIGHT MODE OVERRIDES
+   ======================================== */
+
+:global(body.light) .pageSubtitle {
+  color: var(--gray-700);
+}
+
+:global(body.light) .waitingText {
+  color: var(--gray-600);
+}
+
+:global(body.light) .volumeLabel {
+  color: var(--gray-600);
+}
+
+:global(body.light) .volumeValue {
+  color: var(--gray-600);
+}
+
+:global(body.light) .frequencyDisplay {
+  color: var(--gray-600);
+}
+
+:global(body.light) .gaugeLabel {
+  color: var(--gray-600);
+}

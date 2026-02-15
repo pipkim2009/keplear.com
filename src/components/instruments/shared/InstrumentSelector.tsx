@@ -1,68 +1,56 @@
-import { memo, useMemo, useCallback } from 'react'
+import { memo, useMemo, useEffect } from 'react'
 import { useInstrumentType } from '../../../hooks'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
-import { IoMusicalNotes } from 'react-icons/io5'
 import { useTranslation } from '../../../contexts/TranslationContext'
+import '../../../styles/components/InstrumentSelector.css'
 
-const INSTRUMENTS = [
+type InstrumentValue = 'keyboard' | 'guitar' | 'bass'
+
+const ALL_INSTRUMENTS = [
   { value: 'keyboard' as const, labelKey: 'sandbox.keyboard', icon: PiPianoKeysFill },
   { value: 'guitar' as const, labelKey: 'sandbox.guitar', icon: GiGuitarHead },
   { value: 'bass' as const, labelKey: 'sandbox.bass', icon: GiGuitarBassHead },
 ] as const
 
-/**
- * Component for selecting different instruments
- * Extracted from InstrumentControls for better modularity
- * Optimized with memo, useMemo, and focused context hook
- */
-const InstrumentSelector = memo(function InstrumentSelector() {
+interface InstrumentSelectorProps {
+  exclude?: InstrumentValue[]
+}
+
+const InstrumentSelector = memo(function InstrumentSelector({ exclude }: InstrumentSelectorProps) {
   const { t } = useTranslation()
-  // Use focused instrument type hook instead of full context
   const { instrument, handleInstrumentChange } = useInstrumentType()
 
-  // Memoize click handlers to prevent recreation on every render
-  const handleKeyboardClick = useCallback(
-    () => handleInstrumentChange('keyboard'),
-    [handleInstrumentChange]
-  )
-  const handleGuitarClick = useCallback(
-    () => handleInstrumentChange('guitar'),
-    [handleInstrumentChange]
-  )
-  const handleBassClick = useCallback(
-    () => handleInstrumentChange('bass'),
-    [handleInstrumentChange]
+  const instruments = useMemo(
+    () =>
+      exclude ? ALL_INSTRUMENTS.filter(inst => !exclude.includes(inst.value)) : ALL_INSTRUMENTS,
+    [exclude]
   )
 
-  const handlers = useMemo(
-    () => ({
-      keyboard: handleKeyboardClick,
-      guitar: handleGuitarClick,
-      bass: handleBassClick,
-    }),
-    [handleKeyboardClick, handleGuitarClick, handleBassClick]
-  )
+  // If the current instrument is excluded, auto-select the first available one
+  useEffect(() => {
+    if (exclude?.includes(instrument as InstrumentValue) && instruments.length > 0) {
+      handleInstrumentChange(instruments[0].value)
+    }
+  }, [instrument, exclude, instruments, handleInstrumentChange])
 
   return (
-    <div className="instrument-selector">
-      <h3>
-        <IoMusicalNotes /> {t('sandbox.chooseInstrument')}
-      </h3>
-      <div className="instrument-options">
-        {INSTRUMENTS.map(inst => {
+    <div className="control-group instrument-selector-group">
+      <div className="instrument-selector desktop-selector">
+        {instruments.map(inst => {
           const Icon = inst.icon
           return (
-            <button
+            <div
               key={inst.value}
-              className={`instrument-button ${instrument === inst.value ? 'active' : ''}`}
-              onClick={handlers[inst.value]}
+              className={`instrument-card ${inst.value}-theme ${instrument === inst.value ? 'active' : ''}`}
+              onClick={() => handleInstrumentChange(inst.value)}
             >
-              <span className="instrument-emoji">
+              <div className="instrument-icon">
                 <Icon />
-              </span>
-              <span className="instrument-name">{t(inst.labelKey)}</span>
-            </button>
+              </div>
+              <div className="instrument-name">{t(inst.labelKey)}</div>
+              <div className="instrument-glow"></div>
+            </div>
           )
         })}
       </div>

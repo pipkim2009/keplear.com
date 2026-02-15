@@ -30,7 +30,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, var(--primary-purple-alpha-10), var(--primary-purple-alpha-5));
+  background: linear-gradient(
+    145deg,
+    var(--primary-purple-alpha-10),
+    var(--primary-purple-alpha-5)
+  );
   border: 2px solid var(--primary-purple-alpha-30);
   border-radius: 16px;
   padding: 20px;
@@ -166,3 +170,66 @@
 }
 
 /* Note: Animations pulse and bounce are defined in enhanced-effects.css */
+
+/* ========================================
+   Explicit theme classes
+   Override nth-child theming so colors stay
+   correct when instruments are excluded.
+   ======================================== */
+
+/* Keyboard - Blue (doubled class for higher specificity over nth-child) */
+.instrument-card.instrument-card.keyboard-theme {
+  background: linear-gradient(145deg, var(--blue-alpha-10), var(--blue-alpha-05));
+  border-color: var(--blue-alpha-30);
+}
+.instrument-card.instrument-card.keyboard-theme:hover {
+  border-color: var(--blue-alpha-60);
+}
+.instrument-card.instrument-card.keyboard-theme.active {
+  background: linear-gradient(145deg, var(--blue-alpha-30), var(--blue-alpha-20));
+  border-color: var(--blue-500);
+}
+.instrument-card.instrument-card.keyboard-theme .instrument-icon {
+  color: var(--blue-500);
+}
+.instrument-card.instrument-card.keyboard-theme .instrument-glow {
+  background: radial-gradient(circle, var(--blue-alpha-20) 0%, transparent 70%);
+}
+
+/* Guitar - Green */
+.instrument-card.instrument-card.guitar-theme {
+  background: linear-gradient(145deg, var(--green-alpha-10), var(--green-alpha-05));
+  border-color: var(--green-alpha-30);
+}
+.instrument-card.instrument-card.guitar-theme:hover {
+  border-color: var(--green-alpha-60);
+}
+.instrument-card.instrument-card.guitar-theme.active {
+  background: linear-gradient(145deg, var(--green-alpha-30), var(--green-alpha-20));
+  border-color: var(--green-500);
+}
+.instrument-card.instrument-card.guitar-theme .instrument-icon {
+  color: var(--green-500);
+}
+.instrument-card.instrument-card.guitar-theme .instrument-glow {
+  background: radial-gradient(circle, var(--green-alpha-20) 0%, transparent 70%);
+}
+
+/* Bass - Red */
+.instrument-card.instrument-card.bass-theme {
+  background: linear-gradient(145deg, var(--red-alpha-10), var(--red-alpha-05));
+  border-color: var(--red-alpha-30);
+}
+.instrument-card.instrument-card.bass-theme:hover {
+  border-color: var(--red-alpha-60);
+}
+.instrument-card.instrument-card.bass-theme.active {
+  background: linear-gradient(145deg, var(--red-alpha-30), var(--red-alpha-20));
+  border-color: var(--red-500);
+}
+.instrument-card.instrument-card.bass-theme .instrument-icon {
+  color: var(--red-500);
+}
+.instrument-card.instrument-card.bass-theme .instrument-glow {
+  background: radial-gradient(circle, var(--red-alpha-20) 0%, transparent 70%);
+}

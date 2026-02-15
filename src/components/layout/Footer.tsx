@@ -15,6 +15,32 @@ function Footer() {
         <div className="footer-main">
           <div className="footer-brand">
             <img src={logo} alt="Keplear" className="footer-logo" />
+            <nav className="footer-nav">
+              <Link to="/dashboard" className="footer-nav-link">
+                {t('nav.dashboard')}
+              </Link>
+              <Link to="/sandbox" className="footer-nav-link">
+                {t('nav.sandbox')}
+              </Link>
+              <Link to="/songs" className="footer-nav-link">
+                {t('nav.songs')}
+              </Link>
+              <Link to="/instruments" className="footer-nav-link">
+                {t('nav.instrument')}
+              </Link>
+              <Link to="/isolater" className="footer-nav-link">
+                {t('nav.stems')}
+              </Link>
+              <Link to="/classroom" className="footer-nav-link">
+                {t('nav.classroom')}
+              </Link>
+              <Link to="/metronome" className="footer-nav-link">
+                {t('nav.metronome')}
+              </Link>
+              <Link to="/tuner" className="footer-nav-link">
+                {t('nav.tuner')}
+              </Link>
+            </nav>
           </div>
 
           <div className="footer-info">

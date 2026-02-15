@@ -5,8 +5,10 @@
     "sandbox": "Sandbox",
     "songs": "Songs",
     "stems": "Isolater",
-    "instrument": "Instrument",
-    "classroom": "Classroom"
+    "instrument": "Instruments",
+    "classroom": "Classroom",
+    "metronome": "Metronome",
+    "tuner": "Tuner"
   },
   "auth": {
     "signIn": "Sign In",
@@ -222,8 +224,30 @@
     "reset": "Reset"
   },
   "instrument": {
-    "title": "Instrument",
-    "subtitle": "Play virtual keyboard, guitar, and bass instruments"
+    "title": "Instruments",
+    "subtitle": "Virtual keyboard, guitar, and bass"
+  },
+  "metronome": {
+    "title": "Metronome",
+    "subtitle": "Keep perfect time with an adjustable metronome",
+    "bpm": "BPM",
+    "timeSignature": "Time Signature",
+    "start": "Start",
+    "stop": "Stop",
+    "tapTempo": "Tap Tempo"
+  },
+  "tuner": {
+    "title": "Tuner",
+    "subtitle": "Tune your instrument with real-time pitch detection",
+    "start": "Start Tuner",
+    "stop": "Stop Tuner",
+    "low": "Low",
+    "high": "High",
+    "cents": "cents",
+    "inTune": "In Tune",
+    "waitingForInput": "Play a note...",
+    "micDenied": "Microphone access denied. Please allow microphone access in your browser settings.",
+    "volume": "Volume"
   },
   "songs": {
     "title": "Songs",

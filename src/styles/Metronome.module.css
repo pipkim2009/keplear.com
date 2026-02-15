@@ -1,0 +1,396 @@
+/* ========================================
+   METRONOME PAGE STYLES
+   ======================================== */
+
+.container {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+.headerSection {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+  width: 100%;
+}
+
+.pageTitle {
+  font-size: 3rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+}
+
+.pageSubtitle {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: var(--dark-text-secondary);
+  margin: 0;
+  max-width: 700px;
+  line-height: 1.6;
+}
+
+/* ========================================
+   BEAT INDICATOR
+   ======================================== */
+
+.beatIndicator {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 1.5rem 0;
+  width: 100%;
+}
+
+.beatDot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--dark-text-secondary);
+  opacity: 0.3;
+  transition: all 0.08s ease;
+}
+
+.beatDot.active {
+  opacity: 1;
+  background: var(--primary-purple);
+  transform: scale(1.3);
+  box-shadow: 0 0 12px var(--primary-purple);
+}
+
+.beatDot.accent {
+  width: 30px;
+  height: 30px;
+}
+
+.beatDot.accent.active {
+  background: var(--primary-purple-light);
+  box-shadow: 0 0 18px var(--primary-purple-light);
+}
+
+/* ========================================
+   BPM DISPLAY & CONTROLS
+   ======================================== */
+
+.bpmSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.bpmRow {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.bpmDisplay {
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--dark-text-primary);
+  line-height: 1;
+  min-width: 120px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.bpmDisplay:hover {
+  color: var(--primary-purple);
+}
+
+.bpmInput {
+  font-size: 4rem;
+  font-weight: 800;
+  color: var(--dark-text-primary);
+  line-height: 1;
+  width: 140px;
+  text-align: center;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid var(--primary-purple);
+  outline: none;
+  -moz-appearance: textfield;
+}
+
+.bpmInput::-webkit-outer-spin-button,
+.bpmInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.bpmLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--dark-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.bpmSlider {
+  width: 100%;
+  max-width: 400px;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+
+.bpmSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #a855f7;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+}
+
+.bpmSlider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #a855f7;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
+}
+
+.bpmSlider::-moz-range-progress {
+  background: #a855f7;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.bpmBtn {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--dark-text-secondary);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dark-text-primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.bpmBtn:hover {
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+}
+
+/* ========================================
+   TIME SIGNATURE SELECTOR
+   ======================================== */
+
+.tsSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.tsLabel {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--dark-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.tsGrid {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.tsBtn {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--dark-text-secondary);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--dark-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tsBtn:hover {
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+}
+
+.tsBtn.active {
+  background: var(--primary-purple);
+  border-color: var(--primary-purple);
+  color: #fff;
+}
+
+/* ========================================
+   CUSTOM TIME SIGNATURE
+   ======================================== */
+
+.customTs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.customTsInput {
+  width: 48px;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--dark-text-secondary);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dark-text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.customTsInput:focus {
+  border-color: var(--primary-purple);
+}
+
+.customTsInput::-webkit-outer-spin-button,
+.customTsInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.customTsInput {
+  -moz-appearance: textfield;
+}
+
+.customTsSeparator {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dark-text-secondary);
+}
+
+/* ========================================
+   ACTION BUTTONS
+   ======================================== */
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding-top: 1rem;
+}
+
+.startBtn {
+  padding: 0.8rem 2.5rem;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary-purple);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.startBtn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.startBtn.playing {
+  background: #e74c3c;
+}
+
+.tapBtn {
+  padding: 0.8rem 1.5rem;
+  border: 2px solid var(--primary-purple);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--primary-purple);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tapBtn:hover {
+  background: var(--primary-purple);
+  color: #fff;
+}
+
+.tapBtn:active {
+  transform: scale(0.95);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 767px) {
+  .container {
+    padding: 1.5rem 1rem;
+    gap: 1.5rem;
+  }
+
+  .pageTitle {
+    font-size: 2rem;
+  }
+
+  .pageSubtitle {
+    font-size: 1rem;
+  }
+
+  .bpmDisplay {
+    font-size: 3rem;
+  }
+
+  .beatDot {
+    width: 18px;
+    height: 18px;
+  }
+
+  .beatDot.accent {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ========================================
+   LIGHT MODE OVERRIDES
+   ======================================== */
+
+:global(body.light) .pageSubtitle {
+  color: var(--gray-700);
+}
+
+:global(body.light) .bpmLabel {
+  color: var(--gray-600);
+}
+
+:global(body.light) .tsLabel {
+  color: var(--gray-600);
+}

@@ -40,7 +40,7 @@ export default function Instruments() {
       <SEOHead
         title={t('instrument.title')}
         description={t('instrument.subtitle')}
-        path="/instrument"
+        path="/instruments"
       />
 
       <div className={styles.headerSection}>

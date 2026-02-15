@@ -27,24 +27,26 @@ describe('InstrumentSelector', () => {
   it('renders all instrument options', () => {
     render(<InstrumentSelector />)
 
-    expect(screen.getByText('Choose Your Instrument')).toBeInTheDocument()
-    expect(screen.getByText('Keyboard')).toBeInTheDocument()
-    expect(screen.getByText('Guitar')).toBeInTheDocument()
-    expect(screen.getByText('Bass')).toBeInTheDocument()
+    const names = screen.getAllByText('Keyboard')
+    expect(names.length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Guitar').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText('Bass').length).toBeGreaterThanOrEqual(1)
   })
 
   it('marks the current instrument as active', () => {
     render(<InstrumentSelector />)
 
-    const keyboardButton = screen.getByText('Keyboard').closest('button')
-    expect(keyboardButton).toHaveClass('active')
+    const cards = document.querySelectorAll('.instrument-card')
+    const keyboardCard = Array.from(cards).find(c => c.classList.contains('keyboard-theme'))
+    expect(keyboardCard).toHaveClass('active')
   })
 
   it('calls handleInstrumentChange when instrument is selected', () => {
     render(<InstrumentSelector />)
 
-    const guitarButton = screen.getByText('Guitar').closest('button')
-    fireEvent.click(guitarButton!)
+    const cards = document.querySelectorAll('.instrument-card')
+    const guitarCard = Array.from(cards).find(c => c.classList.contains('guitar-theme'))
+    fireEvent.click(guitarCard!)
 
     expect(mockInstrumentContext.handleInstrumentChange).toHaveBeenCalledWith('guitar')
   })
@@ -53,10 +55,20 @@ describe('InstrumentSelector', () => {
     mockInstrumentContext.instrument = 'bass'
     render(<InstrumentSelector />)
 
-    const bassButton = screen.getByText('Bass').closest('button')
-    expect(bassButton).toHaveClass('active')
+    const cards = document.querySelectorAll('.instrument-card')
+    const bassCard = Array.from(cards).find(c => c.classList.contains('bass-theme'))
+    expect(bassCard).toHaveClass('active')
 
-    const keyboardButton = screen.getByText('Keyboard').closest('button')
-    expect(keyboardButton).not.toHaveClass('active')
+    const keyboardCard = Array.from(cards).find(c => c.classList.contains('keyboard-theme'))
+    expect(keyboardCard).not.toHaveClass('active')
+  })
+
+  it('excludes instruments when exclude prop is provided', () => {
+    render(<InstrumentSelector exclude={['keyboard']} />)
+
+    const cards = document.querySelectorAll('.instrument-card')
+    const keyboardCard = Array.from(cards).find(c => c.classList.contains('keyboard-theme'))
+    expect(keyboardCard).toBeUndefined()
+    expect(cards.length).toBe(2)
   })
 })

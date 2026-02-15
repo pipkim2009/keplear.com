@@ -43,6 +43,26 @@
 .footer-logo:hover {
 }
 
+.footer-nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.footer-nav-link {
+  color: var(--text-primary);
+  opacity: 0.6;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.footer-nav-link:hover {
+  opacity: 1;
+  color: var(--primary-purple-light);
+}
+
 .footer-slogan {
   font-size: 0.875rem;
   margin: 0;
@@ -178,6 +198,7 @@
 .light .footer-copyright p,
 .light .footer-author,
 .light .social-link,
-.light .footer-text {
+.light .footer-text,
+.light .footer-nav-link {
   color: var(--gray-900);
 }

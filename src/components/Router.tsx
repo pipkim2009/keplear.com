@@ -14,6 +14,8 @@ const Instruments = lazy(() => import('./pages/Instruments'))
 const Stems = lazy(() => import('./pages/Stems'))
 const Classroom = lazy(() => import('./pages/Classroom'))
 const Profile = lazy(() => import('./pages/Profile'))
+const Metronome = lazy(() => import('./pages/Metronome'))
+const Tuner = lazy(() => import('./pages/Tuner'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
 const TermsOfService = lazy(() => import('./pages/TermsOfService'))
@@ -60,7 +62,7 @@ function Router() {
           }
         />
         <Route
-          path="/instrument"
+          path="/instruments"
           element={
             <SectionErrorBoundary section="Instruments">
               <Instruments />
@@ -104,6 +106,22 @@ function Router() {
           element={
             <SectionErrorBoundary section="Profile">
               <Profile />
+            </SectionErrorBoundary>
+          }
+        />
+        <Route
+          path="/metronome"
+          element={
+            <SectionErrorBoundary section="Metronome">
+              <Metronome />
+            </SectionErrorBoundary>
+          }
+        />
+        <Route
+          path="/tuner"
+          element={
+            <SectionErrorBoundary section="Tuner">
+              <Tuner />
             </SectionErrorBoundary>
           }
         />
