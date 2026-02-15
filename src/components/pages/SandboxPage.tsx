@@ -1,16 +1,19 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { PiPlus, PiX } from 'react-icons/pi'
 import { useTranslation } from '../../contexts/TranslationContext'
-import { useWindowManager } from '../../hooks/useWindowManager'
-import { TOOL_CONFIGS } from '../sandbox/types'
+import { useWindowManager, detectSnapZone, getSnapRect } from '../../hooks/useWindowManager'
+import { type SnapZone, TOOL_CONFIGS } from '../sandbox/types'
 import SandboxWindow from '../sandbox/SandboxWindow'
 import styles from '../../styles/SandboxPage.module.css'
 
 function SandboxPage() {
   const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
+  const [snapZone, setSnapZone] = useState<SnapZone>(null)
   const menuRef = useRef<HTMLDivElement>(null)
-  const { windows, addWindow, removeWindow, updateWindow, bringToFront } = useWindowManager()
+  const canvasRef = useRef<HTMLDivElement>(null)
+  const { windows, addWindow, removeWindow, updateWindow, bringToFront, snapWindow } =
+    useWindowManager()
 
   useEffect(() => {
     if (!isOpen) return
@@ -31,6 +34,28 @@ function SandboxPage() {
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
   }, [isOpen])
+
+  const handleDragMove = useCallback((clientX: number, clientY: number) => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    setSnapZone(detectSnapZone(clientX, clientY, rect))
+  }, [])
+
+  const handleDragEnd = useCallback(
+    (id: string, zone: SnapZone) => {
+      const canvas = canvasRef.current
+      if (!canvas || !zone) return
+      snapWindow(id, zone, canvas.offsetWidth, canvas.offsetHeight)
+      setSnapZone(null)
+    },
+    [snapWindow]
+  )
+
+  const snapPreview =
+    snapZone && canvasRef.current
+      ? getSnapRect(snapZone, canvasRef.current.offsetWidth, canvasRef.current.offsetHeight)
+      : null
 
   return (
     <div className={styles.page}>
@@ -61,7 +86,19 @@ function SandboxPage() {
         )}
       </div>
 
-      <div className={styles.canvas}>
+      <div className={styles.canvas} ref={canvasRef}>
+        {snapPreview && (
+          <div
+            className={styles.snapPreview}
+            style={{
+              left: snapPreview.x,
+              top: snapPreview.y,
+              width: snapPreview.width,
+              height: snapPreview.height,
+            }}
+          />
+        )}
+
         {windows.map(win => (
           <SandboxWindow
             key={win.id}
@@ -69,6 +106,9 @@ function SandboxPage() {
             onClose={removeWindow}
             onUpdate={updateWindow}
             onFocus={bringToFront}
+            onDragMove={handleDragMove}
+            onDragEnd={handleDragEnd}
+            activeSnapZone={snapZone}
           />
         ))}
       </div>

@@ -3,7 +3,7 @@ import { Rnd } from 'react-rnd'
 import { PiX } from 'react-icons/pi'
 import { useTranslation } from '../../contexts/TranslationContext'
 import SectionErrorBoundary from '../common/SectionErrorBoundary'
-import { type SandboxWindowState, TOOL_CONFIGS } from './types'
+import { type SandboxWindowState, type SnapZone, TOOL_CONFIGS } from './types'
 import styles from '../../styles/SandboxWindow.module.css'
 
 interface SandboxWindowProps {
@@ -11,6 +11,9 @@ interface SandboxWindowProps {
   onClose: (id: string) => void
   onUpdate: (id: string, partial: Partial<SandboxWindowState>) => void
   onFocus: (id: string) => void
+  onDragMove: (clientX: number, clientY: number) => void
+  onDragEnd: (id: string, snapZone: SnapZone) => void
+  activeSnapZone: SnapZone
 }
 
 const MIN_WIDTH = 300
@@ -21,6 +24,9 @@ export default function SandboxWindow({
   onClose,
   onUpdate,
   onFocus,
+  onDragMove,
+  onDragEnd,
+  activeSnapZone,
 }: SandboxWindowProps) {
   const { t } = useTranslation()
   const config = TOOL_CONFIGS.find(c => c.key === win.toolKey)
@@ -36,8 +42,18 @@ export default function SandboxWindow({
       minHeight={MIN_HEIGHT}
       dragHandleClassName={styles.titleBar}
       style={{ zIndex: win.zIndex }}
+      onDrag={e => {
+        const evt = e as MouseEvent
+        if (evt.clientX !== undefined) {
+          onDragMove(evt.clientX, evt.clientY)
+        }
+      }}
       onDragStop={(_e, d) => {
-        onUpdate(win.id, { x: d.x, y: d.y })
+        if (activeSnapZone) {
+          onDragEnd(win.id, activeSnapZone)
+        } else {
+          onUpdate(win.id, { x: d.x, y: d.y })
+        }
       }}
       onResizeStop={(_e, _dir, ref, _delta, position) => {
         onUpdate(win.id, {

@@ -10,6 +10,21 @@
   overflow: hidden;
 }
 
+.snapPreview {
+  position: absolute;
+  background: rgba(100, 140, 255, 0.1);
+  border: 2px solid rgba(100, 140, 255, 0.35);
+  border-radius: 10px;
+  z-index: 9999;
+  pointer-events: none;
+  transition: all 0.15s ease;
+}
+
+:global(.light) .snapPreview {
+  background: rgba(60, 100, 220, 0.08);
+  border-color: rgba(60, 100, 220, 0.3);
+}
+
 .menuWrapper {
   position: absolute;
   top: 1.25rem;

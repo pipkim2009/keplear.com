@@ -57,6 +57,17 @@
   position: relative;
 }
 
+/* Hide page titles/subtitles inside sandbox windows */
+.content [class*='headerSection'] {
+  display: none;
+}
+
+/* Remove bottom margin/padding on the last child */
+.content > div > :last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
 /* Light mode */
 :global(.light) .window {
   border-color: rgba(0, 0, 0, 0.1);
