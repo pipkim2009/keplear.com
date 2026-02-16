@@ -151,19 +151,19 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  border: 2px solid rgba(148, 163, 184, 0.3);
+  border: 2px solid rgba(148, 163, 184, 0.2);
   border-radius: 10px;
   background: transparent;
-  color: var(--light-text-secondary);
+  color: var(--dark-text-secondary);
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-:global(.dark) .resetButton {
-  border-color: rgba(148, 163, 184, 0.2);
-  color: var(--dark-text-secondary);
+:global(.light) .resetButton {
+  border-color: rgba(148, 163, 184, 0.3);
+  color: var(--light-text-secondary);
 }
 
 .resetButton:hover {
@@ -202,32 +202,32 @@
 .progressSeparator {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--light-text-secondary);
+  color: var(--dark-text-secondary);
 }
 
-:global(.dark) .progressSeparator {
-  color: var(--dark-text-secondary);
+:global(.light) .progressSeparator {
+  color: var(--light-text-secondary);
 }
 
 .progressTotal {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--light-text-primary);
+  color: var(--dark-text-primary);
 }
 
-:global(.dark) .progressTotal {
-  color: var(--dark-text-primary);
+:global(.light) .progressTotal {
+  color: var(--light-text-primary);
 }
 
 .progressLabel {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--light-text-secondary);
+  color: var(--dark-text-secondary);
   margin-left: 0.25rem;
 }
 
-:global(.dark) .progressLabel {
-  color: var(--dark-text-secondary);
+:global(.light) .progressLabel {
+  color: var(--light-text-secondary);
 }
 
 .progressBar {
@@ -349,12 +349,12 @@
 }
 
 .volumeIcon {
-  color: var(--light-text-secondary);
+  color: var(--dark-text-secondary);
   flex-shrink: 0;
 }
 
-:global(.dark) .volumeIcon {
-  color: var(--dark-text-secondary);
+:global(.light) .volumeIcon {
+  color: var(--light-text-secondary);
 }
 
 .volumeBar {
@@ -411,11 +411,11 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--light-text-secondary);
+  color: var(--dark-text-secondary);
 }
 
-:global(.dark) .sectionLabel {
-  color: var(--dark-text-secondary);
+:global(.light) .sectionLabel {
+  color: var(--light-text-secondary);
 }
 
 .noteGrid {
@@ -439,14 +439,14 @@
   font-weight: 700;
   font-size: 0.9rem;
   transition: all 0.2s ease;
-  background: rgba(148, 163, 184, 0.15);
-  color: var(--light-text-secondary);
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--dark-text-secondary);
   border: 2px solid transparent;
 }
 
-:global(.dark) .noteChip {
-  background: rgba(148, 163, 184, 0.1);
-  color: var(--dark-text-secondary);
+:global(.light) .noteChip {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--light-text-secondary);
 }
 
 .noteChipSymbol {
@@ -547,12 +547,12 @@
 .instructions p {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--light-text-secondary);
+  color: var(--dark-text-secondary);
   line-height: 1.5;
 }
 
-:global(.dark) .instructions p {
-  color: var(--dark-text-secondary);
+:global(.light) .instructions p {
+  color: var(--light-text-secondary);
 }
 
 .instructions p + p {

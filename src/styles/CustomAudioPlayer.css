@@ -1259,7 +1259,7 @@
 .volume-indicator-label {
   font-size: 11px;
   font-weight: 600;
-  color: var(--gray-900);
+  color: var(--dark-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   min-width: 60px;
@@ -1283,7 +1283,7 @@
 .volume-indicator-value {
   font-size: 11px;
   font-weight: 600;
-  color: var(--gray-900);
+  color: var(--dark-text-secondary);
   min-width: 35px;
   text-align: right;
 }

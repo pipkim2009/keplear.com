@@ -1,4 +1,4 @@
-﻿import { useMemo, useState, useEffect } from 'react'
+﻿import { useMemo, useState, useEffect, useRef } from 'react'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useInstrumentType } from '../../hooks'
 import { useTuner } from '../../hooks/useTuner'
@@ -14,18 +14,18 @@ interface StringInfo {
 
 const TUNINGS: Record<string, StringInfo[]> = {
   guitar: [
-    { name: '1', note: 'E', octave: 4 },
-    { name: '2', note: 'B', octave: 3 },
-    { name: '3', note: 'G', octave: 3 },
-    { name: '4', note: 'D', octave: 3 },
-    { name: '5', note: 'A', octave: 2 },
     { name: '6', note: 'E', octave: 2 },
+    { name: '5', note: 'A', octave: 2 },
+    { name: '4', note: 'D', octave: 3 },
+    { name: '3', note: 'G', octave: 3 },
+    { name: '2', note: 'B', octave: 3 },
+    { name: '1', note: 'E', octave: 4 },
   ],
   bass: [
-    { name: '1', note: 'G', octave: 2 },
-    { name: '2', note: 'D', octave: 2 },
-    { name: '3', note: 'A', octave: 1 },
     { name: '4', note: 'E', octave: 1 },
+    { name: '3', note: 'A', octave: 1 },
+    { name: '2', note: 'D', octave: 2 },
+    { name: '1', note: 'G', octave: 2 },
   ],
 }
 
@@ -37,24 +37,30 @@ export default function Tuner() {
   const { detectedPitch, permission, error, volumeLevel, startTuner, stopTuner } = useTuner()
 
   // Auto-start tuner on mount, stop on unmount
+  const startRef = useRef(startTuner)
+  const stopRef = useRef(stopTuner)
+  startRef.current = startTuner
+  stopRef.current = stopTuner
+
   useEffect(() => {
-    startTuner()
-    return () => stopTuner()
-  }, [startTuner, stopTuner])
+    startRef.current()
+    return () => stopRef.current()
+     
+  }, [])
 
   // Default to guitar if keyboard is selected
   const tunerInstrument = instrument === 'keyboard' ? 'guitar' : instrument
   const strings = TUNINGS[tunerInstrument] ?? TUNINGS.guitar
 
   // User-selected string index (-1 = auto-detect)
-  const [selectedString, setSelectedString] = useState(-1)
+  const [selectedString, setSelectedString] = useState(0)
 
   // Reset selection when instrument changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const prevInstrumentRef = useMemo(() => ({ current: tunerInstrument }), [])
   if (prevInstrumentRef.current !== tunerInstrument) {
     prevInstrumentRef.current = tunerInstrument
-    setSelectedString(-1)
+    setSelectedString(0)
   }
 
   // Which string is closest to the detected pitch (auto-detect mode)
@@ -164,16 +170,16 @@ export default function Tuner() {
         <div className={styles.waitingText}>{t('tuner.waitingForInput')}</div>
       )}
 
-      {/* Volume indicator */}
-      <div className={styles.volumeIndicator}>
-        <span className={styles.volumeLabel}>{t('tuner.volume')}</span>
-        <div className={styles.volumeBar}>
+      {/* Mic level indicator */}
+      <div className={styles.micLevel}>
+        <span className={styles.micLevelLabel}>{t('generator.micLevel')}</span>
+        <div className={styles.micLevelBar}>
           <div
-            className={styles.volumeFill}
+            className={styles.micLevelFill}
             style={{ width: `${Math.min(100, volumeLevel * 100)}%` }}
           />
         </div>
-        <span className={styles.volumeValue}>{Math.round(volumeLevel * 100)}%</span>
+        <span className={styles.micLevelValue}>{Math.round(volumeLevel * 100)}%</span>
       </div>
 
       {/* Error display */}

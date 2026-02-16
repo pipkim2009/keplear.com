@@ -222,52 +222,6 @@
 }
 
 /* ========================================
-   VOLUME INDICATOR
-   ======================================== */
-
-.volumeIndicator {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 16px;
-  width: 100%;
-  max-width: 350px;
-}
-
-.volumeLabel {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--dark-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  min-width: 45px;
-}
-
-.volumeBar {
-  flex: 1;
-  height: 6px;
-  background: rgba(148, 163, 184, 0.15);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.volumeFill {
-  height: 100%;
-  background: var(--green-500);
-  border-radius: 3px;
-  transition: width 0.08s ease-out;
-  min-width: 0;
-}
-
-.volumeValue {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--dark-text-secondary);
-  min-width: 35px;
-  text-align: right;
-}
-
-/* ========================================
    ACTION BUTTON
    ======================================== */
 
@@ -323,24 +277,51 @@
   .gauge {
     max-width: 280px;
   }
+}
 
-  .volumeIndicator {
-    padding: 8px 12px;
-  }
+/* ========================================
+   MIC LEVEL INDICATOR
+   ======================================== */
 
-  .volumeLabel {
-    font-size: 10px;
-    min-width: 40px;
-  }
+.micLevel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  width: 100%;
+  max-width: 350px;
+}
 
-  .volumeBar {
-    height: 5px;
-  }
+.micLevelLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dark-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: 60px;
+}
 
-  .volumeValue {
-    font-size: 10px;
-    min-width: 30px;
-  }
+.micLevelBar {
+  flex: 1;
+  height: 8px;
+  background: var(--gray-800);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.micLevelFill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green-500), var(--green-100));
+  border-radius: 4px;
+  transition: width 0.05s ease-out;
+}
+
+.micLevelValue {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--dark-text-secondary);
+  min-width: 35px;
+  text-align: right;
 }
 
 /* ========================================
@@ -352,18 +333,6 @@
 }
 
 :global(body.light) .waitingText {
-  color: var(--gray-600);
-}
-
-:global(body.light) .volumeLabel {
-  color: var(--gray-600);
-}
-
-:global(body.light) .volumeBar {
-  background: rgba(0, 0, 0, 0.08);
-}
-
-:global(body.light) .volumeValue {
   color: var(--gray-600);
 }
 
