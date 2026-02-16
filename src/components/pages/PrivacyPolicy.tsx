@@ -130,8 +130,9 @@ function PrivacyPolicy() {
             >
               YouTube Terms of Service
             </a>
-            . We use privacy-respecting proxy services to fetch search results and audio stream
-            metadata. No YouTube account data is accessed.
+            . By using the Songs feature, you agree to be bound by the YouTube Terms of Service. We
+            use privacy-respecting proxy services to fetch search results and audio stream metadata.
+            No YouTube account data is accessed or stored.
           </li>
           <li>
             <strong>SoundCloud</strong> &mdash; Embedded SoundCloud players may be used for song

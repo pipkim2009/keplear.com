@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import SkipLink from './components/common/SkipLink'
 import ChatPanel from './components/common/ChatPanel'
+import CookieConsent from './components/common/CookieConsent'
 import SectionErrorBoundary from './components/common/SectionErrorBoundary'
 import { AriaLiveProvider } from './components/common/AriaLive'
 import { useTheme } from './hooks/useTheme'
@@ -122,6 +123,7 @@ const App = memo(function App() {
                       <ChatPanel />
                     </SectionErrorBoundary>
                     <OnboardingController />
+                    <CookieConsent />
                   </div>
                 </InstrumentProvider>
               </AriaLiveProvider>

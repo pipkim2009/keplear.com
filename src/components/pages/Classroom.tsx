@@ -55,6 +55,7 @@ import {
   getKeyboardNoteById,
 } from '../../utils/practice/practiceNotes'
 import { useRecordPracticeSession } from '../../hooks/usePracticeSessions'
+import { supabase } from '../../lib/supabase'
 import { containsScriptInjection } from '../../utils/security'
 import {
   PiMusicNotesFill,
@@ -2731,7 +2732,7 @@ function Classroom() {
     const containerId = 'classroom-yt-player-' + Date.now()
     const playerDiv = document.createElement('div')
     playerDiv.id = containerId
-    songPlayerContainerRef.current.innerHTML = ''
+    songPlayerContainerRef.current.textContent = ''
     songPlayerContainerRef.current.appendChild(playerDiv)
 
     songPlayerRef.current = new window.YT.Player(containerId, {
@@ -2979,6 +2980,12 @@ function Classroom() {
     const octaveLow = 4 - lowerOctaves
     const octaveHigh = 5 + higherOctaves
 
+    // Validate assignment title for XSS
+    if (containsScriptInjection(assignmentTitle)) {
+      setAssignmentError('Assignment title contains invalid characters')
+      return
+    }
+
     try {
       setIsSavingAssignment(true)
       setAssignmentError(null)
@@ -3165,6 +3172,20 @@ function Classroom() {
   const hasRecordedProgressRef = useRef(false)
   // Track completed exercises synchronously (state updates are async)
   const completedExercisesRef = useRef(0)
+  // Store access token for keepalive fetch in beforeunload (can't await async getSession)
+  const accessTokenRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      accessTokenRef.current = session?.access_token || null
+    })
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_, session) => {
+      accessTokenRef.current = session?.access_token || null
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   // Reset the flags when starting a new lesson
   useEffect(() => {
@@ -3209,13 +3230,16 @@ function Classroom() {
         melodies_completed: completedExercisesRef.current,
       }
 
-      // Use fetch with keepalive for browser close
+      // Use fetch with keepalive for browser close — needs user's session token for RLS
+      const token = accessTokenRef.current
+      if (!token) return
+
       fetch(`${import.meta.env.VITE_SUPABASE_URL}/rest/v1/practice_sessions`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${token}`,
           Prefer: 'return=minimal',
         },
         body: JSON.stringify(data),

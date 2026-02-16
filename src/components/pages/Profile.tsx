@@ -131,8 +131,8 @@ const Profile = () => {
         setProfile(profileData)
       }
 
-      // Fetch stats for profile
-      if (viewingOwnProfile || profileData) {
+      // Only fetch detailed stats and activity for own profile (privacy)
+      if (viewingOwnProfile) {
         // Assignments completed
         const { count: completedCount } = await supabase
           .from('assignment_completions')
@@ -156,6 +156,12 @@ const Profile = () => {
 
         // Fetch recent activity
         await fetchActivity(targetUserId)
+      } else {
+        // Clear stats for other users' profiles
+        setAssignmentsCompleted(0)
+        setClassesJoined(0)
+        setClassesOwned(0)
+        setActivity([])
       }
     } catch (error) {
       console.error('Error fetching profile:', error)

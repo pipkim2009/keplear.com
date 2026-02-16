@@ -44,8 +44,12 @@ export async function initPushNotifications(userId: string) {
   // Handle notification tap (navigate to relevant route)
   PushNotifications.addListener('pushNotificationActionPerformed', action => {
     const data = action.notification.data
-    if (data?.route) {
-      window.location.href = data.route
+    if (data?.route && typeof data.route === 'string') {
+      // Only allow relative paths starting with / to prevent open redirect attacks
+      const route = data.route
+      if (route.startsWith('/') && !route.startsWith('//') && !route.includes('://')) {
+        window.location.href = route
+      }
     }
   })
 }

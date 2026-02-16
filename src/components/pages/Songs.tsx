@@ -612,7 +612,7 @@ const Songs = () => {
     const containerId = 'yt-player-' + Date.now()
     const playerDiv = document.createElement('div')
     playerDiv.id = containerId
-    playerContainerRef.current.innerHTML = ''
+    playerContainerRef.current.textContent = ''
     playerContainerRef.current.appendChild(playerDiv)
 
     playerRef.current = new window.YT.Player(containerId, {

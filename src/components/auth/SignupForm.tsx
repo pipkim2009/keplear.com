@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
+import { Link } from 'react-router'
 import { useAuth } from '../../hooks/useAuth'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { validatePassword, containsScriptInjection } from '../../utils/security'
@@ -54,6 +55,8 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
   const [errorKey, setErrorKey] = useState('')
   const [message, setMessage] = useState('')
   const [messageKey, setMessageKey] = useState('')
+  const [agreeToTerms, setAgreeToTerms] = useState(false)
+  const [confirmAge, setConfirmAge] = useState(false)
   const { signUp, signIn } = useAuth()
 
   // Real-time field validation with security checks
@@ -154,6 +157,16 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
     // Check required fields
     if (!formData.username || !formData.password || !formData.confirmPassword) {
       setErrorKey('errors.fillAllFields')
+      return
+    }
+
+    // Check consent
+    if (!agreeToTerms) {
+      setError('You must agree to the Privacy Policy and Terms of Service')
+      return
+    }
+    if (!confirmAge) {
+      setError('You must confirm you are 13 years of age or older')
       return
     }
 
@@ -315,10 +328,61 @@ const SignupForm = ({ onToggleForm, onClose }: SignupFormProps) => {
           )}
         </div>
 
+        <div
+          className={styles.formGroup}
+          style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '4px' }}
+        >
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '8px',
+              fontSize: '0.8rem',
+              color: '#aaa',
+              cursor: 'pointer',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={confirmAge}
+              onChange={e => setConfirmAge(e.target.checked)}
+              style={{ marginTop: '2px', accentColor: '#7c3aed' }}
+            />
+            <span>I confirm I am 13 years of age or older</span>
+          </label>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '8px',
+              fontSize: '0.8rem',
+              color: '#aaa',
+              cursor: 'pointer',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={agreeToTerms}
+              onChange={e => setAgreeToTerms(e.target.checked)}
+              style={{ marginTop: '2px', accentColor: '#7c3aed' }}
+            />
+            <span>
+              I agree to the{' '}
+              <Link to="/privacy" style={{ color: '#a78bfa' }} target="_blank">
+                Privacy Policy
+              </Link>{' '}
+              and{' '}
+              <Link to="/cookies" style={{ color: '#a78bfa' }} target="_blank">
+                Cookie Policy
+              </Link>
+            </span>
+          </label>
+        </div>
+
         <button
           type="submit"
           className={`${styles.authButton} ${styles.primary} ${styles.createAccount}`}
-          disabled={loading}
+          disabled={loading || !agreeToTerms || !confirmAge}
         >
           {loading ? t('auth.creatingAccount') : t('auth.createAccount')}
         </button>
