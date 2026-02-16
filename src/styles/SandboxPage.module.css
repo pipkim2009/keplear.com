@@ -8,6 +8,17 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+:global(.light) .canvas {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.2) 1px, transparent 1px);
+  background-size: 40px 40px;
 }
 
 .snapPreview {
@@ -25,32 +36,50 @@
   border-color: rgba(60, 100, 220, 0.3);
 }
 
-.menuWrapper {
+.toolbar {
   position: absolute;
   top: 1.25rem;
   left: 1.25rem;
   z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.addBtn {
+.toolbarGroup {
+  position: relative;
+}
+
+.toolbarBtn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
   color: var(--text-primary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
-.addBtn:hover {
-  background: rgba(255, 255, 255, 0.12);
+.toolbarBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
 }
 
-.addBtnOpen {
+.toolbarBtn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.toolbarBtnActive {
   background: rgba(255, 255, 255, 0.1);
 }
 
@@ -65,6 +94,15 @@
   padding: 0.375rem 0;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
   animation: fadeIn 0.12s ease;
+}
+
+.layoutIcon {
+  display: inline-block;
+  width: 2rem;
+  font-size: 0.7rem;
+  font-family: monospace;
+  opacity: 0.55;
+  text-align: center;
 }
 
 @keyframes fadeIn {
@@ -98,16 +136,16 @@
 }
 
 /* Light mode */
-:global(.light) .addBtn {
+:global(.light) .toolbar {
   border-color: rgba(0, 0, 0, 0.1);
-  background: rgba(0, 0, 0, 0.04);
+  background: rgba(255, 255, 255, 0.7);
 }
 
-:global(.light) .addBtn:hover {
-  background: rgba(0, 0, 0, 0.08);
+:global(.light) .toolbarBtn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.07);
 }
 
-:global(.light) .addBtnOpen {
+:global(.light) .toolbarBtnActive {
   background: rgba(0, 0, 0, 0.06);
 }
 
@@ -186,15 +224,17 @@
     bottom: 0;
   }
 
-  .menuWrapper {
+  .toolbar {
     top: 0.5rem;
     left: 0.5rem;
+    padding: 2px;
+    border-radius: 12px;
   }
 
-  .addBtn {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+  .toolbarBtn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
   }
 }
 

@@ -122,5 +122,73 @@ export function useWindowManager() {
     setWindows(prev => prev.map(w => (w.id === id ? { ...w, ...rect } : w)))
   }, [])
 
-  return { windows, addWindow, removeWindow, updateWindow, bringToFront, snapWindow }
+  const clearAll = useCallback(() => {
+    setWindows([])
+  }, [])
+
+  const applyLayout = useCallback((layoutId: string, canvasW: number, canvasH: number) => {
+    setWindows(prev => {
+      if (prev.length === 0) return prev
+      const gap = 6
+      const halfW = Math.round((canvasW - gap) / 2)
+      const halfH = Math.round((canvasH - gap) / 2)
+      const thirdW = Math.round((canvasW - gap * 2) / 3)
+
+      const layouts: Record<
+        string,
+        (i: number, total: number) => { x: number; y: number; width: number; height: number }
+      > = {
+        full: () => ({ x: 0, y: 0, width: canvasW, height: canvasH }),
+        'side-by-side': (i, total) => {
+          const w = Math.round((canvasW - gap * (total - 1)) / total)
+          return { x: i * (w + gap), y: 0, width: w, height: canvasH }
+        },
+        'top-bottom': (i, total) => {
+          const h = Math.round((canvasH - gap * (total - 1)) / total)
+          return { x: 0, y: i * (h + gap), width: canvasW, height: h }
+        },
+        grid: (i, total) => {
+          const cols = Math.ceil(Math.sqrt(total))
+          const rows = Math.ceil(total / cols)
+          const col = i % cols
+          const row = Math.floor(i / cols)
+          const w = Math.round((canvasW - gap * (cols - 1)) / cols)
+          const h = Math.round((canvasH - gap * (rows - 1)) / rows)
+          return { x: col * (w + gap), y: row * (h + gap), width: w, height: h }
+        },
+        'left-right-stack': i => {
+          if (i === 0) return { x: 0, y: 0, width: halfW, height: canvasH }
+          const rightCount = prev.length - 1
+          const h = Math.round((canvasH - gap * (rightCount - 1)) / rightCount)
+          return { x: halfW + gap, y: (i - 1) * (h + gap), width: canvasW - halfW - gap, height: h }
+        },
+        'top-bottom-split': i => {
+          if (i === 0) return { x: 0, y: 0, width: canvasW, height: halfH }
+          const bottomCount = prev.length - 1
+          const w = Math.round((canvasW - gap * (bottomCount - 1)) / bottomCount)
+          return { x: (i - 1) * (w + gap), y: halfH + gap, width: w, height: canvasH - halfH - gap }
+        },
+        'three-col': i => ({ x: i * (thirdW + gap), y: 0, width: thirdW, height: canvasH }),
+      }
+
+      const layoutFn = layouts[layoutId]
+      if (!layoutFn) return prev
+
+      return prev.map((w, i) => {
+        const rect = layoutFn(i, prev.length)
+        return { ...w, ...rect, zIndex: nextZIndexRef.current++ }
+      })
+    })
+  }, [])
+
+  return {
+    windows,
+    addWindow,
+    removeWindow,
+    updateWindow,
+    bringToFront,
+    snapWindow,
+    clearAll,
+    applyLayout,
+  }
 }

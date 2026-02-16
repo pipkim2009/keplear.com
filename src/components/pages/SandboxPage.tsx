@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
-import { PiPlus, PiX } from 'react-icons/pi'
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
+import { PiPlus, PiX, PiTrash, PiSquaresFour } from 'react-icons/pi'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useWindowManager, detectSnapZone, getSnapRect } from '../../hooks/useWindowManager'
 import { type SnapZone, TOOL_CONFIGS } from '../sandbox/types'
@@ -32,8 +32,18 @@ function SandboxPage() {
   const menuRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
-  const { windows, addWindow, removeWindow, updateWindow, bringToFront, snapWindow } =
-    useWindowManager()
+  const [layoutOpen, setLayoutOpen] = useState(false)
+  const layoutRef = useRef<HTMLDivElement>(null)
+  const {
+    windows,
+    addWindow,
+    removeWindow,
+    updateWindow,
+    bringToFront,
+    snapWindow,
+    clearAll,
+    applyLayout,
+  } = useWindowManager()
 
   // Auto-select the latest window as active tab on mobile
   useEffect(() => {
@@ -60,13 +70,28 @@ function SandboxPage() {
   }, [isOpen])
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen && !layoutOpen) return
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsOpen(false)
+      if (e.key === 'Escape') {
+        setIsOpen(false)
+        setLayoutOpen(false)
+      }
     }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
-  }, [isOpen])
+  }, [isOpen, layoutOpen])
+
+  // Close layout menu on outside click
+  useEffect(() => {
+    if (!layoutOpen) return
+    const handleClick = (e: MouseEvent) => {
+      if (layoutRef.current && !layoutRef.current.contains(e.target as Node)) {
+        setLayoutOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [layoutOpen])
 
   const handleDragMove = useCallback((clientX: number, clientY: number) => {
     const canvas = canvasRef.current
@@ -94,6 +119,50 @@ function SandboxPage() {
     [addWindow]
   )
 
+  const handleApplyLayout = useCallback(
+    (layoutId: string) => {
+      const canvas = canvasRef.current
+      if (!canvas) return
+      applyLayout(layoutId, canvas.offsetWidth, canvas.offsetHeight)
+      setLayoutOpen(false)
+    },
+    [applyLayout]
+  )
+
+  const handleClearAll = useCallback(() => {
+    clearAll()
+    setActiveTabId(null)
+  }, [clearAll])
+
+  // Build available layouts based on window count
+  const availableLayouts = useMemo(() => {
+    const count = windows.length
+    if (count === 0) return []
+
+    const layouts: { id: string; label: string; icon: string }[] = []
+
+    if (count === 1) {
+      layouts.push({ id: 'full', label: 'Full Screen', icon: '[ ]' })
+    }
+
+    if (count >= 2) {
+      layouts.push({ id: 'side-by-side', label: 'Side by Side', icon: '[ | ]' })
+      layouts.push({ id: 'top-bottom', label: 'Top / Bottom', icon: '[-]' })
+    }
+
+    if (count >= 3) {
+      layouts.push({ id: 'left-right-stack', label: '1 + Stack', icon: '[|=]' })
+      layouts.push({ id: 'top-bottom-split', label: 'Top + Split', icon: '[_||]' })
+      layouts.push({ id: 'three-col', label: '3 Columns', icon: '[|||]' })
+    }
+
+    if (count >= 4) {
+      layouts.push({ id: 'grid', label: 'Grid', icon: '[##]' })
+    }
+
+    return layouts
+  }, [windows.length])
+
   const handleRemoveWindow = useCallback(
     (id: string) => {
       removeWindow(id)
@@ -116,28 +185,77 @@ function SandboxPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.menuWrapper} ref={menuRef}>
-        <button
-          className={`${styles.addBtn} ${isOpen ? styles.addBtnOpen : ''}`}
-          onClick={() => setIsOpen(prev => !prev)}
-          aria-label={isOpen ? t('common.close') : t('common.add')}
-        >
-          {isOpen ? <PiX size={22} /> : <PiPlus size={22} />}
-        </button>
+      <div className={styles.toolbar}>
+        {/* Add window button + menu */}
+        <div className={styles.toolbarGroup} ref={menuRef}>
+          <button
+            className={`${styles.toolbarBtn} ${isOpen ? styles.toolbarBtnActive : ''}`}
+            onClick={() => {
+              setIsOpen(prev => !prev)
+              setLayoutOpen(false)
+            }}
+            aria-label={isOpen ? t('common.close') : t('common.add')}
+            title="Add window"
+          >
+            {isOpen ? <PiX size={18} /> : <PiPlus size={18} />}
+          </button>
 
-        {isOpen && (
-          <div className={styles.menu}>
-            {TOOL_CONFIGS.map(tool => (
-              <button
-                key={tool.key}
-                className={styles.menuItem}
-                onClick={() => handleAddWindow(tool.key)}
-              >
-                {t(tool.labelKey)}
-              </button>
-            ))}
-          </div>
-        )}
+          {isOpen && (
+            <div className={styles.menu}>
+              {TOOL_CONFIGS.map(tool => (
+                <button
+                  key={tool.key}
+                  className={styles.menuItem}
+                  onClick={() => handleAddWindow(tool.key)}
+                >
+                  {t(tool.labelKey)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Layout rearanger */}
+        <div className={styles.toolbarGroup} ref={layoutRef}>
+          <button
+            className={`${styles.toolbarBtn} ${layoutOpen ? styles.toolbarBtnActive : ''}`}
+            onClick={() => {
+              setLayoutOpen(prev => !prev)
+              setIsOpen(false)
+            }}
+            disabled={windows.length === 0}
+            aria-label="Arrange windows"
+            title="Arrange windows"
+          >
+            <PiSquaresFour size={18} />
+          </button>
+
+          {layoutOpen && availableLayouts.length > 0 && (
+            <div className={styles.menu}>
+              {availableLayouts.map(layout => (
+                <button
+                  key={layout.id}
+                  className={styles.menuItem}
+                  onClick={() => handleApplyLayout(layout.id)}
+                >
+                  <span className={styles.layoutIcon}>{layout.icon}</span>
+                  {layout.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Clear all */}
+        <button
+          className={styles.toolbarBtn}
+          onClick={handleClearAll}
+          disabled={windows.length === 0}
+          aria-label="Clear all windows"
+          title="Clear all"
+        >
+          <PiTrash size={18} />
+        </button>
       </div>
 
       <div className={styles.canvas} ref={canvasRef}>
