@@ -3,14 +3,19 @@
  * Shows practice stats, classrooms, pending assignments, and recent activity
  */
 
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useMemo } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useNavigation } from '../../hooks/useInstrumentSelectors'
 import SEOHead from '../common/SEOHead'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import { useDashboardData, type PendingAssignment } from '../../hooks/useDashboardData'
-import type { TimeRange } from '../../hooks/usePracticeSessions'
+import {
+  fetchPracticeStats,
+  type TimeRange,
+  type PracticeStats,
+} from '../../hooks/usePracticeSessions'
+import { supabase } from '../../lib/supabase'
 import {
   PiPlayFill,
   PiCheckCircleFill,
@@ -23,6 +28,10 @@ import {
   PiMusicNoteFill,
   PiPianoKeysFill,
   PiUserCircleFill,
+  PiFireFill,
+  PiCalendarCheckFill,
+  PiTrendUpFill,
+  PiWarningFill,
 } from 'react-icons/pi'
 import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
 import styles from '../../styles/Dashboard.module.css'
@@ -71,6 +80,93 @@ function Dashboard() {
       fetchData()
     }
   }, [user, loading, fetchData])
+
+  // All-time stats for stat cards (independent of chart time range)
+  const [allTimeStats, setAllTimeStats] = useState<PracticeStats | null>(null)
+  const [allTimeAssignments, setAllTimeAssignments] = useState(0)
+
+  useEffect(() => {
+    if (!user?.id) return
+    let cancelled = false
+
+    async function loadAllTime() {
+      const [stats, { count }] = await Promise.all([
+        fetchPracticeStats(user!.id, 'all'),
+        supabase
+          .from('assignment_completions')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user!.id),
+      ])
+      if (!cancelled) {
+        setAllTimeStats(stats)
+        setAllTimeAssignments(count || 0)
+      }
+    }
+
+    loadAllTime()
+    return () => {
+      cancelled = true
+    }
+  }, [user?.id])
+
+  // Derived stats from all-time data
+  const derivedStats = useMemo(() => {
+    const wd = allTimeStats?.weeklyData || []
+    const bi = allTimeStats?.byInstrument || { keyboard: 0, guitar: 0, bass: 0 }
+
+    // Total melodies (all time)
+    const totalMelodies = allTimeStats?.totalMelodies || 0
+
+    // Days active (non-zero) — all time
+    const daysActive = wd.filter(d => d.keyboard + d.guitar + d.bass > 0).length
+
+    // Instrument totals (all time)
+    const keyboardTotal = bi.keyboard
+    const guitarTotal = bi.guitar
+    const bassTotal = bi.bass
+    const instrumentTotal = keyboardTotal + guitarTotal + bassTotal
+
+    // Top instrument
+    const instrumentMap = [
+      { name: 'Keyboard', key: 'keyboard' as const, total: keyboardTotal },
+      { name: 'Guitar', key: 'guitar' as const, total: guitarTotal },
+      { name: 'Bass', key: 'bass' as const, total: bassTotal },
+    ]
+    const topInstrument = instrumentMap.reduce((a, b) => (b.total > a.total ? b : a))
+
+    // Instrument percentages for breakdown bar
+    const keyboardPct =
+      instrumentTotal > 0 ? Math.round((keyboardTotal / instrumentTotal) * 100) : 0
+    const guitarPct = instrumentTotal > 0 ? Math.round((guitarTotal / instrumentTotal) * 100) : 0
+    const bassPct = instrumentTotal > 0 ? 100 - keyboardPct - guitarPct : 0
+
+    // Streak: use weekly data from the graph's current time range (week/month) for accuracy
+    const streakWd = practiceStats?.weeklyData || []
+    let streak = 0
+    if (timeRange === 'week' || timeRange === 'month') {
+      for (let i = streakWd.length - 1; i >= 0; i--) {
+        if (streakWd[i].keyboard + streakWd[i].guitar + streakWd[i].bass > 0) {
+          streak++
+        } else {
+          break
+        }
+      }
+    }
+
+    return {
+      totalMelodies,
+      daysActive,
+      topInstrument,
+      keyboardTotal,
+      guitarTotal,
+      bassTotal,
+      instrumentTotal,
+      keyboardPct,
+      guitarPct,
+      bassPct,
+      streak,
+    }
+  }, [allTimeStats, practiceStats, timeRange])
 
   // Handle starting an assignment
   const handleStartAssignment = (assignment: PendingAssignment) => {
@@ -180,6 +276,17 @@ function Dashboard() {
               <h1>
                 {t('dashboard.welcome')}, {username || 'User'}!
               </h1>
+              {derivedStats.streak > 0 ? (
+                <div className={styles.streakBadge}>
+                  <PiFireFill />
+                  <span>{derivedStats.streak} day streak!</span>
+                </div>
+              ) : (
+                <div className={styles.streakBadgeMuted}>
+                  <PiFireFill />
+                  <span>Start a streak!</span>
+                </div>
+              )}
               <button className={styles.profileLink} onClick={() => navigateToProfile()}>
                 <PiUserCircleFill className={styles.profileIcon} />
                 <span>{username || 'Profile'}</span>
@@ -197,6 +304,111 @@ function Dashboard() {
             </div>
           </div>
         </section>
+
+        {/* Stat Cards Row */}
+        <section className={styles.statCardsRow}>
+          <div className={styles.statCardCompact}>
+            <div className={`${styles.statCardCompactIcon} ${styles.purple}`}>
+              <PiMusicNotesFill />
+            </div>
+            <span className={styles.statCardCompactValue}>{derivedStats.totalMelodies}</span>
+            <span className={styles.statCardCompactLabel}>Total Melodies</span>
+          </div>
+          <div className={styles.statCardCompact}>
+            <div className={`${styles.statCardCompactIcon} ${styles.green}`}>
+              <PiCheckCircleFill />
+            </div>
+            <span className={styles.statCardCompactValue}>{allTimeAssignments}</span>
+            <span className={styles.statCardCompactLabel}>Assignments Done</span>
+          </div>
+          <div className={styles.statCardCompact}>
+            <div className={`${styles.statCardCompactIcon} ${styles.blue}`}>
+              <PiCalendarCheckFill />
+            </div>
+            <span className={styles.statCardCompactValue}>{derivedStats.daysActive}</span>
+            <span className={styles.statCardCompactLabel}>Days Active</span>
+          </div>
+          <div className={styles.statCardCompact}>
+            <div className={`${styles.statCardCompactIcon} ${styles.orange}`}>
+              <PiTrendUpFill />
+            </div>
+            <div className={styles.topInstrumentDisplay}>
+              {getInstrumentIcon(derivedStats.topInstrument.key)}
+              <span className={styles.statCardCompactValue}>{derivedStats.topInstrument.name}</span>
+            </div>
+            <span className={styles.statCardCompactLabel}>Top Instrument</span>
+          </div>
+        </section>
+
+        {/* Instrument Breakdown Bar */}
+        {derivedStats.instrumentTotal > 0 && (
+          <section className={styles.instrumentBreakdown}>
+            <div className={styles.instrumentBreakdownBar}>
+              {derivedStats.keyboardPct > 0 && (
+                <div
+                  className={styles.breakdownSegmentKeyboard}
+                  style={{ width: `${derivedStats.keyboardPct}%` }}
+                >
+                  {derivedStats.keyboardPct >= 10 && <span>{derivedStats.keyboardPct}%</span>}
+                </div>
+              )}
+              {derivedStats.guitarPct > 0 && (
+                <div
+                  className={styles.breakdownSegmentGuitar}
+                  style={{ width: `${derivedStats.guitarPct}%` }}
+                >
+                  {derivedStats.guitarPct >= 10 && <span>{derivedStats.guitarPct}%</span>}
+                </div>
+              )}
+              {derivedStats.bassPct > 0 && (
+                <div
+                  className={styles.breakdownSegmentBass}
+                  style={{ width: `${derivedStats.bassPct}%` }}
+                >
+                  {derivedStats.bassPct >= 10 && <span>{derivedStats.bassPct}%</span>}
+                </div>
+              )}
+            </div>
+            <div className={styles.breakdownLegend}>
+              <span className={styles.breakdownLegendItem}>
+                <span className={`${styles.legendDot} ${styles.legendKeyboard}`} />
+                Keyboard
+              </span>
+              <span className={styles.breakdownLegendItem}>
+                <span className={`${styles.legendDot} ${styles.legendGuitar}`} />
+                Guitar
+              </span>
+              <span className={styles.breakdownLegendItem}>
+                <span className={`${styles.legendDot} ${styles.legendBass}`} />
+                Bass
+              </span>
+            </div>
+          </section>
+        )}
+
+        {/* Pending Assignments Callout */}
+        {pendingAssignments.length > 0 && (
+          <section className={styles.pendingCallout}>
+            <div className={styles.pendingCalloutContent}>
+              <div className={styles.pendingCalloutIcon}>
+                <PiWarningFill />
+              </div>
+              <div className={styles.pendingCalloutText}>
+                <strong>
+                  You have {pendingAssignments.length} pending assignment
+                  {pendingAssignments.length !== 1 ? 's' : ''}
+                </strong>
+              </div>
+              <button
+                className={styles.pendingCalloutButton}
+                onClick={() => handleStartAssignment(pendingAssignments[0])}
+              >
+                <PiPlayFill />
+                Start Now
+              </button>
+            </div>
+          </section>
+        )}
 
         {/* Stats Chart Section */}
         <section className={styles.statsSection}>
@@ -496,6 +708,16 @@ function Dashboard() {
                       {classroom.description && (
                         <p className={classroomStyles.classDescription}>{classroom.description}</p>
                       )}
+                      <div className={styles.classroomMeta}>
+                        <span className={styles.metaItem}>
+                          <PiUsersFill />
+                          {classroom.student_count}
+                        </span>
+                        <span className={styles.metaItem}>
+                          <PiBookOpenFill />
+                          {classroom.assignment_count}
+                        </span>
+                      </div>
                       {classroomPendingAssignments.length > 0 && (
                         <div className={styles.classroomAssignments}>
                           <span className={styles.pendingLabel}>
