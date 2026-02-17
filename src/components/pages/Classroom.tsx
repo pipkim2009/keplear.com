@@ -20,13 +20,17 @@ import {
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
-import type { Note } from '../../utils/notes'
+import { type Note, generateNotesWithSeparateOctaves } from '../../utils/notes'
 import type { AppliedScale, AppliedChord } from '../common/ScaleChordOptions'
 import {
   KEYBOARD_SCALES,
   type KeyboardScale,
+  applyScaleToKeyboard,
 } from '../../utils/instruments/keyboard/keyboardScales'
-import { KEYBOARD_CHORDS } from '../../utils/instruments/keyboard/keyboardChords'
+import {
+  KEYBOARD_CHORDS,
+  applyChordToKeyboard,
+} from '../../utils/instruments/keyboard/keyboardChords'
 import {
   GUITAR_SCALES,
   type GuitarScale,
@@ -111,6 +115,58 @@ interface SerializedChordData {
   octave?: number
   fretZone?: number
   displayName?: string
+}
+
+// Build AppliedScale[] from serialized data (avoids stale closure in handleKeyboardScaleApply)
+function buildAppliedScalesFromData(scaleDataList: SerializedScaleData[]): AppliedScale[] {
+  const fullRangeNotes = generateNotesWithSeparateOctaves(3, 3)
+  return scaleDataList
+    .map(scaleData => {
+      const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
+      if (!scaleObj) return null
+      const octave = scaleData.octave || 4
+      const displayName = `${scaleData.root} ${scaleObj.name} (Octave ${octave})`
+      let scaleNotes = applyScaleToKeyboard(scaleData.root, scaleObj, fullRangeNotes)
+      scaleNotes = scaleNotes.filter(note => {
+        const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
+        return noteOctave === octave
+      })
+      return {
+        id: `${scaleData.root}-${scaleObj.name}-${octave}-${Date.now()}-${Math.random()}`,
+        root: scaleData.root,
+        scale: scaleObj,
+        displayName,
+        notes: scaleNotes,
+        octave,
+      } as AppliedScale
+    })
+    .filter((s): s is AppliedScale => s !== null)
+}
+
+// Build AppliedChord[] from serialized data (avoids stale closure in handleKeyboardChordApply)
+function buildAppliedChordsFromData(chordDataList: SerializedChordData[]): AppliedChord[] {
+  const fullRangeNotes = generateNotesWithSeparateOctaves(3, 3)
+  return chordDataList
+    .map(chordData => {
+      const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
+      if (!chordObj) return null
+      const octave = chordData.octave || 4
+      const displayName = `${chordData.root} ${chordObj.name} (Octave ${octave})`
+      let chordNotes = applyChordToKeyboard(chordData.root, chordObj, fullRangeNotes)
+      chordNotes = chordNotes.filter(note => {
+        const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
+        return noteOctave === octave
+      })
+      return {
+        id: `keyboard-${chordData.root}-${chordObj.name}-${octave}-${Date.now()}-${Math.random()}`,
+        root: chordData.root,
+        chord: chordObj,
+        displayName,
+        notes: chordNotes,
+        octave,
+      } as AppliedChord
+    })
+    .filter((c): c is AppliedChord => c !== null)
 }
 
 // Type for serialized exercise data from JSON
@@ -3452,44 +3508,24 @@ function Classroom() {
         const targetHigher = targetExercise.higherOctaves ?? 0
 
         if (exerciseInstrument === 'keyboard') {
-          setTimeout(() => {
-            // Apply scales from exercise
-            if (targetExercise.appliedScales?.length > 0) {
-              targetExercise.appliedScales.forEach(scaleData => {
-                const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
-                if (scaleObj) {
-                  scaleChordManagement.handleKeyboardScaleApply(
-                    scaleData.root,
-                    scaleObj,
-                    scaleData.octave || 4
-                  )
-                }
-              })
-            }
-
-            // Apply chords from exercise
-            if (targetExercise.appliedChords?.length > 0) {
-              setChordMode('progression')
-              targetExercise.appliedChords.forEach(chordData => {
-                const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
-                if (chordObj) {
-                  scaleChordManagement.handleKeyboardChordApply(
-                    chordData.root,
-                    chordObj,
-                    chordData.octave || 4
-                  )
-                }
-              })
-            }
-
-            // Apply notes from exercise
-            if (targetExercise.selectedNoteIds?.length > 0) {
-              targetExercise.selectedNoteIds.forEach(noteId => {
-                const noteObj = getKeyboardNoteById(noteId, targetLower, targetHigher)
-                if (noteObj) selectNote(noteObj, 'multi')
-              })
-            }
-          }, 0)
+          // Build and apply scales/chords directly to avoid stale closure issues
+          // (handleKeyboardScaleApply closes over old appliedScales for dedup checks)
+          if (targetExercise.appliedScales?.length > 0) {
+            const scales = buildAppliedScalesFromData(targetExercise.appliedScales)
+            scaleChordManagement.setAppliedScalesDirectly(scales)
+          }
+          if (targetExercise.appliedChords?.length > 0) {
+            setChordMode('progression')
+            const chords = buildAppliedChordsFromData(targetExercise.appliedChords)
+            scaleChordManagement.setAppliedChordsDirectly(chords)
+          }
+          // Apply notes from exercise
+          if (targetExercise.selectedNoteIds?.length > 0) {
+            targetExercise.selectedNoteIds.forEach(noteId => {
+              const noteObj = getKeyboardNoteById(noteId, targetLower, targetHigher)
+              if (noteObj) selectNote(noteObj, 'multi')
+            })
+          }
         } else {
           // Guitar/Bass - use pending selection data pattern
           setPendingSelectionData({
@@ -3570,44 +3606,23 @@ function Classroom() {
       if (currentExercise.beats) setNumberOfBeats(currentExercise.beats)
       if (currentExercise.chordMode) setChordMode(currentExercise.chordMode)
 
-      setTimeout(() => {
-        // Apply scales
-        if (currentExercise.appliedScales?.length > 0) {
-          currentExercise.appliedScales.forEach((scaleData: SerializedScaleData) => {
-            const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
-            if (scaleObj) {
-              scaleChordManagement.handleKeyboardScaleApply(
-                scaleData.root,
-                scaleObj,
-                scaleData.octave || 4
-              )
-            }
-          })
-        }
-
-        // Apply chords
-        if (currentExercise.appliedChords?.length > 0) {
-          setChordMode('progression')
-          currentExercise.appliedChords.forEach((chordData: SerializedChordData) => {
-            const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
-            if (chordObj) {
-              scaleChordManagement.handleKeyboardChordApply(
-                chordData.root,
-                chordObj,
-                chordData.octave || 4
-              )
-            }
-          })
-        }
-
-        // Apply notes
-        if (currentExercise.selectedNoteIds?.length > 0) {
-          currentExercise.selectedNoteIds.forEach((noteId: string) => {
-            const noteObj = getKeyboardNoteById(noteId, exerciseLower, exerciseHigher)
-            if (noteObj) selectNote(noteObj, 'multi')
-          })
-        }
-      }, 0)
+      // Build and apply scales/chords directly (no setTimeout, no stale closure issues)
+      if (currentExercise.appliedScales?.length > 0) {
+        const scales = buildAppliedScalesFromData(currentExercise.appliedScales)
+        scaleChordManagement.setAppliedScalesDirectly(scales)
+      }
+      if (currentExercise.appliedChords?.length > 0) {
+        setChordMode('progression')
+        const chords = buildAppliedChordsFromData(currentExercise.appliedChords)
+        scaleChordManagement.setAppliedChordsDirectly(chords)
+      }
+      // Apply notes
+      if (currentExercise.selectedNoteIds?.length > 0) {
+        currentExercise.selectedNoteIds.forEach((noteId: string) => {
+          const noteObj = getKeyboardNoteById(noteId, exerciseLower, exerciseHigher)
+          if (noteObj) selectNote(noteObj, 'multi')
+        })
+      }
     } else {
       // Guitar/Bass - store pending data
       setPendingSelectionData({
@@ -4442,8 +4457,8 @@ function Classroom() {
           hideInstrumentSelector={true}
           hideOctaveRange={currentAssignment.instrument !== 'keyboard'}
           disableOctaveRange={true}
-          hideBpmButtons={true}
-          hideBeatsButtons={true}
+          hideBpmButtons={false}
+          hideBeatsButtons={false}
           hideGenerateButton={true}
           hideDeselectAll={true}
           showOnlyAppliedList={true}
@@ -4456,7 +4471,11 @@ function Classroom() {
           lessonType={
             hasBothScalesAndChords
               ? undefined
-              : (currentAssignment.lesson_type as 'melodies' | 'chords' | undefined)
+              : hasScales
+                ? 'melodies'
+                : hasChords
+                  ? 'chords'
+                  : undefined
           }
           externalSelectedNoteIds={externalSelectedNoteIds}
           hideScalesChords={hasNoScalesOrChords}

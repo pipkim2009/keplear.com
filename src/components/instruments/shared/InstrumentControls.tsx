@@ -704,32 +704,36 @@ const InstrumentControls = memo(function InstrumentControls({
                     disabled={disableBpmInput}
                     readOnly={disableBpmInput}
                   />
-                  <button
-                    className="control-button-internal minus"
-                    onMouseDown={e => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      startBpmDecrement()
-                    }}
-                    onMouseUp={stopBpmInterval}
-                    onMouseLeave={stopBpmInterval}
-                    style={{ userSelect: 'none', touchAction: 'none' }}
-                  >
-                    −
-                  </button>
-                  <button
-                    className="control-button-internal plus"
-                    onMouseDown={e => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      startBpmIncrement()
-                    }}
-                    onMouseUp={stopBpmInterval}
-                    onMouseLeave={stopBpmInterval}
-                    style={{ userSelect: 'none', touchAction: 'none' }}
-                  >
-                    +
-                  </button>
+                  {!disableBpmInput && (
+                    <button
+                      className="control-button-internal minus"
+                      onMouseDown={e => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        startBpmDecrement()
+                      }}
+                      onMouseUp={stopBpmInterval}
+                      onMouseLeave={stopBpmInterval}
+                      style={{ userSelect: 'none', touchAction: 'none' }}
+                    >
+                      −
+                    </button>
+                  )}
+                  {!disableBpmInput && (
+                    <button
+                      className="control-button-internal plus"
+                      onMouseDown={e => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        startBpmIncrement()
+                      }}
+                      onMouseUp={stopBpmInterval}
+                      onMouseLeave={stopBpmInterval}
+                      style={{ userSelect: 'none', touchAction: 'none' }}
+                    >
+                      +
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -763,32 +767,36 @@ const InstrumentControls = memo(function InstrumentControls({
                     disabled={disableBeatsInput}
                     readOnly={disableBeatsInput}
                   />
-                  <button
-                    className="control-button-internal minus"
-                    onMouseDown={e => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      startNotesDecrement()
-                    }}
-                    onMouseUp={stopNotesInterval}
-                    onMouseLeave={stopNotesInterval}
-                    style={{ userSelect: 'none', touchAction: 'none' }}
-                  >
-                    −
-                  </button>
-                  <button
-                    className="control-button-internal plus"
-                    onMouseDown={e => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      startNotesIncrement()
-                    }}
-                    onMouseUp={stopNotesInterval}
-                    onMouseLeave={stopNotesInterval}
-                    style={{ userSelect: 'none', touchAction: 'none' }}
-                  >
-                    +
-                  </button>
+                  {!disableBeatsInput && (
+                    <button
+                      className="control-button-internal minus"
+                      onMouseDown={e => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        startNotesDecrement()
+                      }}
+                      onMouseUp={stopNotesInterval}
+                      onMouseLeave={stopNotesInterval}
+                      style={{ userSelect: 'none', touchAction: 'none' }}
+                    >
+                      −
+                    </button>
+                  )}
+                  {!disableBeatsInput && (
+                    <button
+                      className="control-button-internal plus"
+                      onMouseDown={e => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        startNotesIncrement()
+                      }}
+                      onMouseUp={stopNotesInterval}
+                      onMouseLeave={stopNotesInterval}
+                      style={{ userSelect: 'none', touchAction: 'none' }}
+                    >
+                      +
+                    </button>
+                  )}
                 </div>
               </div>
             )}

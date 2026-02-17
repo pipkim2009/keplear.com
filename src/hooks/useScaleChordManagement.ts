@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from 'react'
+﻿import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Note } from '../utils/notes'
 import type { GuitarScale, ScaleBox } from '../utils/instruments/guitar/guitarScales'
 import type { BassScale, BassScaleBox } from '../utils/instruments/bass/bassScales'
@@ -114,14 +114,23 @@ export const useScaleChordManagement = ({
     handleSetManualNotes: (noteIds: string[]) => void
   } | null>(null)
 
-  // Clear all chords and scales when instrument changes
+  // Track last processed clear trigger to prevent re-clearing on handler changes
+  const lastClearTrigger = useRef(0)
+
+  // Clear all chords and scales when the clear trigger changes
   useEffect(() => {
-    if (clearChordsAndScales && clearChordsAndScales > 0) {
+    if (
+      clearChordsAndScales &&
+      clearChordsAndScales > 0 &&
+      clearChordsAndScales !== lastClearTrigger.current
+    ) {
+      lastClearTrigger.current = clearChordsAndScales
+
       // Clear keyboard scales and chords
       setCurrentKeyboardScale(null)
       setCurrentKeyboardChord(null)
 
-      // Clear applied lists for all instruments (this was missing!)
+      // Clear applied lists for all instruments
       setAppliedChords([])
       setAppliedScales([])
 
