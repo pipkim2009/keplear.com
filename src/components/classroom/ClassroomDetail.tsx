@@ -13,6 +13,7 @@ import {
   PiEyeFill,
   PiCheckCircleFill,
   PiXCircleFill,
+  PiCopySimple,
 } from 'react-icons/pi'
 import styles from '../../styles/Classroom.module.css'
 
@@ -66,6 +67,7 @@ interface ClassroomDetailProps {
   readonly onStartAssignment: (assignment: AssignmentData) => void
   readonly onEditAssignment: (assignment: AssignmentData, classroomId: string) => void
   readonly onCreateAssignment: (classroomId: string) => void
+  readonly onDuplicateAssignment?: (assignmentId: string, classroomId: string) => void
 }
 
 const ClassroomDetail = memo(function ClassroomDetail({
@@ -91,6 +93,7 @@ const ClassroomDetail = memo(function ClassroomDetail({
   onStartAssignment,
   onEditAssignment,
   onCreateAssignment,
+  onDuplicateAssignment,
 }: ClassroomDetailProps) {
   const { t } = useTranslation()
   const [codeCopied, setCodeCopied] = useState(false)
@@ -384,6 +387,15 @@ const ClassroomDetail = memo(function ClassroomDetail({
                           title={t('classroom.assignment.update')}
                         >
                           <PiPencilSimpleFill size={14} />
+                        </button>
+                      )}
+                      {isOwner && onDuplicateAssignment && (
+                        <button
+                          className={styles.editAssignmentButton}
+                          onClick={() => onDuplicateAssignment(assignment.id, classroom.id)}
+                          title="Duplicate assignment"
+                        >
+                          <PiCopySimple size={14} />
                         </button>
                       )}
                       {isOwner && (

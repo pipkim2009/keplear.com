@@ -71,6 +71,7 @@ import {
   PiArrowCounterClockwise,
   PiArrowClockwise,
   PiTrash,
+  PiTrashFill,
   PiSpeakerHigh,
   PiSpeakerLow,
   PiSpeakerNone,
@@ -78,8 +79,24 @@ import {
   PiCaretRight,
   PiEyeFill,
   PiCheckCircleFill,
+  PiChatCircleFill,
+  PiBrainFill,
+  PiBookOpenFill,
 } from 'react-icons/pi'
 import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
+// Shared exercise types (local copies still exist in this file for backward compat)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { ExerciseData as _ExerciseDataShared } from '../../types/exercise'
+import { createDefaultLesson, getExerciseCategoryInfo } from '../../utils/exercisePresets'
+// Music theory imports used by lesson generator modal
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { DifficultyLevel as _DifficultyLevel } from '../../utils/musicTheory'
+import QuickAddMenu from '../classroom/QuickAddMenu'
+// LessonGeneratorModal removed for now
+// TemplatePickerModal removed — add assignment goes straight to default lesson
+import ExerciseLibraryPanel from '../classroom/ExerciseLibraryPanel'
+import { useExerciseLibrary } from '../../hooks/useExerciseLibrary'
+import { duplicateAssignment as duplicateAssignmentAction } from '../../hooks/useClassroomActions'
 import { useRecordCompletion, useUserCompletions } from '../../hooks/useClassrooms'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import styles from '../../styles/Classroom.module.css'
@@ -457,6 +474,12 @@ function Classroom() {
 
   // Real waveform data hook
   const { peaks: songRealPeaks } = useWaveformData(songVideoId)
+
+  // Template picker / lesson generator / library state
+  const [showExerciseLibrary, setShowExerciseLibrary] = useState(false)
+
+  // Exercise library and templates hooks
+  const exerciseLibrary = useExerciseLibrary(user?.id)
 
   // Multi-exercise state for assignment editor
   const [exercises, setExercises] = useState<ExerciseData[]>([])
@@ -1052,25 +1075,7 @@ function Classroom() {
     setAssigningToClassroomId(classroomId)
     clearSelection()
     triggerClearChordsAndScales()
-    // Initialize with one empty exercise
-    setExercises([
-      {
-        id: `exercise-${Date.now()}`,
-        name: 'Exercise 1',
-        transcript: '',
-        bpm: bpm,
-        beats: numberOfBeats,
-        chordMode: chordMode,
-        lowerOctaves: lowerOctaves,
-        higherOctaves: higherOctaves,
-        selectedNoteIds: [],
-        appliedScales: [],
-        appliedChords: [],
-      },
-    ])
-    setCurrentExerciseIndex(0)
     setEditingAssignmentId(null)
-    // Reset assignment type and song state
     setAssignmentType('practice')
     setSongVideoId(null)
     setSongVideoTitle('')
@@ -1081,7 +1086,138 @@ function Classroom() {
     setSongSearchResults([])
     setSongDuration(0)
     setSongCurrentTime(0)
+
+    // Pre-fill with Warmup + Practice + Song
+    const defaultExercises = createDefaultLesson(instrument)
+    setExercises(defaultExercises)
+    setCurrentExerciseIndex(0)
+    setBpm(defaultExercises[0].bpm)
+    setNumberOfBeats(defaultExercises[0].beats)
+    setCurrentExerciseTranscript(defaultExercises[0].transcript || '')
     setViewMode('creating-assignment')
+  }
+
+  // Handle quick-add from menu
+  const handleQuickAddExercise = (exercise: ExerciseData) => {
+    if (exercises.length >= 10) return
+    // Save current state before adding
+    const currentData = saveCurrentToExercise()
+    setExercises(prev => {
+      const updated = [...prev]
+      if (updated.length > 0) {
+        const existingExercise = updated[currentExerciseIndex]
+        if (assignmentType === 'songs' && songVideoId) {
+          updated[currentExerciseIndex] = {
+            ...existingExercise,
+            transcript: currentExerciseTranscript,
+            bpm: currentData.bpm,
+            beats: currentData.beats,
+            chordMode: currentData.chordMode,
+            lowerOctaves: currentData.lowerOctaves,
+            higherOctaves: currentData.higherOctaves,
+            selectedNoteIds: [],
+            appliedScales: [],
+            appliedChords: [],
+            type: 'song',
+            songData: {
+              videoId: songVideoId,
+              videoTitle: songVideoTitle,
+              markerA: songMarkerA,
+              markerB: songMarkerB,
+              playbackRate: songPlaybackRate,
+            },
+          }
+        } else {
+          updated[currentExerciseIndex] = {
+            ...existingExercise,
+            transcript: currentExerciseTranscript,
+            bpm: currentData.bpm,
+            beats: currentData.beats,
+            chordMode: currentData.chordMode,
+            lowerOctaves: currentData.lowerOctaves,
+            higherOctaves: currentData.higherOctaves,
+            selectedNoteIds:
+              currentData.selectedNoteIds.length > 0
+                ? currentData.selectedNoteIds
+                : existingExercise.selectedNoteIds,
+            appliedScales:
+              currentData.appliedScales.length > 0
+                ? currentData.appliedScales
+                : existingExercise.appliedScales,
+            appliedChords:
+              currentData.appliedChords.length > 0
+                ? currentData.appliedChords
+                : existingExercise.appliedChords,
+          }
+        }
+      }
+      const newExercise = { ...exercise, name: `Exercise ${updated.length + 1}` }
+      return [...updated, newExercise]
+    })
+    // Clear and switch to new exercise
+    clearSelection()
+    triggerClearChordsAndScales()
+    setCurrentExerciseTranscript(exercise.transcript || '')
+    if (exercise.type === 'song') {
+      setAssignmentType('songs')
+      if (exercise.songData) {
+        setSongVideoId(exercise.songData.videoId)
+        setSongVideoTitle(exercise.songData.videoTitle)
+        setSongMarkerA(exercise.songData.markerA ?? null)
+        setSongMarkerB(exercise.songData.markerB ?? null)
+        setSongPlaybackRate(exercise.songData.playbackRate || 1)
+      } else {
+        setSongVideoId(null)
+        setSongVideoTitle('')
+      }
+    } else {
+      setAssignmentType('practice')
+      setSongVideoId(null)
+      setSongVideoTitle('')
+      setSongMarkerA(null)
+      setSongMarkerB(null)
+      setSongPlaybackRate(1)
+      if (exercise.bpm) setBpm(exercise.bpm)
+      if (exercise.beats) setNumberOfBeats(exercise.beats)
+      if (exercise.chordMode) setChordMode(exercise.chordMode)
+    }
+    setCurrentExerciseIndex(exercises.length)
+  }
+
+  // Duplicate an assignment from classroom detail
+  const handleDuplicateAssignment = async (assignmentId: string, classroomId: string) => {
+    if (!user) return
+    try {
+      await duplicateAssignmentAction(assignmentId, classroomId, user.id)
+      fetchClassrooms()
+    } catch (err) {
+      console.error('Error duplicating assignment:', err)
+    }
+  }
+
+  // Save current exercise to library
+  const handleSaveToLibrary = async () => {
+    if (!user) return
+    const currentData = saveCurrentToExercise()
+    const exerciseToSave: ExerciseData = {
+      ...exercises[currentExerciseIndex],
+      ...currentData,
+      transcript: currentExerciseTranscript,
+    }
+    if (assignmentType === 'songs' && songVideoId) {
+      exerciseToSave.type = 'song'
+      exerciseToSave.songData = {
+        videoId: songVideoId,
+        videoTitle: songVideoTitle,
+        markerA: songMarkerA,
+        markerB: songMarkerB,
+        playbackRate: songPlaybackRate,
+      }
+    }
+    const name = exerciseToSave.transcript
+      ? exerciseToSave.transcript.slice(0, 50)
+      : `${instrument} exercise`
+    await exerciseLibrary.saveExercise(name, instrument, exerciseToSave)
   }
 
   // Edit an existing assignment
@@ -1670,126 +1806,6 @@ function Classroom() {
     higherOctaves,
   ])
 
-  // Add a new exercise (saves current state first) - max 10 exercises
-  const handleAddExercise = useCallback(() => {
-    if (exercises.length >= 10) return // Max 10 exercises
-
-    const currentData = saveCurrentToExercise()
-
-    // Update current exercise with latest data - merge intelligently
-    setExercises(prev => {
-      const updated = [...prev]
-      if (updated.length > 0) {
-        const existingExercise = updated[currentExerciseIndex]
-
-        // Check if current exercise is in song mode with a video selected
-        if (assignmentType === 'songs' && songVideoId) {
-          // Save as song exercise
-          updated[currentExerciseIndex] = {
-            ...existingExercise,
-            transcript: currentExerciseTranscript,
-            bpm: currentData.bpm,
-            beats: currentData.beats,
-            chordMode: currentData.chordMode,
-            lowerOctaves: currentData.lowerOctaves,
-            higherOctaves: currentData.higherOctaves,
-            selectedNoteIds: [],
-            appliedScales: [],
-            appliedChords: [],
-            type: 'song',
-            songData: {
-              videoId: songVideoId,
-              videoTitle: songVideoTitle,
-              markerA: songMarkerA,
-              markerB: songMarkerB,
-              playbackRate: songPlaybackRate,
-            },
-          }
-        } else {
-          // Save as Generator exercise
-          updated[currentExerciseIndex] = {
-            ...existingExercise,
-            transcript: currentExerciseTranscript,
-            bpm: currentData.bpm,
-            beats: currentData.beats,
-            chordMode: currentData.chordMode,
-            lowerOctaves: currentData.lowerOctaves,
-            higherOctaves: currentData.higherOctaves,
-            selectedNoteIds:
-              currentData.selectedNoteIds.length > 0
-                ? currentData.selectedNoteIds
-                : existingExercise.selectedNoteIds,
-            appliedScales:
-              currentData.appliedScales.length > 0
-                ? currentData.appliedScales
-                : existingExercise.appliedScales,
-            appliedChords:
-              currentData.appliedChords.length > 0
-                ? currentData.appliedChords
-                : existingExercise.appliedChords,
-            type: undefined,
-            songData: undefined,
-          }
-        }
-      }
-
-      // Add new exercise (always starts as Generator)
-      const newExercise: ExerciseData = {
-        id: `exercise-${Date.now()}`,
-        name: `Exercise ${updated.length + 1}`,
-        transcript: '',
-        bpm: bpm,
-        beats: numberOfBeats,
-        chordMode: chordMode,
-        lowerOctaves: lowerOctaves,
-        higherOctaves: higherOctaves,
-        selectedNoteIds: [],
-        appliedScales: [],
-        appliedChords: [],
-      }
-      return [...updated, newExercise]
-    })
-
-    // Clear notes for new exercise
-    clearSelection()
-    triggerClearChordsAndScales()
-    setCurrentExerciseTranscript('')
-
-    // Reset to Generator mode and clear song state for new exercise
-    setAssignmentType('practice')
-    setSongVideoId(null)
-    setSongVideoTitle('')
-    setSongMarkerA(null)
-    setSongMarkerB(null)
-    setSongPlaybackRate(1)
-    setSongIsPlayerReady(false)
-    setIsSongPlaying(false)
-    setSongSearchQuery('')
-    setSongSearchResults([])
-
-    // Switch to new exercise
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    setCurrentExerciseIndex(prev => (exercises.length > 0 ? exercises.length : 0))
-  }, [
-    saveCurrentToExercise,
-    currentExerciseIndex,
-    exercises.length,
-    clearSelection,
-    triggerClearChordsAndScales,
-    bpm,
-    numberOfBeats,
-    chordMode,
-    lowerOctaves,
-    higherOctaves,
-    currentExerciseTranscript,
-    assignmentType,
-    songVideoId,
-    songVideoTitle,
-    songMarkerA,
-    songMarkerB,
-    songPlaybackRate,
-  ])
-
   // Switch to a different exercise
   const handleSwitchExercise = useCallback(
     (index: number) => {
@@ -1826,7 +1842,7 @@ function Classroom() {
           },
         }
       } else {
-        // Save as Generator exercise
+        // Save as Generator exercise — preserve existing type
         updatedExercises[currentExerciseIndex] = {
           ...existingExercise,
           transcript: currentExerciseTranscript,
@@ -1847,8 +1863,6 @@ function Classroom() {
             currentData.appliedChords.length > 0
               ? currentData.appliedChords
               : existingExercise.appliedChords,
-          type: undefined,
-          songData: undefined,
         }
       }
 
@@ -2980,9 +2994,6 @@ function Classroom() {
             currentData.appliedChords.length > 0
               ? currentData.appliedChords
               : existingExercise.appliedChords,
-          // Clear song data if switching from song to Generator
-          type: undefined,
-          songData: undefined,
         }
       }
     }
@@ -4214,16 +4225,39 @@ function Classroom() {
               >
                 <div className={practiceStyles.exerciseTimelineLine} />
                 <div className={practiceStyles.exerciseCircles}>
-                  {lessonExercises.map((exercise, index) => (
-                    <div
-                      key={exercise.id}
-                      className={`${practiceStyles.exerciseCircle} ${index === lessonExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${index < lessonExerciseIndex ? practiceStyles.exerciseCircleCompleted : ''}`}
-                      title={exercise.name}
-                      style={{ cursor: 'default' }}
-                    >
-                      {index + 1}
-                    </div>
-                  ))}
+                  {lessonExercises.map((exercise, index) => {
+                    const catInfo = getExerciseCategoryInfo(exercise)
+                    let LessonIcon = PiBrainFill
+                    let lColor = '#e53e3e'
+                    if (catInfo.category === 'song') {
+                      LessonIcon = PiMusicNotesFill
+                      lColor = '#7c3aed'
+                    } else if (
+                      catInfo.category === 'practice' ||
+                      catInfo.category === 'chord-progression'
+                    ) {
+                      lColor = '#f59e0b'
+                      if (instrument === 'keyboard') LessonIcon = PiPianoKeysFill
+                      else if (instrument === 'guitar') LessonIcon = GiGuitarHead
+                      else if (instrument === 'bass') LessonIcon = GiGuitarBassHead
+                      else LessonIcon = PiMusicNotesFill
+                    }
+                    return (
+                      <div
+                        key={exercise.id}
+                        className={`${practiceStyles.exerciseCircle} ${index === lessonExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${index < lessonExerciseIndex ? practiceStyles.exerciseCircleCompleted : ''}`}
+                        title={exercise.name}
+                        style={{
+                          cursor: 'default',
+                          background: index === lessonExerciseIndex ? lColor : undefined,
+                          borderColor: lColor,
+                          color: '#fff',
+                        }}
+                      >
+                        <LessonIcon size={14} />
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             </div>
@@ -4391,16 +4425,39 @@ function Classroom() {
             >
               <div className={practiceStyles.exerciseTimelineLine} />
               <div className={practiceStyles.exerciseCircles}>
-                {lessonExercises.map((exercise, index) => (
-                  <div
-                    key={exercise.id}
-                    className={`${practiceStyles.exerciseCircle} ${index === lessonExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${index < lessonExerciseIndex ? practiceStyles.exerciseCircleCompleted : ''}`}
-                    title={exercise.name}
-                    style={{ cursor: 'default' }}
-                  >
-                    {index + 1}
-                  </div>
-                ))}
+                {lessonExercises.map((exercise, index) => {
+                  const catInfo2 = getExerciseCategoryInfo(exercise)
+                  let LessonIcon2 = PiBrainFill
+                  let lColor2 = '#e53e3e'
+                  if (catInfo2.category === 'song') {
+                    LessonIcon2 = PiMusicNotesFill
+                    lColor2 = '#7c3aed'
+                  } else if (
+                    catInfo2.category === 'practice' ||
+                    catInfo2.category === 'chord-progression'
+                  ) {
+                    lColor2 = '#f59e0b'
+                    if (instrument === 'keyboard') LessonIcon2 = PiPianoKeysFill
+                    else if (instrument === 'guitar') LessonIcon2 = GiGuitarHead
+                    else if (instrument === 'bass') LessonIcon2 = GiGuitarBassHead
+                    else LessonIcon2 = PiMusicNotesFill
+                  }
+                  return (
+                    <div
+                      key={exercise.id}
+                      className={`${practiceStyles.exerciseCircle} ${index === lessonExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${index < lessonExerciseIndex ? practiceStyles.exerciseCircleCompleted : ''}`}
+                      title={exercise.name}
+                      style={{
+                        cursor: 'default',
+                        background: index === lessonExerciseIndex ? lColor2 : undefined,
+                        borderColor: lColor2,
+                        color: '#fff',
+                      }}
+                    >
+                      <LessonIcon2 size={14} />
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -4661,86 +4718,220 @@ function Classroom() {
           </div>
           {/* Timeline and Transcript rows - shown in both modes */}
           <>
-            {/* Row 2: Timeline */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
-              <span className={practiceStyles.exerciseTimelineLabel} style={{ minWidth: '70px' }}>
-                {t('classroom.timeline')}
-              </span>
-              <div className={practiceStyles.exerciseTimeline}>
-                <div className={practiceStyles.exerciseTimelineLine} />
-                <div className={practiceStyles.exerciseCircles}>
-                  {exercises.map((exercise, index) => {
-                    // Check if this exercise has content
-                    const hasContent =
-                      index === currentExerciseIndex
-                        ? currentHasContent
-                        : exerciseHasContent(exercise)
-                    // Check if this exercise has a transcript
-                    const hasTranscript =
-                      index === currentExerciseIndex
-                        ? currentExerciseTranscript.trim().length > 0
-                        : (exercise.transcript || '').trim().length > 0
-                    // Check if this is a song exercise
-                    const isSongExercise = exercise.type === 'song' && exercise.songData?.videoId
-                    return (
-                      <div key={exercise.id} className={practiceStyles.exerciseCircleWrapper}>
-                        <button
-                          className={`${practiceStyles.exerciseCircle} ${index === currentExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${!hasContent ? practiceStyles.exerciseCircleEmpty : ''}`}
-                          onClick={() => handleSwitchExercise(index)}
-                          title={
-                            isSongExercise
-                              ? `${exercise.name} (Song: ${exercise.songData?.videoTitle})`
-                              : hasContent
-                                ? exercise.name
-                                : `${exercise.name} (no content)`
-                          }
-                        >
-                          {index + 1}
-                        </button>
-                        {hasContent && (
-                          <span
-                            className={practiceStyles.exerciseCircleReady}
-                            title={isSongExercise ? 'Song applied' : 'Ready for assignment'}
-                          >
-                            <PiCheckCircleFill size={12} />
-                          </span>
-                        )}
-                        {hasTranscript && (
-                          <span
-                            className={practiceStyles.exerciseCircleTranscript}
-                            title="Has transcript"
-                          >
-                            <PiChatCircleFill size={12} />
-                          </span>
-                        )}
-                        {exercises.length > 1 && index === currentExerciseIndex && (
-                          <button
-                            className={practiceStyles.exerciseCircleRemove}
-                            onClick={e => {
-                              e.stopPropagation()
-                              handleRemoveExercise(index)
-                            }}
-                            title="Remove exercise"
-                          >
-                            <PiTrashFill size={10} />
-                          </button>
-                        )}
-                      </div>
+            {/* Row 2: Timeline split into Warmup / Practice / Song sections */}
+            <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
+              {(() => {
+                const sections: Array<{
+                  key: string
+                  label: string
+                  color: string
+                  categories: string[]
+                }> = [
+                  { key: 'warmup', label: 'Warmup', color: '#e53e3e', categories: ['warmup'] },
+                  {
+                    key: 'practice',
+                    label: 'Practice',
+                    color: '#f59e0b',
+                    categories: ['practice', 'chord-progression'],
+                  },
+                  { key: 'song', label: 'Song', color: '#7c3aed', categories: ['song'] },
+                ]
+
+                const getIconForSection = (sectionKey: string) => {
+                  if (sectionKey === 'warmup') return PiBrainFill
+                  if (sectionKey === 'song') return PiMusicNotesFill
+                  if (instrument === 'keyboard') return PiPianoKeysFill
+                  if (instrument === 'guitar') return GiGuitarHead
+                  if (instrument === 'bass') return GiGuitarBassHead
+                  return PiMusicNotesFill
+                }
+
+                return sections.map(section => {
+                  const sectionExercises = exercises
+                    .map((ex, idx) => ({ exercise: ex, index: idx }))
+                    .filter(({ exercise }) =>
+                      section.categories.includes(getExerciseCategoryInfo(exercise).category)
                     )
-                  })}
-                  {exercises.length < 10 && (
-                    <div className={practiceStyles.exerciseCircleWrapper}>
-                      <button
-                        className={practiceStyles.exerciseCircle}
-                        onClick={handleAddExercise}
-                        title="Add new exercise"
+                  const SectionIcon = getIconForSection(section.key)
+
+                  return (
+                    <div
+                      key={section.key}
+                      style={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <span
+                        style={{
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                          color: section.color,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          alignSelf: 'flex-start',
+                        }}
                       >
-                        +
-                      </button>
+                        {section.label}
+                      </span>
+                      <div
+                        style={{
+                          position: 'relative',
+                          display: 'flex',
+                          alignItems: 'center',
+                          width: '100%',
+                        }}
+                      >
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '8px',
+                            right: '8px',
+                            height: '2px',
+                            background: `${section.color}33`,
+                            borderRadius: '1px',
+                          }}
+                        />
+                        <div
+                          style={{
+                            position: 'relative',
+                            display: 'flex',
+                            gap: '8px',
+                            justifyContent: 'flex-start',
+                            width: '100%',
+                            padding: '0 4px',
+                          }}
+                        >
+                          {sectionExercises.map(({ exercise, index }) => {
+                            const hasContent =
+                              index === currentExerciseIndex
+                                ? currentHasContent
+                                : exerciseHasContent(exercise)
+                            const hasTranscript =
+                              index === currentExerciseIndex
+                                ? currentExerciseTranscript.trim().length > 0
+                                : (exercise.transcript || '').trim().length > 0
+
+                            return (
+                              <div
+                                key={exercise.id}
+                                className={practiceStyles.exerciseCircleWrapper}
+                              >
+                                <button
+                                  className={`${practiceStyles.exerciseCircle} ${index === currentExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${!hasContent ? practiceStyles.exerciseCircleEmpty : ''}`}
+                                  onClick={() => handleSwitchExercise(index)}
+                                  title={exercise.name}
+                                  style={{
+                                    background:
+                                      index === currentExerciseIndex ? section.color : undefined,
+                                    borderColor: section.color,
+                                    color: '#fff',
+                                  }}
+                                >
+                                  <SectionIcon size={14} />
+                                </button>
+                                {hasContent && (
+                                  <span
+                                    className={practiceStyles.exerciseCircleReady}
+                                    title="Ready"
+                                  >
+                                    <PiCheckCircleFill size={12} />
+                                  </span>
+                                )}
+                                {hasTranscript && (
+                                  <span
+                                    className={practiceStyles.exerciseCircleTranscript}
+                                    title="Has transcript"
+                                  >
+                                    <PiChatCircleFill size={12} />
+                                  </span>
+                                )}
+                                {exercises.length > 1 && index === currentExerciseIndex && (
+                                  <button
+                                    className={practiceStyles.exerciseCircleRemove}
+                                    onClick={e => {
+                                      e.stopPropagation()
+                                      handleRemoveExercise(index)
+                                    }}
+                                    title="Remove exercise"
+                                    style={{ position: 'absolute', top: '-6px', left: '-6px' }}
+                                  >
+                                    <PiTrashFill size={9} />
+                                  </button>
+                                )}
+                              </div>
+                            )
+                          })}
+                          <QuickAddMenu
+                            instrument={instrument}
+                            rootNote="C"
+                            exerciseCount={exercises.length}
+                            maxExercises={10}
+                            onAddExercise={ex => {
+                              // Tag the exercise type based on which section's "+" was clicked
+                              const tagged = { ...ex }
+                              if (section.key === 'warmup') tagged.bpm = 80
+                              else if (section.key === 'song') tagged.type = 'song'
+                              handleQuickAddExercise(tagged)
+                            }}
+                          />
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
-              </div>
+                  )
+                })
+              })()}
+            </div>
+            {/* Row 2.5: Exercise library buttons */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', width: '100%' }}>
+              <span style={{ minWidth: '70px' }} />
+              <button
+                onClick={() => {
+                  exerciseLibrary.fetchExercises()
+                  setShowExerciseLibrary(true)
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                  border: '1px solid var(--border-color, rgba(255,255,255,0.1))',
+                  background: 'transparent',
+                  color: 'var(--text-secondary, #aaa)',
+                  cursor: 'pointer',
+                }}
+                title="Open exercise library"
+              >
+                <PiBookOpenFill size={12} /> Library
+              </button>
+              <button
+                onClick={handleSaveToLibrary}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '6px',
+                  border: '1px solid var(--border-color, rgba(255,255,255,0.1))',
+                  background: 'transparent',
+                  color: 'var(--text-secondary, #aaa)',
+                  cursor: 'pointer',
+                  padding: 0,
+                  fontSize: '14px',
+                  fontWeight: 700,
+                }}
+                title="Save current exercise to library"
+              >
+                +
+              </button>
             </div>
             {/* Row 3: Transcript */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
@@ -5309,6 +5500,7 @@ function Classroom() {
           onStartAssignment={handleStartAssignment}
           onEditAssignment={handleEditAssignment}
           onCreateAssignment={handleCreateAssignment}
+          onDuplicateAssignment={handleDuplicateAssignment}
         />
         <CreateClassroomModal
           isOpen={isModalOpen}
@@ -5414,6 +5606,18 @@ function Classroom() {
         onTitleChange={setAssignmentTitle}
         onSave={handleSaveAssignment}
         onClose={handleCloseAssignModal}
+      />
+      {/* Exercise library slide-out panel */}
+      <ExerciseLibraryPanel
+        isOpen={showExerciseLibrary}
+        exercises={exerciseLibrary.exercises}
+        loading={exerciseLibrary.loading}
+        onClose={() => setShowExerciseLibrary(false)}
+        onInsert={exerciseData => {
+          handleQuickAddExercise(exerciseData)
+          setShowExerciseLibrary(false)
+        }}
+        onDelete={id => exerciseLibrary.deleteExercise(id)}
       />
     </>
   )

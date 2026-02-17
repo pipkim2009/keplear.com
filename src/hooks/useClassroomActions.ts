@@ -194,3 +194,36 @@ export async function saveAssignment(
     if (error) throw error
   }
 }
+
+/**
+ * Duplicate an existing assignment into the same or different classroom
+ */
+export async function duplicateAssignment(
+  assignmentId: string,
+  targetClassroomId: string,
+  userId: string,
+  newTitle?: string
+) {
+  // Fetch the original assignment
+  const { data: original, error: fetchError } = await supabase
+    .from('assignments')
+    .select('*')
+    .eq('id', assignmentId)
+    .single()
+
+  if (fetchError || !original) {
+    throw fetchError || new Error('Assignment not found')
+  }
+
+  // Create a copy with new ID
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id: _id, created_at: _created_at, created_by: _created_by, ...rest } = original
+  const { error: insertError } = await supabase.from('assignments').insert({
+    ...rest,
+    classroom_id: targetClassroomId,
+    title: newTitle || `${original.title} (Copy)`,
+    created_by: userId,
+  })
+
+  if (insertError) throw insertError
+}
