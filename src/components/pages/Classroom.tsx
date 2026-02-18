@@ -81,7 +81,7 @@ import {
   PiCheckCircleFill,
   PiChatCircleFill,
   PiBrainFill,
-  PiBookOpenFill,
+  PiSparkle,
 } from 'react-icons/pi'
 import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
 // Shared exercise types (local copies still exist in this file for backward compat)
@@ -94,8 +94,6 @@ import type { DifficultyLevel as _DifficultyLevel } from '../../utils/musicTheor
 import QuickAddMenu from '../classroom/QuickAddMenu'
 // LessonGeneratorModal removed for now
 // TemplatePickerModal removed — add assignment goes straight to default lesson
-import ExerciseLibraryPanel from '../classroom/ExerciseLibraryPanel'
-import { useExerciseLibrary } from '../../hooks/useExerciseLibrary'
 import { duplicateAssignment as duplicateAssignmentAction } from '../../hooks/useClassroomActions'
 import { useRecordCompletion, useUserCompletions } from '../../hooks/useClassrooms'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -450,6 +448,14 @@ function Classroom() {
   // Assignment type toggle (practice exercises vs song practice)
   const [assignmentType, setAssignmentType] = useState<'practice' | 'songs'>('practice')
 
+  // Assignment generation mode (custom vs AI)
+  const [assignmentMode, setAssignmentMode] = useState<'custom' | 'ai'>('custom')
+
+  // AI mode step (1: pick a song, 2: instrument/generate)
+  const [aiStep, setAiStep] = useState<'song-select' | 'instrument'>('song-select')
+  const [aiSongVideoId, setAiSongVideoId] = useState<string | null>(null)
+  const [aiSongTitle, setAiSongTitle] = useState('')
+
   // Song assignment state
   const [songVideoId, setSongVideoId] = useState<string | null>(null)
   const [songVideoTitle, setSongVideoTitle] = useState('')
@@ -474,12 +480,6 @@ function Classroom() {
 
   // Real waveform data hook
   const { peaks: songRealPeaks } = useWaveformData(songVideoId)
-
-  // Template picker / lesson generator / library state
-  const [showExerciseLibrary, setShowExerciseLibrary] = useState(false)
-
-  // Exercise library and templates hooks
-  const exerciseLibrary = useExerciseLibrary(user?.id)
 
   // Multi-exercise state for assignment editor
   const [exercises, setExercises] = useState<ExerciseData[]>([])
@@ -1193,31 +1193,6 @@ function Classroom() {
     } catch (err) {
       console.error('Error duplicating assignment:', err)
     }
-  }
-
-  // Save current exercise to library
-  const handleSaveToLibrary = async () => {
-    if (!user) return
-    const currentData = saveCurrentToExercise()
-    const exerciseToSave: ExerciseData = {
-      ...exercises[currentExerciseIndex],
-      ...currentData,
-      transcript: currentExerciseTranscript,
-    }
-    if (assignmentType === 'songs' && songVideoId) {
-      exerciseToSave.type = 'song'
-      exerciseToSave.songData = {
-        videoId: songVideoId,
-        videoTitle: songVideoTitle,
-        markerA: songMarkerA,
-        markerB: songMarkerB,
-        playbackRate: songPlaybackRate,
-      }
-    }
-    const name = exerciseToSave.transcript
-      ? exerciseToSave.transcript.slice(0, 50)
-      : `${instrument} exercise`
-    await exerciseLibrary.saveExercise(name, instrument, exerciseToSave)
   }
 
   // Edit an existing assignment
@@ -4716,755 +4691,1289 @@ function Classroom() {
                   : t('classroom.assign')}
             </button>
           </div>
-          {/* Timeline and Transcript rows - shown in both modes */}
-          <>
-            {/* Row 2: Timeline split into Warmup / Practice / Song sections */}
-            <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
-              {(() => {
-                const sections: Array<{
-                  key: string
-                  label: string
-                  color: string
-                  categories: string[]
-                }> = [
-                  { key: 'warmup', label: 'Warmup', color: '#e53e3e', categories: ['warmup'] },
-                  {
-                    key: 'practice',
-                    label: 'Practice',
-                    color: '#f59e0b',
-                    categories: ['practice', 'chord-progression'],
-                  },
-                  { key: 'song', label: 'Song', color: '#7c3aed', categories: ['song'] },
-                ]
+          {/* Custom / AI mode toggle */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              width: '100%',
+              margin: '0.35rem 0',
+            }}
+          >
+            <div
+              style={{
+                display: 'inline-flex',
+                borderRadius: '0.5rem',
+                overflow: 'hidden',
+                border: '1px solid rgba(255,255,255,0.12)',
+                background: 'rgba(0,0,0,0.25)',
+              }}
+            >
+              <button
+                onClick={() => {
+                  setAssignmentMode('custom')
+                  setAiStep('song-select')
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  padding: '0.3rem 0.75rem',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  background: assignmentMode === 'custom' ? 'rgba(59,130,246,0.25)' : 'transparent',
+                  color: assignmentMode === 'custom' ? '#93c5fd' : 'rgba(255,255,255,0.4)',
+                  borderRight: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >
+                Custom
+              </button>
+              <button
+                onClick={() => setAssignmentMode('ai')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  padding: '0.3rem 0.75rem',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  background: assignmentMode === 'ai' ? 'rgba(139,92,246,0.25)' : 'transparent',
+                  color: assignmentMode === 'ai' ? '#c4b5fd' : 'rgba(255,255,255,0.4)',
+                }}
+              >
+                <PiSparkle size={14} />
+                AI
+              </button>
+            </div>
+          </div>
+          {/* Timeline and Transcript rows - shown in custom mode only */}
+          {assignmentMode === 'custom' && (
+            <>
+              {/* Row 2: Timeline split into Warmup / Practice / Song sections */}
+              <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
+                {(() => {
+                  const sections: Array<{
+                    key: string
+                    label: string
+                    color: string
+                    categories: string[]
+                  }> = [
+                    { key: 'warmup', label: 'Warmup', color: '#e53e3e', categories: ['warmup'] },
+                    {
+                      key: 'practice',
+                      label: 'Practice',
+                      color: '#f59e0b',
+                      categories: ['practice', 'chord-progression'],
+                    },
+                    { key: 'song', label: 'Song', color: '#7c3aed', categories: ['song'] },
+                  ]
 
-                const getIconForSection = (sectionKey: string) => {
-                  if (sectionKey === 'warmup') return PiBrainFill
-                  if (sectionKey === 'song') return PiMusicNotesFill
-                  if (instrument === 'keyboard') return PiPianoKeysFill
-                  if (instrument === 'guitar') return GiGuitarHead
-                  if (instrument === 'bass') return GiGuitarBassHead
-                  return PiMusicNotesFill
-                }
+                  const getIconForSection = (sectionKey: string) => {
+                    if (sectionKey === 'warmup') return PiBrainFill
+                    if (sectionKey === 'song') return PiMusicNotesFill
+                    if (instrument === 'keyboard') return PiPianoKeysFill
+                    if (instrument === 'guitar') return GiGuitarHead
+                    if (instrument === 'bass') return GiGuitarBassHead
+                    return PiMusicNotesFill
+                  }
 
-                return sections.map(section => {
-                  const sectionExercises = exercises
-                    .map((ex, idx) => ({ exercise: ex, index: idx }))
-                    .filter(({ exercise }) =>
-                      section.categories.includes(getExerciseCategoryInfo(exercise).category)
-                    )
-                  const SectionIcon = getIconForSection(section.key)
+                  return sections.map(section => {
+                    const sectionExercises = exercises
+                      .map((ex, idx) => ({ exercise: ex, index: idx }))
+                      .filter(({ exercise }) =>
+                        section.categories.includes(getExerciseCategoryInfo(exercise).category)
+                      )
+                    const SectionIcon = getIconForSection(section.key)
 
-                  return (
-                    <div
-                      key={section.key}
-                      style={{
-                        flex: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: '6px',
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: '0.7rem',
-                          fontWeight: 600,
-                          color: section.color,
-                          textTransform: 'uppercase',
-                          letterSpacing: '0.5px',
-                          alignSelf: 'flex-start',
-                        }}
-                      >
-                        {section.label}
-                      </span>
+                    return (
                       <div
+                        key={section.key}
                         style={{
-                          position: 'relative',
+                          flex: 1,
                           display: 'flex',
+                          flexDirection: 'column',
                           alignItems: 'center',
-                          width: '100%',
+                          gap: '6px',
                         }}
                       >
-                        <div
+                        <span
                           style={{
-                            position: 'absolute',
-                            top: '50%',
-                            left: '8px',
-                            right: '8px',
-                            height: '2px',
-                            background: `${section.color}33`,
-                            borderRadius: '1px',
+                            fontSize: '0.7rem',
+                            fontWeight: 600,
+                            color: section.color,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                            alignSelf: 'flex-start',
                           }}
-                        />
+                        >
+                          {section.label}
+                        </span>
                         <div
                           style={{
                             position: 'relative',
                             display: 'flex',
-                            gap: '8px',
-                            justifyContent: 'flex-start',
+                            alignItems: 'center',
                             width: '100%',
-                            padding: '0 4px',
                           }}
                         >
-                          {sectionExercises.map(({ exercise, index }) => {
-                            const hasContent =
-                              index === currentExerciseIndex
-                                ? currentHasContent
-                                : exerciseHasContent(exercise)
-                            const hasTranscript =
-                              index === currentExerciseIndex
-                                ? currentExerciseTranscript.trim().length > 0
-                                : (exercise.transcript || '').trim().length > 0
-
-                            return (
-                              <div
-                                key={exercise.id}
-                                className={practiceStyles.exerciseCircleWrapper}
-                              >
-                                <button
-                                  className={`${practiceStyles.exerciseCircle} ${index === currentExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${!hasContent ? practiceStyles.exerciseCircleEmpty : ''}`}
-                                  onClick={() => handleSwitchExercise(index)}
-                                  title={exercise.name}
-                                  style={{
-                                    background:
-                                      index === currentExerciseIndex ? section.color : undefined,
-                                    borderColor: section.color,
-                                    color: '#fff',
-                                  }}
-                                >
-                                  <SectionIcon size={14} />
-                                </button>
-                                {hasContent && (
-                                  <span
-                                    className={practiceStyles.exerciseCircleReady}
-                                    title="Ready"
-                                  >
-                                    <PiCheckCircleFill size={12} />
-                                  </span>
-                                )}
-                                {hasTranscript && (
-                                  <span
-                                    className={practiceStyles.exerciseCircleTranscript}
-                                    title="Has transcript"
-                                  >
-                                    <PiChatCircleFill size={12} />
-                                  </span>
-                                )}
-                                {exercises.length > 1 && index === currentExerciseIndex && (
-                                  <button
-                                    className={practiceStyles.exerciseCircleRemove}
-                                    onClick={e => {
-                                      e.stopPropagation()
-                                      handleRemoveExercise(index)
-                                    }}
-                                    title="Remove exercise"
-                                    style={{ position: 'absolute', top: '-6px', left: '-6px' }}
-                                  >
-                                    <PiTrashFill size={9} />
-                                  </button>
-                                )}
-                              </div>
-                            )
-                          })}
-                          <QuickAddMenu
-                            instrument={instrument}
-                            rootNote="C"
-                            exerciseCount={exercises.length}
-                            maxExercises={10}
-                            onAddExercise={ex => {
-                              // Tag the exercise type based on which section's "+" was clicked
-                              const tagged = { ...ex }
-                              if (section.key === 'warmup') tagged.bpm = 80
-                              else if (section.key === 'song') tagged.type = 'song'
-                              handleQuickAddExercise(tagged)
+                          <div
+                            style={{
+                              position: 'absolute',
+                              top: '50%',
+                              left: '8px',
+                              right: '8px',
+                              height: '2px',
+                              background: `${section.color}33`,
+                              borderRadius: '1px',
                             }}
                           />
+                          <div
+                            style={{
+                              position: 'relative',
+                              display: 'flex',
+                              gap: '8px',
+                              justifyContent: 'flex-start',
+                              width: '100%',
+                              padding: '0 4px',
+                            }}
+                          >
+                            {sectionExercises.map(({ exercise, index }) => {
+                              const hasContent =
+                                index === currentExerciseIndex
+                                  ? currentHasContent
+                                  : exerciseHasContent(exercise)
+                              const hasTranscript =
+                                index === currentExerciseIndex
+                                  ? currentExerciseTranscript.trim().length > 0
+                                  : (exercise.transcript || '').trim().length > 0
+
+                              return (
+                                <div
+                                  key={exercise.id}
+                                  className={practiceStyles.exerciseCircleWrapper}
+                                >
+                                  <button
+                                    className={`${practiceStyles.exerciseCircle} ${index === currentExerciseIndex ? practiceStyles.exerciseCircleActive : ''} ${!hasContent ? practiceStyles.exerciseCircleEmpty : ''}`}
+                                    onClick={() => handleSwitchExercise(index)}
+                                    title={exercise.name}
+                                    style={{
+                                      background:
+                                        index === currentExerciseIndex ? section.color : undefined,
+                                      borderColor: section.color,
+                                      color: '#fff',
+                                    }}
+                                  >
+                                    <SectionIcon size={14} />
+                                  </button>
+                                  {hasContent && (
+                                    <span
+                                      className={practiceStyles.exerciseCircleReady}
+                                      title="Ready"
+                                    >
+                                      <PiCheckCircleFill size={12} />
+                                    </span>
+                                  )}
+                                  {hasTranscript && (
+                                    <span
+                                      className={practiceStyles.exerciseCircleTranscript}
+                                      title="Has transcript"
+                                    >
+                                      <PiChatCircleFill size={12} />
+                                    </span>
+                                  )}
+                                  {exercises.length > 1 && index === currentExerciseIndex && (
+                                    <button
+                                      className={practiceStyles.exerciseCircleRemove}
+                                      onClick={e => {
+                                        e.stopPropagation()
+                                        handleRemoveExercise(index)
+                                      }}
+                                      title="Remove exercise"
+                                      style={{ position: 'absolute', top: '-6px', left: '-6px' }}
+                                    >
+                                      <PiTrashFill size={9} />
+                                    </button>
+                                  )}
+                                </div>
+                              )
+                            })}
+                            <QuickAddMenu
+                              instrument={instrument}
+                              rootNote="C"
+                              exerciseCount={exercises.length}
+                              maxExercises={10}
+                              onAddExercise={ex => {
+                                // Tag the exercise type based on which section's "+" was clicked
+                                const tagged = { ...ex }
+                                if (section.key === 'warmup') tagged.bpm = 80
+                                else if (section.key === 'song') tagged.type = 'song'
+                                handleQuickAddExercise(tagged)
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )
-                })
-              })()}
-            </div>
-            {/* Row 2.5: Exercise library buttons */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', width: '100%' }}>
-              <span style={{ minWidth: '70px' }} />
-              <button
-                onClick={() => {
-                  exerciseLibrary.fetchExercises()
-                  setShowExerciseLibrary(true)
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  padding: '4px 10px',
-                  borderRadius: '6px',
-                  fontSize: '0.75rem',
-                  fontWeight: 600,
-                  border: '1px solid var(--border-color, rgba(255,255,255,0.1))',
-                  background: 'transparent',
-                  color: 'var(--text-secondary, #aaa)',
-                  cursor: 'pointer',
-                }}
-                title="Open exercise library"
-              >
-                <PiBookOpenFill size={12} /> Library
-              </button>
-              <button
-                onClick={handleSaveToLibrary}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '24px',
-                  height: '24px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border-color, rgba(255,255,255,0.1))',
-                  background: 'transparent',
-                  color: 'var(--text-secondary, #aaa)',
-                  cursor: 'pointer',
-                  padding: 0,
-                  fontSize: '14px',
-                  fontWeight: 700,
-                }}
-                title="Save current exercise to library"
-              >
-                +
-              </button>
-            </div>
-            {/* Row 3: Transcript */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
-              <label
-                style={{
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  color: 'var(--primary-purple)',
-                  whiteSpace: 'nowrap',
-                  minWidth: '70px',
-                }}
-              >
-                {t('classroom.transcript')}
-              </label>
-              <input
-                type="text"
-                className={practiceStyles.assignmentTitleInput}
-                style={{ flex: 1 }}
-                value={currentExerciseTranscript}
-                onChange={e => setCurrentExerciseTranscript(e.target.value)}
-                placeholder={t('classroom.transcriptPlaceholder')}
-              />
-            </div>
-          </>
-        </div>
-
-        {/* Assignment Type Toggle - Centered below header */}
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '1rem',
-            padding: '1.5rem 0',
-          }}
-        >
-          <button
-            onClick={() => setAssignmentType('practice')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '12px',
-              border:
-                assignmentType === 'practice'
-                  ? '2px solid var(--primary-purple)'
-                  : '2px solid var(--gray-500)',
-              background:
-                assignmentType === 'practice' ? 'var(--primary-purple-alpha-15)' : 'transparent',
-              color: assignmentType === 'practice' ? 'var(--primary-purple)' : 'var(--gray-200)',
-              fontWeight: 600,
-              fontSize: '1rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            {instrument === 'keyboard' && <PiPianoKeysFill size={20} />}
-            {instrument === 'guitar' && <GiGuitarHead size={20} />}
-            {instrument === 'bass' && <GiGuitarBassHead size={20} />}
-            Generator
-          </button>
-          <button
-            onClick={() => setAssignmentType('songs')}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.75rem 1.5rem',
-              borderRadius: '12px',
-              border:
-                assignmentType === 'songs'
-                  ? '2px solid var(--primary-purple)'
-                  : '2px solid var(--gray-500)',
-              background:
-                assignmentType === 'songs' ? 'var(--primary-purple-alpha-15)' : 'transparent',
-              color: assignmentType === 'songs' ? 'var(--primary-purple)' : 'var(--gray-200)',
-              fontWeight: 600,
-              fontSize: '1rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <PiMusicNotesFill size={20} />
-            Song
-          </button>
-        </div>
-
-        {/* Practice Assignment: Instrument Display */}
-        {assignmentType === 'practice' && (
-          <InstrumentDisplay
-            onNoteClick={handleNoteClick}
-            isSelected={isSelected}
-            isInMelody={isInMelody}
-            showNotes={showNotes}
-            bpm={bpm}
-            setBpm={setBpm}
-            numberOfBeats={numberOfBeats}
-            setNumberOfBeats={setNumberOfBeats}
-            chordMode={chordMode}
-            setChordMode={setChordMode}
-            instrument={instrument}
-            setInstrument={handleInstrumentChange}
-            setGuitarNotes={setGuitarNotes}
-            clearSelection={clearSelection}
-            clearTrigger={clearTrigger}
-            selectedNotes={selectedNotes}
-            selectNote={selectNote}
-            onOctaveRangeChange={handleOctaveRangeChange}
-            initialLowerOctaves={lowerOctaves}
-            initialHigherOctaves={higherOctaves}
-            flashingInputs={{
-              bpm: flashingInputs.bpm || activeInputs.bpm,
-              beats: flashingInputs.beats || activeInputs.beats,
-              mode: flashingInputs.mode || activeInputs.mode,
-            }}
-            triggerInputFlash={triggerInputFlash}
-            setInputActive={setInputActive}
-            clearChordsAndScales={clearChordsAndScalesTrigger}
-            onGenerateMelody={handleGenerateMelody}
-            onPlayMelody={handlePlayMelody}
-            onRecordMelody={handleRecordMelody}
-            isPlaying={isPlaying}
-            isRecording={isRecording}
-            hasGeneratedMelody={generatedMelody.length > 0}
-            onToggleNotes={toggleShowNotes}
-            playbackProgress={playbackProgress}
-            melodyDuration={melodyDuration}
-            onProgressChange={setPlaybackProgress}
-            onClearRecordedAudio={handleClearRecordedAudio}
-            recordedAudioBlob={recordedAudioBlob}
-            generatedMelody={generatedMelody}
-            hasChanges={hasChanges}
-            isGeneratingMelody={isGeneratingMelody}
-            isAutoRecording={isAutoRecording}
-            currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
-            onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
-            externalSelectedNoteIds={externalSelectedNoteIds}
-            hideInstrumentSelector={true}
-            hideGenerateButton={true}
-          />
-        )}
-
-        {/* Song Assignment: Using Songs page styles */}
-        {assignmentType === 'songs' && (
-          <div className={songStyles.songsContainer} style={{ padding: '1rem 2rem' }}>
-            {/* Search Section */}
-            <form
-              className={songStyles.searchSection}
-              onSubmit={e => {
-                e.preventDefault()
-                handleSongSearch(songSearchQuery)
-              }}
-            >
-              <div className={songStyles.searchInputWrapper}>
-                <PiMagnifyingGlass className={songStyles.searchIcon} />
+                    )
+                  })
+                })()}
+              </div>
+              {/* Row 3: Transcript */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%' }}>
+                <label
+                  style={{
+                    fontWeight: 600,
+                    fontSize: '0.875rem',
+                    color: 'var(--primary-purple)',
+                    whiteSpace: 'nowrap',
+                    minWidth: '70px',
+                  }}
+                >
+                  {t('classroom.transcript')}
+                </label>
                 <input
                   type="text"
-                  className={songStyles.searchInput}
-                  placeholder="Search YouTube for a song..."
-                  value={songSearchQuery}
-                  onChange={e => setSongSearchQuery(e.target.value)}
+                  className={practiceStyles.assignmentTitleInput}
+                  style={{ flex: 1 }}
+                  value={currentExerciseTranscript}
+                  onChange={e => setCurrentExerciseTranscript(e.target.value)}
+                  placeholder={t('classroom.transcriptPlaceholder')}
                 />
-                {songSearchQuery && (
-                  <button
-                    type="button"
-                    className={songStyles.clearSearchButton}
-                    onClick={() => {
-                      setSongSearchQuery('')
-                      setSongSearchResults([])
-                    }}
-                    aria-label="Clear"
-                  >
-                    <PiX />
-                  </button>
-                )}
               </div>
-              <button type="submit" className={songStyles.loadButton} disabled={isSearchingSongs}>
-                {isSearchingSongs ? 'Searching...' : 'Search'}
-              </button>
-            </form>
+            </>
+          )}
+        </div>
 
-            {/* Search Results */}
-            {songSearchResults.length > 0 && (
-              <div className={songStyles.resultsSection}>
-                <div className={songStyles.resultsSectionHeader}>
-                  <h2 className={songStyles.sectionTitle}>Search Results</h2>
-                  <span className={songStyles.resultsCount}>
-                    {songSearchResults.length} results
-                  </span>
-                </div>
-                <div className={songStyles.searchResultsList}>
-                  {songSearchResults.map(result => (
-                    <div
-                      key={result.videoId}
-                      className={songStyles.searchResultItem}
-                      onClick={() => handleSelectSong(result)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={e => e.key === 'Enter' && handleSelectSong(result)}
-                    >
-                      <img
-                        src={`https://i.ytimg.com/vi/${result.videoId}/mqdefault.jpg`}
-                        alt={result.title}
-                        className={songStyles.resultThumbnail}
-                      />
-                      <div className={songStyles.resultInfo}>
-                        <span className={songStyles.resultTitle}>{result.title}</span>
-                        <span className={songStyles.resultAuthor}>{result.author}</span>
-                        <div className={songStyles.resultMeta}>
-                          <span className={songStyles.resultDuration}>
-                            {formatSongTime(result.lengthSeconds)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+        {/* Custom mode: Assignment Type Toggle, Instrument, Song */}
+        {assignmentMode === 'custom' && (
+          <>
+            {/* Assignment Type Toggle - Centered below header */}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '1rem',
+                padding: '1.5rem 0',
+              }}
+            >
+              <button
+                onClick={() => setAssignmentType('practice')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '12px',
+                  border:
+                    assignmentType === 'practice'
+                      ? '2px solid var(--primary-purple)'
+                      : '2px solid var(--gray-500)',
+                  background:
+                    assignmentType === 'practice'
+                      ? 'var(--primary-purple-alpha-15)'
+                      : 'transparent',
+                  color:
+                    assignmentType === 'practice' ? 'var(--primary-purple)' : 'var(--gray-200)',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {instrument === 'keyboard' && <PiPianoKeysFill size={20} />}
+                {instrument === 'guitar' && <GiGuitarHead size={20} />}
+                {instrument === 'bass' && <GiGuitarBassHead size={20} />}
+                Generator
+              </button>
+              <button
+                onClick={() => setAssignmentType('songs')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1.5rem',
+                  borderRadius: '12px',
+                  border:
+                    assignmentType === 'songs'
+                      ? '2px solid var(--primary-purple)'
+                      : '2px solid var(--gray-500)',
+                  background:
+                    assignmentType === 'songs' ? 'var(--primary-purple-alpha-15)' : 'transparent',
+                  color: assignmentType === 'songs' ? 'var(--primary-purple)' : 'var(--gray-200)',
+                  fontWeight: 600,
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <PiMusicNotesFill size={20} />
+                Song
+              </button>
+            </div>
+
+            {/* Practice Assignment: Instrument Display */}
+            {assignmentType === 'practice' && (
+              <InstrumentDisplay
+                onNoteClick={handleNoteClick}
+                isSelected={isSelected}
+                isInMelody={isInMelody}
+                showNotes={showNotes}
+                bpm={bpm}
+                setBpm={setBpm}
+                numberOfBeats={numberOfBeats}
+                setNumberOfBeats={setNumberOfBeats}
+                chordMode={chordMode}
+                setChordMode={setChordMode}
+                instrument={instrument}
+                setInstrument={handleInstrumentChange}
+                setGuitarNotes={setGuitarNotes}
+                clearSelection={clearSelection}
+                clearTrigger={clearTrigger}
+                selectedNotes={selectedNotes}
+                selectNote={selectNote}
+                onOctaveRangeChange={handleOctaveRangeChange}
+                initialLowerOctaves={lowerOctaves}
+                initialHigherOctaves={higherOctaves}
+                flashingInputs={{
+                  bpm: flashingInputs.bpm || activeInputs.bpm,
+                  beats: flashingInputs.beats || activeInputs.beats,
+                  mode: flashingInputs.mode || activeInputs.mode,
+                }}
+                triggerInputFlash={triggerInputFlash}
+                setInputActive={setInputActive}
+                clearChordsAndScales={clearChordsAndScalesTrigger}
+                onGenerateMelody={handleGenerateMelody}
+                onPlayMelody={handlePlayMelody}
+                onRecordMelody={handleRecordMelody}
+                isPlaying={isPlaying}
+                isRecording={isRecording}
+                hasGeneratedMelody={generatedMelody.length > 0}
+                onToggleNotes={toggleShowNotes}
+                playbackProgress={playbackProgress}
+                melodyDuration={melodyDuration}
+                onProgressChange={setPlaybackProgress}
+                onClearRecordedAudio={handleClearRecordedAudio}
+                recordedAudioBlob={recordedAudioBlob}
+                generatedMelody={generatedMelody}
+                hasChanges={hasChanges}
+                isGeneratingMelody={isGeneratingMelody}
+                isAutoRecording={isAutoRecording}
+                currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
+                onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
+                externalSelectedNoteIds={externalSelectedNoteIds}
+                hideInstrumentSelector={true}
+                hideGenerateButton={true}
+              />
             )}
 
-            {/* Hidden YouTube Player Container */}
-            <div ref={songPlayerContainerRef} style={{ position: 'absolute', left: '-9999px' }} />
-
-            {/* Selected Song Player - Exact match of Songs page */}
-            {songVideoId && (
-              <div className={songStyles.playerSection}>
-                <div className={songStyles.playerHeader}>
-                  <div className={songStyles.playerTrackInfo}>
-                    <img
-                      src={`https://i.ytimg.com/vi/${songVideoId}/mqdefault.jpg`}
-                      alt={songVideoTitle}
-                      className={songStyles.playerArtwork}
+            {/* Song Assignment: Using Songs page styles */}
+            {assignmentType === 'songs' && (
+              <div className={songStyles.songsContainer} style={{ padding: '1rem 2rem' }}>
+                {/* Search Section */}
+                <form
+                  className={songStyles.searchSection}
+                  onSubmit={e => {
+                    e.preventDefault()
+                    handleSongSearch(songSearchQuery)
+                  }}
+                >
+                  <div className={songStyles.searchInputWrapper}>
+                    <PiMagnifyingGlass className={songStyles.searchIcon} />
+                    <input
+                      type="text"
+                      className={songStyles.searchInput}
+                      placeholder="Search YouTube for a song..."
+                      value={songSearchQuery}
+                      onChange={e => setSongSearchQuery(e.target.value)}
                     />
-                    <div className={songStyles.playerTrackDetails}>
-                      <h2 className={songStyles.nowPlaying}>{songVideoTitle}</h2>
-                      <p className={songStyles.playerArtist}>YouTube</p>
+                    {songSearchQuery && (
+                      <button
+                        type="button"
+                        className={songStyles.clearSearchButton}
+                        onClick={() => {
+                          setSongSearchQuery('')
+                          setSongSearchResults([])
+                        }}
+                        aria-label="Clear"
+                      >
+                        <PiX />
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    type="submit"
+                    className={songStyles.loadButton}
+                    disabled={isSearchingSongs}
+                  >
+                    {isSearchingSongs ? 'Searching...' : 'Search'}
+                  </button>
+                </form>
+
+                {/* Search Results */}
+                {songSearchResults.length > 0 && (
+                  <div className={songStyles.resultsSection}>
+                    <div className={songStyles.resultsSectionHeader}>
+                      <h2 className={songStyles.sectionTitle}>Search Results</h2>
+                      <span className={songStyles.resultsCount}>
+                        {songSearchResults.length} results
+                      </span>
+                    </div>
+                    <div className={songStyles.searchResultsList}>
+                      {songSearchResults.map(result => (
+                        <div
+                          key={result.videoId}
+                          className={songStyles.searchResultItem}
+                          onClick={() => handleSelectSong(result)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={e => e.key === 'Enter' && handleSelectSong(result)}
+                        >
+                          <img
+                            src={`https://i.ytimg.com/vi/${result.videoId}/mqdefault.jpg`}
+                            alt={result.title}
+                            className={songStyles.resultThumbnail}
+                          />
+                          <div className={songStyles.resultInfo}>
+                            <span className={songStyles.resultTitle}>{result.title}</span>
+                            <span className={songStyles.resultAuthor}>{result.author}</span>
+                            <div className={songStyles.resultMeta}>
+                              <span className={songStyles.resultDuration}>
+                                {formatSongTime(result.lengthSeconds)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                  <button
-                    className={`${songStyles.controlButton} ${songIsLooping ? songStyles.controlButtonActive : ''}`}
-                    onClick={() => setSongIsLooping(!songIsLooping)}
-                    aria-label="Loop"
-                    title="Loop"
-                  >
-                    <PiRepeat />
-                  </button>
-                  <div className={songStyles.volumeControl}>
-                    <SongVolumeIcon className={songStyles.volumeIcon} />
-                    <input
-                      type="range"
-                      className={songStyles.volumeSlider}
-                      min={0}
-                      max={100}
-                      step={1}
-                      value={songVolume}
-                      onChange={handleSongVolumeChange}
-                      style={{ '--volume-percent': `${songVolume}%` } as React.CSSProperties}
-                    />
-                  </div>
-                  <button
-                    className={songStyles.closePlayerButton}
-                    onClick={handleClearSong}
-                    aria-label="Close"
-                  >
-                    <PiX />
-                  </button>
-                </div>
-
-                {/* Loading indicator */}
-                {!songIsPlayerReady && (
-                  <div className={songStyles.audioLoading}>Loading audio...</div>
                 )}
 
-                {/* Timeline with A-B markers */}
-                <div className={songStyles.timelineSection}>
-                  <div className={songStyles.timelineWrapper}>
-                    {/* Waveform visualization - 1 bar per 0.1 seconds */}
-                    <div className={songStyles.waveformContainer}>
-                      {(() => {
-                        const numBars = Math.min(600, Math.max(1, Math.ceil(songDuration * 10)))
-                        const bars = songRealPeaks
-                          ? resamplePeaks(songRealPeaks, numBars)
-                          : generateFallbackWaveform(songVideoId, numBars)
+                {/* Hidden YouTube Player Container */}
+                <div
+                  ref={songPlayerContainerRef}
+                  style={{ position: 'absolute', left: '-9999px' }}
+                />
 
-                        return bars.map((height, i) => {
-                          const barProgress = (i + 1) / numBars
-                          const currentProgress =
-                            songDuration > 0 ? songCurrentTime / songDuration : 0
-                          const isPassed = barProgress <= currentProgress
-
-                          return (
-                            <div
-                              key={i}
-                              className={`${songStyles.waveformBar} ${isPassed ? songStyles.waveformBarPassed : ''}`}
-                              style={{ height: `${height * 100}%` }}
-                            />
-                          )
-                        })
-                      })()}
-                    </div>
-                    {/* A-B marker visualization */}
-                    {songMarkerA !== null && songDuration > 0 && (
-                      <div
-                        className={songStyles.markerA}
-                        style={{ left: `${(songMarkerA / songDuration) * 100}%` }}
-                        title={`A: ${formatSongTime(songMarkerA)}`}
-                      />
-                    )}
-                    {songMarkerB !== null && songDuration > 0 && (
-                      <div
-                        className={songStyles.markerB}
-                        style={{ left: `${(songMarkerB / songDuration) * 100}%` }}
-                        title={`B: ${formatSongTime(songMarkerB)}`}
-                      />
-                    )}
-                    {songMarkerA !== null && songMarkerB !== null && songDuration > 0 && (
-                      <div
-                        className={songStyles.abRange}
-                        style={{
-                          left: `${(songMarkerA / songDuration) * 100}%`,
-                          width: `${((songMarkerB - songMarkerA) / songDuration) * 100}%`,
-                        }}
-                      />
-                    )}
-                    <input
-                      type="range"
-                      className={songStyles.timeline}
-                      min={0}
-                      max={songDuration || 100}
-                      value={songCurrentTime}
-                      onChange={handleSongSeek}
-                      step={0.1}
-                      disabled={!songIsPlayerReady}
-                    />
-                  </div>
-                  <div className={songStyles.timeDisplay}>
-                    <span>{formatSongTime(songCurrentTime)}</span>
-                    <span>{formatSongTime(songDuration)}</span>
-                  </div>
-                </div>
-
-                {/* Controls + Looper Grid */}
-                <div className={songStyles.controlsGrid}>
-                  <div className={songStyles.controlsLeft}>
-                    <div className={songStyles.transportRow}>
-                      <button
-                        className={songStyles.controlButtonSmall}
-                        onClick={() => handleSongSkip(-10)}
-                        disabled={!songIsPlayerReady}
-                        aria-label="Rewind 10 seconds"
-                        title="Rewind 10s"
-                      >
-                        <PiArrowCounterClockwise />
-                      </button>
-                      <button
-                        className={songStyles.controlButton}
-                        onClick={toggleSongPlayPause}
-                        disabled={!songIsPlayerReady}
-                        aria-label={isSongPlaying ? 'Pause' : 'Play'}
-                      >
-                        {isSongPlaying ? <PiPause /> : <PiPlay />}
-                      </button>
-                      <button
-                        className={songStyles.controlButtonSmall}
-                        onClick={() => handleSongSkip(10)}
-                        disabled={!songIsPlayerReady}
-                        aria-label="Forward 10 seconds"
-                        title="Forward 10s"
-                      >
-                        <PiArrowClockwise />
-                      </button>
-                    </div>
-                    <div className={songStyles.speedControl}>
-                      <div className={songStyles.speedButtons}>
-                        {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
-                          <button
-                            key={speed}
-                            className={`${songStyles.speedButton} ${songPlaybackRate === speed ? songStyles.speedButtonActive : ''}`}
-                            onClick={() => setSongPlaybackRate(speed)}
-                          >
-                            {speed}x
-                          </button>
-                        ))}
+                {/* Selected Song Player - Exact match of Songs page */}
+                {songVideoId && (
+                  <div className={songStyles.playerSection}>
+                    <div className={songStyles.playerHeader}>
+                      <div className={songStyles.playerTrackInfo}>
+                        <img
+                          src={`https://i.ytimg.com/vi/${songVideoId}/mqdefault.jpg`}
+                          alt={songVideoTitle}
+                          className={songStyles.playerArtwork}
+                        />
+                        <div className={songStyles.playerTrackDetails}>
+                          <h2 className={songStyles.nowPlaying}>{songVideoTitle}</h2>
+                          <p className={songStyles.playerArtist}>YouTube</p>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-
-                  <div className={songStyles.abControls}>
-                    <span className={songStyles.controlLabel}>Looper</span>
-                    <div className={songStyles.abButtons}>
                       <button
-                        className={`${songStyles.markerButton} ${songMarkerA !== null ? songStyles.markerButtonSet : ''}`}
-                        onClick={setMarkerAAtCurrent}
-                        disabled={!songIsPlayerReady}
-                        title="Set marker A at current position"
-                      >
-                        A {songMarkerA !== null && `(${formatSongTime(songMarkerA)})`}
-                      </button>
-                      <button
-                        className={`${songStyles.markerButton} ${songMarkerB !== null ? songStyles.markerButtonSet : ''}`}
-                        onClick={setMarkerBAtCurrent}
-                        disabled={songMarkerA === null || !songIsPlayerReady}
-                        title="Set marker B at current position"
-                      >
-                        B {songMarkerB !== null && `(${formatSongTime(songMarkerB)})`}
-                      </button>
-                      <button
-                        className={`${songStyles.abToggleButton} ${songIsABLooping ? songStyles.abToggleButtonActive : ''}`}
-                        onClick={toggleSongABLoop}
-                        disabled={songMarkerA === null || songMarkerB === null}
-                        title="Toggle A-B loop"
+                        className={`${songStyles.controlButton} ${songIsLooping ? songStyles.controlButtonActive : ''}`}
+                        onClick={() => setSongIsLooping(!songIsLooping)}
+                        aria-label="Loop"
+                        title="Loop"
                       >
                         <PiRepeat />
                       </button>
+                      <div className={songStyles.volumeControl}>
+                        <SongVolumeIcon className={songStyles.volumeIcon} />
+                        <input
+                          type="range"
+                          className={songStyles.volumeSlider}
+                          min={0}
+                          max={100}
+                          step={1}
+                          value={songVolume}
+                          onChange={handleSongVolumeChange}
+                          style={{ '--volume-percent': `${songVolume}%` } as React.CSSProperties}
+                        />
+                      </div>
                       <button
-                        className={songStyles.clearMarkersButton}
-                        onClick={clearSongMarkers}
-                        disabled={songMarkerA === null && songMarkerB === null}
-                        title="Clear markers"
+                        className={songStyles.closePlayerButton}
+                        onClick={handleClearSong}
+                        aria-label="Close"
                       >
-                        <PiTrash />
+                        <PiX />
                       </button>
                     </div>
+
+                    {/* Loading indicator */}
+                    {!songIsPlayerReady && (
+                      <div className={songStyles.audioLoading}>Loading audio...</div>
+                    )}
+
+                    {/* Timeline with A-B markers */}
+                    <div className={songStyles.timelineSection}>
+                      <div className={songStyles.timelineWrapper}>
+                        {/* Waveform visualization - 1 bar per 0.1 seconds */}
+                        <div className={songStyles.waveformContainer}>
+                          {(() => {
+                            const numBars = Math.min(600, Math.max(1, Math.ceil(songDuration * 10)))
+                            const bars = songRealPeaks
+                              ? resamplePeaks(songRealPeaks, numBars)
+                              : generateFallbackWaveform(songVideoId, numBars)
+
+                            return bars.map((height, i) => {
+                              const barProgress = (i + 1) / numBars
+                              const currentProgress =
+                                songDuration > 0 ? songCurrentTime / songDuration : 0
+                              const isPassed = barProgress <= currentProgress
+
+                              return (
+                                <div
+                                  key={i}
+                                  className={`${songStyles.waveformBar} ${isPassed ? songStyles.waveformBarPassed : ''}`}
+                                  style={{ height: `${height * 100}%` }}
+                                />
+                              )
+                            })
+                          })()}
+                        </div>
+                        {/* A-B marker visualization */}
+                        {songMarkerA !== null && songDuration > 0 && (
+                          <div
+                            className={songStyles.markerA}
+                            style={{ left: `${(songMarkerA / songDuration) * 100}%` }}
+                            title={`A: ${formatSongTime(songMarkerA)}`}
+                          />
+                        )}
+                        {songMarkerB !== null && songDuration > 0 && (
+                          <div
+                            className={songStyles.markerB}
+                            style={{ left: `${(songMarkerB / songDuration) * 100}%` }}
+                            title={`B: ${formatSongTime(songMarkerB)}`}
+                          />
+                        )}
+                        {songMarkerA !== null && songMarkerB !== null && songDuration > 0 && (
+                          <div
+                            className={songStyles.abRange}
+                            style={{
+                              left: `${(songMarkerA / songDuration) * 100}%`,
+                              width: `${((songMarkerB - songMarkerA) / songDuration) * 100}%`,
+                            }}
+                          />
+                        )}
+                        <input
+                          type="range"
+                          className={songStyles.timeline}
+                          min={0}
+                          max={songDuration || 100}
+                          value={songCurrentTime}
+                          onChange={handleSongSeek}
+                          step={0.1}
+                          disabled={!songIsPlayerReady}
+                        />
+                      </div>
+                      <div className={songStyles.timeDisplay}>
+                        <span>{formatSongTime(songCurrentTime)}</span>
+                        <span>{formatSongTime(songDuration)}</span>
+                      </div>
+                    </div>
+
+                    {/* Controls + Looper Grid */}
+                    <div className={songStyles.controlsGrid}>
+                      <div className={songStyles.controlsLeft}>
+                        <div className={songStyles.transportRow}>
+                          <button
+                            className={songStyles.controlButtonSmall}
+                            onClick={() => handleSongSkip(-10)}
+                            disabled={!songIsPlayerReady}
+                            aria-label="Rewind 10 seconds"
+                            title="Rewind 10s"
+                          >
+                            <PiArrowCounterClockwise />
+                          </button>
+                          <button
+                            className={songStyles.controlButton}
+                            onClick={toggleSongPlayPause}
+                            disabled={!songIsPlayerReady}
+                            aria-label={isSongPlaying ? 'Pause' : 'Play'}
+                          >
+                            {isSongPlaying ? <PiPause /> : <PiPlay />}
+                          </button>
+                          <button
+                            className={songStyles.controlButtonSmall}
+                            onClick={() => handleSongSkip(10)}
+                            disabled={!songIsPlayerReady}
+                            aria-label="Forward 10 seconds"
+                            title="Forward 10s"
+                          >
+                            <PiArrowClockwise />
+                          </button>
+                        </div>
+                        <div className={songStyles.speedControl}>
+                          <div className={songStyles.speedButtons}>
+                            {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
+                              <button
+                                key={speed}
+                                className={`${songStyles.speedButton} ${songPlaybackRate === speed ? songStyles.speedButtonActive : ''}`}
+                                onClick={() => setSongPlaybackRate(speed)}
+                              >
+                                {speed}x
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className={songStyles.abControls}>
+                        <span className={songStyles.controlLabel}>Looper</span>
+                        <div className={songStyles.abButtons}>
+                          <button
+                            className={`${songStyles.markerButton} ${songMarkerA !== null ? songStyles.markerButtonSet : ''}`}
+                            onClick={setMarkerAAtCurrent}
+                            disabled={!songIsPlayerReady}
+                            title="Set marker A at current position"
+                          >
+                            A {songMarkerA !== null && `(${formatSongTime(songMarkerA)})`}
+                          </button>
+                          <button
+                            className={`${songStyles.markerButton} ${songMarkerB !== null ? songStyles.markerButtonSet : ''}`}
+                            onClick={setMarkerBAtCurrent}
+                            disabled={songMarkerA === null || !songIsPlayerReady}
+                            title="Set marker B at current position"
+                          >
+                            B {songMarkerB !== null && `(${formatSongTime(songMarkerB)})`}
+                          </button>
+                          <button
+                            className={`${songStyles.abToggleButton} ${songIsABLooping ? songStyles.abToggleButtonActive : ''}`}
+                            onClick={toggleSongABLoop}
+                            disabled={songMarkerA === null || songMarkerB === null}
+                            title="Toggle A-B loop"
+                          >
+                            <PiRepeat />
+                          </button>
+                          <button
+                            className={songStyles.clearMarkersButton}
+                            onClick={clearSongMarkers}
+                            disabled={songMarkerA === null && songMarkerB === null}
+                            title="Clear markers"
+                          >
+                            <PiTrash />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Assign Buttons */}
+                    {/* Apply Buttons - Add song to exercise timeline */}
+                    {(() => {
+                      // Check if current exercise has this song applied
+                      const currentExercise = exercises[currentExerciseIndex]
+                      const isLoopApplied =
+                        currentExercise?.type === 'song' &&
+                        currentExercise?.songData?.videoId === songVideoId &&
+                        currentExercise?.songData?.markerA !== null &&
+                        currentExercise?.songData?.markerB !== null
+                      const isEntireTrackApplied =
+                        currentExercise?.type === 'song' &&
+                        currentExercise?.songData?.videoId === songVideoId &&
+                        currentExercise?.songData?.markerA === null &&
+                        currentExercise?.songData?.markerB === null
+
+                      return (
+                        <div
+                          style={{
+                            display: 'flex',
+                            gap: '1rem',
+                            marginTop: '1rem',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <button
+                            onClick={() => applySongToExercise(true)}
+                            disabled={songMarkerA === null || songMarkerB === null}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.75rem 1.5rem',
+                              borderRadius: '10px',
+                              border: 'none',
+                              background: isLoopApplied
+                                ? 'var(--green-500)'
+                                : songMarkerA !== null && songMarkerB !== null
+                                  ? 'var(--primary-purple)'
+                                  : 'var(--gray-600)',
+                              color: 'white',
+                              fontWeight: 600,
+                              fontSize: '0.9rem',
+                              cursor:
+                                songMarkerA !== null && songMarkerB !== null
+                                  ? 'pointer'
+                                  : 'not-allowed',
+                              opacity: songMarkerA !== null && songMarkerB !== null ? 1 : 0.5,
+                              transition: 'all 0.2s ease',
+                            }}
+                            title={
+                              songMarkerA === null || songMarkerB === null
+                                ? 'Set A and B markers first'
+                                : isLoopApplied
+                                  ? 'Loop applied to exercise'
+                                  : 'Apply the looped section as an exercise'
+                            }
+                          >
+                            {isLoopApplied ? (
+                              <PiCheckCircleFill size={18} />
+                            ) : (
+                              <PiRepeat size={18} />
+                            )}
+                            {isLoopApplied ? 'Applied Loop' : 'Apply Loop'}
+                          </button>
+                          <button
+                            onClick={() => applySongToExercise(false)}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              padding: '0.75rem 1.5rem',
+                              borderRadius: '10px',
+                              border: isEntireTrackApplied
+                                ? 'none'
+                                : '2px solid var(--primary-purple)',
+                              background: isEntireTrackApplied ? 'var(--green-500)' : 'transparent',
+                              color: isEntireTrackApplied ? 'white' : 'var(--primary-purple)',
+                              fontWeight: 600,
+                              fontSize: '0.9rem',
+                              cursor: 'pointer',
+                              opacity: 1,
+                              transition: 'all 0.2s ease',
+                            }}
+                            title={
+                              isEntireTrackApplied
+                                ? 'Entire track applied to exercise'
+                                : 'Apply the entire song as an exercise'
+                            }
+                          >
+                            {isEntireTrackApplied ? (
+                              <PiCheckCircleFill size={18} />
+                            ) : (
+                              <PiMusicNotesFill size={18} />
+                            )}
+                            {isEntireTrackApplied ? 'Applied Entire Track' : 'Apply Entire Track'}
+                          </button>
+                        </div>
+                      )
+                    })()}
                   </div>
-                </div>
+                )}
 
-                {/* Assign Buttons */}
-                {/* Apply Buttons - Add song to exercise timeline */}
-                {(() => {
-                  // Check if current exercise has this song applied
-                  const currentExercise = exercises[currentExerciseIndex]
-                  const isLoopApplied =
-                    currentExercise?.type === 'song' &&
-                    currentExercise?.songData?.videoId === songVideoId &&
-                    currentExercise?.songData?.markerA !== null &&
-                    currentExercise?.songData?.markerB !== null
-                  const isEntireTrackApplied =
-                    currentExercise?.type === 'song' &&
-                    currentExercise?.songData?.videoId === songVideoId &&
-                    currentExercise?.songData?.markerA === null &&
-                    currentExercise?.songData?.markerB === null
+                {/* Empty State */}
+                {!songVideoId && songSearchResults.length === 0 && (
+                  <div className={songStyles.emptyState}>
+                    <p className={songStyles.emptyStateText}>
+                      Search for a YouTube song to assign to students
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
+        )}
 
-                  return (
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: '1rem',
-                        marginTop: '1rem',
-                        justifyContent: 'center',
+        {/* AI mode */}
+        {assignmentMode === 'ai' && (
+          <>
+            {/* Step 1: Song selector */}
+            {aiStep === 'song-select' && (
+              <div className={songStyles.songsContainer} style={{ padding: '1rem 2rem' }}>
+                <h2
+                  style={{
+                    textAlign: 'center',
+                    fontSize: '1.1rem',
+                    fontWeight: 700,
+                    color: 'var(--gray-100)',
+                    margin: '0.5rem 0 1rem',
+                  }}
+                >
+                  Select a Song
+                </h2>
+                {/* Search - shown when no song selected yet */}
+                {!songVideoId && (
+                  <>
+                    <form
+                      className={songStyles.searchSection}
+                      onSubmit={e => {
+                        e.preventDefault()
+                        handleSongSearch(songSearchQuery)
                       }}
                     >
+                      <div className={songStyles.searchInputWrapper}>
+                        <PiMagnifyingGlass className={songStyles.searchIcon} />
+                        <input
+                          type="text"
+                          className={songStyles.searchInput}
+                          placeholder="Search YouTube for a song..."
+                          value={songSearchQuery}
+                          onChange={e => setSongSearchQuery(e.target.value)}
+                        />
+                        {songSearchQuery && (
+                          <button
+                            type="button"
+                            className={songStyles.clearSearchButton}
+                            onClick={() => {
+                              setSongSearchQuery('')
+                              setSongSearchResults([])
+                            }}
+                            aria-label="Clear"
+                          >
+                            <PiX />
+                          </button>
+                        )}
+                      </div>
                       <button
-                        onClick={() => applySongToExercise(true)}
-                        disabled={songMarkerA === null || songMarkerB === null}
+                        type="submit"
+                        className={songStyles.loadButton}
+                        disabled={isSearchingSongs}
+                      >
+                        {isSearchingSongs ? 'Searching...' : 'Search'}
+                      </button>
+                    </form>
+
+                    {/* Search Results */}
+                    {songSearchResults.length > 0 && (
+                      <div className={songStyles.resultsSection}>
+                        <div className={songStyles.resultsSectionHeader}>
+                          <h2 className={songStyles.sectionTitle}>Search Results</h2>
+                          <span className={songStyles.resultsCount}>
+                            {songSearchResults.length} results
+                          </span>
+                        </div>
+                        <div className={songStyles.searchResultsList}>
+                          {songSearchResults.map(result => (
+                            <div
+                              key={result.videoId}
+                              className={songStyles.searchResultItem}
+                              onClick={() => {
+                                setAiSongVideoId(result.videoId)
+                                setAiSongTitle(result.title)
+                                handleSelectSong(result)
+                              }}
+                              role="button"
+                              tabIndex={0}
+                              onKeyDown={e => {
+                                if (e.key === 'Enter') {
+                                  setAiSongVideoId(result.videoId)
+                                  setAiSongTitle(result.title)
+                                  handleSelectSong(result)
+                                }
+                              }}
+                            >
+                              <img
+                                src={`https://i.ytimg.com/vi/${result.videoId}/mqdefault.jpg`}
+                                alt={result.title}
+                                className={songStyles.resultThumbnail}
+                              />
+                              <div className={songStyles.resultInfo}>
+                                <span className={songStyles.resultTitle}>{result.title}</span>
+                                <span className={songStyles.resultAuthor}>{result.author}</span>
+                                <div className={songStyles.resultMeta}>
+                                  <span className={songStyles.resultDuration}>
+                                    {formatSongTime(result.lengthSeconds)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Empty State */}
+                    {songSearchResults.length === 0 && !songSearchQuery && (
+                      <div className={songStyles.emptyState}>
+                        <p className={songStyles.emptyStateText}>
+                          Search for a song to generate an AI assignment
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Hidden YouTube Player Container */}
+                <div
+                  ref={songPlayerContainerRef}
+                  style={{ position: 'absolute', left: '-9999px' }}
+                />
+
+                {/* Song Player - shown after selecting a song */}
+                {songVideoId && (
+                  <>
+                    <div className={songStyles.playerSection}>
+                      <div className={songStyles.playerHeader}>
+                        <div className={songStyles.playerTrackInfo}>
+                          <img
+                            src={`https://i.ytimg.com/vi/${songVideoId}/mqdefault.jpg`}
+                            alt={songVideoTitle}
+                            className={songStyles.playerArtwork}
+                          />
+                          <div className={songStyles.playerTrackDetails}>
+                            <h2 className={songStyles.nowPlaying}>{songVideoTitle}</h2>
+                            <p className={songStyles.playerArtist}>YouTube</p>
+                          </div>
+                        </div>
+                        <button
+                          className={`${songStyles.controlButton} ${songIsLooping ? songStyles.controlButtonActive : ''}`}
+                          onClick={() => setSongIsLooping(!songIsLooping)}
+                          aria-label="Loop"
+                          title="Loop"
+                        >
+                          <PiRepeat />
+                        </button>
+                        <div className={songStyles.volumeControl}>
+                          <SongVolumeIcon className={songStyles.volumeIcon} />
+                          <input
+                            type="range"
+                            className={songStyles.volumeSlider}
+                            min={0}
+                            max={100}
+                            step={1}
+                            value={songVolume}
+                            onChange={handleSongVolumeChange}
+                            style={{ '--volume-percent': `${songVolume}%` } as React.CSSProperties}
+                          />
+                        </div>
+                        <button
+                          className={songStyles.closePlayerButton}
+                          onClick={() => {
+                            handleClearSong()
+                            setAiSongVideoId(null)
+                            setAiSongTitle('')
+                          }}
+                          aria-label="Close"
+                        >
+                          <PiX />
+                        </button>
+                      </div>
+
+                      {/* Loading indicator */}
+                      {!songIsPlayerReady && (
+                        <div className={songStyles.audioLoading}>Loading audio...</div>
+                      )}
+
+                      {/* Timeline with A-B markers */}
+                      <div className={songStyles.timelineSection}>
+                        <div className={songStyles.timelineWrapper}>
+                          <div className={songStyles.waveformContainer}>
+                            {(() => {
+                              const numBars = Math.min(
+                                600,
+                                Math.max(1, Math.ceil(songDuration * 10))
+                              )
+                              const bars = songRealPeaks
+                                ? resamplePeaks(songRealPeaks, numBars)
+                                : generateFallbackWaveform(songVideoId, numBars)
+
+                              return bars.map((height, i) => {
+                                const barProgress = (i + 1) / numBars
+                                const currentProgress =
+                                  songDuration > 0 ? songCurrentTime / songDuration : 0
+                                const isPassed = barProgress <= currentProgress
+
+                                return (
+                                  <div
+                                    key={i}
+                                    className={`${songStyles.waveformBar} ${isPassed ? songStyles.waveformBarPassed : ''}`}
+                                    style={{ height: `${height * 100}%` }}
+                                  />
+                                )
+                              })
+                            })()}
+                          </div>
+                          {songMarkerA !== null && songDuration > 0 && (
+                            <div
+                              className={songStyles.markerA}
+                              style={{ left: `${(songMarkerA / songDuration) * 100}%` }}
+                              title={`A: ${formatSongTime(songMarkerA)}`}
+                            />
+                          )}
+                          {songMarkerB !== null && songDuration > 0 && (
+                            <div
+                              className={songStyles.markerB}
+                              style={{ left: `${(songMarkerB / songDuration) * 100}%` }}
+                              title={`B: ${formatSongTime(songMarkerB)}`}
+                            />
+                          )}
+                          {songMarkerA !== null && songMarkerB !== null && songDuration > 0 && (
+                            <div
+                              className={songStyles.abRange}
+                              style={{
+                                left: `${(songMarkerA / songDuration) * 100}%`,
+                                width: `${((songMarkerB - songMarkerA) / songDuration) * 100}%`,
+                              }}
+                            />
+                          )}
+                          <input
+                            type="range"
+                            className={songStyles.timeline}
+                            min={0}
+                            max={songDuration || 100}
+                            value={songCurrentTime}
+                            onChange={handleSongSeek}
+                            step={0.1}
+                            disabled={!songIsPlayerReady}
+                          />
+                        </div>
+                        <div className={songStyles.timeDisplay}>
+                          <span>{formatSongTime(songCurrentTime)}</span>
+                          <span>{formatSongTime(songDuration)}</span>
+                        </div>
+                      </div>
+
+                      {/* Controls + Looper Grid */}
+                      <div className={songStyles.controlsGrid}>
+                        <div className={songStyles.controlsLeft}>
+                          <div className={songStyles.transportRow}>
+                            <button
+                              className={songStyles.controlButtonSmall}
+                              onClick={() => handleSongSkip(-10)}
+                              disabled={!songIsPlayerReady}
+                              aria-label="Rewind 10 seconds"
+                              title="Rewind 10s"
+                            >
+                              <PiArrowCounterClockwise />
+                            </button>
+                            <button
+                              className={songStyles.controlButton}
+                              onClick={toggleSongPlayPause}
+                              disabled={!songIsPlayerReady}
+                              aria-label={isSongPlaying ? 'Pause' : 'Play'}
+                            >
+                              {isSongPlaying ? <PiPause /> : <PiPlay />}
+                            </button>
+                            <button
+                              className={songStyles.controlButtonSmall}
+                              onClick={() => handleSongSkip(10)}
+                              disabled={!songIsPlayerReady}
+                              aria-label="Forward 10 seconds"
+                              title="Forward 10s"
+                            >
+                              <PiArrowClockwise />
+                            </button>
+                          </div>
+                          <div className={songStyles.speedControl}>
+                            <div className={songStyles.speedButtons}>
+                              {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
+                                <button
+                                  key={speed}
+                                  className={`${songStyles.speedButton} ${songPlaybackRate === speed ? songStyles.speedButtonActive : ''}`}
+                                  onClick={() => setSongPlaybackRate(speed)}
+                                >
+                                  {speed}x
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className={songStyles.abControls}>
+                          <span className={songStyles.controlLabel}>Looper</span>
+                          <div className={songStyles.abButtons}>
+                            <button
+                              className={`${songStyles.markerButton} ${songMarkerA !== null ? songStyles.markerButtonSet : ''}`}
+                              onClick={setMarkerAAtCurrent}
+                              disabled={!songIsPlayerReady}
+                              title="Set marker A at current position"
+                            >
+                              A {songMarkerA !== null && `(${formatSongTime(songMarkerA)})`}
+                            </button>
+                            <button
+                              className={`${songStyles.markerButton} ${songMarkerB !== null ? songStyles.markerButtonSet : ''}`}
+                              onClick={setMarkerBAtCurrent}
+                              disabled={songMarkerA === null || !songIsPlayerReady}
+                              title="Set marker B at current position"
+                            >
+                              B {songMarkerB !== null && `(${formatSongTime(songMarkerB)})`}
+                            </button>
+                            <button
+                              className={`${songStyles.abToggleButton} ${songIsABLooping ? songStyles.abToggleButtonActive : ''}`}
+                              onClick={toggleSongABLoop}
+                              disabled={songMarkerA === null || songMarkerB === null}
+                              title="Toggle A-B loop"
+                            >
+                              <PiRepeat />
+                            </button>
+                            <button
+                              className={songStyles.clearMarkersButton}
+                              onClick={clearSongMarkers}
+                              disabled={songMarkerA === null && songMarkerB === null}
+                              title="Clear markers"
+                            >
+                              <PiTrash />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Continue button */}
+                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+                      <button
+                        onClick={() => setAiStep('instrument')}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
                           gap: '0.5rem',
-                          padding: '0.75rem 1.5rem',
+                          padding: '0.75rem 2rem',
                           borderRadius: '10px',
                           border: 'none',
-                          background: isLoopApplied
-                            ? 'var(--green-500)'
-                            : songMarkerA !== null && songMarkerB !== null
-                              ? 'var(--primary-purple)'
-                              : 'var(--gray-600)',
+                          background: 'var(--primary-purple)',
                           color: 'white',
                           fontWeight: 600,
-                          fontSize: '0.9rem',
-                          cursor:
-                            songMarkerA !== null && songMarkerB !== null
-                              ? 'pointer'
-                              : 'not-allowed',
-                          opacity: songMarkerA !== null && songMarkerB !== null ? 1 : 0.5,
-                          transition: 'all 0.2s ease',
-                        }}
-                        title={
-                          songMarkerA === null || songMarkerB === null
-                            ? 'Set A and B markers first'
-                            : isLoopApplied
-                              ? 'Loop applied to exercise'
-                              : 'Apply the looped section as an exercise'
-                        }
-                      >
-                        {isLoopApplied ? <PiCheckCircleFill size={18} /> : <PiRepeat size={18} />}
-                        {isLoopApplied ? 'Applied Loop' : 'Apply Loop'}
-                      </button>
-                      <button
-                        onClick={() => applySongToExercise(false)}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.5rem',
-                          padding: '0.75rem 1.5rem',
-                          borderRadius: '10px',
-                          border: isEntireTrackApplied ? 'none' : '2px solid var(--primary-purple)',
-                          background: isEntireTrackApplied ? 'var(--green-500)' : 'transparent',
-                          color: isEntireTrackApplied ? 'white' : 'var(--primary-purple)',
-                          fontWeight: 600,
-                          fontSize: '0.9rem',
+                          fontSize: '0.95rem',
                           cursor: 'pointer',
-                          opacity: 1,
                           transition: 'all 0.2s ease',
                         }}
-                        title={
-                          isEntireTrackApplied
-                            ? 'Entire track applied to exercise'
-                            : 'Apply the entire song as an exercise'
-                        }
                       >
-                        {isEntireTrackApplied ? (
-                          <PiCheckCircleFill size={18} />
-                        ) : (
-                          <PiMusicNotesFill size={18} />
-                        )}
-                        {isEntireTrackApplied ? 'Applied Entire Track' : 'Apply Entire Track'}
+                        Continue
+                        <PiCaretRight size={18} />
                       </button>
                     </div>
-                  )
-                })()}
+                  </>
+                )}
               </div>
             )}
 
-            {/* Empty State */}
-            {!songVideoId && songSearchResults.length === 0 && (
-              <div className={songStyles.emptyState}>
-                <p className={songStyles.emptyStateText}>
-                  Search for a YouTube song to assign to students
-                </p>
-              </div>
+            {/* Step 2: Instrument display */}
+            {aiStep === 'instrument' && (
+              <>
+                <h2
+                  style={{
+                    textAlign: 'center',
+                    fontSize: '1.1rem',
+                    fontWeight: 700,
+                    color: 'var(--gray-100)',
+                    margin: '0.5rem 0 1rem',
+                  }}
+                >
+                  Select Song Notes
+                </h2>
+                {/* Selected song bar with back button */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.75rem',
+                    padding: '0.5rem 1rem',
+                    background: 'rgba(139,92,246,0.08)',
+                    borderRadius: '0.5rem',
+                    margin: '0 1rem',
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      handleClearSong()
+                      setAiStep('song-select')
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '28px',
+                      height: '28px',
+                      borderRadius: '0.375rem',
+                      border: '1px solid rgba(255,255,255,0.12)',
+                      background: 'rgba(255,255,255,0.06)',
+                      color: 'rgba(255,255,255,0.6)',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                    }}
+                    title="Change song"
+                  >
+                    <PiCaretRight size={14} style={{ transform: 'rotate(180deg)' }} />
+                  </button>
+                  {aiSongVideoId && (
+                    <img
+                      src={`https://i.ytimg.com/vi/${aiSongVideoId}/mqdefault.jpg`}
+                      alt={aiSongTitle}
+                      style={{
+                        width: '48px',
+                        height: '28px',
+                        objectFit: 'cover',
+                        borderRadius: '0.25rem',
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
+                  <span
+                    style={{
+                      fontSize: '0.82rem',
+                      fontWeight: 600,
+                      color: '#c4b5fd',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {aiSongTitle}
+                  </span>
+                </div>
+
+                <InstrumentDisplay
+                  onNoteClick={handleNoteClick}
+                  isSelected={isSelected}
+                  isInMelody={isInMelody}
+                  showNotes={showNotes}
+                  bpm={bpm}
+                  setBpm={setBpm}
+                  numberOfBeats={numberOfBeats}
+                  setNumberOfBeats={setNumberOfBeats}
+                  chordMode={chordMode}
+                  setChordMode={setChordMode}
+                  instrument={instrument}
+                  setInstrument={handleInstrumentChange}
+                  setGuitarNotes={setGuitarNotes}
+                  clearSelection={clearSelection}
+                  clearTrigger={clearTrigger}
+                  selectedNotes={selectedNotes}
+                  selectNote={selectNote}
+                  onOctaveRangeChange={handleOctaveRangeChange}
+                  initialLowerOctaves={lowerOctaves}
+                  initialHigherOctaves={higherOctaves}
+                  flashingInputs={{
+                    bpm: flashingInputs.bpm || activeInputs.bpm,
+                    beats: flashingInputs.beats || activeInputs.beats,
+                    mode: flashingInputs.mode || activeInputs.mode,
+                  }}
+                  triggerInputFlash={triggerInputFlash}
+                  setInputActive={setInputActive}
+                  clearChordsAndScales={clearChordsAndScalesTrigger}
+                  onGenerateMelody={handleGenerateMelody}
+                  onPlayMelody={handlePlayMelody}
+                  onRecordMelody={handleRecordMelody}
+                  isPlaying={isPlaying}
+                  isRecording={isRecording}
+                  hasGeneratedMelody={generatedMelody.length > 0}
+                  onToggleNotes={toggleShowNotes}
+                  playbackProgress={playbackProgress}
+                  melodyDuration={melodyDuration}
+                  onProgressChange={setPlaybackProgress}
+                  onClearRecordedAudio={handleClearRecordedAudio}
+                  recordedAudioBlob={recordedAudioBlob}
+                  generatedMelody={generatedMelody}
+                  hasChanges={hasChanges}
+                  isGeneratingMelody={isGeneratingMelody}
+                  isAutoRecording={isAutoRecording}
+                  currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
+                  onCurrentlyPlayingNoteChange={handleCurrentlyPlayingNoteChange}
+                  externalSelectedNoteIds={externalSelectedNoteIds}
+                  hideInstrumentSelector={true}
+                  hideGenerateButton={true}
+                  hideBpmButtons={true}
+                  hideBeatsButtons={true}
+                  hideChordMode={true}
+                />
+              </>
             )}
-          </div>
+          </>
         )}
       </>
     )
@@ -5606,18 +6115,6 @@ function Classroom() {
         onTitleChange={setAssignmentTitle}
         onSave={handleSaveAssignment}
         onClose={handleCloseAssignModal}
-      />
-      {/* Exercise library slide-out panel */}
-      <ExerciseLibraryPanel
-        isOpen={showExerciseLibrary}
-        exercises={exerciseLibrary.exercises}
-        loading={exerciseLibrary.loading}
-        onClose={() => setShowExerciseLibrary(false)}
-        onInsert={exerciseData => {
-          handleQuickAddExercise(exerciseData)
-          setShowExerciseLibrary(false)
-        }}
-        onDelete={id => exerciseLibrary.deleteExercise(id)}
       />
     </>
   )
