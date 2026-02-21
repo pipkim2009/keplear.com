@@ -88,13 +88,13 @@ import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { ExerciseData as _ExerciseDataShared } from '../../types/exercise'
 import { createDefaultLesson, getExerciseCategoryInfo } from '../../utils/exercisePresets'
+import { generateAILesson, type GenerateAILessonParams } from '../../utils/aiLessonGenerator'
 // Music theory imports used by lesson generator modal
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { DifficultyLevel as _DifficultyLevel } from '../../utils/musicTheory'
 import QuickAddMenu from '../classroom/QuickAddMenu'
 // LessonGeneratorModal removed for now
 // TemplatePickerModal removed — add assignment goes straight to default lesson
-import { duplicateAssignment as duplicateAssignmentAction } from '../../hooks/useClassroomActions'
 import { useRecordCompletion, useUserCompletions } from '../../hooks/useClassrooms'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import styles from '../../styles/Classroom.module.css'
@@ -450,6 +450,8 @@ function Classroom() {
 
   // Assignment generation mode (custom vs AI)
   const [assignmentMode, setAssignmentMode] = useState<'custom' | 'ai'>('custom')
+  const [isAiGenerated, setIsAiGenerated] = useState(false)
+  const aiLessonParamsRef = useRef<GenerateAILessonParams | null>(null)
 
   // AI mode step (1: pick a song, 2: instrument/generate)
   const [aiStep, setAiStep] = useState<'song-select' | 'instrument'>('song-select')
@@ -1076,6 +1078,8 @@ function Classroom() {
     clearSelection()
     triggerClearChordsAndScales()
     setEditingAssignmentId(null)
+    setIsAiGenerated(false)
+    aiLessonParamsRef.current = null
     setAssignmentType('practice')
     setSongVideoId(null)
     setSongVideoTitle('')
@@ -1184,21 +1188,12 @@ function Classroom() {
     setCurrentExerciseIndex(exercises.length)
   }
 
-  // Duplicate an assignment from classroom detail
-  const handleDuplicateAssignment = async (assignmentId: string, classroomId: string) => {
-    if (!user) return
-    try {
-      await duplicateAssignmentAction(assignmentId, classroomId, user.id)
-      fetchClassrooms()
-    } catch (err) {
-      console.error('Error duplicating assignment:', err)
-    }
-  }
-
   // Edit an existing assignment
   const handleEditAssignment = (assignment: AssignmentData, classroomId: string) => {
     setAssigningToClassroomId(classroomId)
     setEditingAssignmentId(assignment.id)
+    setIsAiGenerated(false)
+    aiLessonParamsRef.current = null
     setAssignmentTitle(assignment.title)
     clearSelection()
     triggerClearChordsAndScales()
@@ -4756,7 +4751,42 @@ function Classroom() {
           {assignmentMode === 'custom' && (
             <>
               {/* Row 2: Timeline split into Warmup / Practice / Song sections */}
-              <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
+              <div style={{ display: 'flex', gap: '0.5rem', width: '100%', position: 'relative' }}>
+                {isAiGenerated && (
+                  <button
+                    onClick={() => {
+                      if (!aiLessonParamsRef.current) return
+                      const generatedExercises = generateAILesson(aiLessonParamsRef.current)
+                      setExercises(generatedExercises)
+                      setCurrentExerciseIndex(0)
+                      setBpm(generatedExercises[0].bpm)
+                      setNumberOfBeats(generatedExercises[0].beats)
+                      setCurrentExerciseTranscript(generatedExercises[0].transcript || '')
+                    }}
+                    title="Regenerate lesson"
+                    style={{
+                      position: 'absolute',
+                      top: '-2px',
+                      right: '-2px',
+                      zIndex: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '3px',
+                      padding: '2px 6px',
+                      background: 'rgba(139,92,246,0.3)',
+                      color: '#c4b5fd',
+                      border: '1px solid rgba(139,92,246,0.4)',
+                      borderRadius: '6px',
+                      fontSize: '0.65rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <PiSparkle size={11} />
+                    <PiArrowClockwise size={11} />
+                  </button>
+                )}
                 {(() => {
                   const sections: Array<{
                     key: string
@@ -5971,6 +6001,70 @@ function Classroom() {
                   hideBeatsButtons={true}
                   hideChordMode={true}
                 />
+
+                {/* Generate Lesson button */}
+                <div style={{ display: 'flex', justifyContent: 'center', margin: '1.5rem 0 1rem' }}>
+                  <button
+                    onClick={() => {
+                      const manualNoteIds = selectedNotes
+                        .filter(
+                          n => n.isManualSelection === true || n.isManualSelection === undefined
+                        )
+                        .map(n => n.id)
+
+                      const params: GenerateAILessonParams = {
+                        selectedNoteIds: manualNoteIds,
+                        appliedScales: scaleChordManagement.appliedScales.map(s => ({
+                          root: s.root,
+                          scaleName: s.scale?.name || 'Major',
+                          octave: s.octave,
+                          displayName: s.displayName,
+                        })),
+                        appliedChords: scaleChordManagement.appliedChords.map(c => ({
+                          root: c.root,
+                          chordName: c.chord?.name || 'Major',
+                          octave: c.octave,
+                          fretZone: c.fretZone,
+                          displayName: c.displayName,
+                        })),
+                        instrument,
+                        songVideoId: aiSongVideoId || '',
+                        songTitle: aiSongTitle,
+                        songMarkerA,
+                        songMarkerB,
+                        songPlaybackRate,
+                      }
+                      aiLessonParamsRef.current = params
+                      const generatedExercises = generateAILesson(params)
+
+                      setExercises(generatedExercises)
+                      setCurrentExerciseIndex(0)
+                      setBpm(generatedExercises[0].bpm)
+                      setNumberOfBeats(generatedExercises[0].beats)
+                      setCurrentExerciseTranscript(generatedExercises[0].transcript || '')
+                      setIsAiGenerated(true)
+                      setAssignmentMode('custom')
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.75rem 2rem',
+                      background:
+                        'linear-gradient(135deg, rgba(139,92,246,0.8), rgba(168,85,247,0.8))',
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '0.75rem',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                    }}
+                  >
+                    <PiSparkle size={18} />
+                    Generate Lesson
+                  </button>
+                </div>
               </>
             )}
           </>
@@ -6009,7 +6103,6 @@ function Classroom() {
           onStartAssignment={handleStartAssignment}
           onEditAssignment={handleEditAssignment}
           onCreateAssignment={handleCreateAssignment}
-          onDuplicateAssignment={handleDuplicateAssignment}
         />
         <CreateClassroomModal
           isOpen={isModalOpen}

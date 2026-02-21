@@ -386,9 +386,9 @@ const InstrumentControls = memo(function InstrumentControls({
   }, [audioFileUrl])
 
   // Determine if melody can be generated
-  // Need at least 1 note/chord/scale AND beats must be >= total notes
+  // Need at least 1 note/chord/scale selected — beats warning is advisory only
   const hasContent = appliedChordsCount > 0 || appliedScalesCount > 0 || selectedNotesCount > 0
-  const canGenerateMelody = hasContent && hasEnoughBeats
+  const canGenerateMelody = hasContent
   return (
     <div
       className={`instrument-controls ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}
