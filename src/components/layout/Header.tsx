@@ -1,6 +1,8 @@
-﻿import { useState, useCallback, memo } from 'react'
+﻿import { useState, useCallback, useEffect, memo } from 'react'
 import { Link, useLocation } from 'react-router'
 import { PiMagnifyingGlass } from 'react-icons/pi'
+import { HiOutlineMenu } from 'react-icons/hi'
+import { IoClose } from 'react-icons/io5'
 import { useAuth } from '../../hooks/useAuth'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import { useTranslation } from '../../contexts/TranslationContext'
@@ -24,8 +26,14 @@ const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) 
   const [showSearch, setShowSearch] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authForm, setAuthForm] = useState<'login' | 'signup'>('login')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const currentPath = location.pathname
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [currentPath])
 
   const handleShowLogin = useCallback(() => {
     setAuthForm('login')
@@ -50,12 +58,21 @@ const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) 
     <header className="header">
       <div className="header-content">
         <div className="header-left">
-          <div className="header-brand">
+          <Link to={user ? '/dashboard' : '/'} className="header-brand">
             <img src={logo} alt="Keplear" className="header-logo" />
-          </div>
+          </Link>
         </div>
 
-        <nav className="header-nav">
+        <button
+          className="mobile-menu-btn"
+          onClick={() => setMobileMenuOpen(prev => !prev)}
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileMenuOpen}
+        >
+          {mobileMenuOpen ? <IoClose size={32} /> : <HiOutlineMenu size={32} />}
+        </button>
+
+        <nav className={`header-nav ${mobileMenuOpen ? 'header-nav-open' : ''}`}>
           {user ? (
             <Link
               to="/dashboard"

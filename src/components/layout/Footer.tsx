@@ -1,11 +1,13 @@
 ﻿import { Link } from 'react-router'
 import logo from '/Keplear-logo.webp'
+import { useAuth } from '../../hooks/useAuth'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { FaInstagram, FaTiktok } from 'react-icons/fa'
 import { FaXTwitter } from 'react-icons/fa6'
 import '../../styles/Footer.css'
 
 function Footer() {
+  const { user } = useAuth()
   const { t } = useTranslation()
   const currentYear = new Date().getFullYear()
 
@@ -14,7 +16,9 @@ function Footer() {
       <div className="footer-content">
         <div className="footer-main">
           <div className="footer-brand">
-            <img src={logo} alt="Keplear" className="footer-logo" />
+            <Link to={user ? '/dashboard' : '/'}>
+              <img src={logo} alt="Keplear" className="footer-logo" />
+            </Link>
             <nav className="footer-nav">
               <Link to="/dashboard" className="footer-nav-link">
                 {t('nav.dashboard')}

@@ -2,6 +2,7 @@
 import { Routes, Route } from 'react-router'
 import PageLoader from './common/PageLoader'
 import SectionErrorBoundary from './common/SectionErrorBoundary'
+import ProtectedRoute from './ProtectedRoute'
 
 /**
  * Lazy-loaded page components for code splitting
@@ -41,97 +42,121 @@ function Router() {
         <Route
           path="/dashboard"
           element={
-            <SectionErrorBoundary section="Dashboard">
-              <Dashboard />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="Dashboard">
+                <Dashboard />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/generator"
           element={
-            <SectionErrorBoundary section="generator">
-              <Generator />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="generator">
+                <Generator />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/songs"
           element={
-            <SectionErrorBoundary section="Songs">
-              <Songs />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="Songs">
+                <Songs />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/instruments"
           element={
-            <SectionErrorBoundary section="Instruments">
-              <Instruments />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="Instruments">
+                <Instruments />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/isolater"
           element={
-            <SectionErrorBoundary section="Stems">
-              <Stems />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="Stems">
+                <Stems />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/classroom"
           element={
-            <SectionErrorBoundary section="Classroom">
-              <Classroom />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="Classroom">
+                <Classroom />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/classroom/:id"
           element={
-            <SectionErrorBoundary section="Classroom">
-              <Classroom />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="Classroom">
+                <Classroom />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/profile"
           element={
-            <SectionErrorBoundary section="Profile">
-              <Profile />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="Profile">
+                <Profile />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/profile/:userId"
           element={
-            <SectionErrorBoundary section="Profile">
-              <Profile />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="Profile">
+                <Profile />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/metronome"
           element={
-            <SectionErrorBoundary section="Metronome">
-              <Metronome />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="Metronome">
+                <Metronome />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/tuner"
           element={
-            <SectionErrorBoundary section="Tuner">
-              <Tuner />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="Tuner">
+                <Tuner />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/sandbox"
           element={
-            <SectionErrorBoundary section="Sandbox">
-              <SandboxPage />
-            </SectionErrorBoundary>
+            <ProtectedRoute>
+              <SectionErrorBoundary section="Sandbox">
+                <SandboxPage />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
           }
         />
         <Route path="/privacy" element={<PrivacyPolicy />} />

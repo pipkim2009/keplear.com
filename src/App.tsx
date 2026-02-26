@@ -7,7 +7,6 @@ import { TranslationProvider } from './contexts/TranslationContext'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import Router from './components/Router'
-import ProtectedRoute from './components/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import SkipLink from './components/common/SkipLink'
 import ChatPanel from './components/common/ChatPanel'
@@ -112,9 +111,7 @@ const App = memo(function App() {
                           </div>
                         }
                       >
-                        <ProtectedRoute>
-                          <Router />
-                        </ProtectedRoute>
+                        <Router />
                       </ErrorBoundary>
                     </main>
 
