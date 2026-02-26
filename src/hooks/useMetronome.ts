@@ -42,16 +42,18 @@ interface UseMetronomeReturn {
   tapTempo: () => void
 }
 
-const PRESET_TIME_SIGNATURES = ['2/4', '3/4', '4/4', '5/4', '6/8', '7/8'] as const
+const PRESET_TIME_SIGNATURES = ['2/2', '2/4', '3/4', '4/4', '5/4', '6/8', '7/8', '12/8'] as const
 type PresetTimeSignature = (typeof PRESET_TIME_SIGNATURES)[number]
 
 const PRESET_BEATS: Record<PresetTimeSignature, { top: number; bottom: number }> = {
+  '2/2': { top: 2, bottom: 2 },
   '2/4': { top: 2, bottom: 4 },
   '3/4': { top: 3, bottom: 4 },
   '4/4': { top: 4, bottom: 4 },
   '5/4': { top: 5, bottom: 4 },
   '6/8': { top: 6, bottom: 8 },
   '7/8': { top: 7, bottom: 8 },
+  '12/8': { top: 12, bottom: 8 },
 }
 
 const MIN_BPM = 1

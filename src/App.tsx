@@ -9,7 +9,6 @@ import Footer from './components/layout/Footer'
 import Router from './components/Router'
 import ErrorBoundary from './components/ErrorBoundary'
 import SkipLink from './components/common/SkipLink'
-import ChatPanel from './components/common/ChatPanel'
 import CookieConsent from './components/common/CookieConsent'
 import SectionErrorBoundary from './components/common/SectionErrorBoundary'
 import { AriaLiveProvider } from './components/common/AriaLive'
@@ -116,9 +115,6 @@ const App = memo(function App() {
                     </main>
 
                     <Footer />
-                    <SectionErrorBoundary section="Chat" silent>
-                      <ChatPanel />
-                    </SectionErrorBoundary>
                     <OnboardingController />
                     <CookieConsent />
                   </div>

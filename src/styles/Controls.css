@@ -307,11 +307,11 @@
 }
 
 /* Mobile instrument dropdown styles */
-.mobile-selector {
+.instrument-selector.mobile-selector {
   display: none;
 }
 
-.desktop-selector {
+.instrument-selector.desktop-selector {
   display: flex;
   gap: 15px;
   justify-content: center;
@@ -319,11 +319,11 @@
 }
 
 @media (max-width: 480px) {
-  .desktop-selector {
+  .instrument-selector.desktop-selector {
     display: none;
   }
 
-  .mobile-selector {
+  .instrument-selector.mobile-selector {
     display: flex;
     justify-content: center;
     width: 100%;
