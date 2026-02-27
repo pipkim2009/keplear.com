@@ -430,77 +430,91 @@ const InstrumentDisplay = memo(function InstrumentDisplay({
     handleScaleDelete,
   ])
 
+  // Determine if the controls panel has any visible content
+  const hasInstrumentSelector = !hideInstrumentSelector
+  const hasOctaveRange = !hideOctaveRange && instrument === 'keyboard'
+  const hasControlsRow =
+    !hideBpmButtons ||
+    !hideBeatsButtons ||
+    !hideGenerateButton ||
+    (!!setChordMode && !hideChordMode)
+  const hasAudioPlayer = !!recordedAudioBlob || isGeneratingMelody || isAutoRecording
+  const hasControlsPanelContent =
+    hasInstrumentSelector || hasOctaveRange || hasControlsRow || hasAudioPlayer
+
   return (
     <>
-      <div
-        className={`instrument-controls-container ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}
-        data-instrument={instrument}
-      >
-        <InstrumentControls
-          bpm={bpm}
-          setBpm={setBpm}
-          numberOfBeats={numberOfBeats}
-          setNumberOfBeats={setNumberOfBeats}
-          chordMode={chordMode}
-          setChordMode={setChordMode}
-          instrument={instrument}
-          setInstrument={setInstrument}
-          clearSelection={clearSelection}
-          hasSelectedNotes={selectedNotes.length > 0}
-          onScaleSelect={handleScaleSelect}
-          onScaleBoxSelect={handleScaleBoxSelect}
-          onClearScale={handleClearScale}
-          lowerOctaves={lowerOctaves}
-          higherOctaves={higherOctaves}
-          onAddLowerOctave={handleAddLowerOctave}
-          onRemoveLowerOctave={handleRemoveLowerOctave}
-          onAddHigherOctave={handleAddHigherOctave}
-          onRemoveHigherOctave={handleRemoveHigherOctave}
-          onKeyboardScaleApply={handleKeyboardScaleApply}
-          onKeyboardScaleClear={handleKeyboardScaleClear}
-          flashingInputs={flashingInputs}
-          triggerInputFlash={triggerInputFlash}
-          setInputActive={setInputActive}
-          selectedNotesCount={selectedNotes.length}
-          appliedChordsCount={appliedChords.length}
-          appliedScalesCount={appliedScales.length}
-          onGenerateMelody={onGenerateMelody}
-          onPlayMelody={onPlayMelody}
-          onRecordMelody={onRecordMelody}
-          isPlaying={isPlaying}
-          isRecording={isRecording}
-          hasGeneratedMelody={hasGeneratedMelody}
-          showNotes={showNotes}
-          onToggleNotes={onToggleNotes}
-          playbackProgress={playbackProgress}
-          melodyDuration={melodyDuration}
-          onProgressChange={onProgressChange}
-          onClearRecordedAudio={onClearRecordedAudio}
-          recordedAudioBlob={recordedAudioBlob}
-          generatedMelody={generatedMelody}
-          hasChanges={hasChanges}
-          isGeneratingMelody={isGeneratingMelody}
-          isAutoRecording={isAutoRecording}
-          onCurrentlyPlayingNoteChange={onCurrentlyPlayingNoteChange}
-          currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
-          hideInstrumentSelector={hideInstrumentSelector}
-          hideOctaveRange={hideOctaveRange}
-          disableOctaveRange={disableOctaveRange}
-          hideBpmButtons={hideBpmButtons}
-          hideBeatsButtons={hideBeatsButtons}
-          hideGenerateButton={hideGenerateButton}
-          hideChordMode={hideChordMode}
-          disableBpmInput={disableBpmInput}
-          disableBeatsInput={disableBeatsInput}
-          disableChordMode={disableChordMode}
-          onMelodyComplete={onLessonComplete}
-          autoPlayAudio={autoPlayAudio}
-          autoStartFeedback={autoStartFeedback}
-          onExportToClassroom={onExportToClassroom}
-          canExportToClassroom={canExportToClassroom}
-          hasExportableContent={hasExportableContent}
-        />
-      </div>
+      {hasControlsPanelContent && (
+        <div
+          className={`instrument-controls-container ${instrument === 'guitar' || instrument === 'bass' ? 'guitar-mode' : ''}`}
+          data-instrument={instrument}
+        >
+          <InstrumentControls
+            bpm={bpm}
+            setBpm={setBpm}
+            numberOfBeats={numberOfBeats}
+            setNumberOfBeats={setNumberOfBeats}
+            chordMode={chordMode}
+            setChordMode={setChordMode}
+            instrument={instrument}
+            setInstrument={setInstrument}
+            clearSelection={clearSelection}
+            hasSelectedNotes={selectedNotes.length > 0}
+            onScaleSelect={handleScaleSelect}
+            onScaleBoxSelect={handleScaleBoxSelect}
+            onClearScale={handleClearScale}
+            lowerOctaves={lowerOctaves}
+            higherOctaves={higherOctaves}
+            onAddLowerOctave={handleAddLowerOctave}
+            onRemoveLowerOctave={handleRemoveLowerOctave}
+            onAddHigherOctave={handleAddHigherOctave}
+            onRemoveHigherOctave={handleRemoveHigherOctave}
+            onKeyboardScaleApply={handleKeyboardScaleApply}
+            onKeyboardScaleClear={handleKeyboardScaleClear}
+            flashingInputs={flashingInputs}
+            triggerInputFlash={triggerInputFlash}
+            setInputActive={setInputActive}
+            selectedNotesCount={selectedNotes.length}
+            appliedChordsCount={appliedChords.length}
+            appliedScalesCount={appliedScales.length}
+            onGenerateMelody={onGenerateMelody}
+            onPlayMelody={onPlayMelody}
+            onRecordMelody={onRecordMelody}
+            isPlaying={isPlaying}
+            isRecording={isRecording}
+            hasGeneratedMelody={hasGeneratedMelody}
+            showNotes={showNotes}
+            onToggleNotes={onToggleNotes}
+            playbackProgress={playbackProgress}
+            melodyDuration={melodyDuration}
+            onProgressChange={onProgressChange}
+            onClearRecordedAudio={onClearRecordedAudio}
+            recordedAudioBlob={recordedAudioBlob}
+            generatedMelody={generatedMelody}
+            hasChanges={hasChanges}
+            isGeneratingMelody={isGeneratingMelody}
+            isAutoRecording={isAutoRecording}
+            onCurrentlyPlayingNoteChange={onCurrentlyPlayingNoteChange}
+            currentlyPlayingNoteIndex={currentlyPlayingNoteIndex}
+            hideInstrumentSelector={hideInstrumentSelector}
+            hideOctaveRange={hideOctaveRange}
+            disableOctaveRange={disableOctaveRange}
+            hideBpmButtons={hideBpmButtons}
+            hideBeatsButtons={hideBeatsButtons}
+            hideGenerateButton={hideGenerateButton}
+            hideChordMode={hideChordMode}
+            disableBpmInput={disableBpmInput}
+            disableBeatsInput={disableBeatsInput}
+            disableChordMode={disableChordMode}
+            onMelodyComplete={onLessonComplete}
+            autoPlayAudio={autoPlayAudio}
+            autoStartFeedback={autoStartFeedback}
+            onExportToClassroom={onExportToClassroom}
+            canExportToClassroom={canExportToClassroom}
+            hasExportableContent={hasExportableContent}
+          />
+        </div>
+      )}
 
       <div className="instrument-container" data-practice-mode={practiceMode}>
         {!(hideScalesChords && hideDeselectAll) && (

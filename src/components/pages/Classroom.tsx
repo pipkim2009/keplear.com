@@ -77,6 +77,7 @@ import {
   PiSpeakerNone,
   PiPianoKeysFill,
   PiCaretRight,
+  PiCaretLeft,
   PiEyeFill,
   PiCheckCircleFill,
   PiChatCircleFill,
@@ -1077,10 +1078,17 @@ function Classroom() {
     setAssigningToClassroomId(classroomId)
     clearSelection()
     triggerClearChordsAndScales()
+    setExternalSelectedNoteIds([])
+    setPendingSelectionData(null)
     setEditingAssignmentId(null)
     setIsAiGenerated(false)
     aiLessonParamsRef.current = null
+    setAssignmentMode('custom')
+    setAiStep('song-select')
+    setAiSongVideoId(null)
+    setAiSongTitle('')
     setAssignmentType('practice')
+    setChordMode('single')
     setSongVideoId(null)
     setSongVideoTitle('')
     setSongMarkerA(null)
@@ -1194,9 +1202,15 @@ function Classroom() {
     setEditingAssignmentId(assignment.id)
     setIsAiGenerated(false)
     aiLessonParamsRef.current = null
+    setAssignmentMode('custom')
+    setAiStep('song-select')
+    setAiSongVideoId(null)
+    setAiSongTitle('')
     setAssignmentTitle(assignment.title)
     clearSelection()
     triggerClearChordsAndScales()
+    setExternalSelectedNoteIds([])
+    setPendingSelectionData(null)
 
     // Check if this is a song assignment
     if (assignment.lesson_type === 'songs') {
@@ -1732,6 +1746,8 @@ function Classroom() {
     setEditingAssignmentId(null)
     clearSelection()
     triggerClearChordsAndScales()
+    setExternalSelectedNoteIds([])
+    setPendingSelectionData(null)
     setExercises([])
     setCurrentExerciseIndex(0)
     setCurrentExerciseTranscript('')
@@ -3058,8 +3074,16 @@ function Classroom() {
       setAssignmentTitle('')
       setAssigningToClassroomId(null)
       setEditingAssignmentId(null)
+      setIsAiGenerated(false)
+      aiLessonParamsRef.current = null
+      setAssignmentMode('custom')
+      setAiStep('song-select')
+      setAiSongVideoId(null)
+      setAiSongTitle('')
       clearSelection()
       triggerClearChordsAndScales()
+      setExternalSelectedNoteIds([])
+      setPendingSelectionData(null)
       setExercises([])
       setCurrentExerciseIndex(0)
       setCurrentExerciseTranscript('')
@@ -4686,107 +4710,43 @@ function Classroom() {
                   : t('classroom.assign')}
             </button>
           </div>
-          {/* Custom / AI mode toggle */}
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              width: '100%',
-              margin: '0.35rem 0',
-            }}
-          >
+          {/* Quick Build button - launches AI-guided flow */}
+          {assignmentMode === 'custom' && (
             <div
               style={{
-                display: 'inline-flex',
-                borderRadius: '0.5rem',
-                overflow: 'hidden',
-                border: '1px solid rgba(255,255,255,0.12)',
-                background: 'rgba(0,0,0,0.25)',
+                display: 'flex',
+                justifyContent: 'center',
+                width: '100%',
+                margin: '0.35rem 0',
               }}
             >
-              <button
-                onClick={() => {
-                  setAssignmentMode('custom')
-                  setAiStep('song-select')
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.3rem',
-                  padding: '0.3rem 0.75rem',
-                  fontSize: '0.78rem',
-                  fontWeight: 600,
-                  border: 'none',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s',
-                  background: assignmentMode === 'custom' ? 'rgba(59,130,246,0.25)' : 'transparent',
-                  color: assignmentMode === 'custom' ? '#93c5fd' : 'rgba(255,255,255,0.4)',
-                  borderRight: '1px solid rgba(255,255,255,0.08)',
-                }}
-              >
-                Custom
-              </button>
               <button
                 onClick={() => setAssignmentMode('ai')}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.3rem',
-                  padding: '0.3rem 0.75rem',
+                  gap: '0.4rem',
+                  padding: '0.35rem 0.85rem',
                   fontSize: '0.78rem',
                   fontWeight: 600,
-                  border: 'none',
+                  border: `1px solid ${isAiGenerated ? 'rgba(34,197,94,0.35)' : 'rgba(139,92,246,0.35)'}`,
+                  borderRadius: '0.5rem',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
-                  background: assignmentMode === 'ai' ? 'rgba(139,92,246,0.25)' : 'transparent',
-                  color: assignmentMode === 'ai' ? '#c4b5fd' : 'rgba(255,255,255,0.4)',
+                  background: isAiGenerated ? 'rgba(34,197,94,0.12)' : 'rgba(139,92,246,0.12)',
+                  color: isAiGenerated ? '#86efac' : '#c4b5fd',
                 }}
               >
-                <PiSparkle size={14} />
-                AI
+                {isAiGenerated ? <PiCheckCircleFill size={14} /> : <PiSparkle size={14} />}
+                Quick Build
               </button>
             </div>
-          </div>
+          )}
           {/* Timeline and Transcript rows - shown in custom mode only */}
           {assignmentMode === 'custom' && (
             <>
               {/* Row 2: Timeline split into Warmup / Practice / Song sections */}
               <div style={{ display: 'flex', gap: '0.5rem', width: '100%', position: 'relative' }}>
-                {isAiGenerated && (
-                  <button
-                    onClick={() => {
-                      if (!aiLessonParamsRef.current) return
-                      const generatedExercises = generateAILesson(aiLessonParamsRef.current)
-                      setExercises(generatedExercises)
-                      setCurrentExerciseIndex(0)
-                      setBpm(generatedExercises[0].bpm)
-                      setNumberOfBeats(generatedExercises[0].beats)
-                      setCurrentExerciseTranscript(generatedExercises[0].transcript || '')
-                    }}
-                    title="Regenerate lesson"
-                    style={{
-                      position: 'absolute',
-                      top: '-2px',
-                      right: '-2px',
-                      zIndex: 2,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '3px',
-                      padding: '2px 6px',
-                      background: 'rgba(139,92,246,0.3)',
-                      color: '#c4b5fd',
-                      border: '1px solid rgba(139,92,246,0.4)',
-                      borderRadius: '6px',
-                      fontSize: '0.65rem',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                    }}
-                  >
-                    <PiSparkle size={11} />
-                    <PiArrowClockwise size={11} />
-                  </button>
-                )}
                 {(() => {
                   const sections: Array<{
                     key: string
@@ -5099,6 +5059,9 @@ function Classroom() {
                 externalSelectedNoteIds={externalSelectedNoteIds}
                 hideInstrumentSelector={true}
                 hideGenerateButton={true}
+                hideBpmButtons={true}
+                hideBeatsButtons={true}
+                hideChordMode={true}
               />
             )}
 
@@ -5512,6 +5475,33 @@ function Classroom() {
         {/* AI mode */}
         {assignmentMode === 'ai' && (
           <>
+            {/* Back to custom editor */}
+            <div style={{ display: 'flex', justifyContent: 'center', margin: '0.5rem 0 0' }}>
+              <button
+                onClick={() => {
+                  setAssignmentMode('custom')
+                  setAiStep('song-select')
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.3rem',
+                  padding: '0.3rem 0.7rem',
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  border: 'none',
+                  borderRadius: '0.4rem',
+                  cursor: 'pointer',
+                  background: 'rgba(255,255,255,0.06)',
+                  color: 'rgba(255,255,255,0.5)',
+                  transition: 'all 0.2s',
+                }}
+              >
+                <PiCaretLeft size={12} />
+                Back to editor
+              </button>
+            </div>
+
             {/* Step 1: Song selector */}
             {aiStep === 'song-select' && (
               <div className={songStyles.songsContainer} style={{ padding: '1rem 2rem' }}>
@@ -5638,6 +5628,15 @@ function Classroom() {
                 {songVideoId && (
                   <>
                     <div className={songStyles.playerSection}>
+                      {/* Thumbnail background blur - matches Songs page */}
+                      <div
+                        className={songStyles.playerThumbnailBg}
+                        style={{
+                          backgroundImage: `url(https://i.ytimg.com/vi/${songVideoId}/mqdefault.jpg)`,
+                        }}
+                      />
+
+                      {/* Header: track info, loop, volume, close */}
                       <div className={songStyles.playerHeader}>
                         <div className={songStyles.playerTrackInfo}>
                           <img
@@ -5689,7 +5688,91 @@ function Classroom() {
                         <div className={songStyles.audioLoading}>Loading audio...</div>
                       )}
 
-                      {/* Timeline with A-B markers */}
+                      {/* Transport: play/pause + skip + speed */}
+                      <div className={songStyles.transportSection}>
+                        <div className={songStyles.transportRow}>
+                          <button
+                            className={songStyles.controlButtonSmall}
+                            onClick={() => handleSongSkip(-10)}
+                            disabled={!songIsPlayerReady}
+                            aria-label="Rewind 10 seconds"
+                            title="Rewind 10s"
+                          >
+                            <PiArrowCounterClockwise />
+                          </button>
+                          <button
+                            className={songStyles.playButton}
+                            onClick={toggleSongPlayPause}
+                            disabled={!songIsPlayerReady}
+                            aria-label={isSongPlaying ? 'Pause' : 'Play'}
+                          >
+                            {isSongPlaying ? <PiPause /> : <PiPlay />}
+                          </button>
+                          <button
+                            className={songStyles.controlButtonSmall}
+                            onClick={() => handleSongSkip(10)}
+                            disabled={!songIsPlayerReady}
+                            aria-label="Forward 10 seconds"
+                            title="Forward 10s"
+                          >
+                            <PiArrowClockwise />
+                          </button>
+                        </div>
+                        <div className={songStyles.speedControl}>
+                          <div className={songStyles.speedButtons}>
+                            {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
+                              <button
+                                key={speed}
+                                className={`${songStyles.speedButton} ${songPlaybackRate === speed ? songStyles.speedButtonActive : ''}`}
+                                onClick={() => setSongPlaybackRate(speed)}
+                              >
+                                {speed}x
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Looper */}
+                      <div className={songStyles.abControls}>
+                        <span className={songStyles.controlLabel}>Looper</span>
+                        <div className={songStyles.abButtons}>
+                          <button
+                            className={`${songStyles.markerButton} ${songMarkerA !== null ? songStyles.markerButtonSet : ''}`}
+                            onClick={setMarkerAAtCurrent}
+                            disabled={!songIsPlayerReady}
+                            title="Set marker A at current position"
+                          >
+                            A {songMarkerA !== null && `(${formatSongTime(songMarkerA)})`}
+                          </button>
+                          <button
+                            className={`${songStyles.markerButton} ${songMarkerB !== null ? songStyles.markerButtonSet : ''}`}
+                            onClick={setMarkerBAtCurrent}
+                            disabled={songMarkerA === null || !songIsPlayerReady}
+                            title="Set marker B at current position"
+                          >
+                            B {songMarkerB !== null && `(${formatSongTime(songMarkerB)})`}
+                          </button>
+                          <button
+                            className={`${songStyles.abToggleButton} ${songIsABLooping ? songStyles.abToggleButtonActive : ''}`}
+                            onClick={toggleSongABLoop}
+                            disabled={songMarkerA === null || songMarkerB === null}
+                            title="Toggle A-B loop"
+                          >
+                            <PiRepeat />
+                          </button>
+                          <button
+                            className={songStyles.clearMarkersButton}
+                            onClick={clearSongMarkers}
+                            disabled={songMarkerA === null && songMarkerB === null}
+                            title="Clear markers"
+                          >
+                            <PiTrash />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Timeline with waveform + A-B markers at the bottom */}
                       <div className={songStyles.timelineSection}>
                         <div className={songStyles.timelineWrapper}>
                           <div className={songStyles.waveformContainer}>
@@ -5755,91 +5838,6 @@ function Classroom() {
                         <div className={songStyles.timeDisplay}>
                           <span>{formatSongTime(songCurrentTime)}</span>
                           <span>{formatSongTime(songDuration)}</span>
-                        </div>
-                      </div>
-
-                      {/* Controls + Looper Grid */}
-                      <div className={songStyles.controlsGrid}>
-                        <div className={songStyles.controlsLeft}>
-                          <div className={songStyles.transportRow}>
-                            <button
-                              className={songStyles.controlButtonSmall}
-                              onClick={() => handleSongSkip(-10)}
-                              disabled={!songIsPlayerReady}
-                              aria-label="Rewind 10 seconds"
-                              title="Rewind 10s"
-                            >
-                              <PiArrowCounterClockwise />
-                            </button>
-                            <button
-                              className={songStyles.controlButton}
-                              onClick={toggleSongPlayPause}
-                              disabled={!songIsPlayerReady}
-                              aria-label={isSongPlaying ? 'Pause' : 'Play'}
-                            >
-                              {isSongPlaying ? <PiPause /> : <PiPlay />}
-                            </button>
-                            <button
-                              className={songStyles.controlButtonSmall}
-                              onClick={() => handleSongSkip(10)}
-                              disabled={!songIsPlayerReady}
-                              aria-label="Forward 10 seconds"
-                              title="Forward 10s"
-                            >
-                              <PiArrowClockwise />
-                            </button>
-                          </div>
-                          <div className={songStyles.speedControl}>
-                            <div className={songStyles.speedButtons}>
-                              {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
-                                <button
-                                  key={speed}
-                                  className={`${songStyles.speedButton} ${songPlaybackRate === speed ? songStyles.speedButtonActive : ''}`}
-                                  onClick={() => setSongPlaybackRate(speed)}
-                                >
-                                  {speed}x
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className={songStyles.abControls}>
-                          <span className={songStyles.controlLabel}>Looper</span>
-                          <div className={songStyles.abButtons}>
-                            <button
-                              className={`${songStyles.markerButton} ${songMarkerA !== null ? songStyles.markerButtonSet : ''}`}
-                              onClick={setMarkerAAtCurrent}
-                              disabled={!songIsPlayerReady}
-                              title="Set marker A at current position"
-                            >
-                              A {songMarkerA !== null && `(${formatSongTime(songMarkerA)})`}
-                            </button>
-                            <button
-                              className={`${songStyles.markerButton} ${songMarkerB !== null ? songStyles.markerButtonSet : ''}`}
-                              onClick={setMarkerBAtCurrent}
-                              disabled={songMarkerA === null || !songIsPlayerReady}
-                              title="Set marker B at current position"
-                            >
-                              B {songMarkerB !== null && `(${formatSongTime(songMarkerB)})`}
-                            </button>
-                            <button
-                              className={`${songStyles.abToggleButton} ${songIsABLooping ? songStyles.abToggleButtonActive : ''}`}
-                              onClick={toggleSongABLoop}
-                              disabled={songMarkerA === null || songMarkerB === null}
-                              title="Toggle A-B loop"
-                            >
-                              <PiRepeat />
-                            </button>
-                            <button
-                              className={songStyles.clearMarkersButton}
-                              onClick={clearSongMarkers}
-                              disabled={songMarkerA === null && songMarkerB === null}
-                              title="Clear markers"
-                            >
-                              <PiTrash />
-                            </button>
-                          </div>
                         </div>
                       </div>
                     </div>
