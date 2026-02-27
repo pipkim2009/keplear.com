@@ -2,6 +2,8 @@
  * SongPlayerUI - Reusable song player with waveform visualization
  * Extracted from Classroom.tsx to eliminate duplication across
  * lesson mode (legacy + multi-exercise) and assignment editor views
+ *
+ * Design matches Songs page player (minus the looper controls)
  */
 
 import {
@@ -67,6 +69,15 @@ export default function SongPlayerUI({
 
   return (
     <div className={songStyles.playerSection}>
+      {/* Thumbnail background blur - matches Songs page */}
+      <div
+        className={songStyles.playerThumbnailBg}
+        style={{
+          backgroundImage: `url(https://i.ytimg.com/vi/${videoId}/mqdefault.jpg)`,
+        }}
+      />
+
+      {/* Header: track info + volume */}
       <div className={songStyles.playerHeader}>
         <div className={songStyles.playerTrackInfo}>
           <img
@@ -98,7 +109,53 @@ export default function SongPlayerUI({
       {/* Loading indicator */}
       {!isPlayerReady && <div className={songStyles.audioLoading}>Loading audio...</div>}
 
-      {/* Timeline with waveform visualization */}
+      {/* Transport: play/pause + skip + speed - matches Songs page layout */}
+      <div className={songStyles.transportSection}>
+        <div className={songStyles.transportRow}>
+          <button
+            className={songStyles.controlButtonSmall}
+            onClick={() => onSkip(-10)}
+            disabled={!isPlayerReady}
+            aria-label="Rewind 10 seconds"
+            title="Rewind 10s"
+          >
+            <PiArrowCounterClockwise />
+          </button>
+          <button
+            className={songStyles.playButton}
+            onClick={onTogglePlayPause}
+            disabled={!isPlayerReady}
+            aria-label={isPlaying ? 'Pause' : 'Play'}
+          >
+            {isPlaying ? <PiPause /> : <PiPlay />}
+          </button>
+          <button
+            className={songStyles.controlButtonSmall}
+            onClick={() => onSkip(10)}
+            disabled={!isPlayerReady}
+            aria-label="Forward 10 seconds"
+            title="Forward 10s"
+          >
+            <PiArrowClockwise />
+          </button>
+        </div>
+
+        <div className={songStyles.speedControl}>
+          <div className={songStyles.speedButtons}>
+            {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
+              <button
+                key={speed}
+                className={`${songStyles.speedButton} ${playbackRate === speed ? songStyles.speedButtonActive : ''}`}
+                onClick={() => onPlaybackRateChange(speed)}
+              >
+                {speed}x
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Timeline with waveform visualization - at the bottom like Songs page */}
       <div className={songStyles.timelineSection}>
         <div className={songStyles.timelineWrapper}>
           <div className={songStyles.waveformContainer}>
@@ -107,7 +164,6 @@ export default function SongPlayerUI({
 
               let bars: number[]
               if (realPeaks && hasLoop && duration > 0) {
-                // Slice peaks for the A-B loop section
                 const startFrac = loopStart / duration
                 const endFrac = loopEnd / duration
                 const startIdx = Math.floor(startFrac * realPeaks.length)
@@ -152,52 +208,6 @@ export default function SongPlayerUI({
         <div className={songStyles.timeDisplay}>
           <span>{formatTime(hasLoop ? Math.max(0, currentTime - markerA!) : currentTime)}</span>
           <span>{formatTime(hasLoop ? markerB! - markerA! : duration)}</span>
-        </div>
-      </div>
-
-      {/* Playback Controls */}
-      <div className={songStyles.controlsLeft}>
-        <div className={songStyles.transportRow}>
-          <button
-            className={songStyles.controlButtonSmall}
-            onClick={() => onSkip(-10)}
-            disabled={!isPlayerReady}
-            aria-label="Rewind 10 seconds"
-            title="Rewind 10s"
-          >
-            <PiArrowCounterClockwise />
-          </button>
-          <button
-            className={songStyles.controlButton}
-            onClick={onTogglePlayPause}
-            disabled={!isPlayerReady}
-            aria-label={isPlaying ? 'Pause' : 'Play'}
-          >
-            {isPlaying ? <PiPause /> : <PiPlay />}
-          </button>
-          <button
-            className={songStyles.controlButtonSmall}
-            onClick={() => onSkip(10)}
-            disabled={!isPlayerReady}
-            aria-label="Forward 10 seconds"
-            title="Forward 10s"
-          >
-            <PiArrowClockwise />
-          </button>
-        </div>
-
-        <div className={songStyles.speedControl}>
-          <div className={songStyles.speedButtons}>
-            {[0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2].map(speed => (
-              <button
-                key={speed}
-                className={`${songStyles.speedButton} ${playbackRate === speed ? songStyles.speedButtonActive : ''}`}
-                onClick={() => onPlaybackRateChange(speed)}
-              >
-                {speed}x
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </div>

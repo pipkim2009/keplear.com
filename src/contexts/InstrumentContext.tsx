@@ -70,8 +70,7 @@ interface InstrumentContextType {
     notesToUse?: readonly Note[],
     chordMode?: 'arpeggiator' | 'progression',
     appliedChords?: AppliedChord[],
-    appliedScales?: AppliedScale[],
-    inclusiveMode?: boolean
+    appliedScales?: AppliedScale[]
   ) => void
   setGuitarNotes: (notes: Note[]) => void
   isSelected: (note: Note) => boolean
@@ -104,7 +103,7 @@ interface InstrumentContextType {
 
   // Handlers
   handleNoteClick: (note: Note) => Promise<void>
-  handleGenerateMelody: (inclusiveMode?: boolean) => void
+  handleGenerateMelody: () => void
   handlePlayMelody: () => void
   handleInstrumentChange: (newInstrument: InstrumentType) => void
   handleOctaveRangeChange: (lowerOctaves: number, higherOctaves: number) => void
@@ -334,62 +333,58 @@ export const InstrumentProvider: React.FC<InstrumentProviderProps> = ({ children
     ]
   )
 
-  const handleGenerateMelody = useCallback(
-    (inclusiveMode?: boolean): void => {
-      setIsGeneratingMelody(true)
+  const handleGenerateMelody = useCallback((): void => {
+    setIsGeneratingMelody(true)
 
-      // Store the BPM used for this melody
-      setMelodyBpm(bpm)
+    // Store the BPM used for this melody
+    setMelodyBpm(bpm)
 
-      // Generate melody immediately with current values
-      // Use local lowerOctaves/higherOctaves state which is updated by the octave buttons
-      const melodyNotes =
-        instrument === 'keyboard' && (lowerOctaves !== 0 || higherOctaves !== 0)
-          ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
-          : notes
+    // Generate melody immediately with current values
+    // Use local lowerOctaves/higherOctaves state which is updated by the octave buttons
+    const melodyNotes =
+      instrument === 'keyboard' && (lowerOctaves !== 0 || higherOctaves !== 0)
+        ? generateNotesWithSeparateOctaves(lowerOctaves, higherOctaves)
+        : notes
 
-      // Take a snapshot of currently selected notes to prevent interference from note clicks during generation
-      const selectedNotesSnapshot = [...selectedNotes]
+    // Take a snapshot of currently selected notes to prevent interference from note clicks during generation
+    const selectedNotesSnapshot = [...selectedNotes]
 
-      // Pass chordMode, appliedChords, appliedScales, and inclusiveMode to generateMelody (always use 'multi' mode)
-      generateMelody(
-        melodyNotes,
-        numberOfBeats,
-        instrument,
-        'multi',
-        selectedNotesSnapshot,
-        chordMode,
-        appliedChords,
-        appliedScales,
-        inclusiveMode
-      )
-
-      const duration = calculateMelodyDuration(numberOfBeats, bpm, instrument)
-      setMelodyDuration(duration)
-      setPlaybackProgress(0)
-      handleClearRecordedAudio()
-      clearChanges()
-
-      // isGeneratingMelody will stay true until recorded audio is ready
-    },
-    [
-      generateMelody,
+    // Pass chordMode, appliedChords, appliedScales to generateMelody (always use 'multi' mode)
+    generateMelody(
+      melodyNotes,
       numberOfBeats,
       instrument,
-      lowerOctaves,
-      higherOctaves,
-      selectedNotes,
-      calculateMelodyDuration,
-      bpm,
-      setMelodyDuration,
-      setPlaybackProgress,
-      handleClearRecordedAudio,
-      clearChanges,
+      'multi',
+      selectedNotesSnapshot,
       chordMode,
       appliedChords,
-      appliedScales,
-    ]
-  )
+      appliedScales
+    )
+
+    const duration = calculateMelodyDuration(numberOfBeats, bpm, instrument)
+    setMelodyDuration(duration)
+    setPlaybackProgress(0)
+    handleClearRecordedAudio()
+    clearChanges()
+
+    // isGeneratingMelody will stay true until recorded audio is ready
+  }, [
+    generateMelody,
+    numberOfBeats,
+    instrument,
+    lowerOctaves,
+    higherOctaves,
+    selectedNotes,
+    calculateMelodyDuration,
+    bpm,
+    setMelodyDuration,
+    setPlaybackProgress,
+    handleClearRecordedAudio,
+    clearChanges,
+    chordMode,
+    appliedChords,
+    appliedScales,
+  ])
 
   const handlePlayMelody = useCallback((): void => {
     if (isPlaying) {

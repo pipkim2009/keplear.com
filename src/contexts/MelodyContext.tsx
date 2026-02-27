@@ -62,7 +62,7 @@ interface MelodyContextType {
 
   // High-level Actions
   handleNoteClick: (note: Note) => Promise<void>
-  handleGenerateMelody: (inclusiveMode?: boolean) => void
+  handleGenerateMelody: () => void
   handlePlayMelody: () => void
 }
 
@@ -192,51 +192,47 @@ export const MelodyProvider: React.FC<MelodyProviderProps> = ({ children }) => {
   )
 
   // Handle melody generation
-  const handleGenerateMelody = useCallback(
-    (inclusiveMode?: boolean): void => {
-      setIsGeneratingMelody(true)
+  const handleGenerateMelody = useCallback((): void => {
+    setIsGeneratingMelody(true)
 
-      // Store the BPM used for this melody
-      setMelodyBpm(ui.bpm)
+    // Store the BPM used for this melody
+    setMelodyBpm(ui.bpm)
 
-      // Hide notes before generating new melody
-      melodyPlayer.setShowNotes(false)
+    // Hide notes before generating new melody
+    melodyPlayer.setShowNotes(false)
 
-      const melodyNotes =
-        config.instrument === 'keyboard' &&
-        (config.keyboardOctaves.lower !== 0 || config.keyboardOctaves.higher !== 0)
-          ? generateNotesWithSeparateOctaves(
-              config.keyboardOctaves.lower,
-              config.keyboardOctaves.higher
-            )
-          : notes
+    const melodyNotes =
+      config.instrument === 'keyboard' &&
+      (config.keyboardOctaves.lower !== 0 || config.keyboardOctaves.higher !== 0)
+        ? generateNotesWithSeparateOctaves(
+            config.keyboardOctaves.lower,
+            config.keyboardOctaves.higher
+          )
+        : notes
 
-      const selectedNotesSnapshot = [...melodyGen.selectedNotes]
+    const selectedNotesSnapshot = [...melodyGen.selectedNotes]
 
-      melodyGen.generateMelody(
-        melodyNotes,
-        ui.numberOfBeats,
-        config.instrument,
-        'multi',
-        selectedNotesSnapshot,
-        ui.chordMode,
-        appliedChords,
-        appliedScales,
-        inclusiveMode
-      )
+    melodyGen.generateMelody(
+      melodyNotes,
+      ui.numberOfBeats,
+      config.instrument,
+      'multi',
+      selectedNotesSnapshot,
+      ui.chordMode,
+      appliedChords,
+      appliedScales
+    )
 
-      const duration = melodyPlayer.calculateMelodyDuration(
-        ui.numberOfBeats,
-        ui.bpm,
-        config.instrument
-      )
-      melodyPlayer.setMelodyDuration(duration)
-      melodyPlayer.setPlaybackProgress(0)
-      melodyPlayer.handleClearRecordedAudio()
-      changes.clearChanges()
-    },
-    [melodyGen, ui, config, melodyPlayer, changes, appliedChords, appliedScales]
-  )
+    const duration = melodyPlayer.calculateMelodyDuration(
+      ui.numberOfBeats,
+      ui.bpm,
+      config.instrument
+    )
+    melodyPlayer.setMelodyDuration(duration)
+    melodyPlayer.setPlaybackProgress(0)
+    melodyPlayer.handleClearRecordedAudio()
+    changes.clearChanges()
+  }, [melodyGen, ui, config, melodyPlayer, changes, appliedChords, appliedScales])
 
   // Handle melody playback
   const handlePlayMelody = useCallback((): void => {

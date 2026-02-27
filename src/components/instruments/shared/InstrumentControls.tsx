@@ -43,7 +43,7 @@ interface InstrumentControlsProps {
   selectedNotesCount?: number
   appliedChordsCount?: number
   appliedScalesCount?: number
-  onGenerateMelody?: (inclusiveMode?: boolean) => void
+  onGenerateMelody?: () => void
   onPlayMelody?: () => void
   onRecordMelody?: () => Promise<Blob | null>
   isPlaying?: boolean

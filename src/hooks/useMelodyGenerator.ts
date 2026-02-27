@@ -23,14 +23,45 @@ interface UseMelodyGeneratorReturn {
     notesToUse?: readonly Note[],
     chordMode?: 'arpeggiator' | 'progression',
     appliedChords?: AppliedChord[],
-    appliedScales?: AppliedScale[],
-    inclusiveMode?: boolean
+    appliedScales?: AppliedScale[]
   ) => void
   setGuitarNotes: (notes: Note[]) => void
   isSelected: (note: Note) => boolean
   isInMelody: (note: Note, showNotes: boolean) => boolean
   clearSelection: () => void
   clearMelody: () => void
+}
+
+/**
+ * Fisher-Yates shuffle for true uniform random distribution
+ */
+const fisherYatesShuffle = (array: Note[]): Note[] => {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
+/**
+ * Generates a melody that maximizes note variety from the pool.
+ * Always uses as many unique notes as possible before repeating.
+ * - If beats >= pool size: include every note at least once, fill remaining randomly
+ * - If beats < pool size: pick `beats` unique notes (no repeats)
+ */
+const maxVarietyMelody = (pool: readonly Note[], beats: number): Note[] => {
+  if (pool.length === 0) return []
+  if (beats >= pool.length) {
+    const required = [...pool]
+    const remaining = beats - pool.length
+    const fill = Array(remaining)
+      .fill(null)
+      .map(() => pool[Math.floor(Math.random() * pool.length)])
+    return fisherYatesShuffle([...required, ...fill])
+  } else {
+    return fisherYatesShuffle([...pool]).slice(0, beats)
+  }
 }
 
 /**
@@ -90,8 +121,7 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
       notesToUse?: readonly Note[],
       chordMode: 'arpeggiator' | 'progression' = 'arpeggiator',
       appliedChords?: AppliedChord[],
-      appliedScales?: AppliedScale[],
-      inclusiveMode: boolean = false
+      appliedScales?: AppliedScale[]
     ): void => {
       if (numberOfNotes <= 0) {
         console.warn('Number of notes must be positive')
@@ -140,40 +170,60 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
           return
         }
 
-        for (let i = 0; i < numberOfNotes; i++) {
-          // Pick a random index from the combined pool
-          const randomIndex = Math.floor(Math.random() * totalPoolSize)
+        // Build pool options: each individual note and each chord is one option
+        interface PoolOption {
+          type: 'note' | 'chord'
+          noteIndex?: number
+          chordIndex?: number
+        }
+        const poolOptions: PoolOption[] = [
+          ...individualNotes.map((_, i) => ({ type: 'note' as const, noteIndex: i })),
+          ...appliedChords.map((_, i) => ({ type: 'chord' as const, chordIndex: i })),
+        ]
 
-          if (randomIndex < individualNotes.length) {
-            // Picked an individual note
-            const randomNote = individualNotes[randomIndex]
+        // Maximize variety: use each pool option before repeating
+        const orderedOptions: PoolOption[] = []
+        if (numberOfNotes >= poolOptions.length) {
+          // Include every option at least once, fill remaining randomly
+          orderedOptions.push(...poolOptions)
+          const remaining = numberOfNotes - poolOptions.length
+          for (let i = 0; i < remaining; i++) {
+            orderedOptions.push(poolOptions[Math.floor(Math.random() * poolOptions.length)])
+          }
+        } else {
+          // Fewer beats than options: pick numberOfNotes unique options
+          const shuffled = [...poolOptions].sort(() => Math.random() - 0.5)
+          orderedOptions.push(...shuffled.slice(0, numberOfNotes))
+        }
 
-            // Create a clean copy without chordGroup info
+        // Shuffle the final order
+        for (let i = orderedOptions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1))
+          ;[orderedOptions[i], orderedOptions[j]] = [orderedOptions[j], orderedOptions[i]]
+        }
+
+        for (const option of orderedOptions) {
+          if (option.type === 'note') {
+            const randomNote = individualNotes[option.noteIndex!]
             const cleanNote: Note = {
               name: randomNote.name,
               frequency: randomNote.frequency,
               position: randomNote.position,
               octave: randomNote.octave,
             }
-
             melody.push(cleanNote)
           } else {
-            // Picked a chord
-            const chordIndex = randomIndex - individualNotes.length
-            const selectedChord = appliedChords[chordIndex]
+            const selectedChord = appliedChords[option.chordIndex!]
             const chordNotes = selectedChord.notes || []
 
             if (chordNotes.length > 0) {
-              // Pick a random note from this chord (just for melody display)
               const randomNote = chordNotes[Math.floor(Math.random() * chordNotes.length)]
 
-              // Validate that the note has valid properties
               if (!randomNote || !randomNote.name || typeof randomNote.frequency !== 'number') {
                 console.warn('Invalid note in chord group:', randomNote, selectedChord)
                 continue
               }
 
-              // Create a new note with chord group information
               const noteWithChordInfo: Note = {
                 ...randomNote,
                 chordGroup: {
@@ -184,7 +234,6 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
                   chordPositions: selectedChord.noteKeys || [],
                 },
               }
-
               melody.push(noteWithChordInfo)
             }
           }
@@ -264,10 +313,7 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
             return
           }
 
-          const melody = Array(numberOfNotes)
-            .fill(null)
-            .map(() => notesInRange[Math.floor(Math.random() * notesInRange.length)])
-
+          const melody = maxVarietyMelody(notesInRange, numberOfNotes)
           setGeneratedMelody(melody)
         } else {
           // Multi mode: use selected notes directly (like guitar)
@@ -276,41 +322,7 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
             return
           }
 
-          // Fisher-Yates shuffle for true uniform random distribution
-          const fisherYatesShuffle = (array: Note[]): Note[] => {
-            const shuffled = [...array]
-            for (let i = shuffled.length - 1; i > 0; i--) {
-              const j = Math.floor(Math.random() * (i + 1))
-              ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-            }
-            return shuffled
-          }
-
-          let melody: Note[]
-          if (inclusiveMode && currentSelectedNotes.length <= numberOfNotes) {
-            if (currentSelectedNotes.length === numberOfNotes) {
-              // Exact match: each beat is a unique note, no repeats
-              melody = fisherYatesShuffle([...currentSelectedNotes])
-            } else {
-              // More beats than notes: include all notes once, fill rest randomly
-              const requiredNotes = [...currentSelectedNotes]
-              const remainingSlots = numberOfNotes - requiredNotes.length
-              const randomFill = Array(remainingSlots)
-                .fill(null)
-                .map(
-                  () =>
-                    currentSelectedNotes[Math.floor(Math.random() * currentSelectedNotes.length)]
-                )
-              melody = fisherYatesShuffle([...requiredNotes, ...randomFill])
-            }
-          } else {
-            melody = Array(numberOfNotes)
-              .fill(null)
-              .map(
-                () => currentSelectedNotes[Math.floor(Math.random() * currentSelectedNotes.length)]
-              )
-          }
-
+          const melody = maxVarietyMelody(currentSelectedNotes, numberOfNotes)
           setGeneratedMelody(melody)
         }
       } else {
@@ -320,40 +332,7 @@ export const useMelodyGenerator = (): UseMelodyGeneratorReturn => {
           return
         }
 
-        // Fisher-Yates shuffle for true uniform random distribution
-        const fisherYatesShuffle = (array: Note[]): Note[] => {
-          const shuffled = [...array]
-          for (let i = shuffled.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1))
-            ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-          }
-          return shuffled
-        }
-
-        let melody: Note[]
-        if (inclusiveMode && currentSelectedNotes.length <= numberOfNotes) {
-          if (currentSelectedNotes.length === numberOfNotes) {
-            // Exact match: each beat is a unique note, no repeats
-            melody = fisherYatesShuffle([...currentSelectedNotes])
-          } else {
-            // More beats than notes: include all notes once, fill rest randomly
-            const requiredNotes = [...currentSelectedNotes]
-            const remainingSlots = numberOfNotes - requiredNotes.length
-            const randomFill = Array(remainingSlots)
-              .fill(null)
-              .map(
-                () => currentSelectedNotes[Math.floor(Math.random() * currentSelectedNotes.length)]
-              )
-            melody = fisherYatesShuffle([...requiredNotes, ...randomFill])
-          }
-        } else {
-          melody = Array(numberOfNotes)
-            .fill(null)
-            .map(
-              () => currentSelectedNotes[Math.floor(Math.random() * currentSelectedNotes.length)]
-            )
-        }
-
+        const melody = maxVarietyMelody(currentSelectedNotes, numberOfNotes)
         setGeneratedMelody(melody)
       }
     },
