@@ -35,56 +35,22 @@ export function getModelForInstrument(instrument: string): SpleeterModel {
   return '2stems'
 }
 
-// ─── Model availability (cached across hook instances) ─────────────────────
+// ─── Model availability ─────────────────────────────────────────────────────
+// All models are available: 2stems on HuggingFace, 4stems/5stems self-hosted
 
-const modelAvailabilityCache: Record<string, boolean | null> = {
-  '2stems': true, // known available
-  '4stems': null,
-  '5stems': null,
+const modelAvailabilityCache: Record<string, boolean> = {
+  '2stems': true,
+  '4stems': true,
+  '5stems': true,
 }
 
-let availabilityCheckPromise: Promise<void> | null = null
-
-/** Check which models are available. Runs once and caches results. */
+/** All models are self-hosted and always available. */
 export function checkAllModelAvailability(): Promise<Record<string, boolean>> {
-  if (!availabilityCheckPromise) {
-    availabilityCheckPromise = new Promise<void>(resolve => {
-      const worker = new Worker(new URL('../workers/stemSeparation.worker.ts', import.meta.url), {
-        type: 'module',
-      })
-      let pending = 2 // check 4stems and 5stems
-      worker.onmessage = (e: MessageEvent) => {
-        if (e.data.type === 'AVAILABILITY') {
-          modelAvailabilityCache[e.data.model] = e.data.available
-          pending--
-          if (pending <= 0) {
-            worker.terminate()
-            resolve()
-          }
-        }
-      }
-      worker.onerror = () => {
-        // On error, mark unknown models as unavailable
-        if (modelAvailabilityCache['4stems'] === null) modelAvailabilityCache['4stems'] = false
-        if (modelAvailabilityCache['5stems'] === null) modelAvailabilityCache['5stems'] = false
-        worker.terminate()
-        resolve()
-      }
-
-      worker.postMessage({ type: 'CHECK_AVAILABILITY', model: '4stems' })
-      worker.postMessage({ type: 'CHECK_AVAILABILITY', model: '5stems' })
-    })
-  }
-
-  return availabilityCheckPromise.then(() => ({
-    '2stems': modelAvailabilityCache['2stems'] ?? false,
-    '4stems': modelAvailabilityCache['4stems'] ?? false,
-    '5stems': modelAvailabilityCache['5stems'] ?? false,
-  }))
+  return Promise.resolve({ ...modelAvailabilityCache })
 }
 
-/** Get cached availability (synchronous, returns null if not yet checked). */
-export function getModelAvailability(): Record<string, boolean | null> {
+/** Get model availability (all models are available). */
+export function getModelAvailability(): Record<string, boolean> {
   return { ...modelAvailabilityCache }
 }
 

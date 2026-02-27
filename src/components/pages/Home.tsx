@@ -27,6 +27,31 @@ function Home() {
   const [wordIndex, setWordIndex] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
 
+  // Countdown to March 14, 2026
+  const targetDate = useMemo(() => new Date('2026-03-14T00:00:00'), [])
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const diff = targetDate.getTime() - Date.now()
+    return diff > 0 ? diff : 0
+  })
+
+  useEffect(() => {
+    if (timeLeft <= 0) return
+    const timer = setInterval(() => {
+      const diff = targetDate.getTime() - Date.now()
+      setTimeLeft(diff > 0 ? diff : 0)
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [targetDate, timeLeft])
+
+  const countdown = useMemo(() => {
+    const totalSeconds = Math.floor(timeLeft / 1000)
+    const days = Math.floor(totalSeconds / 86400)
+    const hours = Math.floor((totalSeconds % 86400) / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const seconds = totalSeconds % 60
+    return { days, hours, minutes, seconds }
+  }, [timeLeft])
+
   // Redirect logged-in users to dashboard
   useEffect(() => {
     if (user && !loading) {
@@ -107,6 +132,41 @@ function Home() {
             <PiLightningFill />
             <span>{t('home.freeToUse')}</span>
           </div>
+
+          {timeLeft > 0 && (
+            <div className={styles.countdown}>
+              <span className={styles.countdownLabel}>Launch</span>
+              <div className={styles.countdownTimer}>
+                <div className={styles.countdownUnit}>
+                  <span className={styles.countdownNumber}>
+                    {String(countdown.days).padStart(2, '0')}
+                  </span>
+                  <span className={styles.countdownSuffix}>days</span>
+                </div>
+                <span className={styles.countdownSeparator}>:</span>
+                <div className={styles.countdownUnit}>
+                  <span className={styles.countdownNumber}>
+                    {String(countdown.hours).padStart(2, '0')}
+                  </span>
+                  <span className={styles.countdownSuffix}>hrs</span>
+                </div>
+                <span className={styles.countdownSeparator}>:</span>
+                <div className={styles.countdownUnit}>
+                  <span className={styles.countdownNumber}>
+                    {String(countdown.minutes).padStart(2, '0')}
+                  </span>
+                  <span className={styles.countdownSuffix}>min</span>
+                </div>
+                <span className={styles.countdownSeparator}>:</span>
+                <div className={styles.countdownUnit}>
+                  <span className={styles.countdownNumber}>
+                    {String(countdown.seconds).padStart(2, '0')}
+                  </span>
+                  <span className={styles.countdownSuffix}>sec</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           <h1 className={styles.heroTitle}>
             {t('home.trainYourEar')}

@@ -63,20 +63,39 @@
 }
 
 @keyframes float1 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(5%, 10%) scale(1.1); }
-  66% { transform: translate(-5%, 5%) scale(0.95); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(5%, 10%) scale(1.1);
+  }
+  66% {
+    transform: translate(-5%, 5%) scale(0.95);
+  }
 }
 
 @keyframes float2 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(-8%, -5%) scale(1.05); }
-  66% { transform: translate(5%, -10%) scale(1.1); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(-8%, -5%) scale(1.05);
+  }
+  66% {
+    transform: translate(5%, -10%) scale(1.1);
+  }
 }
 
 @keyframes float3 {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-10%, 15%) scale(1.15); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-10%, 15%) scale(1.15);
+  }
 }
 
 .heroContent {
@@ -106,6 +125,110 @@
   color: var(--primary-purple);
 }
 
+/* ===========================================
+   COUNTDOWN TIMER
+   =========================================== */
+
+.countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 40px;
+  animation: fadeInDown 0.6s ease-out 0.05s both;
+}
+
+.countdownLabel {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 6px;
+  background: linear-gradient(135deg, #ffffff 0%, var(--primary-purple-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.countdownTimer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.countdownUnit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.countdownNumber {
+  font-size: clamp(3rem, 10vw, 5.5rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    var(--primary-purple-light) 60%,
+    var(--primary-purple) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  min-width: 2ch;
+  text-align: center;
+}
+
+.countdownSuffix {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.countdownSeparator {
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 700;
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    var(--primary-purple-light) 60%,
+    var(--primary-purple) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  align-self: flex-start;
+  line-height: 1;
+  padding-top: 6px;
+}
+
+@media (max-width: 640px) {
+  .countdownTimer {
+    gap: 6px;
+  }
+
+  .countdownSeparator {
+    padding-top: 4px;
+  }
+}
+
+.light .countdownLabel {
+  background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.light .countdownNumber,
+.light .countdownSeparator {
+  background: linear-gradient(180deg, var(--primary-purple) 0%, var(--primary-purple-dark) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
 .heroTitle {
   font-size: clamp(2.5rem, 8vw, 5rem);
@@ -116,14 +239,15 @@
   animation: fadeInUp 0.6s ease-out 0.1s both;
 }
 
-
 .rotatingWord {
   display: inline-block;
   background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-purple-light) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
 }
 
 .fadeOut {
@@ -144,7 +268,6 @@
   line-height: 1.6;
   animation: fadeInUp 0.6s ease-out 0.2s both;
 }
-
 
 .heroCta {
   display: flex;
@@ -189,7 +312,6 @@
   color: var(--text-muted);
 }
 
-
 .heroInstruments {
   display: flex;
   justify-content: center;
@@ -227,7 +349,6 @@
   color: var(--primary-purple-light);
 }
 
-
 /* Scroll Indicator */
 .scrollIndicator {
   position: absolute;
@@ -249,7 +370,6 @@
   letter-spacing: 1px;
 }
 
-
 .scrollArrow {
   width: 24px;
   height: 24px;
@@ -260,9 +380,19 @@
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% { transform: rotate(45deg) translateY(0); }
-  40% { transform: rotate(45deg) translateY(6px); }
-  60% { transform: rotate(45deg) translateY(3px); }
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: rotate(45deg) translateY(0);
+  }
+  40% {
+    transform: rotate(45deg) translateY(6px);
+  }
+  60% {
+    transform: rotate(45deg) translateY(3px);
+  }
 }
 
 /* ===========================================
@@ -271,7 +401,12 @@
 
 .features {
   padding: 120px 24px;
-  background: linear-gradient(180deg, transparent 0%, var(--primary-purple-alpha-05) 50%, transparent 100%);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--primary-purple-alpha-05) 50%,
+    transparent 100%
+  );
 }
 
 .featuresContainer {
@@ -301,7 +436,6 @@
   margin: 0 0 16px;
 }
 
-
 .sectionHeader p {
   font-size: 1.125rem;
   color: var(--text-secondary);
@@ -309,7 +443,6 @@
   margin: 0 auto;
   line-height: 1.6;
 }
-
 
 .featureGrid {
   display: grid;
@@ -356,20 +489,22 @@
   box-shadow: 0 4px 16px var(--black-alpha-10);
 }
 
-
 .featureIconWrapper {
   width: 56px;
   height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary-purple-alpha-20) 0%, var(--primary-purple-alpha-10) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--primary-purple-alpha-20) 0%,
+    var(--primary-purple-alpha-10) 100%
+  );
   border-radius: 14px;
   margin-bottom: 20px;
   font-size: 1.75rem;
   color: var(--primary-purple-light);
 }
-
 
 .featureCard h3 {
   font-size: 1.25rem;
@@ -378,14 +513,12 @@
   margin: 0 0 12px;
 }
 
-
 .featureCard p {
   font-size: 1rem;
   color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
 }
-
 
 /* ===========================================
    STATS SECTION
@@ -428,7 +561,6 @@
   letter-spacing: 1px;
 }
 
-
 .statDivider {
   width: 1px;
   height: 60px;
@@ -438,7 +570,6 @@
 .light .statDivider {
   background: var(--gray-200);
 }
-
 
 @media (max-width: 640px) {
   .statsContainer {
@@ -474,14 +605,12 @@
   margin: 0 0 16px;
 }
 
-
 .ctaContent p {
   font-size: 1.125rem;
   color: var(--text-secondary);
   margin: 0 0 32px;
   line-height: 1.6;
 }
-
 
 /* ===========================================
    ANIMATIONS

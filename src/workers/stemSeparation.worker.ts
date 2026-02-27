@@ -35,31 +35,24 @@ const MODEL_STEMS: Record<string, string[]> = {
   '5stems': ['vocals', 'drums', 'bass', 'piano', 'other'],
 }
 
-// HuggingFace model URLs per variant (fp32)
-// 2stems: publicly available from sherpa-onnx (csukuangfj)
-// 4stems/5stems: must be converted from Spleeter TF checkpoints and hosted.
-//   Run: python scripts/convert-spleeter-onnx.py --model 4stems
-//   Then upload to HuggingFace and update the URL below.
+// 2stems: HuggingFace (csukuangfj), 4stems/5stems: self-hosted in public/models/spleeter/
 const HF_BASE_URLS: Record<string, string> = {
   '2stems': 'https://huggingface.co/csukuangfj/sherpa-onnx-spleeter-2stems/resolve/main',
-  '4stems': 'https://huggingface.co/csukuangfj/sherpa-onnx-spleeter-4stems/resolve/main',
-  '5stems': 'https://huggingface.co/csukuangfj/sherpa-onnx-spleeter-5stems/resolve/main',
 }
 
-// Track which models have been verified as available (avoids repeated HEAD checks)
+// All models are available — 4stems/5stems are self-hosted, 2stems on HuggingFace
 const modelAvailability: Record<string, boolean | null> = {
-  '2stems': true, // known available
-  '4stems': null, // unknown until checked
-  '5stems': null,
+  '2stems': true,
+  '4stems': true,
+  '5stems': true,
 }
 
-/** In dev mode, proxy through the Vite dev server to avoid CSP issues. */
 function getModelUrl(model: string, stem: string): string {
-  const isDev = typeof location !== 'undefined' && location.origin.includes('localhost')
-  if (isDev) {
-    return `/api/spleeter-model?model=${model}&stem=${stem}`
+  if (model === '2stems') {
+    return `${HF_BASE_URLS['2stems']}/${stem}.onnx`
   }
-  return `${HF_BASE_URLS[model]}/${stem}.onnx`
+  // 4stems/5stems served from public/models/spleeter/
+  return `/models/spleeter/${model}/${stem}.onnx`
 }
 
 // Configure ONNX Runtime — use multi-threading when SharedArrayBuffer is available
@@ -790,32 +783,8 @@ async function separateStems(
 // ─── Model Availability Check ──────────────────────────────────────────────
 
 async function checkModelAvailability(modelName: string): Promise<boolean> {
-  // Already verified
-  if (modelAvailability[modelName] === true) return true
-  if (modelAvailability[modelName] === false) return false
-
-  // Check if models are cached in IndexedDB (if cached, they're available)
-  const stemNames = MODEL_STEMS[modelName]
-  if (!stemNames) return false
-
-  const firstStem = stemNames[0]
-  const cached = await getCachedModel(`${modelName}_${firstStem}`)
-  if (cached) {
-    modelAvailability[modelName] = true
-    return true
-  }
-
-  // HEAD request to check if the first stem's model file exists
-  try {
-    const url = getModelUrl(modelName, firstStem)
-    const response = await fetch(url, { method: 'HEAD' })
-    const available = response.ok
-    modelAvailability[modelName] = available
-    return available
-  } catch {
-    modelAvailability[modelName] = false
-    return false
-  }
+  // All models are available — 2stems on HuggingFace, 4stems/5stems self-hosted
+  return modelAvailability[modelName] === true
 }
 
 // ─── Worker Message Handler ────────────────────────────────────────────────
