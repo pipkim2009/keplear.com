@@ -13,6 +13,11 @@
   gap: 2rem;
 }
 
+.container :global(.instrument-controls-container) {
+  width: 100%;
+  max-width: 100%;
+}
+
 .headerSection {
   text-align: center;
   display: flex;

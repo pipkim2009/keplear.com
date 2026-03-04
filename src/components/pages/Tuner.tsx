@@ -45,7 +45,6 @@ export default function Tuner() {
   useEffect(() => {
     startRef.current()
     return () => stopRef.current()
-     
   }, [])
 
   // Default to guitar if keyboard is selected
@@ -116,7 +115,9 @@ export default function Tuner() {
       </div>
 
       {/* Instrument selector — same UI as Generator, keyboard hidden */}
-      <InstrumentSelector exclude={['keyboard']} />
+      <div className="instrument-controls-container guitar-mode">
+        <InstrumentSelector exclude={['keyboard']} />
+      </div>
 
       {/* String reference */}
       <div className={styles.stringsSection}>
