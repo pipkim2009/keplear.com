@@ -58,7 +58,7 @@ const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) 
     <header className="header">
       <div className="header-content">
         <div className="header-left">
-          <Link to={user ? '/dashboard' : '/'} className="header-brand">
+          <Link to="/dashboard" className="header-brand">
             <img src={logo} alt="Keplear" className="header-logo" />
           </Link>
         </div>
@@ -73,18 +73,12 @@ const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) 
         </button>
 
         <nav className={`header-nav ${mobileMenuOpen ? 'header-nav-open' : ''}`}>
-          {user ? (
-            <Link
-              to="/dashboard"
-              className={`nav-link ${currentPath === '/dashboard' ? 'nav-link-active' : ''}`}
-            >
-              {t('nav.dashboard')}
-            </Link>
-          ) : (
-            <Link to="/" className={`nav-link ${currentPath === '/' ? 'nav-link-active' : ''}`}>
-              {t('nav.home')}
-            </Link>
-          )}
+          <Link
+            to="/dashboard"
+            className={`nav-link ${currentPath === '/dashboard' ? 'nav-link-active' : ''}`}
+          >
+            {t('nav.dashboard')}
+          </Link>
           <Link
             to="/generator"
             className={`nav-link ${currentPath === '/generator' ? 'nav-link-active' : ''}`}

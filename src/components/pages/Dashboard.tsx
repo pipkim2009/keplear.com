@@ -38,6 +38,9 @@ import styles from '../../styles/Dashboard.module.css'
 import classroomStyles from '../../styles/Classroom.module.css'
 import TutorialOverlay from '../onboarding/TutorialOverlay'
 import { useTutorial } from '../../hooks/useTutorial'
+import DailyChallengeCard from '../dashboard/DailyChallengeCard'
+import type { InstrumentType } from '../../types/instrument'
+import { useNavigate } from 'react-router'
 
 function Dashboard() {
   const authContext = useContext(AuthContext)
@@ -47,6 +50,13 @@ function Dashboard() {
   const { t } = useTranslation()
   const { navigateToGenerator, navigateToClassroom, navigateToProfile } = useNavigation()
   const { setInstrument, setBpm, setNumberOfBeats } = useInstrument()
+  const routerNavigate = useNavigate()
+
+  // Daily Challenge handler
+  const handleStartDailyChallenge = (instrument: InstrumentType) => {
+    localStorage.setItem('dailyChallengeInstrument', instrument)
+    routerNavigate('/daily-challenge')
+  }
 
   // Tutorial
   const {
@@ -59,6 +69,31 @@ function Dashboard() {
     shouldShowTutorial,
     startTutorial,
   } = useTutorial()
+
+  // Launch countdown to March 14, 2026
+  const targetDate = useMemo(() => new Date('2026-03-14T00:00:00'), [])
+  const [timeLeft, setTimeLeft] = useState(() => {
+    const diff = targetDate.getTime() - Date.now()
+    return diff > 0 ? diff : 0
+  })
+
+  useEffect(() => {
+    if (timeLeft <= 0) return
+    const timer = setInterval(() => {
+      const diff = targetDate.getTime() - Date.now()
+      setTimeLeft(diff > 0 ? diff : 0)
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [targetDate, timeLeft])
+
+  const countdown = useMemo(() => {
+    const totalSeconds = Math.floor(timeLeft / 1000)
+    const days = Math.floor(totalSeconds / 86400)
+    const hours = Math.floor((totalSeconds % 86400) / 3600)
+    const minutes = Math.floor((totalSeconds % 3600) / 60)
+    const seconds = totalSeconds % 60
+    return { days, hours, minutes, seconds }
+  }, [timeLeft])
 
   // State
   const [timeRange, setTimeRange] = useState<TimeRange>('week')
@@ -265,6 +300,42 @@ function Dashboard() {
 
       {/* Main Content */}
       <div className={styles.mainContent}>
+        {/* Launch Countdown */}
+        {timeLeft > 0 && (
+          <div className={styles.launchCountdown}>
+            <span className={styles.launchLabel}>Launch</span>
+            <div className={styles.launchTimer}>
+              <div className={styles.launchUnit}>
+                <span className={styles.launchNumber}>
+                  {String(countdown.days).padStart(2, '0')}
+                </span>
+                <span className={styles.launchSuffix}>days</span>
+              </div>
+              <span className={styles.launchSeparator}>:</span>
+              <div className={styles.launchUnit}>
+                <span className={styles.launchNumber}>
+                  {String(countdown.hours).padStart(2, '0')}
+                </span>
+                <span className={styles.launchSuffix}>hrs</span>
+              </div>
+              <span className={styles.launchSeparator}>:</span>
+              <div className={styles.launchUnit}>
+                <span className={styles.launchNumber}>
+                  {String(countdown.minutes).padStart(2, '0')}
+                </span>
+                <span className={styles.launchSuffix}>min</span>
+              </div>
+              <span className={styles.launchSeparator}>:</span>
+              <div className={styles.launchUnit}>
+                <span className={styles.launchNumber}>
+                  {String(countdown.seconds).padStart(2, '0')}
+                </span>
+                <span className={styles.launchSuffix}>sec</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Welcome Banner */}
         <section className={styles.welcomeBanner}>
           <div className={styles.welcomeContent}>
@@ -304,6 +375,9 @@ function Dashboard() {
             </div>
           </div>
         </section>
+
+        {/* Daily Challenge */}
+        <DailyChallengeCard onStart={handleStartDailyChallenge} />
 
         {/* Stat Cards Row */}
         <section className={styles.statCardsRow}>

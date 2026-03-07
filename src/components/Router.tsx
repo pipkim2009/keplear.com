@@ -18,6 +18,7 @@ const Profile = lazy(() => import('./pages/Profile'))
 const Metronome = lazy(() => import('./pages/Metronome'))
 const Tuner = lazy(() => import('./pages/Tuner'))
 const SandboxPage = lazy(() => import('./pages/SandboxPage'))
+const DailyChallenge = lazy(() => import('./pages/DailyChallenge'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'))
 const TermsOfService = lazy(() => import('./pages/TermsOfService'))
@@ -145,6 +146,16 @@ function Router() {
             <ProtectedRoute>
               <SectionErrorBoundary section="Tuner">
                 <Tuner />
+              </SectionErrorBoundary>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/daily-challenge"
+          element={
+            <ProtectedRoute>
+              <SectionErrorBoundary section="DailyChallenge">
+                <DailyChallenge />
               </SectionErrorBoundary>
             </ProtectedRoute>
           }
