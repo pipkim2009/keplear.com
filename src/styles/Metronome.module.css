@@ -387,10 +387,63 @@
   color: var(--gray-700);
 }
 
+:global(body.light) .beatDot {
+  background: var(--gray-500);
+}
+
+:global(body.light) .bpmDisplay {
+  color: var(--gray-900);
+}
+
+:global(body.light) .bpmDisplay:hover {
+  color: var(--primary-purple);
+}
+
+:global(body.light) .bpmInput {
+  color: var(--gray-900);
+}
+
 :global(body.light) .bpmLabel {
   color: var(--gray-600);
 }
 
+:global(body.light) .bpmBtn {
+  border-color: var(--gray-900);
+  color: var(--gray-900);
+}
+
+:global(body.light) .bpmBtn:hover {
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+}
+
 :global(body.light) .tsLabel {
   color: var(--gray-600);
+}
+
+:global(body.light) .tsBtn {
+  border-color: var(--gray-900);
+  color: var(--gray-900);
+}
+
+:global(body.light) .tsBtn:hover {
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+}
+
+:global(body.light) .tsBtn.active {
+  color: #fff;
+}
+
+:global(body.light) .customTsInput {
+  border-color: var(--gray-900);
+  color: var(--gray-900);
+}
+
+:global(body.light) .customTsSeparator {
+  color: var(--gray-600);
+}
+
+:global(body.light) .tapBtn {
+  color: var(--primary-purple);
 }

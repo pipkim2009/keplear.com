@@ -653,6 +653,150 @@
   color: var(--gray-700);
 }
 
+/* Containers: subtle light bg with visible border */
+:global(body.light) .stemControls {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: var(--gray-900);
+}
+
+:global(body.light) .transportSection {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: var(--gray-900);
+}
+
+/* Upload button: neutral state only */
+:global(body.light) .stemUploadBtn {
+  border-color: var(--gray-900);
+  background: rgba(0, 0, 0, 0.02);
+  color: var(--gray-500);
+}
+
+:global(body.light) .stemUploadBtn:hover {
+  border-color: var(--primary-purple);
+  background: var(--primary-purple-alpha-10);
+  color: var(--primary-purple);
+}
+
+:global(body.light) .stemUploadBtnActive {
+  border-color: var(--primary-purple);
+  color: var(--gray-900);
+}
+
+/* Instrument chips: neutral inactive state — active chips keep --chip-color */
+:global(body.light) .stemInstrumentChip {
+  border-color: var(--gray-900);
+  background: rgba(0, 0, 0, 0.02);
+  color: var(--gray-700);
+}
+
+:global(body.light) .stemInstrumentChip:hover {
+  background: var(--primary-purple-alpha-10);
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+}
+
+/* Active chips: preserve their --chip-color in light mode */
+:global(body.light) .stemInstrumentChipActive {
+  background: var(--chip-bg);
+  border-color: var(--chip-color);
+  color: var(--chip-color);
+}
+
+:global(body.light) .stemInstrumentChipUnavailable {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: var(--silver-dark);
+  color: var(--gray-500);
+}
+
+:global(body.light) .stemChipBadge {
+  color: var(--gray-500);
+  background: rgba(0, 0, 0, 0.06);
+}
+
+/* Progress bar */
+:global(body.light) .stemProgressTrack {
+  background: var(--silver-dark);
+}
+
+:global(body.light) .stemProgressText {
+  color: var(--gray-700);
+}
+
+/* Stem labels keep --stem-color, fallback to dark text */
+:global(body.light) .stemLabel {
+  color: var(--stem-color, var(--gray-900));
+}
+
+:global(body.light) .stemVolumeText {
+  color: var(--gray-700);
+}
+
+/* Mute/Solo: neutral state gets dark border. Active states (red/yellow) are NOT overridden */
+:global(body.light) .stemMuteBtn,
+:global(body.light) .stemSoloBtn {
+  border-color: var(--gray-900);
+  color: var(--gray-700);
+}
+
+:global(body.light) .stemMuteBtn:hover,
+:global(body.light) .stemSoloBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+:global(body.light) .stemMuteBtnActive {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: var(--red-500);
+  color: var(--red-500);
+}
+
+:global(body.light) .stemSoloBtnActive {
+  background: rgba(234, 179, 8, 0.12);
+  border-color: #eab308;
+  color: #eab308;
+}
+
+:global(body.light) .controlLabel {
+  color: var(--gray-700);
+}
+
+:global(body.light) .timeDisplay {
+  color: var(--gray-700);
+}
+
+/* Speed buttons: neutral + coloured active */
+:global(body.light) .speedButton {
+  color: var(--gray-700);
+}
+
+:global(body.light) .speedButton:hover {
+  color: var(--primary-purple);
+  background: var(--primary-purple-alpha-10);
+}
+
+/* Sliders keep --stem-color, just fix the empty track */
+:global(body.light) .seekBar {
+  background: linear-gradient(
+    to right,
+    var(--primary-purple) 0%,
+    var(--primary-purple) var(--seek-percent, 0%),
+    var(--silver-dark) var(--seek-percent, 0%),
+    var(--silver-dark) 100%
+  );
+}
+
+:global(body.light) .stemSlider {
+  background: linear-gradient(
+    to right,
+    var(--stem-color, var(--primary-purple)) 0%,
+    var(--stem-color, var(--primary-purple)) var(--stem-volume, 100%),
+    var(--silver-dark) var(--stem-volume, 100%),
+    var(--silver-dark) 100%
+  );
+}
+
+/* Play/control buttons keep purple */
+
+/* Empty state */
 :global(body.light) .emptyState {
   background: linear-gradient(145deg, var(--silver-light), var(--silver-dark));
   border-color: var(--gray-900);

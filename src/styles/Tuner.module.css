@@ -139,7 +139,7 @@
   height: 28px;
   width: 3px;
   opacity: 0.6;
-  background: var(--primary-purple);
+  background: var(--red-500);
 }
 
 .needle {
@@ -147,11 +147,11 @@
   top: 0.5rem;
   width: 4px;
   height: 40px;
-  background: var(--primary-purple);
+  background: var(--red-500);
   border-radius: 2px;
   transform: translateX(-50%);
   transition: left 0.12s ease-out;
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
 }
 
 .gaugeLabels {
@@ -337,6 +337,26 @@
   color: var(--gray-700);
 }
 
+:global(body.light) .stringDot {
+  border-color: var(--gray-500);
+}
+
+:global(body.light) .stringNote {
+  color: var(--gray-900);
+}
+
+:global(body.light) .noteName {
+  color: var(--gray-900);
+}
+
+:global(body.light) .tick {
+  background: var(--gray-500);
+}
+
+:global(body.light) .tick.tickCenter {
+  background: var(--red-500);
+}
+
 :global(body.light) .waitingText {
   color: var(--gray-600);
 }
@@ -346,5 +366,17 @@
 }
 
 :global(body.light) .gaugeLabel {
+  color: var(--gray-600);
+}
+
+:global(body.light) .micLevelLabel {
+  color: var(--gray-600);
+}
+
+:global(body.light) .micLevelBar {
+  background: var(--silver-dark);
+}
+
+:global(body.light) .micLevelValue {
   color: var(--gray-600);
 }

@@ -140,6 +140,20 @@ export default function Tuner() {
         })}
       </div>
 
+      {/* Note display */}
+      <div className={styles.noteSection}>
+        <div className={styles.noteName}>
+          {detectedPitch ? detectedPitch.note : '_'}
+          {detectedPitch && <span className={styles.noteOctave}>{detectedPitch.octave}</span>}
+        </div>
+        {detectedPitch && (
+          <>
+            <div className={`${styles.centsDisplay} ${centsClass}`}>{centsLabel}</div>
+            <div className={styles.frequencyDisplay}>{detectedPitch.frequency.toFixed(1)} Hz</div>
+          </>
+        )}
+      </div>
+
       {/* Gauge */}
       <div className={styles.gauge}>
         <div className={styles.gaugeTicks}>
@@ -156,20 +170,6 @@ export default function Tuner() {
           <span className={styles.gaugeLabel}>{t('tuner.high')}</span>
         </div>
       </div>
-
-      {/* Note display */}
-      {detectedPitch ? (
-        <div className={styles.noteSection}>
-          <div className={styles.noteName}>
-            {detectedPitch.note}
-            <span className={styles.noteOctave}>{detectedPitch.octave}</span>
-          </div>
-          <div className={`${styles.centsDisplay} ${centsClass}`}>{centsLabel}</div>
-          <div className={styles.frequencyDisplay}>{detectedPitch.frequency.toFixed(1)} Hz</div>
-        </div>
-      ) : (
-        <div className={styles.waitingText}>{t('tuner.waitingForInput')}</div>
-      )}
 
       {/* Mic level indicator */}
       <div className={styles.micLevel}>
