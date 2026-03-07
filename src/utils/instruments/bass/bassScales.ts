@@ -1,4 +1,5 @@
 import type { BassNote } from './bassNotes'
+import { ROOT_NOTES, getNotesFromIntervals, stripOctave, isNoteInNoteSet } from '../../musicTheory'
 
 export type BassScale = {
   name: string
@@ -8,8 +9,8 @@ export type BassScale = {
 
 export type BassScalePosition = {
   string: number // 1-4
-  fret: number   // 0-24
-  note: string   // Note name
+  fret: number // 0-24
+  note: string // Note name
   isRoot: boolean // Is this the root note of the scale
 }
 
@@ -25,88 +26,80 @@ export const BASS_SCALES: BassScale[] = [
   {
     name: 'Major',
     intervals: [0, 2, 4, 5, 7, 9, 11],
-    description: 'The most common scale, bright and happy sounding'
+    description: 'The most common scale, bright and happy sounding',
   },
   {
     name: 'Minor',
     intervals: [0, 2, 3, 5, 7, 8, 10],
-    description: 'Minor scale with a sad, melancholic sound'
+    description: 'Minor scale with a sad, melancholic sound',
   },
   {
     name: 'Dorian',
     intervals: [0, 2, 3, 5, 7, 9, 10],
-    description: 'Minor scale with a raised 6th, jazzy sound'
+    description: 'Minor scale with a raised 6th, jazzy sound',
   },
   {
     name: 'Phrygian',
     intervals: [0, 1, 3, 5, 7, 8, 10],
-    description: 'Minor scale with a flattened 2nd, Spanish sound'
+    description: 'Minor scale with a flattened 2nd, Spanish sound',
   },
   {
     name: 'Lydian',
     intervals: [0, 2, 4, 6, 7, 9, 11],
-    description: 'Major scale with a raised 4th, dreamy sound'
+    description: 'Major scale with a raised 4th, dreamy sound',
   },
   {
     name: 'Mixolydian',
     intervals: [0, 2, 4, 5, 7, 9, 10],
-    description: 'Major scale with a flattened 7th, bluesy sound'
+    description: 'Major scale with a flattened 7th, bluesy sound',
   },
   {
     name: 'Locrian',
     intervals: [0, 1, 3, 5, 6, 8, 10],
-    description: 'Diminished scale, unstable and dark'
+    description: 'Diminished scale, unstable and dark',
   },
   {
     name: 'Pentatonic Major',
     intervals: [0, 2, 4, 7, 9],
-    description: 'Five-note scale, great for blues and rock'
+    description: 'Five-note scale, great for blues and rock',
   },
   {
     name: 'Pentatonic Minor',
     intervals: [0, 3, 5, 7, 10],
-    description: 'Five-note minor scale, essential for blues and rock'
+    description: 'Five-note minor scale, essential for blues and rock',
   },
   {
     name: 'Harmonic Minor',
     intervals: [0, 2, 3, 5, 7, 8, 11],
-    description: 'Minor scale with a raised 7th, exotic sound'
+    description: 'Minor scale with a raised 7th, exotic sound',
   },
   {
     name: 'Blues Scale',
     intervals: [0, 3, 5, 6, 7, 10],
-    description: 'Minor pentatonic with added blue note'
+    description: 'Minor pentatonic with added blue note',
   },
   {
     name: 'Chromatic',
     intervals: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-    description: 'All twelve notes, used for warm-ups and runs'
-  }
+    description: 'All twelve notes, used for warm-ups and runs',
+  },
 ]
 
-// Root notes available for scales
-export const BASS_ROOT_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+// Re-export for backward compatibility
+export const BASS_ROOT_NOTES = ROOT_NOTES
 
-// Function to get note name from semitone offset
-const getNoteFromInterval = (rootNote: string, interval: number): string => {
-  const rootIndex = BASS_ROOT_NOTES.indexOf(rootNote)
-  if (rootIndex === -1) return rootNote
-
-  const noteIndex = (rootIndex + interval) % 12
-  return BASS_ROOT_NOTES[noteIndex]
-}
-
-// Function to get all notes in a scale given root note and scale
+// Delegate to shared utility
 export const getBassScaleNotes = (rootNote: string, scale: BassScale): string[] => {
-  return scale.intervals.map(interval => getNoteFromInterval(rootNote, interval))
+  return getNotesFromIntervals(rootNote, scale.intervals)
 }
 
-// Function to check if a note belongs to a scale
-export const isNoteInBassScale = (noteName: string, rootNote: string, scale: BassScale): boolean => {
-  const scaleNotes = getBassScaleNotes(rootNote, scale)
-  // Remove octave numbers for comparison (e.g., "C4" becomes "C")
-  const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
-  return scaleNotes.includes(noteNameWithoutOctave)
+// Delegate to shared utility
+export const isNoteInBassScale = (
+  noteName: string,
+  rootNote: string,
+  scale: BassScale
+): boolean => {
+  return isNoteInNoteSet(noteName, getBassScaleNotes(rootNote, scale))
 }
 
 // Function to get scale positions on the bass fretboard
@@ -119,15 +112,13 @@ export const getBassScalePositions = (
   const positions: BassScalePosition[] = []
 
   bassNotes.forEach(bassNote => {
-    const noteNameWithoutOctave = bassNote.name.replace(/\d+$/, '')
-
-    // Check if note is in scale
-    if (scaleNotes.includes(noteNameWithoutOctave)) {
+    const noteName = stripOctave(bassNote.name)
+    if (scaleNotes.includes(noteName)) {
       positions.push({
         string: bassNote.string,
         fret: bassNote.fret,
         note: bassNote.name,
-        isRoot: noteNameWithoutOctave === rootNote
+        isRoot: noteName === rootNote,
       })
     }
   })
@@ -151,12 +142,12 @@ export const getBassScaleBoxes = (
     { name: 'Position 3', minFret: 9, maxFret: 12 },
     { name: 'Position 4', minFret: 13, maxFret: 16 },
     { name: 'Position 5', minFret: 17, maxFret: 20 },
-    { name: 'Position 6', minFret: 21, maxFret: 24 }
+    { name: 'Position 6', minFret: 21, maxFret: 24 },
   ]
 
   boxRanges.forEach(range => {
-    const boxPositions = allPositions.filter(pos =>
-      pos.fret >= range.minFret && pos.fret <= range.maxFret
+    const boxPositions = allPositions.filter(
+      pos => pos.fret >= range.minFret && pos.fret <= range.maxFret
     )
 
     if (boxPositions.length > 0) {
@@ -164,7 +155,7 @@ export const getBassScaleBoxes = (
         name: `${scale.name} (Frets ${range.minFret}-${range.maxFret})`,
         minFret: range.minFret,
         maxFret: range.maxFret,
-        positions: boxPositions
+        positions: boxPositions,
       })
     }
   })
@@ -177,9 +168,9 @@ export const applyScaleToBass = (
   rootNote: string,
   scale: BassScale,
   bassNotes: BassNote[]
-): { stringIndex: number, fretIndex: number }[] => {
+): { stringIndex: number; fretIndex: number }[] => {
   const scalePositions = getBassScalePositions(rootNote, scale, bassNotes)
-  const selections: { stringIndex: number, fretIndex: number }[] = []
+  const selections: { stringIndex: number; fretIndex: number }[] = []
 
   scalePositions.forEach(position => {
     // Convert bass string number (1-4) to visual string index (0-3)
@@ -198,8 +189,8 @@ export const applyScaleToBass = (
 // Function to apply a specific scale box to bass note selection
 export const applyScaleBoxToBass = (
   scaleBox: BassScaleBox
-): { stringIndex: number, fretIndex: number }[] => {
-  const selections: { stringIndex: number, fretIndex: number }[] = []
+): { stringIndex: number; fretIndex: number }[] => {
+  const selections: { stringIndex: number; fretIndex: number }[] = []
 
   scaleBox.positions.forEach(position => {
     // Convert bass string number (1-4) to visual string index (0-3)

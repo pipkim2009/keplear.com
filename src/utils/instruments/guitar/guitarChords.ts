@@ -1,4 +1,5 @@
 import type { GuitarNote } from './guitarNotes'
+import { ROOT_NOTES, getNotesFromIntervals, isNoteInNoteSet } from '../../musicTheory'
 
 export type GuitarChord = {
   name: string
@@ -100,8 +101,8 @@ export const GUITAR_CHORDS: GuitarChord[] = [
   },
 ]
 
-// Root notes available for chords (same as scales)
-export const CHORD_ROOT_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+// Re-export for backward compatibility
+export const CHORD_ROOT_NOTES = ROOT_NOTES
 
 // Predefined chord fingerings for common chords
 // Format: [low E, A, D, G, B, high E] - fret numbers or 'x' for muted
@@ -1079,26 +1080,14 @@ export const CHORD_FINGERINGS: { [key: string]: { [chordType: string]: ChordFing
   },
 }
 
-// Function to get note name from semitone offset
-const getNoteFromInterval = (rootNote: string, interval: number): string => {
-  const rootIndex = CHORD_ROOT_NOTES.indexOf(rootNote)
-  if (rootIndex === -1) return rootNote
-
-  const noteIndex = (rootIndex + interval) % 12
-  return CHORD_ROOT_NOTES[noteIndex]
-}
-
-// Function to get all notes in a chord given root note and chord
+// Delegate to shared utility
 export const getChordNotes = (rootNote: string, chord: GuitarChord): string[] => {
-  return chord.intervals.map(interval => getNoteFromInterval(rootNote, interval))
+  return getNotesFromIntervals(rootNote, chord.intervals)
 }
 
-// Function to check if a note belongs to a chord
+// Delegate to shared utility
 export const isNoteInChord = (noteName: string, rootNote: string, chord: GuitarChord): boolean => {
-  const chordNotes = getChordNotes(rootNote, chord)
-  // Remove octave numbers for comparison (e.g., "C4" becomes "C")
-  const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
-  return chordNotes.includes(noteNameWithoutOctave)
+  return isNoteInNoteSet(noteName, getChordNotes(rootNote, chord))
 }
 
 // Function to get chord positions on the guitar fretboard

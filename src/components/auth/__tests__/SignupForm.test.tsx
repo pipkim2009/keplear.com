@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router'
 import SignupForm from '../SignupForm'
 import { TranslationProvider } from '../../../contexts/TranslationContext'
 
@@ -23,9 +24,11 @@ function renderSignupForm(props: Partial<Parameters<typeof SignupForm>[0]> = {})
     onClose: vi.fn(),
   }
   return render(
-    <TranslationProvider>
-      <SignupForm {...defaultProps} {...props} />
-    </TranslationProvider>
+    <MemoryRouter>
+      <TranslationProvider>
+        <SignupForm {...defaultProps} {...props} />
+      </TranslationProvider>
+    </MemoryRouter>
   )
 }
 
@@ -112,6 +115,9 @@ describe('SignupForm', () => {
     await user.type(screen.getByLabelText(/^username$/i), 'newuser')
     await user.type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
     await user.type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
+    // Check required consent checkboxes
+    await user.click(screen.getByLabelText(/I confirm I am 13 years of age or older/i))
+    await user.click(screen.getByLabelText(/I agree to the/i))
     await user.click(screen.getByRole('button', { name: /create account/i }))
 
     await waitFor(() => {
@@ -131,6 +137,8 @@ describe('SignupForm', () => {
     await user.type(screen.getByLabelText(/^username$/i), 'existinguser')
     await user.type(screen.getByLabelText(/^password$/i), 'StrongPass123!')
     await user.type(screen.getByLabelText(/confirm password/i), 'StrongPass123!')
+    await user.click(screen.getByLabelText(/I confirm I am 13 years of age or older/i))
+    await user.click(screen.getByLabelText(/I agree to the/i))
     await user.click(screen.getByRole('button', { name: /create account/i }))
 
     await waitFor(() => {

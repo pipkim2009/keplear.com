@@ -5,6 +5,39 @@
 
 export const ROOT_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
+/**
+ * Get note name from a root note + semitone interval.
+ * Shared by guitar, bass, and keyboard scale/chord utilities.
+ */
+export function getNoteFromInterval(rootNote: string, interval: number): string {
+  const rootIndex = ROOT_NOTES.indexOf(rootNote)
+  if (rootIndex === -1) return rootNote
+  const noteIndex = (rootIndex + interval) % 12
+  return ROOT_NOTES[noteIndex]
+}
+
+/**
+ * Get all note names in a scale/chord given root + intervals.
+ * Works for any instrument — just needs the interval array.
+ */
+export function getNotesFromIntervals(rootNote: string, intervals: number[]): string[] {
+  return intervals.map(interval => getNoteFromInterval(rootNote, interval))
+}
+
+/**
+ * Strip octave number from a note name (e.g. "C4" → "C", "D#3" → "D#").
+ */
+export function stripOctave(noteName: string): string {
+  return noteName.replace(/\d+$/, '')
+}
+
+/**
+ * Check if a note (with or without octave) belongs to a set of scale/chord notes.
+ */
+export function isNoteInNoteSet(noteName: string, noteSet: string[]): boolean {
+  return noteSet.includes(stripOctave(noteName))
+}
+
 /** Which chords pair well with which scales */
 export const SCALE_CHORD_MAP: Record<string, string[]> = {
   Major: ['Major', 'Minor', 'Dominant 7th', 'Major 7th'],

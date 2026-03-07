@@ -1,4 +1,5 @@
 import { getChordNotes, type GuitarChord } from '../guitar/guitarChords'
+import { stripOctave, isNoteInNoteSet, getNoteFromInterval } from '../../musicTheory'
 import type { Note } from '../../notes'
 
 /**
@@ -17,10 +18,7 @@ export const applyChordToKeyboard = (
   const keyboardChordNotes: Note[] = []
 
   availableNotes.forEach(note => {
-    // Remove octave number from note name for comparison (e.g., "C4" becomes "C")
-    const noteNameWithoutOctave = note.name.replace(/\d+$/, '')
-
-    if (chordNotes.includes(noteNameWithoutOctave)) {
+    if (isNoteInNoteSet(note.name, chordNotes)) {
       keyboardChordNotes.push(note)
     }
   })
@@ -40,9 +38,7 @@ export const isKeyboardNoteInChord = (
   rootNote: string,
   chord: GuitarChord
 ): boolean => {
-  const chordNotes = getChordNotes(rootNote, chord)
-  const noteNameWithoutOctave = note.name.replace(/\d+$/, '')
-  return chordNotes.includes(noteNameWithoutOctave)
+  return isNoteInNoteSet(note.name, getChordNotes(rootNote, chord))
 }
 
 /**
@@ -52,8 +48,7 @@ export const isKeyboardNoteInChord = (
  * @returns True if the note is the root note
  */
 export const isKeyboardNoteChordRoot = (note: Note, rootNote: string): boolean => {
-  const noteNameWithoutOctave = note.name.replace(/\d+$/, '')
-  return noteNameWithoutOctave === rootNote
+  return stripOctave(note.name) === rootNote
 }
 
 /**
@@ -88,13 +83,7 @@ export const getKeyboardChordVoicings = (
 
   // Get chord intervals for voicings
   const intervals = chord.intervals
-  const chordToneNames = intervals.map(interval => {
-    const rootIndex = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'].indexOf(
-      rootNote
-    )
-    const noteIndex = (rootIndex + interval) % 12
-    return ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'][noteIndex]
-  })
+  const chordToneNames = intervals.map(interval => getNoteFromInterval(rootNote, interval))
 
   // Create different voicings
   const voicings = {
@@ -107,7 +96,7 @@ export const getKeyboardChordVoicings = (
   // Find notes for each voicing type across octaves
   Object.values(notesByOctave).forEach(octaveNotes => {
     octaveNotes.forEach(note => {
-      const noteName = note.name.replace(/\d+$/, '')
+      const noteName = stripOctave(note.name)
       const chordToneIndex = chordToneNames.indexOf(noteName)
 
       if (chordToneIndex !== -1) {

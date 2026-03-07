@@ -6,9 +6,12 @@
 import { useState, useEffect, useContext, useMemo } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
 import { useTranslation } from '../../contexts/TranslationContext'
-import { useNavigation } from '../../hooks/useInstrumentSelectors'
+import {
+  useNavigation,
+  useInstrumentType,
+  useMelodySettings,
+} from '../../hooks/useInstrumentSelectors'
 import SEOHead from '../common/SEOHead'
-import { useInstrument } from '../../contexts/InstrumentContext'
 import { useDashboardData, type PendingAssignment } from '../../hooks/useDashboardData'
 import {
   fetchPracticeStats,
@@ -49,7 +52,8 @@ function Dashboard() {
 
   const { t } = useTranslation()
   const { navigateToGenerator, navigateToClassroom, navigateToProfile } = useNavigation()
-  const { setInstrument, setBpm, setNumberOfBeats } = useInstrument()
+  const { setInstrument } = useInstrumentType()
+  const { setBpm, setNumberOfBeats } = useMelodySettings()
   const routerNavigate = useNavigate()
 
   // Daily Challenge handler

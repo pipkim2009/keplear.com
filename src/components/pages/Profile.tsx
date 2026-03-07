@@ -7,7 +7,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
-import { useInstrument } from '../../contexts/InstrumentContext'
+import { useNavigation } from '../../hooks/useInstrumentSelectors'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { containsScriptInjection, sanitizeUsername } from '../../utils/security'
 import SEOHead from '../common/SEOHead'
@@ -68,7 +68,7 @@ interface ActivityItem {
 const Profile = () => {
   const { t } = useTranslation()
   const { user } = useAuth()
-  const { profileUserId, navigateToHome, navigateToClassroom } = useInstrument()
+  const { profileUserId, navigateToHome, navigateToClassroom } = useNavigation()
 
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [loading, setLoading] = useState(true)

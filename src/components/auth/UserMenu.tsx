@@ -4,7 +4,7 @@ import { useAuth } from '../../hooks/useAuth'
 import { useTheme } from '../../hooks/useTheme'
 import { useTranslation } from '../../contexts/TranslationContext'
 import { PiCaretUpFill, PiSignOutFill, PiTrashFill, PiUserFill } from 'react-icons/pi'
-import { useInstrument } from '../../contexts/InstrumentContext'
+import { useNavigation } from '../../hooks/useInstrumentSelectors'
 import { useSupabaseQuery } from '../../hooks/useSupabaseQuery'
 import { supabase } from '../../lib/supabase'
 import logo from '/Keplear-logo.webp'
@@ -29,7 +29,7 @@ const UserMenu = () => {
   const { t } = useTranslation()
   const { user, signOut, deleteAccount } = useAuth()
   const { isDarkMode } = useTheme()
-  const { navigateToProfile } = useInstrument()
+  const { navigateToProfile } = useNavigation()
   const [isOpen, setIsOpen] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -140,7 +140,9 @@ const UserMenu = () => {
           <div className={authStyles.authBrand}>
             <img src={logo} alt="Keplear" className={authStyles.authLogo} />
           </div>
-          <h2 style={{ color: '#ef4444', marginBottom: '20px' }}>{t('auth.deleteAccountTitle')}</h2>
+          <h2 style={{ color: 'var(--red-500)', marginBottom: '20px' }}>
+            {t('auth.deleteAccountTitle')}
+          </h2>
           <p className={authStyles.formDescription} style={{ marginBottom: '32px' }}>
             <strong>{t('auth.cannotBeUndone')}</strong> {t('auth.dataWillBeDeleted')}
           </p>
@@ -165,17 +167,17 @@ const UserMenu = () => {
               style={{
                 width: 'auto',
                 minWidth: '120px',
-                background: '#ef4444',
-                border: '2px solid #ef4444',
+                background: 'var(--red-500)',
+                border: '2px solid var(--red-500)',
                 marginTop: 0,
               }}
               onMouseOver={e => {
-                e.currentTarget.style.background = '#b91c1c'
-                e.currentTarget.style.borderColor = '#b91c1c'
+                e.currentTarget.style.background = 'var(--red-700)'
+                e.currentTarget.style.borderColor = 'var(--red-700)'
               }}
               onMouseOut={e => {
-                e.currentTarget.style.background = '#ef4444'
-                e.currentTarget.style.borderColor = '#ef4444'
+                e.currentTarget.style.background = 'var(--red-500)'
+                e.currentTarget.style.borderColor = 'var(--red-500)'
               }}
             >
               {t('auth.deleteAccount')}

@@ -1,5 +1,10 @@
 import { useCallback } from 'react'
-import { useInstrument } from '../../contexts/InstrumentContext'
+import {
+  useInstrumentType,
+  useAudioPlayback,
+  useNoteSelection,
+  useOctaveRange,
+} from '../../hooks/useInstrumentSelectors'
 import { useTranslation } from '../../contexts/TranslationContext'
 import SEOHead from '../common/SEOHead'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
@@ -8,15 +13,10 @@ import styles from '../../styles/Instruments.module.css'
 
 export default function Instruments() {
   const { t } = useTranslation()
-  const {
-    instrument,
-    handleInstrumentChange,
-    setGuitarNotes,
-    handleOctaveRangeChange,
-    playNote,
-    playGuitarNote,
-    playBassNote,
-  } = useInstrument()
+  const { instrument, handleInstrumentChange } = useInstrumentType()
+  const { playNote, playGuitarNote, playBassNote } = useAudioPlayback()
+  const { setGuitarNotes } = useNoteSelection()
+  const { handleOctaveRangeChange } = useOctaveRange()
 
   // Play-only handler — no note selection
   const handleNotePlay = useCallback(
@@ -31,9 +31,6 @@ export default function Instruments() {
     },
     [instrument, playNote, playGuitarNote, playBassNote]
   )
-
-  const noOp = useCallback(() => {}, [])
-  const alwaysFalse = useCallback(() => false, [])
 
   return (
     <div className={styles.instrumentsContainer}>
@@ -50,23 +47,10 @@ export default function Instruments() {
 
       <InstrumentDisplay
         onNoteClick={handleNotePlay}
-        isSelected={alwaysFalse}
-        isInMelody={alwaysFalse}
-        showNotes={false}
-        bpm={120}
-        setBpm={noOp}
-        numberOfBeats={4}
-        setNumberOfBeats={noOp}
         instrument={instrument}
         setInstrument={handleInstrumentChange}
         setGuitarNotes={setGuitarNotes}
-        clearSelection={noOp}
-        clearTrigger={0}
-        selectedNotes={[]}
         onOctaveRangeChange={handleOctaveRangeChange}
-        flashingInputs={{ bpm: false, beats: false, mode: false }}
-        triggerInputFlash={noOp}
-        setInputActive={noOp}
         hideGenerateButton
         hideBpmButtons
         hideBeatsButtons

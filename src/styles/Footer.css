@@ -40,9 +40,6 @@
   transition: transform 0.3s ease;
 }
 
-.footer-logo:hover {
-}
-
 .footer-nav {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -129,11 +126,20 @@
   opacity: 0.7;
   font-size: 1.25rem;
   transition: all 0.2s ease;
-  padding: 0.5rem;
+  padding: 0.75rem;
   border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.footer-nav-link:focus-visible,
+.footer-legal-link:focus-visible,
+.social-link:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
 }
 
 .social-link:hover {

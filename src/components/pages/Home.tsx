@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect, useMemo, useContext } from 'react'
 import { AuthContext } from '../../contexts/AuthContext'
-import { useInstrument } from '../../contexts/InstrumentContext'
+import { useNavigation } from '../../hooks/useInstrumentSelectors'
 import { useTranslation } from '../../contexts/TranslationContext'
 import SEOHead from '../common/SEOHead'
 import styles from '../../styles/Home.module.css'
@@ -21,7 +21,7 @@ function Home() {
   const authContext = useContext(AuthContext)
   const user = authContext?.user
   const loading = authContext?.loading
-  const { navigateToGenerator, navigateToDashboard } = useInstrument()
+  const { navigateToGenerator, navigateToDashboard } = useNavigation()
 
   const { t } = useTranslation()
   const [wordIndex, setWordIndex] = useState(0)

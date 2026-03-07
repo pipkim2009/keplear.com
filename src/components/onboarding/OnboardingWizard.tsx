@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { useFocusTrap, useBodyScrollLock } from '../../hooks/useFocusTrap'
 import { useOnboarding } from '../../hooks/useOnboarding'
 import { useJoinClassroom } from '../../hooks/useClassrooms'
-import { useInstrument } from '../../contexts/InstrumentContext'
+import { useInstrumentType, useNavigation } from '../../hooks/useInstrumentSelectors'
 import InstrumentStep from './steps/InstrumentStep'
 import JoinClassStep from './steps/JoinClassStep'
 import TutorialStep from './steps/TutorialStep'
@@ -34,7 +34,8 @@ const OnboardingWizard = ({ isOpen, userId, onComplete }: OnboardingWizardProps)
 
   const { completeOnboarding } = useOnboarding(userId)
   const { mutate: joinClassroom } = useJoinClassroom()
-  const { setInstrument, navigateToDashboard } = useInstrument()
+  const { setInstrument } = useInstrumentType()
+  const { navigateToDashboard } = useNavigation()
 
   // Focus trap for accessibility
   const { containerRef } = useFocusTrap<HTMLDivElement>({

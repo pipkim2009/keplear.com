@@ -565,6 +565,12 @@
     grid-template-columns: 1fr;
   }
 
+  .activityTitle {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+
   .statValue {
     font-size: 2rem;
   }

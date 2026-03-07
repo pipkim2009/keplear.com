@@ -3,7 +3,6 @@ import { useInstrumentType } from '../../../hooks'
 import { PiPianoKeysFill } from 'react-icons/pi'
 import { GiGuitarBassHead, GiGuitarHead } from 'react-icons/gi'
 import { useTranslation } from '../../../contexts/TranslationContext'
-import '../../../styles/components/InstrumentSelector.css'
 
 type InstrumentValue = 'keyboard' | 'guitar' | 'bass'
 

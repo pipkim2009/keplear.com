@@ -11,20 +11,20 @@ import type { FretboardPreview, KeyboardPreview } from '../../common/ScaleChordO
 /** Core note selection and interaction */
 export interface NoteInteractionProps {
   onNoteClick: (note: Note) => void
-  isSelected: (note: Note) => boolean
-  isInMelody: (note: Note, showNotes: boolean) => boolean
-  selectedNotes: Note[]
+  isSelected?: (note: Note) => boolean
+  isInMelody?: (note: Note, showNotes: boolean) => boolean
+  selectedNotes?: Note[]
   selectNote?: (note: Note, selectionMode?: 'range' | 'multi') => void
-  clearSelection: () => void
-  clearTrigger: number
-  showNotes: boolean
+  clearSelection?: () => void
+  clearTrigger?: number
+  showNotes?: boolean
 }
 
 /** Instrument type and configuration */
 export interface InstrumentConfigProps {
   instrument: string
-  setInstrument: (instrument: string) => void
-  setGuitarNotes: (notes: Note[]) => void
+  setInstrument?: (instrument: string) => void
+  setGuitarNotes?: (notes: Note[]) => void
   setBassNotes?: (notes: Note[]) => void
   chordMode?: ChordMode
   setChordMode?: (mode: ChordMode) => void
@@ -33,13 +33,13 @@ export interface InstrumentConfigProps {
 
 /** Tempo, beats, and input flash state */
 export interface TempoControlProps {
-  bpm: number
-  setBpm: (bpm: number) => void
-  numberOfBeats: number
-  setNumberOfBeats: (count: number) => void
-  flashingInputs: { bpm: boolean; beats: boolean; mode: boolean }
-  triggerInputFlash: (inputType: 'bpm' | 'beats' | 'mode') => void
-  setInputActive: (inputType: 'bpm' | 'beats' | 'mode', active: boolean) => void
+  bpm?: number
+  setBpm?: (bpm: number) => void
+  numberOfBeats?: number
+  setNumberOfBeats?: (count: number) => void
+  flashingInputs?: { bpm: boolean; beats: boolean; mode: boolean }
+  triggerInputFlash?: (inputType: 'bpm' | 'beats' | 'mode') => void
+  setInputActive?: (inputType: 'bpm' | 'beats' | 'mode', active: boolean) => void
 }
 
 /** Octave range and fret range */
@@ -119,32 +119,36 @@ interface InstrumentDisplayProps
     PracticeModeProps,
     ExportProps {}
 
+const noOp = () => {}
+const alwaysFalse = () => false as const
+const defaultFlashingInputs = { bpm: false, beats: false, mode: false }
+
 const InstrumentDisplay = memo(function InstrumentDisplay({
   onNoteClick,
-  isSelected,
-  isInMelody,
-  showNotes,
-  bpm,
-  setBpm,
-  numberOfBeats,
-  setNumberOfBeats,
+  isSelected = alwaysFalse,
+  isInMelody = alwaysFalse,
+  showNotes = false,
+  bpm = 120,
+  setBpm = noOp,
+  numberOfBeats = 4,
+  setNumberOfBeats = noOp,
   chordMode = 'arpeggiator',
   setChordMode,
   instrument,
-  setInstrument,
-  setGuitarNotes,
+  setInstrument = noOp,
+  setGuitarNotes = noOp,
   setBassNotes,
-  clearSelection,
-  clearTrigger,
-  selectedNotes,
+  clearSelection = noOp,
+  clearTrigger = 0,
+  selectedNotes = [],
   selectNote,
   onOctaveRangeChange,
   initialLowerOctaves = 0,
   initialHigherOctaves = 0,
   disableOctaveCleanup = false,
-  flashingInputs,
-  triggerInputFlash,
-  setInputActive,
+  flashingInputs = defaultFlashingInputs,
+  triggerInputFlash = noOp,
+  setInputActive = noOp,
   onGenerateMelody,
   onPlayMelody,
   onRecordMelody,

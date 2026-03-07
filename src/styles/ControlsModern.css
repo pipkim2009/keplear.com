@@ -1,0 +1,592 @@
+/* Modern Controls / Assignment Editor - extracted from Controls.css */
+/* Modern Controls Row Styling */
+.control-group.modern-controls-row {
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-200) 100%);
+  border: 1px solid var(--gray-300);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: visible;
+}
+
+.controls-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.modern-generate-button {
+  background: var(--primary-purple);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 9.5px 24px;
+  font-size: 15px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  width: 100%;
+  min-width: auto;
+  margin-top: 25px;
+  align-self: center;
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+}
+
+.modern-generate-button:hover:not(:disabled) {
+  background: var(--purple-500);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(147, 51, 234, 0.4);
+}
+
+.modern-generate-button:active:not(:disabled) {
+  background: var(--primary-purple);
+  transform: translateY(0);
+  box-shadow: 0 4px 15px rgba(147, 51, 234, 0.3);
+}
+
+.modern-generate-button:disabled {
+  background: var(--gray-500);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Desktop - add margin when in flex row layout */
+@media (min-width: 769px) {
+  .controls-container:not(.second-row):not(.third-row) {
+    gap: 12px;
+    flex-wrap: nowrap;
+  }
+
+  .modern-generate-button {
+    align-self: center;
+    margin-top: 25px;
+  }
+}
+
+/* Modern Notes Toggle Button - Same green as melody container border */
+.modern-notes-toggle-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.modern-notes-toggle-button.expanded {
+  min-width: 300px;
+  max-width: 600px;
+  width: auto;
+  padding: 0 20px 15px;
+  background: var(--green-alpha-10);
+  border: 2px solid var(--green-500);
+  border-radius: 6px;
+}
+
+.modern-notes-toggle-button .toggle-content {
+  background: var(--green-500);
+  color: var(--dark-bg-primary) !important;
+  border: 2px solid var(--green-500);
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-shrink: 0;
+  outline: none;
+}
+
+.modern-notes-toggle-button .toggle-content:hover {
+  background: var(--green-700);
+  border-color: var(--green-700);
+  color: var(--dark-bg-primary) !important;
+}
+
+.modern-notes-toggle-button .toggle-content:active {
+  background: var(--green-700);
+  border-color: var(--green-700);
+  color: var(--dark-bg-primary) !important;
+  transform: none;
+}
+
+.modern-notes-toggle-button.expanded .toggle-content {
+  background: var(--green-alpha-10);
+  border-radius: 0 0 6px 6px;
+  border-top: none;
+}
+
+.modern-notes-toggle-button .expanded-melody-content {
+  width: 100%;
+  margin-top: 0;
+  padding-top: 8px;
+  animation: expand-in 0.3s ease-out;
+}
+
+.modern-notes-toggle-button .expanded-melody-content .melody-title {
+  color: var(--green-500) !important;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.modern-notes-toggle-button .expanded-melody-content .melody-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.modern-notes-toggle-button .expanded-melody-content .melody-note {
+  background: var(--green-500) !important;
+  color: var(--dark-bg-primary) !important;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 2px solid transparent;
+  transition: none;
+}
+
+/* Golden highlight for currently playing note */
+.modern-notes-toggle-button .expanded-melody-content .melody-note.currently-playing {
+  background: linear-gradient(145deg, var(--orange-500), var(--orange-500)) !important;
+  color: var(--gray-800) !important;
+  border: 2px solid var(--orange-100) !important;
+  transition: none !important;
+}
+
+@keyframes expand-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure all child elements also have black text */
+.modern-notes-toggle-button * {
+  color: var(--black) !important;
+}
+
+/* When expanded, make toggle text green */
+.modern-notes-toggle-button.expanded .toggle-content * {
+  color: var(--green-500) !important;
+}
+
+.label-with-tooltip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.modern-control-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.modern-control-item .control-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.modern-control-item .input-with-buttons {
+  position: relative;
+  background: var(--blue-alpha-10) !important;
+  border: 2px solid var(--blue-500) !important;
+  border-radius: 8px;
+  overflow: visible;
+  transition: all 0.2s ease;
+}
+
+.modern-control-item .input-with-buttons:focus-within {
+  border-color: var(--blue-500);
+}
+
+.modern-control-item .input-with-buttons:has(.control-input.warning) {
+  border-color: var(--orange-500) !important;
+}
+
+.modern-control-item .control-input {
+  border: none;
+  background: transparent;
+  padding: 12px 40px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--blue-500) !important;
+  width: 80px;
+}
+
+.modern-control-item .control-input:focus {
+  outline: none;
+}
+
+.modern-control-item .control-button-internal {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  width: 32px;
+  height: 27px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 10;
+  pointer-events: auto;
+  color: var(--blue-500);
+}
+
+.modern-control-item .control-button-internal:hover {
+  background: var(--blue-500);
+  color: var(--white);
+  transform: translateY(-50%);
+}
+
+.modern-control-item .control-button-internal.minus {
+  left: 4px;
+}
+
+.modern-control-item .control-button-internal.plus {
+  right: 4px;
+}
+
+/* Second row styling */
+.controls-container.second-row {
+  margin-top: 7px;
+  padding-top: 0;
+  justify-content: center;
+}
+
+/* Third row styling - for melody content */
+.controls-container.third-row {
+  margin-top: 7px;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  flex-flow: row wrap;
+}
+
+/* Direct expanded melody content styling (when not wrapped in toggle button) */
+.controls-container.third-row > .expanded-melody-content {
+  width: 100%;
+  padding: 12px;
+  background: var(--black-alpha-90);
+  border-radius: 8px;
+  border: 1px solid var(--gray-800);
+  animation: expand-in 0.3s ease-out;
+}
+
+.controls-container.third-row > .expanded-melody-content .melody-title {
+  color: var(--green-500) !important;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.controls-container.third-row > .expanded-melody-content .melody-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.controls-container.third-row > .expanded-melody-content .melody-note {
+  background: var(--green-500) !important;
+  color: var(--dark-bg-primary) !important;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+/* Golden highlight for currently playing note */
+.controls-container.third-row > .expanded-melody-content .melody-note.currently-playing {
+  background: linear-gradient(145deg, var(--orange-500), var(--orange-500)) !important;
+  color: var(--gray-800) !important;
+  border: 2px solid var(--orange-100) !important;
+  transform: scale(1.1);
+  box-shadow: 0 0 12px var(--orange-alpha-50);
+}
+
+/* Audio player section styling */
+.modern-control-item.audio-player-section {
+  flex: 1;
+  max-width: 100%;
+  width: 100%;
+}
+
+.modern-control-item.audio-player-section.centered {
+  width: 100%;
+  align-items: center;
+}
+
+/* Dark mode support for modern controls */
+@media (prefers-color-scheme: dark) {
+  .control-group.modern-controls-row {
+    background: linear-gradient(135deg, var(--dark-bg-secondary) 0%, var(--dark-bg-surface) 100%);
+    border-color: var(--dark-border-primary);
+  }
+
+  .modern-control-item .control-label {
+    color: var(--dark-text-tertiary);
+  }
+
+  .modern-control-item .input-with-buttons {
+    background: var(--gray-900);
+    border-color: var(--gray-900);
+  }
+
+  .modern-control-item .input-with-buttons:focus-within {
+    border-color: var(--btn-primary-bg);
+  }
+
+  .modern-control-item .control-input {
+    color: var(--dark-text-tertiary);
+  }
+
+  .modern-control-item .control-button-internal {
+    background: transparent;
+    color: var(--dark-text-tertiary);
+  }
+
+  .modern-control-item .control-button-internal:hover {
+    background: var(--green-500);
+    color: var(--dark-bg-primary);
+  }
+}
+
+/* Dark mode styling for native audio player - only when dark class is present */
+.dark .modern-control-item.audio-player-section audio,
+body.dark .modern-control-item.audio-player-section audio {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* Responsive design for modern controls */
+@media (max-width: 768px) {
+  .controls-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modern-generate-button {
+    min-width: 200px;
+    margin-top: 0;
+  }
+
+  .modern-notes-toggle-button {
+    min-width: 200px;
+  }
+
+  .modern-control-item {
+    width: 100%;
+  }
+
+  /* Ensure third-row (reveal/hide button) stays centered on tablet */
+  .controls-container.third-row {
+    display: flex !important;
+    flex-flow: row wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+}
+
+/* Medium screens - 3 columns on first row */
+@media (max-width: 768px) and (min-width: 601px) {
+  .controls-container:not(.second-row):not(.third-row) {
+    display: grid;
+    grid-template: 'bpm notes chord' auto 'generate generate generate' auto / 1fr 1fr 1fr;
+    gap: 12px 8px;
+  }
+
+  .modern-control-item:nth-child(1) {
+    grid-area: bpm;
+  }
+
+  .modern-control-item:nth-child(2) {
+    grid-area: notes;
+  }
+
+  .modern-control-item:nth-child(3) {
+    grid-area: chord;
+  }
+
+  .modern-generate-button {
+    grid-area: generate;
+    min-width: auto;
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .modern-notes-toggle-button {
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+/* Small-medium screens - BPM and Beats on row 1, Chord on row 2, Generate on row 3 */
+@media (max-width: 600px) and (min-width: 481px) {
+  .control-group.modern-controls-row {
+    padding: 25px 20px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .controls-container:not(.second-row):not(.third-row) {
+    display: grid;
+    grid-template: 'bpm notes' auto 'chord chord' auto 'generate generate' auto / 1fr 1fr;
+    gap: 12px 8px;
+  }
+
+  .modern-control-item:nth-child(1) {
+    grid-area: bpm;
+  }
+
+  .modern-control-item:nth-child(2) {
+    grid-area: notes;
+  }
+
+  .modern-control-item:nth-child(3) {
+    grid-area: chord;
+  }
+
+  .modern-generate-button {
+    grid-area: generate;
+    width: 100%;
+    min-width: auto;
+    margin-top: 0;
+  }
+
+  .modern-notes-toggle-button {
+    width: 100%;
+    min-width: auto;
+  }
+}
+
+/* Phone layout - stack everything vertically for very small screens */
+@media (max-width: 480px) {
+  .control-group.modern-controls-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    padding: 15px !important;
+    position: static !important;
+    width: auto !important;
+    max-width: 360px !important;
+  }
+
+  .controls-container:not(.second-row):not(.third-row) {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modern-control-item:nth-child(1),
+  .modern-control-item:nth-child(2),
+  .modern-control-item:nth-child(3) {
+    width: 100%;
+  }
+
+  .modern-generate-button {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .controls-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Ensure modern control inputs maintain proper width on phones */
+  .control-group.modern-controls-row .modern-control-item .control-input {
+    width: 110px !important;
+    min-width: 110px !important;
+  }
+
+  /* Ensure third-row (reveal/hide button) stays centered on mobile */
+  .controls-container.third-row {
+    display: flex !important;
+    flex-flow: row wrap !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 12px !important;
+  }
+
+  /* Mobile styling for expandable notes button */
+  .modern-notes-toggle-button.expanded {
+    min-width: 280px;
+    max-width: 320px;
+    padding: 0 15px 12px;
+  }
+
+  .modern-notes-toggle-button .expanded-melody-content .melody-notes {
+    gap: 4px;
+  }
+
+  .modern-notes-toggle-button .expanded-melody-content .melody-note {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+
+  /* Golden highlight for currently playing note in mobile view */
+  .modern-notes-toggle-button .expanded-melody-content .melody-note.currently-playing {
+    background: linear-gradient(145deg, var(--orange-500), var(--orange-500)) !important;
+    color: var(--gray-800) !important;
+    border: 2px solid var(--orange-100) !important;
+    transition: none !important;
+  }
+
+  /* Mobile styling for direct expanded melody content */
+  .controls-container.third-row > .expanded-melody-content {
+    padding: 10px;
+  }
+
+  .controls-container.third-row > .expanded-melody-content .melody-notes {
+    gap: 4px;
+  }
+
+  .controls-container.third-row > .expanded-melody-content .melody-note {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+
+  .controls-container.third-row > .expanded-melody-content .melody-note.currently-playing {
+    transition: none !important;
+  }
+}

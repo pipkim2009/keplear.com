@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
 import AuthModal from '../AuthModal'
 import { TranslationProvider } from '../../../contexts/TranslationContext'
 
@@ -27,9 +28,11 @@ function renderAuthModal(props: Partial<Parameters<typeof AuthModal>[0]> = {}) {
     onClose: vi.fn(),
   }
   return render(
-    <TranslationProvider>
-      <AuthModal {...defaultProps} {...props} />
-    </TranslationProvider>
+    <MemoryRouter>
+      <TranslationProvider>
+        <AuthModal {...defaultProps} {...props} />
+      </TranslationProvider>
+    </MemoryRouter>
   )
 }
 
@@ -40,9 +43,11 @@ beforeEach(() => {
 describe('AuthModal', () => {
   it('renders nothing when not open', () => {
     const { container } = render(
-      <TranslationProvider>
-        <AuthModal isOpen={false} onClose={vi.fn()} />
-      </TranslationProvider>
+      <MemoryRouter>
+        <TranslationProvider>
+          <AuthModal isOpen={false} onClose={vi.fn()} />
+        </TranslationProvider>
+      </MemoryRouter>
     )
     expect(container.innerHTML).toBe('')
   })

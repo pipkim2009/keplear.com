@@ -4,7 +4,7 @@ import { PiMagnifyingGlass } from 'react-icons/pi'
 import { HiOutlineMenu } from 'react-icons/hi'
 import { IoClose } from 'react-icons/io5'
 import { useAuth } from '../../hooks/useAuth'
-import { useInstrument } from '../../contexts/InstrumentContext'
+import { useNavigation } from '../../hooks/useInstrumentSelectors'
 import { useTranslation } from '../../contexts/TranslationContext'
 import ThemeToggle from '../common/ThemeToggle'
 import SearchOverlay from '../common/SearchOverlay'
@@ -20,7 +20,7 @@ interface HeaderProps {
 
 const Header = memo(function Header({ isDarkMode, onToggleTheme }: HeaderProps) {
   const location = useLocation()
-  const { navigateToGenerator } = useInstrument()
+  const { navigateToGenerator } = useNavigation()
   const { user, loading } = useAuth()
   const { t } = useTranslation()
   const [showSearch, setShowSearch] = useState(false)

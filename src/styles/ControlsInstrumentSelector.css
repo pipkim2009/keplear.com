@@ -1,0 +1,384 @@
+/* Instrument Selector Styles - extracted from Controls.css */
+/* Instrument selector styling */
+.instrument-selector-group {
+  flex: 1 0 100%;
+}
+
+.instrument-selector-group .control-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-50) !important;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+}
+
+.instrument-selector {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.instrument-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    145deg,
+    var(--primary-purple-alpha-10),
+    var(--primary-purple-alpha-5)
+  );
+  border: 2px solid var(--primary-purple-alpha-30);
+  border-radius: 16px;
+  padding: 20px;
+  min-width: 120px;
+  height: 100px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+
+.instrument-card:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Keyboard - Blue theme */
+.instrument-card:nth-child(1) {
+  background: linear-gradient(145deg, var(--blue-alpha-10), var(--blue-alpha-05));
+  border-color: var(--blue-alpha-30);
+}
+
+.instrument-card:nth-child(1):hover {
+  background: linear-gradient(145deg, var(--blue-alpha-15), var(--blue-alpha-10));
+}
+
+.instrument-card:nth-child(1).active {
+  background: linear-gradient(145deg, var(--blue-alpha-30), var(--blue-alpha-20));
+  border-color: var(--blue-500);
+}
+
+.instrument-card:nth-child(1) .instrument-icon {
+  color: var(--blue-500);
+}
+
+.instrument-card:nth-child(1) .instrument-glow {
+  background: radial-gradient(circle, var(--blue-alpha-20) 0%, transparent 70%);
+}
+
+/* Guitar - Green theme */
+.instrument-card:nth-child(2) {
+  background: linear-gradient(145deg, var(--green-alpha-10), var(--green-alpha-05));
+  border-color: var(--green-alpha-30);
+}
+
+.instrument-card:nth-child(2):hover {
+  background: linear-gradient(145deg, var(--green-alpha-15), var(--green-alpha-10));
+}
+
+.instrument-card:nth-child(2).active {
+  background: linear-gradient(145deg, var(--green-alpha-30), var(--green-alpha-20));
+  border-color: var(--green-500);
+}
+
+.instrument-card:nth-child(2) .instrument-icon {
+  color: var(--green-500);
+}
+
+.instrument-card:nth-child(2) .instrument-glow {
+  background: radial-gradient(circle, var(--green-alpha-20) 0%, transparent 70%);
+}
+
+/* Bass - Red theme */
+.instrument-card:nth-child(3) {
+  background: linear-gradient(145deg, var(--red-alpha-10), var(--red-alpha-05));
+  border-color: var(--red-alpha-30);
+}
+
+.instrument-card:nth-child(3):hover {
+  background: linear-gradient(145deg, var(--red-alpha-15), var(--red-alpha-10));
+}
+
+.instrument-card:nth-child(3).active {
+  background: linear-gradient(145deg, var(--red-alpha-30), var(--red-alpha-20));
+  border-color: var(--red-500);
+}
+
+.instrument-card:nth-child(3) .instrument-icon {
+  color: var(--red-500);
+}
+
+.instrument-card:nth-child(3) .instrument-glow {
+  background: radial-gradient(circle, var(--red-alpha-20) 0%, transparent 70%);
+}
+
+.instrument-card.active .instrument-glow {
+  opacity: 1;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.instrument-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+  transition: all 0.3s ease;
+}
+
+.instrument-card.active .instrument-icon {
+  animation: bounce 1.5s ease-in-out infinite;
+}
+
+.instrument-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-50);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.instrument-glow {
+  position: absolute;
+  inset: -50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Note: @keyframes pulse and bounce are defined in enhanced-effects.css */
+
+/* Mobile responsiveness for instrument selector */
+@media (max-width: 768px) {
+  .instrument-selector {
+    gap: 10px;
+  }
+
+  .instrument-card {
+    min-width: 100px;
+    height: 80px;
+    padding: 15px;
+  }
+
+  .instrument-icon {
+    font-size: 28px;
+  }
+
+  .instrument-name {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .instrument-selector {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .instrument-card {
+    width: 200px;
+    height: 70px;
+    flex-direction: row;
+    gap: 15px;
+    min-width: unset;
+  }
+
+  .instrument-icon {
+    font-size: 24px;
+    margin-bottom: 0;
+  }
+}
+
+/* Mobile instrument dropdown styles */
+.instrument-selector.mobile-selector {
+  display: none;
+}
+
+.instrument-selector.desktop-selector {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  .instrument-selector.desktop-selector {
+    display: none;
+  }
+
+  .instrument-selector.mobile-selector {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    position: relative;
+    z-index: 1002;
+  }
+
+  .instrument-dropdown {
+    position: relative;
+    background: linear-gradient(
+      145deg,
+      var(--primary-purple-alpha-10),
+      var(--primary-purple-alpha-5)
+    );
+    border: 2px solid var(--primary-purple-alpha-30);
+    border-radius: 12px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    min-width: 160px;
+    max-width: 200px;
+    z-index: 1001;
+  }
+
+  .instrument-dropdown:hover {
+    background: linear-gradient(
+      145deg,
+      var(--primary-purple-alpha-25),
+      var(--primary-purple-alpha-20)
+    );
+  }
+
+  .current-instrument {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .current-instrument .instrument-icon {
+    font-size: 20px;
+  }
+
+  .current-instrument .instrument-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-50);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .dropdown-arrow {
+    font-size: 12px;
+    color: var(--gray-50);
+    transition: transform 0.3s ease;
+    opacity: 0.7;
+  }
+
+  .dropdown-arrow.rotated {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-options {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: var(--black);
+    border: 2px solid var(--primary-purple-alpha-30);
+    border-radius: 8px;
+    z-index: 1003;
+    overflow: hidden;
+  }
+
+  .dropdown-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--primary-purple-alpha-10);
+  }
+
+  .dropdown-option:last-child {
+    border-bottom: none;
+  }
+
+  .dropdown-option:hover {
+    background: var(--primary-purple-alpha-15);
+  }
+
+  .dropdown-option .instrument-icon {
+    font-size: 18px;
+  }
+
+  .dropdown-option .instrument-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-50);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Instrument-specific colors for dropdown options */
+  .dropdown-option.keyboard-option:hover {
+    background: var(--blue-alpha-15);
+  }
+
+  .dropdown-option.keyboard-option .instrument-icon {
+    color: var(--blue-500);
+  }
+
+  .dropdown-option.guitar-option:hover {
+    background: var(--green-alpha-15);
+  }
+
+  .dropdown-option.guitar-option .instrument-icon {
+    color: var(--green-500);
+  }
+
+  .dropdown-option.bass-option:hover {
+    background: var(--red-alpha-15);
+  }
+
+  .dropdown-option.bass-option .instrument-icon {
+    color: var(--red-500);
+  }
+
+  /* Active instrument styling for current selection */
+  .instrument-dropdown.keyboard-active {
+    background: linear-gradient(145deg, var(--blue-alpha-30), var(--blue-alpha-20));
+    border-color: var(--blue-500);
+  }
+
+  .instrument-dropdown.keyboard-active:hover {
+    background: linear-gradient(145deg, var(--blue-alpha-40), var(--blue-alpha-30));
+  }
+
+  .instrument-dropdown.keyboard-active .current-instrument .instrument-icon {
+    color: var(--blue-500);
+  }
+
+  .instrument-dropdown.guitar-active {
+    background: linear-gradient(145deg, var(--green-alpha-30), var(--green-alpha-20));
+    border-color: var(--green-500);
+  }
+
+  .instrument-dropdown.guitar-active:hover {
+    background: linear-gradient(145deg, var(--green-alpha-40), var(--green-alpha-30));
+  }
+
+  .instrument-dropdown.guitar-active .current-instrument .instrument-icon {
+    color: var(--green-500);
+  }
+
+  .instrument-dropdown.bass-active {
+    background: linear-gradient(145deg, var(--red-alpha-30), var(--red-alpha-20));
+    border-color: var(--red-500);
+  }
+
+  .instrument-dropdown.bass-active:hover {
+    background: linear-gradient(145deg, var(--red-alpha-40), var(--red-alpha-30));
+  }
+
+  .instrument-dropdown.bass-active .current-instrument .instrument-icon {
+    color: var(--red-500);
+  }
+}

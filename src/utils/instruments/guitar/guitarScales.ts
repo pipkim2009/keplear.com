@@ -1,4 +1,10 @@
 import type { GuitarNote } from './guitarNotes'
+import {
+  ROOT_NOTES as SHARED_ROOT_NOTES,
+  getNotesFromIntervals,
+  stripOctave,
+  isNoteInNoteSet,
+} from '../../musicTheory'
 
 export type GuitarScale = {
   name: string
@@ -79,29 +85,17 @@ export const GUITAR_SCALES: GuitarScale[] = [
   },
 ]
 
-// Root notes available for scales
-export const ROOT_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
+// Re-export ROOT_NOTES for backward compatibility
+export const ROOT_NOTES = SHARED_ROOT_NOTES
 
-// Function to get note name from semitone offset
-const getNoteFromInterval = (rootNote: string, interval: number): string => {
-  const rootIndex = ROOT_NOTES.indexOf(rootNote)
-  if (rootIndex === -1) return rootNote
-
-  const noteIndex = (rootIndex + interval) % 12
-  return ROOT_NOTES[noteIndex]
-}
-
-// Function to get all notes in a scale given root note and scale
+// Delegate to shared utility
 export const getScaleNotes = (rootNote: string, scale: GuitarScale): string[] => {
-  return scale.intervals.map(interval => getNoteFromInterval(rootNote, interval))
+  return getNotesFromIntervals(rootNote, scale.intervals)
 }
 
-// Function to check if a note belongs to a scale
+// Delegate to shared utility
 export const isNoteInScale = (noteName: string, rootNote: string, scale: GuitarScale): boolean => {
-  const scaleNotes = getScaleNotes(rootNote, scale)
-  // Remove octave numbers for comparison (e.g., "C4" becomes "C")
-  const noteNameWithoutOctave = noteName.replace(/\d+$/, '')
-  return scaleNotes.includes(noteNameWithoutOctave)
+  return isNoteInNoteSet(noteName, getScaleNotes(rootNote, scale))
 }
 
 // Function to get scale positions on the guitar fretboard
@@ -114,14 +108,13 @@ export const getScalePositions = (
   const positions: ScalePosition[] = []
 
   guitarNotes.forEach(guitarNote => {
-    const noteNameWithoutOctave = guitarNote.name.replace(/\d+$/, '')
-    // Check if note is in scale
-    if (scaleNotes.includes(noteNameWithoutOctave)) {
+    const noteName = stripOctave(guitarNote.name)
+    if (scaleNotes.includes(noteName)) {
       positions.push({
         string: guitarNote.string,
         fret: guitarNote.fret,
         note: guitarNote.name,
-        isRoot: noteNameWithoutOctave === rootNote,
+        isRoot: noteName === rootNote,
       })
     }
   })

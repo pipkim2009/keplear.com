@@ -133,6 +133,9 @@ export default function StemControls({
         setAudioFile({ name: file.name, data: reader.result })
       }
     }
+    reader.onerror = () => {
+      console.error('Failed to read file:', reader.error)
+    }
     reader.readAsArrayBuffer(file)
   }, [])
 

@@ -11,8 +11,8 @@ vi.mock('../../hooks/useAuth', () => ({
   })),
 }))
 
-vi.mock('../../contexts/InstrumentContext', () => ({
-  useInstrument: () => ({
+vi.mock('../../hooks/useInstrumentSelectors', () => ({
+  useNavigation: () => ({
     navigateToGenerator: vi.fn(),
   }),
 }))
@@ -26,6 +26,11 @@ vi.mock('../../contexts/TranslationContext', () => ({
         'nav.generator': 'Generator',
         'nav.songs': 'Songs',
         'nav.classroom': 'Classroom',
+        'nav.sandbox': 'Sandbox',
+        'nav.instrument': 'Instrument',
+        'nav.stems': 'Stems',
+        'nav.metronome': 'Metronome',
+        'nav.tuner': 'Tuner',
         'auth.signIn': 'Sign In',
         'auth.signUp': 'Sign Up',
       }
@@ -87,7 +92,7 @@ describe('Header', () => {
     renderHeader()
 
     expect(screen.getByAltText('Keplear')).toBeInTheDocument()
-    expect(screen.getByText('Home')).toBeInTheDocument()
+    expect(screen.getByText('Dashboard')).toBeInTheDocument()
     expect(screen.getByText('Generator')).toBeInTheDocument()
     expect(screen.getByText('Songs')).toBeInTheDocument()
     expect(screen.getByText('Classroom')).toBeInTheDocument()
@@ -128,23 +133,9 @@ describe('Header', () => {
     expect(screen.getByTestId('user-menu')).toBeInTheDocument()
   })
 
-  it('shows Dashboard link for logged-in users instead of Home', () => {
-    mockUseAuth.mockReturnValue({
-      user: { id: '1', email: 'test@example.com' } as ReturnType<typeof mockUseAuth>['user'],
-      loading: false,
-      isNewUser: false,
-      clearNewUserFlag: vi.fn(),
-      signIn: vi.fn(),
-      signUp: vi.fn(),
-      signOut: vi.fn(),
-      updatePassword: vi.fn(),
-      deleteAccount: vi.fn(),
-    })
-
+  it('shows Dashboard link in navigation', () => {
     renderHeader()
-
     expect(screen.getByText('Dashboard')).toBeInTheDocument()
-    expect(screen.queryByText('Home')).not.toBeInTheDocument()
   })
 
   it('renders banner element for accessibility', () => {

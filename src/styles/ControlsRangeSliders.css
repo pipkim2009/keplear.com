@@ -1,0 +1,322 @@
+/* Range Controls (Octave & Fret) - extracted from Controls.css */
+/* Octave range control styling */
+.octave-range-control {
+  min-width: 280px !important;
+  width: 100% !important;
+  max-width: 500px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+}
+
+.octave-range-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.range-labels-center {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 8px;
+}
+
+.range-label-center {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--white);
+  background: var(--white-alpha-10);
+  border: 2px solid var(--white);
+  border-radius: 6px;
+  padding: 4px 12px;
+}
+
+.dual-range-container {
+  position: relative;
+  width: 100% !important;
+  min-width: 280px !important;
+  max-width: 100% !important;
+  height: 40px;
+  margin: 0 auto;
+}
+
+.dual-range-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--white-alpha-20);
+  z-index: 0;
+}
+
+.range-fill {
+  position: absolute;
+  top: 0;
+  height: 6px;
+  background: linear-gradient(145deg, var(--white), var(--gray-200));
+  border-radius: 3px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.range-slider {
+  position: absolute;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: transparent;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  pointer-events: none;
+}
+
+.range-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--white), var(--gray-300));
+  border: 2px solid var(--white);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.range-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--white), var(--gray-300));
+  border: 2px solid var(--white);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.range-slider.range-low {
+  z-index: 3;
+  width: 87.5%;
+  left: 0;
+}
+
+.range-slider.range-high {
+  z-index: 2;
+  width: 87.5%;
+  right: 0;
+  left: auto;
+}
+
+.range-slider.range-low::-webkit-slider-thumb {
+  margin-left: 0;
+}
+
+.range-slider.range-high::-webkit-slider-thumb {
+  margin-left: 0;
+}
+
+.range-slider.range-low::-moz-range-thumb {
+  transform: translateX(0);
+}
+
+.range-slider.range-high::-moz-range-thumb {
+  transform: translateX(0);
+}
+
+.range-slider:hover::-webkit-slider-thumb {
+}
+
+.range-slider:hover::-moz-range-thumb {
+}
+
+/* Small octave visual indicator */
+.octave-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-top: -29px;
+  font-size: 0;
+  line-height: 0;
+  letter-spacing: 0;
+  word-spacing: 0;
+  width: 100%;
+}
+
+.slider-hidden .octave-visual {
+  margin-top: -8px;
+}
+
+.keyboard-range-container {
+  position: relative;
+  width: 100%;
+  height: 54px;
+  overflow: hidden;
+}
+
+.keyboard-range-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.keyboard-dim-overlay {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.keyboard-dim-left {
+  left: 0;
+}
+
+.keyboard-dim-right {
+  right: 0;
+}
+
+/* Fretboard range control for guitar/bass */
+.fret-range-control {
+  width: 100% !important;
+  max-width: 500px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+}
+
+.fret-range-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.fret-visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-top: -29px;
+  font-size: 0;
+  line-height: 0;
+  letter-spacing: 0;
+  word-spacing: 0;
+  width: 100%;
+}
+
+.fretboard-range-container {
+  position: relative;
+  width: 100%;
+  height: 54px;
+  overflow: hidden;
+}
+
+.fretboard-range-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.fretboard-dim-overlay {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.fretboard-dim-left {
+  left: 0;
+}
+
+.fretboard-dim-right {
+  right: 0;
+}
+
+/* Fret sliders use full width since fret positions map directly */
+.fret-range-container .range-slider.range-low,
+.fret-range-container .range-slider.range-high {
+  width: 100%;
+  left: 0;
+  right: auto;
+}
+
+/* Mobile range styling for smaller screens */
+@media (max-width: 480px) {
+  .keyboard-range-container {
+    height: 40px;
+  }
+
+  .fretboard-range-container {
+    height: 40px;
+  }
+}
+
+@media (max-width: 360px) {
+  .octave-range-control .keyboard-range-container {
+    height: 32px !important;
+  }
+
+  .octave-range-control .dual-range-container {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    height: 36px !important;
+  }
+
+  .octave-range-control .range-label-center {
+    font-size: 11px !important;
+    padding: 3px 10px !important;
+  }
+
+  .octave-range-control .octave-range-slider {
+    width: 240px !important;
+    max-width: 240px !important;
+  }
+
+  .octave-range-control .octave-visual {
+    width: 240px !important;
+    max-width: 240px !important;
+  }
+
+  .fret-range-control .fretboard-range-container {
+    height: 32px !important;
+  }
+
+  .fret-range-control .dual-range-container {
+    width: 240px !important;
+    min-width: 240px !important;
+    max-width: 240px !important;
+    height: 36px !important;
+  }
+
+  .fret-range-control .range-label-center {
+    font-size: 11px !important;
+    padding: 3px 10px !important;
+  }
+
+  .fret-range-control .fret-range-slider {
+    width: 240px !important;
+    max-width: 240px !important;
+  }
+
+  .fret-range-control .fret-visual {
+    width: 240px !important;
+    max-width: 240px !important;
+  }
+}

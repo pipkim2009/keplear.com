@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
+import styles from '../../styles/CookieConsent.module.css'
 
 const CONSENT_KEY = 'keplear_cookie_consent'
 
@@ -28,67 +29,22 @@ export default function CookieConsent() {
   if (!visible) return null
 
   return (
-    <div
-      role="dialog"
-      aria-label="Cookie consent"
-      style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 10000,
-        background: 'rgba(18, 18, 18, 0.97)',
-        backdropFilter: 'blur(12px)',
-        borderTop: '1px solid rgba(255,255,255,0.1)',
-        padding: '16px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '16px',
-        flexWrap: 'wrap',
-        fontFamily: 'inherit',
-        fontSize: '0.875rem',
-        color: '#ccc',
-      }}
-    >
-      <p style={{ margin: 0, maxWidth: 600 }}>
+    <div role="dialog" aria-label="Cookie consent" className={styles.banner}>
+      <p className={styles.message}>
         We use essential cookies to keep you signed in and remember your preferences.{' '}
-        <Link to="/cookies" style={{ color: '#a78bfa', textDecoration: 'underline' }}>
+        <Link to="/cookies" className={styles.link}>
           Cookie Policy
         </Link>{' '}
         &middot;{' '}
-        <Link to="/privacy" style={{ color: '#a78bfa', textDecoration: 'underline' }}>
+        <Link to="/privacy" className={styles.link}>
           Privacy Policy
         </Link>
       </p>
-      <div style={{ display: 'flex', gap: '8px' }}>
-        <button
-          onClick={handleDecline}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '8px',
-            border: '1px solid rgba(255,255,255,0.2)',
-            background: 'transparent',
-            color: '#ccc',
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-          }}
-        >
+      <div className={styles.buttons}>
+        <button onClick={handleDecline} className={styles.declineButton}>
           Decline
         </button>
-        <button
-          onClick={handleAccept}
-          style={{
-            padding: '8px 16px',
-            borderRadius: '8px',
-            border: 'none',
-            background: '#7c3aed',
-            color: '#fff',
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-            fontWeight: 600,
-          }}
-        >
+        <button onClick={handleAccept} className={styles.acceptButton}>
           Accept
         </button>
       </div>

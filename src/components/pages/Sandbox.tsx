@@ -58,24 +58,8 @@ import { useRecordPracticeSession } from '../../hooks/usePracticeSessions'
 import AssignmentComplete from '../sandbox/AssignmentComplete'
 import WelcomeSubtitle from '../sandbox/WelcomeSubtitle'
 import type { AppliedScale, AppliedChord } from '../common/ScaleChordOptions'
+import type { SerializedScaleData, SerializedChordData } from '../../types/exercise'
 import styles from '../../styles/Practice.module.css'
-
-// Type for serialized scale data from JSON
-interface SerializedScaleData {
-  root: string
-  scaleName: string
-  octave?: number
-  displayName?: string
-}
-
-// Type for serialized chord data from JSON
-interface SerializedChordData {
-  root: string
-  chordName: string
-  octave?: number
-  fretZone?: number
-  displayName?: string
-}
 
 // Type for scale/chord box with shared shape
 interface ScaleChordBoxData {

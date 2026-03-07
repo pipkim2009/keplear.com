@@ -1,0 +1,115 @@
+/* Cookie Consent Banner */
+.banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10000;
+  background: rgba(18, 18, 18, 0.97);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  color: var(--gray-200);
+}
+
+.message {
+  margin: 0;
+  max-width: 600px;
+}
+
+.link {
+  color: var(--primary-purple-light);
+  text-decoration: underline;
+}
+
+.link:hover {
+  color: var(--primary-purple-lighter);
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.declineButton {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: var(--gray-200);
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.declineButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.declineButton:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.acceptButton {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary-purple);
+  color: var(--white);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.acceptButton:hover {
+  background: var(--primary-purple-dark);
+}
+
+.acceptButton:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Light mode */
+:global(body.light) .banner {
+  background: rgba(255, 255, 255, 0.97);
+  border-top-color: var(--gray-300);
+  color: var(--gray-900);
+}
+
+:global(body.light) .message {
+  color: var(--gray-900);
+}
+
+:global(body.light) .declineButton {
+  border-color: var(--gray-300);
+  color: var(--gray-900);
+}
+
+:global(body.light) .declineButton:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-400);
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 16px;
+  }
+
+  .buttons {
+    justify-content: center;
+  }
+}

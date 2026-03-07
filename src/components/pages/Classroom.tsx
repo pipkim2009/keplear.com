@@ -20,44 +20,15 @@ import {
 import { useTranslation } from '../../contexts/TranslationContext'
 import { useInstrument } from '../../contexts/InstrumentContext'
 import InstrumentDisplay from '../instruments/shared/InstrumentDisplay'
-import { type Note, generateNotesWithSeparateOctaves } from '../../utils/notes'
-import type { AppliedScale, AppliedChord } from '../common/ScaleChordOptions'
+import { KEYBOARD_SCALES } from '../../utils/instruments/keyboard/keyboardScales'
+import { KEYBOARD_CHORDS } from '../../utils/instruments/keyboard/keyboardChords'
+import { getKeyboardNoteById } from '../../utils/practice/practiceNotes'
 import {
-  KEYBOARD_SCALES,
-  type KeyboardScale,
-  applyScaleToKeyboard,
-} from '../../utils/instruments/keyboard/keyboardScales'
-import {
-  KEYBOARD_CHORDS,
-  applyChordToKeyboard,
-} from '../../utils/instruments/keyboard/keyboardChords'
-import {
-  GUITAR_SCALES,
-  type GuitarScale,
-  getScalePositions,
-} from '../../utils/instruments/guitar/guitarScales'
-import {
-  GUITAR_CHORDS,
-  type GuitarChord,
-  getChordBoxes,
-} from '../../utils/instruments/guitar/guitarChords'
-import { guitarNotes } from '../../utils/instruments/guitar/guitarNotes'
-import {
-  BASS_SCALES,
-  type BassScale,
-  getBassScalePositions,
-} from '../../utils/instruments/bass/bassScales'
-import {
-  BASS_CHORDS,
-  type BassChord,
-  getBassChordBoxes,
-} from '../../utils/instruments/bass/bassChords'
-import { bassNotes } from '../../utils/instruments/bass/bassNotes'
-import {
-  getGuitarNoteById,
-  getBassNoteById,
-  getKeyboardNoteById,
-} from '../../utils/practice/practiceNotes'
+  buildKeyboardScales,
+  buildKeyboardChords,
+  buildScalesForInstrument,
+  buildChordsForInstrument,
+} from '../../utils/exerciseDataApplier'
 import { useRecordPracticeSession } from '../../hooks/usePracticeSessions'
 import { supabase } from '../../lib/supabase'
 import { containsScriptInjection } from '../../utils/security'
@@ -85,9 +56,11 @@ import {
   PiSparkle,
 } from 'react-icons/pi'
 import { GiGuitarHead, GiGuitarBassHead } from 'react-icons/gi'
-// Shared exercise types (local copies still exist in this file for backward compat)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { ExerciseData as _ExerciseDataShared } from '../../types/exercise'
+import type {
+  SerializedScaleData,
+  SerializedChordData,
+  SerializedExerciseData,
+} from '../../types/exercise'
 import { createDefaultLesson, getExerciseCategoryInfo } from '../../utils/exercisePresets'
 import { generateAILesson, type GenerateAILessonParams } from '../../utils/aiLessonGenerator'
 // Music theory imports used by lesson generator modal
@@ -116,97 +89,9 @@ import { useWaveformData } from '../../hooks/useWaveformData'
 import { generateFallbackWaveform, resamplePeaks } from '../../utils/waveformUtils'
 import { apiUrl } from '../../lib/api'
 
-// Type for serialized scale data from JSON
-interface SerializedScaleData {
-  root: string
-  scaleName: string
-  octave?: number
-  displayName?: string
-}
-
-// Type for serialized chord data from JSON
-interface SerializedChordData {
-  root: string
-  chordName: string
-  octave?: number
-  fretZone?: number
-  displayName?: string
-}
-
-// Build AppliedScale[] from serialized data (avoids stale closure in handleKeyboardScaleApply)
-function buildAppliedScalesFromData(scaleDataList: SerializedScaleData[]): AppliedScale[] {
-  const fullRangeNotes = generateNotesWithSeparateOctaves(3, 3)
-  return scaleDataList
-    .map(scaleData => {
-      const scaleObj = KEYBOARD_SCALES.find(s => s.name === scaleData.scaleName)
-      if (!scaleObj) return null
-      const octave = scaleData.octave || 4
-      const displayName = `${scaleData.root} ${scaleObj.name} (Octave ${octave})`
-      let scaleNotes = applyScaleToKeyboard(scaleData.root, scaleObj, fullRangeNotes)
-      scaleNotes = scaleNotes.filter(note => {
-        const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
-        return noteOctave === octave
-      })
-      return {
-        id: `${scaleData.root}-${scaleObj.name}-${octave}-${Date.now()}-${Math.random()}`,
-        root: scaleData.root,
-        scale: scaleObj,
-        displayName,
-        notes: scaleNotes,
-        octave,
-      } as AppliedScale
-    })
-    .filter((s): s is AppliedScale => s !== null)
-}
-
-// Build AppliedChord[] from serialized data (avoids stale closure in handleKeyboardChordApply)
-function buildAppliedChordsFromData(chordDataList: SerializedChordData[]): AppliedChord[] {
-  const fullRangeNotes = generateNotesWithSeparateOctaves(3, 3)
-  return chordDataList
-    .map(chordData => {
-      const chordObj = KEYBOARD_CHORDS.find(c => c.name === chordData.chordName)
-      if (!chordObj) return null
-      const octave = chordData.octave || 4
-      const displayName = `${chordData.root} ${chordObj.name} (Octave ${octave})`
-      let chordNotes = applyChordToKeyboard(chordData.root, chordObj, fullRangeNotes)
-      chordNotes = chordNotes.filter(note => {
-        const noteOctave = parseInt(note.name.replace(/[^0-9]/g, ''), 10)
-        return noteOctave === octave
-      })
-      return {
-        id: `keyboard-${chordData.root}-${chordObj.name}-${octave}-${Date.now()}-${Math.random()}`,
-        root: chordData.root,
-        chord: chordObj,
-        displayName,
-        notes: chordNotes,
-        octave,
-      } as AppliedChord
-    })
-    .filter((c): c is AppliedChord => c !== null)
-}
-
-// Type for serialized exercise data from JSON
-interface SerializedExerciseData {
-  id?: string
-  name?: string
-  transcript?: string
-  bpm?: number
-  beats?: number
-  chordMode?: 'single' | 'progression'
-  lowerOctaves?: number
-  higherOctaves?: number
-  selectedNoteIds?: string[]
-  appliedScales?: SerializedScaleData[]
-  appliedChords?: SerializedChordData[]
-  type?: 'generator' | 'song'
-  songData?: {
-    videoId: string
-    videoTitle: string
-    markerA: number | null
-    markerB: number | null
-    playbackRate: number
-  }
-}
+// Delegates to shared utility (avoids stale closure in handleKeyboardScaleApply)
+const buildAppliedScalesFromData = buildKeyboardScales
+const buildAppliedChordsFromData = buildKeyboardChords
 
 interface StudentData {
   user_id: string
@@ -618,86 +503,12 @@ function Classroom() {
                     )
                   }
                 })
-              } else if (data.instrument === 'guitar') {
-                const scalesToApply: AppliedScale[] = []
-                selectionData.appliedScales.forEach((scaleData: SerializedScaleData) => {
-                  const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
-                  const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-                  const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-                  const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-                  const scaleObj = GUITAR_SCALES.find(
-                    s => s.name === baseScaleName || s.name === scaleData.scaleName
-                  )
-                  if (scaleObj) {
-                    const allPositions = getScalePositions(scaleData.root, scaleObj, guitarNotes)
-                    const positions = allPositions.filter(
-                      pos => pos.fret >= fretLow && pos.fret <= fretHigh
-                    )
-                    const scaleNotes = positions.map(pos => {
-                      const noteId = `g-s${pos.string}-f${pos.fret}`
-                      const guitarNote = getGuitarNoteById(noteId)
-                      return {
-                        id: noteId,
-                        name: pos.note,
-                        frequency: guitarNote?.frequency || 0,
-                        isBlack: pos.note.includes('#'),
-                        position: guitarNote?.position || 0,
-                        __guitarCoord: { stringIndex: 6 - pos.string, fretIndex: pos.fret },
-                      }
-                    })
-                    const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-                    scalesToApply.push({
-                      id: `guitar-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                      root: scaleData.root,
-                      scale: scaleObj,
-                      displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                      notes: scaleNotes,
-                    })
-                  }
-                })
-                if (scalesToApply.length > 0) {
-                  scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-                }
-              } else if (data.instrument === 'bass') {
-                const scalesToApply: AppliedScale[] = []
-                selectionData.appliedScales.forEach((scaleData: SerializedScaleData) => {
-                  const fretRangeMatch = scaleData.scaleName.match(/\(Frets (\d+)-(\d+)\)$/)
-                  const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-                  const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-                  const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-                  const scaleObj = BASS_SCALES.find(
-                    s => s.name === baseScaleName || s.name === scaleData.scaleName
-                  )
-                  if (scaleObj) {
-                    const allPositions = getBassScalePositions(scaleData.root, scaleObj, bassNotes)
-                    const positions = allPositions.filter(
-                      pos => pos.fret >= fretLow && pos.fret <= fretHigh
-                    )
-                    const scaleNotes = positions.map(pos => {
-                      const noteId = `b-s${pos.string}-f${pos.fret}`
-                      const bassNote = getBassNoteById(noteId)
-                      return {
-                        id: noteId,
-                        name: pos.note,
-                        frequency: bassNote?.frequency || 0,
-                        isBlack: pos.note.includes('#'),
-                        position: bassNote?.position || 0,
-                        __bassCoord: { stringIndex: 4 - pos.string, fretIndex: pos.fret },
-                      }
-                    })
-                    const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-                    scalesToApply.push({
-                      id: `bass-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                      root: scaleData.root,
-                      scale: scaleObj as GuitarScale | BassScale | KeyboardScale,
-                      displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                      notes: scaleNotes,
-                    })
-                  }
-                })
-                if (scalesToApply.length > 0) {
-                  scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-                }
+              } else {
+                const scales = buildScalesForInstrument(
+                  data.instrument,
+                  selectionData.appliedScales
+                )
+                if (scales.length > 0) scaleChordManagement.setAppliedScalesDirectly(scales)
               }
             }
 
@@ -715,112 +526,12 @@ function Classroom() {
                     )
                   }
                 })
-              } else if (data.instrument === 'guitar') {
-                const chordsToApply: AppliedChord[] = []
-                selectionData.appliedChords.forEach((chordData: SerializedChordData) => {
-                  let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-                  baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
-                  const chordObj = GUITAR_CHORDS.find(
-                    c => c.name === baseChordName || c.name === chordData.chordName
-                  )
-                  if (chordObj) {
-                    const chordBoxes = getChordBoxes(chordData.root, chordObj, guitarNotes)
-                    if (chordBoxes.length > 0) {
-                      const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
-                      const chordBox = chordBoxes[boxIndex]
-                      const noteKeys: string[] = []
-                      const chordNotes: Note[] = []
-                      chordBox.positions.forEach(pos => {
-                        const stringIndex = 6 - pos.string
-                        const fretIndex = pos.fret
-                        const noteKey =
-                          fretIndex === 0
-                            ? `${stringIndex}-open`
-                            : `${stringIndex}-${fretIndex - 1}`
-                        noteKeys.push(noteKey)
-                        // Find the guitar note for this position
-                        const guitarNote = guitarNotes.find(
-                          n => n.string === pos.string && n.fret === pos.fret
-                        )
-                        if (guitarNote) {
-                          chordNotes.push({
-                            id: `g-s${pos.string}-f${pos.fret}`,
-                            name: guitarNote.name,
-                            frequency: guitarNote.frequency,
-                            isBlack: guitarNote.name.includes('#'),
-                            position: stringIndex * 100 + (fretIndex > 0 ? fretIndex - 1 : -1),
-                            __guitarCoord: { stringIndex, fretIndex: pos.fret },
-                          } as Note)
-                        }
-                      })
-                      chordsToApply.push({
-                        id: `guitar-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
-                        root: chordData.root,
-                        chord: chordObj as GuitarChord | BassChord,
-                        displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
-                        noteKeys: noteKeys,
-                        notes: chordNotes,
-                        fretZone: boxIndex,
-                      })
-                    }
-                  }
-                })
-                if (chordsToApply.length > 0) {
-                  scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-                }
-              } else if (data.instrument === 'bass') {
-                const chordsToApply: AppliedChord[] = []
-                selectionData.appliedChords.forEach((chordData: SerializedChordData) => {
-                  let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-                  baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
-                  const chordObj = BASS_CHORDS.find(
-                    c => c.name === baseChordName || c.name === chordData.chordName
-                  )
-                  if (chordObj) {
-                    const chordBoxes = getBassChordBoxes(chordData.root, chordObj, bassNotes)
-                    if (chordBoxes.length > 0) {
-                      const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
-                      const chordBox = chordBoxes[boxIndex]
-                      const noteKeys: string[] = []
-                      const chordNotes: Note[] = []
-                      chordBox.positions.forEach(pos => {
-                        const stringIndex = 4 - pos.string
-                        const fretIndex = pos.fret
-                        const noteKey =
-                          fretIndex === 0
-                            ? `${stringIndex}-open`
-                            : `${stringIndex}-${fretIndex - 1}`
-                        noteKeys.push(noteKey)
-                        // Find the bass note for this position
-                        const bassNote = bassNotes.find(
-                          n => n.string === pos.string && n.fret === pos.fret
-                        )
-                        if (bassNote) {
-                          chordNotes.push({
-                            id: `b-s${pos.string}-f${pos.fret}`,
-                            name: bassNote.name,
-                            frequency: bassNote.frequency,
-                            isBlack: bassNote.name.includes('#'),
-                            position: stringIndex * 100 + (fretIndex > 0 ? fretIndex - 1 : -1),
-                            __bassCoord: { stringIndex, fretIndex: pos.fret },
-                          } as Note)
-                        }
-                      })
-                      chordsToApply.push({
-                        id: `bass-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
-                        root: chordData.root,
-                        chord: chordObj as GuitarChord | BassChord,
-                        displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
-                        noteKeys: noteKeys,
-                        notes: chordNotes,
-                        fretZone: boxIndex,
-                      })
-                    }
-                  }
-                })
-                if (chordsToApply.length > 0) {
-                  scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-                }
+              } else {
+                const chords = buildChordsForInstrument(
+                  data.instrument,
+                  selectionData.appliedChords
+                )
+                if (chords.length > 0) scaleChordManagement.setAppliedChordsDirectly(chords)
               }
             }
 
@@ -1310,86 +1021,9 @@ function Classroom() {
                 )
               }
             })
-          } else if (targetInstrument === 'guitar') {
-            const scalesToApply: AppliedScale[] = []
-            firstExercise.appliedScales.forEach((scaleData: SerializedScaleData) => {
-              const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
-              const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-              const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-              const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-              const scaleObj = GUITAR_SCALES.find(
-                s => s.name === baseScaleName || s.name === scaleData.scaleName
-              )
-              if (scaleObj) {
-                const allPositions = getScalePositions(scaleData.root, scaleObj, guitarNotes)
-                const positions = allPositions.filter(
-                  pos => pos.fret >= fretLow && pos.fret <= fretHigh
-                )
-                const scaleNotes = positions.map(pos => {
-                  const noteId = `g-s${pos.string}-f${pos.fret}`
-                  const guitarNote = getGuitarNoteById(noteId)
-                  return {
-                    id: noteId,
-                    name: pos.note,
-                    frequency: guitarNote?.frequency || 0,
-                    isBlack: pos.note.includes('#'),
-                    position: guitarNote?.position || 0,
-                    __guitarCoord: { stringIndex: 6 - pos.string, fretIndex: pos.fret },
-                  }
-                })
-                const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-                scalesToApply.push({
-                  id: `guitar-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                  root: scaleData.root,
-                  scale: scaleObj,
-                  displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                  notes: scaleNotes,
-                })
-              }
-            })
-            if (scalesToApply.length > 0) {
-              scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-            }
-          } else if (targetInstrument === 'bass') {
-            const scalesToApply: AppliedScale[] = []
-            firstExercise.appliedScales.forEach((scaleData: SerializedScaleData) => {
-              const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
-              const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-              const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-              const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-              const scaleObj = BASS_SCALES.find(
-                s => s.name === baseScaleName || s.name === scaleData.scaleName
-              )
-              if (scaleObj) {
-                const allPositions = getBassScalePositions(scaleData.root, scaleObj, bassNotes)
-                const positions = allPositions.filter(
-                  pos => pos.fret >= fretLow && pos.fret <= fretHigh
-                )
-                const scaleNotes = positions.map(pos => {
-                  const noteId = `b-s${pos.string}-f${pos.fret}`
-                  const bassNote = getBassNoteById(noteId)
-                  return {
-                    id: noteId,
-                    name: pos.note,
-                    frequency: bassNote?.frequency || 0,
-                    isBlack: pos.note.includes('#'),
-                    position: bassNote?.position || 0,
-                    __bassCoord: { stringIndex: 4 - pos.string, fretIndex: pos.fret },
-                  }
-                })
-                const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-                scalesToApply.push({
-                  id: `bass-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                  root: scaleData.root,
-                  scale: scaleObj as GuitarScale | BassScale | KeyboardScale,
-                  displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                  notes: scaleNotes,
-                })
-              }
-            })
-            if (scalesToApply.length > 0) {
-              scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-            }
+          } else {
+            const scales = buildScalesForInstrument(targetInstrument, firstExercise.appliedScales)
+            if (scales.length > 0) scaleChordManagement.setAppliedScalesDirectly(scales)
           }
         }
 
@@ -1407,66 +1041,9 @@ function Classroom() {
                 )
               }
             })
-          } else if (targetInstrument === 'guitar') {
-            const chordsToApply: AppliedChord[] = []
-            firstExercise.appliedChords.forEach((chordData: SerializedChordData) => {
-              const chordBoxes = getChordBoxes(chordData.root, chordData.chordName)
-              const chordBox = chordBoxes[chordData.fretZone ?? 0] || chordBoxes[0]
-              if (chordBox) {
-                const chordNotes = chordBox.positions.map(pos => {
-                  const noteId = `g-s${pos.string}-f${pos.fret}`
-                  const guitarNote = getGuitarNoteById(noteId)
-                  return {
-                    id: noteId,
-                    name: guitarNote?.name || '',
-                    frequency: guitarNote?.frequency || 0,
-                    isBlack: guitarNote?.isBlack || false,
-                    position: guitarNote?.position || 0,
-                    __guitarCoord: { stringIndex: 6 - pos.string, fretIndex: pos.fret },
-                  }
-                })
-                chordsToApply.push({
-                  id: `guitar-${chordData.root}-${chordData.chordName}-${chordData.fretZone ?? 0}-${Date.now()}`,
-                  root: chordData.root,
-                  chord: { name: chordData.chordName, intervals: [] },
-                  displayName: chordData.displayName || `${chordData.root} ${chordData.chordName}`,
-                  notes: chordNotes,
-                })
-              }
-            })
-            if (chordsToApply.length > 0) {
-              scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-            }
-          } else if (targetInstrument === 'bass') {
-            const chordsToApply: AppliedChord[] = []
-            firstExercise.appliedChords.forEach((chordData: SerializedChordData) => {
-              const chordBoxes = getBassChordBoxes(chordData.root, chordData.chordName)
-              const chordBox = chordBoxes[chordData.fretZone ?? 0] || chordBoxes[0]
-              if (chordBox) {
-                const chordNotes = chordBox.positions.map(pos => {
-                  const noteId = `b-s${pos.string}-f${pos.fret}`
-                  const bassNote = getBassNoteById(noteId)
-                  return {
-                    id: noteId,
-                    name: bassNote?.name || '',
-                    frequency: bassNote?.frequency || 0,
-                    isBlack: bassNote?.isBlack || false,
-                    position: bassNote?.position || 0,
-                    __bassCoord: { stringIndex: 4 - pos.string, fretIndex: pos.fret },
-                  }
-                })
-                chordsToApply.push({
-                  id: `bass-${chordData.root}-${chordData.chordName}-${chordData.fretZone ?? 0}-${Date.now()}`,
-                  root: chordData.root,
-                  chord: { name: chordData.chordName, intervals: [] },
-                  displayName: chordData.displayName || `${chordData.root} ${chordData.chordName}`,
-                  notes: chordNotes,
-                })
-              }
-            })
-            if (chordsToApply.length > 0) {
-              scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-            }
+          } else {
+            const chords = buildChordsForInstrument(targetInstrument, firstExercise.appliedChords)
+            if (chords.length > 0) scaleChordManagement.setAppliedChordsDirectly(chords)
           }
         }
 
@@ -1540,86 +1117,9 @@ function Classroom() {
                 )
               }
             })
-          } else if (targetInstrument === 'guitar') {
-            const scalesToApply: AppliedScale[] = []
-            legacyExercise.appliedScales.forEach((scaleData: SerializedScaleData) => {
-              const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
-              const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-              const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-              const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-              const scaleObj = GUITAR_SCALES.find(
-                s => s.name === baseScaleName || s.name === scaleData.scaleName
-              )
-              if (scaleObj) {
-                const allPositions = getScalePositions(scaleData.root, scaleObj, guitarNotes)
-                const positions = allPositions.filter(
-                  pos => pos.fret >= fretLow && pos.fret <= fretHigh
-                )
-                const scaleNotes = positions.map(pos => {
-                  const noteId = `g-s${pos.string}-f${pos.fret}`
-                  const guitarNote = getGuitarNoteById(noteId)
-                  return {
-                    id: noteId,
-                    name: pos.note,
-                    frequency: guitarNote?.frequency || 0,
-                    isBlack: pos.note.includes('#'),
-                    position: guitarNote?.position || 0,
-                    __guitarCoord: { stringIndex: 6 - pos.string, fretIndex: pos.fret },
-                  }
-                })
-                const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-                scalesToApply.push({
-                  id: `guitar-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                  root: scaleData.root,
-                  scale: scaleObj,
-                  displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                  notes: scaleNotes,
-                })
-              }
-            })
-            if (scalesToApply.length > 0) {
-              scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-            }
-          } else if (targetInstrument === 'bass') {
-            const scalesToApply: AppliedScale[] = []
-            legacyExercise.appliedScales.forEach((scaleData: SerializedScaleData) => {
-              const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
-              const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-              const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-              const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-              const scaleObj = BASS_SCALES.find(
-                s => s.name === baseScaleName || s.name === scaleData.scaleName
-              )
-              if (scaleObj) {
-                const allPositions = getBassScalePositions(scaleData.root, scaleObj, bassNotes)
-                const positions = allPositions.filter(
-                  pos => pos.fret >= fretLow && pos.fret <= fretHigh
-                )
-                const scaleNotes = positions.map(pos => {
-                  const noteId = `b-s${pos.string}-f${pos.fret}`
-                  const bassNote = getBassNoteById(noteId)
-                  return {
-                    id: noteId,
-                    name: pos.note,
-                    frequency: bassNote?.frequency || 0,
-                    isBlack: pos.note.includes('#'),
-                    position: bassNote?.position || 0,
-                    __bassCoord: { stringIndex: 4 - pos.string, fretIndex: pos.fret },
-                  }
-                })
-                const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-                scalesToApply.push({
-                  id: `bass-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                  root: scaleData.root,
-                  scale: scaleObj as GuitarScale | BassScale | KeyboardScale,
-                  displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                  notes: scaleNotes,
-                })
-              }
-            })
-            if (scalesToApply.length > 0) {
-              scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-            }
+          } else {
+            const scales = buildScalesForInstrument(targetInstrument, legacyExercise.appliedScales)
+            if (scales.length > 0) scaleChordManagement.setAppliedScalesDirectly(scales)
           }
         }
 
@@ -1637,66 +1137,9 @@ function Classroom() {
                 )
               }
             })
-          } else if (targetInstrument === 'guitar') {
-            const chordsToApply: AppliedChord[] = []
-            legacyExercise.appliedChords.forEach((chordData: SerializedChordData) => {
-              const chordBoxes = getChordBoxes(chordData.root, chordData.chordName)
-              const chordBox = chordBoxes[chordData.fretZone ?? 0] || chordBoxes[0]
-              if (chordBox) {
-                const chordNotes = chordBox.positions.map(pos => {
-                  const noteId = `g-s${pos.string}-f${pos.fret}`
-                  const guitarNote = getGuitarNoteById(noteId)
-                  return {
-                    id: noteId,
-                    name: guitarNote?.name || '',
-                    frequency: guitarNote?.frequency || 0,
-                    isBlack: guitarNote?.isBlack || false,
-                    position: guitarNote?.position || 0,
-                    __guitarCoord: { stringIndex: 6 - pos.string, fretIndex: pos.fret },
-                  }
-                })
-                chordsToApply.push({
-                  id: `guitar-${chordData.root}-${chordData.chordName}-${chordData.fretZone ?? 0}-${Date.now()}`,
-                  root: chordData.root,
-                  chord: { name: chordData.chordName, intervals: [] },
-                  displayName: chordData.displayName || `${chordData.root} ${chordData.chordName}`,
-                  notes: chordNotes,
-                })
-              }
-            })
-            if (chordsToApply.length > 0) {
-              scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-            }
-          } else if (targetInstrument === 'bass') {
-            const chordsToApply: AppliedChord[] = []
-            legacyExercise.appliedChords.forEach((chordData: SerializedChordData) => {
-              const chordBoxes = getBassChordBoxes(chordData.root, chordData.chordName)
-              const chordBox = chordBoxes[chordData.fretZone ?? 0] || chordBoxes[0]
-              if (chordBox) {
-                const chordNotes = chordBox.positions.map(pos => {
-                  const noteId = `b-s${pos.string}-f${pos.fret}`
-                  const bassNote = getBassNoteById(noteId)
-                  return {
-                    id: noteId,
-                    name: bassNote?.name || '',
-                    frequency: bassNote?.frequency || 0,
-                    isBlack: bassNote?.isBlack || false,
-                    position: bassNote?.position || 0,
-                    __bassCoord: { stringIndex: 4 - pos.string, fretIndex: pos.fret },
-                  }
-                })
-                chordsToApply.push({
-                  id: `bass-${chordData.root}-${chordData.chordName}-${chordData.fretZone ?? 0}-${Date.now()}`,
-                  root: chordData.root,
-                  chord: { name: chordData.chordName, intervals: [] },
-                  displayName: chordData.displayName || `${chordData.root} ${chordData.chordName}`,
-                  notes: chordNotes,
-                })
-              }
-            })
-            if (chordsToApply.length > 0) {
-              scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-            }
+          } else {
+            const chords = buildChordsForInstrument(targetInstrument, legacyExercise.appliedChords)
+            if (chords.length > 0) scaleChordManagement.setAppliedChordsDirectly(chords)
           }
         }
 
@@ -1925,88 +1368,12 @@ function Classroom() {
                   )
                 }
               })
-            } else if (targetInstrument === 'guitar') {
-              const scalesToApply: AppliedScale[] = []
-              targetExercise.appliedScales.forEach(scaleData => {
-                // Extract fret range from displayName (e.g., "C Major (Frets 0-12)")
-                const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
-                const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-                const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-                const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-                const scaleObj = GUITAR_SCALES.find(
-                  s => s.name === baseScaleName || s.name === scaleData.scaleName
-                )
-                if (scaleObj) {
-                  const allPositions = getScalePositions(scaleData.root, scaleObj, guitarNotes)
-                  const positions = allPositions.filter(
-                    pos => pos.fret >= fretLow && pos.fret <= fretHigh
-                  )
-                  const scaleNotes = positions.map(pos => {
-                    const noteId = `g-s${pos.string}-f${pos.fret}`
-                    const guitarNote = getGuitarNoteById(noteId)
-                    return {
-                      id: noteId,
-                      name: pos.note,
-                      frequency: guitarNote?.frequency || 0,
-                      isBlack: pos.note.includes('#'),
-                      position: guitarNote?.position || 0,
-                      __guitarCoord: { stringIndex: 6 - pos.string, fretIndex: pos.fret },
-                    }
-                  })
-                  const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-                  scalesToApply.push({
-                    id: `guitar-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                    root: scaleData.root,
-                    scale: scaleObj,
-                    displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                    notes: scaleNotes,
-                  })
-                }
-              })
-              if (scalesToApply.length > 0) {
-                scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-              }
-            } else if (targetInstrument === 'bass') {
-              const scalesToApply: AppliedScale[] = []
-              targetExercise.appliedScales.forEach(scaleData => {
-                // Extract fret range from displayName (e.g., "C Major (Frets 0-12)")
-                const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
-                const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-                const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-                const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-                const scaleObj = BASS_SCALES.find(
-                  s => s.name === baseScaleName || s.name === scaleData.scaleName
-                )
-                if (scaleObj) {
-                  const allPositions = getBassScalePositions(scaleData.root, scaleObj, bassNotes)
-                  const positions = allPositions.filter(
-                    pos => pos.fret >= fretLow && pos.fret <= fretHigh
-                  )
-                  const scaleNotes = positions.map(pos => {
-                    const noteId = `b-s${pos.string}-f${pos.fret}`
-                    const bassNote = getBassNoteById(noteId)
-                    return {
-                      id: noteId,
-                      name: pos.note,
-                      frequency: bassNote?.frequency || 0,
-                      isBlack: pos.note.includes('#'),
-                      position: bassNote?.position || 0,
-                      __bassCoord: { stringIndex: 4 - pos.string, fretIndex: pos.fret },
-                    }
-                  })
-                  const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-                  scalesToApply.push({
-                    id: `bass-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                    root: scaleData.root,
-                    scale: scaleObj as GuitarScale | BassScale | KeyboardScale,
-                    displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                    notes: scaleNotes,
-                  })
-                }
-              })
-              if (scalesToApply.length > 0) {
-                scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-              }
+            } else {
+              const scales = buildScalesForInstrument(
+                targetInstrument,
+                targetExercise.appliedScales
+              )
+              if (scales.length > 0) scaleChordManagement.setAppliedScalesDirectly(scales)
             }
           }
 
@@ -2024,74 +1391,12 @@ function Classroom() {
                   )
                 }
               })
-            } else if (targetInstrument === 'guitar') {
-              const chordsToApply: AppliedChord[] = []
-              targetExercise.appliedChords.forEach(chordData => {
-                let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-                baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
-                const chordObj = GUITAR_CHORDS.find(
-                  c => c.name === baseChordName || c.name === chordData.chordName
-                )
-                if (chordObj) {
-                  const chordBoxes = getChordBoxes(chordData.root, chordObj, guitarNotes)
-                  if (chordBoxes.length > 0) {
-                    const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
-                    const chordBox = chordBoxes[boxIndex]
-                    const noteKeys = chordBox.positions.map(pos => {
-                      const stringIndex = 6 - pos.string
-                      const fretIndex = pos.fret
-                      return fretIndex === 0
-                        ? `${stringIndex}-open`
-                        : `${stringIndex}-${fretIndex - 1}`
-                    })
-                    chordsToApply.push({
-                      id: `guitar-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
-                      root: chordData.root,
-                      chord: chordObj as GuitarChord | BassChord,
-                      displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
-                      noteKeys: noteKeys,
-                      fretZone: boxIndex,
-                    })
-                  }
-                }
-              })
-              if (chordsToApply.length > 0) {
-                scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-              }
-            } else if (targetInstrument === 'bass') {
-              const chordsToApply: AppliedChord[] = []
-              targetExercise.appliedChords.forEach(chordData => {
-                let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-                baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
-                const chordObj = BASS_CHORDS.find(
-                  c => c.name === baseChordName || c.name === chordData.chordName
-                )
-                if (chordObj) {
-                  const chordBoxes = getBassChordBoxes(chordData.root, chordObj, bassNotes)
-                  if (chordBoxes.length > 0) {
-                    const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
-                    const chordBox = chordBoxes[boxIndex]
-                    const noteKeys = chordBox.positions.map(pos => {
-                      const stringIndex = 4 - pos.string
-                      const fretIndex = pos.fret
-                      return fretIndex === 0
-                        ? `${stringIndex}-open`
-                        : `${stringIndex}-${fretIndex - 1}`
-                    })
-                    chordsToApply.push({
-                      id: `bass-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
-                      root: chordData.root,
-                      chord: chordObj as GuitarChord | BassChord,
-                      displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
-                      noteKeys: noteKeys,
-                      fretZone: boxIndex,
-                    })
-                  }
-                }
-              })
-              if (chordsToApply.length > 0) {
-                scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-              }
+            } else {
+              const chords = buildChordsForInstrument(
+                targetInstrument,
+                targetExercise.appliedChords
+              )
+              if (chords.length > 0) scaleChordManagement.setAppliedChordsDirectly(chords)
             }
           }
 
@@ -2232,86 +1537,12 @@ function Classroom() {
                   )
                 }
               })
-            } else if (targetInstrument === 'guitar') {
-              const scalesToApply: AppliedScale[] = []
-              targetExercise.appliedScales.forEach((scaleData: SerializedScaleData) => {
-                const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
-                const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-                const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-                const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-                const scaleObj = GUITAR_SCALES.find(
-                  s => s.name === baseScaleName || s.name === scaleData.scaleName
-                )
-                if (scaleObj) {
-                  const allPositions = getScalePositions(scaleData.root, scaleObj, guitarNotes)
-                  const positions = allPositions.filter(
-                    pos => pos.fret >= fretLow && pos.fret <= fretHigh
-                  )
-                  const scaleNotes = positions.map(pos => {
-                    const noteId = `g-s${pos.string}-f${pos.fret}`
-                    const guitarNote = getGuitarNoteById(noteId)
-                    return {
-                      id: noteId,
-                      name: pos.note,
-                      frequency: guitarNote?.frequency || 0,
-                      isBlack: pos.note.includes('#'),
-                      position: guitarNote?.position || 0,
-                      __guitarCoord: { stringIndex: 6 - pos.string, fretIndex: pos.fret },
-                    }
-                  })
-                  const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-                  scalesToApply.push({
-                    id: `guitar-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                    root: scaleData.root,
-                    scale: scaleObj,
-                    displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                    notes: scaleNotes,
-                  })
-                }
-              })
-              if (scalesToApply.length > 0) {
-                scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-              }
-            } else if (targetInstrument === 'bass') {
-              const scalesToApply: AppliedScale[] = []
-              targetExercise.appliedScales.forEach((scaleData: SerializedScaleData) => {
-                const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
-                const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-                const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-                const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-                const scaleObj = BASS_SCALES.find(
-                  s => s.name === baseScaleName || s.name === scaleData.scaleName
-                )
-                if (scaleObj) {
-                  const allPositions = getBassScalePositions(scaleData.root, scaleObj, bassNotes)
-                  const positions = allPositions.filter(
-                    pos => pos.fret >= fretLow && pos.fret <= fretHigh
-                  )
-                  const scaleNotes = positions.map(pos => {
-                    const noteId = `b-s${pos.string}-f${pos.fret}`
-                    const bassNote = getBassNoteById(noteId)
-                    return {
-                      id: noteId,
-                      name: pos.note,
-                      frequency: bassNote?.frequency || 0,
-                      isBlack: pos.note.includes('#'),
-                      position: bassNote?.position || 0,
-                      __bassCoord: { stringIndex: 4 - pos.string, fretIndex: pos.fret },
-                    }
-                  })
-                  const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-                  scalesToApply.push({
-                    id: `bass-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                    root: scaleData.root,
-                    scale: scaleObj as GuitarScale | BassScale | KeyboardScale,
-                    displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                    notes: scaleNotes,
-                  })
-                }
-              })
-              if (scalesToApply.length > 0) {
-                scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-              }
+            } else {
+              const scales = buildScalesForInstrument(
+                targetInstrument,
+                targetExercise.appliedScales
+              )
+              if (scales.length > 0) scaleChordManagement.setAppliedScalesDirectly(scales)
             }
           }
 
@@ -2329,68 +1560,12 @@ function Classroom() {
                   )
                 }
               })
-            } else if (targetInstrument === 'guitar') {
-              const chordsToApply: AppliedChord[] = []
-              targetExercise.appliedChords.forEach((chordData: SerializedChordData) => {
-                const chordBoxes = getChordBoxes(chordData.root, chordData.chordName)
-                const chordBox = chordBoxes[chordData.fretZone ?? 0] || chordBoxes[0]
-                if (chordBox) {
-                  const chordNotes = chordBox.positions.map(pos => {
-                    const noteId = `g-s${pos.string}-f${pos.fret}`
-                    const guitarNote = getGuitarNoteById(noteId)
-                    return {
-                      id: noteId,
-                      name: guitarNote?.name || '',
-                      frequency: guitarNote?.frequency || 0,
-                      isBlack: guitarNote?.isBlack || false,
-                      position: guitarNote?.position || 0,
-                      __guitarCoord: { stringIndex: 6 - pos.string, fretIndex: pos.fret },
-                    }
-                  })
-                  chordsToApply.push({
-                    id: `guitar-${chordData.root}-${chordData.chordName}-${chordData.fretZone ?? 0}-${Date.now()}`,
-                    root: chordData.root,
-                    chord: { name: chordData.chordName, intervals: [] },
-                    displayName:
-                      chordData.displayName || `${chordData.root} ${chordData.chordName}`,
-                    notes: chordNotes,
-                  })
-                }
-              })
-              if (chordsToApply.length > 0) {
-                scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-              }
-            } else if (targetInstrument === 'bass') {
-              const chordsToApply: AppliedChord[] = []
-              targetExercise.appliedChords.forEach((chordData: SerializedChordData) => {
-                const chordBoxes = getBassChordBoxes(chordData.root, chordData.chordName)
-                const chordBox = chordBoxes[chordData.fretZone ?? 0] || chordBoxes[0]
-                if (chordBox) {
-                  const chordNotes = chordBox.positions.map(pos => {
-                    const noteId = `b-s${pos.string}-f${pos.fret}`
-                    const bassNote = getBassNoteById(noteId)
-                    return {
-                      id: noteId,
-                      name: bassNote?.name || '',
-                      frequency: bassNote?.frequency || 0,
-                      isBlack: bassNote?.isBlack || false,
-                      position: bassNote?.position || 0,
-                      __bassCoord: { stringIndex: 4 - pos.string, fretIndex: pos.fret },
-                    }
-                  })
-                  chordsToApply.push({
-                    id: `bass-${chordData.root}-${chordData.chordName}-${chordData.fretZone ?? 0}-${Date.now()}`,
-                    root: chordData.root,
-                    chord: { name: chordData.chordName, intervals: [] },
-                    displayName:
-                      chordData.displayName || `${chordData.root} ${chordData.chordName}`,
-                    notes: chordNotes,
-                  })
-                }
-              })
-              if (chordsToApply.length > 0) {
-                scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-              }
+            } else {
+              const chords = buildChordsForInstrument(
+                targetInstrument,
+                targetExercise.appliedChords
+              )
+              if (chords.length > 0) scaleChordManagement.setAppliedChordsDirectly(chords)
             }
           }
 
@@ -3698,157 +2873,15 @@ function Classroom() {
     const applyTimeoutId = setTimeout(() => {
       // Apply scales
       if (selectionData.appliedScales?.length > 0) {
-        const scalesToApply: AppliedScale[] = []
-
-        if (pendingInstrument === 'guitar') {
-          selectionData.appliedScales.forEach((scaleData: SerializedScaleData) => {
-            // Extract fret range from displayName (e.g., "C Major (Frets 0-12)")
-            const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
-            const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-            const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-            const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-            const scaleObj = GUITAR_SCALES.find(
-              s => s.name === baseScaleName || s.name === scaleData.scaleName
-            )
-            if (scaleObj) {
-              const allPositions = getScalePositions(scaleData.root, scaleObj, guitarNotes)
-              const positions = allPositions.filter(
-                pos => pos.fret >= fretLow && pos.fret <= fretHigh
-              )
-              const scaleNotes = positions.map(pos => {
-                const noteId = `g-s${pos.string}-f${pos.fret}`
-                const guitarNote = getGuitarNoteById(noteId)
-                return {
-                  id: noteId,
-                  name: pos.note,
-                  frequency: guitarNote?.frequency || 0,
-                  isBlack: pos.note.includes('#'),
-                  position: guitarNote?.position || 0,
-                  __guitarCoord: { stringIndex: 6 - pos.string, fretIndex: pos.fret },
-                }
-              })
-              const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-              scalesToApply.push({
-                id: `guitar-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                root: scaleData.root,
-                scale: scaleObj,
-                displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                notes: scaleNotes,
-              })
-            }
-          })
-        } else if (pendingInstrument === 'bass') {
-          selectionData.appliedScales.forEach((scaleData: SerializedScaleData) => {
-            // Extract fret range from displayName (e.g., "C Major (Frets 0-12)")
-            const fretRangeMatch = (scaleData.displayName || '').match(/\(Frets (\d+)-(\d+)\)$/)
-            const baseScaleName = scaleData.scaleName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-            const fretLow = fretRangeMatch ? parseInt(fretRangeMatch[1], 10) : 0
-            const fretHigh = fretRangeMatch ? parseInt(fretRangeMatch[2], 10) : 24
-            const scaleObj = BASS_SCALES.find(
-              s => s.name === baseScaleName || s.name === scaleData.scaleName
-            )
-            if (scaleObj) {
-              const allPositions = getBassScalePositions(scaleData.root, scaleObj, bassNotes)
-              const positions = allPositions.filter(
-                pos => pos.fret >= fretLow && pos.fret <= fretHigh
-              )
-              const scaleNotes = positions.map(pos => {
-                const noteId = `b-s${pos.string}-f${pos.fret}`
-                const bassNote = getBassNoteById(noteId)
-                return {
-                  id: noteId,
-                  name: pos.note,
-                  frequency: bassNote?.frequency || 0,
-                  isBlack: pos.note.includes('#'),
-                  position: bassNote?.position || 0,
-                  __bassCoord: { stringIndex: 4 - pos.string, fretIndex: pos.fret },
-                }
-              })
-              const fretInfo = fretRangeMatch ? ` (Frets ${fretLow}-${fretHigh})` : ''
-              scalesToApply.push({
-                id: `bass-${scaleData.root}-${scaleObj.name}-${Date.now()}`,
-                root: scaleData.root,
-                scale: scaleObj as GuitarScale | BassScale | KeyboardScale,
-                displayName: `${scaleData.root} ${scaleObj.name}${fretInfo}`,
-                notes: scaleNotes,
-              })
-            }
-          })
-        }
-
-        if (scalesToApply.length > 0) {
-          scaleChordManagement.setAppliedScalesDirectly(scalesToApply)
-        }
+        const scales = buildScalesForInstrument(pendingInstrument, selectionData.appliedScales)
+        if (scales.length > 0) scaleChordManagement.setAppliedScalesDirectly(scales)
       }
 
       // Apply chords
       if (selectionData.appliedChords?.length > 0) {
         setChordMode('progression')
-        const chordsToApply: AppliedChord[] = []
-
-        if (pendingInstrument === 'guitar') {
-          selectionData.appliedChords.forEach((chordData: SerializedChordData) => {
-            let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-            baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
-            const chordObj = GUITAR_CHORDS.find(
-              c => c.name === baseChordName || c.name === chordData.chordName
-            )
-            if (chordObj) {
-              // Compute actual chord positions
-              const chordBoxes = getChordBoxes(chordData.root, chordObj, guitarNotes)
-              if (chordBoxes.length > 0) {
-                const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
-                const chordBox = chordBoxes[boxIndex]
-                const noteKeys = chordBox.positions.map(pos => {
-                  const stringIndex = 6 - pos.string
-                  const fretIndex = pos.fret
-                  return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-                })
-                chordsToApply.push({
-                  id: `guitar-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
-                  root: chordData.root,
-                  chord: chordObj as GuitarChord | BassChord,
-                  displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
-                  noteKeys: noteKeys,
-                  fretZone: boxIndex,
-                })
-              }
-            }
-          })
-        } else if (pendingInstrument === 'bass') {
-          selectionData.appliedChords.forEach((chordData: SerializedChordData) => {
-            let baseChordName = chordData.chordName.replace(/\s*\(Frets \d+-\d+\)$/, '')
-            baseChordName = baseChordName.replace(/^[A-G][#b]?\s+/, '')
-            const chordObj = BASS_CHORDS.find(
-              c => c.name === baseChordName || c.name === chordData.chordName
-            )
-            if (chordObj) {
-              // Compute actual chord positions
-              const chordBoxes = getBassChordBoxes(chordData.root, chordObj, bassNotes)
-              if (chordBoxes.length > 0) {
-                const boxIndex = Math.min(chordData.fretZone || 0, chordBoxes.length - 1)
-                const chordBox = chordBoxes[boxIndex]
-                const noteKeys = chordBox.positions.map(pos => {
-                  const stringIndex = 4 - pos.string
-                  const fretIndex = pos.fret
-                  return fretIndex === 0 ? `${stringIndex}-open` : `${stringIndex}-${fretIndex - 1}`
-                })
-                chordsToApply.push({
-                  id: `bass-${chordData.root}-${chordObj.name}-${Date.now()}-${Math.random()}`,
-                  root: chordData.root,
-                  chord: chordObj as GuitarChord | BassChord,
-                  displayName: `${chordData.root} ${chordObj.name} (Frets ${chordBox.minFret}-${chordBox.maxFret})`,
-                  noteKeys: noteKeys,
-                  fretZone: boxIndex,
-                })
-              }
-            }
-          })
-        }
-
-        if (chordsToApply.length > 0) {
-          scaleChordManagement.setAppliedChordsDirectly(chordsToApply)
-        }
+        const chords = buildChordsForInstrument(pendingInstrument, selectionData.appliedChords)
+        if (chords.length > 0) scaleChordManagement.setAppliedChordsDirectly(chords)
       }
 
       // Apply notes - set external note IDs for Guitar/Bass to sync from

@@ -1,4 +1,5 @@
 import { GUITAR_SCALES, ROOT_NOTES, getScaleNotes, type GuitarScale } from '../guitar/guitarScales'
+import { stripOctave, isNoteInNoteSet } from '../../musicTheory'
 import type { Note } from '../../notes'
 
 /**
@@ -17,10 +18,7 @@ export const applyScaleToKeyboard = (
   const keyboardScaleNotes: Note[] = []
 
   availableNotes.forEach(note => {
-    // Remove octave number from note name for comparison (e.g., "C4" becomes "C")
-    const noteNameWithoutOctave = note.name.replace(/\d+$/, '')
-
-    if (scaleNotes.includes(noteNameWithoutOctave)) {
+    if (isNoteInNoteSet(note.name, scaleNotes)) {
       keyboardScaleNotes.push(note)
     }
   })
@@ -40,9 +38,7 @@ export const isKeyboardNoteInScale = (
   rootNote: string,
   scale: GuitarScale
 ): boolean => {
-  const scaleNotes = getScaleNotes(rootNote, scale)
-  const noteNameWithoutOctave = note.name.replace(/\d+$/, '')
-  return scaleNotes.includes(noteNameWithoutOctave)
+  return isNoteInNoteSet(note.name, getScaleNotes(rootNote, scale))
 }
 
 /**
@@ -52,8 +48,7 @@ export const isKeyboardNoteInScale = (
  * @returns True if the note is the root note
  */
 export const isKeyboardNoteRoot = (note: Note, rootNote: string): boolean => {
-  const noteNameWithoutOctave = note.name.replace(/\d+$/, '')
-  return noteNameWithoutOctave === rootNote
+  return stripOctave(note.name) === rootNote
 }
 
 // Re-export guitar scales and utilities for keyboard use

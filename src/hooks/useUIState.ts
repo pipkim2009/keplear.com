@@ -104,6 +104,13 @@ export const useUIState = (): UseUIStateReturn => {
 
   const navigateToProfile = useCallback(
     (userId?: string) => {
+      // Validate UUID format if provided
+      if (
+        userId &&
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)
+      ) {
+        return
+      }
       setProfileUserId(userId || null)
       const path = userId ? `/profile/${userId}` : '/profile'
       navigateWithUrl('profile', path)
